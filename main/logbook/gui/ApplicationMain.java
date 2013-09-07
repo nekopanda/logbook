@@ -95,7 +95,7 @@ public final class ApplicationMain {
         final Display display = Display.getDefault();
         this.shell = new Shell(SWT.SHELL_TRIM | getConfig().getOnTop());
         this.shell.setSize(getConfig().getWidth(), getConfig().getHeight());
-        this.shell.setText("航海日誌");
+        this.shell.setText("航海日誌 " + GlobalConfig.VERSION);
         this.shell.setLayout(new GridLayout(1, false));
 
         // トレイアイコンを追加します
@@ -188,7 +188,7 @@ public final class ApplicationMain {
             }
         });
         Button itemList = new Button(command, SWT.PUSH);
-        itemList.setText("所有装備一覧");
+        itemList.setText("所有装備一覧(0)");
         itemList.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent paramSelectionEvent) {
@@ -207,22 +207,22 @@ public final class ApplicationMain {
             }
         });
         Button shipList = new Button(command, SWT.PUSH);
-        shipList.setText("所有艦娘一覧");
+        shipList.setText("所有艦娘一覧(0)");
         shipList.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent paramSelectionEvent) {
                 Set<Entry<String, ShipDto>> ships = GlobalContext.getShipMap().entrySet();
-                String[] header = { "艦娘ID", "艦隊", "名前", "Lv", "疲", "経験値", "HP", "装備1", "装備2", "装備3", "装備4", "火力", "雷装",
+                String[] header = { "艦娘ID", "艦隊", "疲", "名前", "Lv", "経験値", "HP", "装備1", "装備2", "装備3", "装備4", "火力", "雷装",
                         "対空",
                         "装甲", "回避", "対潜", "索敵", "運" };
                 List<Object[]> body = new ArrayList<Object[]>();
                 for (Entry<String, ShipDto> entry : ships) {
                     ShipDto ship = entry.getValue();
-                    body.add(new Object[] { ship.getId(), ship.getFleetid(), ship.getName(), ship.getLv(),
-                            ship.getCond(), ship.getExp(), ship.getMaxhp(), ship.getSlot().get(0),
-                            ship.getSlot().get(1), ship.getSlot().get(2), ship.getSlot().get(3), ship.getKaryoku(),
-                            ship.getRaisou(), ship.getTaiku(), ship.getSoukou(), ship.getKaihi(), ship.getTaisen(),
-                            ship.getSakuteki(), ship.getLucky() });
+                    body.add(new Object[] { ship.getId(), ship.getFleetid(), ship.getCond(), ship.getName(),
+                            ship.getLv(), ship.getExp(), ship.getMaxhp(), ship.getSlot().get(0), ship.getSlot().get(1),
+                            ship.getSlot().get(2), ship.getSlot().get(3), ship.getKaryoku(), ship.getRaisou(),
+                            ship.getTaiku(), ship.getSoukou(), ship.getKaihi(), ship.getTaisen(), ship.getSakuteki(),
+                            ship.getLucky() });
                 }
                 new TableDialog(ApplicationMain.this.shell, "所有艦娘一覧", header, body).open();
             }
@@ -330,9 +330,9 @@ public final class ApplicationMain {
         console.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
 
         // 非同期で画面を更新するスレッド
-        Thread asyncExecUpdateThread = new AsyncExecApplicationMain(display, this.shell, item, deckNotice, deck1name,
-                deck1time, deck2name, deck2time, deck3name, deck3time, ndockNotice, ndock1name, ndock1time, ndock2name,
-                ndock2time, ndock3name, ndock3time, ndock4name, ndock4time);
+        Thread asyncExecUpdateThread = new AsyncExecApplicationMain(display, this.shell, item, itemList, shipList,
+                deckNotice, deck1name, deck1time, deck2name, deck2time, deck3name, deck3time, ndockNotice, ndock1name,
+                ndock1time, ndock2name, ndock2time, ndock3name, ndock3time, ndock4name, ndock4time);
         asyncExecUpdateThread.setDaemon(true);
         asyncExecUpdateThread.start();
         // 非同期でログを出すスレッド

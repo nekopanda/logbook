@@ -35,6 +35,8 @@ public final class AsyncExecApplicationMain extends Thread {
     private final Shell shell;
     private final TrayItem item;
 
+    private final Button itemList;
+    private final Button shipList;
     private final Button deckNotice;
     private final Label deck1name;
     private final Text deck1time;
@@ -61,15 +63,14 @@ public final class AsyncExecApplicationMain extends Thread {
      * @param display
      * @param shell
      * @param item
+     * @param itemList
+     * @param shipList
      * @param deckNotice
      * @param deck1name
-     * @param deck1mission
      * @param deck1time
      * @param deck2name
-     * @param deck2mission
      * @param deck2time
      * @param deck3name
-     * @param deck3mission
      * @param deck3time
      * @param ndockNotice
      * @param ndock1name
@@ -81,14 +82,16 @@ public final class AsyncExecApplicationMain extends Thread {
      * @param ndock4name
      * @param ndock4time
      */
-    public AsyncExecApplicationMain(Display display, Shell shell, TrayItem item, Button deckNotice, Label deck1name,
-            Text deck1time, Label deck2name, Text deck2time, Label deck3name, Text deck3time, Button ndockNotice,
-            Label ndock1name, Text ndock1time, Label ndock2name, Text ndock2time, Label ndock3name, Text ndock3time,
-            Label ndock4name, Text ndock4time) {
+    public AsyncExecApplicationMain(Display display, Shell shell, TrayItem item, Button itemList, Button shipList,
+            Button deckNotice, Label deck1name, Text deck1time, Label deck2name, Text deck2time, Label deck3name,
+            Text deck3time, Button ndockNotice, Label ndock1name, Text ndock1time, Label ndock2name, Text ndock2time,
+            Label ndock3name, Text ndock3time, Label ndock4name, Text ndock4time) {
         this.display = display;
         this.shell = shell;
         this.item = item;
 
+        this.itemList = itemList;
+        this.shipList = shipList;
         this.deckNotice = deckNotice;
         this.deck1name = deck1name;
         this.deck1time = deck1time;
@@ -127,6 +130,11 @@ public final class AsyncExecApplicationMain extends Thread {
 
                         List<String> notice = new ArrayList<String>();
 
+                        // 保有アイテム数を更新する
+                        this.updateItemCount();
+                        // 保有艦娘数を更新する
+                        this.updateShipCount();
+
                         // 遠征を更新する
                         this.updateDeck(now, notice);
                         // 入渠を更新する
@@ -144,6 +152,31 @@ public final class AsyncExecApplicationMain extends Thread {
                             }
                         } catch (Exception e) {
                             this.log.warn("お知らせの表示に失敗しました", e);
+                        }
+                    }
+
+                    /**
+                     * 保有アイテム数を更新する
+                     */
+                    private void updateItemCount() {
+                        Button itemList = AsyncExecApplicationMain.this.itemList;
+                        String setText = "所有装備一覧(" + GlobalContext.getItemMap().size() + ")";
+                        if (!setText.equals(itemList.getText())) {
+                            itemList.setText(setText);
+                            itemList.getParent().layout();
+                        }
+                    }
+
+                    /**
+                     * 保有艦娘数を更新する
+                     */
+                    private void updateShipCount() {
+                        Button itemList = AsyncExecApplicationMain.this.itemList;
+                        Button shipList = AsyncExecApplicationMain.this.shipList;
+                        String setText = "所有艦娘一覧(" + GlobalContext.getShipMap().size() + ")";
+                        if (!setText.equals(shipList.getText())) {
+                            shipList.setText(setText);
+                            shipList.getParent().layout();
                         }
                     }
 

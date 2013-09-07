@@ -22,14 +22,17 @@ import org.eclipse.swt.SWT;
  */
 public final class GlobalConfig {
 
-    /** ロガー */
-    private static final Logger LOG = LogManager.getLogger(UndefinedData.class);
-
     /** 文字コード(Shift_JIS) */
-    public static final Charset CHARSET = null;
+    public static final Charset CHARSET = Charset.forName("MS932");
 
     /** 日付書式 */
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
+    /** バージョン */
+    public static final String VERSION = "0.2.0";
+
+    /** ロガー */
+    private static final Logger LOG = LogManager.getLogger(UndefinedData.class);
 
     /** 各種設定 */
     private static final GlobalConfig CONFIG = new GlobalConfig();
