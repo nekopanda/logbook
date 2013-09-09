@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
@@ -38,16 +39,16 @@ public final class GlobalContext {
     private static final Logger LOG = LogManager.getLogger(GlobalContext.class);
 
     /** ログに表示する日付書式 */
-    private static final SimpleDateFormat FORMAT = new SimpleDateFormat(GlobalConfig.DATE_FORMAT);
+    private static final SimpleDateFormat FORMAT = new SimpleDateFormat(GlobalConfig.DATE_SHORT_FORMAT);
 
     /** 装備Map */
-    private static Map<String, ItemDto> itemMap = new HashMap<String, ItemDto>();
+    private static Map<String, ItemDto> itemMap = new ConcurrentHashMap<String, ItemDto>();
 
     /** 装備Map(敵) */
-    private static Map<String, String> enemyItemMap = new HashMap<String, String>();
+    private static Map<String, String> enemyItemMap = new ConcurrentHashMap<String, String>();
 
     /** 艦娘Map */
-    private static Map<String, ShipDto> shipMap = new HashMap<String, ShipDto>();
+    private static Map<String, ShipDto> shipMap = new ConcurrentHashMap<String, ShipDto>();
 
     /** 秘書艦 */
     private static ShipDto secretary;
@@ -122,7 +123,7 @@ public final class GlobalContext {
     private static Date ndock4time;
 
     /** ログキュー */
-    private static Queue<String> consoleQueue = new ArrayBlockingQueue<String>(100);
+    private static Queue<String> consoleQueue = new ArrayBlockingQueue<String>(10);
 
     /**
      * @return 装備Map
@@ -512,6 +513,9 @@ public final class GlobalContext {
                     ShipDto ship = shipMap.get(shipid);
                     if (ship != null) {
                         if ((i == 0) && (j == 0)) {
+                            if ((secretary == null) || (ship.getId() != secretary.getId())) {
+                                addConsole(ship.getName() + "(Lv" + ship.getLv() + ")" + " が秘書艦に任命されました");
+                            }
                             // 秘書艦を設定
                             secretary = ship;
                         }

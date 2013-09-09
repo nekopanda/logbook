@@ -28,8 +28,11 @@ public final class GlobalConfig {
     /** 日付書式 */
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
+    /** 日付書式 */
+    public static final String DATE_SHORT_FORMAT = "HH:mm:ss";
+
     /** バージョン */
-    public static final String VERSION = "0.2.0";
+    public static final String VERSION = "0.2.2";
 
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(UndefinedData.class);
@@ -69,7 +72,7 @@ public final class GlobalConfig {
         if ((width != null) && StringUtils.isNumeric(width)) {
             this.width = Integer.parseInt(width);
         } else {
-            this.width = 370;
+            this.width = 330;
         }
         // ウインドウサイズ(width)
         String height = internal.get("height");

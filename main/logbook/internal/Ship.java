@@ -256,7 +256,7 @@ public class Ship {
             this.put("237", "電改");
             this.put("238", "初春改");
             this.put("239", "子日改");
-            this.put("240", "若葉");
+            this.put("240", "若葉改");
             this.put("241", "初霜改");
             this.put("242", "白露改");
             this.put("243", "時雨改");

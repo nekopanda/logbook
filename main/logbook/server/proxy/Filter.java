@@ -35,7 +35,7 @@ public class Filter {
      * 鎮守府サーバー名を取得する
      * @param name 鎮守府サーバー名
      */
-    public static String getServerName(String name) {
+    public static String getServerName() {
         return serverName;
     }
 

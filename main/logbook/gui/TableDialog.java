@@ -3,19 +3,14 @@
  */
 package logbook.gui;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import logbook.config.GlobalConfig;
+import logbook.gui.logic.CreateReportLogic;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
@@ -42,7 +37,6 @@ import org.eclipse.swt.widgets.TableItem;
 public final class TableDialog extends Dialog {
 
     private Display display;
-    private Object result;
     private Shell shell;
 
     private final String[] header;
@@ -54,22 +48,10 @@ public final class TableDialog extends Dialog {
      * @param parent
      * @param style
      */
-    public TableDialog(Shell parent, String title, String[] header, List<Object[]> body) {
-        super(parent, SWT.SHELL_TRIM
-                | SWT.SYSTEM_MODAL);
+    public TableDialog(Shell parent, String title, String[] header, List<String[]> body) {
+        super(parent, SWT.SHELL_TRIM | SWT.MODELESS);
         this.header = header;
-        this.body = new ArrayList<String[]>();
-        for (Object[] objects : body) {
-            String[] values = new String[objects.length];
-            for (int i = 0; i < objects.length; i++) {
-                if (objects[i] != null) {
-                    values[i] = String.valueOf(objects[i]);
-                } else {
-                    values[i] = "";
-                }
-            }
-            this.body.add(values);
-        }
+        this.body = body;
 
         this.orderflgs = new boolean[header.length];
         this.setText(title);
@@ -79,7 +61,7 @@ public final class TableDialog extends Dialog {
      * Open the dialog.
      * @return the result
      */
-    public Object open() {
+    public void open() {
         this.createContents();
         this.shell.open();
         this.shell.layout();
@@ -89,7 +71,6 @@ public final class TableDialog extends Dialog {
                 this.display.sleep();
             }
         }
-        return this.result;
     }
 
     /**
@@ -122,17 +103,7 @@ public final class TableDialog extends Dialog {
                         }
                     }
                     try {
-                        OutputStream stream = new BufferedOutputStream(new FileOutputStream(file));
-                        try {
-                            IOUtils.write(StringUtils.join(TableDialog.this.header, ',') + "\r\n", stream,
-                                    GlobalConfig.CHARSET);
-                            for (String[] colums : TableDialog.this.body) {
-                                IOUtils.write(StringUtils.join(colums, ',') + "\r\n", stream,
-                                        GlobalConfig.CHARSET);
-                            }
-                        } finally {
-                            stream.close();
-                        }
+                        CreateReportLogic.writeCsv(file, TableDialog.this.header, TableDialog.this.body, false);
                     } catch (IOException e) {
                         MessageBox messageBox = new MessageBox(TableDialog.this.shell, SWT.ICON_ERROR);
                         messageBox.setText("書き込めませんでした");

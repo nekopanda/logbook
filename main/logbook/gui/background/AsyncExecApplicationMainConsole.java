@@ -1,6 +1,3 @@
-/**
- * 
- */
 package logbook.gui.background;
 
 import logbook.data.context.GlobalContext;
@@ -23,7 +20,10 @@ public final class AsyncExecApplicationMainConsole extends Thread {
     private final List console;
 
     /**
+     * 非同期にコンソールを更新します
      * 
+     * @param display
+     * @param console
      */
     public AsyncExecApplicationMainConsole(Display display, List console) {
         this.display = display;

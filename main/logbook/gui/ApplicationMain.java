@@ -1,31 +1,22 @@
 package logbook.gui;
 
 import static logbook.config.GlobalConfig.*;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import logbook.config.GlobalConfig;
-import logbook.data.context.GlobalContext;
-import logbook.dto.BattleResultDto;
-import logbook.dto.CreateItemDto;
-import logbook.dto.GetShipDto;
-import logbook.dto.ItemDto;
-import logbook.dto.ShipDto;
 import logbook.gui.background.AsyncExecApplicationMain;
 import logbook.gui.background.AsyncExecApplicationMainConsole;
+import logbook.gui.listener.CreateItemReportAdapter;
+import logbook.gui.listener.CreateShipReportAdapter;
+import logbook.gui.listener.DropReportAdapter;
+import logbook.gui.listener.HelpEventListener;
+import logbook.gui.listener.ItemListReportAdapter;
+import logbook.gui.listener.ShellEventAdapter;
+import logbook.gui.listener.ShipListReportAdapter;
+import logbook.gui.listener.TraySelectionListener;
 import logbook.server.proxy.ProxyServer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.ShellAdapter;
-import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -33,10 +24,8 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tray;
@@ -51,9 +40,7 @@ public final class ApplicationMain {
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(ApplicationMain.class);
 
-    /** 日付フォーマット */
-    private static final SimpleDateFormat FORMAT = new SimpleDateFormat(GlobalConfig.DATE_FORMAT);
-
+    /** シェル */
     private Shell shell;
 
     /**
@@ -98,135 +85,38 @@ public final class ApplicationMain {
         this.shell.setText("航海日誌 " + GlobalConfig.VERSION);
         this.shell.setLayout(new GridLayout(1, false));
 
+        // キーが押された時に呼ばれるリスナーを追加します
+        this.shell.addHelpListener(new HelpEventListener(this.shell));
+
         // トレイアイコンを追加します
         final Tray tray = display.getSystemTray();
         final TrayItem item = new TrayItem(tray, SWT.NONE);
         final Image image = display.getSystemImage(SWT.ICON_INFORMATION);
         item.setImage(image);
-        item.addListener(SWT.Selection, new Listener() {
-            /*
-             * トレイアイコンをクリックした場合の動作
-             */
-            @Override
-            public void handleEvent(Event paramEvent) {
-                ApplicationMain.this.shell.forceActive();
-            }
-        });
+        item.addListener(SWT.Selection, new TraySelectionListener(this.shell));
 
-        this.shell.addShellListener(new ShellAdapter() {
-            /*
-             * ウインドウを閉じた場合の動作
-             */
-            @Override
-            public void shellClosed(ShellEvent paramShellEvent) {
-                // プロキシサーバーをシャットダウンする
-                ProxyServer.end();
-                // トレイアイコンを削除する
-                item.dispose();
-                image.dispose();
-
-                super.shellClosed(paramShellEvent);
-            }
-        });
+        // 閉じるときに呼ばれるリスナーを追加します
+        this.shell.addShellListener(new ShellEventAdapter(item, image));
 
         // コマンドボタン
         Composite command = new Composite(this.shell, SWT.NONE);
         command.setLayout(new RowLayout());
         command.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         Button dropResult = new Button(command, SWT.PUSH);
-        dropResult.setText("海戦・ドロップ報告書");
-        dropResult.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent paramSelectionEvent) {
-                List<BattleResultDto> items = GlobalContext.getBattleResultList();
-                String[] header = { "日付", "海域", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘" };
-                List<Object[]> body = new ArrayList<Object[]>();
-
-                for (BattleResultDto item : items) {
-                    body.add(new Object[] { FORMAT.format(item.getBattleDate()), item.getQuestName(),
-                            item.getRank(), item.getEnemyName(), item.getDropType(), item.getDropName() });
-                }
-                new TableDialog(ApplicationMain.this.shell, "海戦・ドロップ報告書", header, body).open();
-            }
-        });
+        dropResult.setText("ドロップ報告書");
+        dropResult.addSelectionListener(new DropReportAdapter(this.shell));
         Button createShip = new Button(command, SWT.PUSH);
         createShip.setText("建造報告書");
-        createShip.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent paramSelectionEvent) {
-                List<GetShipDto> ships = GlobalContext.getGetshipList();
-                String[] header = { "日付", "名前", "燃料", "弾薬", "鋼材", "ボーキ", "秘書艦" };
-                List<Object[]> body = new ArrayList<Object[]>();
-                for (GetShipDto ship : ships) {
-                    body.add(new Object[] { FORMAT.format(ship.getGetDate()), ship.getName(),
-                            ship.getFuel(), ship.getAmmo(), ship.getMetal(),
-                            ship.getBauxite(), ship.getSecretary() });
-                }
-                new TableDialog(ApplicationMain.this.shell, "建造報告書", header, body).open();
-            }
-        });
+        createShip.addSelectionListener(new CreateShipReportAdapter(this.shell));
         Button createItem = new Button(command, SWT.PUSH);
-        createItem.setText("装備開発報告書");
-        createItem.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent paramSelectionEvent) {
-                List<CreateItemDto> items = GlobalContext.getCreateItemList();
-                String[] header = { "日付", "開発装備", "種別", "燃料", "弾薬", "鋼材", "ボーキ", "秘書艦" };
-                List<Object[]> body = new ArrayList<Object[]>();
-
-                for (CreateItemDto item : items) {
-                    String name = "失敗";
-                    String type = "";
-                    if (item.isCreateFlag()) {
-                        name = item.getName();
-                        type = item.getType();
-                    }
-                    body.add(new Object[] { FORMAT.format(item.getCreateDate()), name, type, item.getFuel(),
-                            item.getAmmo(), item.getMetal(), item.getBauxite(), item.getSecretary() });
-                }
-                new TableDialog(ApplicationMain.this.shell, "装備開発報告書", header, body).open();
-            }
-        });
+        createItem.setText("開発報告書");
+        createItem.addSelectionListener(new CreateItemReportAdapter(this.shell));
         Button itemList = new Button(command, SWT.PUSH);
         itemList.setText("所有装備一覧(0)");
-        itemList.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent paramSelectionEvent) {
-                Set<Entry<String, ItemDto>> items = GlobalContext.getItemMap().entrySet();
-                String[] header = { "名称", "種別", "火力", "命中", "回避", "射程", "運", "爆装", "雷装", "索敵", "対潜",
-                        "対空" };
-                List<Object[]> body = new ArrayList<Object[]>();
-                for (Entry<String, ItemDto> entry : items) {
-                    ItemDto item = entry.getValue();
-                    body.add(new Object[] { item.getName(), item.getType(), item.getHoug(), item.getHoum(),
-                            item.getKaih(), item.getLeng(), item.getLuck(), item.getBaku(), item.getRaig(),
-                            item.getSaku(), item.getTais(), item.getTyku()
-                    });
-                }
-                new TableDialog(ApplicationMain.this.shell, "所有装備一覧", header, body).open();
-            }
-        });
+        itemList.addSelectionListener(new ItemListReportAdapter(this.shell));
         Button shipList = new Button(command, SWT.PUSH);
         shipList.setText("所有艦娘一覧(0)");
-        shipList.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent paramSelectionEvent) {
-                Set<Entry<String, ShipDto>> ships = GlobalContext.getShipMap().entrySet();
-                String[] header = { "艦娘ID", "艦隊", "疲", "名前", "Lv", "経験値", "HP", "装備1", "装備2", "装備3", "装備4", "火力", "雷装",
-                        "対空",
-                        "装甲", "回避", "対潜", "索敵", "運" };
-                List<Object[]> body = new ArrayList<Object[]>();
-                for (Entry<String, ShipDto> entry : ships) {
-                    ShipDto ship = entry.getValue();
-                    body.add(new Object[] { ship.getId(), ship.getFleetid(), ship.getCond(), ship.getName(),
-                            ship.getLv(), ship.getExp(), ship.getMaxhp(), ship.getSlot().get(0), ship.getSlot().get(1),
-                            ship.getSlot().get(2), ship.getSlot().get(3), ship.getKaryoku(), ship.getRaisou(),
-                            ship.getTaiku(), ship.getSoukou(), ship.getKaihi(), ship.getTaisen(), ship.getSakuteki(),
-                            ship.getLucky() });
-                }
-                new TableDialog(ApplicationMain.this.shell, "所有艦娘一覧", header, body).open();
-            }
-        });
+        shipList.addSelectionListener(new ShipListReportAdapter(this.shell));
 
         // 遠征
         Group deckGroup = new Group(this.shell, SWT.NONE);
