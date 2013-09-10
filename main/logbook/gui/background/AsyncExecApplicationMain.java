@@ -8,6 +8,7 @@ import java.util.Map;
 
 import logbook.data.context.GlobalContext;
 import logbook.dto.ShipDto;
+import logbook.gui.logic.Sound;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -136,9 +137,13 @@ public final class AsyncExecApplicationMain extends Thread {
                         this.updateShipCount();
 
                         // 遠征を更新する
-                        this.updateDeck(now, notice);
+                        if (this.updateDeck(now, notice)) {
+                            Sound.randomExpeditionSoundPlay();
+                        }
                         // 入渠を更新する
-                        this.updateNdock(now, notice);
+                        if (this.updateNdock(now, notice)) {
+                            Sound.randomDockSoundPlay();
+                        }
 
                         try {
                             // 遠征・入渠のお知らせ
@@ -171,7 +176,6 @@ public final class AsyncExecApplicationMain extends Thread {
                      * 保有艦娘数を更新する
                      */
                     private void updateShipCount() {
-                        Button itemList = AsyncExecApplicationMain.this.itemList;
                         Button shipList = AsyncExecApplicationMain.this.shipList;
                         String setText = "所有艦娘一覧(" + GlobalContext.getShipMap().size() + ")";
                         if (!setText.equals(shipList.getText())) {
@@ -182,9 +186,13 @@ public final class AsyncExecApplicationMain extends Thread {
 
                     /**
                      * 遠征を更新する
+                     * 
                      * @param now
+                     * @param notice
+                     * @return
                      */
-                    private void updateDeck(Date now, List<String> notice) {
+                    private boolean updateDeck(Date now, List<String> notice) {
+                        boolean noticeflg = false;
 
                         Label[] deckNameLabels = { AsyncExecApplicationMain.this.deck1name,
                                 AsyncExecApplicationMain.this.deck2name, AsyncExecApplicationMain.this.deck3name
@@ -209,6 +217,7 @@ public final class AsyncExecApplicationMain extends Thread {
                                     if (AsyncExecApplicationMain.this.deckNotice.getSelection()) {
                                         if (((rest <= ONE_MINUTES) && !AsyncExecApplicationMain.this.flagNoticeDeck[i])) {
                                             notice.add(dispname + " がまもなく帰投します");
+                                            noticeflg = true;
                                             AsyncExecApplicationMain.this.flagNoticeDeck[i] = true;
                                         } else if (rest > ONE_MINUTES) {
                                             AsyncExecApplicationMain.this.flagNoticeDeck[i] = false;
@@ -225,13 +234,19 @@ public final class AsyncExecApplicationMain extends Thread {
                             deckNameLabels[i].setText(dispname);
                             deckTimeTexts[i].setText(time);
                         }
+                        return noticeflg;
                     }
 
                     /**
                      * 入渠を更新する
+                     * 
                      * @param now
+                     * @param notice
+                     * @return
                      */
-                    private void updateNdock(Date now, List<String> notice) {
+                    private boolean updateNdock(Date now, List<String> notice) {
+                        boolean noticeflg = false;
+
                         Map<String, ShipDto> shipMap = GlobalContext.getShipMap();
 
                         Label[] ndockNameLabels = { AsyncExecApplicationMain.this.ndock1name,
@@ -259,6 +274,7 @@ public final class AsyncExecApplicationMain extends Thread {
                                     if (AsyncExecApplicationMain.this.ndockNotice.getSelection()) {
                                         if ((rest <= ONE_MINUTES) && !AsyncExecApplicationMain.this.flagNoticeNdock[i]) {
                                             notice.add(name + " がまもなくお風呂からあがります");
+                                            noticeflg = true;
                                             AsyncExecApplicationMain.this.flagNoticeNdock[i] = true;
                                         } else if (rest > ONE_MINUTES) {
                                             AsyncExecApplicationMain.this.flagNoticeNdock[i] = false;
@@ -275,6 +291,7 @@ public final class AsyncExecApplicationMain extends Thread {
                             ndockNameLabels[i].setText(name);
                             ndockTimeTexts[i].setText(time);
                         }
+                        return noticeflg;
                     }
                 });
                 Thread.sleep(ONE_SECONDS_FORMILIS);

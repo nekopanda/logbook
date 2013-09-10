@@ -12,6 +12,7 @@ import logbook.gui.listener.ItemListReportAdapter;
 import logbook.gui.listener.ShellEventAdapter;
 import logbook.gui.listener.ShipListReportAdapter;
 import logbook.gui.listener.TraySelectionListener;
+import logbook.gui.logic.Sound;
 import logbook.server.proxy.ProxyServer;
 
 import org.apache.logging.log4j.LogManager;
@@ -229,5 +230,10 @@ public final class ApplicationMain {
         Thread asyncExecConsoleThread = new AsyncExecApplicationMainConsole(display, console);
         asyncExecConsoleThread.setDaemon(true);
         asyncExecConsoleThread.start();
+        // サウンドを出すスレッド
+        Thread player = new Sound.PlayerThread();
+        player.setDaemon(true);
+        player.start();
+
     }
 }
