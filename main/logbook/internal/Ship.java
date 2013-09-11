@@ -163,7 +163,7 @@ public class Ship {
             this.put("144", "");
             this.put("145", "");
             this.put("146", "");
-            this.put("147", "");
+            this.put("147", "Верный");
             this.put("148", "");
             this.put("149", "");
             this.put("150", "");

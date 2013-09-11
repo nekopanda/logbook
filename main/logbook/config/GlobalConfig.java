@@ -32,7 +32,7 @@ public final class GlobalConfig {
     public static final String DATE_SHORT_FORMAT = "HH:mm:ss";
 
     /** バージョン */
-    public static final String VERSION = "0.2.3";
+    public static final String VERSION = "0.2.4";
 
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(UndefinedData.class);
