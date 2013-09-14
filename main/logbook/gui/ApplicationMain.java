@@ -257,5 +257,7 @@ public final class ApplicationMain {
         ThreadManager.regist(new ThreadStateObserver(this.shell));
 
         ThreadManager.start();
+
+        Sound.randomDockSoundPlay();
     }
 }

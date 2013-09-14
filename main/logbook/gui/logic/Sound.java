@@ -16,8 +16,11 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
+import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
+
+import logbook.config.GlobalConfig;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
@@ -65,11 +68,17 @@ public final class Sound {
                 DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
                 // 指定されたデータライン情報に一致するラインを取得します
                 SourceDataLine line = (SourceDataLine) AudioSystem.getLine(info);
+
                 try {
                     // 指定されたオーディオ形式でラインを開きます
                     line.open(audioFormat);
                     // ラインでのデータ入出力を可能にします
                     line.start();
+
+                    // ゲインのコントロールを取得します
+                    FloatControl control = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
+                    // サウンド音量を設定
+                    controlByLinearScalar(control, GlobalConfig.getConfig().getSoundLevel());
 
                     int nBytesRead = 0;
                     byte[] abData = new byte[BUFFER_SIZE];
@@ -149,6 +158,16 @@ public final class Sound {
     }
 
     /**
+     * 音量を調節する
+     * 
+     * @param control
+     * @param linearScalar
+     */
+    private static void controlByLinearScalar(FloatControl control, double linearScalar) {
+        control.setValue((float) Math.log10(linearScalar) * 20);
+    }
+
+    /**
      * プレイヤースレッド
      * 
      */
@@ -172,6 +191,5 @@ public final class Sound {
                 throw new RuntimeException(e);
             }
         }
-
     }
 }

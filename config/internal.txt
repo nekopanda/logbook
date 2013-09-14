@@ -4,7 +4,10 @@ listen_port=8888
 
 # ウインドウサイズ
 width=330
-height=450
+height=460
 
 # 最前面に表示する(1=Yes, 0=No)
 on_top=1
+
+# 音量(%)
+sound_level=85

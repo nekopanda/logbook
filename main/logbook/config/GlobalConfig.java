@@ -36,7 +36,7 @@ public final class GlobalConfig {
     public static final String DATE_SHORT_FORMAT = "HH:mm:ss";
 
     /** バージョン */
-    public static final String VERSION = "0.2.4";
+    public static final String VERSION = "0.2.5";
 
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(UndefinedData.class);
@@ -55,6 +55,9 @@ public final class GlobalConfig {
 
     /** 最前面に表示する */
     private final int onTop;
+
+    /** 音量 */
+    private final float soundLevel;
 
     /**
      * コンストラクター
@@ -77,6 +80,8 @@ public final class GlobalConfig {
         } else {
             this.onTop = 0;
         }
+        // 音量
+        this.soundLevel = ((float) Integer.parseInt(internal.getProperty("sound_level", "85"))) / 100;
     }
 
     /**
@@ -109,6 +114,14 @@ public final class GlobalConfig {
      */
     public int getOnTop() {
         return this.onTop;
+    }
+
+    /**
+     * 音量
+     * @return 音量
+     */
+    public float getSoundLevel() {
+        return this.soundLevel;
     }
 
     /**
