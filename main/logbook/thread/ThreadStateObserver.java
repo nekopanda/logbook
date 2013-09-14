@@ -42,7 +42,7 @@ public final class ThreadStateObserver extends Thread {
                     if (!target.isAlive()) {
                         StringBuilder sb = new StringBuilder();
                         sb.append(target.getClass().getName());
-                        sb.append("スレッド[");
+                        sb.append("[");
                         sb.append(target.getName());
                         sb.append("]");
                         sb.append("が予期せず終了しました、エラーログを確認して下さい。\n");
