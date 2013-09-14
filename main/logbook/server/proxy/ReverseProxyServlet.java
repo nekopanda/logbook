@@ -1,3 +1,8 @@
+/**
+ * No Rights Reserved.
+ * This program and the accompanying materials
+ * are made available under the terms of the Public Domain.
+ */
 package logbook.server.proxy;
 
 import java.io.ByteArrayOutputStream;

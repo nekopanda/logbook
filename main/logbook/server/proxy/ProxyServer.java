@@ -1,4 +1,11 @@
+/**
+ * No Rights Reserved.
+ * This program and the accompanying materials
+ * are made available under the terms of the Public Domain.
+ */
 package logbook.server.proxy;
+
+import static logbook.config.GlobalConfig.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,6 +44,7 @@ public final class ProxyServer extends Thread {
             this.server.join();
         } catch (Exception e) {
             LOG.fatal("サーバーの起動に失敗しました", e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -48,10 +56,11 @@ public final class ProxyServer extends Thread {
         }
     }
 
-    public static void start(int port) {
-        proxyServer = new ProxyServer(port);
-        proxyServer.setDaemon(true);
-        proxyServer.start();
+    public static ProxyServer getInstance() {
+        if (proxyServer == null) {
+            proxyServer = new ProxyServer(getConfig().getListenPort());
+        }
+        return proxyServer;
     }
 
     public static void end() {

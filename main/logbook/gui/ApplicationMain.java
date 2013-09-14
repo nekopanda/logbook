@@ -1,6 +1,15 @@
+/**
+ * No Rights Reserved.
+ * This program and the accompanying materials
+ * are made available under the terms of the Public Domain.
+ */
 package logbook.gui;
 
 import static logbook.config.GlobalConfig.*;
+
+import java.io.File;
+import java.io.IOException;
+
 import logbook.config.GlobalConfig;
 import logbook.gui.background.AsyncExecApplicationMain;
 import logbook.gui.background.AsyncExecApplicationMainConsole;
@@ -9,11 +18,13 @@ import logbook.gui.listener.CreateShipReportAdapter;
 import logbook.gui.listener.DropReportAdapter;
 import logbook.gui.listener.HelpEventListener;
 import logbook.gui.listener.ItemListReportAdapter;
-import logbook.gui.listener.ShellEventAdapter;
 import logbook.gui.listener.ShipListReportAdapter;
 import logbook.gui.listener.TraySelectionListener;
+import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.Sound;
 import logbook.server.proxy.ProxyServer;
+import logbook.thread.ThreadManager;
+import logbook.thread.ThreadStateObserver;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,6 +42,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
  * メイン画面
@@ -53,7 +65,23 @@ public final class ApplicationMain {
             ApplicationMain window = new ApplicationMain();
             window.open();
         } catch (Exception e) {
-            LOG.fatal(e);
+            LOG.fatal("メインスレッドが異常終了しました", e);
+        } finally {
+            // リソースを開放する
+            SWTResourceManager.dispose();
+            // プロキシサーバーをシャットダウンする
+            ProxyServer.end();
+            // 報告書を保存する
+            try {
+                CreateReportLogic.writeCsv(new File("./海戦・ドロップ報告書.csv"), CreateReportLogic.getBattleResultHeader(),
+                        CreateReportLogic.getBattleResultBody(), true);
+                CreateReportLogic.writeCsv(new File("./建造報告書.csv"), CreateReportLogic.getCreateShipHeader(),
+                        CreateReportLogic.getCreateShipBody(), true);
+                CreateReportLogic.writeCsv(new File("./開発報告書.csv"), CreateReportLogic.getCreateItemHeader(),
+                        CreateReportLogic.getCreateItemBody(), true);
+            } catch (IOException e) {
+                LOG.warn("報告書の保存に失敗しました", e);
+            }
         }
     }
 
@@ -77,9 +105,6 @@ public final class ApplicationMain {
      */
     public void createContents() {
 
-        // プロキシサーバーを開始する
-        ProxyServer.start(getConfig().getListenPort());
-
         final Display display = Display.getDefault();
         this.shell = new Shell(SWT.SHELL_TRIM | getConfig().getOnTop());
         this.shell.setSize(getConfig().getWidth(), getConfig().getHeight());
@@ -95,9 +120,6 @@ public final class ApplicationMain {
         final Image image = display.getSystemImage(SWT.ICON_INFORMATION);
         item.setImage(image);
         item.addListener(SWT.Selection, new TraySelectionListener(this.shell));
-
-        // 閉じるときに呼ばれるリスナーを追加します
-        this.shell.addShellListener(new ShellEventAdapter(item, image));
 
         // コマンドボタン
         Composite command = new Composite(this.shell, SWT.NONE);
@@ -220,20 +242,20 @@ public final class ApplicationMain {
         org.eclipse.swt.widgets.List console = new org.eclipse.swt.widgets.List(consolec, SWT.BORDER | SWT.V_SCROLL);
         console.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
 
-        // 非同期で画面を更新するスレッド
-        Thread asyncExecUpdateThread = new AsyncExecApplicationMain(display, this.shell, item, itemList, shipList,
-                deckNotice, deck1name, deck1time, deck2name, deck2time, deck3name, deck3time, ndockNotice, ndock1name,
-                ndock1time, ndock2name, ndock2time, ndock3name, ndock3time, ndock4name, ndock4time);
-        asyncExecUpdateThread.setDaemon(true);
-        asyncExecUpdateThread.start();
-        // 非同期でログを出すスレッド
-        Thread asyncExecConsoleThread = new AsyncExecApplicationMainConsole(display, console);
-        asyncExecConsoleThread.setDaemon(true);
-        asyncExecConsoleThread.start();
-        // サウンドを出すスレッド
-        Thread player = new Sound.PlayerThread();
-        player.setDaemon(true);
-        player.start();
+        // プロキシサーバーを開始する
+        ThreadManager.regist(ProxyServer.getInstance());
 
+        // 非同期で画面を更新するスレッド
+        ThreadManager.regist(new AsyncExecApplicationMain(this.shell, item, itemList, shipList,
+                deckNotice, deck1name, deck1time, deck2name, deck2time, deck3name, deck3time, ndockNotice, ndock1name,
+                ndock1time, ndock2name, ndock2time, ndock3name, ndock3time, ndock4name, ndock4time));
+        // 非同期でログを出すスレッド
+        ThreadManager.regist(new AsyncExecApplicationMainConsole(console));
+        // サウンドを出すスレッド
+        ThreadManager.regist(new Sound.PlayerThread());
+        // スレッドを監視するスレッド
+        ThreadManager.regist(new ThreadStateObserver(this.shell));
+
+        ThreadManager.start();
     }
 }

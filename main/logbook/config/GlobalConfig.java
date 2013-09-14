@@ -1,15 +1,19 @@
+/**
+ * No Rights Reserved.
+ * This program and the accompanying materials
+ * are made available under the terms of the Public Domain.
+ */
 package logbook.config;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Properties;
 
 import logbook.data.UndefinedData;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
@@ -58,31 +62,16 @@ public final class GlobalConfig {
     private GlobalConfig() {
 
         // 内部設定
-        Map<String, String> internal =
-                configreader(new File("./config/internal.txt"));
+        Properties internal =
+                readconfig(new File("./config/internal.txt"));
         // ポート番号
-        String listenport = internal.get("listen_port");
-        if ((listenport != null) && StringUtils.isNumeric(listenport)) {
-            this.listenPort = Integer.parseInt(listenport);
-        } else {
-            this.listenPort = 8888;
-        }
+        this.listenPort = Integer.parseInt(internal.getProperty("listen_port", "8888"));
         // ウインドウサイズ(width)
-        String width = internal.get("width");
-        if ((width != null) && StringUtils.isNumeric(width)) {
-            this.width = Integer.parseInt(width);
-        } else {
-            this.width = 330;
-        }
+        this.width = Integer.parseInt(internal.getProperty("width", "330"));
         // ウインドウサイズ(width)
-        String height = internal.get("height");
-        if ((height != null) && StringUtils.isNumeric(height)) {
-            this.height = Integer.parseInt(height);
-        } else {
-            this.height = 450;
-        }
+        this.height = Integer.parseInt(internal.getProperty("height", "450"));
         // 常に最前面に表示
-        String onTop = internal.get("on_top");
+        String onTop = internal.getProperty("on_top");
         if ((onTop != null) && "1".equals(onTop)) {
             this.onTop = SWT.ON_TOP;
         } else {
@@ -127,24 +116,24 @@ public final class GlobalConfig {
      * @param file
      * @return
      */
-    private static Map<String, String> configreader(File file) {
-
-        Map<String, String> ret = new HashMap<String, String>();
-
+    private static Properties readconfig(File file) {
+        Properties properties = new Properties();
         try {
-            List<String> lines = FileUtils.readLines(file, CHARSET);
-            for (String line : lines) {
-                if (!line.startsWith("#") && (line.indexOf('=') > 0)) {
-                    String[] kv = line.split("=", 2);
-                    if (kv.length == 2) {
-                        ret.put(kv[0], kv[1]);
-                    }
+            InputStream in = new FileInputStream(file);
+            try {
+                InputStreamReader reader = new InputStreamReader(in, CHARSET);
+                try {
+                    properties.load(reader);
+                } finally {
+                    reader.close();
                 }
+            } finally {
+                in.close();
             }
         } catch (Exception e) {
             LOG.fatal("設定ファイルの読み込みに失敗しました", e);
         }
-        return ret;
+        return properties;
     }
 
     public static GlobalConfig getConfig() {

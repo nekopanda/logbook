@@ -1,5 +1,7 @@
 /**
- * 
+ * No Rights Reserved.
+ * This program and the accompanying materials
+ * are made available under the terms of the Public Domain.
  */
 package logbook.gui.logic;
 
@@ -22,19 +24,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * @author noname
+ * サウンドを操作します
  *
  */
 public final class Sound {
 
     /** 再生待ち */
-    private static Queue<File> soundfileQueue = new ArrayBlockingQueue<File>(100);
+    private static Queue<File> soundfileQueue = new ArrayBlockingQueue<File>(10);
 
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(Sound.class);
 
     /** バッファーサイズ */
-    private static final int BUFFER_SIZE = 1024 * 16;
+    private static final int BUFFER_SIZE = 1024 * 8;
 
     /** 拡張子 */
     private static final String[] EXTENSIONS = { "wav" };
@@ -167,6 +169,7 @@ public final class Sound {
                 }
             } catch (Exception e) {
                 LOG.fatal("スレッドが異常終了しました", e);
+                throw new RuntimeException(e);
             }
         }
 

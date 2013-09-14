@@ -1,3 +1,8 @@
+/**
+ * No Rights Reserved.
+ * This program and the accompanying materials
+ * are made available under the terms of the Public Domain.
+ */
 package logbook.gui.background;
 
 import java.util.ArrayList;
@@ -30,9 +35,9 @@ public final class AsyncExecApplicationMain extends Thread {
 
     private static final int ONE_SECONDS_FORMILIS = 1000;
     private static final int ONE_MINUTES = 60;
-    private static final int ONE_HOURS = 60 * 60;
+    private static final int ONE_HOUR = 60 * 60;
+    private static final int ONE_DAY = 60 * 60 * 24;
 
-    private final Display display;
     private final Shell shell;
     private final TrayItem item;
 
@@ -83,11 +88,10 @@ public final class AsyncExecApplicationMain extends Thread {
      * @param ndock4name
      * @param ndock4time
      */
-    public AsyncExecApplicationMain(Display display, Shell shell, TrayItem item, Button itemList, Button shipList,
+    public AsyncExecApplicationMain(Shell shell, TrayItem item, Button itemList, Button shipList,
             Button deckNotice, Label deck1name, Text deck1time, Label deck2name, Text deck2time, Label deck3name,
             Text deck3time, Button ndockNotice, Label ndock1name, Text ndock1time, Label ndock2name, Text ndock2time,
             Label ndock3name, Text ndock3time, Label ndock4name, Text ndock4time) {
-        this.display = display;
         this.shell = shell;
         this.item = item;
 
@@ -121,7 +125,7 @@ public final class AsyncExecApplicationMain extends Thread {
             while (true) {
                 GlobalContext.updateContext();
 
-                this.display.asyncExec(new Runnable() {
+                Display.getDefault().asyncExec(new Runnable() {
                     private final Logger log = LogManager.getLogger(AsyncExecApplicationMain.class);
 
                     @Override
@@ -298,6 +302,7 @@ public final class AsyncExecApplicationMain extends Thread {
             }
         } catch (Exception e) {
             LOG.fatal("スレッドが異常終了しました", e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -309,7 +314,7 @@ public final class AsyncExecApplicationMain extends Thread {
      * @return
      */
     private static long getRest(Date date1, Date date2) {
-        return (date2.getTime() - date1.getTime()) / ONE_SECONDS_FORMILIS;
+        return ((date2.getTime() - date1.getTime()) / ONE_SECONDS_FORMILIS);
     }
 
     /**
@@ -320,8 +325,11 @@ public final class AsyncExecApplicationMain extends Thread {
      */
     private static String toDateRestString(long rest) {
         if (rest > 0) {
-            if (rest > ONE_HOURS) {
-                return (rest / ONE_HOURS) + "時間" + ((rest % ONE_HOURS) / ONE_MINUTES) + "分";
+            if (rest > ONE_DAY) {
+                return (rest / ONE_DAY) + "日" + ((rest % ONE_DAY) / ONE_HOUR) + "時間"
+                        + ((rest % ONE_HOUR) / ONE_MINUTES) + "分";
+            } else if (rest > ONE_HOUR) {
+                return (rest / ONE_HOUR) + "時間" + ((rest % ONE_HOUR) / ONE_MINUTES) + "分";
             } else if (rest > ONE_MINUTES) {
                 return (rest / ONE_MINUTES) + "分" + (rest % ONE_MINUTES) + "秒";
             } else {

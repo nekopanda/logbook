@@ -1,3 +1,8 @@
+/**
+ * No Rights Reserved.
+ * This program and the accompanying materials
+ * are made available under the terms of the Public Domain.
+ */
 package logbook.gui.background;
 
 import logbook.data.context.GlobalContext;
@@ -16,7 +21,6 @@ public final class AsyncExecApplicationMainConsole extends Thread {
     private static final int UPDATE_FORMILIS = 500;
     private static final int MAX_LOG_LINES = 200;
 
-    private final Display display;
     private final List console;
 
     /**
@@ -25,8 +29,7 @@ public final class AsyncExecApplicationMainConsole extends Thread {
      * @param display
      * @param console
      */
-    public AsyncExecApplicationMainConsole(Display display, List console) {
-        this.display = display;
+    public AsyncExecApplicationMainConsole(List console) {
         this.console = console;
     }
 
@@ -37,7 +40,7 @@ public final class AsyncExecApplicationMainConsole extends Thread {
     public void run() {
         try {
             while (true) {
-                this.display.asyncExec(new Runnable() {
+                Display.getDefault().asyncExec(new Runnable() {
                     @Override
                     public void run() {
                         // ログメッセージを取り出す
@@ -57,6 +60,7 @@ public final class AsyncExecApplicationMainConsole extends Thread {
             }
         } catch (Exception e) {
             LOG.fatal("スレッドが異常終了しました", e);
+            throw new RuntimeException(e);
         }
     }
 }
