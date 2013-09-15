@@ -26,6 +26,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolTip;
 import org.eclipse.swt.widgets.TrayItem;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
  * 非同期にメイン画面を更新します
@@ -218,6 +219,16 @@ public final class AsyncExecApplicationMain extends Thread {
                                 dispname = deckNames[i] + " (" + deckMissions[i] + ")";
                                 if (deckTimes[i] != null) {
                                     long rest = getRest(now, deckTimes[i]);
+                                    // 20分前、10分前、5分前になったら背景色を変更する
+                                    if (rest <= (ONE_MINUTES * 5)) {
+                                        deckTimeTexts[i].setBackground(SWTResourceManager.getColor(255, 215, 0));
+                                    } else if (rest <= (ONE_MINUTES * 10)) {
+                                        deckTimeTexts[i].setBackground(SWTResourceManager.getColor(255, 239, 153));
+                                    } else if (rest <= (ONE_MINUTES * 20)) {
+                                        deckTimeTexts[i].setBackground(SWTResourceManager.getColor(255, 247, 203));
+                                    } else {
+                                        deckTimeTexts[i].setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+                                    }
                                     if (AsyncExecApplicationMain.this.deckNotice.getSelection()) {
                                         if (((rest <= ONE_MINUTES) && !AsyncExecApplicationMain.this.flagNoticeDeck[i])) {
                                             notice.add(dispname + " がまもなく帰投します");
@@ -234,6 +245,8 @@ public final class AsyncExecApplicationMain extends Thread {
                                         time = "まもなく帰投します";
                                     }
                                 }
+                            } else {
+                                deckTimeTexts[i].setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
                             }
                             deckNameLabels[i].setText(dispname);
                             deckTimeTexts[i].setText(time);
@@ -274,8 +287,19 @@ public final class AsyncExecApplicationMain extends Thread {
                                 if (ship != null) {
                                     name = ship.getName() + " (Lv" + ship.getLv() + ")";
                                     long rest = getRest(now, times[i]);
-
+                                    // 20分前、10分前、5分前になったら背景色を変更する
+                                    if (rest <= (ONE_MINUTES * 5)) {
+                                        ndockTimeTexts[i].setBackground(SWTResourceManager.getColor(255, 215, 0));
+                                    } else if (rest <= (ONE_MINUTES * 10)) {
+                                        ndockTimeTexts[i].setBackground(SWTResourceManager.getColor(255, 239, 153));
+                                    } else if (rest <= (ONE_MINUTES * 20)) {
+                                        ndockTimeTexts[i].setBackground(SWTResourceManager.getColor(255, 247, 203));
+                                    } else {
+                                        ndockTimeTexts[i].setBackground(SWTResourceManager
+                                                .getColor(SWT.COLOR_WHITE));
+                                    }
                                     if (AsyncExecApplicationMain.this.ndockNotice.getSelection()) {
+
                                         if ((rest <= ONE_MINUTES) && !AsyncExecApplicationMain.this.flagNoticeNdock[i]) {
                                             notice.add(name + " がまもなくお風呂からあがります");
                                             noticeflg = true;
@@ -291,6 +315,8 @@ public final class AsyncExecApplicationMain extends Thread {
                                         time = "まもなくお風呂からあがります";
                                     }
                                 }
+                            } else {
+                                ndockTimeTexts[i].setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
                             }
                             ndockNameLabels[i].setText(name);
                             ndockTimeTexts[i].setText(time);

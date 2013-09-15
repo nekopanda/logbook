@@ -5,20 +5,17 @@
  */
 package logbook.gui.listener;
 
-import logbook.gui.Help;
+import logbook.gui.CalcExp;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.HelpEvent;
-import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * ヘルプキーを押した場合のリスナー
+ * メニューから経験値計算機を押した場合のリスナー
  *
  */
-public final class HelpEventListener extends SelectionAdapter implements HelpListener {
+public final class CalcExpAdapter extends SelectionAdapter {
 
     /** シェル */
     private final Shell shell;
@@ -28,17 +25,12 @@ public final class HelpEventListener extends SelectionAdapter implements HelpLis
      * 
      * @param shell シェル
      */
-    public HelpEventListener(Shell shell) {
+    public CalcExpAdapter(Shell shell) {
         this.shell = shell;
     }
 
     @Override
-    public void helpRequested(HelpEvent paramHelpEvent) {
-        new Help(this.shell, SWT.SHELL_TRIM | SWT.MODELESS).open();
-    }
-
-    @Override
     public void widgetSelected(SelectionEvent e) {
-        new Help(this.shell, SWT.SHELL_TRIM | SWT.MODELESS).open();
+        new CalcExp(this.shell).open();
     }
 }

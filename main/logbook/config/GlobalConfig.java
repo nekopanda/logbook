@@ -36,7 +36,7 @@ public final class GlobalConfig {
     public static final String DATE_SHORT_FORMAT = "HH:mm:ss";
 
     /** バージョン */
-    public static final String VERSION = "0.2.5";
+    public static final String VERSION = "0.3.0";
 
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(UndefinedData.class);
@@ -70,9 +70,9 @@ public final class GlobalConfig {
         // ポート番号
         this.listenPort = Integer.parseInt(internal.getProperty("listen_port", "8888"));
         // ウインドウサイズ(width)
-        this.width = Integer.parseInt(internal.getProperty("width", "330"));
+        this.width = Integer.parseInt(internal.getProperty("width", "280"));
         // ウインドウサイズ(width)
-        this.height = Integer.parseInt(internal.getProperty("height", "450"));
+        this.height = Integer.parseInt(internal.getProperty("height", "420"));
         // 常に最前面に表示
         String onTop = internal.getProperty("on_top");
         if ((onTop != null) && "1".equals(onTop)) {
