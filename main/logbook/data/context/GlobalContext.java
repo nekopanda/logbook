@@ -11,21 +11,25 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
+import javax.json.JsonValue;
 
 import logbook.config.GlobalConfig;
 import logbook.data.Data;
 import logbook.data.DataQueue;
 import logbook.dto.BattleResultDto;
 import logbook.dto.CreateItemDto;
+import logbook.dto.DeckMissionDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
 import logbook.dto.ResourceDto;
@@ -76,32 +80,14 @@ public final class GlobalContext {
     /** 海戦・ドロップ */
     private static List<BattleResultDto> battleResultList = new ArrayList<BattleResultDto>();
 
-    /** 遠征1 艦隊名 */
-    private static String deck1Name = "";
+    /** 遠征1 */
+    private static DeckMissionDto deck1Mission;
 
-    /** 遠征1 遠征名 */
-    private static String deck1mission = "";
+    /** 遠征1 */
+    private static DeckMissionDto deck2Mission;
 
-    /** 遠征1 帰投時間 */
-    private static Date deck1Time;
-
-    /** 遠征2 艦隊名 */
-    private static String deck2Name = "";
-
-    /** 遠征2 遠征名 */
-    private static String deck2mission = "";
-
-    /** 遠征2 帰投時間 */
-    private static Date deck2Time;
-
-    /** 遠征3 艦隊名 */
-    private static String deck3Name = "";
-
-    /** 遠征3 遠征名 */
-    private static String deck3mission = "";
-
-    /** 遠征3 帰投時間 */
-    private static Date deck3Time;
+    /** 遠征1 */
+    private static DeckMissionDto deck3Mission;
 
     /** 入渠1 艦娘ID */
     private static long ndock1id;
@@ -180,66 +166,24 @@ public final class GlobalContext {
     }
 
     /**
-     * @return 遠征1 艦隊名
+     * @return 遠征1
      */
-    public static String getDeck1Name() {
-        return deck1Name != null ? deck1Name : "";
+    public static DeckMissionDto getDeck1Mission() {
+        return deck1Mission;
     }
 
     /**
-     * @return 遠征1 遠征名
+     * @return 遠征2
      */
-    public static String getDeck1mission() {
-        return deck1mission != null ? deck1mission : "";
+    public static DeckMissionDto getDeck2Mission() {
+        return deck2Mission;
     }
 
     /**
-     * @return 遠征1 帰投時間
+     * @return 遠征3
      */
-    public static Date getDeck1Time() {
-        return deck1Time;
-    }
-
-    /**
-     * @return 遠征2 艦隊名
-     */
-    public static String getDeck2Name() {
-        return deck2Name != null ? deck2Name : "";
-    }
-
-    /**
-     * @return 遠征2 遠征名
-     */
-    public static String getDeck2mission() {
-        return deck2mission != null ? deck2mission : "";
-    }
-
-    /**
-     * @return 遠征2 帰投時間
-     */
-    public static Date getDeck2Time() {
-        return deck2Time;
-    }
-
-    /**
-     * @return 遠征3 艦隊名
-     */
-    public static String getDeck3Name() {
-        return deck3Name != null ? deck3Name : "";
-    }
-
-    /**
-     * @return 遠征3 遠征名
-     */
-    public static String getDeck3mission() {
-        return deck3mission != null ? deck3mission : "";
-    }
-
-    /**
-     * @return 遠征3 帰投時間 
-     */
-    public static Date getDeck3Time() {
-        return deck3Time;
+    public static DeckMissionDto getDeck3Mission() {
+        return deck3Mission;
     }
 
     /** 
@@ -564,6 +508,16 @@ public final class GlobalContext {
                 long section = ((JsonNumber) jmission.get(1)).longValue();
                 String mission = Deck.get(Long.toString(section));
                 long milis = ((JsonNumber) jmission.get(2)).longValue();
+                long fleetid = object.getJsonNumber("api_id").longValue();
+
+                Set<Long> ships = new LinkedHashSet<Long>();
+                JsonArray shiparray = object.getJsonArray("api_ship");
+                for (JsonValue jsonValue : shiparray) {
+                    long shipid = ((JsonNumber) jsonValue).longValue();
+                    if (shipid != -1) {
+                        ships.add(shipid);
+                    }
+                }
 
                 Date time = null;
                 if (milis > 0) {
@@ -572,19 +526,13 @@ public final class GlobalContext {
 
                 switch (i) {
                 case 1:
-                    deck1Name = name;
-                    deck1mission = mission;
-                    deck1Time = time;
+                    deck1Mission = new DeckMissionDto(name, mission, time, fleetid, ships);
                     break;
                 case 2:
-                    deck2Name = name;
-                    deck2mission = mission;
-                    deck2Time = time;
+                    deck2Mission = new DeckMissionDto(name, mission, time, fleetid, ships);
                     break;
                 case 3:
-                    deck3Name = name;
-                    deck3mission = mission;
-                    deck3Time = time;
+                    deck3Mission = new DeckMissionDto(name, mission, time, fleetid, ships);
                     break;
                 default:
                     break;

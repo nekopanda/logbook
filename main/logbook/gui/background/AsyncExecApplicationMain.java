@@ -12,8 +12,10 @@ import java.util.List;
 import java.util.Map;
 
 import logbook.data.context.GlobalContext;
+import logbook.dto.DeckMissionDto;
 import logbook.dto.ShipDto;
 import logbook.gui.logic.Sound;
+import logbook.gui.logic.TimeLogic;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -36,8 +38,6 @@ public final class AsyncExecApplicationMain extends Thread {
 
     private static final int ONE_SECONDS_FORMILIS = 1000;
     private static final int ONE_MINUTES = 60;
-    private static final int ONE_HOUR = 60 * 60;
-    private static final int ONE_DAY = 60 * 60 * 24;
 
     private final Shell shell;
     private final TrayItem item;
@@ -205,20 +205,17 @@ public final class AsyncExecApplicationMain extends Thread {
                         Text[] deckTimeTexts = { AsyncExecApplicationMain.this.deck1time,
                                 AsyncExecApplicationMain.this.deck2time, AsyncExecApplicationMain.this.deck3time
                         };
-                        String[] deckNames = { GlobalContext.getDeck1Name(), GlobalContext.getDeck2Name(),
-                                GlobalContext.getDeck3Name() };
-                        String[] deckMissions = { GlobalContext.getDeck1mission(), GlobalContext.getDeck2mission(),
-                                GlobalContext.getDeck3mission() };
-                        Date[] deckTimes = { GlobalContext.getDeck1Time(), GlobalContext.getDeck2Time(),
-                                GlobalContext.getDeck3Time() };
 
-                        for (int i = 0; i < deckTimes.length; i++) {
+                        DeckMissionDto[] deckMissions = { GlobalContext.getDeck1Mission(),
+                                GlobalContext.getDeck2Mission(), GlobalContext.getDeck3Mission() };
+
+                        for (int i = 0; i < 3; i++) {
                             String time = "";
                             String dispname = "";
-                            if (!StringUtils.isEmpty(deckMissions[i])) {
-                                dispname = deckNames[i] + " (" + deckMissions[i] + ")";
-                                if (deckTimes[i] != null) {
-                                    long rest = getRest(now, deckTimes[i]);
+                            if ((deckMissions[i] != null) && (deckMissions[i].getMission() != null)) {
+                                dispname = deckMissions[i].getName() + " (" + deckMissions[i].getMission() + ")";
+                                if (deckMissions[i].getTime() != null) {
+                                    long rest = getRest(now, deckMissions[i].getTime());
                                     // 20分前、10分前、5分前になったら背景色を変更する
                                     if (rest <= (ONE_MINUTES * 5)) {
                                         deckTimeTexts[i].setBackground(SWTResourceManager.getColor(255, 215, 0));
@@ -240,7 +237,7 @@ public final class AsyncExecApplicationMain extends Thread {
                                     } else {
                                         AsyncExecApplicationMain.this.flagNoticeDeck[i] = false;
                                     }
-                                    time = toDateRestString(rest);
+                                    time = TimeLogic.toDateRestString(rest);
                                     if (time == null) {
                                         time = "まもなく帰投します";
                                     }
@@ -310,7 +307,7 @@ public final class AsyncExecApplicationMain extends Thread {
                                     } else {
                                         AsyncExecApplicationMain.this.flagNoticeNdock[i] = false;
                                     }
-                                    time = toDateRestString(rest);
+                                    time = TimeLogic.toDateRestString(rest);
                                     if (time == null) {
                                         time = "まもなくお風呂からあがります";
                                     }
@@ -341,28 +338,5 @@ public final class AsyncExecApplicationMain extends Thread {
      */
     private static long getRest(Date date1, Date date2) {
         return ((date2.getTime() - date1.getTime()) / ONE_SECONDS_FORMILIS);
-    }
-
-    /**
-     * 残り時間を見やすい形式に整形する
-     * 
-     * @param rest
-     * @return
-     */
-    private static String toDateRestString(long rest) {
-        if (rest > 0) {
-            if (rest > ONE_DAY) {
-                return (rest / ONE_DAY) + "日" + ((rest % ONE_DAY) / ONE_HOUR) + "時間"
-                        + ((rest % ONE_HOUR) / ONE_MINUTES) + "分";
-            } else if (rest > ONE_HOUR) {
-                return (rest / ONE_HOUR) + "時間" + ((rest % ONE_HOUR) / ONE_MINUTES) + "分";
-            } else if (rest > ONE_MINUTES) {
-                return (rest / ONE_MINUTES) + "分" + (rest % ONE_MINUTES) + "秒";
-            } else {
-                return rest + "秒";
-            }
-        } else {
-            return null;
-        }
     }
 }

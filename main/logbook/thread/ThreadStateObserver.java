@@ -5,6 +5,7 @@
  */
 package logbook.thread;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
@@ -26,7 +27,7 @@ public final class ThreadStateObserver extends Thread {
      * コンストラクター
      */
     public ThreadStateObserver(Shell shell) {
-        this.observthread = ThreadManager.getThreads();
+        this.observthread = new ArrayList<Thread>(ThreadManager.getThreads());
         this.shell = shell;
     }
 

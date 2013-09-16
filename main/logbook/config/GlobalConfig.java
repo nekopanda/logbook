@@ -36,7 +36,7 @@ public final class GlobalConfig {
     public static final String DATE_SHORT_FORMAT = "HH:mm:ss";
 
     /** バージョン */
-    public static final String VERSION = "0.3.0";
+    public static final String VERSION = "0.3.2";
 
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(UndefinedData.class);
@@ -65,8 +65,7 @@ public final class GlobalConfig {
     private GlobalConfig() {
 
         // 内部設定
-        Properties internal =
-                readconfig(new File("./config/internal.txt"));
+        Properties internal = readconfig(new File("./config/internal.txt"));
         // ポート番号
         this.listenPort = Integer.parseInt(internal.getProperty("listen_port", "8888"));
         // ウインドウサイズ(width)

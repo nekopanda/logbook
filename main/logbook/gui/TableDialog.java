@@ -5,28 +5,22 @@
  */
 package logbook.gui;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import logbook.gui.logic.CreateReportLogic;
+import logbook.gui.listener.TableToClipboardAdapter;
+import logbook.gui.listener.TableToCsvSaveAdapter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -52,6 +46,7 @@ public final class TableDialog extends Dialog {
      */
     public TableDialog(Shell parent, String title, String[] header, List<String[]> body) {
         super(parent, SWT.SHELL_TRIM | SWT.MODELESS);
+        this.shell = parent;
         this.header = header;
         this.body = body;
 
@@ -87,34 +82,6 @@ public final class TableDialog extends Dialog {
         Menu menubar = new Menu(this.shell, SWT.BAR);
         this.shell.setMenuBar(menubar);
         MenuItem item1 = new MenuItem(menubar, SWT.CASCADE);
-        item1.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent arg) {
-                FileDialog dialog = new FileDialog(TableDialog.this.shell, SWT.SAVE);
-                dialog.setFileName(TableDialog.this.getText() + ".csv");
-                dialog.setFilterExtensions(new String[] { "*.csv" });
-                String filename = dialog.open();
-                if (filename != null) {
-                    File file = new File(filename);
-                    if (file.exists()) {
-                        MessageBox messageBox = new MessageBox(TableDialog.this.shell, SWT.YES | SWT.NO);
-                        messageBox.setText("確認");
-                        messageBox.setMessage("指定されたファイルは存在します。\n上書きしますか？");
-                        if (messageBox.open() == SWT.NO) {
-                            return;
-                        }
-                    }
-                    try {
-                        CreateReportLogic.writeCsv(file, TableDialog.this.header, TableDialog.this.body, false);
-                    } catch (IOException e) {
-                        MessageBox messageBox = new MessageBox(TableDialog.this.shell, SWT.ICON_ERROR);
-                        messageBox.setText("書き込めませんでした");
-                        messageBox.setMessage(e.toString());
-                        messageBox.open();
-                    }
-                }
-            }
-        });
         item1.setText("CSVファイルに保存");
 
         final Table table = new Table(this.shell, SWT.FULL_SELECTION | SWT.MULTI);
@@ -130,33 +97,12 @@ public final class TableDialog extends Dialog {
 
         this.addAllTableItems(table);
 
+        item1.addSelectionListener(new TableToCsvSaveAdapter(this.shell, this.getText(), this.header, table));
+
         Menu menu = new Menu(table);
         table.setMenu(menu);
-
         MenuItem menuItem = new MenuItem(menu, SWT.NONE);
-        menuItem.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent arg) {
-
-                TableItem[] tableItems = table.getSelection();
-
-                StringBuilder sb = new StringBuilder();
-                sb.append(StringUtils.join(TableDialog.this.header, "\t"));
-                sb.append("\r\n");
-                for (TableItem column : tableItems) {
-                    String[] columns = new String[TableDialog.this.header.length];
-                    for (int i = 0; i < TableDialog.this.header.length; i++) {
-                        columns[i] = column.getText(i);
-                    }
-                    sb.append(StringUtils.join(columns, "\t"));
-                    sb.append("\r\n");
-                }
-
-                Clipboard clipboard = new Clipboard(TableDialog.this.display);
-                clipboard.setContents(new Object[] { sb.toString() },
-                        new Transfer[] { TextTransfer.getInstance() });
-            }
-        });
+        menuItem.addSelectionListener(new TableToClipboardAdapter(this.header, table));
         menuItem.setText("クリップボードにコピー");
 
         for (int i = 0; i < columns.length; i++) {

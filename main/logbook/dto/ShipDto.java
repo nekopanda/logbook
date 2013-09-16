@@ -38,6 +38,15 @@ public final class ShipDto extends AbstractDto {
     /** 疲労 */
     private final long cond;
 
+    /** 入渠時間 */
+    private final long docktime;
+
+    /** 修復資材 燃料 */
+    private final long dockfuel;
+
+    /** 修復資材 鋼材 */
+    private final long dockmetal;
+
     /** 経験値 */
     private final long exp;
 
@@ -85,6 +94,11 @@ public final class ShipDto extends AbstractDto {
         this.name = Ship.get(object.getJsonNumber("api_ship_id").toString());
         this.lv = object.getJsonNumber("api_lv").longValue();
         this.cond = object.getJsonNumber("api_cond").longValue();
+
+        this.docktime = object.getJsonNumber("api_ndock_time").longValue();
+        this.dockfuel = object.getJsonArray("api_ndock_item").getJsonNumber(0).longValue();
+        this.dockmetal = object.getJsonArray("api_ndock_item").getJsonNumber(1).longValue();
+
         this.exp = object.getJsonNumber("api_exp").longValue();
         this.nowhp = object.getJsonNumber("api_nowhp").longValue();
         this.maxhp = object.getJsonNumber("api_maxhp").longValue();
@@ -146,6 +160,27 @@ public final class ShipDto extends AbstractDto {
      */
     public long getCond() {
         return this.cond;
+    }
+
+    /**
+     * @return 入渠時間
+     */
+    public long getDocktime() {
+        return this.docktime;
+    }
+
+    /**
+     * @return 修復資材 燃料
+     */
+    public long getDockfuel() {
+        return this.dockfuel;
+    }
+
+    /**
+     * @return 修復資材 鋼材
+     */
+    public long getDockmetal() {
+        return this.dockmetal;
     }
 
     /**

@@ -13,6 +13,7 @@ import java.io.IOException;
 import logbook.config.GlobalConfig;
 import logbook.gui.background.AsyncExecApplicationMain;
 import logbook.gui.background.AsyncExecApplicationMainConsole;
+import logbook.gui.listener.BathwaterTableAdapter;
 import logbook.gui.listener.CalcExpAdapter;
 import logbook.gui.listener.CreateItemReportAdapter;
 import logbook.gui.listener.CreateShipReportAdapter;
@@ -152,6 +153,8 @@ public final class ApplicationMain {
         MenuItem cmdcreateitem = new MenuItem(cmdmenu, SWT.NONE);
         cmdcreateitem.setText("開発報告書");
         cmdcreateitem.addSelectionListener(new CreateItemReportAdapter(this.shell));
+        // セパレータ
+        new MenuItem(cmdmenu, SWT.SEPARATOR);
         // コマンド-所有装備一覧
         MenuItem cmditemlist = new MenuItem(cmdmenu, SWT.NONE);
         cmditemlist.setText("所有装備一覧");
@@ -160,6 +163,12 @@ public final class ApplicationMain {
         MenuItem cmdshiplist = new MenuItem(cmdmenu, SWT.NONE);
         cmdshiplist.setText("所有艦娘一覧");
         cmdshiplist.addSelectionListener(new ShipListReportAdapter(this.shell));
+        // セパレータ
+        new MenuItem(cmdmenu, SWT.SEPARATOR);
+        // コマンド-お風呂に入りたい艦娘
+        MenuItem cmdbathwaterlist = new MenuItem(cmdmenu, SWT.NONE);
+        cmdbathwaterlist.setText("お風呂に入りたい艦娘");
+        cmdbathwaterlist.addSelectionListener(new BathwaterTableAdapter(this.shell));
 
         // 計算機-経験値計算
         MenuItem calcexp = new MenuItem(calcmenu, SWT.NONE);
