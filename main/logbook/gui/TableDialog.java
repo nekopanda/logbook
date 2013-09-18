@@ -9,8 +9,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import logbook.gui.listener.TableKeyShortcutAdapter;
 import logbook.gui.listener.TableToClipboardAdapter;
 import logbook.gui.listener.TableToCsvSaveAdapter;
+import logbook.gui.logic.TableItemCreator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
@@ -38,17 +40,19 @@ public final class TableDialog extends Dialog {
     private final String[] header;
     private final List<String[]> body;
     private final boolean[] orderflgs;
+    private final TableItemCreator creater;
 
     /**
      * Create the dialog.
      * @param parent
      * @param style
      */
-    public TableDialog(Shell parent, String title, String[] header, List<String[]> body) {
+    public TableDialog(Shell parent, String title, String[] header, List<String[]> body, TableItemCreator creater) {
         super(parent, SWT.SHELL_TRIM | SWT.MODELESS);
         this.shell = parent;
         this.header = header;
         this.body = body;
+        this.creater = creater;
 
         this.orderflgs = new boolean[header.length];
         this.setText(title);
@@ -85,6 +89,7 @@ public final class TableDialog extends Dialog {
         item1.setText("CSVファイルに保存");
 
         final Table table = new Table(this.shell, SWT.FULL_SELECTION | SWT.MULTI);
+        table.addKeyListener(new TableKeyShortcutAdapter(this.header, table));
         table.setLinesVisible(true);
         table.setHeaderVisible(true);
         TableColumn[] columns = new TableColumn[this.header.length];
@@ -132,8 +137,7 @@ public final class TableDialog extends Dialog {
 
     private void addAllTableItems(Table table) {
         for (String[] line : this.body) {
-            TableItem item = new TableItem(table, SWT.NONE);
-            item.setText(line);
+            this.creater.create(table, line);
         }
         table.redraw();
     }

@@ -27,6 +27,6 @@ public final class ItemListReportAdapter extends AbstractReportAdapter {
     @Override
     public void widgetSelected(SelectionEvent paramSelectionEvent) {
         new TableDialog(this.shell, "所有装備一覧", CreateReportLogic.getItemListHeader(),
-                CreateReportLogic.getItemListBody()).open();
+                CreateReportLogic.getItemListBody(), CreateReportLogic.DEFAULT_TABLE_ITEM_CREATOR).open();
     }
 }

@@ -14,6 +14,7 @@ import java.util.Set;
 
 import logbook.data.context.GlobalContext;
 import logbook.dto.ShipDto;
+import logbook.gui.listener.TableKeyShortcutAdapter;
 import logbook.gui.listener.TableToClipboardAdapter;
 import logbook.gui.listener.TableToCsvSaveAdapter;
 import logbook.gui.logic.TimeLogic;
@@ -124,6 +125,7 @@ public class BathwaterTable extends Dialog {
         removecheck.setSelection(removeflg);
 
         final Table table = new Table(this.shell, SWT.FULL_SELECTION | SWT.MULTI);
+        table.addKeyListener(new TableKeyShortcutAdapter(header, table));
         table.setLinesVisible(true);
         table.setHeaderVisible(true);
         TableColumn[] columns = new TableColumn[header.length];

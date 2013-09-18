@@ -27,6 +27,6 @@ public final class ShipListReportAdapter extends AbstractReportAdapter {
     @Override
     public void widgetSelected(SelectionEvent paramSelectionEvent) {
         new TableDialog(this.shell, "所有艦娘一覧", CreateReportLogic.getShipListHeader(),
-                CreateReportLogic.getShipListBody()).open();
+                CreateReportLogic.getShipListBody(), CreateReportLogic.SHIP_LIST_TABLE_ITEM_CREATOR).open();
     }
 }

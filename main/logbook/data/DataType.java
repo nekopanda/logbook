@@ -23,6 +23,8 @@ public enum DataType {
     SLOTITEM_MEMBER("/kcsapi/api_get_member/slotitem"),
     /** アイテム一覧 */
     SLOTITEM_MASTER("/kcsapi/api_get_master/slotitem"),
+    /** 戦闘 */
+    BATTLE("/kcsapi/api_req_sortie/battle"),
     /** 戦闘結果 */
     BATTLERESULT("/kcsapi/api_req_sortie/battleresult"),
     /** 開発 */

@@ -18,6 +18,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
@@ -27,6 +28,7 @@ import javax.json.JsonValue;
 import logbook.config.GlobalConfig;
 import logbook.data.Data;
 import logbook.data.DataQueue;
+import logbook.dto.AwaitingDecision;
 import logbook.dto.BattleResultDto;
 import logbook.dto.CreateItemDto;
 import logbook.dto.DeckMissionDto;
@@ -51,13 +53,13 @@ public final class GlobalContext {
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat(GlobalConfig.DATE_SHORT_FORMAT);
 
     /** 装備Map */
-    private static Map<String, ItemDto> itemMap = new ConcurrentHashMap<String, ItemDto>();
+    private static Map<Long, ItemDto> itemMap = new ConcurrentSkipListMap<Long, ItemDto>();
 
     /** 装備Map(敵) */
     private static Map<String, String> enemyItemMap = new ConcurrentHashMap<String, String>();
 
     /** 艦娘Map */
-    private static Map<String, ShipDto> shipMap = new ConcurrentHashMap<String, ShipDto>();
+    private static Map<Long, ShipDto> shipMap = new ConcurrentSkipListMap<Long, ShipDto>();
 
     /** 秘書艦 */
     private static ShipDto secretary;
@@ -65,8 +67,8 @@ public final class GlobalContext {
     /** 建造 */
     private static List<GetShipDto> getShipList = new ArrayList<GetShipDto>();
 
-    /** 建造(装備名の確定待ち)(艦娘ID, ドックID) */
-    private static Queue<String[]> getShipQueue = new ArrayBlockingQueue<String[]>(10);
+    /** 建造(艦娘名の確定待ち) */
+    private static Queue<AwaitingDecision> getShipQueue = new ArrayBlockingQueue<AwaitingDecision>(10);
 
     /** 建造(投入資源) */
     private static Map<String, ResourceDto> getShipResource = new HashMap<String, ResourceDto>();
@@ -119,7 +121,7 @@ public final class GlobalContext {
     /**
      * @return 装備Map
      */
-    public static Map<String, ItemDto> getItemMap() {
+    public static Map<Long, ItemDto> getItemMap() {
         return Collections.unmodifiableMap(itemMap);
     }
 
@@ -133,7 +135,7 @@ public final class GlobalContext {
     /**
      * @return 艦娘Map
      */
-    public static Map<String, ShipDto> getShipMap() {
+    public static Map<Long, ShipDto> getShipMap() {
         return Collections.unmodifiableMap(shipMap);
     }
 
@@ -341,10 +343,10 @@ public final class GlobalContext {
     private static void doGetship(Data data) {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
-            String shipid = Long.toString(apidata.getJsonNumber("api_id").longValue());
+            long shipid = apidata.getJsonNumber("api_id").longValue();
             String dock = data.getField("api_kdock_id");
 
-            getShipQueue.add(new String[] { shipid, dock });
+            getShipQueue.add(new AwaitingDecision(shipid, dock));
 
             addConsole("建造(入手)情報を更新しました");
         } catch (Exception e) {
@@ -393,12 +395,12 @@ public final class GlobalContext {
             for (int i = 0; i < apidata.size(); i++) {
                 JsonObject object = (JsonObject) apidata.get(i);
                 ItemDto item = new ItemDto(object);
-                itemMap.put(Long.toString(item.getId()), item);
+                itemMap.put(Long.valueOf(item.getId()), item);
             }
             // 確定待ちの開発装備がある場合、装備の名前を確定させます
             CreateItemDto createitem;
             while ((createitem = createItemQueue.poll()) != null) {
-                ItemDto item = itemMap.get(Long.toString(createitem.getId()));
+                ItemDto item = itemMap.get(Long.valueOf(createitem.getId()));
                 if (item != null) {
                     createitem.setName(item.getName());
                     createitem.setType(item.getType());
@@ -449,7 +451,7 @@ public final class GlobalContext {
             shipMap.clear();
             for (int i = 0; i < apidata.size(); i++) {
                 ShipDto ship = new ShipDto((JsonObject) apidata.get(i));
-                shipMap.put(Long.toString(ship.getId()), ship);
+                shipMap.put(Long.valueOf(ship.getId()), ship);
             }
             // 艦隊IDを追加
             JsonArray apidatadeck = data.getJsonObject().getJsonArray("api_data_deck");
@@ -458,7 +460,7 @@ public final class GlobalContext {
                 String fleetid = Long.toString(jsonObject.getJsonNumber("api_id").longValue());
                 JsonArray apiship = jsonObject.getJsonArray("api_ship");
                 for (int j = 0; j < apiship.size(); j++) {
-                    String shipid = Long.toString(((JsonNumber) apiship.get(j)).longValue());
+                    Long shipid = Long.valueOf(((JsonNumber) apiship.get(j)).longValue());
                     ShipDto ship = shipMap.get(shipid);
                     if (ship != null) {
                         if ((i == 0) && (j == 0)) {
@@ -475,11 +477,11 @@ public final class GlobalContext {
             }
 
             // 確定待ちの艦娘がある場合、艦娘の名前を確定させます
-            String[] shipInfo;
+            AwaitingDecision shipInfo;
             while ((shipInfo = getShipQueue.poll()) != null) {
-                ShipDto getShip = shipMap.get(shipInfo[0]);
+                ShipDto getShip = shipMap.get(Long.valueOf(shipInfo.getShipid()));
                 if (getShip != null) {
-                    getShipList.add(new GetShipDto(getShip, getShipResource.get(shipInfo[1])));
+                    getShipList.add(new GetShipDto(getShip, getShipResource.get(shipInfo.getDock())));
                 } else {
                     getShipQueue.add(shipInfo);
                 }

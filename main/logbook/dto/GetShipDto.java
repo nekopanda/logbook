@@ -58,6 +58,13 @@ public final class GetShipDto extends AbstractDto {
     }
 
     /**
+     * @return 艦種
+     */
+    public String getType() {
+        return this.ship.getType();
+    }
+
+    /**
      * @return Lv
      */
     public long getLv() {

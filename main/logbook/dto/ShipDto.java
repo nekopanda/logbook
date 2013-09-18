@@ -32,6 +32,9 @@ public final class ShipDto extends AbstractDto {
     /** 名前 */
     private final String name;
 
+    /** 艦種 */
+    private final String type;
+
     /** Lv */
     private final long lv;
 
@@ -57,7 +60,7 @@ public final class ShipDto extends AbstractDto {
     private final long maxhp;
 
     /** 装備 */
-    private final List<String> slot;
+    private final List<Long> slot;
 
     /** 火力 */
     private final long karyoku;
@@ -91,7 +94,11 @@ public final class ShipDto extends AbstractDto {
     public ShipDto(JsonObject object) {
 
         this.id = object.getJsonNumber("api_id").longValue();
-        this.name = Ship.get(object.getJsonNumber("api_ship_id").toString());
+
+        ShipInfoDto shipinfo = Ship.get(object.getJsonNumber("api_ship_id").toString());
+        this.name = shipinfo.getName();
+        this.type = shipinfo.getType();
+
         this.lv = object.getJsonNumber("api_lv").longValue();
         this.cond = object.getJsonNumber("api_cond").longValue();
 
@@ -102,11 +109,11 @@ public final class ShipDto extends AbstractDto {
         this.exp = object.getJsonNumber("api_exp").longValue();
         this.nowhp = object.getJsonNumber("api_nowhp").longValue();
         this.maxhp = object.getJsonNumber("api_maxhp").longValue();
-        this.slot = new ArrayList<String>();
+        this.slot = new ArrayList<Long>();
         JsonArray array = object.getJsonArray("api_slot");
         for (JsonValue jsonValue : array) {
             JsonNumber itemid = (JsonNumber) jsonValue;
-            this.slot.add(Long.toString(itemid.longValue()));
+            this.slot.add(Long.valueOf(itemid.longValue()));
         }
         this.karyoku = ((JsonNumber) object.getJsonArray("api_karyoku").get(0)).longValue();
         this.raisou = ((JsonNumber) object.getJsonArray("api_raisou").get(0)).longValue();
@@ -146,6 +153,13 @@ public final class ShipDto extends AbstractDto {
      */
     public String getName() {
         return this.name;
+    }
+
+    /**
+     * @return 艦種
+     */
+    public String getType() {
+        return this.type;
     }
 
     /**
@@ -209,9 +223,9 @@ public final class ShipDto extends AbstractDto {
      */
     public List<String> getSlot() {
         List<String> itemNames = new ArrayList<String>();
-        Map<String, ItemDto> itemMap = GlobalContext.getItemMap();
-        for (String itemid : this.slot) {
-            if (!"-1".equals(itemid)) {
+        Map<Long, ItemDto> itemMap = GlobalContext.getItemMap();
+        for (Long itemid : this.slot) {
+            if (-1 != itemid) {
                 ItemDto name = itemMap.get(itemid);
                 if (name != null) {
                     itemNames.add(name.getName());

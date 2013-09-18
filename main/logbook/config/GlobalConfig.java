@@ -36,7 +36,7 @@ public final class GlobalConfig {
     public static final String DATE_SHORT_FORMAT = "HH:mm:ss";
 
     /** バージョン */
-    public static final String VERSION = "0.3.2";
+    public static final String VERSION = "0.3.3";
 
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(UndefinedData.class);

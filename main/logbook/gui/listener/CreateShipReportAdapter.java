@@ -27,6 +27,6 @@ public final class CreateShipReportAdapter extends AbstractReportAdapter {
     @Override
     public void widgetSelected(SelectionEvent paramSelectionEvent) {
         new TableDialog(this.shell, "建造報告書", CreateReportLogic.getCreateShipHeader(),
-                CreateReportLogic.getCreateShipBody()).open();
+                CreateReportLogic.getCreateShipBody(), CreateReportLogic.DEFAULT_TABLE_ITEM_CREATOR).open();
     }
 }

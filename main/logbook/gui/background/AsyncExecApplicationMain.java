@@ -261,7 +261,7 @@ public final class AsyncExecApplicationMain extends Thread {
                     private boolean updateNdock(Date now, List<String> notice) {
                         boolean noticeflg = false;
 
-                        Map<String, ShipDto> shipMap = GlobalContext.getShipMap();
+                        Map<Long, ShipDto> shipMap = GlobalContext.getShipMap();
 
                         Label[] ndockNameLabels = { AsyncExecApplicationMain.this.ndock1name,
                                 AsyncExecApplicationMain.this.ndock2name, AsyncExecApplicationMain.this.ndock3name,
@@ -280,7 +280,7 @@ public final class AsyncExecApplicationMain extends Thread {
                             String time = "";
 
                             if (ids[i] != 0) {
-                                ShipDto ship = shipMap.get(Long.toString(ids[i]));
+                                ShipDto ship = shipMap.get(Long.valueOf(ids[i]));
                                 if (ship != null) {
                                     name = ship.getName() + " (Lv" + ship.getLv() + ")";
                                     long rest = getRest(now, times[i]);

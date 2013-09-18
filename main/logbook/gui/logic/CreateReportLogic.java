@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -27,12 +28,73 @@ import logbook.dto.ShipDto;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
  * 各種報告書を作成します
  *
  */
 public final class CreateReportLogic {
+
+    /** テーブルアイテム作成(デフォルト) */
+    public static final TableItemCreator DEFAULT_TABLE_ITEM_CREATOR = new TableItemCreator() {
+        @Override
+        public TableItem create(Table table, String[] text) {
+            TableItem item = new TableItem(table, SWT.NONE);
+            item.setText(text);
+            return item;
+        }
+    };
+
+    /** テーブルアイテム作成(所有艦娘一覧) */
+    public static final TableItemCreator SHIP_LIST_TABLE_ITEM_CREATOR = new TableItemCreator() {
+        @Override
+        public TableItem create(Table table, String[] text) {
+            // 艦娘
+            Long ship = Long.valueOf(text[0]);
+
+            TableItem item = new TableItem(table, SWT.NONE);
+            // 疲労
+            int cond = Integer.parseInt(text[2]);
+            if (cond <= 15) {
+                item.setForeground(SWTResourceManager.getColor(255, 16, 0));
+            } else if (cond <= 29) {
+                item.setForeground(SWTResourceManager.getColor(255, 140, 0));
+            }
+
+            // 遠征
+            Set<Long> deckmissions = new HashSet<Long>();
+            if ((GlobalContext.getDeck1Mission() != null) && (GlobalContext.getDeck1Mission().getMission() != null)) {
+                deckmissions.addAll(GlobalContext.getDeck1Mission().getShips());
+            }
+            if ((GlobalContext.getDeck2Mission() != null) && (GlobalContext.getDeck2Mission().getMission() != null)) {
+                deckmissions.addAll(GlobalContext.getDeck2Mission().getShips());
+            }
+            if ((GlobalContext.getDeck3Mission() != null) && (GlobalContext.getDeck3Mission().getMission() != null)) {
+                deckmissions.addAll(GlobalContext.getDeck3Mission().getShips());
+            }
+            if (deckmissions.contains(ship)) {
+                item.setForeground(SWTResourceManager.getColor(102, 51, 255));
+            }
+
+            // 入渠
+            Set<Long> docks = new HashSet<Long>();
+            docks.add(GlobalContext.getNdock1id());
+            docks.add(GlobalContext.getNdock2id());
+            docks.add(GlobalContext.getNdock3id());
+            docks.add(GlobalContext.getNdock4id());
+            if (docks.contains(ship)) {
+                item.setForeground(SWTResourceManager.getColor(0, 102, 153));
+            }
+
+            item.setText(text);
+            return item;
+        }
+    };
+
     /** 日付フォーマット */
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat(GlobalConfig.DATE_FORMAT);
 
@@ -67,7 +129,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getCreateShipHeader() {
-        return new String[] { "日付", "名前", "燃料", "弾薬", "鋼材", "ボーキ", "秘書艦" };
+        return new String[] { "日付", "名前", "艦種", "燃料", "弾薬", "鋼材", "ボーキ", "秘書艦" };
     }
 
     /**
@@ -79,7 +141,7 @@ public final class CreateReportLogic {
         List<GetShipDto> ships = GlobalContext.getGetshipList();
         List<Object[]> body = new ArrayList<Object[]>();
         for (GetShipDto ship : ships) {
-            body.add(new Object[] { FORMAT.format(ship.getGetDate()), ship.getName(),
+            body.add(new Object[] { FORMAT.format(ship.getGetDate()), ship.getName(), ship.getType(),
                     ship.getFuel(), ship.getAmmo(), ship.getMetal(),
                     ship.getBauxite(), ship.getSecretary() });
         }
@@ -132,9 +194,9 @@ public final class CreateReportLogic {
      * @return 内容
      */
     public static List<String[]> getItemListBody() {
-        Set<Entry<String, ItemDto>> items = GlobalContext.getItemMap().entrySet();
+        Set<Entry<Long, ItemDto>> items = GlobalContext.getItemMap().entrySet();
         List<Object[]> body = new ArrayList<Object[]>();
-        for (Entry<String, ItemDto> entry : items) {
+        for (Entry<Long, ItemDto> entry : items) {
             ItemDto item = entry.getValue();
             body.add(new Object[] { item.getName(), item.getType(), item.getHoug(), item.getHoum(),
                     item.getKaih(), item.getLeng(), item.getLuck(), item.getBaku(), item.getRaig(),
@@ -150,7 +212,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getShipListHeader() {
-        return new String[] { "艦娘ID", "艦隊", "疲", "名前", "Lv", "経験値", "HP", "装備1", "装備2", "装備3", "装備4",
+        return new String[] { "艦娘ID", "艦隊", "疲労", "名前", "艦種", "Lv", "経験値", "HP", "装備1", "装備2", "装備3", "装備4",
                 "火力", "雷装", "対空", "装甲", "回避", "対潜", "索敵", "運" };
     }
 
@@ -160,11 +222,11 @@ public final class CreateReportLogic {
      * @return 内容
      */
     public static List<String[]> getShipListBody() {
-        Set<Entry<String, ShipDto>> ships = GlobalContext.getShipMap().entrySet();
+        Set<Entry<Long, ShipDto>> ships = GlobalContext.getShipMap().entrySet();
         List<Object[]> body = new ArrayList<Object[]>();
-        for (Entry<String, ShipDto> entry : ships) {
+        for (Entry<Long, ShipDto> entry : ships) {
             ShipDto ship = entry.getValue();
-            body.add(new Object[] { ship.getId(), ship.getFleetid(), ship.getCond(), ship.getName(),
+            body.add(new Object[] { ship.getId(), ship.getFleetid(), ship.getCond(), ship.getName(), ship.getType(),
                     ship.getLv(), ship.getExp(), ship.getMaxhp(), ship.getSlot().get(0), ship.getSlot().get(1),
                     ship.getSlot().get(2), ship.getSlot().get(3), ship.getKaryoku(), ship.getRaisou(),
                     ship.getTaiku(), ship.getSoukou(), ship.getKaihi(), ship.getTaisen(), ship.getSakuteki(),

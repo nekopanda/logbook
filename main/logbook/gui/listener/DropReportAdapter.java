@@ -27,6 +27,6 @@ public final class DropReportAdapter extends AbstractReportAdapter {
     @Override
     public void widgetSelected(SelectionEvent paramSelectionEvent) {
         new TableDialog(this.shell, "ドロップ報告書", CreateReportLogic.getBattleResultHeader(),
-                CreateReportLogic.getBattleResultBody()).open();
+                CreateReportLogic.getBattleResultBody(), CreateReportLogic.DEFAULT_TABLE_ITEM_CREATOR).open();
     }
 }

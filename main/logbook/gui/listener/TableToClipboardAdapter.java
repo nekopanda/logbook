@@ -40,13 +40,23 @@ public final class TableToClipboardAdapter extends SelectionAdapter {
 
     @Override
     public void widgetSelected(SelectionEvent arg) {
-        TableItem[] tableItems = this.table.getSelection();
+        copyTable(this.header, this.table);
+    }
+
+    /**
+     * テーブルの選択されている部分をヘッダー付きでクリップボードにコピーします
+     * 
+     * @param header ヘッダー
+     * @param table テーブル
+     */
+    public static void copyTable(String[] header, Table table) {
+        TableItem[] tableItems = table.getSelection();
         StringBuilder sb = new StringBuilder();
-        sb.append(StringUtils.join(this.header, "\t"));
+        sb.append(StringUtils.join(header, "\t"));
         sb.append("\r\n");
         for (TableItem column : tableItems) {
-            String[] columns = new String[this.header.length];
-            for (int i = 0; i < this.header.length; i++) {
+            String[] columns = new String[header.length];
+            for (int i = 0; i < header.length; i++) {
                 columns[i] = column.getText(i);
             }
             sb.append(StringUtils.join(columns, "\t"));
