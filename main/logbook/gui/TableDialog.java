@@ -85,8 +85,13 @@ public final class TableDialog extends Dialog {
 
         Menu menubar = new Menu(this.shell, SWT.BAR);
         this.shell.setMenuBar(menubar);
-        MenuItem item1 = new MenuItem(menubar, SWT.CASCADE);
-        item1.setText("CSVファイルに保存");
+        MenuItem fileroot = new MenuItem(menubar, SWT.CASCADE);
+        fileroot.setText("ファイル");
+        Menu filemenu = new Menu(fileroot);
+        fileroot.setMenu(filemenu);
+
+        MenuItem savecsv = new MenuItem(filemenu, SWT.NONE);
+        savecsv.setText("CSVファイルに保存");
 
         final Table table = new Table(this.shell, SWT.FULL_SELECTION | SWT.MULTI);
         table.addKeyListener(new TableKeyShortcutAdapter(this.header, table));
@@ -102,7 +107,7 @@ public final class TableDialog extends Dialog {
 
         this.addAllTableItems(table);
 
-        item1.addSelectionListener(new TableToCsvSaveAdapter(this.shell, this.getText(), this.header, table));
+        savecsv.addSelectionListener(new TableToCsvSaveAdapter(this.shell, this.getText(), this.header, table));
 
         Menu menu = new Menu(table);
         table.setMenu(menu);

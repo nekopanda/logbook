@@ -112,14 +112,19 @@ public class BathwaterTable extends Dialog {
         this.shell.setText(this.getText());
         this.shell.setLayout(new FillLayout());
 
-        Menu menubar1 = new Menu(this.shell, SWT.BAR);
-        this.shell.setMenuBar(menubar1);
-        MenuItem item1 = new MenuItem(menubar1, SWT.CASCADE);
-        item1.setText("CSVファイルに保存");
-        MenuItem item2 = new MenuItem(menubar1, SWT.CASCADE);
-        item2.setText("操作");
-        Menu menubar2 = new Menu(item2);
-        item2.setMenu(menubar2);
+        Menu menubar = new Menu(this.shell, SWT.BAR);
+        this.shell.setMenuBar(menubar);
+        MenuItem fileroot = new MenuItem(menubar, SWT.CASCADE);
+        fileroot.setText("ファイル");
+        Menu filemenu = new Menu(fileroot);
+        fileroot.setMenu(filemenu);
+        MenuItem savecsv = new MenuItem(filemenu, SWT.NONE);
+        savecsv.setText("CSVファイルに保存");
+
+        MenuItem operation = new MenuItem(menubar, SWT.CASCADE);
+        operation.setText("操作");
+        Menu menubar2 = new Menu(operation);
+        operation.setMenu(menubar2);
         final MenuItem removecheck = new MenuItem(menubar2, SWT.CHECK);
         removecheck.setText("遠征・入渠中の艦娘を外す");
         removecheck.setSelection(removeflg);
@@ -137,7 +142,7 @@ public class BathwaterTable extends Dialog {
         }
         this.addAllTableItems(table);
 
-        item1.addSelectionListener(new TableToCsvSaveAdapter(this.shell, this.getText(), header, table));
+        savecsv.addSelectionListener(new TableToCsvSaveAdapter(this.shell, this.getText(), header, table));
 
         for (int i = 0; i < columns.length; i++) {
             columns[i].pack();

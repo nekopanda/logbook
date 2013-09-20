@@ -112,7 +112,7 @@ public class CalcExp extends Dialog {
         label1.setText("今のレベル");
         final Spinner beforelv = new Spinner(plan, SWT.BORDER);
         GridData gdBeforelv = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdBeforelv.widthHint = 20;
+        gdBeforelv.widthHint = 30;
         beforelv.setLayoutData(gdBeforelv);
         beforelv.setMaximum(99);
         beforelv.setMinimum(1);
@@ -130,7 +130,7 @@ public class CalcExp extends Dialog {
         label4.setText("目標レベル");
         final Spinner afterlv = new Spinner(plan, SWT.BORDER);
         GridData gdAfterlv = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdAfterlv.widthHint = 20;
+        gdAfterlv.widthHint = 30;
         afterlv.setLayoutData(gdAfterlv);
         afterlv.setMaximum(99);
         afterlv.setMinimum(1);
