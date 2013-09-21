@@ -79,7 +79,7 @@ public class UndefinedData implements Data {
         if (this.response.length != 0) {
 
             for (DataType entry : DataType.values()) {
-                if ((this.url != null) && this.url.endsWith(entry.getUrl())) {
+                if ((entry.getUrl() != null) && this.url.endsWith(entry.getUrl())) {
                     try {
                         // リクエストのフィールドを復号します
                         Map<String, String> field = null;
