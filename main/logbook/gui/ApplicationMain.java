@@ -137,10 +137,10 @@ public final class ApplicationMain {
         calcmenuroot.setText("計算機");
         Menu calcmenu = new Menu(calcmenuroot);
         calcmenuroot.setMenu(calcmenu);
-        MenuItem helproot = new MenuItem(menubar, SWT.CASCADE);
-        helproot.setText("ヘルプ");
-        Menu helpmenu = new Menu(helproot);
-        helproot.setMenu(helpmenu);
+        MenuItem etcroot = new MenuItem(menubar, SWT.CASCADE);
+        etcroot.setText("その他");
+        Menu etcmenu = new Menu(etcroot);
+        etcroot.setMenu(etcmenu);
 
         // メニュー
         // コマンド-ドロップ報告書
@@ -177,8 +177,12 @@ public final class ApplicationMain {
         calcexp.setText("経験値計算機");
         calcexp.addSelectionListener(new CalcExpAdapter(this.shell));
 
+        // ヘルプ-設定
+        MenuItem config = new MenuItem(etcmenu, SWT.NONE);
+        config.setText("設定");
+        config.addSelectionListener(new HelpEventListener(this.shell));
         // ヘルプ-バージョン情報
-        MenuItem version = new MenuItem(helpmenu, SWT.NONE);
+        MenuItem version = new MenuItem(etcmenu, SWT.NONE);
         version.setText("バージョン情報");
         version.addSelectionListener(new HelpEventListener(this.shell));
 
