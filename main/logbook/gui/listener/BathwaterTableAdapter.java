@@ -3,7 +3,7 @@
  */
 package logbook.gui.listener;
 
-import logbook.gui.BathwaterTable;
+import logbook.gui.BathwaterTableDialog;
 
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -29,6 +29,6 @@ public final class BathwaterTableAdapter extends SelectionAdapter {
 
     @Override
     public void widgetSelected(SelectionEvent e) {
-        new BathwaterTable(this.shell).open();
+        new BathwaterTableDialog(this.shell).open();
     }
 }

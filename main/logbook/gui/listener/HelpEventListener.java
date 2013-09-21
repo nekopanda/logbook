@@ -5,9 +5,8 @@
  */
 package logbook.gui.listener;
 
-import logbook.gui.Help;
+import logbook.gui.VersionDialog;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -34,11 +33,11 @@ public final class HelpEventListener extends SelectionAdapter implements HelpLis
 
     @Override
     public void helpRequested(HelpEvent paramHelpEvent) {
-        new Help(this.shell, SWT.SHELL_TRIM | SWT.MODELESS).open();
+        new VersionDialog(this.shell).open();
     }
 
     @Override
     public void widgetSelected(SelectionEvent e) {
-        new Help(this.shell, SWT.SHELL_TRIM | SWT.MODELESS).open();
+        new VersionDialog(this.shell).open();
     }
 }

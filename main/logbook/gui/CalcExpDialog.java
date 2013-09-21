@@ -43,7 +43,7 @@ import org.eclipse.swt.widgets.Text;
  * 経験値計算機
  *
  */
-public class CalcExp extends Dialog {
+public class CalcExpDialog extends Dialog {
 
     /** 海域インデックス値 */
     private static int seaidx;
@@ -63,7 +63,7 @@ public class CalcExp extends Dialog {
      * @param parent
      * @param style
      */
-    public CalcExp(Shell parent) {
+    public CalcExpDialog(Shell parent) {
         super(parent, SWT.SHELL_TRIM | SWT.MODELESS);
         this.setText("経験値計算機");
 
@@ -112,7 +112,7 @@ public class CalcExp extends Dialog {
         label1.setText("今のレベル");
         final Spinner beforelv = new Spinner(plan, SWT.BORDER);
         GridData gdBeforelv = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdBeforelv.widthHint = 30;
+        gdBeforelv.widthHint = 45;
         beforelv.setLayoutData(gdBeforelv);
         beforelv.setMaximum(99);
         beforelv.setMinimum(1);
@@ -120,7 +120,7 @@ public class CalcExp extends Dialog {
         label2.setText("Lv");
         final Text beforexp = new Text(plan, SWT.BORDER | SWT.READ_ONLY);
         GridData gdBeforexp = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdBeforexp.widthHint = 55;
+        gdBeforexp.widthHint = 60;
         beforexp.setLayoutData(gdBeforexp);
         beforexp.setText("0");
         Label label3 = new Label(plan, SWT.NONE);
@@ -130,7 +130,7 @@ public class CalcExp extends Dialog {
         label4.setText("目標レベル");
         final Spinner afterlv = new Spinner(plan, SWT.BORDER);
         GridData gdAfterlv = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdAfterlv.widthHint = 30;
+        gdAfterlv.widthHint = 45;
         afterlv.setLayoutData(gdAfterlv);
         afterlv.setMaximum(99);
         afterlv.setMinimum(1);
@@ -138,7 +138,7 @@ public class CalcExp extends Dialog {
         label5.setText("Lv");
         final Text afterexp = new Text(plan, SWT.BORDER | SWT.READ_ONLY);
         GridData gdAfterexp = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdAfterexp.widthHint = 55;
+        gdAfterexp.widthHint = 60;
         afterexp.setLayoutData(gdAfterexp);
         afterexp.setText("0");
         Label label6 = new Label(plan, SWT.NONE);
@@ -261,9 +261,9 @@ public class CalcExp extends Dialog {
         // 評価コンボボックスのインデックス値を保存
         evalidx = evalcombo.getSelectionIndex();
         // 旗艦チェックを保存
-        CalcExp.flag = flag;
+        CalcExpDialog.flag = flag;
         // MVPチェックを保存
-        CalcExp.mvp = mvp;
+        CalcExpDialog.mvp = mvp;
     }
 
     /**
@@ -336,7 +336,8 @@ public class CalcExp extends Dialog {
 
         @Override
         public void widgetSelected(SelectionEvent e) {
-            CalcExp.this.calc(this.beforexp, this.afterexp, this.seacombo, this.evalcombo, this.flagbtn.getSelection(),
+            CalcExpDialog.this.calc(this.beforexp, this.afterexp, this.seacombo, this.evalcombo,
+                    this.flagbtn.getSelection(),
                     this.mvp.getSelection(), this.getexp, this.needexp, this.battlecount);
         }
     }
@@ -393,7 +394,8 @@ public class CalcExp extends Dialog {
         @Override
         public void widgetSelected(SelectionEvent e) {
             if (this.shipcombo.getSelectionIndex() > -1) {
-                ShipDto ship = CalcExp.this.shipmap.get(this.shipcombo.getItem(this.shipcombo.getSelectionIndex()));
+                ShipDto ship = CalcExpDialog.this.shipmap
+                        .get(this.shipcombo.getItem(this.shipcombo.getSelectionIndex()));
                 if (ship != null) {
                     int before = (int) ship.getLv();
                     int after = Math.min(((int) (ship.getLv() + 20) / 10) * 10, 99);
@@ -407,7 +409,8 @@ public class CalcExp extends Dialog {
                     this.afterexp.setText(afterexpstr);
                 }
             }
-            CalcExp.this.calc(this.beforexp, this.afterexp, this.seacombo, this.evalcombo, this.flagbtn.getSelection(),
+            CalcExpDialog.this.calc(this.beforexp, this.afterexp, this.seacombo, this.evalcombo,
+                    this.flagbtn.getSelection(),
                     this.mvp.getSelection(), this.getexp, this.needexp, this.battlecount);
         }
     }
@@ -458,7 +461,8 @@ public class CalcExp extends Dialog {
         public void widgetSelected(SelectionEvent e) {
             String beforeexpstr = Long.toString(ExpTable.get().get(this.beforelv.getSelection()));
             this.beforexp.setText(beforeexpstr);
-            CalcExp.this.calc(this.beforexp, this.afterexp, this.seacombo, this.evalcombo, this.flagbtn.getSelection(),
+            CalcExpDialog.this.calc(this.beforexp, this.afterexp, this.seacombo, this.evalcombo,
+                    this.flagbtn.getSelection(),
                     this.mvp.getSelection(), this.getexp, this.needexp, this.battlecount);
         }
     }
@@ -509,7 +513,8 @@ public class CalcExp extends Dialog {
         public void widgetSelected(SelectionEvent e) {
             String afterexpstr = Long.toString(ExpTable.get().get(this.afterlv.getSelection()));
             this.afterexp.setText(afterexpstr);
-            CalcExp.this.calc(this.beforexp, this.afterexp, this.seacombo, this.evalcombo, this.flagbtn.getSelection(),
+            CalcExpDialog.this.calc(this.beforexp, this.afterexp, this.seacombo, this.evalcombo,
+                    this.flagbtn.getSelection(),
                     this.mvp.getSelection(), this.getexp, this.needexp, this.battlecount);
         }
     }

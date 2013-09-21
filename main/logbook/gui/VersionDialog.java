@@ -5,12 +5,19 @@
  */
 package logbook.gui;
 
+import java.awt.Desktop;
+import java.net.URI;
+
 import logbook.config.GlobalConfig;
 import logbook.server.proxy.Filter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -18,13 +25,16 @@ import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 
 /**
  * @author noname
  *
  */
-public class Help extends Dialog {
+public class VersionDialog extends Dialog {
+
+    private static final Logger LOG = LogManager.getLogger(VersionDialog.class);
 
     protected Object result;
     protected Shell shell;
@@ -34,9 +44,9 @@ public class Help extends Dialog {
      * @param parent
      * @param style
      */
-    public Help(Shell parent, int style) {
-        super(parent, style);
-        this.setText("ヘルプ");
+    public VersionDialog(Shell parent) {
+        super(parent, SWT.SHELL_TRIM | SWT.MODELESS);
+        this.setText("バージョン情報");
     }
 
     /**
@@ -61,7 +71,6 @@ public class Help extends Dialog {
      */
     private void createContents() {
         this.shell = new Shell(this.getParent(), this.getStyle());
-        this.shell.setSize(300, 350);
         this.shell.setText(this.getText());
         this.shell.setLayout(new GridLayout(1, false));
 
@@ -71,8 +80,22 @@ public class Help extends Dialog {
         versionGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         versionGroup.setLayout(new GridLayout(2, true));
 
-        this.label("航海日誌", versionGroup);
-        this.label(GlobalConfig.VERSION, versionGroup);
+        label("航海日誌", versionGroup);
+        label(GlobalConfig.VERSION, versionGroup);
+
+        Link gowebsite = new Link(versionGroup, SWT.NONE);
+        gowebsite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
+        gowebsite.setText("<a>クリックするとウェブサイトに移動します</a>");
+        gowebsite.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                try {
+                    Desktop.getDesktop().browse(new URI("http://kancolle.sanaechan.net/"));
+                } catch (Exception e) {
+                    LOG.warn("ウェブサイトに移動が失敗しました", e);
+                }
+            }
+        });
 
         // 設定
         Group appGroup = new Group(this.shell, SWT.NONE);
@@ -80,8 +103,8 @@ public class Help extends Dialog {
         appGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         appGroup.setLayout(new GridLayout(2, true));
 
-        this.label("鎮守府サーバー", appGroup);
-        this.label(StringUtils.defaultString(Filter.getServerName(), "未設定"), appGroup);
+        label("鎮守府サーバー", appGroup);
+        label(StringUtils.defaultString(Filter.getServerName(), "未設定"), appGroup);
 
         // 設定
         Group javaGroup = new Group(this.shell, SWT.NONE);
@@ -92,26 +115,28 @@ public class Help extends Dialog {
         double totalMemory = ((double) Runtime.getRuntime().totalMemory()) / 1024 / 1024;
         double freeMemory = ((double) Runtime.getRuntime().freeMemory()) / 1024 / 1024;
 
-        this.label("利用可能メモリサイズ", javaGroup);
-        this.label(Long.toString(Math.round(totalMemory)) + " MB", javaGroup);
+        label("利用可能メモリサイズ", javaGroup);
+        label(Long.toString(Math.round(totalMemory)) + " MB", javaGroup);
 
-        this.label("利用中メモリサイズ", javaGroup);
-        this.label(Long.toString(Math.round(totalMemory - freeMemory)) + " MB", javaGroup);
+        label("利用中メモリサイズ", javaGroup);
+        label(Long.toString(Math.round(totalMemory - freeMemory)) + " MB", javaGroup);
 
-        this.label("os.name", javaGroup);
-        this.label(SystemUtils.OS_NAME, javaGroup);
+        label("os.name", javaGroup);
+        label(SystemUtils.OS_NAME, javaGroup);
 
-        this.label("os.version", javaGroup);
-        this.label(SystemUtils.OS_VERSION, javaGroup);
+        label("os.version", javaGroup);
+        label(SystemUtils.OS_VERSION, javaGroup);
 
-        this.label("java.vendor", javaGroup);
-        this.label(SystemUtils.JAVA_VENDOR, javaGroup);
+        label("java.vendor", javaGroup);
+        label(SystemUtils.JAVA_VENDOR, javaGroup);
 
-        this.label("java.version", javaGroup);
-        this.label(SystemUtils.JAVA_VERSION, javaGroup);
+        label("java.version", javaGroup);
+        label(SystemUtils.JAVA_VERSION, javaGroup);
+
+        this.shell.pack();
     }
 
-    private Label label(String text, Composite composite) {
+    private static Label label(String text, Composite composite) {
         Label label = new Label(composite, SWT.NONE);
         label.setText(text);
         label.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));

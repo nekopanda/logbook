@@ -7,13 +7,17 @@ package logbook.config;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.Properties;
 
 import logbook.data.UndefinedData;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
@@ -41,91 +45,125 @@ public final class GlobalConfig {
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(UndefinedData.class);
 
-    /** 各種設定 */
-    private static final GlobalConfig CONFIG = new GlobalConfig();
+    /** 設定ファイル  */
+    private static final File CONFIG_FILE = new File("./config/internal.txt");
 
-    /** ポート番号 */
-    private final int listenPort;
-
-    /** ウインドウサイズ(width) */
-    private final int width;
-
-    /** ウインドウサイズ(height) */
-    private final int height;
-
-    /** 最前面に表示する */
-    private final int onTop;
-
-    /** 音量 */
-    private final float soundLevel;
+    /** 設定プロパティ */
+    private static final Properties PROPERTIES = readconfig(CONFIG_FILE);
 
     /**
      * コンストラクター
      */
     private GlobalConfig() {
-
-        // 内部設定
-        Properties internal = readconfig(new File("./config/internal.txt"));
-        // ポート番号
-        this.listenPort = Integer.parseInt(internal.getProperty("listen_port", "8888"));
-        // ウインドウサイズ(width)
-        this.width = Integer.parseInt(internal.getProperty("width", "280"));
-        // ウインドウサイズ(width)
-        this.height = Integer.parseInt(internal.getProperty("height", "420"));
-        // 常に最前面に表示
-        String onTop = internal.getProperty("on_top");
-        if ((onTop != null) && "1".equals(onTop)) {
-            this.onTop = SWT.ON_TOP;
-        } else {
-            this.onTop = 0;
-        }
-        // 音量
-        this.soundLevel = ((float) Integer.parseInt(internal.getProperty("sound_level", "85"))) / 100;
     }
 
     /**
-     * ポート番号
+     * ポート番号を取得する
+     * 
      * @return ポート番号
      */
-    public int getListenPort() {
-        return this.listenPort;
+    public static int getListenPort() {
+        return Integer.parseInt(PROPERTIES.getProperty("listen_port", "8888"));
     }
 
     /**
-     * ウインドウサイズ(width)
+     * ポート番号をセットする
+     */
+    public static void setListenPort(String listenPort) {
+        if (StringUtils.isNumeric(listenPort)) {
+            PROPERTIES.setProperty("listen_port", listenPort);
+        }
+    }
+
+    /**
+     * ウインドウサイズ(width)を取得する
+     * 
      * @return ウインドウサイズ(width)
      */
-    public int getWidth() {
-        return this.width;
+    public static int getWidth() {
+        return Integer.parseInt(PROPERTIES.getProperty("width", "280"));
     }
 
     /**
-     * ウインドウサイズ(height)
+     * ウインドウサイズ(width)をセットする
+     * 
+     * @param width
+     */
+    public static void setWidth(String width) {
+        if (StringUtils.isNumeric(width)) {
+            PROPERTIES.setProperty("width", width);
+        }
+    }
+
+    /**
+     * ウインドウサイズ(height)を取得する
+     * 
      * @return ウインドウサイズ(height)
      */
-    public int getHeight() {
-        return this.height;
+    public static int getHeight() {
+        return Integer.parseInt(PROPERTIES.getProperty("height", "420"));
     }
 
     /**
-     * 最前面に表示
+     * ウインドウサイズ(height)をセットする
+     * 
+     * @param height
+     */
+    public static void setHeight(String height) {
+        if (StringUtils.isNumeric(height)) {
+            PROPERTIES.setProperty("height", height);
+        }
+    }
+
+    /**
+     * 最前面に表示を取得する
+     * 
      * @return 最前面に表示
      */
-    public int getOnTop() {
-        return this.onTop;
+    public static int getOnTop() {
+        return "1".equals(PROPERTIES.getProperty("on_top", "1")) ? SWT.ON_TOP : SWT.NONE;
     }
 
     /**
-     * 音量
+     * 最前面に表示をセットする
+     * 
+     * @param ontop
+     */
+    public static void setOnTop(boolean ontop) {
+        PROPERTIES.setProperty("on_top", ontop ? "1" : "0");
+    }
+
+    /**
+     * 音量を取得する
+     * 
      * @return 音量
      */
-    public float getSoundLevel() {
-        return this.soundLevel;
+    public static float getSoundLevel() {
+        return ((float) Integer.parseInt(PROPERTIES.getProperty("sound_level", "85"))) / 100;
+    }
+
+    /**
+     * 音量をセットする
+     * 
+     * @param level
+     */
+    public static void setSoundLevel(String level) {
+        if (StringUtils.isNumeric(level)) {
+            PROPERTIES.setProperty("sound_level", level);
+        }
+    }
+
+    /**
+     * 設定ファイルを書き込みます
+     */
+    public static void store() {
+        saveconfig(PROPERTIES, CONFIG_FILE);
     }
 
     /**
      * 設定ファイルを読み込みます
-     * @param file
+     * 
+     * @param file File
      * @return
      */
     private static Properties readconfig(File file) {
@@ -148,7 +186,27 @@ public final class GlobalConfig {
         return properties;
     }
 
-    public static GlobalConfig getConfig() {
-        return CONFIG;
+    /**
+     * 設定ファイルを書き込みます
+     * 
+     * @param properties Properties
+     * @param file File
+     */
+    private static void saveconfig(Properties properties, File file) {
+        try {
+            OutputStream out = new FileOutputStream(file);
+            try {
+                OutputStreamWriter writer = new OutputStreamWriter(out, CHARSET);
+                try {
+                    properties.store(writer, "内部設定");
+                } finally {
+                    writer.close();
+                }
+            } finally {
+                out.close();
+            }
+        } catch (Exception e) {
+            LOG.fatal("設定ファイルの書き込みに失敗しました", e);
+        }
     }
 }

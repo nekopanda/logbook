@@ -5,7 +5,7 @@
  */
 package logbook.gui.listener;
 
-import logbook.gui.CalcExpDialog;
+import logbook.gui.ConfigDialog;
 
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Shell;
  * メニューから経験値計算機を押した場合のリスナー
  *
  */
-public final class CalcExpAdapter extends SelectionAdapter {
+public final class ConfigDialogAdapter extends SelectionAdapter {
 
     /** シェル */
     private final Shell shell;
@@ -25,12 +25,12 @@ public final class CalcExpAdapter extends SelectionAdapter {
      * 
      * @param shell シェル
      */
-    public CalcExpAdapter(Shell shell) {
+    public ConfigDialogAdapter(Shell shell) {
         this.shell = shell;
     }
 
     @Override
     public void widgetSelected(SelectionEvent e) {
-        new CalcExpDialog(this.shell).open();
+        new ConfigDialog(this.shell).open();
     }
 }

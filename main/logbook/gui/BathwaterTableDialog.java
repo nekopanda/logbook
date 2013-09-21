@@ -38,7 +38,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
  * お風呂に入りたい艦娘
  * 
  */
-public class BathwaterTable extends Dialog {
+public class BathwaterTableDialog extends Dialog {
 
     private static boolean removeflg;
 
@@ -53,7 +53,7 @@ public class BathwaterTable extends Dialog {
      * @param parent
      * @param style
      */
-    public BathwaterTable(Shell parent) {
+    public BathwaterTableDialog(Shell parent) {
         super(parent, SWT.SHELL_TRIM | SWT.MODELESS);
         this.setText("お風呂に入りたい艦娘");
     }
@@ -157,8 +157,8 @@ public class BathwaterTable extends Dialog {
         removecheck.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                BathwaterTable.removeflg = removecheck.getSelection();
-                BathwaterTable.this.addAllTableItems(table);
+                BathwaterTableDialog.removeflg = removecheck.getSelection();
+                BathwaterTableDialog.this.addAllTableItems(table);
             }
         });
     }

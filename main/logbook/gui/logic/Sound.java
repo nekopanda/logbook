@@ -78,7 +78,7 @@ public final class Sound {
                     // ゲインのコントロールを取得します
                     FloatControl control = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
                     // サウンド音量を設定
-                    controlByLinearScalar(control, GlobalConfig.getConfig().getSoundLevel());
+                    controlByLinearScalar(control, GlobalConfig.getSoundLevel());
 
                     int nBytesRead = 0;
                     byte[] abData = new byte[BUFFER_SIZE];

@@ -5,8 +5,6 @@
  */
 package logbook.gui;
 
-import static logbook.config.GlobalConfig.*;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -15,6 +13,7 @@ import logbook.gui.background.AsyncExecApplicationMain;
 import logbook.gui.background.AsyncExecApplicationMainConsole;
 import logbook.gui.listener.BathwaterTableAdapter;
 import logbook.gui.listener.CalcExpAdapter;
+import logbook.gui.listener.ConfigDialogAdapter;
 import logbook.gui.listener.CreateItemReportAdapter;
 import logbook.gui.listener.CreateShipReportAdapter;
 import logbook.gui.listener.DropReportAdapter;
@@ -114,8 +113,8 @@ public final class ApplicationMain {
     public void createContents() {
 
         final Display display = Display.getDefault();
-        this.shell = new Shell(SWT.SHELL_TRIM | getConfig().getOnTop());
-        this.shell.setSize(getConfig().getWidth(), getConfig().getHeight());
+        this.shell = new Shell(SWT.SHELL_TRIM | GlobalConfig.getOnTop());
+        this.shell.setSize(GlobalConfig.getWidth(), GlobalConfig.getHeight());
         this.shell.setText("航海日誌 " + GlobalConfig.VERSION);
         GridLayout glShell = new GridLayout(1, false);
         glShell.horizontalSpacing = 1;
@@ -180,7 +179,7 @@ public final class ApplicationMain {
         // ヘルプ-設定
         MenuItem config = new MenuItem(etcmenu, SWT.NONE);
         config.setText("設定");
-        config.addSelectionListener(new HelpEventListener(this.shell));
+        config.addSelectionListener(new ConfigDialogAdapter(this.shell));
         // ヘルプ-バージョン情報
         MenuItem version = new MenuItem(etcmenu, SWT.NONE);
         version.setText("バージョン情報");
