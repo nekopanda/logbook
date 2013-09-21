@@ -8,7 +8,6 @@ package logbook.data;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URLDecoder;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,16 +17,13 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 /**
  * 同定されていない未加工のデータ
  * 
  */
 public class UndefinedData implements Data {
 
-    private static final Logger LOG = LogManager.getLogger(UndefinedData.class);
+    private static final long SKIP_BYTES = "svdata=".length();
 
     private final String url;
 
@@ -45,8 +41,8 @@ public class UndefinedData implements Data {
      */
     public UndefinedData(String url, byte[] request, byte[] response) {
         this.url = url;
-        this.request = Arrays.copyOf(request, request.length);
-        this.response = Arrays.copyOf(response, response.length);
+        this.request = request;
+        this.response = response;
         this.date = Calendar.getInstance().getTime();
     }
 
@@ -71,22 +67,6 @@ public class UndefinedData implements Data {
     }
 
     /**
-     * URLを返します
-     * @return URL
-     */
-    public final String getUrl() {
-        return this.url;
-    }
-
-    /**
-     * レスポンスを返します
-     * @return レスポンス
-     */
-    public final byte[] getResponse() {
-        return Arrays.copyOf(this.response, this.response.length);
-    }
-
-    /**
      * <p>
      * 未定義のデータを同定します
      * 同定出来ない場合の型はUndefeatedDataです
@@ -96,34 +76,30 @@ public class UndefinedData implements Data {
      * @return
      */
     public final Data toDefinedData() {
-        try {
-            if (this.getResponse().length != 0) {
+        if (this.response.length != 0) {
 
-                for (DataType entry : DataType.values()) {
-                    if ((entry.getUrl() != null) && this.getUrl().endsWith(entry.getUrl())) {
-                        try {
-                            // リクエストのフィールドを復号します
-                            Map<String, String> field = null;
-                            if (this.request != null) {
-                                field = getQueryMap(URLDecoder.decode(new String(this.request).trim(), "UTF-8"));
-                            }
-                            // レスポンスのJSONを復号します
-                            InputStream stream = new ByteArrayInputStream(this.getResponse());
-                            // レスポンスボディのJSONはsvdata=から始まるので除去します
-                            stream.skip("svdata=".length());
-
-                            JsonReader jsonreader = Json.createReader(stream);
-                            JsonObject json = jsonreader.readObject();
-
-                            return new ActionData(entry, this.getCreateDate(), json, field);
-                        } catch (Exception e) {
-                            return this;
+            for (DataType entry : DataType.values()) {
+                if ((this.url != null) && this.url.endsWith(entry.getUrl())) {
+                    try {
+                        // リクエストのフィールドを復号します
+                        Map<String, String> field = null;
+                        if (this.request != null) {
+                            field = getQueryMap(URLDecoder.decode(new String(this.request).trim(), "UTF-8"));
                         }
+                        // レスポンスのJSONを復号します
+                        InputStream stream = new ByteArrayInputStream(this.response);
+                        // レスポンスボディのJSONはsvdata=から始まるので除去します
+                        stream.skip(SKIP_BYTES);
+
+                        JsonReader jsonreader = Json.createReader(stream);
+                        JsonObject json = jsonreader.readObject();
+
+                        return new ActionData(entry, this.date, json, field);
+                    } catch (Exception e) {
+                        return this;
                     }
                 }
             }
-        } catch (Exception e) {
-            LOG.warn("取得したデータの解析に失敗しました", e);
         }
         return this;
     }
