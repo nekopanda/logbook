@@ -61,7 +61,6 @@ public class CalcExpDialog extends Dialog {
     /**
      * Create the dialog.
      * @param parent
-     * @param style
      */
     public CalcExpDialog(Shell parent) {
         super(parent, SWT.SHELL_TRIM | SWT.MODELESS);
@@ -74,8 +73,6 @@ public class CalcExpDialog extends Dialog {
 
     /**
      * Open the dialog.
-     * @return 
-     * @return the result
      */
     public void open() {
         this.createContents();

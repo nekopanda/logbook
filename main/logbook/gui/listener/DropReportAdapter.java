@@ -5,7 +5,7 @@
  */
 package logbook.gui.listener;
 
-import logbook.gui.TableDialog;
+import logbook.gui.BattleTableDialog;
 import logbook.gui.logic.CreateReportLogic;
 
 import org.eclipse.swt.events.SelectionEvent;
@@ -26,7 +26,7 @@ public final class DropReportAdapter extends AbstractReportAdapter {
 
     @Override
     public void widgetSelected(SelectionEvent paramSelectionEvent) {
-        new TableDialog(this.shell, "ドロップ報告書", CreateReportLogic.getBattleResultHeader(),
+        new BattleTableDialog(this.shell, "ドロップ報告書", CreateReportLogic.getBattleResultHeader(),
                 CreateReportLogic.getBattleResultBody(), CreateReportLogic.DEFAULT_TABLE_ITEM_CREATOR).open();
     }
 }

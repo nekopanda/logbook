@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -104,7 +105,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getBattleResultHeader() {
-        return new String[] { "日付", "海域", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘" };
+        return new String[] { "", "日付", "海域", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘" };
     }
 
     /**
@@ -116,8 +117,9 @@ public final class CreateReportLogic {
         List<BattleResultDto> results = GlobalContext.getBattleResultList();
         List<Object[]> body = new ArrayList<Object[]>();
 
-        for (BattleResultDto item : results) {
-            body.add(new Object[] { FORMAT.format(item.getBattleDate()), item.getQuestName(),
+        for (int i = 0; i < results.size(); i++) {
+            BattleResultDto item = results.get(i);
+            body.add(new Object[] { Integer.toString(i + 1), FORMAT.format(item.getBattleDate()), item.getQuestName(),
                     item.getRank(), item.getEnemyName(), item.getDropType(), item.getDropName() });
         }
         return toListStringArray(body);
@@ -129,7 +131,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getCreateShipHeader() {
-        return new String[] { "日付", "名前", "艦種", "燃料", "弾薬", "鋼材", "ボーキ", "秘書艦" };
+        return new String[] { "", "日付", "名前", "艦種", "燃料", "弾薬", "鋼材", "ボーキ", "秘書艦" };
     }
 
     /**
@@ -140,10 +142,11 @@ public final class CreateReportLogic {
     public static List<String[]> getCreateShipBody() {
         List<GetShipDto> ships = GlobalContext.getGetshipList();
         List<Object[]> body = new ArrayList<Object[]>();
-        for (GetShipDto ship : ships) {
-            body.add(new Object[] { FORMAT.format(ship.getGetDate()), ship.getName(), ship.getType(),
-                    ship.getFuel(), ship.getAmmo(), ship.getMetal(),
-                    ship.getBauxite(), ship.getSecretary() });
+        for (int i = 0; i < ships.size(); i++) {
+            GetShipDto ship = ships.get(i);
+            body.add(new Object[] { Integer.toString(i + 1), FORMAT.format(ship.getGetDate()), ship.getName(),
+                    ship.getType(), ship.getFuel(), ship.getAmmo(), ship.getMetal(), ship.getBauxite(),
+                    ship.getSecretary() });
         }
         return toListStringArray(body);
     }
@@ -154,7 +157,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getCreateItemHeader() {
-        return new String[] { "日付", "開発装備", "種別", "燃料", "弾薬", "鋼材", "ボーキ", "秘書艦" };
+        return new String[] { "", "日付", "開発装備", "種別", "燃料", "弾薬", "鋼材", "ボーキ", "秘書艦" };
     }
 
     /**
@@ -166,15 +169,16 @@ public final class CreateReportLogic {
         List<CreateItemDto> items = GlobalContext.getCreateItemList();
         List<Object[]> body = new ArrayList<Object[]>();
 
-        for (CreateItemDto item : items) {
+        for (int i = 0; i < items.size(); i++) {
+            CreateItemDto item = items.get(i);
             String name = "失敗";
             String type = "";
             if (item.isCreateFlag()) {
                 name = item.getName();
                 type = item.getType();
             }
-            body.add(new Object[] { FORMAT.format(item.getCreateDate()), name, type, item.getFuel(),
-                    item.getAmmo(), item.getMetal(), item.getBauxite(), item.getSecretary() });
+            body.add(new Object[] { Integer.toString(i + 1), FORMAT.format(item.getCreateDate()), name, type,
+                    item.getFuel(), item.getAmmo(), item.getMetal(), item.getBauxite(), item.getSecretary() });
         }
         return toListStringArray(body);
     }
@@ -185,7 +189,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getItemListHeader() {
-        return new String[] { "名称", "種別", "火力", "命中", "回避", "射程", "運", "爆装", "雷装", "索敵", "対潜", "対空" };
+        return new String[] { "", "名称", "種別", "火力", "命中", "回避", "射程", "運", "爆装", "雷装", "索敵", "対潜", "対空" };
     }
 
     /**
@@ -247,11 +251,19 @@ public final class CreateReportLogic {
     public static void writeCsv(File file, String[] header, List<String[]> body, boolean applend)
             throws IOException {
         OutputStream stream = new BufferedOutputStream(new FileOutputStream(file, applend));
+
+        // 報告書の項番を除く
+        String[] copyheader = Arrays.copyOfRange(header, 1, header.length);
+        List<String[]> copybody = new ArrayList<String[]>();
+        for (String[] strings : body) {
+            copybody.add(Arrays.copyOfRange(strings, 1, strings.length));
+        }
+
         try {
             if (!file.exists() || (FileUtils.sizeOf(file) <= 0)) {
-                IOUtils.write(StringUtils.join(header, ',') + "\r\n", stream, GlobalConfig.CHARSET);
+                IOUtils.write(StringUtils.join(copyheader, ',') + "\r\n", stream, GlobalConfig.CHARSET);
             }
-            for (String[] colums : body) {
+            for (String[] colums : copybody) {
                 IOUtils.write(StringUtils.join(colums, ',') + "\r\n", stream, GlobalConfig.CHARSET);
             }
         } finally {

@@ -15,20 +15,37 @@ import javax.json.JsonObject;
  */
 public final class BattleResultDto extends AbstractDto {
 
+    /** 日付 */
     private final Date battleDate;
+
+    /** 海域名 */
     private final String questName;
+
+    /** ランク */
     private final String rank;
+
+    /** 敵艦隊名 */
     private final String enemyName;
+
+    /** ドロップフラグ */
     private final boolean dropFlag;
+
+    /** 艦種 */
     private final String dropType;
+
+    /** 艦名 */
     private final String dropName;
+
+    /** 戦闘詳細 */
+    private final BattleDto battle;
 
     /**
      * コンストラクター
      * 
      * @param object JSON Object
+     * @param battle 戦闘詳細
      */
-    public BattleResultDto(JsonObject object) {
+    public BattleResultDto(JsonObject object, BattleDto battle) {
 
         this.battleDate = Calendar.getInstance().getTime();
         this.questName = object.getString("api_quest_name");
@@ -42,54 +59,63 @@ public final class BattleResultDto extends AbstractDto {
             this.dropType = "";
             this.dropName = "";
         }
+
+        this.battle = battle;
     }
 
     /**
-     * @return battleDate
+     * @return 日付
      */
     public Date getBattleDate() {
         return this.battleDate;
     }
 
     /**
-     * @return questName
+     * @return 海域名
      */
     public String getQuestName() {
         return this.questName;
     }
 
     /**
-     * @return rank
+     * @return ランク
      */
     public String getRank() {
         return this.rank;
     }
 
     /**
-     * @return enemyName
+     * @return 敵艦隊名
      */
     public String getEnemyName() {
         return this.enemyName;
     }
 
     /**
-     * @return dropFlag
+     * @return ドロップフラグ
      */
     public boolean isDropFlag() {
         return this.dropFlag;
     }
 
     /**
-     * @return dropType
+     * @return 艦種
      */
     public String getDropType() {
         return this.dropType;
     }
 
     /**
-     * @return dropName
+     * @return 艦名
      */
     public String getDropName() {
         return this.dropName;
+    }
+
+    /**
+     * @return 戦闘詳細
+     */
+    public BattleDto getBattleDto() {
+        return this.battle;
     }
 }

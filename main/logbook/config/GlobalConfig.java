@@ -13,7 +13,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 
 import logbook.data.UndefinedData;
 
@@ -40,7 +44,7 @@ public final class GlobalConfig {
     public static final String DATE_SHORT_FORMAT = "HH:mm:ss";
 
     /** バージョン */
-    public static final String VERSION = "0.3.3";
+    public static final String VERSION = "0.3.4";
 
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(UndefinedData.class);
@@ -154,6 +158,42 @@ public final class GlobalConfig {
     }
 
     /**
+     * 開発者オプション-JSONを保存するを取得する
+     * 
+     * @return
+     */
+    public static boolean getStoreJson() {
+        return "1".equals(PROPERTIES.getProperty("store_json", "0"));
+    }
+
+    /**
+     * 開発者オプション-JSONを保存するをセットする
+     * 
+     * @return
+     */
+    public static void setStoreJson(boolean storeJson) {
+        PROPERTIES.setProperty("store_json", storeJson ? "1" : "0");
+    }
+
+    /**
+     * 開発者オプション-JSONの保存先を取得する
+     * 
+     * @return
+     */
+    public static String getStoreJsonPath() {
+        return PROPERTIES.getProperty("store_json_path", "./json/");
+    }
+
+    /**
+     * 開発者オプション-JSONの保存先をセットする
+     * 
+     * @return
+     */
+    public static void setStoreJsonPath(String storeJsonPath) {
+        PROPERTIES.setProperty("store_json_path", storeJsonPath);
+    }
+
+    /**
      * 設定ファイルを書き込みます
      */
     public static void store() {
@@ -167,7 +207,17 @@ public final class GlobalConfig {
      * @return
      */
     private static Properties readconfig(File file) {
-        Properties properties = new Properties();
+        Properties properties = new Properties() {
+            @Override
+            public Set<Object> keySet() {
+                return Collections.unmodifiableSet(new TreeSet<Object>(super.keySet()));
+            }
+
+            @Override
+            public synchronized Enumeration<Object> elements() {
+                return Collections.enumeration(new TreeSet<Object>(super.keySet()));
+            }
+        };
         try {
             InputStream in = new FileInputStream(file);
             try {

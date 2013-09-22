@@ -35,7 +35,6 @@ public final class ConfigDialog extends Dialog {
     /**
      * Create the dialog.
      * @param parent
-     * @param style
      */
     public ConfigDialog(Shell parent) {
         super(parent, SWT.SHELL_TRIM | SWT.MODELESS);
@@ -44,7 +43,6 @@ public final class ConfigDialog extends Dialog {
 
     /**
      * Open the dialog.
-     * @return the result
      */
     public void open() {
         this.createContents();
@@ -69,50 +67,70 @@ public final class ConfigDialog extends Dialog {
         TabFolder tabFolder = new TabFolder(this.shell, SWT.NONE);
         tabFolder.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
 
-        TabItem tabItem = new TabItem(tabFolder, SWT.NONE);
-        tabItem.setText("システム");
+        TabItem tabSystem = new TabItem(tabFolder, SWT.NONE);
+        tabSystem.setText("システム");
 
-        Composite composite = new Composite(tabFolder, SWT.NONE);
-        tabItem.setControl(composite);
-        composite.setLayout(new GridLayout(2, false));
+        Composite compositeSystem = new Composite(tabFolder, SWT.NONE);
+        compositeSystem.setLayout(new GridLayout(2, false));
+        tabSystem.setControl(compositeSystem);
 
-        Label label = new Label(composite, SWT.NONE);
+        Label label = new Label(compositeSystem, SWT.NONE);
         label.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
         label.setText("ポート番号");
 
-        final Text listenport = new Text(composite, SWT.BORDER);
+        final Text listenport = new Text(compositeSystem, SWT.BORDER);
         listenport.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
         listenport.setText(Integer.toString(GlobalConfig.getListenPort()));
 
-        Label label1 = new Label(composite, SWT.NONE);
+        Label label1 = new Label(compositeSystem, SWT.NONE);
         label1.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
         label1.setText("ウインドウサイズ(横)");
 
-        final Text width = new Text(composite, SWT.BORDER);
+        final Text width = new Text(compositeSystem, SWT.BORDER);
         width.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
         width.setText(Integer.toString(GlobalConfig.getWidth()));
 
-        Label label2 = new Label(composite, SWT.NONE);
+        Label label2 = new Label(compositeSystem, SWT.NONE);
         label2.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
         label2.setText("ウインドウサイズ(縦)");
 
-        final Text height = new Text(composite, SWT.BORDER);
+        final Text height = new Text(compositeSystem, SWT.BORDER);
         height.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
         height.setText(Integer.toString(GlobalConfig.getHeight()));
 
-        new Label(composite, SWT.NONE);
+        new Label(compositeSystem, SWT.NONE);
 
-        final Button ontop = new Button(composite, SWT.CHECK);
+        final Button ontop = new Button(compositeSystem, SWT.CHECK);
         ontop.setText("最前面に表示する");
         ontop.setSelection(GlobalConfig.getOnTop() != SWT.NONE);
 
-        Label label3 = new Label(composite, SWT.NONE);
+        Label label3 = new Label(compositeSystem, SWT.NONE);
         label3.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
         label3.setText("音量(%)");
 
-        final Text soundlevel = new Text(composite, SWT.BORDER);
+        final Text soundlevel = new Text(compositeSystem, SWT.BORDER);
         soundlevel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
         soundlevel.setText(Integer.toString((int) (GlobalConfig.getSoundLevel() * 100)));
+
+        TabItem tbtmDevelopment = new TabItem(tabFolder, SWT.NONE);
+        tbtmDevelopment.setText("Development");
+
+        Composite compositeDevelopment = new Composite(tabFolder, SWT.NONE);
+        compositeDevelopment.setLayout(new GridLayout(2, false));
+        tbtmDevelopment.setControl(compositeDevelopment);
+        new Label(compositeDevelopment, SWT.NONE);
+
+        final Button btnJson = new Button(compositeDevelopment, SWT.CHECK);
+        btnJson.setText("JSONを保存する");
+        btnJson.setSelection(GlobalConfig.getStoreJson());
+
+        Label lblJson = new Label(compositeDevelopment, SWT.NONE);
+        lblJson.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        lblJson.setText("JSON保存先");
+
+        final Text jsonpath = new Text(compositeDevelopment, SWT.BORDER);
+        jsonpath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+        jsonpath.setText(GlobalConfig.getStoreJsonPath());
 
         Composite command = new Composite(this.shell, SWT.NONE);
         RowLayout rlCommand = new RowLayout();
@@ -125,11 +143,16 @@ public final class ConfigDialog extends Dialog {
         applyBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                // system
                 GlobalConfig.setListenPort(listenport.getText());
                 GlobalConfig.setWidth(width.getText());
                 GlobalConfig.setHeight(height.getText());
                 GlobalConfig.setOnTop(ontop.getSelection());
                 GlobalConfig.setSoundLevel(soundlevel.getText());
+                // development
+                GlobalConfig.setStoreJson(btnJson.getSelection());
+                GlobalConfig.setStoreJsonPath(jsonpath.getText());
+
                 GlobalConfig.store();
                 ConfigDialog.this.shell.close();
             }

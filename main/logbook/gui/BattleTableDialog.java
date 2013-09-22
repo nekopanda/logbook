@@ -16,6 +16,8 @@ import logbook.gui.logic.TableItemCreator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
@@ -29,10 +31,10 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 /**
- * 一覧のダイアログ
+ * ドロップ報告書のダイアログ
  * 
  */
-public final class TableDialog extends Dialog {
+public final class BattleTableDialog extends Dialog {
 
     private Display display;
     private Shell shell;
@@ -50,7 +52,8 @@ public final class TableDialog extends Dialog {
      * @param body
      * @param creater
      */
-    public TableDialog(Shell parent, String title, String[] header, List<String[]> body, TableItemCreator creater) {
+    public BattleTableDialog(Shell parent, String title, String[] header, List<String[]> body,
+            TableItemCreator creater) {
         super(parent, SWT.SHELL_TRIM | SWT.MODELESS);
         this.shell = parent;
         this.header = header;
@@ -97,6 +100,15 @@ public final class TableDialog extends Dialog {
 
         final Table table = new Table(this.shell, SWT.FULL_SELECTION | SWT.MULTI);
         table.addKeyListener(new TableKeyShortcutAdapter(this.header, table));
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseDoubleClick(MouseEvent e) {
+                TableItem[] items = table.getSelection();
+                for (TableItem tableItem : items) {
+                    new BattleDialog(BattleTableDialog.this.shell, tableItem.getText(0)).open();
+                }
+            }
+        });
         table.setLinesVisible(true);
         table.setHeaderVisible(true);
         TableColumn[] columns = new TableColumn[this.header.length];
@@ -125,16 +137,16 @@ public final class TableDialog extends Dialog {
                     // ソートを行う
                     if (arg.getSource() instanceof TableColumn) {
                         // ソート前に画面描画を停止する
-                        TableDialog.this.shell.setRedraw(false);
+                        BattleTableDialog.this.shell.setRedraw(false);
                         TableItem[] items = table.getItems();
                         for (int i = 0; i < items.length; i++) {
                             items[i].dispose();
                         }
                         String header = ((TableColumn) arg.getSource()).getText();
-                        TableDialog.this.sortTableItems(header);
-                        TableDialog.this.addAllTableItems(table);
+                        BattleTableDialog.this.sortTableItems(header);
+                        BattleTableDialog.this.addAllTableItems(table);
                         // 画面描画を再開する
-                        TableDialog.this.shell.setRedraw(true);
+                        BattleTableDialog.this.shell.setRedraw(true);
                     }
                     super.widgetSelected(arg);
                 }

@@ -5,11 +5,13 @@
  */
 package logbook.data.context;
 
-import java.sql.Date;
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -29,15 +31,19 @@ import logbook.config.GlobalConfig;
 import logbook.data.Data;
 import logbook.data.DataQueue;
 import logbook.dto.AwaitingDecision;
+import logbook.dto.BattleDto;
 import logbook.dto.BattleResultDto;
 import logbook.dto.CreateItemDto;
 import logbook.dto.DeckMissionDto;
+import logbook.dto.DockDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
 import logbook.dto.ResourceDto;
 import logbook.dto.ShipDto;
 import logbook.internal.Deck;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -82,14 +88,20 @@ public final class GlobalContext {
     /** 海戦・ドロップ */
     private static List<BattleResultDto> battleResultList = new ArrayList<BattleResultDto>();
 
+    /** 戦闘詳細 */
+    private static Queue<BattleDto> battleList = new ArrayBlockingQueue<BattleDto>(10);
+
     /** 遠征1 */
     private static DeckMissionDto deck1Mission;
 
-    /** 遠征1 */
+    /** 遠征2 */
     private static DeckMissionDto deck2Mission;
 
-    /** 遠征1 */
+    /** 遠征3 */
     private static DeckMissionDto deck3Mission;
+
+    /** ドック */
+    private static Map<String, DockDto> dock = new HashMap<String, DockDto>();
 
     /** 入渠1 艦娘ID */
     private static long ndock1id;
@@ -245,6 +257,13 @@ public final class GlobalContext {
     }
 
     /**
+     * @return ドック
+     */
+    public static DockDto getDock(String id) {
+        return dock.get(id);
+    }
+
+    /**
      * @return ログメッセージ
      */
     public static String getConsoleMessage() {
@@ -257,6 +276,10 @@ public final class GlobalContext {
     public static final void updateContext() {
         Data data;
         while ((data = DataQueue.poll()) != null) {
+            // json保存設定
+            if (GlobalConfig.getStoreJson()) {
+                doStoreJson(data);
+            }
             switch (data.getDataType()) {
             // 保有装備
             case SLOTITEM_MEMBER:
@@ -291,6 +314,10 @@ public final class GlobalContext {
                 doCreateitem(data);
                 break;
             // 海戦
+            case BATTLE:
+                doBattle(data);
+                break;
+            // 海戦結果
             case BATTLERESULT:
                 doBattleresult(data);
                 break;
@@ -301,13 +328,51 @@ public final class GlobalContext {
     }
 
     /**
+     * JSONオブジェクトを保存する
+     * @param data
+     */
+    private static void doStoreJson(Data data) {
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd_HHmmss.SSS");
+            Date time = Calendar.getInstance().getTime();
+            // ファイル名
+            String fname = new StringBuilder().append(format.format(time)).append("_").append(data.getDataType())
+                    .append(".json").toString();
+            // ファイルパス
+            File file = new File(FilenameUtils.concat(GlobalConfig.getStoreJsonPath(), fname));
+
+            FileUtils.write(file, data.getJsonObject().toString());
+        } catch (IOException e) {
+            LOG.warn("JSONオブジェクトを保存するに失敗しました", e);
+            LOG.warn(data);
+        }
+
+    }
+
+    /**
+     * 海戦情報を更新します
+     * @param data
+     */
+    private static void doBattle(Data data) {
+        try {
+            JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+            battleList.add(new BattleDto(apidata));
+
+            addConsole("海戦情報を更新しました");
+        } catch (Exception e) {
+            LOG.warn("海戦情報を更新しますに失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
      * 海戦情報を更新します
      * @param data
      */
     private static void doBattleresult(Data data) {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
-            battleResultList.add(new BattleResultDto(apidata));
+            battleResultList.add(new BattleResultDto(apidata, battleList.poll()));
 
             addConsole("海戦情報を更新しました");
         } catch (Exception e) {
@@ -454,15 +519,24 @@ public final class GlobalContext {
                 shipMap.put(Long.valueOf(ship.getId()), ship);
             }
             // 艦隊IDを追加
+            dock.clear();
             JsonArray apidatadeck = data.getJsonObject().getJsonArray("api_data_deck");
             for (int i = 0; i < apidatadeck.size(); i++) {
                 JsonObject jsonObject = (JsonObject) apidatadeck.get(i);
                 String fleetid = Long.toString(jsonObject.getJsonNumber("api_id").longValue());
+                String name = jsonObject.getString("api_name");
                 JsonArray apiship = jsonObject.getJsonArray("api_ship");
+
+                DockDto dockdto = new DockDto(fleetid, name);
+                dock.put(fleetid, dockdto);
+
                 for (int j = 0; j < apiship.size(); j++) {
                     Long shipid = Long.valueOf(((JsonNumber) apiship.get(j)).longValue());
                     ShipDto ship = shipMap.get(shipid);
+
                     if (ship != null) {
+                        dockdto.addShip(ship);
+
                         if ((i == 0) && (j == 0)) {
                             if ((secretary == null) || (ship.getId() != secretary.getId())) {
                                 addConsole(ship.getName() + "(Lv" + ship.getLv() + ")" + " が秘書艦に任命されました");

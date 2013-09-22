@@ -42,7 +42,6 @@ public class VersionDialog extends Dialog {
     /**
      * Create the dialog.
      * @param parent
-     * @param style
      */
     public VersionDialog(Shell parent) {
         super(parent, SWT.SHELL_TRIM | SWT.MODELESS);
@@ -51,7 +50,6 @@ public class VersionDialog extends Dialog {
 
     /**
      * Open the dialog.
-     * @return the result
      */
     public Object open() {
         this.createContents();
