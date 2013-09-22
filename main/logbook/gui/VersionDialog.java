@@ -29,15 +29,14 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * @author noname
+ * バージョン情報
  *
  */
-public class VersionDialog extends Dialog {
+public final class VersionDialog extends Dialog {
 
     private static final Logger LOG = LogManager.getLogger(VersionDialog.class);
 
-    protected Object result;
-    protected Shell shell;
+    private Shell shell;
 
     /**
      * Create the dialog.
@@ -51,7 +50,7 @@ public class VersionDialog extends Dialog {
     /**
      * Open the dialog.
      */
-    public Object open() {
+    public void open() {
         this.createContents();
         this.shell.open();
         this.shell.layout();
@@ -61,7 +60,6 @@ public class VersionDialog extends Dialog {
                 display.sleep();
             }
         }
-        return this.result;
     }
 
     /**

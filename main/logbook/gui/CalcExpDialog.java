@@ -43,7 +43,7 @@ import org.eclipse.swt.widgets.Text;
  * 経験値計算機
  *
  */
-public class CalcExpDialog extends Dialog {
+public final class CalcExpDialog extends Dialog {
 
     /** 海域インデックス値 */
     private static int seaidx;

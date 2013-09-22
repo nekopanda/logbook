@@ -71,7 +71,7 @@ public final class ThreadManager {
      * エラーハンドラ
      *
      */
-    public static class ExceptionHandler implements Thread.UncaughtExceptionHandler {
+    public static final class ExceptionHandler implements Thread.UncaughtExceptionHandler {
 
         private Throwable throwable;
 

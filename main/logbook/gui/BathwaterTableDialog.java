@@ -38,7 +38,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
  * お風呂に入りたい艦娘
  * 
  */
-public class BathwaterTableDialog extends Dialog {
+public final class BathwaterTableDialog extends Dialog {
 
     private static boolean removeflg;
 
@@ -151,7 +151,7 @@ public class BathwaterTableDialog extends Dialog {
         Menu menu = new Menu(table);
         table.setMenu(menu);
         MenuItem menuItem = new MenuItem(menu, SWT.NONE);
-        menuItem.addSelectionListener(new TableToClipboardAdapter(this.header, table));
+        menuItem.addSelectionListener(new TableToClipboardAdapter(header, table));
         menuItem.setText("クリップボードにコピー");
 
         removecheck.addSelectionListener(new SelectionAdapter() {

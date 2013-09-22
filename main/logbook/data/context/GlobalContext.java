@@ -273,7 +273,7 @@ public final class GlobalContext {
     /**
      * 情報を更新します
      */
-    public static final void updateContext() {
+    public static void updateContext() {
         Data data;
         while ((data = DataQueue.poll()) != null) {
             // json保存設定

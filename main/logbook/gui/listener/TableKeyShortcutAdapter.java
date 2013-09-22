@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Table;
  * テーブルウィジェットのキー操作のアダプターです
  *
  */
-public class TableKeyShortcutAdapter extends KeyAdapter {
+public final class TableKeyShortcutAdapter extends KeyAdapter {
 
     /** テーブルヘッダー */
     private final String[] header;
