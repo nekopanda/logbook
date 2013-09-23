@@ -17,6 +17,8 @@ public enum DataType {
     SHIP2("/kcsapi/api_get_member/ship2"),
     /** 遠征 */
     DECK_PORT("/kcsapi/api_get_member/deck_port"),
+    /** 基本 */
+    BASIC("/kcsapi/api_get_member/basic"),
     /** 入渠 */
     NDOCK("/kcsapi/api_get_member/ndock"),
     /** アイテム一覧 */
@@ -25,8 +27,6 @@ public enum DataType {
     SLOTITEM_MASTER("/kcsapi/api_get_master/slotitem"),
     /** 戦闘 */
     BATTLE("/kcsapi/api_req_sortie/battle"),
-    /** 戦闘(夜戦) */
-    BATTLE_MIDNIGHT("/kcsapi/api_req_battle_midnight/battle"),
     /** 戦闘結果 */
     BATTLERESULT("/kcsapi/api_req_sortie/battleresult"),
     /** 開発 */

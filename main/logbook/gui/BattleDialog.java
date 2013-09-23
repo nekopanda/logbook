@@ -148,41 +148,43 @@ public final class BattleDialog extends Dialog {
         int id = Integer.valueOf(this.id) - 1;
         BattleResultDto result = GlobalContext.getBattleResultList().get(id);
         BattleDto battle = result.getBattleDto();
-        DockDto dock = battle.getDock();
         // タイトル
         title.setText("「" + result.getQuestName() + "」で作戦行動中に「" + result.getEnemyName() + "」と対峙しました");
 
-        if (dock != null) {
-            // 見方艦隊
-            label1.setText(dock.getName());
-            // 敵艦隊
-            label2.setText(result.getEnemyName());
-            // 見方艦隊
-            Label[] friendnames = new Label[] { fname1, fname2, fname3, fname4, fname5, fname6 };
-            Label[] friendhps = new Label[] { fhp1, fhp2, fhp3, fhp4, fhp5, label14 };
-            List<ShipDto> friendships = dock.getShips();
-            for (int i = 0; i < friendships.size(); i++) {
-                ShipDto ship = friendships.get(i);
-                String name = ship.getName() + "(Lv" + ship.getLv() + ")";
-                // 名前
-                friendnames[i].setText(name);
-                // HP
-                friendhps[i].setText(battle.getNowFriendHp()[i] + "/" + battle.getMaxFriendHp()[i]);
-            }
-            // 敵艦隊
-            Label[] enemynames = new Label[] { ename1, ename2, ename3, ename4, ename5, ename6 };
-            Label[] enemyhps = new Label[] { ehp1, ehp2, ehp3, ehp4, ehp5, ehp6 };
-            List<ShipInfoDto> enemyships = battle.getEnemy();
-            for (int i = 0; i < enemyships.size(); i++) {
-                ShipInfoDto ship = enemyships.get(i);
-                String name = ship.getName();
-                if (!StringUtils.isEmpty(ship.getFlagship())) {
-                    name += "(" + ship.getFlagship() + ")";
+        if (battle != null) {
+            DockDto dock = battle.getDock();
+            if (dock != null) {
+                // 見方艦隊
+                label1.setText(dock.getName());
+                // 敵艦隊
+                label2.setText(result.getEnemyName());
+                // 見方艦隊
+                Label[] friendnames = new Label[] { fname1, fname2, fname3, fname4, fname5, fname6 };
+                Label[] friendhps = new Label[] { fhp1, fhp2, fhp3, fhp4, fhp5, label14 };
+                List<ShipDto> friendships = dock.getShips();
+                for (int i = 0; i < friendships.size(); i++) {
+                    ShipDto ship = friendships.get(i);
+                    String name = ship.getName() + "(Lv" + ship.getLv() + ")";
+                    // 名前
+                    friendnames[i].setText(name);
+                    // HP
+                    friendhps[i].setText(battle.getNowFriendHp()[i] + "/" + battle.getMaxFriendHp()[i]);
                 }
-                // 名前
-                enemynames[i].setText(name);
-                // HP
-                enemyhps[i].setText(battle.getNowEnemyHp()[i] + "/" + battle.getMaxEnemyHp()[i]);
+                // 敵艦隊
+                Label[] enemynames = new Label[] { ename1, ename2, ename3, ename4, ename5, ename6 };
+                Label[] enemyhps = new Label[] { ehp1, ehp2, ehp3, ehp4, ehp5, ehp6 };
+                List<ShipInfoDto> enemyships = battle.getEnemy();
+                for (int i = 0; i < enemyships.size(); i++) {
+                    ShipInfoDto ship = enemyships.get(i);
+                    String name = ship.getName();
+                    if (!StringUtils.isEmpty(ship.getFlagship())) {
+                        name += "(" + ship.getFlagship() + ")";
+                    }
+                    // 名前
+                    enemynames[i].setText(name);
+                    // HP
+                    enemyhps[i].setText(battle.getNowEnemyHp()[i] + "/" + battle.getMaxEnemyHp()[i]);
+                }
             }
         }
         this.shell.pack();

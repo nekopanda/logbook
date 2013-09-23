@@ -88,6 +88,9 @@ public final class GlobalContext {
     /** 海戦・ドロップ */
     private static List<BattleResultDto> battleResultList = new ArrayList<BattleResultDto>();
 
+    /** 司令部Lv */
+    private static int hqLevel;
+
     /** 戦闘詳細 */
     private static Queue<BattleDto> battleList = new ArrayBlockingQueue<BattleDto>(10);
 
@@ -156,6 +159,13 @@ public final class GlobalContext {
      */
     public static ShipDto getSecretary() {
         return secretary;
+    }
+
+    /**
+     * @return 司令部Lv
+     */
+    public static int hqLevel() {
+        return hqLevel;
     }
 
     /**
@@ -293,6 +303,10 @@ public final class GlobalContext {
             case SHIP2:
                 doShip2(data);
                 break;
+            // 基本
+            case BASIC:
+                doBasic(data);
+                break;
             // 遠征
             case DECK_PORT:
                 doDeckPort(data);
@@ -391,7 +405,7 @@ public final class GlobalContext {
                     data.getField("api_kdock_id"),
                     new ResourceDto(
                             data.getField("api_item1"), data.getField("api_item2"), data.getField("api_item3"),
-                            data.getField("api_item4"), secretary
+                            data.getField("api_item4"), secretary, hqLevel
                     ));
 
             addConsole("建造(投入資源)情報を更新しました");
@@ -431,7 +445,7 @@ public final class GlobalContext {
 
             // 投入資源
             ResourceDto resources = new ResourceDto(data.getField("api_item1"), data.getField("api_item2"),
-                    data.getField("api_item3"), data.getField("api_item4"), secretary);
+                    data.getField("api_item3"), data.getField("api_item4"), secretary, hqLevel);
 
             CreateItemDto item = new CreateItemDto(apidata, resources);
             if (item.isCreateFlag()) {
@@ -564,6 +578,26 @@ public final class GlobalContext {
             addConsole("保有艦娘情報を更新しました");
         } catch (Exception e) {
             LOG.warn("保有艦娘を更新しますに失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 司令部Lvを更新する
+     * 
+     * @param data
+     */
+    private static void doBasic(Data data) {
+        try {
+            JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+
+            int newhqLevel = apidata.getJsonNumber("api_level").intValue();
+            if (hqLevel != newhqLevel) {
+                hqLevel = newhqLevel;
+                addConsole("司令部Lvを更新しました");
+            }
+        } catch (Exception e) {
+            LOG.warn("司令部Lvを更新するに失敗しました", e);
             LOG.warn(data);
         }
     }

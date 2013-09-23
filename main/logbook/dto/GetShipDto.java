@@ -33,7 +33,7 @@ public final class GetShipDto extends AbstractDto {
 
         this.getDate = Calendar.getInstance().getTime();
         this.ship = ship;
-        this.resources = resources != null ? resources : new ResourceDto("0", "0", "0", "0", null);
+        this.resources = resources != null ? resources : new ResourceDto("0", "0", "0", "0", null, 0);
     }
 
     /**
@@ -192,5 +192,12 @@ public final class GetShipDto extends AbstractDto {
             return ship.getName() + "(Lv" + ship.getLv() + ")";
         }
         return "";
+    }
+
+    /**
+     * @return 司令部Lv
+     */
+    public int getHqLevel() {
+        return this.resources.getHqLevel();
     }
 }

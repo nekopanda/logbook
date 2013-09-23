@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import logbook.config.GlobalConfig;
 import logbook.data.context.GlobalContext;
 import logbook.dto.ShipDto;
 import logbook.gui.listener.TableKeyShortcutAdapter;
@@ -186,12 +187,12 @@ public final class BathwaterTableDialog extends Dialog {
 
             // 遠征中の艦娘の色を変更する
             if (deckmissions.contains(shipid)) {
-                color = SWTResourceManager.getColor(102, 51, 255);
+                color = SWTResourceManager.getColor(GlobalConfig.MISSION_COLOR);
                 line[line.length - 1] = "遠征";
             }
             // 入渠中の艦娘の色を変更する
             if (docks.contains(shipid)) {
-                color = SWTResourceManager.getColor(0, 102, 153);
+                color = SWTResourceManager.getColor(GlobalConfig.NDOCK_COLOR);
                 line[line.length - 1] = "入渠";
             }
 

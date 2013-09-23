@@ -48,7 +48,7 @@ public final class CreateItemDto extends AbstractDto {
         } else {
             this.id = 0;
         }
-        this.resources = resources != null ? resources : new ResourceDto("0", "0", "0", "0", null);
+        this.resources = resources != null ? resources : new ResourceDto("0", "0", "0", "0", null, 0);
     }
 
     /**
@@ -137,5 +137,12 @@ public final class CreateItemDto extends AbstractDto {
             return ship.getName() + "(Lv" + ship.getLv() + ")";
         }
         return "";
+    }
+
+    /**
+     * @return 司令部Lv
+     */
+    public int getHqLevel() {
+        return this.resources.getHqLevel();
     }
 }

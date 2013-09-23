@@ -20,11 +20,14 @@ import java.util.Set;
 
 import logbook.config.GlobalConfig;
 import logbook.data.context.GlobalContext;
+import logbook.dto.BattleDto;
 import logbook.dto.BattleResultDto;
 import logbook.dto.CreateItemDto;
+import logbook.dto.DockDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
 import logbook.dto.ShipDto;
+import logbook.dto.ShipInfoDto;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -61,9 +64,9 @@ public final class CreateReportLogic {
             // 疲労
             int cond = Integer.parseInt(text[2]);
             if (cond <= 15) {
-                item.setForeground(SWTResourceManager.getColor(255, 16, 0));
+                item.setForeground(SWTResourceManager.getColor(GlobalConfig.COND_RED_COLOR));
             } else if (cond <= 29) {
-                item.setForeground(SWTResourceManager.getColor(255, 140, 0));
+                item.setForeground(SWTResourceManager.getColor(GlobalConfig.COND_ORANGE_COLOR));
             }
 
             // 遠征
@@ -78,7 +81,7 @@ public final class CreateReportLogic {
                 deckmissions.addAll(GlobalContext.getDeck3Mission().getShips());
             }
             if (deckmissions.contains(ship)) {
-                item.setForeground(SWTResourceManager.getColor(102, 51, 255));
+                item.setForeground(SWTResourceManager.getColor(GlobalConfig.MISSION_COLOR));
             }
 
             // 入渠
@@ -88,7 +91,7 @@ public final class CreateReportLogic {
             docks.add(GlobalContext.getNdock3id());
             docks.add(GlobalContext.getNdock4id());
             if (docks.contains(ship)) {
-                item.setForeground(SWTResourceManager.getColor(0, 102, 153));
+                item.setForeground(SWTResourceManager.getColor(GlobalConfig.NDOCK_COLOR));
             }
 
             item.setText(text);
@@ -126,12 +129,90 @@ public final class CreateReportLogic {
     }
 
     /**
+     * ドロップ報告書のヘッダー(保存用)
+     * 
+     * @return ヘッダー
+     */
+    public static String[] getBattleResultStoreHeader() {
+        return new String[] { "", "日付", "海域", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘",
+                "見方艦1", "見方艦1HP",
+                "見方艦2", "見方艦2HP",
+                "見方艦3", "見方艦3HP",
+                "見方艦4", "見方艦4HP",
+                "見方艦5", "見方艦5HP",
+                "見方艦6", "見方艦6HP",
+                "敵艦1", "敵艦1HP",
+                "敵艦2", "敵艦2HP",
+                "敵艦3", "敵艦3HP",
+                "敵艦4", "敵艦4HP",
+                "敵艦5", "敵艦5HP",
+                "敵艦6", "敵艦6HP" };
+    }
+
+    /**
+     * ドロップ報告書の内容(保存用)
+     * 
+     * @return 内容
+     */
+    public static List<String[]> getBattleResultStoreBody() {
+        List<BattleResultDto> results = GlobalContext.getBattleResultList();
+        List<Object[]> body = new ArrayList<Object[]>();
+
+        for (int i = 0; i < results.size(); i++) {
+            BattleResultDto item = results.get(i);
+            BattleDto battle = item.getBattleDto();
+            String[] friend = new String[6];
+            String[] friendHp = new String[6];
+            String[] enemy = new String[6];
+            String[] enemyHp = new String[6];
+
+            Arrays.fill(friend, "");
+            Arrays.fill(friendHp, "");
+            Arrays.fill(enemy, "");
+            Arrays.fill(enemyHp, "");
+
+            if (battle != null) {
+                DockDto dock = battle.getDock();
+                if (dock != null) {
+                    List<ShipDto> friendships = dock.getShips();
+                    int[] fnowhps = battle.getNowFriendHp();
+                    int[] fmaxhps = battle.getMaxFriendHp();
+                    for (int j = 0; j < friendships.size(); j++) {
+                        ShipDto ship = friendships.get(j);
+                        friend[j] = ship.getName() + "(Lv" + ship.getLv() + ")";
+                        friendHp[j] = fnowhps[j] + "/" + fmaxhps[j];
+                    }
+                    List<ShipInfoDto> enemyships = battle.getEnemy();
+                    int[] enowhps = battle.getNowEnemyHp();
+                    int[] emaxhps = battle.getMaxEnemyHp();
+                    for (int j = 0; j < enemyships.size(); j++) {
+                        ShipInfoDto ship = enemyships.get(j);
+                        if (!StringUtils.isEmpty(ship.getFlagship())) {
+                            enemy[j] = ship.getName() + "(" + ship.getFlagship() + ")";
+                        } else {
+                            enemy[j] = ship.getName();
+                        }
+                        enemyHp[j] = enowhps[j] + "/" + emaxhps[j];
+                    }
+                }
+            }
+
+            body.add(new Object[] { Integer.toString(i + 1), FORMAT.format(item.getBattleDate()), item.getQuestName(),
+                    item.getRank(), item.getEnemyName(), item.getDropType(), item.getDropName(), friend[0],
+                    friendHp[0], friend[1], friendHp[1], friend[2], friendHp[2], friend[3], friendHp[3], friend[4],
+                    friendHp[4], friend[5], friendHp[5], enemy[0], enemyHp[0], enemy[1], enemyHp[1], enemy[2],
+                    enemyHp[2], enemy[3], enemyHp[3], enemy[4], enemyHp[4], enemy[5], enemyHp[5] });
+        }
+        return toListStringArray(body);
+    }
+
+    /**
      * 建造報告書のヘッダー
      * 
      * @return ヘッダー
      */
     public static String[] getCreateShipHeader() {
-        return new String[] { "", "日付", "名前", "艦種", "燃料", "弾薬", "鋼材", "ボーキ", "秘書艦" };
+        return new String[] { "", "日付", "名前", "艦種", "燃料", "弾薬", "鋼材", "ボーキ", "秘書艦", "司令部Lv" };
     }
 
     /**
@@ -146,7 +227,7 @@ public final class CreateReportLogic {
             GetShipDto ship = ships.get(i);
             body.add(new Object[] { Integer.toString(i + 1), FORMAT.format(ship.getGetDate()), ship.getName(),
                     ship.getType(), ship.getFuel(), ship.getAmmo(), ship.getMetal(), ship.getBauxite(),
-                    ship.getSecretary() });
+                    ship.getSecretary(), ship.getHqLevel() });
         }
         return toListStringArray(body);
     }
@@ -157,7 +238,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getCreateItemHeader() {
-        return new String[] { "", "日付", "開発装備", "種別", "燃料", "弾薬", "鋼材", "ボーキ", "秘書艦" };
+        return new String[] { "", "日付", "開発装備", "種別", "燃料", "弾薬", "鋼材", "ボーキ", "秘書艦", "司令部Lv" };
     }
 
     /**
@@ -178,7 +259,8 @@ public final class CreateReportLogic {
                 type = item.getType();
             }
             body.add(new Object[] { Integer.toString(i + 1), FORMAT.format(item.getCreateDate()), name, type,
-                    item.getFuel(), item.getAmmo(), item.getMetal(), item.getBauxite(), item.getSecretary() });
+                    item.getFuel(), item.getAmmo(), item.getMetal(), item.getBauxite(), item.getSecretary(),
+                    item.getHqLevel() });
         }
         return toListStringArray(body);
     }

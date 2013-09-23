@@ -26,6 +26,9 @@ public final class ResourceDto extends AbstractDto {
     /** 秘書艦 */
     private final ShipDto ship;
 
+    /** 司令部Lv */
+    private final int hqLevel;
+
     /**
      * コンストラクター
      * 
@@ -35,13 +38,14 @@ public final class ResourceDto extends AbstractDto {
      * @param bauxite ボーキサイト
      * @param ship 秘書艦
      */
-    public ResourceDto(String fuel, String ammo, String metal, String bauxite, ShipDto ship) {
+    public ResourceDto(String fuel, String ammo, String metal, String bauxite, ShipDto ship, int hqLevel) {
 
         this.fuel = fuel;
         this.ammo = ammo;
         this.metal = metal;
         this.bauxite = bauxite;
         this.ship = ship;
+        this.hqLevel = hqLevel;
     }
 
     /**
@@ -77,5 +81,12 @@ public final class ResourceDto extends AbstractDto {
      */
     public ShipDto getSecretary() {
         return this.ship;
+    }
+
+    /**
+     * @return 司令部Lv
+     */
+    public int getHqLevel() {
+        return this.hqLevel;
     }
 }

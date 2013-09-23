@@ -79,8 +79,9 @@ public final class ApplicationMain {
             ProxyServer.end();
             // 報告書を保存する
             try {
-                CreateReportLogic.writeCsv(new File("./海戦・ドロップ報告書.csv"), CreateReportLogic.getBattleResultHeader(),
-                        CreateReportLogic.getBattleResultBody(), true);
+                CreateReportLogic.writeCsv(new File("./海戦・ドロップ報告書.csv"),
+                        CreateReportLogic.getBattleResultStoreHeader(),
+                        CreateReportLogic.getBattleResultStoreBody(), true);
                 CreateReportLogic.writeCsv(new File("./建造報告書.csv"), CreateReportLogic.getCreateShipHeader(),
                         CreateReportLogic.getCreateShipBody(), true);
                 CreateReportLogic.writeCsv(new File("./開発報告書.csv"), CreateReportLogic.getCreateItemHeader(),

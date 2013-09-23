@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.RGB;
 
 /**
  * <p>
@@ -44,7 +45,19 @@ public final class GlobalConfig {
     public static final String DATE_SHORT_FORMAT = "HH:mm:ss";
 
     /** バージョン */
-    public static final String VERSION = "0.3.4";
+    public static final String VERSION = "0.3.5";
+
+    /** 遠征色 */
+    public static final RGB MISSION_COLOR = new RGB(102, 51, 255);
+
+    /** 入渠色 */
+    public static final RGB NDOCK_COLOR = new RGB(0, 102, 153);
+
+    /** 疲労赤色 */
+    public static final RGB COND_RED_COLOR = new RGB(255, 16, 0);
+
+    /** 疲労オレンジ色 */
+    public static final RGB COND_ORANGE_COLOR = new RGB(255, 140, 0);
 
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(UndefinedData.class);
