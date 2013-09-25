@@ -6,7 +6,6 @@
 package logbook.gui;
 
 import java.awt.Desktop;
-import java.net.URI;
 
 import logbook.config.GlobalConfig;
 import logbook.server.proxy.Filter;
@@ -86,7 +85,7 @@ public final class VersionDialog extends Dialog {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    Desktop.getDesktop().browse(new URI("http://kancolle.sanaechan.net/"));
+                    Desktop.getDesktop().browse(GlobalConfig.HOME_PAGE_URI);
                 } catch (Exception e) {
                     LOG.warn("ウェブサイトに移動が失敗しました", e);
                 }

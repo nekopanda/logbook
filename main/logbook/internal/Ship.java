@@ -156,7 +156,7 @@ public class Ship {
             this.put("138", ShipInfoDto.EMPTY);
             this.put("139", ShipInfoDto.EMPTY);
             this.put("140", ShipInfoDto.EMPTY);
-            this.put("141", ShipInfoDto.EMPTY);
+            this.put("141", new ShipInfoDto("五十鈴改二", "軽巡洋艦"));
             this.put("142", ShipInfoDto.EMPTY);
             this.put("143", ShipInfoDto.EMPTY);
             this.put("144", ShipInfoDto.EMPTY);

@@ -11,6 +11,7 @@ import java.io.IOException;
 import logbook.config.GlobalConfig;
 import logbook.gui.background.AsyncExecApplicationMain;
 import logbook.gui.background.AsyncExecApplicationMainConsole;
+import logbook.gui.background.AsyncExecUpdateCheck;
 import logbook.gui.listener.BathwaterTableAdapter;
 import logbook.gui.listener.CalcExpAdapter;
 import logbook.gui.listener.ConfigDialogAdapter;
@@ -357,6 +358,11 @@ public final class ApplicationMain {
         ThreadManager.regist(new ThreadStateObserver(this.shell));
 
         ThreadManager.start();
+
+        // アップデートチェックする
+        if (GlobalConfig.getCheckUpdate()) {
+            new AsyncExecUpdateCheck(this.shell).start();
+        }
     }
 
     /**

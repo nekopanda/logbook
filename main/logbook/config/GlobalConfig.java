@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -45,7 +46,7 @@ public final class GlobalConfig {
     public static final String DATE_SHORT_FORMAT = "HH:mm:ss";
 
     /** バージョン */
-    public static final String VERSION = "0.3.5";
+    public static final String VERSION = "0.3.6";
 
     /** 遠征色 */
     public static final RGB MISSION_COLOR = new RGB(102, 51, 255);
@@ -58,6 +59,12 @@ public final class GlobalConfig {
 
     /** 疲労オレンジ色 */
     public static final RGB COND_ORANGE_COLOR = new RGB(255, 140, 0);
+
+    /** ホームページ */
+    public static final URI HOME_PAGE_URI = URI.create("http://kancolle.sanaechan.net/");
+
+    /** アップデートチェック先 */
+    public static final URI UPDATE_CHECK_URI = URI.create("http://kancolle.sanaechan.net/checkversion.txt");
 
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(UndefinedData.class);
@@ -168,6 +175,22 @@ public final class GlobalConfig {
         if (StringUtils.isNumeric(level)) {
             PROPERTIES.setProperty("sound_level", level);
         }
+    }
+
+    /**
+     * アップデートチェックを取得する
+     */
+    public static boolean getCheckUpdate() {
+        return "1".equals(PROPERTIES.getProperty("check_update", "1"));
+    }
+
+    /**
+     * アップデートチェックをセットする
+     * 
+     * @param checkUpdate
+     */
+    public static void setCheckUpdate(boolean checkUpdate) {
+        PROPERTIES.setProperty("check_update", checkUpdate ? "1" : "0");
     }
 
     /**

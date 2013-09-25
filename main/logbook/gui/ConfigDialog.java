@@ -98,12 +98,6 @@ public final class ConfigDialog extends Dialog {
         height.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
         height.setText(Integer.toString(GlobalConfig.getHeight()));
 
-        new Label(compositeSystem, SWT.NONE);
-
-        final Button ontop = new Button(compositeSystem, SWT.CHECK);
-        ontop.setText("最前面に表示する");
-        ontop.setSelection(GlobalConfig.getOnTop() != SWT.NONE);
-
         Label label3 = new Label(compositeSystem, SWT.NONE);
         label3.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
         label3.setText("音量(%)");
@@ -111,6 +105,16 @@ public final class ConfigDialog extends Dialog {
         final Text soundlevel = new Text(compositeSystem, SWT.BORDER);
         soundlevel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
         soundlevel.setText(Integer.toString((int) (GlobalConfig.getSoundLevel() * 100)));
+
+        final Button ontop = new Button(compositeSystem, SWT.CHECK);
+        ontop.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
+        ontop.setText("最前面に表示する");
+        ontop.setSelection(GlobalConfig.getOnTop() != SWT.NONE);
+
+        final Button checkUpdate = new Button(compositeSystem, SWT.CHECK);
+        checkUpdate.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
+        checkUpdate.setText("起動時にアップデートチェック");
+        checkUpdate.setSelection(GlobalConfig.getCheckUpdate());
 
         TabItem tbtmDevelopment = new TabItem(tabFolder, SWT.NONE);
         tbtmDevelopment.setText("Development");
@@ -149,6 +153,8 @@ public final class ConfigDialog extends Dialog {
                 GlobalConfig.setHeight(height.getText());
                 GlobalConfig.setOnTop(ontop.getSelection());
                 GlobalConfig.setSoundLevel(soundlevel.getText());
+                GlobalConfig.setCheckUpdate(checkUpdate.getSelection());
+
                 // development
                 GlobalConfig.setStoreJson(btnJson.getSelection());
                 GlobalConfig.setStoreJsonPath(jsonpath.getText());
