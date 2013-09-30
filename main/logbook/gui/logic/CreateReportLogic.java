@@ -13,8 +13,12 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -271,7 +275,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getItemListHeader() {
-        return new String[] { "名称", "種別", "火力", "命中", "回避", "射程", "運", "爆装", "雷装", "索敵", "対潜", "対空" };
+        return new String[] { "名称", "種別", "個数", "火力", "命中", "回避", "射程", "運", "爆装", "雷装", "索敵", "対潜", "対空" };
     }
 
     /**
@@ -281,12 +285,35 @@ public final class CreateReportLogic {
      */
     public static List<String[]> getItemListBody() {
         Set<Entry<Long, ItemDto>> items = GlobalContext.getItemMap().entrySet();
-        List<Object[]> body = new ArrayList<Object[]>();
+        Map<ItemDto, Integer> itemCountMap = new HashMap<ItemDto, Integer>();
+
         for (Entry<Long, ItemDto> entry : items) {
             ItemDto item = entry.getValue();
-            body.add(new Object[] { item.getName(), item.getType(), item.getHoug(), item.getHoum(),
-                    item.getKaih(), item.getLeng(), item.getLuck(), item.getBaku(), item.getRaig(),
-                    item.getSaku(), item.getTais(), item.getTyku()
+            Integer count = itemCountMap.get(item);
+            if (count == null) {
+                count = 1;
+            } else {
+                count = count + 1;
+            }
+            itemCountMap.put(item, count);
+        }
+
+        List<Entry<ItemDto, Integer>> countitems = new ArrayList<Entry<ItemDto, Integer>>(itemCountMap.entrySet());
+        Collections.sort(countitems, new Comparator<Entry<ItemDto, Integer>>() {
+            @Override
+            public int compare(Entry<ItemDto, Integer> o1, Entry<ItemDto, Integer> o2) {
+                return o1.getValue().compareTo(o2.getValue());
+            }
+        });
+
+        List<Object[]> body = new ArrayList<Object[]>();
+
+        for (Entry<ItemDto, Integer> entry : countitems) {
+            ItemDto item = entry.getKey();
+            Integer count = entry.getValue();
+            body.add(new Object[] { item.getName(), item.getType(), count.toString(), item.getHoug(), item.getHoum(),
+                    item.getKaih(), item.getLeng(), item.getLuck(), item.getBaku(), item.getRaig(), item.getSaku(),
+                    item.getTais(), item.getTyku()
             });
         }
         return toListStringArray(body);

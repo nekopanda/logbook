@@ -335,6 +335,9 @@ public final class GlobalContext {
             case BATTLERESULT:
                 doBattleresult(data);
                 break;
+            // 艦隊
+            case DECK:
+                doDeck(data);
             default:
                 break;
             }
@@ -532,37 +535,9 @@ public final class GlobalContext {
                 ShipDto ship = new ShipDto((JsonObject) apidata.get(i));
                 shipMap.put(Long.valueOf(ship.getId()), ship);
             }
-            // 艦隊IDを追加
-            dock.clear();
-            JsonArray apidatadeck = data.getJsonObject().getJsonArray("api_data_deck");
-            for (int i = 0; i < apidatadeck.size(); i++) {
-                JsonObject jsonObject = (JsonObject) apidatadeck.get(i);
-                String fleetid = Long.toString(jsonObject.getJsonNumber("api_id").longValue());
-                String name = jsonObject.getString("api_name");
-                JsonArray apiship = jsonObject.getJsonArray("api_ship");
 
-                DockDto dockdto = new DockDto(fleetid, name);
-                dock.put(fleetid, dockdto);
-
-                for (int j = 0; j < apiship.size(); j++) {
-                    Long shipid = Long.valueOf(((JsonNumber) apiship.get(j)).longValue());
-                    ShipDto ship = shipMap.get(shipid);
-
-                    if (ship != null) {
-                        dockdto.addShip(ship);
-
-                        if ((i == 0) && (j == 0)) {
-                            if ((secretary == null) || (ship.getId() != secretary.getId())) {
-                                addConsole(ship.getName() + "(Lv" + ship.getLv() + ")" + " が秘書艦に任命されました");
-                            }
-                            // 秘書艦を設定
-                            secretary = ship;
-                        }
-                        // 艦隊IDを設定
-                        ship.setFleetid(fleetid);
-                    }
-                }
-            }
+            // 艦隊を設定
+            doDeck(data.getJsonObject().getJsonArray("api_data_deck"));
 
             // 確定待ちの艦娘がある場合、艦娘の名前を確定させます
             AwaitingDecision shipInfo;
@@ -579,6 +554,59 @@ public final class GlobalContext {
         } catch (Exception e) {
             LOG.warn("保有艦娘を更新しますに失敗しました", e);
             LOG.warn(data);
+        }
+    }
+
+    /**
+     * 艦隊を更新します
+     * 
+     * @param data
+     */
+    private static void doDeck(Data data) {
+        try {
+            JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
+            doDeck(apidata);
+            addConsole("艦隊を更新しました");
+        } catch (Exception e) {
+            LOG.warn("艦隊を更新しますに失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 艦隊を設定します
+     * 
+     * @param apidata
+     */
+    private static void doDeck(JsonArray apidata) {
+        dock.clear();
+        for (int i = 0; i < apidata.size(); i++) {
+            JsonObject jsonObject = (JsonObject) apidata.get(i);
+            String fleetid = Long.toString(jsonObject.getJsonNumber("api_id").longValue());
+            String name = jsonObject.getString("api_name");
+            JsonArray apiship = jsonObject.getJsonArray("api_ship");
+
+            DockDto dockdto = new DockDto(fleetid, name);
+            dock.put(fleetid, dockdto);
+
+            for (int j = 0; j < apiship.size(); j++) {
+                Long shipid = Long.valueOf(((JsonNumber) apiship.get(j)).longValue());
+                ShipDto ship = shipMap.get(shipid);
+
+                if (ship != null) {
+                    dockdto.addShip(ship);
+
+                    if ((i == 0) && (j == 0)) {
+                        if ((secretary == null) || (ship.getId() != secretary.getId())) {
+                            addConsole(ship.getName() + "(Lv" + ship.getLv() + ")" + " が秘書艦に任命されました");
+                        }
+                        // 秘書艦を設定
+                        secretary = ship;
+                    }
+                    // 艦隊IDを設定
+                    ship.setFleetid(fleetid);
+                }
+            }
         }
     }
 

@@ -92,6 +92,8 @@ public final class GlobalConfig {
 
     /**
      * ポート番号をセットする
+     * 
+     * @param listenPort
      */
     public static void setListenPort(String listenPort) {
         if (StringUtils.isNumeric(listenPort)) {
@@ -179,6 +181,8 @@ public final class GlobalConfig {
 
     /**
      * アップデートチェックを取得する
+     * 
+     * @return アップデートチェック
      */
     public static boolean getCheckUpdate() {
         return "1".equals(PROPERTIES.getProperty("check_update", "1"));
@@ -196,7 +200,7 @@ public final class GlobalConfig {
     /**
      * 開発者オプション-JSONを保存するを取得する
      * 
-     * @return
+     * @return JSONを保存する
      */
     public static boolean getStoreJson() {
         return "1".equals(PROPERTIES.getProperty("store_json", "0"));
@@ -205,7 +209,7 @@ public final class GlobalConfig {
     /**
      * 開発者オプション-JSONを保存するをセットする
      * 
-     * @return
+     * @param storeJson
      */
     public static void setStoreJson(boolean storeJson) {
         PROPERTIES.setProperty("store_json", storeJson ? "1" : "0");
@@ -214,7 +218,7 @@ public final class GlobalConfig {
     /**
      * 開発者オプション-JSONの保存先を取得する
      * 
-     * @return
+     * @return JSONの保存先
      */
     public static String getStoreJsonPath() {
         return PROPERTIES.getProperty("store_json_path", "./json/");
@@ -223,7 +227,7 @@ public final class GlobalConfig {
     /**
      * 開発者オプション-JSONの保存先をセットする
      * 
-     * @return
+     * @param storeJsonPath
      */
     public static void setStoreJsonPath(String storeJsonPath) {
         PROPERTIES.setProperty("store_json_path", storeJsonPath);
@@ -240,7 +244,7 @@ public final class GlobalConfig {
      * 設定ファイルを読み込みます
      * 
      * @param file File
-     * @return
+     * @return 設定ファイル
      */
     private static Properties readconfig(File file) {
         Properties properties = new Properties() {

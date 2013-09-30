@@ -232,4 +232,17 @@ public final class ItemDto extends AbstractDto {
     public long getTyku() {
         return this.tyku;
     }
+
+    @Override
+    public int hashCode() {
+        return this.name.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if ((obj != null) && (obj instanceof ItemDto)) {
+            return this.name.equals(((ItemDto) obj).getName());
+        }
+        return false;
+    }
 }

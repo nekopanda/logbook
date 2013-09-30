@@ -11,8 +11,6 @@ package logbook.data;
  */
 public enum DataType {
 
-    /** フィルタ前のデータ */
-    UNDEFINED(null),
     /** 保有艦 */
     SHIP2("/kcsapi/api_get_member/ship2"),
     /** 遠征 */
@@ -34,7 +32,11 @@ public enum DataType {
     /** 建造 */
     CREATESHIP("/kcsapi/api_req_kousyou/createship"),
     /** 建造(入手) */
-    GETSHIP("/kcsapi/api_req_kousyou/getship");
+    GETSHIP("/kcsapi/api_req_kousyou/getship"),
+    /** 艦隊 */
+    DECK("/kcsapi/api_get_member/deck"),
+    /** フィルタ前のデータ */
+    UNDEFINED(null);
 
     private final String url;
 
