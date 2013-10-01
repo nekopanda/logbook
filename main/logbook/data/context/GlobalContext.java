@@ -565,6 +565,12 @@ public final class GlobalContext {
     private static void doDeck(Data data) {
         try {
             JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
+            // 艦隊IDをクリアします
+            for (DockDto dockdto : dock.values()) {
+                for (ShipDto ship : dockdto.getShips()) {
+                    ship.setFleetid("");
+                }
+            }
             doDeck(apidata);
             addConsole("艦隊を更新しました");
         } catch (Exception e) {
