@@ -160,6 +160,24 @@ public final class GlobalConfig {
     }
 
     /**
+     * 縮小表示を取得する
+     * 
+     * @return 縮小表示に表示
+     */
+    public static boolean getMinimumLayout() {
+        return "1".equals(PROPERTIES.getProperty("minimum_layout", "0"));
+    }
+
+    /**
+     * 縮小表示をセットする
+     * 
+     * @param minimumLayout
+     */
+    public static void setMinimumLayout(boolean minimumLayout) {
+        PROPERTIES.setProperty("minimum_layout", minimumLayout ? "1" : "0");
+    }
+
+    /**
      * 音量を取得する
      * 
      * @return 音量
