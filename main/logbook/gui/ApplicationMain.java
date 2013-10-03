@@ -149,37 +149,44 @@ public final class ApplicationMain {
         // メニュー
         // コマンド-ドロップ報告書
         MenuItem cmddrop = new MenuItem(cmdmenu, SWT.NONE);
-        cmddrop.setText("ドロップ報告書");
+        cmddrop.setText("ドロップ報告書(Ctrl+&D)");
+        cmddrop.setAccelerator(SWT.CTRL + 'd');
         cmddrop.addSelectionListener(new DropReportAdapter(this.shell));
         // コマンド-建造報告書
         MenuItem cmdcreateship = new MenuItem(cmdmenu, SWT.NONE);
-        cmdcreateship.setText("建造報告書");
+        cmdcreateship.setText("建造報告書(Ctrl+&B)");
+        cmdcreateship.setAccelerator(SWT.CTRL + 'b');
         cmdcreateship.addSelectionListener(new CreateShipReportAdapter(this.shell));
         // コマンド-開発報告書
         MenuItem cmdcreateitem = new MenuItem(cmdmenu, SWT.NONE);
-        cmdcreateitem.setText("開発報告書");
+        cmdcreateitem.setText("開発報告書(Ctrl+&E)");
+        cmdcreateitem.setAccelerator(SWT.CTRL + 'e');
         cmdcreateitem.addSelectionListener(new CreateItemReportAdapter(this.shell));
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // コマンド-所有装備一覧
         MenuItem cmditemlist = new MenuItem(cmdmenu, SWT.NONE);
-        cmditemlist.setText("所有装備一覧");
+        cmditemlist.setText("所有装備一覧(Ctrl+&I)");
+        cmditemlist.setAccelerator(SWT.CTRL + 'i');
         cmditemlist.addSelectionListener(new ItemListReportAdapter(this.shell));
         // コマンド-所有艦娘一覧
         MenuItem cmdshiplist = new MenuItem(cmdmenu, SWT.NONE);
-        cmdshiplist.setText("所有艦娘一覧");
+        cmdshiplist.setText("所有艦娘一覧(Ctrl+&S)");
+        cmdshiplist.setAccelerator(SWT.CTRL + 's');
         cmdshiplist.addSelectionListener(new ShipListReportAdapter(this.shell));
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // コマンド-お風呂に入りたい艦娘
         MenuItem cmdbathwaterlist = new MenuItem(cmdmenu, SWT.NONE);
-        cmdbathwaterlist.setText("お風呂に入りたい艦娘");
+        cmdbathwaterlist.setText("お風呂に入りたい艦娘(Ctrl+&N)");
+        cmdbathwaterlist.setAccelerator(SWT.CTRL + 'n');
         cmdbathwaterlist.addSelectionListener(new BathwaterTableAdapter(this.shell));
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // 表示-縮小表示
         final MenuItem dispsize = new MenuItem(cmdmenu, SWT.CHECK);
-        dispsize.setText("縮小表示");
+        dispsize.setText("縮小表示(Ctrl+&M)");
+        dispsize.setAccelerator(SWT.CTRL + 'm');
 
         // 計算機-経験値計算
         MenuItem calcexp = new MenuItem(calcmenu, SWT.NONE);
