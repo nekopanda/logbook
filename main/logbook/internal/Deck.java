@@ -48,8 +48,8 @@ public final class Deck {
             this.put("32", "<UNKNOWN>");
             this.put("33", "前衛支援任務");
             this.put("34", "艦隊決戦支援任務");
-            this.put("35", "<UNKNOWN>");
-            this.put("36", "<UNKNOWN>");
+            this.put("35", "ＭＯ作戦");
+            this.put("36", "水上機基地建設");
             this.put("37", "<UNKNOWN>");
             this.put("38", "<UNKNOWN>");
             this.put("39", "<UNKNOWN>");
