@@ -379,13 +379,13 @@ public final class ApplicationMain {
                 // コントロールを隠す
                 ApplicationMain.this.hide(minimum, command, deckNotice, deck1name, deck2name, deck3name, ndockNotice,
                         ndock1name, ndock2name, ndock3name, ndock4name, consolec);
+                ApplicationMain.this.shell.setRedraw(true);
                 // ウインドウサイズを調節
                 if (minimum) {
                     ApplicationMain.this.shell.pack();
                 } else {
                     ApplicationMain.this.shell.setSize(GlobalConfig.getWidth(), GlobalConfig.getHeight());
                 }
-                ApplicationMain.this.shell.setRedraw(true);
                 // 設定を保存
                 GlobalConfig.setMinimumLayout(minimum);
                 GlobalConfig.store();
