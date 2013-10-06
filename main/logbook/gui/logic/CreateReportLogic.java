@@ -349,6 +349,26 @@ public final class CreateReportLogic {
     }
 
     /**
+     * 報告書をCSVファイルに書き込む(最初の列を取り除く)
+     * 
+     * @param file ファイル
+     * @param header ヘッダー
+     * @param body 内容
+     * @param applend 追記フラグ
+     * @throws IOException
+     */
+    public static void writeCsvStripFirstColumn(File file, String[] header, List<String[]> body, boolean applend)
+            throws IOException {
+        // 報告書の項番を除く
+        String[] copyheader = Arrays.copyOfRange(header, 1, header.length);
+        List<String[]> copybody = new ArrayList<String[]>();
+        for (String[] strings : body) {
+            copybody.add(Arrays.copyOfRange(strings, 1, strings.length));
+        }
+        writeCsv(file, copyheader, copybody, applend);
+    }
+
+    /**
      * 報告書をCSVファイルに書き込む
      * 
      * @param file ファイル
@@ -360,19 +380,11 @@ public final class CreateReportLogic {
     public static void writeCsv(File file, String[] header, List<String[]> body, boolean applend)
             throws IOException {
         OutputStream stream = new BufferedOutputStream(new FileOutputStream(file, applend));
-
-        // 報告書の項番を除く
-        String[] copyheader = Arrays.copyOfRange(header, 1, header.length);
-        List<String[]> copybody = new ArrayList<String[]>();
-        for (String[] strings : body) {
-            copybody.add(Arrays.copyOfRange(strings, 1, strings.length));
-        }
-
         try {
             if (!file.exists() || (FileUtils.sizeOf(file) <= 0)) {
-                IOUtils.write(StringUtils.join(copyheader, ',') + "\r\n", stream, GlobalConfig.CHARSET);
+                IOUtils.write(StringUtils.join(header, ',') + "\r\n", stream, GlobalConfig.CHARSET);
             }
-            for (String[] colums : copybody) {
+            for (String[] colums : body) {
                 IOUtils.write(StringUtils.join(colums, ',') + "\r\n", stream, GlobalConfig.CHARSET);
             }
         } finally {
