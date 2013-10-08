@@ -38,6 +38,7 @@ import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
+import logbook.dto.NdockDto;
 import logbook.dto.ResourceDto;
 import logbook.dto.ShipDto;
 import logbook.internal.Deck;
@@ -95,40 +96,57 @@ public final class GlobalContext {
     private static Queue<BattleDto> battleList = new ArrayBlockingQueue<BattleDto>(10);
 
     /** 遠征1 */
+    @Deprecated
     private static DeckMissionDto deck1Mission;
 
     /** 遠征2 */
+    @Deprecated
     private static DeckMissionDto deck2Mission;
 
     /** 遠征3 */
+    @Deprecated
     private static DeckMissionDto deck3Mission;
+
+    /** 遠征リスト */
+    private static DeckMissionDto[] deckMissions;
 
     /** ドック */
     private static Map<String, DockDto> dock = new HashMap<String, DockDto>();
 
     /** 入渠1 艦娘ID */
+    @Deprecated
     private static long ndock1id;
 
     /** 入渠1 お風呂から上がる時間 */
+    @Deprecated
     private static Date ndock1time;
 
     /** 入渠2 艦娘ID */
+    @Deprecated
     private static long ndock2id;
 
     /** 入渠2 お風呂から上がる時間 */
+    @Deprecated
     private static Date ndock2time;
 
     /** 入渠3 艦娘ID */
+    @Deprecated
     private static long ndock3id;
 
     /** 入渠3 お風呂から上がる時間 */
+    @Deprecated
     private static Date ndock3time;
 
     /** 入渠4 艦娘ID */
+    @Deprecated
     private static long ndock4id;
 
     /** 入渠4 お風呂から上がる時間 */
+    @Deprecated
     private static Date ndock4time;
+
+    /** 入渠リスト */
+    private static NdockDto[] ndocks;
 
     /** ログキュー */
     private static Queue<String> consoleQueue = new ArrayBlockingQueue<String>(10);
@@ -192,6 +210,7 @@ public final class GlobalContext {
     /**
      * @return 遠征1
      */
+    @Deprecated
     public static DeckMissionDto getDeck1Mission() {
         return deck1Mission;
     }
@@ -199,6 +218,7 @@ public final class GlobalContext {
     /**
      * @return 遠征2
      */
+    @Deprecated
     public static DeckMissionDto getDeck2Mission() {
         return deck2Mission;
     }
@@ -206,13 +226,22 @@ public final class GlobalContext {
     /**
      * @return 遠征3
      */
+    @Deprecated
     public static DeckMissionDto getDeck3Mission() {
         return deck3Mission;
+    }
+
+    /**
+     * @return 遠征リスト
+     */
+    public static DeckMissionDto[] getDeckMissions() {
+        return deckMissions;
     }
 
     /** 
      * @return 入渠1 艦娘ID
      */
+    @Deprecated
     public static long getNdock1id() {
         return ndock1id;
     }
@@ -220,6 +249,7 @@ public final class GlobalContext {
     /**
      *  @return 入渠1 お風呂から上がる時間
      */
+    @Deprecated
     public static Date getNdock1time() {
         return ndock1time;
     }
@@ -227,6 +257,7 @@ public final class GlobalContext {
     /**
      *  @return 入渠2 艦娘ID
      */
+    @Deprecated
     public static long getNdock2id() {
         return ndock2id;
     }
@@ -234,6 +265,7 @@ public final class GlobalContext {
     /** 
      * @return 入渠2 お風呂から上がる時間
      */
+    @Deprecated
     public static Date getNdock2time() {
         return ndock2time;
     }
@@ -241,6 +273,7 @@ public final class GlobalContext {
     /**
      *  @return 入渠3 艦娘ID
      */
+    @Deprecated
     public static long getNdock3id() {
         return ndock3id;
     }
@@ -248,6 +281,7 @@ public final class GlobalContext {
     /** 
      * @return 入渠3 お風呂から上がる時間
      */
+    @Deprecated
     public static Date getNdock3time() {
         return ndock3time;
     }
@@ -255,6 +289,7 @@ public final class GlobalContext {
     /**
      * @return 入渠4 艦娘ID
      */
+    @Deprecated
     public static long getNdock4id() {
         return ndock4id;
     }
@@ -262,8 +297,16 @@ public final class GlobalContext {
     /** 
      * @return 入渠4 お風呂から上がる時間
      */
+    @Deprecated
     public static Date getNdock4time() {
         return ndock4time;
+    }
+
+    /**
+     * @return 入渠リスト
+     */
+    public static NdockDto[] getNdocks() {
+        return ndocks;
     }
 
     /**
@@ -644,6 +687,9 @@ public final class GlobalContext {
     private static void doDeckPort(Data data) {
         try {
             JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
+
+            deckMissions = new DeckMissionDto[] { DeckMissionDto.EMPTY, DeckMissionDto.EMPTY, DeckMissionDto.EMPTY };
+
             for (int i = 1; i < apidata.size(); i++) {
                 JsonObject object = (JsonObject) apidata.get(i);
                 String name = object.getString("api_name");
@@ -667,6 +713,7 @@ public final class GlobalContext {
                 if (milis > 0) {
                     time = new Date(milis);
                 }
+                deckMissions[i - 1] = new DeckMissionDto(name, mission, time, fleetid, ships);
 
                 switch (i) {
                 case 1:
@@ -697,6 +744,9 @@ public final class GlobalContext {
     private static void doNdock(Data data) {
         try {
             JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
+
+            ndocks = new NdockDto[] { NdockDto.EMPTY, NdockDto.EMPTY, NdockDto.EMPTY, NdockDto.EMPTY };
+
             for (int i = 0; i < apidata.size(); i++) {
                 JsonObject object = (JsonObject) apidata.get(i);
                 long id = object.getJsonNumber("api_ship_id").longValue();
@@ -706,6 +756,7 @@ public final class GlobalContext {
                 if (milis > 0) {
                     time = new Date(milis);
                 }
+                ndocks[i] = new NdockDto(id, time);
 
                 switch (i) {
                 case 0:
