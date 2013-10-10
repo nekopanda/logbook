@@ -87,9 +87,11 @@ public final class ApplicationMain {
                 CreateReportLogic.writeCsvStripFirstColumn(new File("./海戦・ドロップ報告書.csv"),
                         CreateReportLogic.getBattleResultStoreHeader(),
                         CreateReportLogic.getBattleResultStoreBody(), true);
-                CreateReportLogic.writeCsvStripFirstColumn(new File("./建造報告書.csv"), CreateReportLogic.getCreateShipHeader(),
+                CreateReportLogic.writeCsvStripFirstColumn(new File("./建造報告書.csv"),
+                        CreateReportLogic.getCreateShipHeader(),
                         CreateReportLogic.getCreateShipBody(), true);
-                CreateReportLogic.writeCsvStripFirstColumn(new File("./開発報告書.csv"), CreateReportLogic.getCreateItemHeader(),
+                CreateReportLogic.writeCsvStripFirstColumn(new File("./開発報告書.csv"),
+                        CreateReportLogic.getCreateItemHeader(),
                         CreateReportLogic.getCreateItemBody(), true);
             } catch (IOException e) {
                 LOG.warn("報告書の保存に失敗しました", e);

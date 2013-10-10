@@ -93,7 +93,7 @@ public final class GlobalContext {
     private static int hqLevel;
 
     /** 戦闘詳細 */
-    private static Queue<BattleDto> battleList = new ArrayBlockingQueue<BattleDto>(10);
+    private static Queue<BattleDto> battleList = new ArrayBlockingQueue<BattleDto>(1);
 
     /** 遠征1 */
     @Deprecated
@@ -374,6 +374,10 @@ public final class GlobalContext {
             case BATTLE:
                 doBattle(data);
                 break;
+            // 海戦(夜戦)
+            case BATTLE_MIDNIGHT:
+                doBattle(data);
+                break;
             // 海戦結果
             case BATTLERESULT:
                 doBattleresult(data);
@@ -415,10 +419,12 @@ public final class GlobalContext {
      */
     private static void doBattle(Data data) {
         try {
-            JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
-            battleList.add(new BattleDto(apidata));
+            if (battleList.size() == 0) {
+                JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+                battleList.add(new BattleDto(apidata));
 
-            addConsole("海戦情報を更新しました");
+                addConsole("海戦情報を更新しました");
+            }
         } catch (Exception e) {
             LOG.warn("海戦情報を更新しますに失敗しました", e);
             LOG.warn(data);

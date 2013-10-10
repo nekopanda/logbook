@@ -41,7 +41,14 @@ public final class BattleDto extends AbstractDto {
      */
     public BattleDto(JsonObject object) {
 
-        String dockId = Long.toString(object.getJsonNumber("api_dock_id").longValue());
+        String dockId;
+
+        if (object.containsKey("api_dock_id")) {
+            dockId = object.get("api_dock_id").toString();
+        } else {
+            dockId = object.get("api_deck_id").toString();
+        }
+
         this.dock = GlobalContext.getDock(dockId);
 
         JsonArray shipKe = object.getJsonArray("api_ship_ke");

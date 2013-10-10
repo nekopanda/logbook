@@ -14,6 +14,8 @@ import java.util.Set;
  */
 public final class DeckMissionDto extends AbstractDto {
 
+    public static final DeckMissionDto EMPTY = new DeckMissionDto(null, null, null, 0, null);
+
     /** 艦隊名 */
     private final String name;
 
