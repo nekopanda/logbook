@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project logbook with libraries in sub-folder">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required                                        -->
+    <target name="create_run_jar">
+        <jar destfile="./dest/logbook.jar">
+            <manifest>
+                <attribute name="Main-Class" value="logbook.gui.ApplicationMain"/>
+                <attribute name="Class-Path" value=". logbook_lib/commons-io-2.4.jar logbook_lib/commons-lang3-3.1.jar logbook_lib/commons-logging-1.1.1.jar logbook_lib/jetty-client-9.0.5.v20130815.jar logbook_lib/jetty-http-9.0.5.v20130815.jar logbook_lib/jetty-io-9.0.5.v20130815.jar logbook_lib/jetty-proxy-9.0.5.v20130815.jar logbook_lib/jetty-server-9.0.5.v20130815.jar logbook_lib/jetty-servlet-9.0.5.v20130815.jar logbook_lib/jetty-util-9.0.5.v20130815.jar logbook_lib/servlet-api-3.0.jar logbook_lib/javax.json-1.0.jar logbook_lib/swt.jar logbook_lib/log4j-api-2.0-beta8.jar logbook_lib/log4j-core-2.0-beta8.jar"/>
+            </manifest>
+            <fileset dir="./bin"/>
+        </jar>
+        <delete dir="./dest/logbook_lib/"/>
+        <mkdir dir="./dest/logbook_lib"/>
+        <copy file="./lib/commons/commons-io-2.4.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/commons/commons-lang3-3.1.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/commons/commons-logging-1.1.1.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/server/jetty-client-9.0.5.v20130815.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/server/jetty-http-9.0.5.v20130815.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/server/jetty-io-9.0.5.v20130815.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/server/jetty-proxy-9.0.5.v20130815.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/server/jetty-server-9.0.5.v20130815.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/server/jetty-servlet-9.0.5.v20130815.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/server/jetty-util-9.0.5.v20130815.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/server/servlet-api-3.0.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/util/javax.json-1.0.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/gui/swt.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/log4j-api-2.0-beta8.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/log4j-core-2.0-beta8.jar" todir="./dest/logbook_lib"/>
+    </target>
+</project>
