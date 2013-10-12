@@ -1,5 +1,7 @@
 /**
- * 
+ * No Rights Reserved.
+ * This program and the accompanying materials
+ * are made available under the terms of the Public Domain.
  */
 package logbook.dto;
 
@@ -13,7 +15,7 @@ import logbook.data.context.GlobalContext;
 import logbook.internal.Ship;
 
 /**
- * @author noname
+ * 会敵を表します
  *
  */
 public final class BattleDto extends AbstractDto {
