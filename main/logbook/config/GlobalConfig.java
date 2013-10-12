@@ -60,6 +60,15 @@ public final class GlobalConfig {
     /** 疲労オレンジ色 */
     public static final RGB COND_ORANGE_COLOR = new RGB(255, 140, 0);
 
+    /** 5分前 */
+    public static final RGB TIME_IN_5_MIN = new RGB(255, 215, 0);
+
+    /** 10分前 */
+    public static final RGB TIME_IN_10_MIN = new RGB(255, 239, 153);
+
+    /** 20分前 */
+    public static final RGB TIME_IN_20_MIN = new RGB(255, 247, 203);
+
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://kancolle.sanaechan.net/");
 

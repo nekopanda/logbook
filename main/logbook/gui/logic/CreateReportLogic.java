@@ -27,9 +27,11 @@ import logbook.data.context.GlobalContext;
 import logbook.dto.BattleDto;
 import logbook.dto.BattleResultDto;
 import logbook.dto.CreateItemDto;
+import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
+import logbook.dto.NdockDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
 
@@ -75,25 +77,23 @@ public final class CreateReportLogic {
 
             // 遠征
             Set<Long> deckmissions = new HashSet<Long>();
-            if ((GlobalContext.getDeck1Mission() != null) && (GlobalContext.getDeck1Mission().getMission() != null)) {
-                deckmissions.addAll(GlobalContext.getDeck1Mission().getShips());
-            }
-            if ((GlobalContext.getDeck2Mission() != null) && (GlobalContext.getDeck2Mission().getMission() != null)) {
-                deckmissions.addAll(GlobalContext.getDeck2Mission().getShips());
-            }
-            if ((GlobalContext.getDeck3Mission() != null) && (GlobalContext.getDeck3Mission().getMission() != null)) {
-                deckmissions.addAll(GlobalContext.getDeck3Mission().getShips());
-            }
-            if (deckmissions.contains(ship)) {
-                item.setForeground(SWTResourceManager.getColor(GlobalConfig.MISSION_COLOR));
+            for (DeckMissionDto deckMission : GlobalContext.getDeckMissions()) {
+                if (deckMission.getShips() != null) {
+                    deckmissions.addAll(deckMission.getShips());
+                }
             }
 
             // 入渠
             Set<Long> docks = new HashSet<Long>();
-            docks.add(GlobalContext.getNdock1id());
-            docks.add(GlobalContext.getNdock2id());
-            docks.add(GlobalContext.getNdock3id());
-            docks.add(GlobalContext.getNdock4id());
+            for (NdockDto ndock : GlobalContext.getNdocks()) {
+                if (ndock.getNdockid() != 0) {
+                    docks.add(ndock.getNdockid());
+                }
+            }
+
+            if (deckmissions.contains(ship)) {
+                item.setForeground(SWTResourceManager.getColor(GlobalConfig.MISSION_COLOR));
+            }
             if (docks.contains(ship)) {
                 item.setForeground(SWTResourceManager.getColor(GlobalConfig.NDOCK_COLOR));
             }

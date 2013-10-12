@@ -5,8 +5,7 @@
  */
 package logbook.gui.listener;
 
-import logbook.gui.TableDialog;
-import logbook.gui.logic.CreateReportLogic;
+import logbook.gui.ItemTable;
 
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Shell;
@@ -26,7 +25,6 @@ public final class ItemListReportAdapter extends AbstractReportAdapter {
 
     @Override
     public void widgetSelected(SelectionEvent paramSelectionEvent) {
-        new TableDialog(this.shell, "所有装備一覧", CreateReportLogic.getItemListHeader(),
-                CreateReportLogic.getItemListBody(), CreateReportLogic.DEFAULT_TABLE_ITEM_CREATOR).open();
+        new ItemTable(this.shell).open();
     }
 }

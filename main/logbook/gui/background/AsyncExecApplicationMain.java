@@ -11,8 +11,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import logbook.config.GlobalConfig;
 import logbook.data.context.GlobalContext;
 import logbook.dto.DeckMissionDto;
+import logbook.dto.NdockDto;
 import logbook.dto.ShipDto;
 import logbook.gui.logic.Sound;
 import logbook.gui.logic.TimeLogic;
@@ -206,23 +208,25 @@ public final class AsyncExecApplicationMain extends Thread {
                                 AsyncExecApplicationMain.this.deck2time, AsyncExecApplicationMain.this.deck3time
                         };
 
-                        DeckMissionDto[] deckMissions = { GlobalContext.getDeck1Mission(),
-                                GlobalContext.getDeck2Mission(), GlobalContext.getDeck3Mission() };
+                        DeckMissionDto[] deckMissions = GlobalContext.getDeckMissions();
 
-                        for (int i = 0; i < 3; i++) {
+                        for (int i = 0; i < deckMissions.length; i++) {
                             String time = "";
                             String dispname = "";
-                            if ((deckMissions[i] != null) && (deckMissions[i].getMission() != null)) {
+                            if (deckMissions[i].getMission() != null) {
                                 dispname = deckMissions[i].getName() + " (" + deckMissions[i].getMission() + ")";
                                 if (deckMissions[i].getTime() != null) {
                                     long rest = getRest(now, deckMissions[i].getTime());
                                     // 20分前、10分前、5分前になったら背景色を変更する
                                     if (rest <= (ONE_MINUTES * 5)) {
-                                        deckTimeTexts[i].setBackground(SWTResourceManager.getColor(255, 215, 0));
+                                        deckTimeTexts[i].setBackground(SWTResourceManager
+                                                .getColor(GlobalConfig.TIME_IN_5_MIN));
                                     } else if (rest <= (ONE_MINUTES * 10)) {
-                                        deckTimeTexts[i].setBackground(SWTResourceManager.getColor(255, 239, 153));
+                                        deckTimeTexts[i].setBackground(SWTResourceManager
+                                                .getColor(GlobalConfig.TIME_IN_10_MIN));
                                     } else if (rest <= (ONE_MINUTES * 20)) {
-                                        deckTimeTexts[i].setBackground(SWTResourceManager.getColor(255, 247, 203));
+                                        deckTimeTexts[i].setBackground(SWTResourceManager
+                                                .getColor(GlobalConfig.TIME_IN_20_MIN));
                                     } else {
                                         deckTimeTexts[i].setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
                                     }
@@ -270,27 +274,27 @@ public final class AsyncExecApplicationMain extends Thread {
                                 AsyncExecApplicationMain.this.ndock2time, AsyncExecApplicationMain.this.ndock3time,
                                 AsyncExecApplicationMain.this.ndock4time };
 
-                        long[] ids = { GlobalContext.getNdock1id(), GlobalContext.getNdock2id(),
-                                GlobalContext.getNdock3id(), GlobalContext.getNdock4id() };
-                        Date[] times = { GlobalContext.getNdock1time(), GlobalContext.getNdock2time(),
-                                GlobalContext.getNdock3time(), GlobalContext.getNdock4time() };
+                        NdockDto[] ndocks = GlobalContext.getNdocks();
 
-                        for (int i = 0; i < times.length; i++) {
+                        for (int i = 0; i < ndocks.length; i++) {
                             String name = "";
                             String time = "";
 
-                            if (ids[i] != 0) {
-                                ShipDto ship = shipMap.get(Long.valueOf(ids[i]));
+                            if (ndocks[i].getNdockid() != 0) {
+                                ShipDto ship = shipMap.get(Long.valueOf(ndocks[i].getNdockid()));
                                 if (ship != null) {
                                     name = ship.getName() + " (Lv" + ship.getLv() + ")";
-                                    long rest = getRest(now, times[i]);
+                                    long rest = getRest(now, ndocks[i].getNdocktime());
                                     // 20分前、10分前、5分前になったら背景色を変更する
                                     if (rest <= (ONE_MINUTES * 5)) {
-                                        ndockTimeTexts[i].setBackground(SWTResourceManager.getColor(255, 215, 0));
+                                        ndockTimeTexts[i].setBackground(SWTResourceManager
+                                                .getColor(GlobalConfig.TIME_IN_5_MIN));
                                     } else if (rest <= (ONE_MINUTES * 10)) {
-                                        ndockTimeTexts[i].setBackground(SWTResourceManager.getColor(255, 239, 153));
+                                        ndockTimeTexts[i].setBackground(SWTResourceManager
+                                                .getColor(GlobalConfig.TIME_IN_10_MIN));
                                     } else if (rest <= (ONE_MINUTES * 20)) {
-                                        ndockTimeTexts[i].setBackground(SWTResourceManager.getColor(255, 247, 203));
+                                        ndockTimeTexts[i].setBackground(SWTResourceManager
+                                                .getColor(GlobalConfig.TIME_IN_20_MIN));
                                     } else {
                                         ndockTimeTexts[i].setBackground(SWTResourceManager
                                                 .getColor(SWT.COLOR_WHITE));

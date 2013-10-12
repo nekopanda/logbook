@@ -65,10 +65,6 @@ public final class CalcExpDialog extends Dialog {
     public CalcExpDialog(Shell parent) {
         super(parent, SWT.SHELL_TRIM | SWT.MODELESS);
         this.setText("経験値計算機");
-
-        for (ShipDto ship : GlobalContext.getShipMap().values()) {
-            this.shipmap.put(this.getShipLabel(ship), ship);
-        }
     }
 
     /**
@@ -99,8 +95,8 @@ public final class CalcExpDialog extends Dialog {
         select.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         final Combo shipcombo = new Combo(select, SWT.READ_ONLY);
         this.setShipComboData(shipcombo);
-        Button preset = new Button(select, SWT.NONE);
-        preset.setText("セット");
+        Button reload = new Button(select, SWT.NONE);
+        reload.setText("更新");
 
         Composite plan = new Composite(this.shell, SWT.NONE);
         plan.setLayout(new GridLayout(5, false));
@@ -203,8 +199,9 @@ public final class CalcExpDialog extends Dialog {
         // MVPチェックを復元
         mvpbtn.setSelection(mvp);
 
-        preset.addSelectionListener(new PresetListener(beforexp, afterexp, shipcombo, flagbtn, battlecount, needexp,
+        shipcombo.addSelectionListener(new PresetListener(beforexp, afterexp, shipcombo, flagbtn, battlecount, needexp,
                 seacombo, evalcombo, afterlv, getexp, mvpbtn, beforelv));
+        reload.addSelectionListener(new ReloadListener(shipcombo));
         beforelv.addSelectionListener(new BeforeLvListener(beforexp, needexp, flagbtn, evalcombo, seacombo,
                 battlecount, beforelv, afterexp, getexp, mvpbtn));
         afterlv.addSelectionListener(new AfterLvListener(beforexp, battlecount, getexp, flagbtn, seacombo, afterexp,
@@ -269,6 +266,15 @@ public final class CalcExpDialog extends Dialog {
      * @param combo
      */
     private void setShipComboData(Combo combo) {
+        // コンボボックスから全ての艦娘を削除
+        combo.removeAll();
+        // 表示用文字列と艦娘の紐付けを削除
+        this.shipmap.clear();
+        // 表示用文字列と艦娘の紐付けを追加
+        for (ShipDto ship : GlobalContext.getShipMap().values()) {
+            this.shipmap.put(this.getShipLabel(ship), ship);
+        }
+        // 艦娘を経験値順でソート
         List<ShipDto> ships = new ArrayList<ShipDto>(this.shipmap.values());
         Collections.sort(ships, new Comparator<ShipDto>() {
             @Override
@@ -276,9 +282,13 @@ public final class CalcExpDialog extends Dialog {
                 return Long.compare(o2.getExp(), o1.getExp());
             }
         });
+        // コンボボックスに追加
         for (ShipDto ship : ships) {
             combo.add(this.getShipLabel(ship));
         }
+        // コントロールを再配置
+        combo.pack();
+        combo.getParent().pack();
     }
 
     /**
@@ -290,6 +300,26 @@ public final class CalcExpDialog extends Dialog {
     private String getShipLabel(ShipDto ship) {
         return StringUtils.leftPad(Long.toString(ship.getId()), 5, '0') + ": " + ship.getName() + " (Lv" + ship.getLv()
                 + ")";
+    }
+
+    /**
+     * 艦娘の状態を更新する
+     * 
+     */
+    private final class ReloadListener extends SelectionAdapter {
+        private final Combo combo;
+
+        /**
+         * @param combo
+         */
+        public ReloadListener(Combo combo) {
+            this.combo = combo;
+        }
+
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+            CalcExpDialog.this.setShipComboData(this.combo);
+        }
     }
 
     /**

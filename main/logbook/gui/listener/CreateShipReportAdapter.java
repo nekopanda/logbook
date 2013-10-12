@@ -5,8 +5,7 @@
  */
 package logbook.gui.listener;
 
-import logbook.gui.TableDialog;
-import logbook.gui.logic.CreateReportLogic;
+import logbook.gui.CreateShipReportTable;
 
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Shell;
@@ -26,7 +25,6 @@ public final class CreateShipReportAdapter extends AbstractReportAdapter {
 
     @Override
     public void widgetSelected(SelectionEvent paramSelectionEvent) {
-        new TableDialog(this.shell, "建造報告書", CreateReportLogic.getCreateShipHeader(),
-                CreateReportLogic.getCreateShipBody(), CreateReportLogic.DEFAULT_TABLE_ITEM_CREATOR).open();
+        new CreateShipReportTable(this.shell).open();
     }
 }

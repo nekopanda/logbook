@@ -95,58 +95,16 @@ public final class GlobalContext {
     /** 戦闘詳細 */
     private static Queue<BattleDto> battleList = new ArrayBlockingQueue<BattleDto>(1);
 
-    /** 遠征1 */
-    @Deprecated
-    private static DeckMissionDto deck1Mission;
-
-    /** 遠征2 */
-    @Deprecated
-    private static DeckMissionDto deck2Mission;
-
-    /** 遠征3 */
-    @Deprecated
-    private static DeckMissionDto deck3Mission;
-
     /** 遠征リスト */
-    private static DeckMissionDto[] deckMissions;
+    private static DeckMissionDto[] deckMissions = new DeckMissionDto[] { DeckMissionDto.EMPTY, DeckMissionDto.EMPTY,
+            DeckMissionDto.EMPTY };
 
     /** ドック */
     private static Map<String, DockDto> dock = new HashMap<String, DockDto>();
 
-    /** 入渠1 艦娘ID */
-    @Deprecated
-    private static long ndock1id;
-
-    /** 入渠1 お風呂から上がる時間 */
-    @Deprecated
-    private static Date ndock1time;
-
-    /** 入渠2 艦娘ID */
-    @Deprecated
-    private static long ndock2id;
-
-    /** 入渠2 お風呂から上がる時間 */
-    @Deprecated
-    private static Date ndock2time;
-
-    /** 入渠3 艦娘ID */
-    @Deprecated
-    private static long ndock3id;
-
-    /** 入渠3 お風呂から上がる時間 */
-    @Deprecated
-    private static Date ndock3time;
-
-    /** 入渠4 艦娘ID */
-    @Deprecated
-    private static long ndock4id;
-
-    /** 入渠4 お風呂から上がる時間 */
-    @Deprecated
-    private static Date ndock4time;
-
     /** 入渠リスト */
-    private static NdockDto[] ndocks;
+    private static NdockDto[] ndocks = new NdockDto[] { NdockDto.EMPTY, NdockDto.EMPTY, NdockDto.EMPTY,
+            NdockDto.EMPTY };
 
     /** ログキュー */
     private static Queue<String> consoleQueue = new ArrayBlockingQueue<String>(10);
@@ -208,98 +166,10 @@ public final class GlobalContext {
     }
 
     /**
-     * @return 遠征1
-     */
-    @Deprecated
-    public static DeckMissionDto getDeck1Mission() {
-        return deck1Mission;
-    }
-
-    /**
-     * @return 遠征2
-     */
-    @Deprecated
-    public static DeckMissionDto getDeck2Mission() {
-        return deck2Mission;
-    }
-
-    /**
-     * @return 遠征3
-     */
-    @Deprecated
-    public static DeckMissionDto getDeck3Mission() {
-        return deck3Mission;
-    }
-
-    /**
      * @return 遠征リスト
      */
     public static DeckMissionDto[] getDeckMissions() {
         return deckMissions;
-    }
-
-    /** 
-     * @return 入渠1 艦娘ID
-     */
-    @Deprecated
-    public static long getNdock1id() {
-        return ndock1id;
-    }
-
-    /**
-     *  @return 入渠1 お風呂から上がる時間
-     */
-    @Deprecated
-    public static Date getNdock1time() {
-        return ndock1time;
-    }
-
-    /**
-     *  @return 入渠2 艦娘ID
-     */
-    @Deprecated
-    public static long getNdock2id() {
-        return ndock2id;
-    }
-
-    /** 
-     * @return 入渠2 お風呂から上がる時間
-     */
-    @Deprecated
-    public static Date getNdock2time() {
-        return ndock2time;
-    }
-
-    /**
-     *  @return 入渠3 艦娘ID
-     */
-    @Deprecated
-    public static long getNdock3id() {
-        return ndock3id;
-    }
-
-    /** 
-     * @return 入渠3 お風呂から上がる時間
-     */
-    @Deprecated
-    public static Date getNdock3time() {
-        return ndock3time;
-    }
-
-    /**
-     * @return 入渠4 艦娘ID
-     */
-    @Deprecated
-    public static long getNdock4id() {
-        return ndock4id;
-    }
-
-    /** 
-     * @return 入渠4 お風呂から上がる時間
-     */
-    @Deprecated
-    public static Date getNdock4time() {
-        return ndock4time;
     }
 
     /**
@@ -720,20 +590,6 @@ public final class GlobalContext {
                     time = new Date(milis);
                 }
                 deckMissions[i - 1] = new DeckMissionDto(name, mission, time, fleetid, ships);
-
-                switch (i) {
-                case 1:
-                    deck1Mission = new DeckMissionDto(name, mission, time, fleetid, ships);
-                    break;
-                case 2:
-                    deck2Mission = new DeckMissionDto(name, mission, time, fleetid, ships);
-                    break;
-                case 3:
-                    deck3Mission = new DeckMissionDto(name, mission, time, fleetid, ships);
-                    break;
-                default:
-                    break;
-                }
             }
 
             addConsole("遠征情報を更新しました");
@@ -763,27 +619,6 @@ public final class GlobalContext {
                     time = new Date(milis);
                 }
                 ndocks[i] = new NdockDto(id, time);
-
-                switch (i) {
-                case 0:
-                    ndock1id = id;
-                    ndock1time = time;
-                    break;
-                case 1:
-                    ndock2id = id;
-                    ndock2time = time;
-                    break;
-                case 2:
-                    ndock3id = id;
-                    ndock3time = time;
-                    break;
-                case 3:
-                    ndock4id = id;
-                    ndock4time = time;
-                    break;
-                default:
-                    break;
-                }
             }
 
             addConsole("入渠情報を更新しました");

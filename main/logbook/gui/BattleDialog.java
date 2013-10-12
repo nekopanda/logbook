@@ -42,7 +42,6 @@ public final class BattleDialog extends Dialog {
      */
     public BattleDialog(Shell parent, String id) {
         super(parent, SWT.SHELL_TRIM | SWT.MODELESS);
-        this.setText("SWT Dialog");
 
         this.id = id;
     }
