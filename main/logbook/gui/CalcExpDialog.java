@@ -57,6 +57,18 @@ public final class CalcExpDialog extends Dialog {
     private final Map<String, ShipDto> shipmap = new HashMap<String, ShipDto>();
 
     private Shell shell;
+    private Combo shipcombo;
+    private Spinner beforelv;
+    private Text beforexp;
+    private Spinner afterlv;
+    private Text afterexp;
+    private Combo seacombo;
+    private Combo evalcombo;
+    private Button flagbtn;
+    private Button mvpbtn;
+    private Text getexp;
+    private Text needexp;
+    private Text battlecount;
 
     /**
      * Create the dialog.
@@ -93,8 +105,8 @@ public final class CalcExpDialog extends Dialog {
         Composite select = new Composite(this.shell, SWT.NONE);
         select.setLayout(new RowLayout());
         select.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        final Combo shipcombo = new Combo(select, SWT.READ_ONLY);
-        this.setShipComboData(shipcombo);
+        this.shipcombo = new Combo(select, SWT.READ_ONLY);
+        this.setShipComboData();
         Button reload = new Button(select, SWT.NONE);
         reload.setText("更新");
 
@@ -103,37 +115,37 @@ public final class CalcExpDialog extends Dialog {
         plan.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         Label label1 = new Label(plan, SWT.NONE);
         label1.setText("今のレベル");
-        final Spinner beforelv = new Spinner(plan, SWT.BORDER);
+        this.beforelv = new Spinner(plan, SWT.BORDER);
         GridData gdBeforelv = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
         gdBeforelv.widthHint = 45;
-        beforelv.setLayoutData(gdBeforelv);
-        beforelv.setMaximum(99);
-        beforelv.setMinimum(1);
+        this.beforelv.setLayoutData(gdBeforelv);
+        this.beforelv.setMaximum(99);
+        this.beforelv.setMinimum(1);
         Label label2 = new Label(plan, SWT.NONE);
         label2.setText("Lv");
-        final Text beforexp = new Text(plan, SWT.BORDER | SWT.READ_ONLY);
+        this.beforexp = new Text(plan, SWT.BORDER | SWT.READ_ONLY);
         GridData gdBeforexp = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
         gdBeforexp.widthHint = 60;
-        beforexp.setLayoutData(gdBeforexp);
-        beforexp.setText("0");
+        this.beforexp.setLayoutData(gdBeforexp);
+        this.beforexp.setText("0");
         Label label3 = new Label(plan, SWT.NONE);
         label3.setText("Exp");
 
         Label label4 = new Label(plan, SWT.NONE);
         label4.setText("目標レベル");
-        final Spinner afterlv = new Spinner(plan, SWT.BORDER);
+        this.afterlv = new Spinner(plan, SWT.BORDER);
         GridData gdAfterlv = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
         gdAfterlv.widthHint = 45;
-        afterlv.setLayoutData(gdAfterlv);
-        afterlv.setMaximum(99);
-        afterlv.setMinimum(1);
+        this.afterlv.setLayoutData(gdAfterlv);
+        this.afterlv.setMaximum(99);
+        this.afterlv.setMinimum(1);
         Label label5 = new Label(plan, SWT.NONE);
         label5.setText("Lv");
-        final Text afterexp = new Text(plan, SWT.BORDER | SWT.READ_ONLY);
+        this.afterexp = new Text(plan, SWT.BORDER | SWT.READ_ONLY);
         GridData gdAfterexp = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
         gdAfterexp.widthHint = 60;
-        afterexp.setLayoutData(gdAfterexp);
-        afterexp.setText("0");
+        this.afterexp.setLayoutData(gdAfterexp);
+        this.afterexp.setText("0");
         Label label6 = new Label(plan, SWT.NONE);
         label6.setText("Exp");
 
@@ -142,24 +154,24 @@ public final class CalcExpDialog extends Dialog {
         plan2.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         Label label7 = new Label(plan2, SWT.NONE);
         label7.setText("海域");
-        final Combo seacombo = new Combo(plan2, SWT.READ_ONLY);
+        this.seacombo = new Combo(plan2, SWT.READ_ONLY);
         for (Entry<String, Integer> entry : SeaExp.get().entrySet()) {
-            seacombo.add(entry.getKey());
+            this.seacombo.add(entry.getKey());
         }
         Label label8 = new Label(plan2, SWT.NONE);
         label8.setText("評価");
-        final Combo evalcombo = new Combo(plan2, SWT.READ_ONLY);
+        this.evalcombo = new Combo(plan2, SWT.READ_ONLY);
         for (Entry<String, Double> entry : EvaluateExp.get().entrySet()) {
-            evalcombo.add(entry.getKey());
+            this.evalcombo.add(entry.getKey());
         }
 
         Composite plan3 = new Composite(this.shell, SWT.NONE);
         plan3.setLayout(new RowLayout());
         plan3.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        final Button flagbtn = new Button(plan3, SWT.CHECK);
-        flagbtn.setText("旗艦");
-        final Button mvpbtn = new Button(plan3, SWT.CHECK);
-        mvpbtn.setText("MVP");
+        this.flagbtn = new Button(plan3, SWT.CHECK);
+        this.flagbtn.setText("旗艦");
+        this.mvpbtn = new Button(plan3, SWT.CHECK);
+        this.mvpbtn.setText("MVP");
 
         Composite plan4 = new Composite(this.shell, SWT.NONE);
         plan4.setLayout(new FillLayout());
@@ -171,71 +183,88 @@ public final class CalcExpDialog extends Dialog {
         result.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         Label label10 = new Label(result, SWT.NONE);
         label10.setText("1回あたり");
-        final Text getexp = new Text(result, SWT.BORDER | SWT.READ_ONLY);
+        this.getexp = new Text(result, SWT.BORDER | SWT.READ_ONLY);
         GridData gdGetexp = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
         gdGetexp.widthHint = 55;
-        getexp.setLayoutData(gdGetexp);
+        this.getexp.setLayoutData(gdGetexp);
         new Label(result, SWT.NONE);
         new Label(result, SWT.NONE);
         Label label11 = new Label(result, SWT.NONE);
         label11.setText("必要経験値");
-        final Text needexp = new Text(result, SWT.BORDER | SWT.READ_ONLY);
+        this.needexp = new Text(result, SWT.BORDER | SWT.READ_ONLY);
         GridData gdNeedexp = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
         gdNeedexp.widthHint = 55;
-        needexp.setLayoutData(gdNeedexp);
+        this.needexp.setLayoutData(gdNeedexp);
         Label label12 = new Label(result, SWT.NONE);
         label12.setText("戦闘回数");
-        final Text battlecount = new Text(result, SWT.BORDER | SWT.READ_ONLY);
+        this.battlecount = new Text(result, SWT.BORDER | SWT.READ_ONLY);
         GridData gdBattlecount = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
         gdBattlecount.widthHint = 55;
-        battlecount.setLayoutData(gdBattlecount);
+        this.battlecount.setLayoutData(gdBattlecount);
 
         // 海域のインデックス値を復元
-        seacombo.select(seaidx);
+        this.seacombo.select(seaidx);
         // 評価のインデックス値を復元
-        evalcombo.select(evalidx);
+        this.evalcombo.select(evalidx);
         // 旗艦チェックを復元
-        flagbtn.setSelection(flag);
+        this.flagbtn.setSelection(flag);
         // MVPチェックを復元
-        mvpbtn.setSelection(mvp);
+        this.mvpbtn.setSelection(mvp);
 
-        shipcombo.addSelectionListener(new PresetListener(beforexp, afterexp, shipcombo, flagbtn, battlecount, needexp,
-                seacombo, evalcombo, afterlv, getexp, mvpbtn, beforelv));
-        reload.addSelectionListener(new ReloadListener(shipcombo));
-        beforelv.addSelectionListener(new BeforeLvListener(beforexp, needexp, flagbtn, evalcombo, seacombo,
-                battlecount, beforelv, afterexp, getexp, mvpbtn));
-        afterlv.addSelectionListener(new AfterLvListener(beforexp, battlecount, getexp, flagbtn, seacombo, afterexp,
-                needexp, mvpbtn, afterlv, evalcombo));
+        this.shipcombo.addSelectionListener(new PresetListener());
+        reload.addSelectionListener(new ReloadListener());
+        this.beforelv.addSelectionListener(new BeforeLvListener(this.beforexp, this.beforelv));
+        this.afterlv.addSelectionListener(new AfterLvListener(this.afterexp, this.afterlv));
 
-        seacombo.addSelectionListener(new UpdateListener(getexp, mvpbtn, afterexp, needexp, beforexp, flagbtn,
-                battlecount, seacombo, evalcombo));
-        evalcombo.addSelectionListener(new UpdateListener(getexp, mvpbtn, afterexp, needexp, beforexp, flagbtn,
-                battlecount, seacombo, evalcombo));
-        flagbtn.addSelectionListener(new UpdateListener(getexp, mvpbtn, afterexp, needexp, beforexp, flagbtn,
-                battlecount, seacombo, evalcombo));
-        mvpbtn.addSelectionListener(new UpdateListener(getexp, mvpbtn, afterexp, needexp, beforexp, flagbtn,
-                battlecount, seacombo, evalcombo));
+        this.seacombo.addSelectionListener(new UpdateListener());
+        this.evalcombo.addSelectionListener(new UpdateListener());
+        this.flagbtn.addSelectionListener(new UpdateListener());
+        this.mvpbtn.addSelectionListener(new UpdateListener());
 
         this.shell.pack();
     }
 
-    private void calc(Text beforexp, Text afterexp, Combo seacombo, Combo evalcombo, boolean flag, boolean mvp,
-            Text getexp, Text needexp, Text battlecount) {
-        if ((seacombo.getSelectionIndex() < 0) || (evalcombo.getSelectionIndex() < 0)) {
+    /**
+     * プリセットを行う
+     */
+    public void preset() {
+        if (this.shipcombo.getSelectionIndex() > -1) {
+            ShipDto ship = CalcExpDialog.this.shipmap
+                    .get(this.shipcombo.getItem(this.shipcombo.getSelectionIndex()));
+            if (ship != null) {
+                int before = (int) ship.getLv();
+                int after = Math.min(((int) (ship.getLv() + 20) / 10) * 10, 99);
+                String beforeexpstr = Long.toString(ship.getExp());
+                String afterexpstr = Long.toString(ExpTable.get().get(after));
+
+                this.beforelv.setSelection(before);
+                this.afterlv.setSelection(after);
+
+                this.beforexp.setText(beforeexpstr);
+                this.afterexp.setText(afterexpstr);
+            }
+        }
+    }
+
+    /**
+     * 計算を行う
+     */
+    private void calc() {
+        if ((this.seacombo.getSelectionIndex() < 0) || (this.evalcombo.getSelectionIndex() < 0)) {
             return;
         }
         // 必要経験値
-        int needexpint = Integer.parseInt(afterexp.getText()) - Integer.parseInt(beforexp.getText());
+        int needexpint = Integer.parseInt(this.afterexp.getText()) - Integer.parseInt(this.beforexp.getText());
         // 基礎経験値
-        int baseexp = SeaExp.get().get(seacombo.getItem(seacombo.getSelectionIndex()));
+        int baseexp = SeaExp.get().get(this.seacombo.getItem(this.seacombo.getSelectionIndex()));
         // 評価
-        double eval = EvaluateExp.get().get(evalcombo.getItem(evalcombo.getSelectionIndex()));
+        double eval = EvaluateExp.get().get(this.evalcombo.getItem(this.evalcombo.getSelectionIndex()));
         // 得られる経験値
         double getexpd = baseexp * eval;
-        if (flag) {
+        if (this.flagbtn.getSelection()) {
             getexpd *= 1.5;
         }
-        if (mvp) {
+        if (this.mvpbtn.getSelection()) {
             getexpd *= 2;
         }
         // 最大累積3.6倍
@@ -245,19 +274,19 @@ public final class CalcExpDialog extends Dialog {
         int count = BigDecimal.valueOf(needexpint).divide(BigDecimal.valueOf(getexpd), RoundingMode.CEILING).intValue();
 
         // 1回の戦闘
-        getexp.setText(Long.toString(Math.round(getexpd)));
+        this.getexp.setText(Long.toString(Math.round(getexpd)));
         // 必要経験値
-        needexp.setText(Integer.toString(needexpint));
+        this.needexp.setText(Integer.toString(needexpint));
         // 戦闘回数
-        battlecount.setText(Integer.toString(count));
+        this.battlecount.setText(Integer.toString(count));
         // 海域コンボボックスのインデックス値を保存
-        seaidx = seacombo.getSelectionIndex();
+        seaidx = this.seacombo.getSelectionIndex();
         // 評価コンボボックスのインデックス値を保存
-        evalidx = evalcombo.getSelectionIndex();
+        evalidx = this.evalcombo.getSelectionIndex();
         // 旗艦チェックを保存
-        CalcExpDialog.flag = flag;
+        CalcExpDialog.flag = this.flagbtn.getSelection();
         // MVPチェックを保存
-        CalcExpDialog.mvp = mvp;
+        CalcExpDialog.mvp = this.mvpbtn.getSelection();
     }
 
     /**
@@ -265,14 +294,25 @@ public final class CalcExpDialog extends Dialog {
      * 
      * @param combo
      */
-    private void setShipComboData(Combo combo) {
+    private void setShipComboData() {
+        // 選択していた艦娘を取得
+        String select = null;
+        if (this.shipcombo.getSelectionIndex() >= 0) {
+            select = this.shipcombo.getItem(this.shipcombo.getSelectionIndex());
+        }
         // コンボボックスから全ての艦娘を削除
-        combo.removeAll();
+        this.shipcombo.removeAll();
         // 表示用文字列と艦娘の紐付けを削除
         this.shipmap.clear();
+        // 艦娘IDの最大を取得してゼロ埋め長さを算出
+        long maxshipid = 0;
+        for (ShipDto ship : GlobalContext.getShipMap().values()) {
+            maxshipid = Math.max(ship.getId(), maxshipid);
+        }
+        int padlength = Long.toString(maxshipid).length();
         // 表示用文字列と艦娘の紐付けを追加
         for (ShipDto ship : GlobalContext.getShipMap().values()) {
-            this.shipmap.put(this.getShipLabel(ship), ship);
+            this.shipmap.put(this.getShipLabel(ship, padlength), ship);
         }
         // 艦娘を経験値順でソート
         List<ShipDto> ships = new ArrayList<ShipDto>(this.shipmap.values());
@@ -283,23 +323,28 @@ public final class CalcExpDialog extends Dialog {
             }
         });
         // コンボボックスに追加
-        for (ShipDto ship : ships) {
-            combo.add(this.getShipLabel(ship));
+        for (int i = 0; i < ships.size(); i++) {
+            String key = this.getShipLabel(ships.get(i), padlength);
+            this.shipcombo.add(key);
+            if (key.equals(select)) {
+                this.shipcombo.select(i);
+            }
         }
         // コントロールを再配置
-        combo.pack();
-        combo.getParent().pack();
+        this.shipcombo.pack();
+        this.shipcombo.getParent().pack();
     }
 
     /**
      * 艦娘のプルダウン表示用文字列を作成します
      * 
      * @param ship
+     * @param padlength
      * @return
      */
-    private String getShipLabel(ShipDto ship) {
-        return StringUtils.leftPad(Long.toString(ship.getId()), 5, '0') + ": " + ship.getName() + " (Lv" + ship.getLv()
-                + ")";
+    private String getShipLabel(ShipDto ship, int padlength) {
+        return new StringBuilder().append(StringUtils.leftPad(Long.toString(ship.getId()), padlength, '0'))
+                .append(": ").append(ship.getName()).append(" (Lv").append(ship.getLv() + ")").toString();
     }
 
     /**
@@ -307,18 +352,11 @@ public final class CalcExpDialog extends Dialog {
      * 
      */
     private final class ReloadListener extends SelectionAdapter {
-        private final Combo combo;
-
-        /**
-         * @param combo
-         */
-        public ReloadListener(Combo combo) {
-            this.combo = combo;
-        }
-
         @Override
         public void widgetSelected(SelectionEvent e) {
-            CalcExpDialog.this.setShipComboData(this.combo);
+            CalcExpDialog.this.setShipComboData();
+            CalcExpDialog.this.preset();
+            CalcExpDialog.this.calc();
         }
     }
 
@@ -327,45 +365,9 @@ public final class CalcExpDialog extends Dialog {
      *
      */
     private final class UpdateListener extends SelectionAdapter {
-        private final Text getexp;
-        private final Button mvp;
-        private final Text afterexp;
-        private final Text needexp;
-        private final Text beforexp;
-        private final Button flagbtn;
-        private final Text battlecount;
-        private final Combo seacombo;
-        private final Combo evalcombo;
-
-        /**
-         * @param getexp
-         * @param mvp
-         * @param afterexp
-         * @param needexp
-         * @param beforexp
-         * @param flagbtn
-         * @param battlecount
-         * @param seacombo
-         * @param evalcombo
-         */
-        private UpdateListener(Text getexp, Button mvp, Text afterexp, Text needexp, Text beforexp, Button flagbtn,
-                Text battlecount, Combo seacombo, Combo evalcombo) {
-            this.getexp = getexp;
-            this.mvp = mvp;
-            this.afterexp = afterexp;
-            this.needexp = needexp;
-            this.beforexp = beforexp;
-            this.flagbtn = flagbtn;
-            this.battlecount = battlecount;
-            this.seacombo = seacombo;
-            this.evalcombo = evalcombo;
-        }
-
         @Override
         public void widgetSelected(SelectionEvent e) {
-            CalcExpDialog.this.calc(this.beforexp, this.afterexp, this.seacombo, this.evalcombo,
-                    this.flagbtn.getSelection(),
-                    this.mvp.getSelection(), this.getexp, this.needexp, this.battlecount);
+            CalcExpDialog.this.calc();
         }
     }
 
@@ -374,71 +376,11 @@ public final class CalcExpDialog extends Dialog {
      *
      */
     private final class PresetListener extends SelectionAdapter {
-        private final Text beforexp;
-        private final Text afterexp;
-        private final Combo shipcombo;
-        private final Button flagbtn;
-        private final Text battlecount;
-        private final Text needexp;
-        private final Combo seacombo;
-        private final Combo evalcombo;
-        private final Spinner afterlv;
-        private final Text getexp;
-        private final Button mvp;
-        private final Spinner beforelv;
-
-        /**
-         * @param beforexp
-         * @param afterexp
-         * @param shipcombo
-         * @param flagbtn
-         * @param battlecount
-         * @param needexp
-         * @param seacombo
-         * @param evalcombo
-         * @param afterlv
-         * @param getexp
-         * @param mvp
-         * @param beforelv
-         */
-        private PresetListener(Text beforexp, Text afterexp, Combo shipcombo, Button flagbtn, Text battlecount,
-                Text needexp, Combo seacombo, Combo evalcombo, Spinner afterlv, Text getexp, Button mvp,
-                Spinner beforelv) {
-            this.beforexp = beforexp;
-            this.afterexp = afterexp;
-            this.shipcombo = shipcombo;
-            this.flagbtn = flagbtn;
-            this.battlecount = battlecount;
-            this.needexp = needexp;
-            this.seacombo = seacombo;
-            this.evalcombo = evalcombo;
-            this.afterlv = afterlv;
-            this.getexp = getexp;
-            this.mvp = mvp;
-            this.beforelv = beforelv;
-        }
 
         @Override
         public void widgetSelected(SelectionEvent e) {
-            if (this.shipcombo.getSelectionIndex() > -1) {
-                ShipDto ship = CalcExpDialog.this.shipmap
-                        .get(this.shipcombo.getItem(this.shipcombo.getSelectionIndex()));
-                if (ship != null) {
-                    int before = (int) ship.getLv();
-                    int after = Math.min(((int) (ship.getLv() + 20) / 10) * 10, 99);
-                    String beforeexpstr = Long.toString(ship.getExp());
-                    String afterexpstr = Long.toString(ExpTable.get().get(after));
-
-                    this.beforelv.setSelection(before);
-                    this.afterlv.setSelection(after);
-
-                    this.beforexp.setText(beforeexpstr);
-                    this.afterexp.setText(afterexpstr);
-                }
-            }
-            CalcExpDialog.this.calc(this.beforexp, this.afterexp, this.seacombo, this.evalcombo,
-                    this.flagbtn.getSelection(),
-                    this.mvp.getSelection(), this.getexp, this.needexp, this.battlecount);
+            CalcExpDialog.this.preset();
+            CalcExpDialog.this.calc();
         }
     }
 
@@ -448,49 +390,22 @@ public final class CalcExpDialog extends Dialog {
      */
     private final class BeforeLvListener extends SelectionAdapter {
         private final Text beforexp;
-        private final Text needexp;
-        private final Button flagbtn;
-        private final Combo evalcombo;
-        private final Combo seacombo;
-        private final Text battlecount;
         private final Spinner beforelv;
-        private final Text afterexp;
-        private final Text getexp;
-        private final Button mvp;
 
         /**
          * @param beforexp
-         * @param needexp
-         * @param flagbtn
-         * @param evalcombo
-         * @param seacombo
-         * @param battlecount
          * @param beforelv
-         * @param afterexp
-         * @param getexp
-         * @param mvp
          */
-        private BeforeLvListener(Text beforexp, Text needexp, Button flagbtn, Combo evalcombo, Combo seacombo,
-                Text battlecount, Spinner beforelv, Text afterexp, Text getexp, Button mvp) {
+        private BeforeLvListener(Text beforexp, Spinner beforelv) {
             this.beforexp = beforexp;
-            this.needexp = needexp;
-            this.flagbtn = flagbtn;
-            this.evalcombo = evalcombo;
-            this.seacombo = seacombo;
-            this.battlecount = battlecount;
             this.beforelv = beforelv;
-            this.afterexp = afterexp;
-            this.getexp = getexp;
-            this.mvp = mvp;
         }
 
         @Override
         public void widgetSelected(SelectionEvent e) {
             String beforeexpstr = Long.toString(ExpTable.get().get(this.beforelv.getSelection()));
             this.beforexp.setText(beforeexpstr);
-            CalcExpDialog.this.calc(this.beforexp, this.afterexp, this.seacombo, this.evalcombo,
-                    this.flagbtn.getSelection(),
-                    this.mvp.getSelection(), this.getexp, this.needexp, this.battlecount);
+            CalcExpDialog.this.calc();
         }
     }
 
@@ -499,50 +414,23 @@ public final class CalcExpDialog extends Dialog {
      *
      */
     private final class AfterLvListener extends SelectionAdapter {
-        private final Text beforexp;
-        private final Text battlecount;
-        private final Text getexp;
-        private final Button flagbtn;
-        private final Combo seacombo;
         private final Text afterexp;
-        private final Text needexp;
-        private final Button mvp;
         private final Spinner afterlv;
-        private final Combo evalcombo;
 
         /**
-         * @param beforexp
-         * @param battlecount
-         * @param getexp
-         * @param flagbtn
-         * @param seacombo
          * @param afterexp
-         * @param needexp
-         * @param mvp
          * @param afterlv
-         * @param evalcombo
          */
-        private AfterLvListener(Text beforexp, Text battlecount, Text getexp, Button flagbtn, Combo seacombo,
-                Text afterexp, Text needexp, Button mvp, Spinner afterlv, Combo evalcombo) {
-            this.beforexp = beforexp;
-            this.battlecount = battlecount;
-            this.getexp = getexp;
-            this.flagbtn = flagbtn;
-            this.seacombo = seacombo;
+        private AfterLvListener(Text afterexp, Spinner afterlv) {
             this.afterexp = afterexp;
-            this.needexp = needexp;
-            this.mvp = mvp;
             this.afterlv = afterlv;
-            this.evalcombo = evalcombo;
         }
 
         @Override
         public void widgetSelected(SelectionEvent e) {
             String afterexpstr = Long.toString(ExpTable.get().get(this.afterlv.getSelection()));
             this.afterexp.setText(afterexpstr);
-            CalcExpDialog.this.calc(this.beforexp, this.afterexp, this.seacombo, this.evalcombo,
-                    this.flagbtn.getSelection(),
-                    this.mvp.getSelection(), this.getexp, this.needexp, this.battlecount);
+            CalcExpDialog.this.calc();
         }
     }
 }
