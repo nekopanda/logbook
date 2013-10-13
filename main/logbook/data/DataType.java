@@ -23,10 +23,14 @@ public enum DataType {
     SLOTITEM_MEMBER("/kcsapi/api_get_member/slotitem"),
     /** アイテム一覧 */
     SLOTITEM_MASTER("/kcsapi/api_get_master/slotitem"),
+    /** 艦隊 */
+    DECK("/kcsapi/api_get_member/deck"),
     /** 戦闘 */
     BATTLE("/kcsapi/api_req_sortie/battle"),
     /** 戦闘(夜戦) */
     BATTLE_MIDNIGHT("/kcsapi/api_req_battle_midnight/battle"),
+    /** 戦闘(夜戦) */
+    BATTLE_SP_MIDNIGHT("/kcsapi/api_req_battle_midnight/sp_midnight"),
     /** 戦闘結果 */
     BATTLERESULT("/kcsapi/api_req_sortie/battleresult"),
     /** 開発 */
@@ -35,8 +39,6 @@ public enum DataType {
     CREATESHIP("/kcsapi/api_req_kousyou/createship"),
     /** 建造(入手) */
     GETSHIP("/kcsapi/api_req_kousyou/getship"),
-    /** 艦隊 */
-    DECK("/kcsapi/api_get_member/deck"),
     /** フィルタ前のデータ */
     UNDEFINED(null);
 
