@@ -296,9 +296,10 @@ public final class CalcExpDialog extends Dialog {
      */
     private void setShipComboData() {
         // 選択していた艦娘を取得
-        String select = null;
+        long select = 0;
         if (this.shipcombo.getSelectionIndex() >= 0) {
-            select = this.shipcombo.getItem(this.shipcombo.getSelectionIndex());
+            ShipDto ship = this.shipmap.get(this.shipcombo.getItem(this.shipcombo.getSelectionIndex()));
+            select = ship.getId();
         }
         // コンボボックスから全ての艦娘を削除
         this.shipcombo.removeAll();
@@ -326,7 +327,7 @@ public final class CalcExpDialog extends Dialog {
         for (int i = 0; i < ships.size(); i++) {
             String key = this.getShipLabel(ships.get(i), padlength);
             this.shipcombo.add(key);
-            if (key.equals(select)) {
+            if (ships.get(i).getId() == select) {
                 this.shipcombo.select(i);
             }
         }
