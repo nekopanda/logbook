@@ -78,7 +78,7 @@ public final class CreateReportLogic {
             // 遠征
             Set<Long> deckmissions = new HashSet<Long>();
             for (DeckMissionDto deckMission : GlobalContext.getDeckMissions()) {
-                if (deckMission.getShips() != null) {
+                if ((deckMission.getMission() != null) && (deckMission.getShips() != null)) {
                     deckmissions.addAll(deckMission.getShips());
                 }
             }
