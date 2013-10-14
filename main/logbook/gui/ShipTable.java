@@ -8,10 +8,12 @@ package logbook.gui;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.TableItemCreator;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 
@@ -20,6 +22,12 @@ import org.eclipse.swt.widgets.TableColumn;
  *
  */
 public final class ShipTable extends AbstractTableDialog {
+
+    /** 成長余地 */
+    private static boolean specdiff = false;
+
+    /** 鍵付きのみ */
+    private static boolean lockedonly = false;
 
     /**
      * @param parent
@@ -30,6 +38,26 @@ public final class ShipTable extends AbstractTableDialog {
 
     @Override
     protected void createContents() {
+        // セパレータ
+        new MenuItem(this.opemenu, SWT.SEPARATOR);
+        final MenuItem switchdiff = new MenuItem(this.opemenu, SWT.CHECK);
+        switchdiff.setText("成長の余地を表示");
+        switchdiff.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                specdiff = switchdiff.getSelection();
+                ShipTable.this.reloadTable();
+            }
+        });
+        final MenuItem switchlockedonly = new MenuItem(this.opemenu, SWT.CHECK);
+        switchlockedonly.setText("鍵付きのみ表示");
+        switchlockedonly.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                lockedonly = switchlockedonly.getSelection();
+                ShipTable.this.reloadTable();
+            }
+        });
     }
 
     @Override
@@ -49,7 +77,7 @@ public final class ShipTable extends AbstractTableDialog {
 
     @Override
     protected void updateTableBody() {
-        this.body = CreateReportLogic.getShipListBody();
+        this.body = CreateReportLogic.getShipListBody(this.specdiff, this.lockedonly);
     }
 
     @Override

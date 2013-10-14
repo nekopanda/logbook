@@ -26,6 +26,9 @@ public final class ShipDto extends AbstractDto {
     /** 艦娘個人を識別するID */
     private final long id;
 
+    /** 鍵付き */
+    private final boolean locked;
+
     /** 艦隊ID */
     private String fleetid = "";
 
@@ -65,26 +68,50 @@ public final class ShipDto extends AbstractDto {
     /** 火力 */
     private final long karyoku;
 
+    /** 火力(最大) */
+    private final long karyokuMax;
+
     /** 雷装 */
     private final long raisou;
+
+    /** 雷装(最大) */
+    private final long raisouMax;
 
     /** 対空 */
     private final long taiku;
 
+    /** 対空(最大) */
+    private final long taikuMax;
+
     /** 装甲 */
     private final long soukou;
+
+    /** 装甲(最大) */
+    private final long soukouMax;
 
     /** 回避 */
     private final long kaihi;
 
+    /** 回避(最大) */
+    private final long kaihiMax;
+
     /** 対潜 */
     private final long taisen;
+
+    /** 対潜(最大) */
+    private final long taisenMax;
 
     /** 索敵 */
     private final long sakuteki;
 
+    /** 索敵(最大) */
+    private final long sakutekiMax;
+
     /** 運 */
     private final long lucky;
+
+    /** 運(最大) */
+    private final long luckyMax;
 
     /**
      * コンストラクター
@@ -94,6 +121,7 @@ public final class ShipDto extends AbstractDto {
     public ShipDto(JsonObject object) {
 
         this.id = object.getJsonNumber("api_id").longValue();
+        this.locked = object.getJsonNumber("api_locked").longValue() == 1;
 
         ShipInfoDto shipinfo = Ship.get(object.getJsonNumber("api_ship_id").toString());
         this.name = shipinfo.getName();
@@ -116,13 +144,21 @@ public final class ShipDto extends AbstractDto {
             this.slot.add(Long.valueOf(itemid.longValue()));
         }
         this.karyoku = ((JsonNumber) object.getJsonArray("api_karyoku").get(0)).longValue();
+        this.karyokuMax = ((JsonNumber) object.getJsonArray("api_karyoku").get(1)).longValue();
         this.raisou = ((JsonNumber) object.getJsonArray("api_raisou").get(0)).longValue();
+        this.raisouMax = ((JsonNumber) object.getJsonArray("api_raisou").get(1)).longValue();
         this.taiku = ((JsonNumber) object.getJsonArray("api_taiku").get(0)).longValue();
+        this.taikuMax = ((JsonNumber) object.getJsonArray("api_taiku").get(1)).longValue();
         this.soukou = ((JsonNumber) object.getJsonArray("api_soukou").get(0)).longValue();
+        this.soukouMax = ((JsonNumber) object.getJsonArray("api_soukou").get(1)).longValue();
         this.kaihi = ((JsonNumber) object.getJsonArray("api_kaihi").get(0)).longValue();
+        this.kaihiMax = ((JsonNumber) object.getJsonArray("api_kaihi").get(1)).longValue();
         this.taisen = ((JsonNumber) object.getJsonArray("api_taisen").get(0)).longValue();
+        this.taisenMax = ((JsonNumber) object.getJsonArray("api_taisen").get(1)).longValue();
         this.sakuteki = ((JsonNumber) object.getJsonArray("api_sakuteki").get(0)).longValue();
+        this.sakutekiMax = ((JsonNumber) object.getJsonArray("api_sakuteki").get(1)).longValue();
         this.lucky = ((JsonNumber) object.getJsonArray("api_lucky").get(0)).longValue();
+        this.luckyMax = ((JsonNumber) object.getJsonArray("api_lucky").get(1)).longValue();
     }
 
     /**
@@ -130,6 +166,13 @@ public final class ShipDto extends AbstractDto {
      */
     public long getId() {
         return this.id;
+    }
+
+    /**
+     * @return 鍵付き
+     */
+    public boolean getLocked() {
+        return this.locked;
     }
 
     /**
@@ -240,10 +283,38 @@ public final class ShipDto extends AbstractDto {
     }
 
     /**
+     * @return 装備
+     */
+    public List<ItemDto> getItem() {
+        List<ItemDto> items = new ArrayList<ItemDto>();
+        Map<Long, ItemDto> itemMap = GlobalContext.getItemMap();
+        for (Long itemid : this.slot) {
+            if (-1 != itemid) {
+                ItemDto item = itemMap.get(itemid);
+                if (item != null) {
+                    items.add(item);
+                } else {
+                    items.add(null);
+                }
+            } else {
+                items.add(null);
+            }
+        }
+        return items;
+    }
+
+    /**
      * @return 火力
      */
     public long getKaryoku() {
         return this.karyoku;
+    }
+
+    /**
+     * @return 火力(最大)
+     */
+    public long getKaryokuMax() {
+        return this.karyokuMax;
     }
 
     /**
@@ -254,10 +325,24 @@ public final class ShipDto extends AbstractDto {
     }
 
     /**
+     * @return 雷装(最大)
+     */
+    public long getRaisouMax() {
+        return this.raisouMax;
+    }
+
+    /**
      * @return 対空
      */
     public long getTaiku() {
         return this.taiku;
+    }
+
+    /**
+     * @return 対空(最大)
+     */
+    public long getTaikuMax() {
+        return this.taikuMax;
     }
 
     /**
@@ -268,10 +353,24 @@ public final class ShipDto extends AbstractDto {
     }
 
     /**
+     * @return 装甲(最大)
+     */
+    public long getSoukouMax() {
+        return this.soukouMax;
+    }
+
+    /**
      * @return 回避
      */
     public long getKaihi() {
         return this.kaihi;
+    }
+
+    /**
+     * @return 回避(最大)
+     */
+    public long getKaihiMax() {
+        return this.kaihiMax;
     }
 
     /**
@@ -282,6 +381,13 @@ public final class ShipDto extends AbstractDto {
     }
 
     /**
+     * @return 対潜(最大)
+     */
+    public long getTaisenMax() {
+        return this.taisenMax;
+    }
+
+    /**
      * @return 索敵
      */
     public long getSakuteki() {
@@ -289,10 +395,24 @@ public final class ShipDto extends AbstractDto {
     }
 
     /**
+     * @return 索敵(最大)
+     */
+    public long getSakutekiMax() {
+        return this.sakutekiMax;
+    }
+
+    /**
      * @return 運
      */
     public long getLucky() {
         return this.lucky;
+    }
+
+    /**
+     * @return 運(最大)
+     */
+    public long getLuckyMax() {
+        return this.luckyMax;
     }
 
 }

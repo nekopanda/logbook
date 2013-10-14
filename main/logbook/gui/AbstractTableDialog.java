@@ -95,9 +95,12 @@ public abstract class AbstractTableDialog extends Dialog {
 
         this.tablemenu = new Menu(this.table);
         this.table.setMenu(this.tablemenu);
-        MenuItem menuItem = new MenuItem(this.tablemenu, SWT.NONE);
-        menuItem.addSelectionListener(new TableToClipboardAdapter(this.header, this.table));
-        menuItem.setText("クリップボードにコピー");
+        MenuItem sendclipbord = new MenuItem(this.tablemenu, SWT.NONE);
+        sendclipbord.addSelectionListener(new TableToClipboardAdapter(this.header, this.table));
+        sendclipbord.setText("クリップボードにコピー(&C)");
+        MenuItem reloadtable = new MenuItem(this.tablemenu, SWT.NONE);
+        reloadtable.setText("再読み込み(&R)");
+        reloadtable.addSelectionListener(new TableReloadAdapter());
 
         this.setTableHeader();
 

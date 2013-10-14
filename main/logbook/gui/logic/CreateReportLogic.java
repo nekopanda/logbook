@@ -117,7 +117,6 @@ public final class CreateReportLogic {
 
     /**
      * ドロップ報告書の内容
-     * 
      * @return 内容
      */
     public static List<String[]> getBattleResultBody() {
@@ -332,18 +331,78 @@ public final class CreateReportLogic {
     /**
      * 所有艦娘一覧の内容
      * 
+     * @param specdiff 成長余地
+     * @param lockedonly 鍵付きのみ
      * @return 内容
      */
-    public static List<String[]> getShipListBody() {
+    public static List<String[]> getShipListBody(boolean specdiff, boolean lockedonly) {
         Set<Entry<Long, ShipDto>> ships = GlobalContext.getShipMap().entrySet();
         List<Object[]> body = new ArrayList<Object[]>();
         for (Entry<Long, ShipDto> entry : ships) {
             ShipDto ship = entry.getValue();
-            body.add(new Object[] { ship.getId(), ship.getFleetid(), ship.getCond(), ship.getName(), ship.getType(),
-                    ship.getLv(), ship.getExp(), ship.getMaxhp(), ship.getSlot().get(0), ship.getSlot().get(1),
-                    ship.getSlot().get(2), ship.getSlot().get(3), ship.getKaryoku(), ship.getRaisou(),
-                    ship.getTaiku(), ship.getSoukou(), ship.getKaihi(), ship.getTaisen(), ship.getSakuteki(),
-                    ship.getLucky() });
+            // 鍵付きのみ
+            if (lockedonly && !ship.getLocked()) {
+                continue;
+            }
+            if (!specdiff) {
+                // 通常
+                body.add(new Object[] {
+                        ship.getId(),
+                        ship.getFleetid(),
+                        ship.getCond(),
+                        ship.getName(),
+                        ship.getType(),
+                        ship.getLv(),
+                        ship.getExp(),
+                        ship.getMaxhp(),
+                        ship.getSlot().get(0),
+                        ship.getSlot().get(1),
+                        ship.getSlot().get(2),
+                        ship.getSlot().get(3),
+                        ship.getKaryoku(),
+                        ship.getRaisou(),
+                        ship.getTaiku(),
+                        ship.getSoukou(),
+                        ship.getKaihi(),
+                        ship.getTaisen(),
+                        ship.getSakuteki(),
+                        ship.getLucky()
+                });
+            } else {
+                // 成長の余地
+                // 火力
+                long karyoku = ship.getKaryokuMax() - ship.getKaryoku();
+                // 雷装
+                long raisou = ship.getRaisouMax() - ship.getRaisou();
+                // 対空
+                long taiku = ship.getTaikuMax() - ship.getTaiku();
+                // 回避
+                long kaihi = ship.getKaihiMax() - ship.getKaihi();
+                // 対潜
+                long taisen = ship.getTaisenMax() - ship.getTaisen();
+                // 索敵
+                long sakuteki = ship.getSakutekiMax() - ship.getSakuteki();
+                // 運
+                long lucky = ship.getLuckyMax() - ship.getLucky();
+
+                for (ItemDto item : ship.getItem()) {
+                    if (item != null) {
+                        karyoku += item.getHoug();
+                        raisou += item.getRaig();
+                        taiku += item.getTyku();
+                        kaihi += item.getKaih();
+                        taisen += item.getTais();
+                        sakuteki += item.getSaku();
+                        lucky += item.getLuck();
+                    }
+                }
+                body.add(new Object[] {
+                        ship.getId(), ship.getFleetid(), ship.getCond(), ship.getName(), ship.getType(), ship.getLv(),
+                        ship.getExp(), ship.getMaxhp(), ship.getSlot().get(0), ship.getSlot().get(1),
+                        ship.getSlot().get(2), ship.getSlot().get(3), karyoku, raisou, taiku,
+                        ship.getSoukouMax() - ship.getSoukou(), kaihi, taisen, sakuteki, lucky
+                });
+            }
         }
         return toListStringArray(body);
     }
