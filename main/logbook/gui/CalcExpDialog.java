@@ -233,7 +233,10 @@ public final class CalcExpDialog extends Dialog {
                     .get(this.shipcombo.getItem(this.shipcombo.getSelectionIndex()));
             if (ship != null) {
                 int before = (int) ship.getLv();
-                int after = Math.min(((int) (ship.getLv() + 20) / 10) * 10, 99);
+                int after = this.afterlv.getSelection();
+                if (before >= after) {
+                    after = Math.min(((int) (ship.getLv() + 20) / 10) * 10, 99);
+                }
                 String beforeexpstr = Long.toString(ship.getExp());
                 String afterexpstr = Long.toString(ExpTable.get().get(after));
 
