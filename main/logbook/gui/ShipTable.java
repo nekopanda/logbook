@@ -42,6 +42,7 @@ public final class ShipTable extends AbstractTableDialog {
         new MenuItem(this.opemenu, SWT.SEPARATOR);
         final MenuItem switchdiff = new MenuItem(this.opemenu, SWT.CHECK);
         switchdiff.setText("成長の余地を表示");
+        switchdiff.setSelection(specdiff);
         switchdiff.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -51,6 +52,7 @@ public final class ShipTable extends AbstractTableDialog {
         });
         final MenuItem switchlockedonly = new MenuItem(this.opemenu, SWT.CHECK);
         switchlockedonly.setText("鍵付きのみ表示");
+        switchlockedonly.setSelection(lockedonly);
         switchlockedonly.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
