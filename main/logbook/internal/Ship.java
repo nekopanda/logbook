@@ -149,8 +149,8 @@ public class Ship {
             this.put("131", new ShipInfoDto("大和", "戦艦"));
             this.put("132", new ShipInfoDto("秋雲", "駆逐艦"));
             this.put("133", new ShipInfoDto("夕雲", "駆逐艦"));
-            this.put("134", ShipInfoDto.EMPTY);
-            this.put("135", ShipInfoDto.EMPTY);
+            this.put("134", new ShipInfoDto("巻雲", "駆逐艦"));
+            this.put("135", new ShipInfoDto("長波", "駆逐艦"));
             this.put("136", new ShipInfoDto("大和改", "戦艦"));
             this.put("137", ShipInfoDto.EMPTY);
             this.put("138", ShipInfoDto.EMPTY);
@@ -318,8 +318,8 @@ public class Ship {
             this.put("300", new ShipInfoDto("初風改", "駆逐艦"));
             this.put("301", new ShipInfoDto("秋雲改", "駆逐艦"));
             this.put("302", new ShipInfoDto("夕雲改", "駆逐艦"));
-            this.put("303", ShipInfoDto.EMPTY);
-            this.put("304", ShipInfoDto.EMPTY);
+            this.put("303", new ShipInfoDto("巻雲改", "駆逐艦"));
+            this.put("304", new ShipInfoDto("長波改", "駆逐艦"));
             this.put("305", ShipInfoDto.EMPTY);
             this.put("306", ShipInfoDto.EMPTY);
             this.put("307", ShipInfoDto.EMPTY);
