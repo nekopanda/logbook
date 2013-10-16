@@ -8,6 +8,7 @@ package logbook.config;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -46,7 +47,7 @@ public final class GlobalConfig {
     public static final String DATE_SHORT_FORMAT = "HH:mm:ss";
 
     /** バージョン */
-    public static final String VERSION = "0.3.9";
+    public static final String VERSION = "0.3.10";
 
     /** 遠征色 */
     public static final RGB MISSION_COLOR = new RGB(102, 51, 255);
@@ -286,6 +287,12 @@ public final class GlobalConfig {
             }
         };
         try {
+            if (!file.exists()) {
+                File parent = file.getParentFile();
+                if ((parent != null) && (!(parent.mkdirs())) && (!(parent.isDirectory()))) {
+                    throw new IOException("Directory '" + parent + "' could not be created");
+                }
+            }
             InputStream in = new FileInputStream(file);
             try {
                 InputStreamReader reader = new InputStreamReader(in, CHARSET);
