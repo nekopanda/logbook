@@ -76,7 +76,7 @@ public final class ConfigDialog extends Dialog {
 
         Label label = new Label(compositeSystem, SWT.NONE);
         label.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        label.setText("ポート番号");
+        label.setText("ポート番号*");
 
         final Text listenport = new Text(compositeSystem, SWT.BORDER);
         listenport.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -106,14 +106,19 @@ public final class ConfigDialog extends Dialog {
         soundlevel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
         soundlevel.setText(Integer.toString((int) (GlobalConfig.getSoundLevel() * 100)));
 
+        final Button hidewindow = new Button(compositeSystem, SWT.CHECK);
+        hidewindow.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
+        hidewindow.setText("最小化時にタスクバーに格納");
+        hidewindow.setSelection(GlobalConfig.getHideWindow());
+
         final Button ontop = new Button(compositeSystem, SWT.CHECK);
         ontop.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
-        ontop.setText("最前面に表示する");
+        ontop.setText("最前面に表示する*");
         ontop.setSelection(GlobalConfig.getOnTop() != SWT.NONE);
 
         final Button checkUpdate = new Button(compositeSystem, SWT.CHECK);
         checkUpdate.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
-        checkUpdate.setText("起動時にアップデートチェック");
+        checkUpdate.setText("起動時にアップデートチェック*");
         checkUpdate.setSelection(GlobalConfig.getCheckUpdate());
 
         TabItem tbtmDevelopment = new TabItem(tabFolder, SWT.NONE);
@@ -151,6 +156,7 @@ public final class ConfigDialog extends Dialog {
                 GlobalConfig.setListenPort(listenport.getText());
                 GlobalConfig.setWidth(width.getText());
                 GlobalConfig.setHeight(height.getText());
+                GlobalConfig.setHideWindow(hidewindow.getSelection());
                 GlobalConfig.setOnTop(ontop.getSelection());
                 GlobalConfig.setSoundLevel(soundlevel.getText());
                 GlobalConfig.setCheckUpdate(checkUpdate.getSelection());

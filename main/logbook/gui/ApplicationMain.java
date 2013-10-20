@@ -20,6 +20,7 @@ import logbook.gui.listener.CreateShipReportAdapter;
 import logbook.gui.listener.DropReportAdapter;
 import logbook.gui.listener.HelpEventListener;
 import logbook.gui.listener.ItemListReportAdapter;
+import logbook.gui.listener.MainShellAdapter;
 import logbook.gui.listener.ShipListReportAdapter;
 import logbook.gui.listener.TraySelectionListener;
 import logbook.gui.logic.CreateReportLogic;
@@ -204,6 +205,8 @@ public final class ApplicationMain {
         version.setText("バージョン情報");
         version.addSelectionListener(new HelpEventListener(this.shell));
 
+        // シェルイベント
+        this.shell.addShellListener(new MainShellAdapter());
         // キーが押された時に呼ばれるリスナーを追加します
         this.shell.addHelpListener(new HelpEventListener(this.shell));
 
@@ -248,7 +251,7 @@ public final class ApplicationMain {
         final Button deckNotice = new Button(deckGroup, SWT.CHECK);
         deckNotice.setSelection(true);
         deckNotice.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
-        deckNotice.setText("帰投する1分前に通知する");
+        deckNotice.setText("1分前に通知する");
 
         final Label deck1name = new Label(deckGroup, SWT.NONE);
         deck1name.setText("ここに艦隊2の艦隊名が入ります");
@@ -299,7 +302,7 @@ public final class ApplicationMain {
         final Button ndockNotice = new Button(ndockGroup, SWT.CHECK);
         ndockNotice.setSelection(true);
         ndockNotice.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
-        ndockNotice.setText("お風呂から上がる1分前に通知する");
+        ndockNotice.setText("1分前に通知する");
 
         final Label ndock1name = new Label(ndockGroup, SWT.NONE);
         ndock1name.setText("ドッグ1に浸かっている艦娘の名前");

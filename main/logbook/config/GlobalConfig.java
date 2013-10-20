@@ -226,6 +226,24 @@ public final class GlobalConfig {
     }
 
     /**
+     * タスクバーに格納を取得する
+     * 
+     * @return アップデートチェック
+     */
+    public static boolean getHideWindow() {
+        return "1".equals(PROPERTIES.getProperty("hide_window", "0"));
+    }
+
+    /**
+     * タスクバーに格納をセットする
+     * 
+     * @param checkUpdate
+     */
+    public static void setHideWindow(boolean hideWindow) {
+        PROPERTIES.setProperty("hide_window", hideWindow ? "1" : "0");
+    }
+
+    /**
      * 開発者オプション-JSONを保存するを取得する
      * 
      * @return JSONを保存する
