@@ -38,7 +38,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
  */
 public final class BathwaterTableDialog extends AbstractTableDialog {
 
-    /** 遠征・入渠中の艦娘を外すフラグ */
+    /** 遠征中の艦娘を外すフラグ */
     private static boolean removeflg;
     /** 遠征中の艦娘 */
     private Set<Long> deckMissionShips;
@@ -57,7 +57,7 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
     @Override
     protected void createContents() {
         final MenuItem removecheck = new MenuItem(this.opemenu, SWT.CHECK);
-        removecheck.setText("遠征・入渠中の艦娘を外す");
+        removecheck.setText("遠征中の艦娘を外す");
         removecheck.setSelection(removeflg);
         removecheck.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -81,13 +81,20 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
 
     @Override
     protected String[] getTableHeader() {
-        return new String[] { "艦娘ID", "艦隊", "疲労", "名前", "Lv", "HP", "時間", "燃料", "鋼材", "" };
+        return new String[] { "", "艦娘ID", "艦隊", "疲労", "名前", "Lv", "HP", "時間", "燃料", "鋼材", "遠征" };
     }
 
     @Override
     protected void updateTableBody() {
+        this.deckMissionShips = this.getDeckMissionShips();
+        this.nDockShips = this.getNDockShips();
+
         List<ShipDto> ships = new ArrayList<ShipDto>();
         for (ShipDto ship : GlobalContext.getShipMap().values()) {
+            if (this.nDockShips.contains(ship.getId())) {
+                // 入渠中は外す
+                continue;
+            }
             // 入渠時間が1秒以上を取得
             if (ship.getDocktime() > 0) {
                 ships.add(ship);
@@ -101,31 +108,24 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
             }
         });
 
-        this.deckMissionShips = this.getDeckMissionShips();
-        this.nDockShips = this.getNDockShips();
-
         List<String[]> body = new ArrayList<String[]>();
-        for (ShipDto ship : ships) {
-            // 遠征・入渠の文字が入る
+        for (int i = 0; i < ships.size(); i++) {
+            ShipDto ship = ships.get(i);
+            // 遠征の文字が入る
             String action = "";
 
             if (this.deckMissionShips.contains(ship.getId())) {
-                // 遠征・入渠中の艦娘を外すフラグが立っていたら遠征・入渠中の艦娘を外す
+                // 遠征中の艦娘を外すフラグが立っていたら遠征中の艦娘を外す
                 if (removeflg) {
                     continue;
                 }
                 action = "遠征";
             }
-            if (this.nDockShips.contains(ship.getId())) {
-                if (removeflg) {
-                    continue;
-                }
-                action = "入渠";
-            }
             // 整形
             body.add(new String[] {
-                    Long.toString(ship.getId()), ship.getFleetid(), Long.toString(ship.getCond()), ship.getName(),
-                    Long.toString(ship.getLv()), Long.toString(ship.getNowhp()) + "/" + Long.toString(ship.getMaxhp()),
+                    Integer.toString(i + 1), Long.toString(ship.getId()), ship.getFleetid(),
+                    Long.toString(ship.getCond()), ship.getName(), Long.toString(ship.getLv()),
+                    Long.toString(ship.getNowhp()) + "/" + Long.toString(ship.getMaxhp()),
                     TimeLogic.toDateRestString(ship.getDocktime() / 1000), Long.toString(ship.getDockfuel()),
                     Long.toString(ship.getDockmetal()), action
             });
@@ -142,9 +142,6 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
                 item.setText(text);
                 if (text[text.length - 1].equals("遠征")) {
                     item.setForeground(SWTResourceManager.getColor(GlobalConfig.MISSION_COLOR));
-                }
-                if (text[text.length - 1].equals("入渠")) {
-                    item.setForeground(SWTResourceManager.getColor(GlobalConfig.NDOCK_COLOR));
                 }
                 return item;
             }
