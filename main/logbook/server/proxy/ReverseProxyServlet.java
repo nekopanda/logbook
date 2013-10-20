@@ -46,6 +46,7 @@ public final class ReverseProxyServlet extends ProxyServlet {
         proxyRequest.header(HttpHeader.X_FORWARDED_PROTO, null);
         proxyRequest.header(HttpHeader.X_FORWARDED_HOST, null);
         proxyRequest.header(HttpHeader.X_FORWARDED_SERVER, null);
+        proxyRequest.header("Origin", null);
 
         String queryString = ((org.eclipse.jetty.server.Request) request).getQueryString();
         fixQueryString(proxyRequest, queryString);
