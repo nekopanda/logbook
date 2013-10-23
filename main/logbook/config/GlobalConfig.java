@@ -21,8 +21,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
-import logbook.data.UndefinedData;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,7 +45,7 @@ public final class GlobalConfig {
     public static final String DATE_SHORT_FORMAT = "HH:mm:ss";
 
     /** バージョン */
-    public static final String VERSION = "0.3.11";
+    public static final String VERSION = "0.3.12";
 
     /** 遠征色 */
     public static final RGB MISSION_COLOR = new RGB(102, 51, 255);
@@ -77,7 +75,7 @@ public final class GlobalConfig {
     public static final URI UPDATE_CHECK_URI = URI.create("http://kancolle.sanaechan.net/checkversion.txt");
 
     /** ロガー */
-    private static final Logger LOG = LogManager.getLogger(UndefinedData.class);
+    private static final Logger LOG = LogManager.getLogger(GlobalConfig.class);
 
     /** 設定ファイル  */
     private static final File CONFIG_FILE = new File("./config/internal.txt");
