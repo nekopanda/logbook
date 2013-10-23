@@ -226,18 +226,18 @@ public final class GlobalConfig {
     }
 
     /**
-     * タスクバーに格納を取得する
+     * タスクトレイに格納を取得する
      * 
-     * @return アップデートチェック
+     * @return タスクトレイに格納
      */
     public static boolean getHideWindow() {
         return "1".equals(PROPERTIES.getProperty("hide_window", "0"));
     }
 
     /**
-     * タスクバーに格納をセットする
+     * タスクトレイに格納をセットする
      * 
-     * @param checkUpdate
+     * @param hideWindow
      */
     public static void setHideWindow(boolean hideWindow) {
         PROPERTIES.setProperty("hide_window", hideWindow ? "1" : "0");

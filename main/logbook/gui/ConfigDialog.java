@@ -108,7 +108,7 @@ public final class ConfigDialog extends Dialog {
 
         final Button hidewindow = new Button(compositeSystem, SWT.CHECK);
         hidewindow.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
-        hidewindow.setText("最小化時にタスクバーに格納");
+        hidewindow.setText("最小化時にタスクトレイに格納");
         hidewindow.setSelection(GlobalConfig.getHideWindow());
 
         final Button ontop = new Button(compositeSystem, SWT.CHECK);
