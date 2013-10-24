@@ -152,57 +152,58 @@ public final class ApplicationMain {
         // メニュー
         // コマンド-ドロップ報告書
         MenuItem cmddrop = new MenuItem(cmdmenu, SWT.NONE);
-        cmddrop.setText("ドロップ報告書(Ctrl+&D)");
-        cmddrop.setAccelerator(SWT.CTRL + 'd');
+        cmddrop.setText("ドロップ報告書(&D)\tCtrl+D");
+        cmddrop.setAccelerator(SWT.CTRL + 'D');
         cmddrop.addSelectionListener(new DropReportAdapter(this.shell));
         // コマンド-建造報告書
         MenuItem cmdcreateship = new MenuItem(cmdmenu, SWT.NONE);
-        cmdcreateship.setText("建造報告書(Ctrl+&B)");
-        cmdcreateship.setAccelerator(SWT.CTRL + 'b');
+        cmdcreateship.setText("建造報告書(&B)\tCtrl+B");
+        cmdcreateship.setAccelerator(SWT.CTRL + 'B');
         cmdcreateship.addSelectionListener(new CreateShipReportAdapter(this.shell));
         // コマンド-開発報告書
         MenuItem cmdcreateitem = new MenuItem(cmdmenu, SWT.NONE);
-        cmdcreateitem.setText("開発報告書(Ctrl+&E)");
-        cmdcreateitem.setAccelerator(SWT.CTRL + 'e');
+        cmdcreateitem.setText("開発報告書(&E)\tCtrl+E");
+        cmdcreateitem.setAccelerator(SWT.CTRL + 'E');
         cmdcreateitem.addSelectionListener(new CreateItemReportAdapter(this.shell));
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // コマンド-所有装備一覧
         MenuItem cmditemlist = new MenuItem(cmdmenu, SWT.NONE);
-        cmditemlist.setText("所有装備一覧(Ctrl+&I)");
-        cmditemlist.setAccelerator(SWT.CTRL + 'i');
+        cmditemlist.setText("所有装備一覧(&I)\tCtrl+I");
+        cmditemlist.setAccelerator(SWT.CTRL + 'I');
         cmditemlist.addSelectionListener(new ItemListReportAdapter(this.shell));
         // コマンド-所有艦娘一覧
         MenuItem cmdshiplist = new MenuItem(cmdmenu, SWT.NONE);
-        cmdshiplist.setText("所有艦娘一覧(Ctrl+&S)");
-        cmdshiplist.setAccelerator(SWT.CTRL + 's');
+        cmdshiplist.setText("所有艦娘一覧(&S)\tCtrl+S");
+        cmdshiplist.setAccelerator(SWT.CTRL + 'S');
         cmdshiplist.addSelectionListener(new ShipListReportAdapter(this.shell));
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // コマンド-お風呂に入りたい艦娘
         MenuItem cmdbathwaterlist = new MenuItem(cmdmenu, SWT.NONE);
-        cmdbathwaterlist.setText("お風呂に入りたい艦娘(Ctrl+&N)");
-        cmdbathwaterlist.setAccelerator(SWT.CTRL + 'n');
+        cmdbathwaterlist.setText("お風呂に入りたい艦娘(&N)\tCtrl+N");
+        cmdbathwaterlist.setAccelerator(SWT.CTRL + 'N');
         cmdbathwaterlist.addSelectionListener(new BathwaterTableAdapter(this.shell));
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // 表示-縮小表示
         final MenuItem dispsize = new MenuItem(cmdmenu, SWT.CHECK);
-        dispsize.setText("縮小表示(Ctrl+&M)");
-        dispsize.setAccelerator(SWT.CTRL + 'm');
+        dispsize.setText("縮小表示(&M)\tCtrl+M");
+        dispsize.setAccelerator(SWT.CTRL + 'M');
 
         // 計算機-経験値計算
         MenuItem calcexp = new MenuItem(calcmenu, SWT.NONE);
-        calcexp.setText("経験値計算機");
+        calcexp.setText("経験値計算機(&C)\tCtrl+C");
+        calcexp.setAccelerator(SWT.CTRL + 'C');
         calcexp.addSelectionListener(new CalcExpAdapter(this.shell));
 
         // ヘルプ-設定
         MenuItem config = new MenuItem(etcmenu, SWT.NONE);
-        config.setText("設定");
+        config.setText("設定(&P)");
         config.addSelectionListener(new ConfigDialogAdapter(this.shell));
         // ヘルプ-バージョン情報
         MenuItem version = new MenuItem(etcmenu, SWT.NONE);
-        version.setText("バージョン情報");
+        version.setText("バージョン情報(&A)");
         version.addSelectionListener(new HelpEventListener(this.shell));
 
         // シェルイベント

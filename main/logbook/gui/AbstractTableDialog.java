@@ -110,8 +110,8 @@ public abstract class AbstractTableDialog extends Dialog {
         fileroot.setMenu(this.filemenu);
 
         MenuItem savecsv = new MenuItem(this.filemenu, SWT.NONE);
-        savecsv.setText("CSVファイルに保存(Ctrl+&S)");
-        savecsv.setAccelerator(SWT.CTRL + 's');
+        savecsv.setText("CSVファイルに保存(&S)\tCtrl+S");
+        savecsv.setAccelerator(SWT.CTRL + 'S');
         savecsv.addSelectionListener(new TableToCsvSaveAdapter(this.shell, this.getTitle(), this.getTableHeader(),
                 this.table));
 
@@ -121,7 +121,7 @@ public abstract class AbstractTableDialog extends Dialog {
         operoot.setMenu(this.opemenu);
 
         MenuItem reload = new MenuItem(this.opemenu, SWT.NONE);
-        reload.setText("再読み込み(F5)");
+        reload.setText("再読み込み\tF5");
         reload.setAccelerator(SWT.F5);
         reload.addSelectionListener(new TableReloadAdapter());
 
