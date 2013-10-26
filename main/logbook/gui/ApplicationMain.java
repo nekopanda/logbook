@@ -76,6 +76,8 @@ public final class ApplicationMain {
         try {
             ApplicationMain window = new ApplicationMain();
             window.open();
+        } catch (Error e) {
+            LOG.fatal("メインスレッドが異常終了しました", e);
         } catch (Exception e) {
             LOG.fatal("メインスレッドが異常終了しました", e);
         } finally {

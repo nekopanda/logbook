@@ -5,6 +5,7 @@
  */
 package logbook.gui;
 
+import logbook.dto.ShipFilterDto;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.TableItemCreator;
 
@@ -26,8 +27,8 @@ public final class ShipTable extends AbstractTableDialog {
     /** 成長余地 */
     private static boolean specdiff = false;
 
-    /** 鍵付きのみ */
-    private static boolean lockedonly = false;
+    /** フィルター */
+    private ShipFilterDto filter;
 
     /**
      * @param parent
@@ -36,8 +37,27 @@ public final class ShipTable extends AbstractTableDialog {
         super(parent);
     }
 
+    /**
+     * フィルターを設定する
+     * @param filter フィルター
+     */
+    public void updateFilter(ShipFilterDto filter) {
+        this.filter = filter;
+        this.reloadTable();
+    }
+
     @Override
     protected void createContents() {
+        final MenuItem filter = new MenuItem(this.opemenu, SWT.PUSH);
+        filter.setText("フィルター(&F)\tCtrl+F");
+        filter.setAccelerator(SWT.CTRL + 'F');
+        filter.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                new ShipFilterDialog(ShipTable.this.shell, ShipTable.this, ShipTable.this.filter).open();
+            }
+        });
+
         // セパレータ
         new MenuItem(this.opemenu, SWT.SEPARATOR);
         final MenuItem switchdiff = new MenuItem(this.opemenu, SWT.CHECK);
@@ -47,16 +67,6 @@ public final class ShipTable extends AbstractTableDialog {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 specdiff = switchdiff.getSelection();
-                ShipTable.this.reloadTable();
-            }
-        });
-        final MenuItem switchlockedonly = new MenuItem(this.opemenu, SWT.CHECK);
-        switchlockedonly.setText("鍵付きのみ表示");
-        switchlockedonly.setSelection(lockedonly);
-        switchlockedonly.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                lockedonly = switchlockedonly.getSelection();
                 ShipTable.this.reloadTable();
             }
         });
@@ -79,7 +89,7 @@ public final class ShipTable extends AbstractTableDialog {
 
     @Override
     protected void updateTableBody() {
-        this.body = CreateReportLogic.getShipListBody(this.specdiff, this.lockedonly);
+        this.body = CreateReportLogic.getShipListBody(ShipTable.specdiff, this.filter);
     }
 
     @Override

@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import logbook.config.GlobalConfig;
 import logbook.data.context.GlobalContext;
@@ -33,6 +36,7 @@ import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
 import logbook.dto.NdockDto;
 import logbook.dto.ShipDto;
+import logbook.dto.ShipFilterDto;
 import logbook.dto.ShipInfoDto;
 
 import org.apache.commons.io.FileUtils;
@@ -332,18 +336,19 @@ public final class CreateReportLogic {
      * 所有艦娘一覧の内容
      * 
      * @param specdiff 成長余地
-     * @param lockedonly 鍵付きのみ
+     * @param filter 鍵付きのみ
      * @return 内容
      */
-    public static List<String[]> getShipListBody(boolean specdiff, boolean lockedonly) {
+    public static List<String[]> getShipListBody(boolean specdiff, ShipFilterDto filter) {
         Set<Entry<Long, ShipDto>> ships = GlobalContext.getShipMap().entrySet();
         List<Object[]> body = new ArrayList<Object[]>();
         for (Entry<Long, ShipDto> entry : ships) {
             ShipDto ship = entry.getValue();
-            // 鍵付きのみ
-            if (lockedonly && !ship.getLocked()) {
+
+            if ((filter != null) && !shipFilter(ship, filter)) {
                 continue;
             }
+
             if (!specdiff) {
                 // 通常
                 body.add(new Object[] {
@@ -471,5 +476,143 @@ public final class CreateReportLogic {
             body.add(values);
         }
         return body;
+    }
+
+    /**
+     * 艦娘をフィルタします
+     * 
+     * @param ship 艦娘
+     * @param filter フィルターオブジェクト
+     * @return フィルタ結果
+     */
+    private static boolean shipFilter(ShipDto ship, ShipFilterDto filter) {
+        // 名前でフィルタ
+        if (!StringUtils.isEmpty(filter.nametext)) {
+            // テキストが入力されている場合処理する
+            if (filter.regexp) {
+                // 正規表現で検索
+                if (filter.namepattern == null) {
+                    // 正規表現で検索する場合、パターンの作成がまだならパターンを作成する
+                    try {
+                        filter.namepattern = Pattern.compile(filter.nametext);
+                    } catch (PatternSyntaxException e) {
+                        // 無効な正規表現はfalseを返す
+                        return false;
+                    }
+                }
+                Matcher matcher = filter.namepattern.matcher(ship.getName());
+                if (!matcher.find()) {
+                    // マッチしない
+                    return false;
+                }
+            } else {
+                // 部分一致で検索する
+                if (ship.getName().indexOf(filter.nametext) == -1) {
+                    return false;
+                }
+            }
+        }
+        // 艦種でフィルタ
+        if (!filter.destroyer) {
+            if ("駆逐艦".equals(ship.getType())) {
+                return false;
+            }
+        }
+        if (!filter.lightCruiser) {
+            if ("軽巡洋艦".equals(ship.getType())) {
+                return false;
+            }
+        }
+        if (!filter.torpedoCruiser) {
+            if ("重雷装巡洋艦".equals(ship.getType())) {
+                return false;
+            }
+        }
+        if (!filter.heavyCruiser) {
+            if ("重巡洋艦".equals(ship.getType())) {
+                return false;
+            }
+        }
+        if (!filter.flyingDeckCruiser) {
+            if ("航空巡洋艦".equals(ship.getType())) {
+                return false;
+            }
+        }
+        if (!filter.seaplaneTender) {
+            if ("水上機母艦".equals(ship.getType())) {
+                return false;
+            }
+        }
+        if (!filter.escortCarrier) {
+            if ("軽空母".equals(ship.getType())) {
+                return false;
+            }
+        }
+        if (!filter.carrier) {
+            if ("正規空母".equals(ship.getType())) {
+                return false;
+            }
+        }
+        if (!filter.battleship) {
+            if ("戦艦".equals(ship.getType())) {
+                return false;
+            }
+        }
+        if (!filter.flyingDeckBattleship) {
+            if ("航空戦艦".equals(ship.getType())) {
+                return false;
+            }
+        }
+        if (!filter.submarine) {
+            if ("潜水艦".equals(ship.getType())) {
+                return false;
+            }
+        }
+        if (!filter.carrierSubmarine) {
+            if ("潜水空母".equals(ship.getType())) {
+                return false;
+            }
+        }
+        // 装備でフィルタ
+        if (!StringUtils.isEmpty(filter.itemname)) {
+            List<ItemDto> item = ship.getItem();
+            boolean hit = false;
+            for (ItemDto itemDto : item) {
+                if (itemDto != null) {
+                    if (filter.itemname.equals(itemDto.getName())) {
+                        hit = true;
+                        break;
+                    }
+                }
+            }
+            if (!hit) {
+                return false;
+            }
+        }
+        // 艦隊に所属
+        if (!filter.onfleet) {
+            if (!StringUtils.isEmpty(ship.getFleetid())) {
+                return false;
+            }
+        }
+        // 艦隊に非所属
+        if (!filter.notonfleet) {
+            if (StringUtils.isEmpty(ship.getFleetid())) {
+                return false;
+            }
+        }
+        // 鍵付き
+        if (!filter.locked) {
+            if (ship.getLocked()) {
+                return false;
+            }
+        }
+        // 鍵付きではない
+        if (!filter.notlocked) {
+            if (!ship.getLocked()) {
+                return false;
+            }
+        }
+        return true;
     }
 }
