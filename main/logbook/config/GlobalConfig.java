@@ -68,6 +68,9 @@ public final class GlobalConfig {
     /** 20分前 */
     public static final RGB TIME_IN_20_MIN = new RGB(255, 247, 203);
 
+    /** テーブル行(偶数行)背景色 */
+    public static final RGB ROW_BACKGROUND = new RGB(246, 246, 246);
+
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://kancolle.sanaechan.net/");
 

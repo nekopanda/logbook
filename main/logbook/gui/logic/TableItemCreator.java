@@ -14,5 +14,7 @@ import org.eclipse.swt.widgets.TableItem;
  */
 public interface TableItemCreator {
 
-    TableItem create(Table table, String[] text);
+    void init();
+
+    TableItem create(Table table, String[] text, int count);
 }

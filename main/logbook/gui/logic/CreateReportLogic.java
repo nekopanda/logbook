@@ -55,9 +55,18 @@ public final class CreateReportLogic {
 
     /** テーブルアイテム作成(デフォルト) */
     public static final TableItemCreator DEFAULT_TABLE_ITEM_CREATOR = new TableItemCreator() {
+
         @Override
-        public TableItem create(Table table, String[] text) {
+        public void init() {
+        }
+
+        @Override
+        public TableItem create(Table table, String[] text, int count) {
             TableItem item = new TableItem(table, SWT.NONE);
+            // 偶数行に背景色を付ける
+            if ((count % 2) != 0) {
+                item.setBackground(SWTResourceManager.getColor(GlobalConfig.ROW_BACKGROUND));
+            }
             item.setText(text);
             return item;
         }
@@ -65,12 +74,40 @@ public final class CreateReportLogic {
 
     /** テーブルアイテム作成(所有艦娘一覧) */
     public static final TableItemCreator SHIP_LIST_TABLE_ITEM_CREATOR = new TableItemCreator() {
+
+        private Set<Long> deckmissions;
+
+        private Set<Long> docks;
+
         @Override
-        public TableItem create(Table table, String[] text) {
+        public void init() {
+            // 遠征
+            this.deckmissions = new HashSet<Long>();
+            for (DeckMissionDto deckMission : GlobalContext.getDeckMissions()) {
+                if ((deckMission.getMission() != null) && (deckMission.getShips() != null)) {
+                    this.deckmissions.addAll(deckMission.getShips());
+                }
+            }
+            // 入渠
+            this.docks = new HashSet<Long>();
+            for (NdockDto ndock : GlobalContext.getNdocks()) {
+                if (ndock.getNdockid() != 0) {
+                    this.docks.add(ndock.getNdockid());
+                }
+            }
+        }
+
+        @Override
+        public TableItem create(Table table, String[] text, int count) {
             // 艦娘
             Long ship = Long.valueOf(text[0]);
 
             TableItem item = new TableItem(table, SWT.NONE);
+            // 偶数行に背景色を付ける
+            if ((count % 2) != 0) {
+                item.setBackground(SWTResourceManager.getColor(GlobalConfig.ROW_BACKGROUND));
+            }
+
             // 疲労
             int cond = Integer.parseInt(text[2]);
             if (cond <= 15) {
@@ -80,25 +117,11 @@ public final class CreateReportLogic {
             }
 
             // 遠征
-            Set<Long> deckmissions = new HashSet<Long>();
-            for (DeckMissionDto deckMission : GlobalContext.getDeckMissions()) {
-                if ((deckMission.getMission() != null) && (deckMission.getShips() != null)) {
-                    deckmissions.addAll(deckMission.getShips());
-                }
-            }
-
-            // 入渠
-            Set<Long> docks = new HashSet<Long>();
-            for (NdockDto ndock : GlobalContext.getNdocks()) {
-                if (ndock.getNdockid() != 0) {
-                    docks.add(ndock.getNdockid());
-                }
-            }
-
-            if (deckmissions.contains(ship)) {
+            if (this.deckmissions.contains(ship)) {
                 item.setForeground(SWTResourceManager.getColor(GlobalConfig.MISSION_COLOR));
             }
-            if (docks.contains(ship)) {
+            // 入渠
+            if (this.docks.contains(ship)) {
                 item.setForeground(SWTResourceManager.getColor(GlobalConfig.NDOCK_COLOR));
             }
 

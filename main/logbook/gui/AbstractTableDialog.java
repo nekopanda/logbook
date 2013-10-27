@@ -176,8 +176,10 @@ public abstract class AbstractTableDialog extends Dialog {
      */
     protected final void setTableBody() {
         TableItemCreator creator = this.getTableItemCreator();
-        for (String[] line : this.body) {
-            creator.create(this.table, line);
+        creator.init();
+        for (int i = 0; i < this.body.size(); i++) {
+            String[] line = this.body.get(i);
+            creator.create(this.table, line, i);
         }
     }
 
