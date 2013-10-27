@@ -245,6 +245,42 @@ public final class GlobalConfig {
     }
 
     /**
+     * 遠征-1分前に通知するを取得する
+     * 
+     * @return
+     */
+    public static boolean getNoticeDeckmission() {
+        return "1".equals(PROPERTIES.getProperty("notice_deckmission", "1"));
+    }
+
+    /**
+     * 遠征-1分前に通知するをセットする
+     * 
+     * @param notice 1分前に通知する
+     */
+    public static void setNoticeDeckmission(boolean notice) {
+        PROPERTIES.setProperty("notice_deckmission", notice ? "1" : "0");
+    }
+
+    /**
+     * 入渠-1分前に通知するを取得する
+     * 
+     * @return
+     */
+    public static boolean getNoticeNdock() {
+        return "1".equals(PROPERTIES.getProperty("notice_ndock", "1"));
+    }
+
+    /**
+     * 入渠-1分前に通知するをセットする
+     * 
+     * @param notice 1分前に通知する
+     */
+    public static void setNoticeNdock(boolean notice) {
+        PROPERTIES.setProperty("notice_ndock", notice ? "1" : "0");
+    }
+
+    /**
      * 開発者オプション-JSONを保存するを取得する
      * 
      * @return JSONを保存する

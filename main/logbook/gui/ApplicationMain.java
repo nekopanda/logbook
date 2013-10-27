@@ -76,6 +76,8 @@ public final class ApplicationMain {
         try {
             ApplicationMain window = new ApplicationMain();
             window.open();
+            // ウインドウが閉じたタイミングで設定を書き込みます
+            GlobalConfig.store();
         } catch (Error e) {
             LOG.fatal("メインスレッドが異常終了しました", e);
         } catch (Exception e) {
@@ -261,9 +263,15 @@ public final class ApplicationMain {
         deckGroup.setLayout(glDeckGroup);
 
         final Button deckNotice = new Button(deckGroup, SWT.CHECK);
-        deckNotice.setSelection(true);
+        deckNotice.setSelection(GlobalConfig.getNoticeDeckmission());
         deckNotice.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
         deckNotice.setText("1分前に通知する");
+        deckNotice.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                GlobalConfig.setNoticeDeckmission(deckNotice.getSelection());
+            }
+        });
 
         final Label deck1name = new Label(deckGroup, SWT.NONE);
         deck1name.setText("ここに艦隊2の艦隊名が入ります");
@@ -312,9 +320,15 @@ public final class ApplicationMain {
         ndockGroup.setLayout(glNdockGroup);
 
         final Button ndockNotice = new Button(ndockGroup, SWT.CHECK);
-        ndockNotice.setSelection(true);
+        ndockNotice.setSelection(GlobalConfig.getNoticeNdock());
         ndockNotice.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
         ndockNotice.setText("1分前に通知する");
+        ndockNotice.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                GlobalConfig.setNoticeNdock(ndockNotice.getSelection());
+            }
+        });
 
         final Label ndock1name = new Label(ndockGroup, SWT.NONE);
         ndock1name.setText("ドッグ1に浸かっている艦娘の名前");
@@ -405,7 +419,6 @@ public final class ApplicationMain {
                 }
                 // 設定を保存
                 GlobalConfig.setMinimumLayout(minimum);
-                GlobalConfig.store();
             }
         });
 
