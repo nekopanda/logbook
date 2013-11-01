@@ -244,6 +244,7 @@ public final class GlobalContext {
             case BATTLE:
             case BATTLE_MIDNIGHT:
             case BATTLE_SP_MIDNIGHT:
+            case BATTLE_NIGHT_TO_DAY:
                 doBattle(data);
                 break;
             // 海戦結果

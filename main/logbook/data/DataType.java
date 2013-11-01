@@ -31,6 +31,8 @@ public enum DataType {
     BATTLE_MIDNIGHT("/kcsapi/api_req_battle_midnight/battle"),
     /** 戦闘(夜戦) */
     BATTLE_SP_MIDNIGHT("/kcsapi/api_req_battle_midnight/sp_midnight"),
+    /** 戦闘(夜戦→昼戦) */
+    BATTLE_NIGHT_TO_DAY("/kcsapi/api_req_sortie/night_to_day"),
     /** 戦闘結果 */
     BATTLERESULT("/kcsapi/api_req_sortie/battleresult"),
     /** 開発 */
