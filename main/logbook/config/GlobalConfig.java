@@ -17,9 +17,14 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
+
+import logbook.data.context.GlobalContext;
+import logbook.dto.ResourceDto;
+import logbook.dto.ShipDto;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -278,6 +283,71 @@ public final class GlobalConfig {
      */
     public static void setNoticeNdock(boolean notice) {
         PROPERTIES.setProperty("notice_ndock", notice ? "1" : "0");
+    }
+
+    /**
+     * 建造ドックの投入資源を取得する
+     * 
+     * @return 投入資源
+     */
+    public static ResourceDto getCreateShipResource(String dock) {
+        String key = "createship_" + dock;
+        Map<Long, ShipDto> ships = GlobalContext.getShipMap();
+        if (ships.size() > 0) {
+            String resource = PROPERTIES.getProperty(key);
+            if (resource != null) {
+                PROPERTIES.remove(key);
+                String[] values = resource.split(",");
+                if ((values.length != 6) || !StringUtils.isNumeric(values[4]) || !StringUtils.isNumeric(values[5])) {
+                    return null;
+                }
+
+                String fuel = values[0];
+                String ammo = values[1];
+                String metal = values[2];
+                String bauxite = values[3];
+                ShipDto ship = ships.get(Long.parseLong(values[4]));
+                int hqLevel = Integer.parseInt(values[5]);
+
+                if (ship != null) {
+                    return new ResourceDto(fuel, ammo, metal, bauxite, ship, hqLevel);
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 建造ドックの投入資源をセットする
+     * 
+     * @param dock 建造ドック
+     * @param resource 投入資源
+     */
+    public static void setCreateShipResource(String dock, ResourceDto resource) {
+        String key = "createship_" + dock;
+
+        String fuel = resource.getFuel();
+        String ammo = resource.getAmmo();
+        String metal = resource.getMetal();
+        String bauxite = resource.getBauxite();
+        ShipDto ship = resource.getSecretary();
+        String hqLevel = Integer.toString(resource.getHqLevel());
+
+        if (ship != null) {
+            String value = fuel + "," + ammo + "," + metal + "," + bauxite + "," + ship.getId() + "," + hqLevel;
+            PROPERTIES.setProperty(key, value);
+        }
+    }
+
+    /**
+     * 建造ドックの投入資源を削除する
+     * 
+     * @param dock 建造ドック
+     */
+    public static void removeCreateShipResource(String dock) {
+        String key = "createship_" + dock;
+
+        PROPERTIES.remove(key);
     }
 
     /**

@@ -315,12 +315,14 @@ public final class GlobalContext {
      */
     private static void doCreateship(Data data) {
         try {
-            getShipResource.put(
-                    data.getField("api_kdock_id"),
-                    new ResourceDto(
-                            data.getField("api_item1"), data.getField("api_item2"), data.getField("api_item3"),
-                            data.getField("api_item4"), secretary, hqLevel
-                    ));
+            // 投入資源
+            ResourceDto resource = new ResourceDto(
+                    data.getField("api_item1"), data.getField("api_item2"), data.getField("api_item3"),
+                    data.getField("api_item4"), secretary, hqLevel
+                    );
+
+            getShipResource.put(data.getField("api_kdock_id"), resource);
+            GlobalConfig.setCreateShipResource(data.getField("api_kdock_id"), resource);
 
             addConsole("建造(投入資源)情報を更新しました");
         } catch (Exception e) {
@@ -433,7 +435,15 @@ public final class GlobalContext {
             while ((shipInfo = getShipQueue.poll()) != null) {
                 ShipDto getShip = shipMap.get(Long.valueOf(shipInfo.getShipid()));
                 if (getShip != null) {
-                    getShipList.add(new GetShipDto(getShip, getShipResource.get(shipInfo.getDock())));
+                    // 投入資源を取得する
+                    ResourceDto resource = getShipResource.get(shipInfo.getDock());
+                    if (resource == null) {
+                        resource = GlobalConfig.getCreateShipResource(shipInfo.getDock());
+                    }
+                    getShipList.add(new GetShipDto(getShip, resource));
+                    // 投入資源を除去する
+                    getShipResource.remove(shipInfo.getDock());
+                    GlobalConfig.removeCreateShipResource(shipInfo.getDock());
                 } else {
                     getShipQueue.add(shipInfo);
                 }
