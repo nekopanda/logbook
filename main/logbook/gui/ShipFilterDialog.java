@@ -73,6 +73,8 @@ public final class ShipFilterDialog extends Dialog {
     private Button submarine;
     /** 艦種.潜水空母 */
     private Button carrierSubmarine;
+    /** 全て選択 */
+    private Button selectall;
 
     /** 装備 */
     private Button item;
@@ -208,6 +210,14 @@ public final class ShipFilterDialog extends Dialog {
         this.carrierSubmarine.setText("潜水空母");
         this.carrierSubmarine.setSelection(true);
         this.carrierSubmarine.addSelectionListener(new ApplyFilterSelectionAdapter());
+
+        new Label(shiptypegroup, SWT.NONE);
+        new Label(shiptypegroup, SWT.NONE);
+
+        this.selectall = new Button(shiptypegroup, SWT.CHECK);
+        this.selectall.setText("全て選択");
+        this.selectall.setSelection(true);
+        this.selectall.addSelectionListener(new SelectAllSelectionAdapter());
 
         Group etcgroup = new Group(composite, SWT.NONE);
         etcgroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -357,6 +367,31 @@ public final class ShipFilterDialog extends Dialog {
         @Override
         public void widgetSelected(SelectionEvent e) {
             ShipFilterDialog.this.itemcombo.setEnabled(ShipFilterDialog.this.item.getSelection());
+        }
+    }
+
+    /**
+     * フィルターを適用する
+     */
+    private final class SelectAllSelectionAdapter extends SelectionAdapter {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+            boolean select = ShipFilterDialog.this.selectall.getSelection();
+
+            ShipFilterDialog.this.destroyer.setSelection(select);
+            ShipFilterDialog.this.lightCruiser.setSelection(select);
+            ShipFilterDialog.this.torpedoCruiser.setSelection(select);
+            ShipFilterDialog.this.heavyCruiser.setSelection(select);
+            ShipFilterDialog.this.flyingDeckCruiser.setSelection(select);
+            ShipFilterDialog.this.seaplaneTender.setSelection(select);
+            ShipFilterDialog.this.escortCarrier.setSelection(select);
+            ShipFilterDialog.this.carrier.setSelection(select);
+            ShipFilterDialog.this.battleship.setSelection(select);
+            ShipFilterDialog.this.flyingDeckBattleship.setSelection(select);
+            ShipFilterDialog.this.submarine.setSelection(select);
+            ShipFilterDialog.this.carrierSubmarine.setSelection(select);
+
+            ShipFilterDialog.this.shipTable.updateFilter(ShipFilterDialog.this.createFilter());
         }
     }
 
