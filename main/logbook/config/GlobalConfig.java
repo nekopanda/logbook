@@ -329,7 +329,7 @@ public final class GlobalConfig {
      * @param file File
      * @return 設定ファイル
      */
-    private static Properties readconfig(File file) {
+    public static Properties readconfig(File file) {
         Properties properties = new Properties() {
             @Override
             public Set<Object> keySet() {
@@ -342,22 +342,18 @@ public final class GlobalConfig {
             }
         };
         try {
-            if (!file.exists()) {
-                File parent = file.getParentFile();
-                if ((parent != null) && (!(parent.mkdirs())) && (!(parent.isDirectory()))) {
-                    throw new IOException("Directory '" + parent + "' could not be created");
-                }
-            }
-            InputStream in = new FileInputStream(file);
-            try {
-                InputStreamReader reader = new InputStreamReader(in, CHARSET);
+            if (file.exists()) {
+                InputStream in = new FileInputStream(file);
                 try {
-                    properties.load(reader);
+                    InputStreamReader reader = new InputStreamReader(in, CHARSET);
+                    try {
+                        properties.load(reader);
+                    } finally {
+                        reader.close();
+                    }
                 } finally {
-                    reader.close();
+                    in.close();
                 }
-            } finally {
-                in.close();
             }
         } catch (Exception e) {
             LOG.fatal("設定ファイルの読み込みに失敗しました", e);
@@ -371,13 +367,19 @@ public final class GlobalConfig {
      * @param properties Properties
      * @param file File
      */
-    private static void saveconfig(Properties properties, File file) {
+    public static void saveconfig(Properties properties, File file) {
         try {
+            if (!file.exists()) {
+                File parent = file.getParentFile();
+                if ((parent != null) && (!(parent.mkdirs())) && (!(parent.isDirectory()))) {
+                    throw new IOException("Directory '" + parent + "' could not be created");
+                }
+            }
             OutputStream out = new FileOutputStream(file);
             try {
                 OutputStreamWriter writer = new OutputStreamWriter(out, CHARSET);
                 try {
-                    properties.store(writer, "内部設定");
+                    properties.store(writer, "");
                 } finally {
                     writer.close();
                 }
