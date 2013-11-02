@@ -21,8 +21,6 @@ public enum DataType {
     NDOCK("/kcsapi/api_get_member/ndock"),
     /** アイテム一覧 */
     SLOTITEM_MEMBER("/kcsapi/api_get_member/slotitem"),
-    /** アイテム一覧 */
-    SLOTITEM_MASTER("/kcsapi/api_get_master/slotitem"),
     /** 艦隊 */
     DECK("/kcsapi/api_get_member/deck"),
     /** 戦闘 */
@@ -41,6 +39,10 @@ public enum DataType {
     CREATESHIP("/kcsapi/api_req_kousyou/createship"),
     /** 建造(入手) */
     GETSHIP("/kcsapi/api_req_kousyou/getship"),
+    /** アイテム一覧 */
+    SLOTITEM_MASTER("/kcsapi/api_get_master/slotitem"),
+    /** 艦娘一覧 */
+    SHIP_MASTER("/kcsapi/api_get_master/ship"),
     /** フィルタ前のデータ */
     UNDEFINED(null);
 

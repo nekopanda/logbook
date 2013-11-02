@@ -1,6 +1,7 @@
 package logbook.internal;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import logbook.dto.ShipInfoDto;
@@ -627,5 +628,21 @@ public class Ship {
      */
     public static ShipInfoDto get(String id) {
         return SHIP.get(id);
+    }
+
+    /**
+     * 艦娘を設定します
+     */
+    public static void set(String id, ShipInfoDto ship) {
+        SHIP.put(id, ship);
+    }
+
+    /**
+     * IDの一覧を取得します
+     * 
+     * @return IDの一覧
+     */
+    public static Set<String> keySet() {
+        return SHIP.keySet();
     }
 }

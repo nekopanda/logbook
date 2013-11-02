@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import javax.json.JsonArray;
@@ -41,7 +40,10 @@ import logbook.dto.ItemDto;
 import logbook.dto.NdockDto;
 import logbook.dto.ResourceDto;
 import logbook.dto.ShipDto;
+import logbook.dto.ShipInfoDto;
 import logbook.internal.Deck;
+import logbook.internal.Ship;
+import logbook.internal.ShipStyle;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -61,9 +63,6 @@ public final class GlobalContext {
 
     /** 装備Map */
     private static Map<Long, ItemDto> itemMap = new ConcurrentSkipListMap<Long, ItemDto>();
-
-    /** 装備Map(敵) */
-    private static Map<String, String> enemyItemMap = new ConcurrentHashMap<String, String>();
 
     /** 艦娘Map */
     private static Map<Long, ShipDto> shipMap = new ConcurrentSkipListMap<Long, ShipDto>();
@@ -114,13 +113,6 @@ public final class GlobalContext {
      */
     public static Map<Long, ItemDto> getItemMap() {
         return Collections.unmodifiableMap(itemMap);
-    }
-
-    /**
-     * @return 敵装備Map
-     */
-    public static Map<String, String> getEnemyItemMap() {
-        return Collections.unmodifiableMap(enemyItemMap);
     }
 
     /**
@@ -208,10 +200,6 @@ public final class GlobalContext {
             case SLOTITEM_MEMBER:
                 doSlotitemMember(data);
                 break;
-            // 保有装備
-            case SLOTITEM_MASTER:
-                doSlotitemMaster(data);
-                break;
             // 保有艦
             case SHIP2:
                 doShip2(data);
@@ -254,6 +242,11 @@ public final class GlobalContext {
             // 艦隊
             case DECK:
                 doDeck(data);
+                break;
+            // 艦娘一覧
+            case SHIP_MASTER:
+                doShipMaster(data);
+                break;
             default:
                 break;
             }
@@ -411,28 +404,6 @@ public final class GlobalContext {
             }
 
             addConsole("保有装備情報を更新しました");
-        } catch (Exception e) {
-            LOG.warn("保有装備を更新しますに失敗しました", e);
-            LOG.warn(data);
-        }
-    }
-
-    /**
-     * 保有装備を更新します
-     * 
-     * @param data
-     */
-    private static void doSlotitemMaster(Data data) {
-        try {
-            JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
-            for (int i = 0; i < apidata.size(); i++) {
-                JsonObject object = (JsonObject) apidata.get(i);
-                String id = Long.toString(object.getJsonNumber("api_id").longValue());
-                String name = object.getString("api_name");
-                enemyItemMap.put(id, name);
-            }
-
-            addConsole("保有装備情報(敵)を更新しました");
         } catch (Exception e) {
             LOG.warn("保有装備を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -625,6 +596,46 @@ public final class GlobalContext {
             LOG.warn("入渠を更新しますに失敗しました", e);
             LOG.warn(data);
         }
+    }
+
+    /**
+     * 艦娘一覧を更新します
+     * 
+     * @param data
+     */
+    private static void doShipMaster(Data data) {
+        JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
+        for (int i = 0; i < apidata.size(); i++) {
+            JsonObject object = (JsonObject) apidata.get(i);
+
+            String id = object.getJsonNumber("api_id").toString();
+
+            Ship.set(id, toShipInfoDto(object));
+        }
+
+        addConsole("艦娘一覧を更新しました");
+    }
+
+    /**
+     * 艦娘を作成します
+     * 
+     * @param object
+     * @return
+     */
+    private static ShipInfoDto toShipInfoDto(JsonObject object) {
+        String name = object.getString("api_name");
+
+        if ("なし".equals(name)) {
+            return ShipInfoDto.EMPTY;
+        }
+
+        String type = ShipStyle.get(object.getJsonNumber("api_stype").toString());
+        int afterlv = object.getJsonNumber("api_afterlv").intValue();
+        String flagship = object.getString("api_yomi");
+        if ("-".equals(flagship)) {
+            flagship = "";
+        }
+        return new ShipInfoDto(name, type, afterlv, flagship);
     }
 
     private static void addConsole(Object message) {

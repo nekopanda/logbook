@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 
 import logbook.config.GlobalConfig;
+import logbook.config.ShipConfig;
 import logbook.gui.background.AsyncExecApplicationMain;
 import logbook.gui.background.AsyncExecApplicationMainConsole;
 import logbook.gui.background.AsyncExecUpdateCheck;
@@ -74,10 +75,14 @@ public final class ApplicationMain {
      */
     public static void main(String[] args) {
         try {
+            // 設定読み込み
+            ShipConfig.load();
+            // アプリケーション開始
             ApplicationMain window = new ApplicationMain();
             window.open();
             // ウインドウが閉じたタイミングで設定を書き込みます
             GlobalConfig.store();
+            ShipConfig.store();
         } catch (Error e) {
             LOG.fatal("メインスレッドが異常終了しました", e);
         } catch (Exception e) {

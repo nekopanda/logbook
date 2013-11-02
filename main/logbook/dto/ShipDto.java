@@ -113,6 +113,9 @@ public final class ShipDto extends AbstractDto {
     /** 運(最大) */
     private final long luckyMax;
 
+    /** 艦娘 */
+    private final ShipInfoDto shipInfo;
+
     /**
      * コンストラクター
      * 
@@ -124,6 +127,7 @@ public final class ShipDto extends AbstractDto {
         this.locked = object.getJsonNumber("api_locked").longValue() == 1;
 
         ShipInfoDto shipinfo = Ship.get(object.getJsonNumber("api_ship_id").toString());
+        this.shipInfo = shipinfo;
         this.name = shipinfo.getName();
         this.type = shipinfo.getType();
 
@@ -415,4 +419,10 @@ public final class ShipDto extends AbstractDto {
         return this.luckyMax;
     }
 
+    /**
+     * @return 艦娘
+     */
+    public ShipInfoDto getShipInfo() {
+        return this.shipInfo;
+    }
 }
