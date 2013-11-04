@@ -1,6 +1,3 @@
-/**
- * 
- */
 package logbook.internal;
 
 import java.util.Map;
