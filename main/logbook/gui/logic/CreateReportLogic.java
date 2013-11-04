@@ -100,7 +100,7 @@ public final class CreateReportLogic {
         @Override
         public TableItem create(Table table, String[] text, int count) {
             // 艦娘
-            Long ship = Long.valueOf(text[0]);
+            Long ship = Long.valueOf(text[1]);
 
             TableItem item = new TableItem(table, SWT.NONE);
             // 偶数行に背景色を付ける
@@ -109,8 +109,8 @@ public final class CreateReportLogic {
             }
 
             // 疲労
-            int cond = Integer.parseInt(text[2]);
-            if (cond <= 15) {
+            int cond = Integer.parseInt(text[3]);
+            if (cond <= 19) {
                 item.setForeground(SWTResourceManager.getColor(GlobalConfig.COND_RED_COLOR));
             } else if (cond <= 29) {
                 item.setForeground(SWTResourceManager.getColor(GlobalConfig.COND_ORANGE_COLOR));
@@ -301,7 +301,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getItemListHeader() {
-        return new String[] { "名称", "種別", "個数", "火力", "命中", "回避", "射程", "運", "爆装", "雷装", "索敵", "対潜", "対空" };
+        return new String[] { "", "名称", "種別", "個数", "火力", "命中", "回避", "射程", "運", "爆装", "雷装", "索敵", "対潜", "対空" };
     }
 
     /**
@@ -334,12 +334,13 @@ public final class CreateReportLogic {
 
         List<Object[]> body = new ArrayList<Object[]>();
 
+        int count = 0;
         for (Entry<ItemDto, Integer> entry : countitems) {
             ItemDto item = entry.getKey();
-            Integer count = entry.getValue();
-            body.add(new Object[] { item.getName(), item.getType(), count.toString(), item.getHoug(), item.getHoum(),
-                    item.getKaih(), item.getLeng(), item.getLuck(), item.getBaku(), item.getRaig(), item.getSaku(),
-                    item.getTais(), item.getTyku()
+            count++;
+            body.add(new Object[] { count, item.getName(), item.getType(), entry.getValue(), item.getHoug(),
+                    item.getHoum(), item.getKaih(), item.getLeng(), item.getLuck(), item.getBaku(), item.getRaig(),
+                    item.getSaku(), item.getTais(), item.getTyku()
             });
         }
         return toListStringArray(body);
@@ -351,7 +352,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getShipListHeader() {
-        return new String[] { "艦娘ID", "艦隊", "疲労", "名前", "艦種", "Lv", "経験値", "HP", "装備1", "装備2", "装備3", "装備4",
+        return new String[] { "", "艦娘ID", "艦隊", "疲労", "名前", "艦種", "Lv", "経験値", "HP", "装備1", "装備2", "装備3", "装備4",
                 "火力", "雷装", "対空", "装甲", "回避", "対潜", "索敵", "運" };
     }
 
@@ -365,6 +366,7 @@ public final class CreateReportLogic {
     public static List<String[]> getShipListBody(boolean specdiff, ShipFilterDto filter) {
         Set<Entry<Long, ShipDto>> ships = GlobalContext.getShipMap().entrySet();
         List<Object[]> body = new ArrayList<Object[]>();
+        int count = 0;
         for (Entry<Long, ShipDto> entry : ships) {
             ShipDto ship = entry.getValue();
 
@@ -372,9 +374,12 @@ public final class CreateReportLogic {
                 continue;
             }
 
+            count++;
+
             if (!specdiff) {
                 // 通常
                 body.add(new Object[] {
+                        count,
                         ship.getId(),
                         ship.getFleetid(),
                         ship.getCond(),
@@ -425,8 +430,8 @@ public final class CreateReportLogic {
                     }
                 }
                 body.add(new Object[] {
-                        ship.getId(), ship.getFleetid(), ship.getCond(), ship.getName(), ship.getType(), ship.getLv(),
-                        ship.getExp(), ship.getMaxhp(), ship.getSlot().get(0), ship.getSlot().get(1),
+                        count, ship.getId(), ship.getFleetid(), ship.getCond(), ship.getName(), ship.getType(),
+                        ship.getLv(), ship.getExp(), ship.getMaxhp(), ship.getSlot().get(0), ship.getSlot().get(1),
                         ship.getSlot().get(2), ship.getSlot().get(3), karyoku, raisou, taiku,
                         ship.getSoukouMax() - ship.getSoukou(), kaihi, taisen, sakuteki, lucky
                 });
