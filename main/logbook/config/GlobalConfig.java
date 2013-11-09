@@ -351,6 +351,42 @@ public final class GlobalConfig {
     }
 
     /**
+     * 画面キャプチャ-保存先を取得する
+     * 
+     * @return
+     */
+    public static String getCapturePath() {
+        return PROPERTIES.getProperty("image_store_path", new File("").getAbsolutePath());
+    }
+
+    /**
+     * 画面キャプチャ-保存先をセットする
+     * 
+     * @return
+     */
+    public static void setCapturePath(String path) {
+        PROPERTIES.setProperty("image_store_path", path);
+    }
+
+    /**
+     * 画面キャプチャ-フォーマットを取得する
+     * 
+     * @return
+     */
+    public static String getImageFormat() {
+        return PROPERTIES.getProperty("image_format", "jpg");
+    }
+
+    /**
+     * 画面キャプチャ-フォーマットをセットする
+     * 
+     * @return
+     */
+    public static void setImageFormat(String format) {
+        PROPERTIES.setProperty("image_format", format);
+    }
+
+    /**
      * 開発者オプション-JSONを保存するを取得する
      * 
      * @return JSONを保存する

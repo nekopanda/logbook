@@ -34,4 +34,20 @@ public final class LayoutLogic {
             widget.setVisible(!hide);
         }
     }
+
+    /**
+     * ウィジェットを無効または有効にします。
+     * 
+     * @param widget
+     * @param enabled
+     */
+    public static void enable(Control widget, boolean enabled) {
+        if (widget instanceof Composite) {
+            Control[] controls = ((Composite) widget).getChildren();
+            for (Control control : controls) {
+                enable(control, enabled);
+            }
+        }
+        widget.setEnabled(enabled);
+    }
 }

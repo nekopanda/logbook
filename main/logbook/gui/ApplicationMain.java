@@ -15,6 +15,7 @@ import logbook.gui.background.AsyncExecApplicationMainConsole;
 import logbook.gui.background.AsyncExecUpdateCheck;
 import logbook.gui.listener.BathwaterTableAdapter;
 import logbook.gui.listener.CalcExpAdapter;
+import logbook.gui.listener.CaptureDialogAdapter;
 import logbook.gui.listener.ConfigDialogAdapter;
 import logbook.gui.listener.CreateItemReportAdapter;
 import logbook.gui.listener.CreateShipReportAdapter;
@@ -159,6 +160,12 @@ public final class ApplicationMain {
         etcroot.setMenu(etcmenu);
 
         // メニュー
+        // コマンド-キャプチャ
+        MenuItem capture = new MenuItem(cmdmenu, SWT.NONE);
+        capture.setText("キャプチャ(&C)");
+        capture.addSelectionListener(new CaptureDialogAdapter(this.shell));
+        // セパレータ
+        new MenuItem(cmdmenu, SWT.SEPARATOR);
         // コマンド-ドロップ報告書
         MenuItem cmddrop = new MenuItem(cmdmenu, SWT.NONE);
         cmddrop.setText("ドロップ報告書(&D)\tCtrl+D");
