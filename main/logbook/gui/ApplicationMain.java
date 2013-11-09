@@ -206,6 +206,17 @@ public final class ApplicationMain {
         final MenuItem dispsize = new MenuItem(cmdmenu, SWT.CHECK);
         dispsize.setText("縮小表示(&M)\tCtrl+M");
         dispsize.setAccelerator(SWT.CTRL + 'M');
+        // セパレータ
+        new MenuItem(cmdmenu, SWT.SEPARATOR);
+        // 終了
+        final MenuItem dispose = new MenuItem(cmdmenu, SWT.NONE);
+        dispose.setText("終了(&X)");
+        dispose.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                ApplicationMain.this.shell.close();
+            }
+        });
 
         // 計算機-経験値計算
         MenuItem calcexp = new MenuItem(calcmenu, SWT.NONE);
