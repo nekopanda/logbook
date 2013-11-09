@@ -50,7 +50,7 @@ public final class GlobalConfig {
     public static final String DATE_SHORT_FORMAT = "HH:mm:ss";
 
     /** バージョン */
-    public static final String VERSION = "0.4.2";
+    public static final String VERSION = "0.4.3";
 
     /** 遠征色 */
     public static final RGB MISSION_COLOR = new RGB(102, 51, 255);
