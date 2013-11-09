@@ -79,8 +79,9 @@ public final class FullScreenDialog extends Dialog {
     private void createContents() {
         // フルスクリーンのウインドウを作成します
         this.shell = new Shell(this.getParent(), this.getStyle());
-        this.shell.setMaximized(true);
         this.shell.setText(this.getText());
+        this.shell.setBounds(Display.getDefault().getPrimaryMonitor().getBounds());
+        this.shell.setFullScreen(true);
 
         GridLayout glShell = new GridLayout(1, false);
         glShell.verticalSpacing = 0;
@@ -109,6 +110,7 @@ public final class FullScreenDialog extends Dialog {
         private final Image image;
 
         private final Color white = SWTResourceManager.getColor(new RGB(255, 255, 255));
+        private final Color black = SWTResourceManager.getColor(new RGB(0, 0, 0));
         private final Font normalfont;
         private final Font largefont;
 
@@ -132,6 +134,8 @@ public final class FullScreenDialog extends Dialog {
             GC gc = e.gc;
             gc.drawImage(this.image, 0, 0);
             gc.setFont(this.largefont);
+            gc.setForeground(this.black);
+            gc.setBackground(this.white);
             gc.drawString("キャプチャする領域をマウスでドラッグして下さい。 [Esc]キーでキャンセル", 2, 2);
         }
 
@@ -147,7 +151,11 @@ public final class FullScreenDialog extends Dialog {
                 this.y2 = e.y;
                 gc.drawRectangle(this.getRectangle());
 
+                gc.setXORMode(false);
+
                 gc.setFont(this.normalfont);
+                gc.setForeground(this.black);
+                gc.setBackground(this.white);
                 String msg = "(" + this.x1 + "," + this.y1 + ")-(" + this.x2 + "," + this.y2 + ")";
                 gc.drawString(msg, this.x1, this.y1);
 
