@@ -124,7 +124,7 @@ public final class FullScreenDialog extends Dialog {
             this.image = image;
             // 描画に使用するフォントを設定します
             FontData normal = shell.getFont().getFontData()[0];
-            FontData large = new FontData(normal.getName(), normal.getStyle(), 32);
+            FontData large = new FontData(normal.getName(), 18, normal.getStyle());
             this.normalfont = new Font(Display.getDefault(), normal);
             this.largefont = new Font(Display.getDefault(), large);
         }
