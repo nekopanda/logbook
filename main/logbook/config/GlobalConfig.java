@@ -92,10 +92,10 @@ public final class GlobalConfig {
     public static final float BADLY_DAMAGE = 0.25f;
 
     /** 補給(少) */
-    public static final float LOW_SUPPLY = 0.9f;
+    public static final float LOW_SUPPLY = 0.99f;
 
     /** 補給(空) */
-    public static final float EMPTY_SUPPLY = 0.7f;
+    public static final float EMPTY_SUPPLY = 0.79f;
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://kancolle.sanaechan.net/");
