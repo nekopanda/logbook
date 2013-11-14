@@ -53,6 +53,18 @@ public final class ShipDto extends AbstractDto {
     /** 修復資材 鋼材 */
     private final long dockmetal;
 
+    /** 残弾 */
+    private final int bull;
+
+    /** 弾Max */
+    private final int bullmax;
+
+    /** 残燃料 */
+    private final int fuel;
+
+    /** 燃料Max */
+    private final int fuelmax;
+
     /** 経験値 */
     private final long exp;
 
@@ -137,6 +149,11 @@ public final class ShipDto extends AbstractDto {
         this.docktime = object.getJsonNumber("api_ndock_time").longValue();
         this.dockfuel = object.getJsonArray("api_ndock_item").getJsonNumber(0).longValue();
         this.dockmetal = object.getJsonArray("api_ndock_item").getJsonNumber(1).longValue();
+
+        this.bull = object.getJsonNumber("api_bull").intValue();
+        this.fuel = object.getJsonNumber("api_fuel").intValue();
+        this.bullmax = shipinfo.getMaxBull();
+        this.fuelmax = shipinfo.getMaxFuel();
 
         this.exp = object.getJsonNumber("api_exp").longValue();
         this.nowhp = object.getJsonNumber("api_nowhp").longValue();
@@ -242,6 +259,34 @@ public final class ShipDto extends AbstractDto {
      */
     public long getDockmetal() {
         return this.dockmetal;
+    }
+
+    /**
+     * @return 弾
+     */
+    public int getBull() {
+        return this.bull;
+    }
+
+    /**
+     * @return 弾Max
+     */
+    public int getBullMax() {
+        return this.bullmax;
+    }
+
+    /**
+     * @return 燃料
+     */
+    public int getFuel() {
+        return this.fuel;
+    }
+
+    /**
+     * @return 燃料Max
+     */
+    public int getFuelMax() {
+        return this.fuelmax;
     }
 
     /**

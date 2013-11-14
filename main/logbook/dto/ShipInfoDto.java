@@ -12,7 +12,7 @@ package logbook.dto;
 public final class ShipInfoDto extends AbstractDto {
 
     /** 空の艦種 */
-    public static final ShipInfoDto EMPTY = new ShipInfoDto("", "", "");
+    public static final ShipInfoDto EMPTY = new ShipInfoDto("", "", "", 0, 0, 0);
 
     /** 名前 */
     private final String name;
@@ -26,34 +26,22 @@ public final class ShipInfoDto extends AbstractDto {
     /** flagshipもしくはelite (敵艦のみ) */
     private final String flagship;
 
-    /**
-     * コンストラクター
-     */
-    public ShipInfoDto(String name, String type, String flagship) {
-        this.name = name;
-        this.type = type;
-        this.afterlv = 0;
-        this.flagship = flagship;
-    }
+    /** 弾 */
+    private final int maxBull;
+
+    /** 燃料 */
+    private final int maxFuel;
 
     /**
      * コンストラクター
      */
-    public ShipInfoDto(String name, String type, int afterlv, String flagship) {
+    public ShipInfoDto(String name, String type, String flagship, int afterlv, int maxBull, int maxFuel) {
         this.name = name;
         this.type = type;
         this.afterlv = afterlv;
         this.flagship = flagship;
-    }
-
-    /**
-     * コンストラクター
-     */
-    public ShipInfoDto(String name, String type) {
-        this.name = name;
-        this.type = type;
-        this.afterlv = 0;
-        this.flagship = "";
+        this.maxBull = maxBull;
+        this.maxFuel = maxFuel;
     }
 
     /**
@@ -71,6 +59,13 @@ public final class ShipInfoDto extends AbstractDto {
     }
 
     /**
+     * @return flagshipもしくはelite
+     */
+    public String getFlagship() {
+        return this.flagship;
+    }
+
+    /**
      * @return 改造レベル(改造ができない場合、0)
      */
     public int getAfterlv() {
@@ -78,9 +73,16 @@ public final class ShipInfoDto extends AbstractDto {
     }
 
     /**
-     * @return flagshipもしくはelite
+     * @return 弾
      */
-    public String getFlagship() {
-        return this.flagship;
+    public int getMaxBull() {
+        return this.maxBull;
+    }
+
+    /**
+     * @return 燃料
+     */
+    public int getMaxFuel() {
+        return this.maxFuel;
     }
 }

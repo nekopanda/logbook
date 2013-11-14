@@ -176,6 +176,13 @@ public final class Sound {
         /** ロガー */
         private static final Logger LOG = LogManager.getLogger(PlayerThread.class);
 
+        /**
+         * プレイヤースレッド
+         */
+        public PlayerThread() {
+            this.setName("logbook_sound.player_thread");
+        }
+
         @Override
         public void run() {
             try {

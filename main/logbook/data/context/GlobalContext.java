@@ -91,6 +91,12 @@ public final class GlobalContext {
     /** 司令部Lv */
     private static int hqLevel;
 
+    /** 最大保有可能 艦娘数 */
+    private static int maxChara;
+
+    /** 最大保有可能 装備数 */
+    private static int maxSlotitem;
+
     /** 戦闘詳細 */
     private static Queue<BattleDto> battleList = new ArrayBlockingQueue<BattleDto>(1);
 
@@ -134,6 +140,20 @@ public final class GlobalContext {
      */
     public static int hqLevel() {
         return hqLevel;
+    }
+
+    /**
+     * @return 最大保有可能 艦娘数
+     */
+    public static int maxChara() {
+        return maxChara;
+    }
+
+    /**
+     * @return 最大保有可能 装備数
+     */
+    public static int maxSlotitem() {
+        return maxSlotitem;
     }
 
     /**
@@ -516,7 +536,7 @@ public final class GlobalContext {
     }
 
     /**
-     * 司令部Lvを更新する
+     * 司令部を更新する
      * 
      * @param data
      */
@@ -524,13 +544,16 @@ public final class GlobalContext {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
 
-            int newhqLevel = apidata.getJsonNumber("api_level").intValue();
-            if (hqLevel != newhqLevel) {
-                hqLevel = newhqLevel;
-                addConsole("司令部Lvを更新しました");
-            }
+            // 指令部Lv
+            hqLevel = apidata.getJsonNumber("api_level").intValue();
+            // 最大所有艦娘数
+            maxChara = apidata.getJsonNumber("api_max_chara").intValue();
+            // 最大所有装備数
+            maxSlotitem = apidata.getJsonNumber("api_max_slotitem").intValue();
+
+            addConsole("司令部を更新しました");
         } catch (Exception e) {
-            LOG.warn("司令部Lvを更新するに失敗しました", e);
+            LOG.warn("司令部を更新するに失敗しました", e);
             LOG.warn(data);
         }
     }
@@ -640,12 +663,20 @@ public final class GlobalContext {
         }
 
         String type = ShipStyle.get(object.getJsonNumber("api_stype").toString());
-        int afterlv = object.getJsonNumber("api_afterlv").intValue();
         String flagship = object.getString("api_yomi");
         if ("-".equals(flagship)) {
             flagship = "";
         }
-        return new ShipInfoDto(name, type, afterlv, flagship);
+        int afterlv = object.getJsonNumber("api_afterlv").intValue();
+        int maxBull = 0;
+        if (object.containsKey("api_bull_max")) {
+            maxBull = object.getJsonNumber("api_bull_max").intValue();
+        }
+        int maxFuel = 0;
+        if (object.containsKey("api_fuel_max")) {
+            maxFuel = object.getJsonNumber("api_fuel_max").intValue();
+        }
+        return new ShipInfoDto(name, type, flagship, afterlv, maxBull, maxFuel);
     }
 
     private static void addConsole(Object message) {

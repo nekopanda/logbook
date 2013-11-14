@@ -34,6 +34,7 @@ public final class AsyncExecUpdateCheck extends Thread {
      */
     public AsyncExecUpdateCheck(Shell shell) {
         this.shell = shell;
+        this.setName("logbook_async_exec_update_check");
     }
 
     @Override

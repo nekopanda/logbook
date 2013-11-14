@@ -12,8 +12,6 @@ import java.util.Set;
 import logbook.dto.ShipInfoDto;
 import logbook.internal.Ship;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * <p>
  * 艦娘のIDと名前の紐付けを保存・復元します
@@ -41,12 +39,20 @@ public class ShipConfig {
         Set<String> shipids = Ship.keySet();
         for (String key : shipids) {
             ShipInfoDto ship = Ship.get(key);
+
+            if (ShipInfoDto.EMPTY == ship) {
+                properties.remove(key.toString());
+                continue;
+            }
+
             String name = ship.getName();
             String type = ship.getType();
-            String afterlv = Integer.toString(ship.getAfterlv());
             String flagship = ship.getFlagship();
+            String afterlv = Integer.toString(ship.getAfterlv());
+            String maxBull = Integer.toString(ship.getMaxBull());
+            String maxFuel = Integer.toString(ship.getMaxFuel());
 
-            String value = name + "," + type + "," + afterlv + "," + flagship;
+            String value = name + "," + type + "," + flagship + "," + afterlv + "," + maxBull + "," + maxFuel;
 
             properties.setProperty(key, value);
         }
@@ -63,16 +69,24 @@ public class ShipConfig {
     private static Properties update(Properties properties) {
         for (Object key : properties.keySet()) {
             String[] values = properties.getProperty(key.toString()).split(",");
-            if ((values.length != 4) || !StringUtils.isNumeric(values[2])) {
+            if (values.length != 6) {
+                properties.remove(key.toString());
                 continue;
             }
 
             String name = values[0];
             String type = values[1];
-            int afterlv = Integer.parseInt(values[2]);
-            String flagship = values[3];
+            String flagship = values[2];
+            int afterlv = Integer.parseInt(values[3]);
+            int maxBull = Integer.parseInt(values[4]);
+            int maxFuel = Integer.parseInt(values[5]);
 
-            ShipInfoDto ship = new ShipInfoDto(name, type, afterlv, flagship);
+            // 未定義の艦娘
+            if ("".equals(name)) {
+                continue;
+            }
+
+            ShipInfoDto ship = new ShipInfoDto(name, type, flagship, afterlv, maxBull, maxFuel);
 
             Ship.set(key.toString(), ship);
         }

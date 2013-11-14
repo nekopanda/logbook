@@ -29,6 +29,7 @@ public final class ThreadStateObserver extends Thread {
     public ThreadStateObserver(Shell shell) {
         this.observthread = new ArrayList<Thread>(ThreadManager.getThreads());
         this.shell = shell;
+        this.setName("logbook_thread_state_observer");
     }
 
     /* (非 Javadoc)

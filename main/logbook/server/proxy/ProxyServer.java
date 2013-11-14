@@ -28,6 +28,7 @@ public final class ProxyServer extends Thread {
 
     private ProxyServer(int port) {
         this.port = port;
+        this.setName("logbook_proxy_server");
     }
 
     @Override

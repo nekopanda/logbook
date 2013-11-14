@@ -110,9 +110,9 @@ public final class CreateReportLogic {
 
             // 疲労
             int cond = Integer.parseInt(text[3]);
-            if (cond <= 19) {
+            if (cond <= GlobalConfig.COND_RED) {
                 item.setForeground(SWTResourceManager.getColor(GlobalConfig.COND_RED_COLOR));
-            } else if (cond <= 29) {
+            } else if (cond <= GlobalConfig.COND_ORANGE) {
                 item.setForeground(SWTResourceManager.getColor(GlobalConfig.COND_ORANGE_COLOR));
             }
 

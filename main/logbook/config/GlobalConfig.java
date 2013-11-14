@@ -52,6 +52,12 @@ public final class GlobalConfig {
     /** バージョン */
     public static final String VERSION = "0.4.3";
 
+    /** 疲労赤色 */
+    public static final int COND_RED = 19;
+
+    /** 疲労オレンジ色 */
+    public static final int COND_ORANGE = 29;
+
     /** 遠征色 */
     public static final RGB MISSION_COLOR = new RGB(102, 51, 255);
 
@@ -75,6 +81,21 @@ public final class GlobalConfig {
 
     /** テーブル行(偶数行)背景色 */
     public static final RGB ROW_BACKGROUND = new RGB(246, 246, 246);
+
+    /** 小破(75%) */
+    public static final float SLIGHT_DAMAGE = 0.75f;
+
+    /** 中破(50%) */
+    public static final float HALF_DAMAGE = 0.5f;
+
+    /** 中破(25%) */
+    public static final float BADLY_DAMAGE = 0.25f;
+
+    /** 補給(少) */
+    public static final float LOW_SUPPLY = 0.9f;
+
+    /** 補給(空) */
+    public static final float EMPTY_SUPPLY = 0.7f;
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://kancolle.sanaechan.net/");

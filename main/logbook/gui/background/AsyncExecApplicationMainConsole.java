@@ -31,6 +31,7 @@ public final class AsyncExecApplicationMainConsole extends Thread {
      */
     public AsyncExecApplicationMainConsole(List console) {
         this.console = console;
+        this.setName("logbook_async_exec_application_main_console");
     }
 
     /**
@@ -40,27 +41,43 @@ public final class AsyncExecApplicationMainConsole extends Thread {
     public void run() {
         try {
             while (true) {
-                Display.getDefault().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        // ログメッセージを取り出す
-                        String message;
-                        while ((message = GlobalContext.getConsoleMessage()) != null) {
-                            List console = AsyncExecApplicationMainConsole.this.console;
-                            int size = console.getItemCount();
-                            if (size >= MAX_LOG_LINES) {
-                                console.remove(0);
-                            }
-                            console.add(message);
-                            console.setSelection(console.getItemCount() - 1);
-                        }
-                    }
-                });
+                // ログメッセージを取り出す
+                String message;
+                while ((message = GlobalContext.getConsoleMessage()) != null) {
+                    Display.getDefault().asyncExec(new UpdateConsoleTask(this.console, message));
+                }
                 Thread.sleep(UPDATE_FORMILIS);
             }
         } catch (Exception e) {
             LOG.fatal("スレッドが異常終了しました", e);
             throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 非同期にコンソールを更新します
+     */
+    private static final class UpdateConsoleTask implements Runnable {
+
+        private final List console;
+        private final String message;
+
+        /**
+         * 非同期にコンソールを更新します
+         */
+        public UpdateConsoleTask(List console, String message) {
+            this.console = console;
+            this.message = message;
+        }
+
+        @Override
+        public void run() {
+            int size = this.console.getItemCount();
+            if (size >= MAX_LOG_LINES) {
+                this.console.remove(0);
+            }
+            this.console.add(this.message);
+            this.console.setSelection(this.console.getItemCount() - 1);
         }
     }
 }
