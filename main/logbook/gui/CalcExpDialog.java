@@ -238,8 +238,9 @@ public final class CalcExpDialog extends Dialog {
                 int afterlv = ship.getShipInfo().getAfterlv();
                 if (before < afterlv) {
                     after = afterlv;
-                } else {
-                    after = Math.min(((int) (ship.getLv() + 20) / 10) * 10, 99);
+                }
+                if (before > after) {
+                    after = before + 1;
                 }
                 String beforeexpstr = Long.toString(ship.getExp());
                 String afterexpstr = Long.toString(ExpTable.get().get(after));
