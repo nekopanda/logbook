@@ -39,6 +39,8 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -52,6 +54,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tray;
@@ -196,6 +199,20 @@ public final class ApplicationMain {
         glShell.marginBottom = 0;
         glShell.verticalSpacing = 1;
         this.shell.setLayout(glShell);
+        this.shell.addShellListener(new ShellAdapter() {
+            @Override
+            public void shellClosed(ShellEvent e) {
+                MessageBox box = new MessageBox(ApplicationMain.this.shell, SWT.YES | SWT.NO
+                        | SWT.ICON_QUESTION);
+                box.setText("終了の確認");
+                box.setMessage("航海日誌を終了しますか？");
+                if (box.open() == SWT.YES) {
+                    e.doit = true;
+                } else {
+                    e.doit = false;
+                }
+            }
+        });
 
         // メニューバー
         Menu menubar = new Menu(this.shell, SWT.BAR);
