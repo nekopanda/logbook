@@ -67,7 +67,7 @@ public final class CaptureDialog extends Dialog {
      * @param parent
      */
     public CaptureDialog(Shell parent) {
-        super(parent, SWT.SHELL_TRIM | SWT.MODELESS);
+        super(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE);
         this.setText("キャプチャ");
     }
 

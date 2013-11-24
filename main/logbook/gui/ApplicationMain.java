@@ -190,7 +190,7 @@ public final class ApplicationMain {
     public void createContents() {
 
         final Display display = Display.getDefault();
-        this.shell = new Shell(SWT.SHELL_TRIM | GlobalConfig.getOnTop());
+        this.shell = new Shell(SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE | GlobalConfig.getOnTop());
         this.shell.setText("航海日誌 " + GlobalConfig.VERSION);
         GridLayout glShell = new GridLayout(1, false);
         glShell.horizontalSpacing = 1;

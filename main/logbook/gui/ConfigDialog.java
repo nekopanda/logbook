@@ -39,7 +39,7 @@ public final class ConfigDialog extends Dialog {
      * @param parent
      */
     public ConfigDialog(Shell parent) {
-        super(parent, SWT.SHELL_TRIM | SWT.MODELESS);
+        super(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE);
         this.setText("設定");
     }
 

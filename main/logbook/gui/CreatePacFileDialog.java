@@ -13,6 +13,7 @@ import logbook.config.GlobalConfig;
 import logbook.server.proxy.Filter;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -54,7 +55,7 @@ public final class CreatePacFileDialog extends Dialog {
      * @param parent
      */
     public CreatePacFileDialog(Shell parent) {
-        super(parent, SWT.SHELL_TRIM | SWT.MODELESS);
+        super(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE);
     }
 
     /**
@@ -160,6 +161,14 @@ public final class CreatePacFileDialog extends Dialog {
             dialog.setFileName("proxy.pac");
             dialog.setFilterExtensions(new String[] { "*.pac" });
             String filename = dialog.open();
+
+            if (!StringUtils.isAsciiPrintable(filename)) {
+                MessageBox messageBox = new MessageBox(this.shell, SWT.ICON_WARNING);
+                messageBox.setText("注意");
+                messageBox.setMessage("保存先にASCII範囲外の文字(全角文字等)が含まれています。\nこのアドレスはInternetExplorerで読み込めません。");
+                messageBox.open();
+            }
+
             if (filename != null) {
 
                 MessageBox messageBox = new MessageBox(this.shell, SWT.ICON_INFORMATION);

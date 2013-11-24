@@ -97,7 +97,7 @@ public final class ShipFilterDialog extends Dialog {
      * @param filter 初期値
      */
     public ShipFilterDialog(Shell parent, ShipTable shipTable, ShipFilterDto filter) {
-        super(parent, SWT.SHELL_TRIM | SWT.MODELESS);
+        super(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE);
         this.shipTable = shipTable;
         this.filter = filter;
     }

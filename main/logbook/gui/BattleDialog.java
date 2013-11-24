@@ -41,7 +41,7 @@ public final class BattleDialog extends Dialog {
      * @param id
      */
     public BattleDialog(Shell parent, String id) {
-        super(parent, SWT.SHELL_TRIM | SWT.MODELESS);
+        super(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE);
 
         this.id = id;
     }

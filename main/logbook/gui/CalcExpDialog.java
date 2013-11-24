@@ -75,7 +75,7 @@ public final class CalcExpDialog extends Dialog {
      * @param parent
      */
     public CalcExpDialog(Shell parent) {
-        super(parent, SWT.SHELL_TRIM | SWT.MODELESS);
+        super(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE);
         this.setText("経験値計算機");
     }
 
