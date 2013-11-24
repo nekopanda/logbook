@@ -5,9 +5,6 @@
  */
 package logbook.gui;
 
-import java.io.File;
-import java.io.IOException;
-
 import logbook.config.GlobalConfig;
 import logbook.config.ShipConfig;
 import logbook.gui.background.AsyncExecApplicationMain;
@@ -25,7 +22,6 @@ import logbook.gui.listener.ItemListReportAdapter;
 import logbook.gui.listener.MainShellAdapter;
 import logbook.gui.listener.ShipListReportAdapter;
 import logbook.gui.listener.TraySelectionListener;
-import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.Sound;
 import logbook.server.proxy.ProxyServer;
@@ -151,20 +147,6 @@ public final class ApplicationMain {
             SWTResourceManager.dispose();
             // プロキシサーバーをシャットダウンする
             ProxyServer.end();
-            // 報告書を保存する
-            try {
-                CreateReportLogic.writeCsvStripFirstColumn(new File("./海戦・ドロップ報告書.csv"),
-                        CreateReportLogic.getBattleResultStoreHeader(),
-                        CreateReportLogic.getBattleResultStoreBody(), true);
-                CreateReportLogic.writeCsvStripFirstColumn(new File("./建造報告書.csv"),
-                        CreateReportLogic.getCreateShipHeader(),
-                        CreateReportLogic.getCreateShipBody(), true);
-                CreateReportLogic.writeCsvStripFirstColumn(new File("./開発報告書.csv"),
-                        CreateReportLogic.getCreateItemHeader(),
-                        CreateReportLogic.getCreateItemBody(), true);
-            } catch (IOException e) {
-                LOG.warn("報告書の保存に失敗しました", e);
-            }
         }
     }
 

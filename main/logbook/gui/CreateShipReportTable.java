@@ -5,6 +5,7 @@
  */
 package logbook.gui;
 
+import logbook.data.context.GlobalContext;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.TableItemCreator;
 
@@ -49,7 +50,7 @@ public final class CreateShipReportTable extends AbstractTableDialog {
 
     @Override
     protected void updateTableBody() {
-        this.body = CreateReportLogic.getCreateShipBody();
+        this.body = CreateReportLogic.getCreateShipBody(GlobalContext.getGetshipList());
     }
 
     @Override

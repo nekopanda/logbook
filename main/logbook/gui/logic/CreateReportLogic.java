@@ -42,6 +42,8 @@ import logbook.dto.ShipInfoDto;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
@@ -130,6 +132,9 @@ public final class CreateReportLogic {
         }
     };
 
+    /** ロガー */
+    private static final Logger LOG = LogManager.getLogger(CreateReportLogic.class);
+
     /** 日付フォーマット */
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat(GlobalConfig.DATE_FORMAT);
 
@@ -181,11 +186,11 @@ public final class CreateReportLogic {
 
     /**
      * ドロップ報告書の内容(保存用)
+     * @param results ドロップ報告書
      * 
      * @return 内容
      */
-    public static List<String[]> getBattleResultStoreBody() {
-        List<BattleResultDto> results = GlobalContext.getBattleResultList();
+    public static List<String[]> getBattleResultStoreBody(List<BattleResultDto> results) {
         List<Object[]> body = new ArrayList<Object[]>();
 
         for (int i = 0; i < results.size(); i++) {
@@ -250,8 +255,7 @@ public final class CreateReportLogic {
      * 
      * @return 内容
      */
-    public static List<String[]> getCreateShipBody() {
-        List<GetShipDto> ships = GlobalContext.getGetshipList();
+    public static List<String[]> getCreateShipBody(List<GetShipDto> ships) {
         List<Object[]> body = new ArrayList<Object[]>();
         for (int i = 0; i < ships.size(); i++) {
             GetShipDto ship = ships.get(i);
@@ -276,8 +280,7 @@ public final class CreateReportLogic {
      * 
      * @return 内容
      */
-    public static List<String[]> getCreateItemBody() {
-        List<CreateItemDto> items = GlobalContext.getCreateItemList();
+    public static List<String[]> getCreateItemBody(List<CreateItemDto> items) {
         List<Object[]> body = new ArrayList<Object[]>();
 
         for (int i = 0; i < items.size(); i++) {
@@ -642,5 +645,56 @@ public final class CreateReportLogic {
             }
         }
         return true;
+    }
+
+    /**
+     * 海戦・ドロップ報告書を書き込む
+     * 
+     * @param dto 海戦・ドロップ報告
+     */
+    public static void storeBattleResultReport(BattleResultDto dto) {
+        try {
+            List<BattleResultDto> dtoList = Collections.singletonList(dto);
+
+            CreateReportLogic.writeCsvStripFirstColumn(new File("./海戦・ドロップ報告書.csv"),
+                    CreateReportLogic.getBattleResultStoreHeader(),
+                    CreateReportLogic.getBattleResultStoreBody(dtoList), true);
+        } catch (IOException e) {
+            LOG.warn("報告書の保存に失敗しました", e);
+        }
+    }
+
+    /**
+     * 建造報告書を書き込む
+     * 
+     * @param dto 建造報告
+     */
+    public static void storeCreateShipReport(GetShipDto dto) {
+        try {
+            List<GetShipDto> dtoList = Collections.singletonList(dto);
+
+            CreateReportLogic.writeCsvStripFirstColumn(new File("./建造報告書.csv"),
+                    CreateReportLogic.getCreateShipHeader(),
+                    CreateReportLogic.getCreateShipBody(dtoList), true);
+        } catch (IOException e) {
+            LOG.warn("報告書の保存に失敗しました", e);
+        }
+    }
+
+    /**
+     * 開発報告書を書き込む
+     * 
+     * @param dto 開発報告
+     */
+    public static void storeCreateItemReport(CreateItemDto dto) {
+        try {
+            List<CreateItemDto> dtoList = Collections.singletonList(dto);
+
+            CreateReportLogic.writeCsvStripFirstColumn(new File("./開発報告書.csv"),
+                    CreateReportLogic.getCreateItemHeader(),
+                    CreateReportLogic.getCreateItemBody(dtoList), true);
+        } catch (IOException e) {
+            LOG.warn("報告書の保存に失敗しました", e);
+        }
     }
 }

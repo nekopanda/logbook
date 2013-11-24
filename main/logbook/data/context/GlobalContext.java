@@ -41,6 +41,7 @@ import logbook.dto.NdockDto;
 import logbook.dto.ResourceDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
+import logbook.gui.logic.CreateReportLogic;
 import logbook.internal.Deck;
 import logbook.internal.Ship;
 import logbook.internal.ShipStyle;
@@ -320,7 +321,9 @@ public final class GlobalContext {
     private static void doBattleresult(Data data) {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
-            battleResultList.add(new BattleResultDto(apidata, battleList.poll()));
+            BattleResultDto dto = new BattleResultDto(apidata, battleList.poll());
+            battleResultList.add(dto);
+            CreateReportLogic.storeBattleResultReport(dto);
 
             addConsole("海戦情報を更新しました");
         } catch (Exception e) {
@@ -388,6 +391,7 @@ public final class GlobalContext {
                 createItemQueue.add(item);
             } else {
                 createItemList.add(item);
+                CreateReportLogic.storeCreateItemReport(item);
             }
 
             addConsole("装備開発情報を更新しました");
@@ -420,6 +424,7 @@ public final class GlobalContext {
                     createitem.setName(item.getName());
                     createitem.setType(item.getType());
                     createItemList.add(createitem);
+                    CreateReportLogic.storeCreateItemReport(createitem);
                 } else {
                     createItemQueue.add(createitem);
                 }
@@ -460,7 +465,9 @@ public final class GlobalContext {
                     if (resource == null) {
                         resource = GlobalConfig.getCreateShipResource(shipInfo.getDock());
                     }
-                    getShipList.add(new GetShipDto(getShip, resource));
+                    GetShipDto dto = new GetShipDto(getShip, resource);
+                    getShipList.add(dto);
+                    CreateReportLogic.storeCreateShipReport(dto);
                     // 投入資源を除去する
                     getShipResource.remove(shipInfo.getDock());
                     GlobalConfig.removeCreateShipResource(shipInfo.getDock());
