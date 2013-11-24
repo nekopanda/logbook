@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 
 /**
@@ -405,6 +406,31 @@ public final class GlobalConfig {
      */
     public static void setImageFormat(String format) {
         PROPERTIES.setProperty("image_format", format);
+    }
+
+    /**
+     * ウインドウ位置を取得する
+     * 
+     * @return
+     */
+    public static Point getLocation() {
+        String location = PROPERTIES.getProperty("location");
+        if (location != null) {
+            String[] point = location.split(",");
+            int x = Integer.parseInt(point[0]);
+            int y = Integer.parseInt(point[1]);
+            return new Point(x, y);
+        }
+        return null;
+    }
+
+    /**
+     * ウインドウ位置をセットする
+     * 
+     * @param point ウインドウ位置
+     */
+    public static void setLocation(Point point) {
+        PROPERTIES.setProperty("location", point.x + "," + point.y);
     }
 
     /**

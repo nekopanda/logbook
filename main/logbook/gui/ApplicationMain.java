@@ -42,6 +42,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -202,6 +203,9 @@ public final class ApplicationMain {
         this.shell.addShellListener(new ShellAdapter() {
             @Override
             public void shellClosed(ShellEvent e) {
+                // 終了の確認でウインドウ位置を記憶
+                GlobalConfig.setLocation(ApplicationMain.this.shell.getLocation());
+
                 MessageBox box = new MessageBox(ApplicationMain.this.shell, SWT.YES | SWT.NO
                         | SWT.ICON_QUESTION);
                 box.setText("終了の確認");
@@ -552,6 +556,12 @@ public final class ApplicationMain {
                 GlobalConfig.setMinimumLayout(minimum);
             }
         });
+        // 前回のウインドウ位置を取得する
+        Point location = GlobalConfig.getLocation();
+        if (location != null) {
+            this.shell.setLocation(location);
+        }
+
         this.startThread();
     }
 
