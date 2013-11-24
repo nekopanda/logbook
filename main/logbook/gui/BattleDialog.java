@@ -85,7 +85,7 @@ public final class BattleDialog extends Dialog {
         top.setText("交戦戦力");
 
         Label label1 = new Label(kaiteki, SWT.NONE);
-        label1.setText("見方艦隊名が入ります");
+        label1.setText("味方艦隊名が入ります");
 
         Label label2 = new Label(kaiteki, SWT.NONE);
         label2.setText("敵艦隊名が入ります");
@@ -153,11 +153,11 @@ public final class BattleDialog extends Dialog {
         if (battle != null) {
             DockDto dock = battle.getDock();
             if (dock != null) {
-                // 見方艦隊
+                // 味方艦隊
                 label1.setText(dock.getName());
                 // 敵艦隊
                 label2.setText(result.getEnemyName());
-                // 見方艦隊
+                // 味方艦隊
                 Label[] friendnames = new Label[] { fname1, fname2, fname3, fname4, fname5, fname6 };
                 Label[] friendhps = new Label[] { fhp1, fhp2, fhp3, fhp4, fhp5, label14 };
                 List<ShipDto> friendships = dock.getShips();

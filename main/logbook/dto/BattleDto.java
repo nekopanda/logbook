@@ -20,19 +20,19 @@ import logbook.internal.Ship;
  */
 public final class BattleDto extends AbstractDto {
 
-    /** 見方艦隊 */
+    /** 味方艦隊 */
     private final DockDto dock;
 
     /** 敵艦隊 */
     private final List<ShipInfoDto> enemy = new ArrayList<ShipInfoDto>();
 
-    /** 見方HP */
+    /** 味方HP */
     private final int[] nowFriendHp = new int[6];
 
     /** 敵HP */
     private final int[] nowEnemyHp = new int[6];
 
-    /** 見方MaxHP */
+    /** 味方MaxHP */
     private final int[] maxFriendHp = new int[6];
 
     /** 敵MaxHP */
