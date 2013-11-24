@@ -242,6 +242,9 @@ public final class CalcExpDialog extends Dialog {
                 if (before > after) {
                     after = before + 1;
                 }
+                // 目標レベルが99を超える場合は99に設定
+                after = Math.min(after, 99);
+
                 String beforeexpstr = Long.toString(ship.getExp());
                 String afterexpstr = Long.toString(ExpTable.get().get(after));
 
