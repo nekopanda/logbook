@@ -222,6 +222,10 @@ public final class GlobalContext {
                 doSlotitemMember(data);
                 break;
             // 保有艦
+            case SHIP3:
+                doShip3(data);
+                break;
+            // 保有艦
             case SHIP2:
                 doShip2(data);
                 break;
@@ -433,6 +437,54 @@ public final class GlobalContext {
             addConsole("保有装備情報を更新しました");
         } catch (Exception e) {
             LOG.warn("保有装備を更新しますに失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 保有艦娘を更新します
+     * 
+     * @param data
+     */
+    private static void doShip3(Data data) {
+        try {
+            JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+
+            JsonArray shipdata = apidata.getJsonArray("api_ship_data");
+            // 情報を破棄
+            shipMap.clear();
+            for (int i = 0; i < shipdata.size(); i++) {
+                ShipDto ship = new ShipDto((JsonObject) shipdata.get(i));
+                shipMap.put(Long.valueOf(ship.getId()), ship);
+            }
+
+            // 艦隊を設定
+            doDeck(apidata.getJsonArray("api_deck_data"));
+
+            // 確定待ちの艦娘がある場合、艦娘の名前を確定させます
+            AwaitingDecision shipInfo;
+            while ((shipInfo = getShipQueue.poll()) != null) {
+                ShipDto getShip = shipMap.get(Long.valueOf(shipInfo.getShipid()));
+                if (getShip != null) {
+                    // 投入資源を取得する
+                    ResourceDto resource = getShipResource.get(shipInfo.getDock());
+                    if (resource == null) {
+                        resource = GlobalConfig.getCreateShipResource(shipInfo.getDock());
+                    }
+                    GetShipDto dto = new GetShipDto(getShip, resource);
+                    getShipList.add(dto);
+                    CreateReportLogic.storeCreateShipReport(dto);
+                    // 投入資源を除去する
+                    getShipResource.remove(shipInfo.getDock());
+                    GlobalConfig.removeCreateShipResource(shipInfo.getDock());
+                } else {
+                    getShipQueue.add(shipInfo);
+                }
+            }
+
+            addConsole("保有艦娘情報を更新しました");
+        } catch (Exception e) {
+            LOG.warn("保有艦娘を更新しますに失敗しました", e);
             LOG.warn(data);
         }
     }

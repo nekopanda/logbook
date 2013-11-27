@@ -13,6 +13,8 @@ public enum DataType {
 
     /** 保有艦 */
     SHIP2("/kcsapi/api_get_member/ship2"),
+    /** 保有艦 */
+    SHIP3("/kcsapi/api_get_member/ship3"),
     /** 遠征 */
     DECK_PORT("/kcsapi/api_get_member/deck_port"),
     /** 基本 */
