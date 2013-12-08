@@ -174,6 +174,7 @@ public final class ApplicationMain {
         final Display display = Display.getDefault();
         this.shell = new Shell(SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE | GlobalConfig.getOnTop());
         this.shell.setText("航海日誌 " + GlobalConfig.VERSION);
+        this.shell.setAlpha(GlobalConfig.getAlpha());
         GridLayout glShell = new GridLayout(1, false);
         glShell.horizontalSpacing = 1;
         glShell.marginTop = 0;

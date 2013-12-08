@@ -117,6 +117,16 @@ public final class ConfigDialog extends Dialog {
         soundlevel.setLayoutData(gdSoundlevel);
         soundlevel.setText(Integer.toString((int) (GlobalConfig.getSoundLevel() * 100)));
 
+        Label label7 = new Label(compositeSystem, SWT.NONE);
+        label7.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        label7.setText("透明度");
+
+        final Text alpha = new Text(compositeSystem, SWT.BORDER);
+        GridData gdAlpha = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+        gdAlpha.widthHint = 90;
+        alpha.setLayoutData(gdSoundlevel);
+        alpha.setText(Integer.toString(GlobalConfig.getAlpha()));
+
         final Button hidewindow = new Button(compositeSystem, SWT.CHECK);
         hidewindow.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
         hidewindow.setText("最小化時にタスクトレイに格納");
@@ -206,12 +216,15 @@ public final class ConfigDialog extends Dialog {
         command.setLayout(rlCommand);
         command.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
 
+        // OK ボタン
         Button applyBtn = new Button(command, SWT.NONE);
         applyBtn.setLayoutData(new RowData(100, SWT.DEFAULT));
         applyBtn.setText("OK");
         applyBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                // 設定の保存アクション
+
                 // system
                 GlobalConfig.setListenPort(listenport.getText());
                 GlobalConfig.setWidth(width.getText());
@@ -219,6 +232,7 @@ public final class ConfigDialog extends Dialog {
                 GlobalConfig.setHideWindow(hidewindow.getSelection());
                 GlobalConfig.setOnTop(ontop.getSelection());
                 GlobalConfig.setSoundLevel(soundlevel.getText());
+                GlobalConfig.setAlpha(alpha.getText());
                 GlobalConfig.setCheckUpdate(checkUpdate.getSelection());
                 // capture
                 GlobalConfig.setCapturePath(captureDir.getText());

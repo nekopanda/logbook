@@ -236,6 +236,29 @@ public final class GlobalConfig {
     }
 
     /**
+     * 透明度を取得する
+     * 
+     * @return 音量
+     */
+    public static int getAlpha() {
+        return Integer.parseInt(PROPERTIES.getProperty("alpha", "255"));
+    }
+
+    /**
+     * 透明度をセットする
+     * 
+     * @param level
+     */
+    public static void setAlpha(String alpha) {
+        if (StringUtils.isNumeric(alpha)) {
+            int ialpha = Integer.parseInt(alpha);
+            ialpha = Math.min(ialpha, 255);
+            ialpha = Math.max(ialpha, 20);
+            PROPERTIES.setProperty("alpha", Integer.toString(ialpha));
+        }
+    }
+
+    /**
      * アップデートチェックを取得する
      * 
      * @return アップデートチェック
