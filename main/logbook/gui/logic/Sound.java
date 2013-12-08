@@ -50,7 +50,7 @@ public final class Sound {
      * @param file ファイル
      */
     public static void addQueue(File file) {
-        soundfileQueue.add(file);
+        soundfileQueue.offer(file);
     }
 
     /**
