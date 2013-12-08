@@ -245,14 +245,11 @@ public abstract class AbstractTableDialog extends Dialog {
     protected abstract SelectionListener getHeaderSelectionListener();
 
     /**
-     * テーブルをソートする共通ロジック
+     * テーブルをソートします
      * 
-     * @param headerColumn
+     * @param headerColumn ソートするカラム
      */
     protected final void sortTableItems(TableColumn headerColumn) {
-        this.shell.setRedraw(false);
-        this.disposeTableBody();
-
         int index = 0;
         for (int i = 0; i < this.header.length; i++) {
             if (this.header[i].equals(headerColumn.getText())) {
@@ -260,6 +257,18 @@ public abstract class AbstractTableDialog extends Dialog {
                 break;
             }
         }
+        this.sortTableItems(index, headerColumn);
+    }
+
+    /**
+     * テーブルをソートします
+     * 
+     * @param index カラムインデックス
+     * @param headerColumn ソートするカラム
+     */
+    protected final void sortTableItems(int index, TableColumn headerColumn) {
+        this.shell.setRedraw(false);
+        this.disposeTableBody();
 
         final boolean orderflg = !this.orderflgs[index];
         for (int i = 0; i < this.orderflgs.length; i++) {
@@ -281,6 +290,7 @@ public abstract class AbstractTableDialog extends Dialog {
         this.setTableBody();
 
         this.shell.setRedraw(true);
+
     }
 
     /**
