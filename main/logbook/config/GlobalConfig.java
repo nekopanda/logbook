@@ -259,6 +259,24 @@ public final class GlobalConfig {
     }
 
     /**
+     * 報告書の保存先を取得する
+     * 
+     * @return
+     */
+    public static String getReportPath() {
+        return PROPERTIES.getProperty("report_store_path", new File("").getAbsolutePath());
+    }
+
+    /**
+     * 報告書の保存先をセットする
+     * 
+     * @return
+     */
+    public static void setReportPath(String path) {
+        PROPERTIES.setProperty("report_store_path", path);
+    }
+
+    /**
      * アップデートチェックを取得する
      * 
      * @return アップデートチェック

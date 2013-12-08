@@ -74,7 +74,7 @@ public final class ConfigDialog extends Dialog {
         tabSystem.setText("システム");
 
         Composite compositeSystem = new Composite(tabFolder, SWT.NONE);
-        compositeSystem.setLayout(new GridLayout(2, false));
+        compositeSystem.setLayout(new GridLayout(3, false));
         tabSystem.setControl(compositeSystem);
 
         Label label = new Label(compositeSystem, SWT.NONE);
@@ -86,6 +86,7 @@ public final class ConfigDialog extends Dialog {
         gdListenport.widthHint = 90;
         listenport.setLayoutData(gdListenport);
         listenport.setText(Integer.toString(GlobalConfig.getListenPort()));
+        new Label(compositeSystem, SWT.NONE);
 
         Label label1 = new Label(compositeSystem, SWT.NONE);
         label1.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -96,6 +97,7 @@ public final class ConfigDialog extends Dialog {
         gdWidth.widthHint = 90;
         width.setLayoutData(gdWidth);
         width.setText(Integer.toString(GlobalConfig.getWidth()));
+        new Label(compositeSystem, SWT.NONE);
 
         Label label2 = new Label(compositeSystem, SWT.NONE);
         label2.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -106,6 +108,7 @@ public final class ConfigDialog extends Dialog {
         gdHeight.widthHint = 90;
         height.setLayoutData(gdHeight);
         height.setText(Integer.toString(GlobalConfig.getHeight()));
+        new Label(compositeSystem, SWT.NONE);
 
         Label label3 = new Label(compositeSystem, SWT.NONE);
         label3.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -116,31 +119,60 @@ public final class ConfigDialog extends Dialog {
         gdSoundlevel.widthHint = 90;
         soundlevel.setLayoutData(gdSoundlevel);
         soundlevel.setText(Integer.toString((int) (GlobalConfig.getSoundLevel() * 100)));
+        new Label(compositeSystem, SWT.NONE);
 
         Label label7 = new Label(compositeSystem, SWT.NONE);
         label7.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        label7.setText("透明度");
+        label7.setText("透明度*");
 
         final Text alpha = new Text(compositeSystem, SWT.BORDER);
         GridData gdAlpha = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
         gdAlpha.widthHint = 90;
-        alpha.setLayoutData(gdSoundlevel);
+        alpha.setLayoutData(gdAlpha);
         alpha.setText(Integer.toString(GlobalConfig.getAlpha()));
+        new Label(compositeSystem, SWT.NONE);
+
+        Label label8 = new Label(compositeSystem, SWT.NONE);
+        label8.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        label8.setText("報告書の保存先");
+
+        final Text reportDir = new Text(compositeSystem, SWT.BORDER);
+        GridData gdReportDir = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+        gdReportDir.widthHint = 120;
+        reportDir.setLayoutData(gdReportDir);
+        reportDir.setText(GlobalConfig.getReportPath());
+
+        Button reportSavedirBtn = new Button(compositeSystem, SWT.NONE);
+        reportSavedirBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                DirectoryDialog dialog = new DirectoryDialog(ConfigDialog.this.shell);
+                dialog.setMessage("保存先を指定して下さい");
+                String path = dialog.open();
+                if (path != null) {
+                    reportDir.setText(path);
+                }
+            }
+        });
+        reportSavedirBtn.setText("選択...");
 
         final Button hidewindow = new Button(compositeSystem, SWT.CHECK);
         hidewindow.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
         hidewindow.setText("最小化時にタスクトレイに格納");
         hidewindow.setSelection(GlobalConfig.getHideWindow());
+        new Label(compositeSystem, SWT.NONE);
 
         final Button ontop = new Button(compositeSystem, SWT.CHECK);
         ontop.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
         ontop.setText("最前面に表示する*");
         ontop.setSelection(GlobalConfig.getOnTop() != SWT.NONE);
+        new Label(compositeSystem, SWT.NONE);
 
         final Button checkUpdate = new Button(compositeSystem, SWT.CHECK);
         checkUpdate.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
         checkUpdate.setText("起動時にアップデートチェック*");
         checkUpdate.setSelection(GlobalConfig.getCheckUpdate());
+        new Label(compositeSystem, SWT.NONE);
 
         // キャプチャ タブ
         TabItem tabCapture = new TabItem(tabFolder, SWT.NONE);
@@ -233,6 +265,7 @@ public final class ConfigDialog extends Dialog {
                 GlobalConfig.setOnTop(ontop.getSelection());
                 GlobalConfig.setSoundLevel(soundlevel.getText());
                 GlobalConfig.setAlpha(alpha.getText());
+                GlobalConfig.setReportPath(reportDir.getText());
                 GlobalConfig.setCheckUpdate(checkUpdate.getSelection());
                 // capture
                 GlobalConfig.setCapturePath(captureDir.getText());

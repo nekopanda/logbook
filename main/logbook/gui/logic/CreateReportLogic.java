@@ -7,9 +7,13 @@ package logbook.gui.logic;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,6 +44,7 @@ import logbook.dto.ShipFilterDto;
 import logbook.dto.ShipInfoDto;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -656,7 +661,14 @@ public final class CreateReportLogic {
         try {
             List<BattleResultDto> dtoList = Collections.singletonList(dto);
 
-            CreateReportLogic.writeCsvStripFirstColumn(new File("./海戦・ドロップ報告書.csv"),
+            File report = new File(FilenameUtils.concat(GlobalConfig.getReportPath(), "海戦・ドロップ報告書.csv"));
+
+            if (isLocked(report)) {
+                // ロックされている場合は代替ファイルに書き込みます
+                report = new File(FilenameUtils.concat(GlobalConfig.getReportPath(), "海戦・ドロップ報告書_alternativefile.csv"));
+            }
+
+            CreateReportLogic.writeCsvStripFirstColumn(report,
                     CreateReportLogic.getBattleResultStoreHeader(),
                     CreateReportLogic.getBattleResultStoreBody(dtoList), true);
         } catch (IOException e) {
@@ -673,7 +685,14 @@ public final class CreateReportLogic {
         try {
             List<GetShipDto> dtoList = Collections.singletonList(dto);
 
-            CreateReportLogic.writeCsvStripFirstColumn(new File("./建造報告書.csv"),
+            File report = new File(FilenameUtils.concat(GlobalConfig.getReportPath(), "建造報告書.csv"));
+
+            if (isLocked(report)) {
+                // ロックされている場合は代替ファイルに書き込みます
+                report = new File(FilenameUtils.concat(GlobalConfig.getReportPath(), "建造報告書_alternativefile.csv"));
+            }
+
+            CreateReportLogic.writeCsvStripFirstColumn(report,
                     CreateReportLogic.getCreateShipHeader(),
                     CreateReportLogic.getCreateShipBody(dtoList), true);
         } catch (IOException e) {
@@ -690,11 +709,47 @@ public final class CreateReportLogic {
         try {
             List<CreateItemDto> dtoList = Collections.singletonList(dto);
 
-            CreateReportLogic.writeCsvStripFirstColumn(new File("./開発報告書.csv"),
+            File report = new File(FilenameUtils.concat(GlobalConfig.getReportPath(), "開発報告書.csv"));
+
+            if (isLocked(report)) {
+                // ロックされている場合は代替ファイルに書き込みます
+                report = new File(FilenameUtils.concat(GlobalConfig.getReportPath(), "開発報告書_alternativefile.csv"));
+            }
+
+            CreateReportLogic.writeCsvStripFirstColumn(report,
                     CreateReportLogic.getCreateItemHeader(),
                     CreateReportLogic.getCreateItemBody(dtoList), true);
         } catch (IOException e) {
             LOG.warn("報告書の保存に失敗しました", e);
+        }
+    }
+
+    /**
+     * ファイルがロックされているかを確認します
+     * 
+     * @param file ファイル
+     * @return
+     * @throws IOException
+     */
+    private static boolean isLocked(File file) throws IOException {
+        if (!file.isFile()) {
+            return false;
+        }
+        try {
+            RandomAccessFile raf = new RandomAccessFile(file, "rw");
+            try {
+                FileChannel channel = raf.getChannel();
+                FileLock lock = channel.tryLock();
+                if (lock == null) {
+                    return true;
+                }
+                lock.release();
+                return false;
+            } finally {
+                raf.close();
+            }
+        } catch (FileNotFoundException e) {
+            return true;
         }
     }
 }
