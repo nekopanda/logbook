@@ -155,7 +155,7 @@ public final class ShipDto extends AbstractDto {
         this.bullmax = shipinfo.getMaxBull();
         this.fuelmax = shipinfo.getMaxFuel();
 
-        this.exp = object.getJsonNumber("api_exp").longValue();
+        this.exp = object.getJsonArray("api_exp").getJsonNumber(0).longValue();
         this.nowhp = object.getJsonNumber("api_nowhp").longValue();
         this.maxhp = object.getJsonNumber("api_maxhp").longValue();
         this.slot = new ArrayList<Long>();
