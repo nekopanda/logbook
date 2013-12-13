@@ -208,10 +208,14 @@ public final class GlobalContext {
 
     /**
      * 情報を更新します
+     * 
+     * @return 更新する情報があった場合trueを返します
      */
-    public static void updateContext() {
+    public static boolean updateContext() {
+        boolean update = false;
         Data data;
         while ((data = DataQueue.poll()) != null) {
+            update = true;
             // json保存設定
             if (GlobalConfig.getStoreJson()) {
                 doStoreJson(data);
@@ -276,6 +280,7 @@ public final class GlobalContext {
                 break;
             }
         }
+        return update;
     }
 
     /**

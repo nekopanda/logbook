@@ -68,15 +68,17 @@ public final class AsyncExecApplicationMain extends Thread {
 
         try {
             while (true) {
-                GlobalContext.updateContext();
-                // 保有アイテム数を更新する
-                Display.getDefault().asyncExec(new UpdateItemCountTask(this.main));
-                // 保有艦娘数を更新する
-                Display.getDefault().asyncExec(new UpdateShipCountTask(this.main));
+                boolean update = GlobalContext.updateContext();
+                if (update) {
+                    // 保有アイテム数を更新する
+                    Display.getDefault().asyncExec(new UpdateItemCountTask(this.main));
+                    // 保有艦娘数を更新する
+                    Display.getDefault().asyncExec(new UpdateShipCountTask(this.main));
+                    // 艦隊タブを更新する
+                    Display.getDefault().asyncExec(new UpdateFleetTabTask(this.main));
+                }
                 // 遠征と入渠を更新する
                 Display.getDefault().asyncExec(new UpdateDeckNdockTask(this.main));
-                // 艦隊タブを更新する
-                Display.getDefault().asyncExec(new UpdateFleetTabTask(this.main));
 
                 Thread.sleep(ONE_SECONDS_FORMILIS);
             }

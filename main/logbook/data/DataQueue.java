@@ -21,6 +21,12 @@ public class DataQueue {
         DATA_QUEUE.add(data);
     }
 
+    /**
+     * キューからデータを取り出します
+     * 
+     * @see java.util.Queue#poll()
+     * @return データ
+     */
     public static Data poll() {
         return DATA_QUEUE.poll();
     }
