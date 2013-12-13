@@ -15,6 +15,7 @@ import javax.json.JsonObject;
 import javax.json.JsonValue;
 
 import logbook.data.context.GlobalContext;
+import logbook.internal.ExpTable;
 import logbook.internal.Ship;
 
 /**
@@ -469,5 +470,17 @@ public final class ShipDto extends AbstractDto {
      */
     public ShipInfoDto getShipInfo() {
         return this.shipInfo;
+    }
+
+    /**
+     * @return 次のレベルまでの経験値
+     */
+    public String getNext() {
+        String next = "";
+        Long nextLvExp = ExpTable.get().get((int) this.lv + 1);
+        if (nextLvExp != null) {
+            next = Long.toString(nextLvExp - this.exp);
+        }
+        return next;
     }
 }

@@ -607,6 +607,8 @@ public final class AsyncExecApplicationMain extends Thread {
                 }
 
                 this.nameLabels[i].setText(name);
+                this.nameLabels[i].setToolTipText("燃:" + ship.getFuel() + "/" + ship.getFuelMax() + " 弾:"
+                        + ship.getBull() + "/" + ship.getBullMax() + " Next:" + ship.getNext() + "exp");
                 this.nowhpLabels[i].setText(Long.toString(nowhp));
                 this.maxhpLabels[i].setText("/" + maxhp);
                 this.condLabels[i].setText(ship.getCond() + " cond.");

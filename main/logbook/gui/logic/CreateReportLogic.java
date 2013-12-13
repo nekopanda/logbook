@@ -360,8 +360,8 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getShipListHeader() {
-        return new String[] { "", "艦娘ID", "艦隊", "疲労", "名前", "艦種", "Lv", "経験値", "HP", "装備1", "装備2", "装備3", "装備4",
-                "火力", "雷装", "対空", "装甲", "回避", "対潜", "索敵", "運" };
+        return new String[] { "", "艦娘ID", "艦隊", "疲労", "名前", "艦種", "Lv", "Next", "経験値", "HP", "装備1", "装備2", "装備3",
+                "装備4", "火力", "雷装", "対空", "装甲", "回避", "対潜", "索敵", "運" };
     }
 
     /**
@@ -394,6 +394,7 @@ public final class CreateReportLogic {
                         ship.getName(),
                         ship.getType(),
                         ship.getLv(),
+                        ship.getNext(),
                         ship.getExp(),
                         ship.getMaxhp(),
                         ship.getSlot().get(0),
@@ -438,10 +439,28 @@ public final class CreateReportLogic {
                     }
                 }
                 body.add(new Object[] {
-                        count, ship.getId(), ship.getFleetid(), ship.getCond(), ship.getName(), ship.getType(),
-                        ship.getLv(), ship.getExp(), ship.getMaxhp(), ship.getSlot().get(0), ship.getSlot().get(1),
-                        ship.getSlot().get(2), ship.getSlot().get(3), karyoku, raisou, taiku,
-                        ship.getSoukouMax() - ship.getSoukou(), kaihi, taisen, sakuteki, lucky
+                        count,
+                        ship.getId(),
+                        ship.getFleetid(),
+                        ship.getCond(),
+                        ship.getName(),
+                        ship.getType(),
+                        ship.getLv(),
+                        ship.getNext(),
+                        ship.getExp(),
+                        ship.getMaxhp(),
+                        ship.getSlot().get(0),
+                        ship.getSlot().get(1),
+                        ship.getSlot().get(2),
+                        ship.getSlot().get(3),
+                        karyoku,
+                        raisou,
+                        taiku,
+                        ship.getSoukouMax() - ship.getSoukou(),
+                        kaihi,
+                        taisen,
+                        sakuteki,
+                        lucky
                 });
             }
         }
