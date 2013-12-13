@@ -307,6 +307,18 @@ public final class ApplicationMain {
 
         this.trayItem = this.addTrayItem(display);
 
+        // コマンドボタン
+        this.commandComposite = new Composite(this.shell, SWT.NONE);
+        this.commandComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
+        this.commandComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        this.itemList = new Button(this.commandComposite, SWT.PUSH);
+        this.itemList.setText("所有装備(0/0)");
+        this.itemList.addSelectionListener(new ItemListReportAdapter(this.shell));
+        this.shipList = new Button(this.commandComposite, SWT.PUSH);
+        this.shipList.setText("所有艦娘(0/0)");
+        this.shipList.addSelectionListener(new ShipListReportAdapter(this.shell));
+
         // タブフォルダー
         this.tabFolder = new CTabFolder(this.shell, SWT.NONE);
         this.tabFolder.setSelectionBackground(Display.getCurrent().getSystemColor(
@@ -334,18 +346,6 @@ public final class ApplicationMain {
         this.mainComposite.setLayout(glMain);
         this.mainComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         mainItem.setControl(this.mainComposite);
-
-        // コマンドボタン
-        this.commandComposite = new Composite(this.mainComposite, SWT.NONE);
-        this.commandComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
-        this.commandComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        this.itemList = new Button(this.commandComposite, SWT.PUSH);
-        this.itemList.setText("所有装備(0/0)");
-        this.itemList.addSelectionListener(new ItemListReportAdapter(this.shell));
-        this.shipList = new Button(this.commandComposite, SWT.PUSH);
-        this.shipList.setText("所有艦娘(0/0)");
-        this.shipList.addSelectionListener(new ShipListReportAdapter(this.shell));
 
         // 遠征
         this.deckGroup = new Group(this.mainComposite, SWT.NONE);

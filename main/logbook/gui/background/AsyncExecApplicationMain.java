@@ -350,6 +350,13 @@ public final class AsyncExecApplicationMain extends Thread {
         @Override
         public void run() {
             // タブを更新する
+            CTabItem maintab = this.main.getTabFolder().getItem(0);
+            maintab.setToolTipText(
+                    "装備:" + GlobalContext.getItemMap().size() + "/"
+                            + GlobalContext.maxSlotitem()
+                            + " 艦娘:" + GlobalContext.getShipMap().size() + "/"
+                            + GlobalContext.maxChara());
+
             for (int i = 0; i < 4; i++) {
                 DockDto dock = GlobalContext.getDock(Integer.toString(i + 1));
                 if (dock != null) {
@@ -414,8 +421,14 @@ public final class AsyncExecApplicationMain extends Thread {
          */
         public FleetComposite(CTabFolder parent) {
             super(parent, SWT.NONE);
-            this.setLayout(new GridLayout(1, false));
             this.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            GridLayout glParent = new GridLayout(1, false);
+            glParent.horizontalSpacing = 0;
+            glParent.marginTop = 0;
+            glParent.marginHeight = 0;
+            glParent.marginBottom = 0;
+            glParent.verticalSpacing = 0;
+            this.setLayout(glParent);
 
             FontData normalfd = parent.getShell().getFont().getFontData()[0];
             FontData largefd1 = new FontData(normalfd.getName(), normalfd.getHeight() + 2, normalfd.getStyle());
@@ -427,11 +440,11 @@ public final class AsyncExecApplicationMain extends Thread {
             this.fleetGroup = new Composite(this, SWT.NONE);
             this.fleetGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             GridLayout glShipGroup = new GridLayout(2, false);
-            glShipGroup.horizontalSpacing = 1;
+            glShipGroup.horizontalSpacing = 0;
             glShipGroup.marginTop = 0;
             glShipGroup.marginHeight = 0;
             glShipGroup.marginBottom = 0;
-            glShipGroup.verticalSpacing = 1;
+            glShipGroup.verticalSpacing = 0;
             this.fleetGroup.setLayout(glShipGroup);
 
             for (int i = 0; i < MAXCHARA; i++) {
@@ -449,7 +462,7 @@ public final class AsyncExecApplicationMain extends Thread {
                 glHp.marginTop = 0;
                 glHp.marginHeight = 0;
                 glHp.marginBottom = 0;
-                glHp.verticalSpacing = 1;
+                glHp.verticalSpacing = 0;
                 hpComposite.setLayout(glHp);
                 hpComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 
@@ -468,7 +481,7 @@ public final class AsyncExecApplicationMain extends Thread {
                 glState.marginTop = 0;
                 glState.marginHeight = 0;
                 glState.marginBottom = 0;
-                glState.verticalSpacing = 1;
+                glState.verticalSpacing = 0;
                 stateComposite.setLayout(glState);
                 stateComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
