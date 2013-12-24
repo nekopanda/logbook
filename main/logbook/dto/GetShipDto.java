@@ -156,6 +156,17 @@ public final class GetShipDto extends AbstractDto {
     }
 
     /**
+     * @return 建造種類
+     */
+    public String getBuildType() {
+        String type = this.resources.getType();
+        if ("1".equals(type)) {
+            return "大型艦建造";
+        }
+        return "通常艦建造";
+    }
+
+    /**
      * @return 燃料
      */
     public String getFuel() {
@@ -181,6 +192,20 @@ public final class GetShipDto extends AbstractDto {
      */
     public String getBauxite() {
         return this.resources.getBauxite();
+    }
+
+    /**
+     * @return 開発資材
+     */
+    public String getResearchMaterials() {
+        return this.resources.getResearchMaterials();
+    }
+
+    /**
+     * @return 空きドック
+     */
+    public String getFreeDock() {
+        return this.resources.getFreeDock();
     }
 
     /**

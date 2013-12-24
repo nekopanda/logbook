@@ -98,6 +98,9 @@ public final class GlobalContext {
     /** 最大保有可能 装備数 */
     private static int maxSlotitem;
 
+    /** 最後に建造を行った建造ドック */
+    private static String lastBuildKdock;
+
     /** 戦闘詳細 */
     private static Queue<BattleDto> battleList = new ArrayBlockingQueue<BattleDto>(1);
 
@@ -249,6 +252,10 @@ public final class GlobalContext {
             case CREATESHIP:
                 doCreateship(data);
                 break;
+            // 建造ドック
+            case KDOCK:
+                doKdock(data);
+                break;
             // 建造(入手)
             case GETSHIP:
                 doGetship(data);
@@ -347,18 +354,54 @@ public final class GlobalContext {
      */
     private static void doCreateship(Data data) {
         try {
+            String kdockid = data.getField("api_kdock_id");
             // 投入資源
             ResourceDto resource = new ResourceDto(
-                    data.getField("api_item1"), data.getField("api_item2"), data.getField("api_item3"),
-                    data.getField("api_item4"), secretary, hqLevel
+                    data.getField("api_large_flag"),
+                    data.getField("api_item1"),
+                    data.getField("api_item2"),
+                    data.getField("api_item3"),
+                    data.getField("api_item4"),
+                    data.getField("api_item5"),
+                    secretary, hqLevel
                     );
-
-            getShipResource.put(data.getField("api_kdock_id"), resource);
-            GlobalConfig.setCreateShipResource(data.getField("api_kdock_id"), resource);
+            lastBuildKdock = kdockid;
+            getShipResource.put(kdockid, resource);
+            GlobalConfig.setCreateShipResource(kdockid, resource);
 
             addConsole("建造(投入資源)情報を更新しました");
         } catch (Exception e) {
             LOG.warn("建造(投入資源)情報を更新しますに失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 建造を更新します
+     * @param data
+     */
+    private static void doKdock(Data data) {
+        try {
+            // 建造ドックの空きをカウントします
+            if (lastBuildKdock != null) {
+                ResourceDto resource = getShipResource.get(lastBuildKdock);
+                if (resource != null) {
+                    int freecount = 0;
+                    JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
+                    for (int i = 0; i < apidata.size(); i++) {
+                        int state = ((JsonObject) apidata.get(i)).getJsonNumber("api_state").intValue();
+                        if (state == 0) {
+                            freecount++;
+                        }
+                    }
+                    // 建造ドックの空きをセットします
+                    resource.setFreeDock(Integer.toString(freecount));
+                    GlobalConfig.setCreateShipResource(lastBuildKdock, resource);
+                }
+            }
+            addConsole("建造を更新しました");
+        } catch (Exception e) {
+            LOG.warn("建造を更新しますに失敗しました", e);
             LOG.warn(data);
         }
     }

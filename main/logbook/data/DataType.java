@@ -19,7 +19,7 @@ public enum DataType {
     DECK_PORT("/kcsapi/api_get_member/deck_port"),
     /** 基本 */
     BASIC("/kcsapi/api_get_member/basic"),
-    /** 入渠 */
+    /** 入渠ドック */
     NDOCK("/kcsapi/api_get_member/ndock"),
     /** アイテム一覧 */
     SLOTITEM_MEMBER("/kcsapi/api_get_member/slotitem"),
@@ -39,6 +39,8 @@ public enum DataType {
     CREATEITEM("/kcsapi/api_req_kousyou/createitem"),
     /** 建造 */
     CREATESHIP("/kcsapi/api_req_kousyou/createship"),
+    /** 建造ドック */
+    KDOCK("/kcsapi/api_get_member/kdock"),
     /** 建造(入手) */
     GETSHIP("/kcsapi/api_req_kousyou/getship"),
     /** アイテム一覧 */

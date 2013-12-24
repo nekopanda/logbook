@@ -361,19 +361,32 @@ public final class GlobalConfig {
             if (resource != null) {
                 PROPERTIES.remove(key);
                 String[] values = resource.split(",");
-                if ((values.length != 6) || !StringUtils.isNumeric(values[4]) || !StringUtils.isNumeric(values[5])) {
+                if ((values.length != 9) || !StringUtils.isNumeric(values[4]) || !StringUtils.isNumeric(values[5])) {
                     return null;
                 }
 
-                String fuel = values[0];
-                String ammo = values[1];
-                String metal = values[2];
-                String bauxite = values[3];
-                ShipDto ship = ships.get(Long.parseLong(values[4]));
-                int hqLevel = Integer.parseInt(values[5]);
+                String type = values[0];
+                String fuel = values[1];
+                String ammo = values[2];
+                String metal = values[3];
+                String bauxite = values[4];
+                String researchMaterials = values[5];
+                ShipDto ship = ships.get(Long.parseLong(values[6]));
+                int hqLevel = Integer.parseInt(values[7]);
+                String freeDock = values[8];
 
                 if (ship != null) {
-                    return new ResourceDto(fuel, ammo, metal, bauxite, ship, hqLevel);
+                    ResourceDto resourcedto = new ResourceDto(
+                            type,
+                            fuel,
+                            ammo,
+                            metal,
+                            bauxite,
+                            researchMaterials,
+                            ship,
+                            hqLevel);
+                    resourcedto.setFreeDock(freeDock);
+                    return resourcedto;
                 }
             }
         }
@@ -389,15 +402,19 @@ public final class GlobalConfig {
     public static void setCreateShipResource(String dock, ResourceDto resource) {
         String key = "createship_" + dock;
 
+        String type = resource.getType();
         String fuel = resource.getFuel();
         String ammo = resource.getAmmo();
         String metal = resource.getMetal();
         String bauxite = resource.getBauxite();
+        String researchMaterials = resource.getResearchMaterials();
         ShipDto ship = resource.getSecretary();
         String hqLevel = Integer.toString(resource.getHqLevel());
+        String freeDock = resource.getFreeDock();
 
         if (ship != null) {
-            String value = fuel + "," + ammo + "," + metal + "," + bauxite + "," + ship.getId() + "," + hqLevel;
+            String value = type + "," + fuel + "," + ammo + "," + metal + "," + bauxite + "," + researchMaterials + ","
+                    + ship.getId() + "," + hqLevel + "," + freeDock;
             PROPERTIES.setProperty(key, value);
         }
     }

@@ -252,7 +252,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getCreateShipHeader() {
-        return new String[] { "", "日付", "名前", "艦種", "燃料", "弾薬", "鋼材", "ボーキ", "秘書艦", "司令部Lv" };
+        return new String[] { "", "日付", "種類", "名前", "艦種", "燃料", "弾薬", "鋼材", "ボーキ", "開発資材", "空きドック", "秘書艦", "司令部Lv" };
     }
 
     /**
@@ -264,9 +264,9 @@ public final class CreateReportLogic {
         List<Object[]> body = new ArrayList<Object[]>();
         for (int i = 0; i < ships.size(); i++) {
             GetShipDto ship = ships.get(i);
-            body.add(new Object[] { Integer.toString(i + 1), FORMAT.format(ship.getGetDate()), ship.getName(),
-                    ship.getType(), ship.getFuel(), ship.getAmmo(), ship.getMetal(), ship.getBauxite(),
-                    ship.getSecretary(), ship.getHqLevel() });
+            body.add(new Object[] { Integer.toString(i + 1), FORMAT.format(ship.getGetDate()), ship.getBuildType(),
+                    ship.getName(), ship.getType(), ship.getFuel(), ship.getAmmo(), ship.getMetal(), ship.getBauxite(),
+                    ship.getResearchMaterials(), ship.getFreeDock(), ship.getSecretary(), ship.getHqLevel() });
         }
         return toListStringArray(body);
     }
