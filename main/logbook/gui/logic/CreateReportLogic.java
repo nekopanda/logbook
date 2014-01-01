@@ -38,6 +38,7 @@ import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
+import logbook.dto.MissionResultDto;
 import logbook.dto.NdockDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipFilterDto;
@@ -463,6 +464,41 @@ public final class CreateReportLogic {
                         lucky
                 });
             }
+        }
+        return toListStringArray(body);
+    }
+
+    /**
+     * 遠征結果のヘッダー
+     * 
+     * @return ヘッダー
+     */
+    public static String[] getCreateMissionResultHeader() {
+        return new String[] { "", "日付", "結果", "遠征", "燃料", "弾薬", "鋼材", "ボーキ" };
+    }
+
+    /**
+     * 遠征結果一覧の内容
+     * 
+     * @return 遠征結果
+     */
+    public static List<String[]> getMissionResultBody() {
+        List<MissionResultDto> resultlist = GlobalContext.getMissionResultList();
+        List<Object[]> body = new ArrayList<Object[]>();
+
+        for (int i = 0; i < resultlist.size(); i++) {
+            MissionResultDto result = resultlist.get(i);
+
+            body.add(new Object[] {
+                    Integer.toString(i + 1),
+                    FORMAT.format(result.getDate()),
+                    result.getClearResult(),
+                    result.getQuestName(),
+                    result.getFuel(),
+                    result.getAmmo(),
+                    result.getMetal(),
+                    result.getBauxite()
+            });
         }
         return toListStringArray(body);
     }

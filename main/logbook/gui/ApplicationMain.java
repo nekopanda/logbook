@@ -20,6 +20,7 @@ import logbook.gui.listener.DropReportAdapter;
 import logbook.gui.listener.HelpEventListener;
 import logbook.gui.listener.ItemListReportAdapter;
 import logbook.gui.listener.MainShellAdapter;
+import logbook.gui.listener.MissionResultReportAdapter;
 import logbook.gui.listener.ShipListReportAdapter;
 import logbook.gui.listener.TraySelectionListener;
 import logbook.gui.logic.LayoutLogic;
@@ -239,6 +240,11 @@ public final class ApplicationMain {
         cmdcreateitem.setText("開発報告書(&E)\tCtrl+E");
         cmdcreateitem.setAccelerator(SWT.CTRL + 'E');
         cmdcreateitem.addSelectionListener(new CreateItemReportAdapter(this.shell));
+        // コマンド-遠征報告書
+        MenuItem cmdmissionresult = new MenuItem(cmdmenu, SWT.NONE);
+        cmdmissionresult.setText("遠征報告書(&E)\tCtrl+M");
+        cmdmissionresult.setAccelerator(SWT.CTRL + 'M');
+        cmdmissionresult.addSelectionListener(new MissionResultReportAdapter(this.shell));
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // コマンド-所有装備一覧

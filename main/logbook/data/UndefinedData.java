@@ -23,8 +23,6 @@ import javax.json.JsonReader;
  */
 public class UndefinedData implements Data {
 
-    private static final long SKIP_BYTES = "svdata=".length();
-
     private final String url;
 
     private final byte[] request;
@@ -89,7 +87,9 @@ public class UndefinedData implements Data {
                         // レスポンスのJSONを復号します
                         InputStream stream = new ByteArrayInputStream(this.response);
                         // レスポンスボディのJSONはsvdata=から始まるので除去します
-                        stream.skip(SKIP_BYTES);
+                        int read;
+                        while (((read = stream.read()) != -1) && (read != '=')) {
+                        }
 
                         JsonReader jsonreader = Json.createReader(stream);
                         JsonObject json = jsonreader.readObject();

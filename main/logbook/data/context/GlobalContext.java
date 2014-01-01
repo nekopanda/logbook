@@ -37,6 +37,7 @@ import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
+import logbook.dto.MissionResultDto;
 import logbook.dto.NdockDto;
 import logbook.dto.ResourceDto;
 import logbook.dto.ShipDto;
@@ -88,6 +89,9 @@ public final class GlobalContext {
 
     /** 海戦・ドロップ */
     private static List<BattleResultDto> battleResultList = new ArrayList<BattleResultDto>();
+
+    /** 遠征結果 */
+    private static List<MissionResultDto> missionResultList = new ArrayList<MissionResultDto>();
 
     /** 司令部Lv */
     private static int hqLevel;
@@ -182,6 +186,13 @@ public final class GlobalContext {
     }
 
     /**
+     * @return 遠征結果
+     */
+    public static List<MissionResultDto> getMissionResultList() {
+        return Collections.unmodifiableList(missionResultList);
+    }
+
+    /**
      * @return 遠征リスト
      */
     public static DeckMissionDto[] getDeckMissions() {
@@ -243,6 +254,10 @@ public final class GlobalContext {
             // 遠征
             case DECK_PORT:
                 doDeckPort(data);
+                break;
+            // 遠征(帰還)
+            case MISSION_RESULT:
+                doMissionResult(data);
                 break;
             // 入渠
             case NDOCK:
@@ -705,6 +720,38 @@ public final class GlobalContext {
             addConsole("遠征情報を更新しました");
         } catch (Exception e) {
             LOG.warn("遠征を更新しますに失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 遠征(帰還)を更新します
+     * 
+     * @param data
+     */
+    private static void doMissionResult(Data data) {
+        try {
+            JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+
+            MissionResultDto result = new MissionResultDto();
+
+            int clearResult = apidata.getJsonNumber("api_clear_result").intValue();
+            result.setClearResult(clearResult);
+            result.setQuestName(apidata.getString("api_quest_name"));
+
+            if (clearResult != 0) {
+                JsonArray material = apidata.getJsonArray("api_get_material");
+                result.setFuel(material.getJsonNumber(0).toString());
+                result.setAmmo(material.getJsonNumber(1).toString());
+                result.setMetal(material.getJsonNumber(2).toString());
+                result.setBauxite(material.getJsonNumber(3).toString());
+            }
+
+            missionResultList.add(result);
+
+            addConsole("遠征(帰還)情報を更新しました");
+        } catch (Exception e) {
+            LOG.warn("遠征(帰還)を更新しますに失敗しました", e);
             LOG.warn(data);
         }
     }

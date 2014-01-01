@@ -17,6 +17,8 @@ public enum DataType {
     SHIP3("/kcsapi/api_get_member/ship3"),
     /** 遠征 */
     DECK_PORT("/kcsapi/api_get_member/deck_port"),
+    /** 遠征(帰還) */
+    MISSION_RESULT("/kcsapi/api_req_mission/result"),
     /** 基本 */
     BASIC("/kcsapi/api_get_member/basic"),
     /** 入渠ドック */
