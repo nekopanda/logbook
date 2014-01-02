@@ -80,6 +80,13 @@ public final class ItemDto extends AbstractDto {
     }
 
     /**
+     * @return type
+     */
+    public String getTypeId() {
+        return Long.toString(this.type4);
+    }
+
+    /**
      * @return atap
      */
     public long getAtap() {
