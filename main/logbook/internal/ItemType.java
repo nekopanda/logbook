@@ -25,14 +25,17 @@ public class ItemType {
             this.put("9", "艦上偵察機");
             this.put("10", "水上偵察機");
             this.put("11", "電波探信儀");
-            this.put("12", "対空砲弾");
+            this.put("12", "対空強化弾");
             this.put("13", "徹甲弾");
             this.put("14", "ダメコン");
-            this.put("15", "対空機関砲");
+            this.put("15", "機銃");
             this.put("16", "高角砲");
             this.put("17", "爆雷投射機");
-            this.put("18", "水中探信儀");
-            this.put("19", "機関");
+            this.put("18", "ソナー");
+            this.put("19", "機関部強化");
+            this.put("20", "上陸用舟艇");
+            this.put("21", "オートジャイロ");
+            this.put("22", "指揮連絡機");
         }
     };
 
