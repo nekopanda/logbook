@@ -117,7 +117,7 @@ public final class CreateReportLogic {
             }
 
             // 疲労
-            int cond = Integer.parseInt(text[3]);
+            int cond = Integer.parseInt(text[5]);
             if (cond <= GlobalConfig.COND_RED) {
                 item.setForeground(SWTResourceManager.getColor(GlobalConfig.COND_RED_COLOR));
             } else if (cond <= GlobalConfig.COND_ORANGE) {
@@ -361,7 +361,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getShipListHeader() {
-        return new String[] { "", "艦娘ID", "艦隊", "疲労", "名前", "艦種", "Lv", "Next", "経験値", "HP", "装備1", "装備2", "装備3",
+        return new String[] { "", "ID", "艦隊", "名前", "艦種", "疲労", "回復", "Lv", "Next", "経験値", "HP", "装備1", "装備2", "装備3",
                 "装備4", "火力", "雷装", "対空", "装甲", "回避", "対潜", "索敵", "運" };
     }
 
@@ -391,9 +391,10 @@ public final class CreateReportLogic {
                         count,
                         ship.getId(),
                         ship.getFleetid(),
-                        ship.getCond(),
                         ship.getName(),
                         ship.getType(),
+                        ship.getCond(),
+                        ship.getCondClearDate(),
                         ship.getLv(),
                         ship.getNext(),
                         ship.getExp(),
@@ -443,9 +444,10 @@ public final class CreateReportLogic {
                         count,
                         ship.getId(),
                         ship.getFleetid(),
-                        ship.getCond(),
                         ship.getName(),
                         ship.getType(),
+                        ship.getCond(),
+                        ship.getCondClearDate(),
                         ship.getLv(),
                         ship.getNext(),
                         ship.getExp(),
@@ -661,6 +663,16 @@ public final class CreateReportLogic {
         }
         if (!filter.carrierSubmarine) {
             if ("潜水空母".equals(ship.getType())) {
+                return false;
+            }
+        }
+        if (!filter.landingship) {
+            if ("揚陸艦".equals(ship.getType())) {
+                return false;
+            }
+        }
+        if (!filter.armoredcarrier) {
+            if ("装甲空母".equals(ship.getType())) {
                 return false;
             }
         }

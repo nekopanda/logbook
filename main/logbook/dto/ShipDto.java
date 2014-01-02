@@ -5,7 +5,9 @@
  */
 package logbook.dto;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +25,12 @@ import logbook.internal.Ship;
  *
  */
 public final class ShipDto extends AbstractDto {
+
+    /** 日付フォーマット */
+    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("HH:mm");
+
+    /** 日時 */
+    private final Calendar time = Calendar.getInstance();
 
     /** 艦娘個人を識別するID */
     private final long id;
@@ -482,5 +490,17 @@ public final class ShipDto extends AbstractDto {
             next = Long.toString(nextLvExp - this.exp);
         }
         return next;
+    }
+
+    /**
+     * @return 疲労が抜けるまでの時間
+     */
+    public String getCondClearDate() {
+        if (this.cond < 49) {
+            int clearmin = Math.max(49 - (int) this.cond, 3);
+            this.time.add(Calendar.MINUTE, clearmin);
+            return FORMAT.format(this.time.getTime());
+        }
+        return "";
     }
 }

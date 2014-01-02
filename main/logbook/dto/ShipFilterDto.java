@@ -43,6 +43,10 @@ public final class ShipFilterDto extends AbstractDto {
     public boolean submarine;
     /** 艦種.潜水空母 */
     public boolean carrierSubmarine;
+    /** 艦種.揚陸艦 */
+    public boolean landingship;
+    /** 艦種.装甲空母 */
+    public boolean armoredcarrier;
 
     /** 装備 */
     public String itemname;

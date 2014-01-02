@@ -73,6 +73,10 @@ public final class ShipFilterDialog extends Dialog {
     private Button submarine;
     /** 艦種.潜水空母 */
     private Button carrierSubmarine;
+    /** 艦種.揚陸艦 */
+    private Button landingship;
+    /** 艦種.装甲空母 */
+    private Button armoredcarrier;
     /** 全て選択 */
     private Button selectall;
 
@@ -211,8 +215,15 @@ public final class ShipFilterDialog extends Dialog {
         this.carrierSubmarine.setSelection(true);
         this.carrierSubmarine.addSelectionListener(new ApplyFilterSelectionAdapter());
 
-        new Label(shiptypegroup, SWT.NONE);
-        new Label(shiptypegroup, SWT.NONE);
+        this.landingship = new Button(shiptypegroup, SWT.CHECK);
+        this.landingship.setText("揚陸艦");
+        this.landingship.setSelection(true);
+        this.landingship.addSelectionListener(new ApplyFilterSelectionAdapter());
+
+        this.armoredcarrier = new Button(shiptypegroup, SWT.CHECK);
+        this.armoredcarrier.setText("装甲空母");
+        this.armoredcarrier.setSelection(true);
+        this.armoredcarrier.addSelectionListener(new ApplyFilterSelectionAdapter());
 
         this.selectall = new Button(shiptypegroup, SWT.CHECK);
         this.selectall.setText("全て選択");
@@ -298,6 +309,10 @@ public final class ShipFilterDialog extends Dialog {
             this.submarine.setSelection(this.filter.submarine);
             // 艦種.潜水空母
             this.carrierSubmarine.setSelection(this.filter.carrierSubmarine);
+            // 艦種.揚陸艦
+            this.landingship.setSelection(this.filter.landingship);
+            // 艦種.装甲空母
+            this.armoredcarrier.setSelection(this.filter.armoredcarrier);
 
             if (!StringUtils.isEmpty(this.filter.itemname)) {
                 // 装備
@@ -346,6 +361,8 @@ public final class ShipFilterDialog extends Dialog {
         filter.flyingDeckBattleship = this.flyingDeckBattleship.getSelection();
         filter.submarine = this.submarine.getSelection();
         filter.carrierSubmarine = this.carrierSubmarine.getSelection();
+        filter.landingship = this.landingship.getSelection();
+        filter.armoredcarrier = this.armoredcarrier.getSelection();
         if (ShipFilterDialog.this.item.getSelection()) {
             if (ShipFilterDialog.this.itemcombo.getSelectionIndex() >= 0) {
                 filter.itemname = this.itemcombo.getItem(ShipFilterDialog.this.itemcombo
@@ -390,6 +407,8 @@ public final class ShipFilterDialog extends Dialog {
             ShipFilterDialog.this.flyingDeckBattleship.setSelection(select);
             ShipFilterDialog.this.submarine.setSelection(select);
             ShipFilterDialog.this.carrierSubmarine.setSelection(select);
+            ShipFilterDialog.this.landingship.setSelection(select);
+            ShipFilterDialog.this.armoredcarrier.setSelection(select);
 
             ShipFilterDialog.this.shipTable.updateFilter(ShipFilterDialog.this.createFilter());
         }
