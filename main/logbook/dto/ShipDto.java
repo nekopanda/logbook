@@ -388,6 +388,7 @@ public final class ShipDto extends AbstractDto {
                 case "7":
                 case "8":
                 case "9":
+                case "10":
                 case "21":
                 case "22":
                     seiku += (int) Math.floor(item.getTyku() * Math.sqrt(this.onslot.get(i)));
