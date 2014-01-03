@@ -87,6 +87,11 @@ public abstract class AbstractTableDialog extends Dialog {
         // メニューバー
         this.menubar = new Menu(this.shell, SWT.BAR);
         this.shell.setMenuBar(this.menubar);
+        // テーブル
+        this.table = new Table(this.shell, SWT.FULL_SELECTION | SWT.MULTI);
+        this.table.addKeyListener(new TableKeyShortcutAdapter(this.header, this.table));
+        this.table.setLinesVisible(true);
+        this.table.setHeaderVisible(true);
         // メニューバーのメニュー
         MenuItem fileroot = new MenuItem(this.menubar, SWT.CASCADE);
         fileroot.setText("ファイル");
@@ -108,11 +113,6 @@ public abstract class AbstractTableDialog extends Dialog {
         reload.setText("再読み込み(&R)\tF5");
         reload.setAccelerator(SWT.F5);
         reload.addSelectionListener(new TableReloadAdapter());
-        // テーブル
-        this.table = new Table(this.shell, SWT.FULL_SELECTION | SWT.MULTI);
-        this.table.addKeyListener(new TableKeyShortcutAdapter(this.header, this.table));
-        this.table.setLinesVisible(true);
-        this.table.setHeaderVisible(true);
         // テーブル右クリックメニュー
         this.tablemenu = new Menu(this.table);
         this.table.setMenu(this.tablemenu);
