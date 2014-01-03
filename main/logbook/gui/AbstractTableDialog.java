@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 /**
- * @author noname
+ * テーブルで構成されるダイアログの基底クラス
  *
  */
 public abstract class AbstractTableDialog extends Dialog {
@@ -79,31 +79,15 @@ public abstract class AbstractTableDialog extends Dialog {
      * Open the dialog.
      */
     public final void open() {
-
+        // シェルを作成
         this.shell = new Shell(this.getParent(), this.getStyle());
         this.shell.setSize(this.getSize());
         this.shell.setText(this.getTitle());
         this.shell.setLayout(new FillLayout());
-
+        // メニューバー
         this.menubar = new Menu(this.shell, SWT.BAR);
         this.shell.setMenuBar(this.menubar);
-
-        this.table = new Table(this.shell, SWT.FULL_SELECTION | SWT.MULTI);
-        this.table.addKeyListener(new TableKeyShortcutAdapter(this.header, this.table));
-        this.table.setLinesVisible(true);
-        this.table.setHeaderVisible(true);
-
-        this.tablemenu = new Menu(this.table);
-        this.table.setMenu(this.tablemenu);
-        MenuItem sendclipbord = new MenuItem(this.tablemenu, SWT.NONE);
-        sendclipbord.addSelectionListener(new TableToClipboardAdapter(this.header, this.table));
-        sendclipbord.setText("クリップボードにコピー(&C)");
-        MenuItem reloadtable = new MenuItem(this.tablemenu, SWT.NONE);
-        reloadtable.setText("再読み込み(&R)");
-        reloadtable.addSelectionListener(new TableReloadAdapter());
-
-        this.setTableHeader();
-
+        // メニューバーのメニュー
         MenuItem fileroot = new MenuItem(this.menubar, SWT.CASCADE);
         fileroot.setText("ファイル");
         this.filemenu = new Menu(fileroot);
@@ -121,12 +105,29 @@ public abstract class AbstractTableDialog extends Dialog {
         operoot.setMenu(this.opemenu);
 
         MenuItem reload = new MenuItem(this.opemenu, SWT.NONE);
-        reload.setText("再読み込み\tF5");
+        reload.setText("再読み込み(&R)\tF5");
         reload.setAccelerator(SWT.F5);
         reload.addSelectionListener(new TableReloadAdapter());
-
+        // テーブル
+        this.table = new Table(this.shell, SWT.FULL_SELECTION | SWT.MULTI);
+        this.table.addKeyListener(new TableKeyShortcutAdapter(this.header, this.table));
+        this.table.setLinesVisible(true);
+        this.table.setHeaderVisible(true);
+        // テーブル右クリックメニュー
+        this.tablemenu = new Menu(this.table);
+        this.table.setMenu(this.tablemenu);
+        MenuItem sendclipbord = new MenuItem(this.tablemenu, SWT.NONE);
+        sendclipbord.addSelectionListener(new TableToClipboardAdapter(this.header, this.table));
+        sendclipbord.setText("クリップボードにコピー(&C)");
+        MenuItem reloadtable = new MenuItem(this.tablemenu, SWT.NONE);
+        reloadtable.setText("再読み込み(&R)");
+        reloadtable.addSelectionListener(new TableReloadAdapter());
+        // テーブルにヘッダーをセット
+        this.setTableHeader();
+        // テーブルに内容をセット
         this.updateTableBody();
         this.setTableBody();
+        // 列幅を整える
         this.packTableHeader();
 
         this.createContents();
