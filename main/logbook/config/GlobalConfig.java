@@ -51,7 +51,7 @@ public final class GlobalConfig {
     public static final String DATE_SHORT_FORMAT = "HH:mm:ss";
 
     /** バージョン */
-    public static final String VERSION = "0.5.0";
+    public static final String VERSION = "0.5.1";
 
     /** 疲労赤色 */
     public static final int COND_RED = 19;
