@@ -48,6 +48,8 @@ public final class ShipTable extends AbstractTableDialog {
 
     @Override
     protected void createContents() {
+        // メニューバーに追加する
+        // フィルターメニュー
         final MenuItem filter = new MenuItem(this.opemenu, SWT.PUSH);
         filter.setText("フィルター(&F)\tCtrl+F");
         filter.setAccelerator(SWT.CTRL + 'F');
@@ -57,9 +59,9 @@ public final class ShipTable extends AbstractTableDialog {
                 new ShipFilterDialog(ShipTable.this.shell, ShipTable.this, ShipTable.this.filter).open();
             }
         });
-
         // セパレータ
         new MenuItem(this.opemenu, SWT.SEPARATOR);
+        // 成長の余地を表示メニュー
         final MenuItem switchdiff = new MenuItem(this.opemenu, SWT.CHECK);
         switchdiff.setText("成長の余地を表示");
         switchdiff.setSelection(specdiff);
@@ -70,6 +72,16 @@ public final class ShipTable extends AbstractTableDialog {
                 ShipTable.this.reloadTable();
             }
         });
+        // 右クリックメニューに追加する
+        final MenuItem filtertable = new MenuItem(this.tablemenu, SWT.NONE);
+        filtertable.setText("フィルター(&F)");
+        filtertable.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                new ShipFilterDialog(ShipTable.this.shell, ShipTable.this, ShipTable.this.filter).open();
+            }
+        });
+
     }
 
     @Override
