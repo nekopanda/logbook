@@ -486,8 +486,7 @@ public final class CreateReportLogic {
      * 
      * @return 遠征結果
      */
-    public static List<String[]> getMissionResultBody() {
-        List<MissionResultDto> resultlist = GlobalContext.getMissionResultList();
+    public static List<String[]> getMissionResultBody(List<MissionResultDto> resultlist) {
         List<Object[]> body = new ArrayList<Object[]>();
 
         for (int i = 0; i < resultlist.size(); i++) {
@@ -730,12 +729,7 @@ public final class CreateReportLogic {
         try {
             List<BattleResultDto> dtoList = Collections.singletonList(dto);
 
-            File report = new File(FilenameUtils.concat(GlobalConfig.getReportPath(), "海戦・ドロップ報告書.csv"));
-
-            if (isLocked(report)) {
-                // ロックされている場合は代替ファイルに書き込みます
-                report = new File(FilenameUtils.concat(GlobalConfig.getReportPath(), "海戦・ドロップ報告書_alternativefile.csv"));
-            }
+            File report = getStoreFile("海戦・ドロップ報告書.csv", "海戦・ドロップ報告書_alternativefile.csv");
 
             CreateReportLogic.writeCsvStripFirstColumn(report,
                     CreateReportLogic.getBattleResultStoreHeader(),
@@ -754,12 +748,7 @@ public final class CreateReportLogic {
         try {
             List<GetShipDto> dtoList = Collections.singletonList(dto);
 
-            File report = new File(FilenameUtils.concat(GlobalConfig.getReportPath(), "建造報告書.csv"));
-
-            if (isLocked(report)) {
-                // ロックされている場合は代替ファイルに書き込みます
-                report = new File(FilenameUtils.concat(GlobalConfig.getReportPath(), "建造報告書_alternativefile.csv"));
-            }
+            File report = getStoreFile("建造報告書.csv", "建造報告書_alternativefile.csv");
 
             CreateReportLogic.writeCsvStripFirstColumn(report,
                     CreateReportLogic.getCreateShipHeader(),
@@ -778,12 +767,7 @@ public final class CreateReportLogic {
         try {
             List<CreateItemDto> dtoList = Collections.singletonList(dto);
 
-            File report = new File(FilenameUtils.concat(GlobalConfig.getReportPath(), "開発報告書.csv"));
-
-            if (isLocked(report)) {
-                // ロックされている場合は代替ファイルに書き込みます
-                report = new File(FilenameUtils.concat(GlobalConfig.getReportPath(), "開発報告書_alternativefile.csv"));
-            }
+            File report = getStoreFile("開発報告書.csv", "開発報告書_alternativefile.csv");
 
             CreateReportLogic.writeCsvStripFirstColumn(report,
                     CreateReportLogic.getCreateItemHeader(),
@@ -791,6 +775,47 @@ public final class CreateReportLogic {
         } catch (IOException e) {
             LOG.warn("報告書の保存に失敗しました", e);
         }
+    }
+
+    /**
+     * 遠征報告書を書き込む
+     * 
+     * @param dto 遠征結果
+     */
+    public static void storeCreateMissionReport(MissionResultDto dto) {
+        try {
+            List<MissionResultDto> dtoList = Collections.singletonList(dto);
+
+            File report = getStoreFile("遠征報告書.csv", "遠征報告書_alternativefile.csv");
+
+            CreateReportLogic.writeCsvStripFirstColumn(report,
+                    CreateReportLogic.getCreateMissionResultHeader(),
+                    CreateReportLogic.getMissionResultBody(dtoList), true);
+        } catch (IOException e) {
+            LOG.warn("報告書の保存に失敗しました", e);
+        }
+    }
+
+    /**
+     * 書き込み先のファイルを返します
+     * 
+     * @param name ファイル名
+     * @param altername 代替ファイル名
+     * @return File
+     * @throws IOException
+     */
+    private static File getStoreFile(String name, String altername) throws IOException {
+        // 報告書の保存先にファイルを保存します
+        File report = new File(FilenameUtils.concat(GlobalConfig.getReportPath(), name));
+        if ((report.getParentFile() == null) && report.mkdirs()) {
+            // 報告書の保存先ディレクトリが無く、ディレクトリの作成に失敗した場合はカレントフォルダにファイルを保存
+            report = new File(name);
+        }
+        if (isLocked(report)) {
+            // ロックされている場合は代替ファイルに書き込みます
+            report = new File(FilenameUtils.concat(report.getParent(), altername));
+        }
+        return report;
     }
 
     /**

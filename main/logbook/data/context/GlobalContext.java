@@ -747,6 +747,7 @@ public final class GlobalContext {
                 result.setBauxite(material.getJsonNumber(3).toString());
             }
 
+            CreateReportLogic.storeCreateMissionReport(result);
             missionResultList.add(result);
 
             addConsole("遠征(帰還)情報を更新しました");
