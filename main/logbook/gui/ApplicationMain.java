@@ -329,7 +329,7 @@ public final class ApplicationMain {
         this.tabFolder = new CTabFolder(this.shell, SWT.NONE);
         this.tabFolder.setSelectionBackground(Display.getCurrent().getSystemColor(
                 SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
-        this.tabFolder.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        this.tabFolder.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
         this.tabFolder.setTabHeight(26);
         this.tabFolder.marginWidth = 0;
         this.tabFolder.setMinimumCharacters(5);
@@ -472,7 +472,7 @@ public final class ApplicationMain {
         this.ndock4time.setLayoutData(gdndock4time);
 
         // コンソール
-        this.consoleComposite = new Composite(this.shell, SWT.NONE);
+        this.consoleComposite = new Composite(this.mainComposite, SWT.NONE);
         GridLayout loglayout = new GridLayout(1, false);
         loglayout.verticalSpacing = 1;
         loglayout.marginTop = 0;
