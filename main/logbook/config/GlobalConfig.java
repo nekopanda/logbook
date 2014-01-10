@@ -39,6 +39,7 @@ import org.eclipse.swt.graphics.RGB;
  * 設定ファイルはShift_JIS(CRLF)でKey=Value形式で記述されることを想定しています<br>
  * </p>
  */
+@Deprecated
 public final class GlobalConfig {
 
     /** 文字コード(Shift_JIS) */
