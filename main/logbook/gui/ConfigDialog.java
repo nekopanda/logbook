@@ -5,8 +5,11 @@
  */
 package logbook.gui;
 
-import logbook.config.GlobalConfig;
+import java.io.IOException;
 
+import logbook.config.AppConfig;
+
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -85,7 +88,7 @@ public final class ConfigDialog extends Dialog {
         GridData gdListenport = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
         gdListenport.widthHint = 90;
         listenport.setLayoutData(gdListenport);
-        listenport.setText(Integer.toString(GlobalConfig.getListenPort()));
+        listenport.setText(Integer.toString(AppConfig.get().getListenPort()));
         new Label(compositeSystem, SWT.NONE);
 
         Label label1 = new Label(compositeSystem, SWT.NONE);
@@ -96,7 +99,7 @@ public final class ConfigDialog extends Dialog {
         GridData gdWidth = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
         gdWidth.widthHint = 90;
         width.setLayoutData(gdWidth);
-        width.setText(Integer.toString(GlobalConfig.getWidth()));
+        width.setText(Integer.toString(AppConfig.get().getWidth()));
         new Label(compositeSystem, SWT.NONE);
 
         Label label2 = new Label(compositeSystem, SWT.NONE);
@@ -107,7 +110,7 @@ public final class ConfigDialog extends Dialog {
         GridData gdHeight = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
         gdHeight.widthHint = 90;
         height.setLayoutData(gdHeight);
-        height.setText(Integer.toString(GlobalConfig.getHeight()));
+        height.setText(Integer.toString(AppConfig.get().getHeight()));
         new Label(compositeSystem, SWT.NONE);
 
         Label label3 = new Label(compositeSystem, SWT.NONE);
@@ -118,7 +121,7 @@ public final class ConfigDialog extends Dialog {
         GridData gdSoundlevel = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
         gdSoundlevel.widthHint = 90;
         soundlevel.setLayoutData(gdSoundlevel);
-        soundlevel.setText(Integer.toString((int) (GlobalConfig.getSoundLevel() * 100)));
+        soundlevel.setText(Integer.toString((int) (AppConfig.get().getSoundLevel() * 100)));
         new Label(compositeSystem, SWT.NONE);
 
         Label label7 = new Label(compositeSystem, SWT.NONE);
@@ -129,7 +132,7 @@ public final class ConfigDialog extends Dialog {
         GridData gdAlpha = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
         gdAlpha.widthHint = 90;
         alpha.setLayoutData(gdAlpha);
-        alpha.setText(Integer.toString(GlobalConfig.getAlpha()));
+        alpha.setText(Integer.toString(AppConfig.get().getAlpha()));
         new Label(compositeSystem, SWT.NONE);
 
         Label label8 = new Label(compositeSystem, SWT.NONE);
@@ -140,7 +143,7 @@ public final class ConfigDialog extends Dialog {
         GridData gdReportDir = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
         gdReportDir.widthHint = 120;
         reportDir.setLayoutData(gdReportDir);
-        reportDir.setText(GlobalConfig.getReportPath());
+        reportDir.setText(AppConfig.get().getReportPath());
 
         Button reportSavedirBtn = new Button(compositeSystem, SWT.NONE);
         reportSavedirBtn.addSelectionListener(new SelectionAdapter() {
@@ -159,19 +162,19 @@ public final class ConfigDialog extends Dialog {
         final Button hidewindow = new Button(compositeSystem, SWT.CHECK);
         hidewindow.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
         hidewindow.setText("最小化時にタスクトレイに格納");
-        hidewindow.setSelection(GlobalConfig.getHideWindow());
+        hidewindow.setSelection(AppConfig.get().isHideWindow());
         new Label(compositeSystem, SWT.NONE);
 
         final Button ontop = new Button(compositeSystem, SWT.CHECK);
         ontop.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
         ontop.setText("最前面に表示する*");
-        ontop.setSelection(GlobalConfig.getOnTop() != SWT.NONE);
+        ontop.setSelection(AppConfig.get().isOnTop());
         new Label(compositeSystem, SWT.NONE);
 
         final Button checkUpdate = new Button(compositeSystem, SWT.CHECK);
         checkUpdate.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
         checkUpdate.setText("起動時にアップデートチェック*");
-        checkUpdate.setSelection(GlobalConfig.getCheckUpdate());
+        checkUpdate.setSelection(AppConfig.get().isCheckUpdate());
         new Label(compositeSystem, SWT.NONE);
 
         // キャプチャ タブ
@@ -190,7 +193,7 @@ public final class ConfigDialog extends Dialog {
         GridData gdCaptureDir = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
         gdCaptureDir.widthHint = 120;
         captureDir.setLayoutData(gdCaptureDir);
-        captureDir.setText(GlobalConfig.getCapturePath());
+        captureDir.setText(AppConfig.get().getCapturePath());
 
         Button savedirBtn = new Button(compositeCapture, SWT.NONE);
         savedirBtn.addSelectionListener(new SelectionAdapter() {
@@ -215,7 +218,7 @@ public final class ConfigDialog extends Dialog {
         imageformatCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         imageformatCombo.select(0);
         for (int i = 0; i < imageformatCombo.getItems().length; i++) {
-            if (GlobalConfig.getImageFormat().equals(imageformatCombo.getItem(i))) {
+            if (AppConfig.get().getImageFormat().equals(imageformatCombo.getItem(i))) {
                 imageformatCombo.select(i);
                 break;
             }
@@ -233,7 +236,7 @@ public final class ConfigDialog extends Dialog {
 
         final Button btnJson = new Button(compositeDevelopment, SWT.CHECK);
         btnJson.setText("JSONを保存する");
-        btnJson.setSelection(GlobalConfig.getStoreJson());
+        btnJson.setSelection(AppConfig.get().isStoreJson());
 
         Label lblJson = new Label(compositeDevelopment, SWT.NONE);
         lblJson.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -241,7 +244,7 @@ public final class ConfigDialog extends Dialog {
 
         final Text jsonpath = new Text(compositeDevelopment, SWT.BORDER);
         jsonpath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-        jsonpath.setText(GlobalConfig.getStoreJsonPath());
+        jsonpath.setText(AppConfig.get().getStoreJsonPath());
 
         Composite command = new Composite(this.shell, SWT.NONE);
         RowLayout rlCommand = new RowLayout();
@@ -258,24 +261,38 @@ public final class ConfigDialog extends Dialog {
                 // 設定の保存アクション
 
                 // system
-                GlobalConfig.setListenPort(listenport.getText());
-                GlobalConfig.setWidth(width.getText());
-                GlobalConfig.setHeight(height.getText());
-                GlobalConfig.setHideWindow(hidewindow.getSelection());
-                GlobalConfig.setOnTop(ontop.getSelection());
-                GlobalConfig.setSoundLevel(soundlevel.getText());
-                GlobalConfig.setAlpha(alpha.getText());
-                GlobalConfig.setReportPath(reportDir.getText());
-                GlobalConfig.setCheckUpdate(checkUpdate.getSelection());
+                if (StringUtils.isNumeric(listenport.getText())) {
+                    AppConfig.get().setListenPort(Integer.parseInt(listenport.getText()));
+                }
+                if (StringUtils.isNumeric(width.getText())) {
+                    AppConfig.get().setWidth(Integer.parseInt(width.getText()));
+                }
+                if (StringUtils.isNumeric(height.getText())) {
+                    AppConfig.get().setHeight(Integer.parseInt(height.getText()));
+                }
+                AppConfig.get().setHideWindow(hidewindow.getSelection());
+                AppConfig.get().setOnTop(ontop.getSelection());
+                if (StringUtils.isNumeric(soundlevel.getText())) {
+                    float level = (float) Integer.parseInt(soundlevel.getText()) / 100;
+                    AppConfig.get().setSoundLevel(level);
+                }
+                if (StringUtils.isNumeric(alpha.getText())) {
+                    AppConfig.get().setAlpha(Integer.parseInt(alpha.getText()));
+                }
+                AppConfig.get().setReportPath(reportDir.getText());
+                AppConfig.get().setCheckUpdate(checkUpdate.getSelection());
                 // capture
-                GlobalConfig.setCapturePath(captureDir.getText());
-                GlobalConfig.setImageFormat(imageformatCombo.getItem(imageformatCombo.getSelectionIndex()));
+                AppConfig.get().setCapturePath(captureDir.getText());
+                AppConfig.get().setImageFormat(imageformatCombo.getItem(imageformatCombo.getSelectionIndex()));
 
                 // development
-                GlobalConfig.setStoreJson(btnJson.getSelection());
-                GlobalConfig.setStoreJsonPath(jsonpath.getText());
-
-                GlobalConfig.store();
+                AppConfig.get().setStoreJson(btnJson.getSelection());
+                AppConfig.get().setStoreJsonPath(jsonpath.getText());
+                try {
+                    AppConfig.store();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
                 ConfigDialog.this.shell.close();
             }
         });

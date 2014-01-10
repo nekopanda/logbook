@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import logbook.config.GlobalConfig;
+import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
@@ -225,13 +225,13 @@ public final class AsyncExecApplicationMain extends Thread {
                         // 20分前、10分前、5分前になったら背景色を変更する
                         if (rest <= (ONE_MINUTES * 5)) {
                             deckTimeTexts[i].setBackground(SWTResourceManager
-                                    .getColor(GlobalConfig.TIME_IN_5_MIN));
+                                    .getColor(AppConstants.TIME_IN_5_MIN));
                         } else if (rest <= (ONE_MINUTES * 10)) {
                             deckTimeTexts[i].setBackground(SWTResourceManager
-                                    .getColor(GlobalConfig.TIME_IN_10_MIN));
+                                    .getColor(AppConstants.TIME_IN_10_MIN));
                         } else if (rest <= (ONE_MINUTES * 20)) {
                             deckTimeTexts[i].setBackground(SWTResourceManager
-                                    .getColor(GlobalConfig.TIME_IN_20_MIN));
+                                    .getColor(AppConstants.TIME_IN_20_MIN));
                         } else {
                             deckTimeTexts[i].setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
                         }
@@ -291,13 +291,13 @@ public final class AsyncExecApplicationMain extends Thread {
                         // 20分前、10分前、5分前になったら背景色を変更する
                         if (rest <= (ONE_MINUTES * 5)) {
                             ndockTimeTexts[i].setBackground(SWTResourceManager
-                                    .getColor(GlobalConfig.TIME_IN_5_MIN));
+                                    .getColor(AppConstants.TIME_IN_5_MIN));
                         } else if (rest <= (ONE_MINUTES * 10)) {
                             ndockTimeTexts[i].setBackground(SWTResourceManager
-                                    .getColor(GlobalConfig.TIME_IN_10_MIN));
+                                    .getColor(AppConstants.TIME_IN_10_MIN));
                         } else if (rest <= (ONE_MINUTES * 20)) {
                             ndockTimeTexts[i].setBackground(SWTResourceManager
-                                    .getColor(GlobalConfig.TIME_IN_20_MIN));
+                                    .getColor(AppConstants.TIME_IN_20_MIN));
                         } else {
                             ndockTimeTexts[i].setBackground(SWTResourceManager
                                     .getColor(SWT.COLOR_WHITE));
@@ -556,15 +556,15 @@ public final class AsyncExecApplicationMain extends Thread {
                 float fuelraito = fuelmax != 0 ? (float) fuel / (float) fuelmax : 1f;
 
                 // 体力メッセージ
-                if (hpratio <= GlobalConfig.BADLY_DAMAGE) {
+                if (hpratio <= AppConstants.BADLY_DAMAGE) {
                     this.hpmsgLabels[i].setText("(大破)");
-                    this.hpmsgLabels[i].setBackground(SWTResourceManager.getColor(GlobalConfig.COND_RED_COLOR));
+                    this.hpmsgLabels[i].setBackground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
                     this.hpmsgLabels[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-                } else if (hpratio <= GlobalConfig.HALF_DAMAGE) {
+                } else if (hpratio <= AppConstants.HALF_DAMAGE) {
                     this.hpmsgLabels[i].setText("(中破)");
-                    this.hpmsgLabels[i].setBackground(SWTResourceManager.getColor(GlobalConfig.COND_ORANGE_COLOR));
+                    this.hpmsgLabels[i].setBackground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
                     this.hpmsgLabels[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-                } else if (hpratio <= GlobalConfig.SLIGHT_DAMAGE) {
+                } else if (hpratio <= AppConstants.SLIGHT_DAMAGE) {
                     this.hpmsgLabels[i].setText("(小破)");
                     this.hpmsgLabels[i].setBackground(null);
                     this.hpmsgLabels[i].setForeground(null);
@@ -589,10 +589,10 @@ public final class AsyncExecApplicationMain extends Thread {
                     this.fuelstLabels[i].setForeground(null);
                 } else {
                     this.fuelstLabels[i].setEnabled(true);
-                    if (fuelraito <= GlobalConfig.EMPTY_SUPPLY) {
-                        this.fuelstLabels[i].setForeground(SWTResourceManager.getColor(GlobalConfig.COND_RED_COLOR));
-                    } else if (fuelraito <= GlobalConfig.LOW_SUPPLY) {
-                        this.fuelstLabels[i].setForeground(SWTResourceManager.getColor(GlobalConfig.COND_ORANGE_COLOR));
+                    if (fuelraito <= AppConstants.EMPTY_SUPPLY) {
+                        this.fuelstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
+                    } else if (fuelraito <= AppConstants.LOW_SUPPLY) {
+                        this.fuelstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
                     }
                 }
                 // ステータス.弾
@@ -603,19 +603,19 @@ public final class AsyncExecApplicationMain extends Thread {
                     this.bullstLabels[i].setForeground(null);
                 } else {
                     this.bullstLabels[i].setEnabled(true);
-                    if (bullraito <= GlobalConfig.EMPTY_SUPPLY) {
-                        this.bullstLabels[i].setForeground(SWTResourceManager.getColor(GlobalConfig.COND_RED_COLOR));
-                    } else if (bullraito <= GlobalConfig.LOW_SUPPLY) {
-                        this.bullstLabels[i].setForeground(SWTResourceManager.getColor(GlobalConfig.COND_ORANGE_COLOR));
+                    if (bullraito <= AppConstants.EMPTY_SUPPLY) {
+                        this.bullstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
+                    } else if (bullraito <= AppConstants.LOW_SUPPLY) {
+                        this.bullstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
                     }
                 }
                 // コンディション
-                if (cond <= GlobalConfig.COND_RED) {
-                    this.condLabels[i].setForeground(SWTResourceManager.getColor(GlobalConfig.COND_RED_COLOR));
-                    this.condstLabels[i].setForeground(SWTResourceManager.getColor(GlobalConfig.COND_RED_COLOR));
-                } else if (cond <= GlobalConfig.COND_ORANGE) {
-                    this.condLabels[i].setForeground(SWTResourceManager.getColor(GlobalConfig.COND_ORANGE_COLOR));
-                    this.condstLabels[i].setForeground(SWTResourceManager.getColor(GlobalConfig.COND_ORANGE_COLOR));
+                if (cond <= AppConstants.COND_RED) {
+                    this.condLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
+                    this.condstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
+                } else if (cond <= AppConstants.COND_ORANGE) {
+                    this.condLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
+                    this.condstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
                 } else {
                     this.condLabels[i].setForeground(null);
                     this.condstLabels[i].setForeground(null);

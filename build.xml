@@ -6,7 +6,7 @@
         <jar destfile="./dest/logbook.jar">
             <manifest>
                 <attribute name="Main-Class" value="logbook.gui.ApplicationMain"/>
-                <attribute name="Class-Path" value=". logbook_lib/commons-io-2.4.jar logbook_lib/commons-lang3-3.1.jar logbook_lib/commons-logging-1.1.1.jar logbook_lib/jetty-client-9.0.5.v20130815.jar logbook_lib/jetty-http-9.0.5.v20130815.jar logbook_lib/jetty-io-9.0.5.v20130815.jar logbook_lib/jetty-proxy-9.0.5.v20130815.jar logbook_lib/jetty-server-9.0.5.v20130815.jar logbook_lib/jetty-servlet-9.0.5.v20130815.jar logbook_lib/jetty-util-9.0.5.v20130815.jar logbook_lib/servlet-api-3.0.jar logbook_lib/javax.json-1.0.jar logbook_lib/swt.jar logbook_lib/log4j-api-2.0-beta8.jar logbook_lib/log4j-core-2.0-beta8.jar"/>
+                <attribute name="Class-Path" value=". logbook_lib/commons-io-2.4.jar logbook_lib/commons-lang3-3.1.jar logbook_lib/commons-logging-1.1.1.jar logbook_lib/jetty-client-9.0.5.v20130815.jar logbook_lib/jetty-http-9.0.5.v20130815.jar logbook_lib/jetty-io-9.0.5.v20130815.jar logbook_lib/jetty-proxy-9.0.5.v20130815.jar logbook_lib/jetty-server-9.0.5.v20130815.jar logbook_lib/jetty-servlet-9.0.5.v20130815.jar logbook_lib/jetty-util-9.0.5.v20130815.jar logbook_lib/servlet-api-3.0.jar logbook_lib/javax.json-1.0.jar logbook_lib/swt.jar logbook_lib/log4j-api-2.0-beta8.jar logbook_lib/log4j-core-2.0-beta8.jar logbook_lib/annotation.jar"/>
             </manifest>
             <fileset dir="./bin"/>
         </jar>
@@ -27,5 +27,6 @@
         <copy file="./lib/gui/swt.jar" todir="./dest/logbook_lib"/>
         <copy file="./lib/log4j-api-2.0-beta8.jar" todir="./dest/logbook_lib"/>
         <copy file="./lib/log4j-core-2.0-beta8.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/annotation.jar" todir="./dest/logbook_lib"/>
     </target>
 </project>

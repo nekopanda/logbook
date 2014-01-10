@@ -5,7 +5,7 @@
  */
 package logbook.gui.listener;
 
-import logbook.config.GlobalConfig;
+import logbook.config.AppConfig;
 
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
@@ -19,7 +19,7 @@ public final class MainShellAdapter extends ShellAdapter {
 
     @Override
     public void shellIconified(ShellEvent e) {
-        if (GlobalConfig.getHideWindow()) {
+        if (AppConfig.get().isHideWindow()) {
             Display.getDefault().asyncExec(new AsyncHide((Shell) e.getSource()));
         }
     }

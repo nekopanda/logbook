@@ -7,7 +7,7 @@ package logbook.gui;
 
 import java.awt.Desktop;
 
-import logbook.config.GlobalConfig;
+import logbook.constants.AppConstants;
 import logbook.server.proxy.Filter;
 
 import org.apache.commons.lang3.StringUtils;
@@ -76,7 +76,7 @@ public final class VersionDialog extends Dialog {
         versionGroup.setLayout(new GridLayout(2, true));
 
         label("航海日誌", versionGroup);
-        label(GlobalConfig.VERSION, versionGroup);
+        label(AppConstants.VERSION, versionGroup);
 
         Link gowebsite = new Link(versionGroup, SWT.NONE);
         gowebsite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
@@ -85,7 +85,7 @@ public final class VersionDialog extends Dialog {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 try {
-                    Desktop.getDesktop().browse(GlobalConfig.HOME_PAGE_URI);
+                    Desktop.getDesktop().browse(AppConstants.HOME_PAGE_URI);
                 } catch (Exception e) {
                     LOG.warn("ウェブサイトに移動が失敗しました", e);
                 }

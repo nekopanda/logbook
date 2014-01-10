@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 
-import logbook.config.GlobalConfig;
+import logbook.config.AppConfig;
 import logbook.server.proxy.Filter;
 
 import org.apache.commons.io.FileUtils;
@@ -162,14 +162,13 @@ public final class CreatePacFileDialog extends Dialog {
             dialog.setFilterExtensions(new String[] { "*.pac" });
             String filename = dialog.open();
 
-            if (!StringUtils.isAsciiPrintable(filename)) {
-                MessageBox messageBox = new MessageBox(this.shell, SWT.ICON_WARNING);
-                messageBox.setText("注意");
-                messageBox.setMessage("保存先にASCII範囲外の文字(全角文字等)が含まれています。\nこのアドレスはInternetExplorerで読み込めません。");
-                messageBox.open();
-            }
-
             if (filename != null) {
+                if (!StringUtils.isAsciiPrintable(filename)) {
+                    MessageBox messageBox = new MessageBox(this.shell, SWT.ICON_WARNING);
+                    messageBox.setText("注意");
+                    messageBox.setMessage("保存先にASCII範囲外の文字(全角文字等)が含まれています。\nこのアドレスはInternetExplorerで読み込めません。");
+                    messageBox.open();
+                }
 
                 MessageBox messageBox = new MessageBox(this.shell, SWT.ICON_INFORMATION);
                 messageBox.setText("成功");
@@ -179,7 +178,7 @@ public final class CreatePacFileDialog extends Dialog {
 
                 String script = MessageFormat.format(CreatePacFileDialog.SCRIPT,
                         this.parent.server.replace(".", "\\."),
-                        Integer.toString(GlobalConfig.getListenPort()));
+                        Integer.toString(AppConfig.get().getListenPort()));
 
                 File file = new File(filename);
                 if (file.getAbsolutePath().startsWith("\\\\")) {

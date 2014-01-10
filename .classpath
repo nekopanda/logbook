@@ -18,5 +18,6 @@
 	<classpathentry kind="lib" path="lib/gui/swt.jar" sourcepath="lib/gui/swt-source.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-api-2.0-beta8.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-core-2.0-beta8.jar"/>
+	<classpathentry kind="lib" path="lib/annotation.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

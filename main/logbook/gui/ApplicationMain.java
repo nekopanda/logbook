@@ -5,8 +5,10 @@
  */
 package logbook.gui;
 
-import logbook.config.GlobalConfig;
+import logbook.config.AppConfig;
+import logbook.config.ConfigMigration;
 import logbook.config.ShipConfig;
+import logbook.constants.AppConstants;
 import logbook.gui.background.AsyncExecApplicationMain;
 import logbook.gui.background.AsyncExecApplicationMainConsole;
 import logbook.gui.background.AsyncExecUpdateCheck;
@@ -132,12 +134,15 @@ public final class ApplicationMain {
     public static void main(String[] args) {
         try {
             // 設定読み込み
+            AppConfig.load();
             ShipConfig.load();
+            // 旧設定ファイルを移行します
+            ConfigMigration.migration();
             // アプリケーション開始
             ApplicationMain window = new ApplicationMain();
             window.open();
             // ウインドウが閉じたタイミングで設定を書き込みます
-            GlobalConfig.store();
+            AppConfig.store();
             ShipConfig.store();
         } catch (Error e) {
             LOG.fatal("メインスレッドが異常終了しました", e);
@@ -171,11 +176,14 @@ public final class ApplicationMain {
      * 画面レイアウトを作成します
      */
     public void createContents() {
-
         final Display display = Display.getDefault();
-        this.shell = new Shell(SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE | GlobalConfig.getOnTop());
-        this.shell.setText("航海日誌 " + GlobalConfig.VERSION);
-        this.shell.setAlpha(GlobalConfig.getAlpha());
+        int shellStyle = SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE;
+        if (AppConfig.get().isOnTop()) {
+            shellStyle |= SWT.ON_TOP;
+        }
+        this.shell = new Shell(shellStyle);
+        this.shell.setText("航海日誌 " + AppConstants.VERSION);
+        this.shell.setAlpha(AppConfig.get().getAlpha());
         GridLayout glShell = new GridLayout(1, false);
         glShell.horizontalSpacing = 1;
         glShell.marginTop = 0;
@@ -188,7 +196,9 @@ public final class ApplicationMain {
             @Override
             public void shellClosed(ShellEvent e) {
                 // 終了の確認でウインドウ位置を記憶
-                GlobalConfig.setLocation(ApplicationMain.this.shell.getLocation());
+                Point location = ApplicationMain.this.shell.getLocation();
+                AppConfig.get().setLocationX(location.x);
+                AppConfig.get().setLocationY(location.y);
 
                 MessageBox box = new MessageBox(ApplicationMain.this.shell, SWT.YES | SWT.NO
                         | SWT.ICON_QUESTION);
@@ -367,12 +377,12 @@ public final class ApplicationMain {
         this.deckGroup.setLayout(glDeckGroup);
 
         this.deckNotice = new Button(this.deckGroup, SWT.CHECK);
-        this.deckNotice.setSelection(GlobalConfig.getNoticeDeckmission());
+        this.deckNotice.setSelection(AppConfig.get().isNoticeDeckmission());
         this.deckNotice.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
         this.deckNotice.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                GlobalConfig.setNoticeDeckmission(ApplicationMain.this.deckNotice.getSelection());
+                AppConfig.get().setNoticeDeckmission(ApplicationMain.this.deckNotice.getSelection());
             }
         });
         this.deckNotice.setText("1分前に通知する");
@@ -421,13 +431,13 @@ public final class ApplicationMain {
         this.ndockGroup.setLayout(glNdockGroup);
 
         this.ndockNotice = new Button(this.ndockGroup, SWT.CHECK);
-        this.ndockNotice.setSelection(GlobalConfig.getNoticeNdock());
+        this.ndockNotice.setSelection(AppConfig.get().isNoticeNdock());
         this.ndockNotice.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
         this.ndockNotice.setText("1分前に通知する");
         this.ndockNotice.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                GlobalConfig.setNoticeNdock(ApplicationMain.this.ndockNotice.getSelection());
+                AppConfig.get().setNoticeNdock(ApplicationMain.this.ndockNotice.getSelection());
             }
         });
 
@@ -487,7 +497,7 @@ public final class ApplicationMain {
         this.console.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
 
         // 初期設定 縮小表示が有効なら縮小表示にする
-        if (GlobalConfig.getMinimumLayout()) {
+        if (AppConfig.get().isMinimumLayout()) {
             this.shell.setRedraw(false);
             ApplicationMain.this.hide(true, this.commandComposite, this.deckNotice, this.deck1name, this.deck2name,
                     this.deck3name, this.ndockNotice, this.ndock1name, this.ndock2name, this.ndock3name,
@@ -496,7 +506,7 @@ public final class ApplicationMain {
             this.shell.pack();
             this.shell.setRedraw(true);
         } else {
-            this.shell.setSize(GlobalConfig.getWidth(), GlobalConfig.getHeight());
+            this.shell.setSize(AppConfig.get().getWidth(), AppConfig.get().getHeight());
         }
 
         // 縮小表示チェック時の動作
@@ -539,16 +549,17 @@ public final class ApplicationMain {
                         }
                     }
                 } else {
-                    shell.setSize(GlobalConfig.getWidth(), GlobalConfig.getHeight());
+                    shell.setSize(AppConfig.get().getWidth(), AppConfig.get().getHeight());
                 }
                 // 設定を保存
-                GlobalConfig.setMinimumLayout(minimum);
+                AppConfig.get().setMinimumLayout(minimum);
             }
         });
         // 前回のウインドウ位置を取得する
-        Point location = GlobalConfig.getLocation();
-        if (location != null) {
-            this.shell.setLocation(location);
+        int locationX = AppConfig.get().getLocationX();
+        int locationY = AppConfig.get().getLocationY();
+        if ((locationX != -1) && (locationY != -1)) {
+            this.shell.setLocation(new Point(locationX, locationY));
         }
 
         this.startThread();
@@ -602,7 +613,7 @@ public final class ApplicationMain {
         ThreadManager.start();
 
         // アップデートチェックする
-        if (GlobalConfig.getCheckUpdate()) {
+        if (AppConfig.get().isCheckUpdate()) {
             new AsyncExecUpdateCheck(this.shell).start();
         }
     }

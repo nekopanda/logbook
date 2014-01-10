@@ -29,7 +29,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import logbook.config.GlobalConfig;
+import logbook.config.AppConfig;
+import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.dto.BattleDto;
 import logbook.dto.BattleResultDto;
@@ -73,7 +74,7 @@ public final class CreateReportLogic {
             TableItem item = new TableItem(table, SWT.NONE);
             // 偶数行に背景色を付ける
             if ((count % 2) != 0) {
-                item.setBackground(SWTResourceManager.getColor(GlobalConfig.ROW_BACKGROUND));
+                item.setBackground(SWTResourceManager.getColor(AppConstants.ROW_BACKGROUND));
             }
             item.setText(text);
             return item;
@@ -113,24 +114,24 @@ public final class CreateReportLogic {
             TableItem item = new TableItem(table, SWT.NONE);
             // 偶数行に背景色を付ける
             if ((count % 2) != 0) {
-                item.setBackground(SWTResourceManager.getColor(GlobalConfig.ROW_BACKGROUND));
+                item.setBackground(SWTResourceManager.getColor(AppConstants.ROW_BACKGROUND));
             }
 
             // 疲労
             int cond = Integer.parseInt(text[5]);
-            if (cond <= GlobalConfig.COND_RED) {
-                item.setForeground(SWTResourceManager.getColor(GlobalConfig.COND_RED_COLOR));
-            } else if (cond <= GlobalConfig.COND_ORANGE) {
-                item.setForeground(SWTResourceManager.getColor(GlobalConfig.COND_ORANGE_COLOR));
+            if (cond <= AppConstants.COND_RED) {
+                item.setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
+            } else if (cond <= AppConstants.COND_ORANGE) {
+                item.setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
             }
 
             // 遠征
             if (this.deckmissions.contains(ship)) {
-                item.setForeground(SWTResourceManager.getColor(GlobalConfig.MISSION_COLOR));
+                item.setForeground(SWTResourceManager.getColor(AppConstants.MISSION_COLOR));
             }
             // 入渠
             if (this.docks.contains(ship)) {
-                item.setForeground(SWTResourceManager.getColor(GlobalConfig.NDOCK_COLOR));
+                item.setForeground(SWTResourceManager.getColor(AppConstants.NDOCK_COLOR));
             }
 
             item.setText(text);
@@ -140,9 +141,6 @@ public final class CreateReportLogic {
 
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(CreateReportLogic.class);
-
-    /** 日付フォーマット */
-    private static final SimpleDateFormat FORMAT = new SimpleDateFormat(GlobalConfig.DATE_FORMAT);
 
     /**
      * ドロップ報告書のヘッダー
@@ -163,7 +161,8 @@ public final class CreateReportLogic {
 
         for (int i = 0; i < results.size(); i++) {
             BattleResultDto item = results.get(i);
-            body.add(new Object[] { Integer.toString(i + 1), FORMAT.format(item.getBattleDate()), item.getQuestName(),
+            body.add(new Object[] { Integer.toString(i + 1),
+                    new SimpleDateFormat(AppConstants.DATE_FORMAT).format(item.getBattleDate()), item.getQuestName(),
                     item.getRank(), item.getEnemyName(), item.getDropType(), item.getDropName() });
         }
         return toListStringArray(body);
@@ -238,7 +237,8 @@ public final class CreateReportLogic {
                 }
             }
 
-            body.add(new Object[] { Integer.toString(i + 1), FORMAT.format(item.getBattleDate()), item.getQuestName(),
+            body.add(new Object[] { Integer.toString(i + 1),
+                    new SimpleDateFormat(AppConstants.DATE_FORMAT).format(item.getBattleDate()), item.getQuestName(),
                     item.getRank(), item.getEnemyName(), item.getDropType(), item.getDropName(), friend[0],
                     friendHp[0], friend[1], friendHp[1], friend[2], friendHp[2], friend[3], friendHp[3], friend[4],
                     friendHp[4], friend[5], friendHp[5], enemy[0], enemyHp[0], enemy[1], enemyHp[1], enemy[2],
@@ -265,7 +265,8 @@ public final class CreateReportLogic {
         List<Object[]> body = new ArrayList<Object[]>();
         for (int i = 0; i < ships.size(); i++) {
             GetShipDto ship = ships.get(i);
-            body.add(new Object[] { Integer.toString(i + 1), FORMAT.format(ship.getGetDate()), ship.getBuildType(),
+            body.add(new Object[] { Integer.toString(i + 1),
+                    new SimpleDateFormat(AppConstants.DATE_FORMAT).format(ship.getGetDate()), ship.getBuildType(),
                     ship.getName(), ship.getType(), ship.getFuel(), ship.getAmmo(), ship.getMetal(), ship.getBauxite(),
                     ship.getResearchMaterials(), ship.getFreeDock(), ship.getSecretary(), ship.getHqLevel() });
         }
@@ -297,7 +298,8 @@ public final class CreateReportLogic {
                 name = item.getName();
                 type = item.getType();
             }
-            body.add(new Object[] { Integer.toString(i + 1), FORMAT.format(item.getCreateDate()), name, type,
+            body.add(new Object[] { Integer.toString(i + 1),
+                    new SimpleDateFormat(AppConstants.DATE_FORMAT).format(item.getCreateDate()), name, type,
                     item.getFuel(), item.getAmmo(), item.getMetal(), item.getBauxite(), item.getSecretary(),
                     item.getHqLevel() });
         }
@@ -494,7 +496,7 @@ public final class CreateReportLogic {
 
             body.add(new Object[] {
                     Integer.toString(i + 1),
-                    FORMAT.format(result.getDate()),
+                    new SimpleDateFormat(AppConstants.DATE_FORMAT).format(result.getDate()),
                     result.getClearResult(),
                     result.getQuestName(),
                     result.getFuel(),
@@ -540,10 +542,10 @@ public final class CreateReportLogic {
         OutputStream stream = new BufferedOutputStream(new FileOutputStream(file, applend));
         try {
             if (!file.exists() || (FileUtils.sizeOf(file) <= 0)) {
-                IOUtils.write(StringUtils.join(header, ',') + "\r\n", stream, GlobalConfig.CHARSET);
+                IOUtils.write(StringUtils.join(header, ',') + "\r\n", stream, AppConstants.CHARSET);
             }
             for (String[] colums : body) {
-                IOUtils.write(StringUtils.join(colums, ',') + "\r\n", stream, GlobalConfig.CHARSET);
+                IOUtils.write(StringUtils.join(colums, ',') + "\r\n", stream, AppConstants.CHARSET);
             }
         } finally {
             stream.close();
@@ -806,7 +808,7 @@ public final class CreateReportLogic {
      */
     private static File getStoreFile(String name, String altername) throws IOException {
         // 報告書の保存先にファイルを保存します
-        File report = new File(FilenameUtils.concat(GlobalConfig.getReportPath(), name));
+        File report = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), name));
         if ((report.getParentFile() == null) && report.mkdirs()) {
             // 報告書の保存先ディレクトリが無く、ディレクトリの作成に失敗した場合はカレントフォルダにファイルを保存
             report = new File(name);

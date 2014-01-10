@@ -26,7 +26,9 @@ import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
-import logbook.config.GlobalConfig;
+import logbook.config.AppConfig;
+import logbook.config.KdockConfig;
+import logbook.constants.AppConstants;
 import logbook.data.Data;
 import logbook.data.DataQueue;
 import logbook.dto.AwaitingDecision;
@@ -59,9 +61,6 @@ import org.apache.logging.log4j.Logger;
 public final class GlobalContext {
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(GlobalContext.class);
-
-    /** ログに表示する日付書式 */
-    private static final SimpleDateFormat FORMAT = new SimpleDateFormat(GlobalConfig.DATE_SHORT_FORMAT);
 
     /** 装備Map */
     private static Map<Long, ItemDto> itemMap = new ConcurrentSkipListMap<Long, ItemDto>();
@@ -231,7 +230,7 @@ public final class GlobalContext {
         while ((data = DataQueue.poll()) != null) {
             update = true;
             // json保存設定
-            if (GlobalConfig.getStoreJson()) {
+            if (AppConfig.get().isStoreJson()) {
                 doStoreJson(data);
             }
             switch (data.getDataType()) {
@@ -317,7 +316,7 @@ public final class GlobalContext {
             String fname = new StringBuilder().append(format.format(time)).append("_").append(data.getDataType())
                     .append(".json").toString();
             // ファイルパス
-            File file = new File(FilenameUtils.concat(GlobalConfig.getStoreJsonPath(), fname));
+            File file = new File(FilenameUtils.concat(AppConfig.get().getStoreJsonPath(), fname));
 
             FileUtils.write(file, data.getJsonObject().toString());
         } catch (IOException e) {
@@ -382,7 +381,7 @@ public final class GlobalContext {
                     );
             lastBuildKdock = kdockid;
             getShipResource.put(kdockid, resource);
-            GlobalConfig.setCreateShipResource(kdockid, resource);
+            KdockConfig.store(kdockid, resource);
 
             addConsole("建造(投入資源)情報を更新しました");
         } catch (Exception e) {
@@ -411,7 +410,7 @@ public final class GlobalContext {
                     }
                     // 建造ドックの空きをセットします
                     resource.setFreeDock(Integer.toString(freecount));
-                    GlobalConfig.setCreateShipResource(lastBuildKdock, resource);
+                    KdockConfig.store(lastBuildKdock, resource);
                 }
             }
             addConsole("建造を更新しました");
@@ -532,14 +531,14 @@ public final class GlobalContext {
                     // 投入資源を取得する
                     ResourceDto resource = getShipResource.get(shipInfo.getDock());
                     if (resource == null) {
-                        resource = GlobalConfig.getCreateShipResource(shipInfo.getDock());
+                        resource = KdockConfig.load(shipInfo.getDock());
                     }
                     GetShipDto dto = new GetShipDto(getShip, resource);
                     getShipList.add(dto);
                     CreateReportLogic.storeCreateShipReport(dto);
                     // 投入資源を除去する
                     getShipResource.remove(shipInfo.getDock());
-                    GlobalConfig.removeCreateShipResource(shipInfo.getDock());
+                    KdockConfig.remove(shipInfo.getDock());
                 } else {
                     getShipQueue.add(shipInfo);
                 }
@@ -578,14 +577,14 @@ public final class GlobalContext {
                     // 投入資源を取得する
                     ResourceDto resource = getShipResource.get(shipInfo.getDock());
                     if (resource == null) {
-                        resource = GlobalConfig.getCreateShipResource(shipInfo.getDock());
+                        resource = KdockConfig.load(shipInfo.getDock());
                     }
                     GetShipDto dto = new GetShipDto(getShip, resource);
                     getShipList.add(dto);
                     CreateReportLogic.storeCreateShipReport(dto);
                     // 投入資源を除去する
                     getShipResource.remove(shipInfo.getDock());
-                    GlobalConfig.removeCreateShipResource(shipInfo.getDock());
+                    KdockConfig.remove(shipInfo.getDock());
                 } else {
                     getShipQueue.add(shipInfo);
                 }
@@ -835,6 +834,7 @@ public final class GlobalContext {
     }
 
     private static void addConsole(Object message) {
-        consoleQueue.add(FORMAT.format(Calendar.getInstance().getTime()) + "  " + message.toString());
+        consoleQueue.add(new SimpleDateFormat(AppConstants.DATE_SHORT_FORMAT).format(Calendar.getInstance().getTime())
+                + "  " + message.toString());
     }
 }

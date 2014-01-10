@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import logbook.config.GlobalConfig;
+import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.dto.DeckMissionDto;
 import logbook.dto.NdockDto;
@@ -146,11 +146,11 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
                 TableItem item = new TableItem(table, SWT.NONE);
                 // 偶数行に背景色を付ける
                 if ((count % 2) != 0) {
-                    item.setBackground(SWTResourceManager.getColor(GlobalConfig.ROW_BACKGROUND));
+                    item.setBackground(SWTResourceManager.getColor(AppConstants.ROW_BACKGROUND));
                 }
                 item.setText(text);
                 if (text[text.length - 1].equals("遠征")) {
-                    item.setForeground(SWTResourceManager.getColor(GlobalConfig.MISSION_COLOR));
+                    item.setForeground(SWTResourceManager.getColor(AppConstants.MISSION_COLOR));
                 }
                 return item;
             }

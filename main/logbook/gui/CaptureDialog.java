@@ -17,7 +17,7 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
 
-import logbook.config.GlobalConfig;
+import logbook.config.AppConfig;
 import logbook.gui.logic.AwtUtils;
 import logbook.gui.logic.LayoutLogic;
 
@@ -297,8 +297,8 @@ public final class CaptureDialog extends Dialog {
                 do {
                     // 時刻からファイル名を作成
                     Date now = Calendar.getInstance().getTime();
-                    String fname = FilenameUtils.concat(GlobalConfig.getCapturePath(), this.format.format(now) + "."
-                            + GlobalConfig.getImageFormat());
+                    String fname = FilenameUtils.concat(AppConfig.get().getCapturePath(), this.format.format(now) + "."
+                            + AppConfig.get().getImageFormat());
                     File file = new File(fname);
 
                     // 範囲をキャプチャする
@@ -307,7 +307,7 @@ public final class CaptureDialog extends Dialog {
 
                         ImageOutputStream ios = ImageIO.createImageOutputStream(file);
                         try {
-                            ImageWriter writer = ImageIO.getImageWritersByFormatName(GlobalConfig.getImageFormat())
+                            ImageWriter writer = ImageIO.getImageWritersByFormatName(AppConfig.get().getImageFormat())
                                     .next();
                             try {
                                 ImageWriteParam iwp = writer.getDefaultWriteParam();

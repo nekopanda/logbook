@@ -5,7 +5,7 @@
  */
 package logbook.server.proxy;
 
-import logbook.config.GlobalConfig;
+import logbook.config.AppConfig;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -59,7 +59,7 @@ public final class ProxyServer extends Thread {
 
     public static ProxyServer getInstance() {
         if (proxyServer == null) {
-            proxyServer = new ProxyServer(GlobalConfig.getListenPort());
+            proxyServer = new ProxyServer(AppConfig.get().getListenPort());
         }
         return proxyServer;
     }

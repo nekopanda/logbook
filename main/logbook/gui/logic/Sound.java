@@ -20,7 +20,7 @@ import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-import logbook.config.GlobalConfig;
+import logbook.config.AppConfig;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
@@ -78,7 +78,7 @@ public final class Sound {
                     // ゲインのコントロールを取得します
                     FloatControl control = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
                     // サウンド音量を設定
-                    controlByLinearScalar(control, GlobalConfig.getSoundLevel());
+                    controlByLinearScalar(control, AppConfig.get().getSoundLevel());
 
                     int nBytesRead = 0;
                     byte[] abData = new byte[BUFFER_SIZE];

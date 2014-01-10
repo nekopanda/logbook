@@ -12,25 +12,32 @@ package logbook.dto;
 public final class ShipInfoDto extends AbstractDto {
 
     /** 空の艦種 */
-    public static final ShipInfoDto EMPTY = new ShipInfoDto("", "", "", 0, 0, 0);
+    public static final ShipInfoDto EMPTY = new ShipInfoDto();
 
     /** 名前 */
-    private final String name;
+    private String name;
 
     /** 艦種 */
-    private final String type;
+    private String type;
 
     /** 改レベル */
-    private final int afterlv;
+    private int afterlv;
 
     /** flagshipもしくはelite (敵艦のみ) */
-    private final String flagship;
+    private String flagship;
 
     /** 弾 */
-    private final int maxBull;
+    private int maxBull;
 
     /** 燃料 */
-    private final int maxFuel;
+    private int maxFuel;
+
+    /**
+     * コンストラクター
+     */
+    public ShipInfoDto() {
+        this("", "", "", 0, 0, 0);
+    }
 
     /**
      * コンストラクター
@@ -45,6 +52,7 @@ public final class ShipInfoDto extends AbstractDto {
     }
 
     /**
+     * 名前を取得します。
      * @return 名前
      */
     public String getName() {
@@ -52,6 +60,23 @@ public final class ShipInfoDto extends AbstractDto {
     }
 
     /**
+     * 名前を設定します。
+     * @param name 名前
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * 改レベルを設定します。
+     * @param afterlv 改レベル
+     */
+    public void setAfterlv(int afterlv) {
+        this.afterlv = afterlv;
+    }
+
+    /**
+     * 艦種を取得します。
      * @return 艦種
      */
     public String getType() {
@@ -59,10 +84,11 @@ public final class ShipInfoDto extends AbstractDto {
     }
 
     /**
-     * @return flagshipもしくはelite
+     * 艦種を設定します。
+     * @param type 艦種
      */
-    public String getFlagship() {
-        return this.flagship;
+    public void setType(String type) {
+        this.type = type;
     }
 
     /**
@@ -73,6 +99,23 @@ public final class ShipInfoDto extends AbstractDto {
     }
 
     /**
+     * flagshipもしくはelite (敵艦のみ)を取得します。
+     * @return flagshipもしくはelite (敵艦のみ)
+     */
+    public String getFlagship() {
+        return this.flagship;
+    }
+
+    /**
+     * flagshipもしくはelite (敵艦のみ)を設定します。
+     * @param flagship flagshipもしくはelite (敵艦のみ)
+     */
+    public void setFlagship(String flagship) {
+        this.flagship = flagship;
+    }
+
+    /**
+     * 弾を取得します。
      * @return 弾
      */
     public int getMaxBull() {
@@ -80,9 +123,26 @@ public final class ShipInfoDto extends AbstractDto {
     }
 
     /**
+     * 弾を設定します。
+     * @param maxBull 弾
+     */
+    public void setMaxBull(int maxBull) {
+        this.maxBull = maxBull;
+    }
+
+    /**
+     * 燃料を取得します。
      * @return 燃料
      */
     public int getMaxFuel() {
         return this.maxFuel;
+    }
+
+    /**
+     * 燃料を設定します。
+     * @param maxFuel 燃料
+     */
+    public void setMaxFuel(int maxFuel) {
+        this.maxFuel = maxFuel;
     }
 }
