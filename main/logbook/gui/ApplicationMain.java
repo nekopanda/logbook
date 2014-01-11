@@ -252,8 +252,8 @@ public final class ApplicationMain {
         cmdcreateitem.addSelectionListener(new CreateItemReportAdapter(this.shell));
         // コマンド-遠征報告書
         MenuItem cmdmissionresult = new MenuItem(cmdmenu, SWT.NONE);
-        cmdmissionresult.setText("遠征報告書(&M)\tCtrl+M");
-        cmdmissionresult.setAccelerator(SWT.CTRL + 'M');
+        cmdmissionresult.setText("遠征報告書(&T)\tCtrl+T");
+        cmdmissionresult.setAccelerator(SWT.CTRL + 'T');
         cmdmissionresult.addSelectionListener(new MissionResultReportAdapter(this.shell));
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
