@@ -5,13 +5,13 @@
  */
 package logbook.config;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import logbook.constants.AppConstants;
 import logbook.dto.ShipInfoDto;
 import logbook.internal.Ship;
 import logbook.util.BeanUtils;
@@ -21,9 +21,6 @@ import logbook.util.BeanUtils;
  * 
  */
 public class ShipConfig {
-
-    /** 設定ファイル  */
-    private static final File CONFIG_FILE = new File("./config/ship.xml");
 
     /**
      * 設定ファイルに書き込みます
@@ -35,7 +32,7 @@ public class ShipConfig {
             ShipInfoDto ship = Ship.get(key);
             map.put(key, ship);
         }
-        BeanUtils.writeObject(CONFIG_FILE, map);
+        BeanUtils.writeObject(AppConstants.SHIP_CONFIG_FILE, map);
     }
 
     /**
@@ -45,7 +42,7 @@ public class ShipConfig {
      * @return
      */
     public static void load() {
-        Map<String, ShipInfoDto> map = BeanUtils.readObject(CONFIG_FILE, Map.class);
+        Map<String, ShipInfoDto> map = BeanUtils.readObject(AppConstants.SHIP_CONFIG_FILE, Map.class);
         if (map != null) {
             for (Entry<String, ShipInfoDto> entry : map.entrySet()) {
                 Ship.set(entry.getKey(), entry.getValue());

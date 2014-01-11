@@ -5,10 +5,10 @@
  */
 package logbook.config;
 
-import java.io.File;
 import java.io.IOException;
 
 import logbook.config.bean.AppConfigBean;
+import logbook.constants.AppConstants;
 import logbook.util.BeanUtils;
 
 /**
@@ -20,9 +20,6 @@ public class AppConfig {
     /** アプリケーション設定 */
     private static AppConfigBean configBean;
 
-    /** 設定ファイル  */
-    private static final File CONFIG_FILE = new File("./config/internal.xml");
-
     /**
      * 設定ファイルに書き込みます
      */
@@ -30,7 +27,7 @@ public class AppConfig {
         if (configBean == null) {
             configBean = new AppConfigBean();
         }
-        BeanUtils.writeObject(CONFIG_FILE, configBean);
+        BeanUtils.writeObject(AppConstants.APP_CONFIG_FILE, configBean);
     }
 
     /**
@@ -40,7 +37,7 @@ public class AppConfig {
      * @return
      */
     public static void load() {
-        AppConfigBean bean = BeanUtils.readObject(CONFIG_FILE, AppConfigBean.class);
+        AppConfigBean bean = BeanUtils.readObject(AppConstants.APP_CONFIG_FILE, AppConfigBean.class);
         if (bean != null) {
             configBean = bean;
         } else {

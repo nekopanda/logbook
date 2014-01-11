@@ -5,6 +5,7 @@
  */
 package logbook.constants;
 
+import java.io.File;
 import java.net.URI;
 import java.nio.charset.Charset;
 
@@ -78,4 +79,13 @@ public class AppConstants {
 
     /** 文字コード(Shift_JIS) */
     public static final Charset CHARSET = Charset.forName("MS932");
+
+    /** アプリケーション設定ファイル  */
+    public static final File APP_CONFIG_FILE = new File("./config/internal.xml");
+
+    /** 艦娘設定ファイル  */
+    public static final File SHIP_CONFIG_FILE = new File("./config/ship.xml");
+
+    /** 建造ドック設定ファイル  */
+    public static final File KDOCK_CONFIG_FILE = new File("./config/kdock.xml");
 }

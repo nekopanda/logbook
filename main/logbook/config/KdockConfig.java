@@ -5,7 +5,6 @@
  */
 package logbook.config;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
@@ -13,6 +12,7 @@ import javax.annotation.CheckForNull;
 
 import logbook.config.bean.KdockBean;
 import logbook.config.bean.KdockMapBean;
+import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.dto.ResourceDto;
 import logbook.dto.ShipDto;
@@ -23,9 +23,6 @@ import logbook.util.BeanUtils;
  *
  */
 public class KdockConfig {
-
-    /** 設定ファイル  */
-    private static final File CONFIG_FILE = new File("./config/kdock.xml");
 
     /** 建造ドックのBean */
     private static KdockMapBean mapBean;
@@ -53,7 +50,7 @@ public class KdockConfig {
         kdock.setFreeDock(resource.getFreeDock());
         mapBean.getKdockMap().put(dock, kdock);
 
-        BeanUtils.writeObject(CONFIG_FILE, mapBean);
+        BeanUtils.writeObject(AppConstants.KDOCK_CONFIG_FILE, mapBean);
     }
 
     /**
@@ -65,7 +62,7 @@ public class KdockConfig {
     @CheckForNull
     public static ResourceDto load(String dock) {
         if (mapBean == null) {
-            mapBean = BeanUtils.readObject(CONFIG_FILE, KdockMapBean.class);
+            mapBean = BeanUtils.readObject(AppConstants.KDOCK_CONFIG_FILE, KdockMapBean.class);
         }
         if (mapBean != null) {
             KdockBean kdock = mapBean.getKdockMap().get(dock);
@@ -91,6 +88,6 @@ public class KdockConfig {
             mapBean.getKdockMap().remove(dock);
         }
 
-        BeanUtils.writeObject(CONFIG_FILE, mapBean);
+        BeanUtils.writeObject(AppConstants.KDOCK_CONFIG_FILE, mapBean);
     }
 }
