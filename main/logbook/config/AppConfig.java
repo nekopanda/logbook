@@ -32,9 +32,6 @@ public class AppConfig {
 
     /**
      * アプリケーション設定を読み込みます
-     * 
-     * @param properties
-     * @return
      */
     public static void load() {
         AppConfigBean bean = BeanUtils.readObject(AppConstants.APP_CONFIG_FILE, AppConfigBean.class);
