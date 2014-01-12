@@ -54,6 +54,8 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
     private Combo shipcombo;
     private Tree tree;
     private TreeItem treeItem;
+    private Button btnAddShip;
+    private Button btnRemoveShip;
 
     private final Map<String, ShipDto> shipmap = new HashMap<String, ShipDto>();
 
@@ -110,6 +112,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
             groupItem.setText(bean.getName());
             groupItem.setData(new GroupProperty(bean, groupItem));
         }
+        this.treeItem.setExpanded(true);
 
         this.mainComposite = new Composite(this.sashForm, SWT.NONE);
         GridLayout mainLayout = new GridLayout(3, false);
@@ -120,6 +123,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
         this.text = new Text(this.mainComposite, SWT.BORDER);
         this.text.addModifyListener(new ModifyNameAdapter(this));
         this.text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+        this.text.setEnabled(false);
     }
 
     /**
@@ -130,13 +134,16 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
         this.table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
         this.shipcombo = new Combo(this.mainComposite, SWT.READ_ONLY);
         this.setShipComboData();
+        this.shipcombo.setEnabled(false);
 
-        Button btnAddShip = new Button(this.mainComposite, SWT.NONE);
-        btnAddShip.setText("追加");
-        btnAddShip.addSelectionListener(new AddShipAdapter(this));
-        Button btnRemoveShip = new Button(this.mainComposite, SWT.NONE);
-        btnRemoveShip.setText("除去");
-        btnRemoveShip.addSelectionListener(new RemoveShipAdapter(this));
+        this.btnAddShip = new Button(this.mainComposite, SWT.NONE);
+        this.btnAddShip.setText("追加");
+        this.btnAddShip.addSelectionListener(new AddShipAdapter(this));
+        this.btnAddShip.setEnabled(false);
+        this.btnRemoveShip = new Button(this.mainComposite, SWT.NONE);
+        this.btnRemoveShip.setText("除去");
+        this.btnRemoveShip.addSelectionListener(new RemoveShipAdapter(this));
+        this.btnRemoveShip.setEnabled(false);
         this.sashForm.setWeights(new int[] { 2, 5 });
     }
 
@@ -200,12 +207,20 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
     @Override
     protected void reloadTable() {
         super.reloadTable();
-        // 名前をセットします
+        // 名前・ボタンの状態をセットします
         if (this.property != null) {
             ShipGroupBean group = this.property.getShipGroupBean();
             this.text.setText(group.getName());
+            this.text.setEnabled(true);
+            this.shipcombo.setEnabled(true);
+            this.btnAddShip.setEnabled(true);
+            this.btnRemoveShip.setEnabled(true);
         } else {
             this.text.setText("");
+            this.text.setEnabled(false);
+            this.shipcombo.setEnabled(false);
+            this.btnAddShip.setEnabled(false);
+            this.btnRemoveShip.setEnabled(false);
         }
     }
 
@@ -288,6 +303,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
                     "/resources/icon/folder_star.png"));
             item.setText(bean.getName());
             item.setData(new GroupProperty(bean, item));
+            this.dialog.treeItem.setExpanded(true);
         }
     }
 
