@@ -138,22 +138,47 @@ public final class ConfigDialog extends Dialog {
         reportSavedirBtn.setText("選択...");
 
         final Button hidewindow = new Button(compositeSystem, SWT.CHECK);
-        hidewindow.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
+        hidewindow.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 3, 1));
         hidewindow.setText("最小化時にタスクトレイに格納");
         hidewindow.setSelection(AppConfig.get().isHideWindow());
-        new Label(compositeSystem, SWT.NONE);
 
         final Button ontop = new Button(compositeSystem, SWT.CHECK);
-        ontop.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
+        ontop.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 3, 1));
         ontop.setText("最前面に表示する*");
         ontop.setSelection(AppConfig.get().isOnTop());
-        new Label(compositeSystem, SWT.NONE);
 
         final Button checkUpdate = new Button(compositeSystem, SWT.CHECK);
-        checkUpdate.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
+        checkUpdate.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 3, 1));
         checkUpdate.setText("起動時にアップデートチェック*");
         checkUpdate.setSelection(AppConfig.get().isCheckUpdate());
-        new Label(compositeSystem, SWT.NONE);
+
+        // 艦隊タブ タブ
+        TabItem tabFleetTab = new TabItem(tabFolder, SWT.NONE);
+        tabFleetTab.setText("艦隊タブ");
+
+        Composite compositeFleetTab = new Composite(tabFolder, SWT.NONE);
+        compositeFleetTab.setLayout(new GridLayout(1, false));
+        tabFleetTab.setControl(compositeFleetTab);
+
+        final Button warnByNeedSupply = new Button(compositeFleetTab, SWT.CHECK);
+        warnByNeedSupply.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 1, 1));
+        warnByNeedSupply.setText("補給不足で警告アイコン表示");
+        warnByNeedSupply.setSelection(AppConfig.get().isWarnByNeedSupply());
+
+        final Button warnByCondState = new Button(compositeFleetTab, SWT.CHECK);
+        warnByCondState.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 1, 1));
+        warnByCondState.setText("疲労状態で警告アイコン表示");
+        warnByCondState.setSelection(AppConfig.get().isWarnByCondState());
+
+        final Button warnByHalfDamage = new Button(compositeFleetTab, SWT.CHECK);
+        warnByHalfDamage.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 1, 1));
+        warnByHalfDamage.setText("中破で致命的アイコン表示");
+        warnByHalfDamage.setSelection(AppConfig.get().isWarnByHalfDamage());
+
+        final Button fatalBybadlyDamage = new Button(compositeFleetTab, SWT.CHECK);
+        fatalBybadlyDamage.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 1, 1));
+        fatalBybadlyDamage.setText("大破で致命的アイコン表示");
+        fatalBybadlyDamage.setSelection(AppConfig.get().isFatalBybadlyDamage());
 
         // キャプチャ タブ
         TabItem tabCapture = new TabItem(tabFolder, SWT.NONE);
@@ -253,6 +278,11 @@ public final class ConfigDialog extends Dialog {
                 }
                 AppConfig.get().setReportPath(reportDir.getText());
                 AppConfig.get().setCheckUpdate(checkUpdate.getSelection());
+                // fleettab
+                AppConfig.get().setWarnByNeedSupply(warnByNeedSupply.getSelection());
+                AppConfig.get().setWarnByCondState(warnByCondState.getSelection());
+                AppConfig.get().setWarnByHalfDamage(warnByHalfDamage.getSelection());
+                AppConfig.get().setFatalBybadlyDamage(fatalBybadlyDamage.getSelection());
                 // capture
                 AppConfig.get().setCapturePath(captureDir.getText());
                 AppConfig.get().setImageFormat(imageformatCombo.getItem(imageformatCombo.getSelectionIndex()));

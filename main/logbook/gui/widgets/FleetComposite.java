@@ -7,6 +7,7 @@ package logbook.gui.widgets;
 
 import java.util.List;
 
+import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.dto.DockDto;
 import logbook.dto.ShipDto;
@@ -16,7 +17,6 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -191,9 +191,6 @@ public class FleetComposite extends Composite {
         }
         for (int i = 0; i < ships.size(); i++) {
             ShipDto ship = ships.get(i);
-
-            // アイコン
-            Image image = null;
             // 名前
             String name = ship.getName();
             // HP
@@ -219,15 +216,19 @@ public class FleetComposite extends Composite {
 
             // 体力メッセージ
             if (hpratio <= AppConstants.BADLY_DAMAGE) {
-                image = SWTResourceManager.getImage(FleetComposite.class, "/resources/icon/exclamation.png");
-                this.state |= FATAL;
+                if (AppConfig.get().isFatalBybadlyDamage()) {
+                    // 大破で致命的アイコン
+                    this.state |= FATAL;
+                }
 
                 this.hpmsgLabels[i].setText("(大破)");
                 this.hpmsgLabels[i].setBackground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
                 this.hpmsgLabels[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
             } else if (hpratio <= AppConstants.HALF_DAMAGE) {
-                image = SWTResourceManager.getImage(FleetComposite.class, "/resources/icon/error.png");
-                this.state |= WARN;
+                if (AppConfig.get().isWarnByHalfDamage()) {
+                    // 中破で警告アイコン
+                    this.state |= WARN;
+                }
 
                 this.hpmsgLabels[i].setText("(中破)");
                 this.hpmsgLabels[i].setBackground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
@@ -256,8 +257,8 @@ public class FleetComposite extends Composite {
                 this.fuelstLabels[i].setEnabled(false);
                 this.fuelstLabels[i].setForeground(null);
             } else {
-                if (image == null) {
-                    image = SWTResourceManager.getImage(FleetComposite.class, "/resources/icon/error.png");
+                if (AppConfig.get().isWarnByNeedSupply()) {
+                    // 補給不足で警告アイコン
                     this.state |= WARN;
                 }
                 this.fuelstLabels[i].setEnabled(true);
@@ -274,8 +275,8 @@ public class FleetComposite extends Composite {
                 this.bullstLabels[i].setBackground(null);
                 this.bullstLabels[i].setForeground(null);
             } else {
-                if (image == null) {
-                    image = SWTResourceManager.getImage(FleetComposite.class, "/resources/icon/error.png");
+                if (AppConfig.get().isWarnByNeedSupply()) {
+                    // 補給不足で警告アイコン
                     this.state |= WARN;
                 }
                 this.bullstLabels[i].setEnabled(true);
@@ -287,15 +288,15 @@ public class FleetComposite extends Composite {
             }
             // コンディション
             if (cond <= AppConstants.COND_RED) {
-                if (image == null) {
-                    image = SWTResourceManager.getImage(FleetComposite.class, "/resources/icon/error.png");
+                if (AppConfig.get().isWarnByCondState()) {
+                    // 疲労状態で警告アイコン
                     this.state |= WARN;
                 }
                 this.condLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
                 this.condstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
             } else if (cond <= AppConstants.COND_ORANGE) {
-                if (image == null) {
-                    image = SWTResourceManager.getImage(FleetComposite.class, "/resources/icon/error.png");
+                if (AppConfig.get().isWarnByCondState()) {
+                    // 疲労状態で警告アイコン
                     this.state |= WARN;
                 }
                 this.condLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
@@ -305,7 +306,15 @@ public class FleetComposite extends Composite {
                 this.condstLabels[i].setForeground(null);
             }
 
-            this.iconLabels[i].setImage(image);
+            if ((this.state & FATAL) == FATAL) {
+                this.iconLabels[i].setImage(SWTResourceManager.getImage(FleetComposite.class,
+                        "/resources/icon/exclamation.png"));
+            } else if ((this.state & WARN) == WARN) {
+                this.iconLabels[i].setImage(SWTResourceManager.getImage(FleetComposite.class,
+                        "/resources/icon/error.png"));
+            } else {
+                this.iconLabels[i].setImage(null);
+            }
             this.nameLabels[i].setText(name);
             this.nameLabels[i].setToolTipText("燃:" + ship.getFuel() + "/" + ship.getFuelMax() + " 弾:"
                     + ship.getBull() + "/" + ship.getBullMax() + " Next:" + ship.getNext() + "exp");

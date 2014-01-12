@@ -61,6 +61,18 @@ public final class AppConfigBean {
     /** ウインドウ位置Y */
     private int locationY = -1;
 
+    /** 補給不足で警告アイコン */
+    private boolean warnByNeedSupply = true;
+
+    /** 疲労状態で警告アイコン */
+    private boolean warnByCondState = true;
+
+    /** 中破状態で警告アイコン */
+    private boolean warnByHalfDamage = true;
+
+    /** 大破状態で致命的アイコン */
+    private boolean fatalByBadlyDamage = true;
+
     /** 開発者オプション-JSONを保存する */
     private boolean storeJson;
 
@@ -321,6 +333,86 @@ public final class AppConfigBean {
      */
     public void setLocationY(int locationY) {
         this.locationY = locationY;
+    }
+
+    /**
+     * 補給不足で警告アイコンを取得します。
+     * @return 補給不足で警告アイコン
+     */
+    public boolean isWarnByNeedSupply() {
+        return this.warnByNeedSupply;
+    }
+
+    /**
+     * 補給不足で警告アイコンを設定します。
+     * @param warnByNeedSupply 補給不足で警告アイコン
+     */
+    public void setWarnByNeedSupply(boolean warnByNeedSupply) {
+        this.warnByNeedSupply = warnByNeedSupply;
+    }
+
+    /**
+     * 疲労状態で警告アイコンを取得します。
+     * @return 疲労状態で警告アイコン
+     */
+    public boolean isWarnByCondState() {
+        return this.warnByCondState;
+    }
+
+    /**
+     * 疲労状態で警告アイコンを設定します。
+     * @param warnByCondState 疲労状態で警告アイコン
+     */
+    public void setWarnByCondState(boolean warnByCondState) {
+        this.warnByCondState = warnByCondState;
+    }
+
+    /**
+     * 大破状態で致命的アイコンを取得します。
+     * @return 大破状態で致命的アイコン
+     */
+    public boolean isFatalBybadlyDamage() {
+        return this.fatalByBadlyDamage;
+    }
+
+    /**
+     * 大破状態で致命的アイコンを設定します。
+     * @param fatalBybadlyDamage 大破状態で致命的アイコン
+     */
+    public void setFatalBybadlyDamage(boolean fatalBybadlyDamage) {
+        this.fatalByBadlyDamage = fatalBybadlyDamage;
+    }
+
+    /**
+     * 中破状態で警告アイコンを取得します。
+     * @return 中破状態で警告アイコン
+     */
+    public boolean isWarnByHalfDamage() {
+        return this.warnByHalfDamage;
+    }
+
+    /**
+     * 中破状態で警告アイコンを設定します。
+     * @param warnByHalfDamage 中破状態で警告アイコン
+     */
+    public void setWarnByHalfDamage(boolean warnByHalfDamage) {
+        this.warnByHalfDamage = warnByHalfDamage;
+    }
+
+    /**
+     * 大破で致命的アイコンを取得します。
+     * @return 大破で致命的アイコン
+     */
+    public boolean isFatalByBadlyDamage() {
+        return this.fatalByBadlyDamage;
+    }
+
+    /**
+     * 大破で致命的アイコンを設定します。
+     * @param fatalByBadlyDamage 大破で致命的アイコン
+     */
+    public void setFatalByBadlyDamage(boolean fatalByBadlyDamage) {
+        this.fatalByBadlyDamage = fatalByBadlyDamage;
     }
 
     /**
