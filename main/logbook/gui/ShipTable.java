@@ -5,6 +5,8 @@
  */
 package logbook.gui;
 
+import logbook.config.ShipGroupConfig;
+import logbook.config.bean.ShipGroupBean;
 import logbook.dto.ShipFilterDto;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.TableItemCreator;
@@ -14,6 +16,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
@@ -28,7 +31,7 @@ public final class ShipTable extends AbstractTableDialog {
     private static boolean specdiff = false;
 
     /** フィルター */
-    private ShipFilterDto filter;
+    private ShipFilterDto filter = new ShipFilterDto();
 
     /**
      * @param parent
@@ -50,6 +53,24 @@ public final class ShipTable extends AbstractTableDialog {
     protected void createContents() {
         // メニューバーに追加する
         // フィルターメニュー
+        SelectionListener groupListener = new GroupFilterSelectionAdapter(this);
+        MenuItem groupCascade = new MenuItem(this.opemenu, SWT.CASCADE);
+        groupCascade.setText("グループフィルター(&G)");
+        Menu groupMenu = new Menu(groupCascade);
+        groupCascade.setMenu(groupMenu);
+        MenuItem nullGroupItem = new MenuItem(groupMenu, SWT.RADIO);
+        nullGroupItem.setText("選択なし\tF6");
+        nullGroupItem.setAccelerator(SWT.F6);
+        nullGroupItem.setSelection(true);
+        nullGroupItem.addSelectionListener(groupListener);
+        for (int i = 0; i < ShipGroupConfig.get().getGroup().size(); i++) {
+            ShipGroupBean group = ShipGroupConfig.get().getGroup().get(i);
+            MenuItem groupItem = new MenuItem(groupMenu, SWT.RADIO);
+            groupItem.setText(group.getName() + "\t" + "F" + (i + 7));
+            groupItem.setAccelerator(SWT.KEYCODE_BIT + 16 + i);
+            groupItem.setData(group);
+            groupItem.addSelectionListener(groupListener);
+        }
         final MenuItem filter = new MenuItem(this.opemenu, SWT.PUSH);
         filter.setText("フィルター(&F)\tCtrl+F");
         filter.setAccelerator(SWT.CTRL + 'F');
@@ -119,5 +140,39 @@ public final class ShipTable extends AbstractTableDialog {
                 }
             }
         };
+    }
+
+    /**
+     * フィルターを取得します。
+     * @return フィルター
+     */
+    public ShipFilterDto getFilter() {
+        return this.filter;
+    }
+
+    /**
+     * グループフィルターを選択した時に呼び出されるアダプター
+     *
+     */
+    private static final class GroupFilterSelectionAdapter extends SelectionAdapter {
+
+        /** ダイアログ */
+        private final ShipTable dialog;
+
+        public GroupFilterSelectionAdapter(ShipTable dialog) {
+            this.dialog = dialog;
+        }
+
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+            if (e.widget instanceof MenuItem) {
+                MenuItem item = (MenuItem) e.widget;
+                if (item.getSelection()) {
+                    ShipGroupBean group = (ShipGroupBean) item.getData();
+                    this.dialog.getFilter().group = group;
+                    this.dialog.reloadTable();
+                }
+            }
+        }
     }
 }

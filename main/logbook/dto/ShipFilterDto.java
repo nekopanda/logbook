@@ -22,44 +22,44 @@ public final class ShipFilterDto extends AbstractDto {
     public Pattern namepattern;
 
     /** 艦種.駆逐艦 */
-    public boolean destroyer;
+    public boolean destroyer = true;
     /** 艦種.軽巡洋艦 */
-    public boolean lightCruiser;
+    public boolean lightCruiser = true;
     /** 艦種.重雷装巡洋艦 */
-    public boolean torpedoCruiser;
+    public boolean torpedoCruiser = true;
     /** 艦種.重巡洋艦 */
-    public boolean heavyCruiser;
+    public boolean heavyCruiser = true;
     /** 艦種.航空巡洋艦 */
-    public boolean flyingDeckCruiser;
+    public boolean flyingDeckCruiser = true;
     /** 艦種.水上機母艦 */
-    public boolean seaplaneTender;
+    public boolean seaplaneTender = true;
     /** 艦種.軽空母 */
-    public boolean escortCarrier;
+    public boolean escortCarrier = true;
     /** 艦種.正規空母 */
-    public boolean carrier;
+    public boolean carrier = true;
     /** 艦種.戦艦 */
-    public boolean battleship;
+    public boolean battleship = true;
     /** 艦種.航空戦艦 */
-    public boolean flyingDeckBattleship;
+    public boolean flyingDeckBattleship = true;
     /** 艦種.潜水艦 */
-    public boolean submarine;
+    public boolean submarine = true;
     /** 艦種.潜水空母 */
-    public boolean carrierSubmarine;
+    public boolean carrierSubmarine = true;
     /** 艦種.揚陸艦 */
-    public boolean landingship;
+    public boolean landingship = true;
     /** 艦種.装甲空母 */
-    public boolean armoredcarrier;
+    public boolean armoredcarrier = true;
 
     /** グループ */
     public ShipGroupBean group;
     /** 装備 */
     public String itemname;
     /** 艦隊に所属 */
-    public boolean onfleet;
+    public boolean onfleet = true;
     /** 艦隊に非所属 */
-    public boolean notonfleet;
+    public boolean notonfleet = true;
     /** 鍵付き */
-    public boolean locked;
+    public boolean locked = true;
     /** 鍵付きではない */
-    public boolean notlocked;
+    public boolean notlocked = true;
 }
