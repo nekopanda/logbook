@@ -203,6 +203,8 @@ public final class ApplicationMain {
                 Point location = ApplicationMain.this.shell.getLocation();
                 AppConfig.get().setLocationX(location.x);
                 AppConfig.get().setLocationY(location.y);
+                AppConfig.get().setWidth(ApplicationMain.this.shell.getSize().x);
+                AppConfig.get().setHeight(ApplicationMain.this.shell.getSize().y);
 
                 MessageBox box = new MessageBox(ApplicationMain.this.shell, SWT.YES | SWT.NO
                         | SWT.ICON_QUESTION);

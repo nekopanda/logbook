@@ -91,28 +91,6 @@ public final class ConfigDialog extends Dialog {
         listenport.setText(Integer.toString(AppConfig.get().getListenPort()));
         new Label(compositeSystem, SWT.NONE);
 
-        Label label1 = new Label(compositeSystem, SWT.NONE);
-        label1.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        label1.setText("ウインドウサイズ(横)");
-
-        final Text width = new Text(compositeSystem, SWT.BORDER);
-        GridData gdWidth = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
-        gdWidth.widthHint = 90;
-        width.setLayoutData(gdWidth);
-        width.setText(Integer.toString(AppConfig.get().getWidth()));
-        new Label(compositeSystem, SWT.NONE);
-
-        Label label2 = new Label(compositeSystem, SWT.NONE);
-        label2.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        label2.setText("ウインドウサイズ(縦)");
-
-        final Text height = new Text(compositeSystem, SWT.BORDER);
-        GridData gdHeight = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
-        gdHeight.widthHint = 90;
-        height.setLayoutData(gdHeight);
-        height.setText(Integer.toString(AppConfig.get().getHeight()));
-        new Label(compositeSystem, SWT.NONE);
-
         Label label3 = new Label(compositeSystem, SWT.NONE);
         label3.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
         label3.setText("音量(%)");
@@ -263,12 +241,6 @@ public final class ConfigDialog extends Dialog {
                 // system
                 if (StringUtils.isNumeric(listenport.getText())) {
                     AppConfig.get().setListenPort(Integer.parseInt(listenport.getText()));
-                }
-                if (StringUtils.isNumeric(width.getText())) {
-                    AppConfig.get().setWidth(Integer.parseInt(width.getText()));
-                }
-                if (StringUtils.isNumeric(height.getText())) {
-                    AppConfig.get().setHeight(Integer.parseInt(height.getText()));
                 }
                 AppConfig.get().setHideWindow(hidewindow.getSelection());
                 AppConfig.get().setOnTop(ontop.getSelection());
