@@ -28,6 +28,7 @@ import logbook.gui.listener.ShipListReportAdapter;
 import logbook.gui.listener.TraySelectionListener;
 import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.Sound;
+import logbook.gui.widgets.FleetComposite;
 import logbook.server.proxy.ProxyServer;
 import logbook.thread.ThreadManager;
 import logbook.thread.ThreadStateObserver;
@@ -547,7 +548,7 @@ public final class ApplicationMain {
                     CTabItem[] tabitems = ApplicationMain.this.tabFolder.getItems();
                     for (CTabItem tabitem : tabitems) {
                         Control control = tabitem.getControl();
-                        if (control instanceof AsyncExecApplicationMain.FleetComposite) {
+                        if (control instanceof FleetComposite) {
                             ApplicationMain.this.hide(true, control);
                         }
                     }
@@ -557,7 +558,7 @@ public final class ApplicationMain {
                     ApplicationMain.this.tabFolder.setSingle(false);
                     for (CTabItem tabitem : tabitems) {
                         Control control = tabitem.getControl();
-                        if (control instanceof AsyncExecApplicationMain.FleetComposite) {
+                        if (control instanceof FleetComposite) {
                             ApplicationMain.this.hide(false, control);
                         }
                     }
