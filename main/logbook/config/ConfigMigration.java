@@ -84,7 +84,7 @@ public class ConfigMigration {
                 SHIP_CONFIG_FILE.delete();
             }
         } catch (Exception e) {
-
+            LOG.fatal("設定ファイルの移行に失敗しました", e);
         }
     }
 
