@@ -7,6 +7,8 @@ package logbook.dto;
 
 import java.util.regex.Pattern;
 
+import logbook.config.bean.ShipGroupBean;
+
 /**
  * 所有艦娘一覧で使用するフィルター
  */
@@ -48,6 +50,8 @@ public final class ShipFilterDto extends AbstractDto {
     /** 艦種.装甲空母 */
     public boolean armoredcarrier;
 
+    /** グループ */
+    public ShipGroupBean group;
     /** 装備 */
     public String itemname;
     /** 艦隊に所属 */

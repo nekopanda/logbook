@@ -5,9 +5,13 @@
  */
 package logbook.gui;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import logbook.config.ShipGroupConfig;
+import logbook.config.bean.ShipGroupBean;
 import logbook.data.context.GlobalContext;
 import logbook.dto.ItemDto;
 import logbook.dto.ShipFilterDto;
@@ -80,6 +84,10 @@ public final class ShipFilterDialog extends Dialog {
     /** 全て選択 */
     private Button selectall;
 
+    /** グループ */
+    private Button group;
+    /** グループ */
+    private Combo groupcombo;
     /** 装備 */
     private Button item;
     /** 装備 */
@@ -92,6 +100,9 @@ public final class ShipFilterDialog extends Dialog {
     private Button locked;
     /** 鍵付きではない */
     private Button notlocked;
+
+    /** 所有艦娘グループのリスト */
+    private final List<ShipGroupBean> shipGroup = new ArrayList<ShipGroupBean>(ShipGroupConfig.get().getGroup());
 
     /**
      * Create the dialog.
@@ -235,6 +246,23 @@ public final class ShipFilterDialog extends Dialog {
         etcgroup.setLayout(new GridLayout(2, false));
         etcgroup.setText("その他");
 
+        Composite groupcomposite = new Composite(etcgroup, SWT.NONE);
+        groupcomposite.setLayout(new RowLayout());
+        groupcomposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
+
+        this.group = new Button(groupcomposite, SWT.CHECK);
+        this.group.setText("グループ");
+        this.group.setSelection(false);
+        this.group.addSelectionListener(new GroupCheckAdapter());
+        this.group.addSelectionListener(new ApplyFilterSelectionAdapter());
+
+        this.groupcombo = new Combo(groupcomposite, SWT.READ_ONLY);
+        this.groupcombo.setEnabled(false);
+        this.groupcombo.addSelectionListener(new ApplyFilterSelectionAdapter());
+        for (ShipGroupBean group : this.shipGroup) {
+            this.groupcombo.add(group.getName());
+        }
+
         Composite itemcomposite = new Composite(etcgroup, SWT.NONE);
         itemcomposite.setLayout(new RowLayout());
         itemcomposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
@@ -363,6 +391,12 @@ public final class ShipFilterDialog extends Dialog {
         filter.carrierSubmarine = this.carrierSubmarine.getSelection();
         filter.landingship = this.landingship.getSelection();
         filter.armoredcarrier = this.armoredcarrier.getSelection();
+        filter.group = null;
+        if (ShipFilterDialog.this.group.getSelection()) {
+            if (ShipFilterDialog.this.groupcombo.getSelectionIndex() >= 0) {
+                filter.group = this.shipGroup.get(ShipFilterDialog.this.groupcombo.getSelectionIndex());
+            }
+        }
         if (ShipFilterDialog.this.item.getSelection()) {
             if (ShipFilterDialog.this.itemcombo.getSelectionIndex() >= 0) {
                 filter.itemname = this.itemcombo.getItem(ShipFilterDialog.this.itemcombo
@@ -375,6 +409,16 @@ public final class ShipFilterDialog extends Dialog {
         filter.notlocked = this.notlocked.getSelection();
 
         return filter;
+    }
+
+    /**
+     * グループを選択した時にグループのコンボボックスを制御する
+     */
+    private final class GroupCheckAdapter extends SelectionAdapter {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+            ShipFilterDialog.this.groupcombo.setEnabled(ShipFilterDialog.this.group.getSelection());
+        }
     }
 
     /**

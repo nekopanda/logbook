@@ -8,6 +8,7 @@ package logbook.gui;
 import logbook.config.AppConfig;
 import logbook.config.ConfigMigration;
 import logbook.config.ShipConfig;
+import logbook.config.ShipGroupConfig;
 import logbook.constants.AppConstants;
 import logbook.gui.background.AsyncExecApplicationMain;
 import logbook.gui.background.AsyncExecApplicationMainConsole;
@@ -136,6 +137,7 @@ public final class ApplicationMain {
             // 設定読み込み
             AppConfig.load();
             ShipConfig.load();
+            ShipGroupConfig.load();
             // 旧設定ファイルを移行します
             ConfigMigration.migration();
             // アプリケーション開始
@@ -144,6 +146,7 @@ public final class ApplicationMain {
             // ウインドウが閉じたタイミングで設定を書き込みます
             AppConfig.store();
             ShipConfig.store();
+            ShipGroupConfig.store();
         } catch (Error e) {
             LOG.fatal("メインスレッドが異常終了しました", e);
         } catch (Exception e) {
@@ -267,6 +270,7 @@ public final class ApplicationMain {
         cmdshiplist.setText("所有艦娘一覧(&S)\tCtrl+S");
         cmdshiplist.setAccelerator(SWT.CTRL + 'S');
         cmdshiplist.addSelectionListener(new ShipListReportAdapter(this.shell));
+
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // コマンド-お風呂に入りたい艦娘
@@ -298,6 +302,15 @@ public final class ApplicationMain {
         calcexp.setAccelerator(SWT.CTRL + 'C');
         calcexp.addSelectionListener(new CalcExpAdapter(this.shell));
 
+        // その他-グループエディター
+        MenuItem shipgroup = new MenuItem(etcmenu, SWT.NONE);
+        shipgroup.setText("グループエディター");
+        shipgroup.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                new ShipFilterGroupDialog(ApplicationMain.this.shell).open();
+            }
+        });
         // ヘルプ-設定
         MenuItem config = new MenuItem(etcmenu, SWT.NONE);
         config.setText("設定(&P)");

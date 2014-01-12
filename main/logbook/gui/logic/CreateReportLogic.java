@@ -679,6 +679,12 @@ public final class CreateReportLogic {
                 return false;
             }
         }
+        // グループでフィルタ
+        if (filter.group != null) {
+            if (!filter.group.getShips().contains(ship.getId())) {
+                return false;
+            }
+        }
         // 装備でフィルタ
         if (!StringUtils.isEmpty(filter.itemname)) {
             List<ItemDto> item = ship.getItem();

@@ -88,4 +88,7 @@ public class AppConstants {
 
     /** 建造ドック設定ファイル  */
     public static final File KDOCK_CONFIG_FILE = new File("./config/kdock.xml");
+
+    /** 所有艦娘グループ設定ファイル  */
+    public static final File GROUP_CONFIG_FILE = new File("./config/group.xml");
 }

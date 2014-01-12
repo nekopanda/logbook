@@ -21,6 +21,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
@@ -78,7 +79,7 @@ public abstract class AbstractTableDialog extends Dialog {
     /**
      * Open the dialog.
      */
-    public final void open() {
+    public void open() {
         // シェルを作成
         this.shell = new Shell(this.getParent(), this.getStyle());
         this.shell.setSize(this.getSize());
@@ -87,8 +88,10 @@ public abstract class AbstractTableDialog extends Dialog {
         // メニューバー
         this.menubar = new Menu(this.shell, SWT.BAR);
         this.shell.setMenuBar(this.menubar);
+        // テーブルより前に作成する必要があるコンポジットを作成
+        this.createContentsBefore();
         // テーブル
-        this.table = new Table(this.shell, SWT.FULL_SELECTION | SWT.MULTI);
+        this.table = new Table(this.getTableParent(), SWT.FULL_SELECTION | SWT.MULTI);
         this.table.addKeyListener(new TableKeyShortcutAdapter(this.header, this.table));
         this.table.setLinesVisible(true);
         this.table.setHeaderVisible(true);
@@ -144,7 +147,7 @@ public abstract class AbstractTableDialog extends Dialog {
     /**
      * テーブルをリロードする
      */
-    protected final void reloadTable() {
+    protected void reloadTable() {
         this.shell.setRedraw(false);
         TableColumn sortColumn = this.table.getSortColumn();
         this.table.setSortColumn(null);
@@ -175,7 +178,7 @@ public abstract class AbstractTableDialog extends Dialog {
     /**
      * テーブルボディーをセットする
      */
-    protected final void setTableBody() {
+    protected void setTableBody() {
         TableItemCreator creator = this.getTableItemCreator();
         creator.init();
         for (int i = 0; i < this.body.size(); i++) {
@@ -187,7 +190,7 @@ public abstract class AbstractTableDialog extends Dialog {
     /**
      * テーブルボディーをクリアする
      */
-    protected final void disposeTableBody() {
+    protected void disposeTableBody() {
         TableItem[] items = this.table.getItems();
         for (int i = 0; i < items.length; i++) {
             items[i].dispose();
@@ -197,11 +200,25 @@ public abstract class AbstractTableDialog extends Dialog {
     /**
      * テーブルヘッダーの幅を調節する
      */
-    protected final void packTableHeader() {
+    protected void packTableHeader() {
         TableColumn[] columns = this.table.getColumns();
         for (TableColumn tableColumn : columns) {
             tableColumn.pack();
         }
+    }
+
+    /**
+     * テーブルの親コンポジット
+     * @return テーブルの親コンポジットを取得します
+     */
+    protected Composite getTableParent() {
+        return this.shell;
+    }
+
+    /**
+     * Create contents of the dialog.
+     */
+    protected void createContentsBefore() {
     }
 
     /**
@@ -250,7 +267,7 @@ public abstract class AbstractTableDialog extends Dialog {
      * 
      * @param headerColumn ソートするカラム
      */
-    protected final void sortTableItems(TableColumn headerColumn) {
+    protected void sortTableItems(TableColumn headerColumn) {
         int index = 0;
         for (int i = 0; i < this.header.length; i++) {
             if (this.header[i].equals(headerColumn.getText())) {
@@ -267,7 +284,7 @@ public abstract class AbstractTableDialog extends Dialog {
      * @param index カラムインデックス
      * @param headerColumn ソートするカラム
      */
-    protected final void sortTableItems(int index, TableColumn headerColumn) {
+    protected void sortTableItems(int index, TableColumn headerColumn) {
         this.shell.setRedraw(false);
         this.disposeTableBody();
 
