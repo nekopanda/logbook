@@ -66,8 +66,12 @@ public final class ShipTable extends AbstractTableDialog {
         for (int i = 0; i < ShipGroupConfig.get().getGroup().size(); i++) {
             ShipGroupBean group = ShipGroupConfig.get().getGroup().get(i);
             MenuItem groupItem = new MenuItem(groupMenu, SWT.RADIO);
-            groupItem.setText(group.getName() + "\t" + "F" + (i + 7));
-            groupItem.setAccelerator(SWT.KEYCODE_BIT + 16 + i);
+            if ((SWT.KEYCODE_BIT + 16 + i) <= SWT.F20) {
+                groupItem.setText(group.getName() + "\t" + "F" + (i + 7));
+                groupItem.setAccelerator(SWT.KEYCODE_BIT + 16 + i);
+            } else {
+                groupItem.setText(group.getName());
+            }
             groupItem.setData(group);
             groupItem.addSelectionListener(groupListener);
         }
