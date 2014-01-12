@@ -305,18 +305,14 @@ public final class ApplicationMain {
 
         // その他-グループエディター
         MenuItem shipgroup = new MenuItem(etcmenu, SWT.NONE);
-        shipgroup.setText("グループエディター");
+        shipgroup.setText("グループエディター(&G)");
         shipgroup.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 new ShipFilterGroupDialog(ApplicationMain.this.shell).open();
             }
         });
-        // ヘルプ-設定
-        MenuItem config = new MenuItem(etcmenu, SWT.NONE);
-        config.setText("設定(&P)");
-        config.addSelectionListener(new ConfigDialogAdapter(this.shell));
-        // ヘルプ-自動プロキシ構成スクリプトファイル生成
+        // その他-自動プロキシ構成スクリプトファイル生成
         MenuItem pack = new MenuItem(etcmenu, SWT.NONE);
         pack.setText("自動プロキシ構成スクリプト");
         pack.addSelectionListener(new SelectionAdapter() {
@@ -325,7 +321,13 @@ public final class ApplicationMain {
                 new CreatePacFileDialog(ApplicationMain.this.shell).open();
             }
         });
-        // ヘルプ-バージョン情報
+        // セパレータ
+        new MenuItem(etcmenu, SWT.SEPARATOR);
+        // その他-設定
+        MenuItem config = new MenuItem(etcmenu, SWT.NONE);
+        config.setText("設定(&P)");
+        config.addSelectionListener(new ConfigDialogAdapter(this.shell));
+        // その他-バージョン情報
         MenuItem version = new MenuItem(etcmenu, SWT.NONE);
         version.setText("バージョン情報(&A)");
         version.addSelectionListener(new HelpEventListener(this.shell));
