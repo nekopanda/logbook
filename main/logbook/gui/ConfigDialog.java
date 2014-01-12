@@ -172,7 +172,7 @@ public final class ConfigDialog extends Dialog {
 
         final Button warnByHalfDamage = new Button(compositeFleetTab, SWT.CHECK);
         warnByHalfDamage.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 1, 1));
-        warnByHalfDamage.setText("中破で致命的アイコン表示");
+        warnByHalfDamage.setText("中破で警告アイコン表示");
         warnByHalfDamage.setSelection(AppConfig.get().isWarnByHalfDamage());
 
         final Button fatalBybadlyDamage = new Button(compositeFleetTab, SWT.CHECK);
