@@ -356,7 +356,7 @@ public final class ApplicationMain {
         this.tabFolder.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
         this.tabFolder.setTabHeight(26);
         this.tabFolder.marginWidth = 0;
-        this.tabFolder.setMinimumCharacters(5);
+        this.tabFolder.setMinimumCharacters(2);
 
         // 母港タブ
         CTabItem mainItem = new CTabItem(this.tabFolder, SWT.NONE);

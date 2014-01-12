@@ -364,7 +364,7 @@ public final class AsyncExecApplicationMain extends Thread {
                         tabItem.setText(dock.getName());
 
                         // メインコンポジット
-                        tabComposite = new FleetComposite(this.main.getTabFolder());
+                        tabComposite = new FleetComposite(this.main.getTabFolder(), tabItem);
                         tabItem.setControl(tabComposite);
 
                         tabItems[i] = tabItem;

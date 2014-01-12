@@ -13,8 +13,10 @@ import logbook.dto.ShipDto;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -28,8 +30,12 @@ import org.eclipse.wb.swt.SWTResourceManager;
  */
 public class FleetComposite extends Composite {
 
+    private static final int WARN = 1;
+    private static final int FATAL = 2;
+
     private static final int MAXCHARA = 6;
 
+    private final CTabItem tab;
     private final Font large1;
     private final Font large2;
 
@@ -37,6 +43,10 @@ public class FleetComposite extends Composite {
 
     private final Composite fleetGroup;
 
+    private int state;
+
+    /** アイコンラベル */
+    private final Label[] iconLabels = new Label[MAXCHARA];
     /** 名前ラベル */
     private final Label[] nameLabels = new Label[MAXCHARA];
     /** 今のHP */
@@ -55,10 +65,12 @@ public class FleetComposite extends Composite {
     private final Label[] fuelstLabels = new Label[MAXCHARA];
 
     /**
-     * @param parent
+     * @param parent 艦隊タブの親
+     * @param tabItem 艦隊タブ
      */
-    public FleetComposite(CTabFolder parent) {
+    public FleetComposite(CTabFolder parent, CTabItem tabItem) {
         super(parent, SWT.NONE);
+        this.tab = tabItem;
         this.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         GridLayout glParent = new GridLayout(1, false);
         glParent.horizontalSpacing = 0;
@@ -77,22 +89,28 @@ public class FleetComposite extends Composite {
 
         this.fleetGroup = new Composite(this, SWT.NONE);
         this.fleetGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        GridLayout glShipGroup = new GridLayout(2, false);
+        GridLayout glShipGroup = new GridLayout(3, false);
         glShipGroup.horizontalSpacing = 0;
         glShipGroup.marginTop = 0;
         glShipGroup.marginHeight = 0;
         glShipGroup.marginBottom = 0;
         glShipGroup.verticalSpacing = 0;
         this.fleetGroup.setLayout(glShipGroup);
+        this.init();
+    }
 
+    /**
+     * 初期化
+     */
+    private void init() {
         for (int i = 0; i < MAXCHARA; i++) {
-
+            // 名前
+            Label iconlabel = new Label(this.fleetGroup, SWT.NONE);
             // 名前
             Label namelabel = new Label(this.fleetGroup, SWT.NONE);
             namelabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             namelabel.setFont(this.large1);
             namelabel.setText("名前");
-
             // HP
             Composite hpComposite = new Composite(this.fleetGroup, SWT.NONE);
             GridLayout glHp = new GridLayout(3, false);
@@ -113,6 +131,7 @@ public class FleetComposite extends Composite {
             hpmsg.setText("(健在)");
 
             // ステータス
+            new Label(this.fleetGroup, SWT.NONE);
             Composite stateComposite = new Composite(this.fleetGroup, SWT.NONE);
             GridLayout glState = new GridLayout(3, false);
             glState.horizontalSpacing = 1;
@@ -135,6 +154,7 @@ public class FleetComposite extends Composite {
             cond.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
             cond.setText("49 cond.");
 
+            this.iconLabels[i] = iconlabel;
             this.nameLabels[i] = namelabel;
             this.nowhpLabels[i] = nowhp;
             this.maxhpLabels[i] = maxhp;
@@ -144,7 +164,6 @@ public class FleetComposite extends Composite {
             this.bullstLabels[i] = bullst;
             this.fuelstLabels[i] = fuelst;
         }
-
         this.fleetGroup.layout(true);
     }
 
@@ -157,6 +176,8 @@ public class FleetComposite extends Composite {
         if (this.dock == dock) {
             return;
         }
+        this.state = 0;
+
         List<ShipDto> ships = dock.getShips();
         for (int i = ships.size(); i < MAXCHARA; i++) {
             this.nameLabels[i].setText("");
@@ -171,6 +192,9 @@ public class FleetComposite extends Composite {
         for (int i = 0; i < ships.size(); i++) {
             ShipDto ship = ships.get(i);
 
+            // アイコン
+            Image image = null;
+            // 名前
             String name = ship.getName();
             // HP
             long nowhp = ship.getNowhp();
@@ -195,10 +219,16 @@ public class FleetComposite extends Composite {
 
             // 体力メッセージ
             if (hpratio <= AppConstants.BADLY_DAMAGE) {
+                image = SWTResourceManager.getImage(FleetComposite.class, "/resources/icon/exclamation.png");
+                this.state |= FATAL;
+
                 this.hpmsgLabels[i].setText("(大破)");
                 this.hpmsgLabels[i].setBackground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
                 this.hpmsgLabels[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
             } else if (hpratio <= AppConstants.HALF_DAMAGE) {
+                image = SWTResourceManager.getImage(FleetComposite.class, "/resources/icon/error.png");
+                this.state |= WARN;
+
                 this.hpmsgLabels[i].setText("(中破)");
                 this.hpmsgLabels[i].setBackground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
                 this.hpmsgLabels[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
@@ -226,6 +256,10 @@ public class FleetComposite extends Composite {
                 this.fuelstLabels[i].setEnabled(false);
                 this.fuelstLabels[i].setForeground(null);
             } else {
+                if (image == null) {
+                    image = SWTResourceManager.getImage(FleetComposite.class, "/resources/icon/error.png");
+                    this.state |= WARN;
+                }
                 this.fuelstLabels[i].setEnabled(true);
                 if (fuelraito <= AppConstants.EMPTY_SUPPLY) {
                     this.fuelstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
@@ -240,6 +274,10 @@ public class FleetComposite extends Composite {
                 this.bullstLabels[i].setBackground(null);
                 this.bullstLabels[i].setForeground(null);
             } else {
+                if (image == null) {
+                    image = SWTResourceManager.getImage(FleetComposite.class, "/resources/icon/error.png");
+                    this.state |= WARN;
+                }
                 this.bullstLabels[i].setEnabled(true);
                 if (bullraito <= AppConstants.EMPTY_SUPPLY) {
                     this.bullstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
@@ -249,9 +287,17 @@ public class FleetComposite extends Composite {
             }
             // コンディション
             if (cond <= AppConstants.COND_RED) {
+                if (image == null) {
+                    image = SWTResourceManager.getImage(FleetComposite.class, "/resources/icon/error.png");
+                    this.state |= WARN;
+                }
                 this.condLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
                 this.condstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
             } else if (cond <= AppConstants.COND_ORANGE) {
+                if (image == null) {
+                    image = SWTResourceManager.getImage(FleetComposite.class, "/resources/icon/error.png");
+                    this.state |= WARN;
+                }
                 this.condLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
                 this.condstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
             } else {
@@ -259,6 +305,7 @@ public class FleetComposite extends Composite {
                 this.condstLabels[i].setForeground(null);
             }
 
+            this.iconLabels[i].setImage(image);
             this.nameLabels[i].setText(name);
             this.nameLabels[i].setToolTipText("燃:" + ship.getFuel() + "/" + ship.getFuelMax() + " 弾:"
                     + ship.getBull() + "/" + ship.getBullMax() + " Next:" + ship.getNext() + "exp");
@@ -268,7 +315,23 @@ public class FleetComposite extends Composite {
             this.bullstLabels[i].getParent().layout(true);
         }
         this.dock = dock;
+        this.updateTabIcon();
         this.fleetGroup.layout(true);
+    }
+
+    /**
+     * 艦隊タブのアイコンを更新します
+     */
+    private void updateTabIcon() {
+        if (this.state == 0) {
+            this.tab.setImage(null);
+        } else {
+            if ((this.state & FATAL) == FATAL) {
+                this.tab.setImage(SWTResourceManager.getImage(FleetComposite.class, "/resources/icon/exclamation.png"));
+            } else if ((this.state & WARN) == WARN) {
+                this.tab.setImage(SWTResourceManager.getImage(FleetComposite.class, "/resources/icon/error.png"));
+            }
+        }
     }
 
     @Override
