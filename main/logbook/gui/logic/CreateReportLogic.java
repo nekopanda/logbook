@@ -587,14 +587,11 @@ public final class CreateReportLogic {
             // テキストが入力されている場合処理する
             if (filter.regexp) {
                 // 正規表現で検索
-                if (filter.namepattern == null) {
-                    // 正規表現で検索する場合、パターンの作成がまだならパターンを作成する
-                    try {
-                        filter.namepattern = Pattern.compile(filter.nametext);
-                    } catch (PatternSyntaxException e) {
-                        // 無効な正規表現はfalseを返す
-                        return false;
-                    }
+                try {
+                    filter.namepattern = Pattern.compile(filter.nametext);
+                } catch (PatternSyntaxException e) {
+                    // 無効な正規表現はfalseを返す
+                    return false;
                 }
                 Matcher matcher = filter.namepattern.matcher(ship.getName());
                 if (!matcher.find()) {

@@ -367,6 +367,8 @@ public final class ShipFilterDialog extends Dialog {
                 filter.itemname = this.itemcombo.getItem(ShipFilterDialog.this.itemcombo
                         .getSelectionIndex());
             }
+        } else {
+            filter.itemname = null;
         }
         filter.onfleet = this.onfleet.getSelection();
         filter.notonfleet = this.notonfleet.getSelection();
