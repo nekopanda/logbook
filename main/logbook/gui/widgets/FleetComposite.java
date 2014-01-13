@@ -180,6 +180,7 @@ public class FleetComposite extends Composite {
 
         List<ShipDto> ships = dock.getShips();
         for (int i = ships.size(); i < MAXCHARA; i++) {
+            this.iconLabels[i].setImage(null);
             this.nameLabels[i].setText("");
             this.nowhpLabels[i].setText("");
             this.maxhpLabels[i].setText("");
@@ -190,6 +191,7 @@ public class FleetComposite extends Composite {
             this.fuelstLabels[i].setText("");
         }
         for (int i = 0; i < ships.size(); i++) {
+            int state = 0;
             ShipDto ship = ships.get(i);
             // 名前
             String name = ship.getName();
@@ -218,7 +220,7 @@ public class FleetComposite extends Composite {
             if (hpratio <= AppConstants.BADLY_DAMAGE) {
                 if (AppConfig.get().isFatalBybadlyDamage()) {
                     // 大破で致命的アイコン
-                    this.state |= FATAL;
+                    state |= FATAL;
                 }
 
                 this.hpmsgLabels[i].setText("(大破)");
@@ -227,7 +229,7 @@ public class FleetComposite extends Composite {
             } else if (hpratio <= AppConstants.HALF_DAMAGE) {
                 if (AppConfig.get().isWarnByHalfDamage()) {
                     // 中破で警告アイコン
-                    this.state |= WARN;
+                    state |= WARN;
                 }
 
                 this.hpmsgLabels[i].setText("(中破)");
@@ -259,7 +261,7 @@ public class FleetComposite extends Composite {
             } else {
                 if (AppConfig.get().isWarnByNeedSupply()) {
                     // 補給不足で警告アイコン
-                    this.state |= WARN;
+                    state |= WARN;
                 }
                 this.fuelstLabels[i].setEnabled(true);
                 if (fuelraito <= AppConstants.EMPTY_SUPPLY) {
@@ -277,7 +279,7 @@ public class FleetComposite extends Composite {
             } else {
                 if (AppConfig.get().isWarnByNeedSupply()) {
                     // 補給不足で警告アイコン
-                    this.state |= WARN;
+                    state |= WARN;
                 }
                 this.bullstLabels[i].setEnabled(true);
                 if (bullraito <= AppConstants.EMPTY_SUPPLY) {
@@ -288,28 +290,34 @@ public class FleetComposite extends Composite {
             }
             // コンディション
             if (cond <= AppConstants.COND_RED) {
+                // 疲労19以下
                 if (AppConfig.get().isWarnByCondState()) {
                     // 疲労状態で警告アイコン
-                    this.state |= WARN;
+                    state |= WARN;
                 }
                 this.condLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
                 this.condstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
             } else if (cond <= AppConstants.COND_ORANGE) {
+                // 疲労29以下
                 if (AppConfig.get().isWarnByCondState()) {
                     // 疲労状態で警告アイコン
-                    this.state |= WARN;
+                    state |= WARN;
                 }
                 this.condLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
                 this.condstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
+            } else if (cond >= AppConstants.COND_GREEN) {
+                // 疲労50以上
+                this.condLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_GREEN_COLOR));
+                this.condstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_GREEN_COLOR));
             } else {
                 this.condLabels[i].setForeground(null);
                 this.condstLabels[i].setForeground(null);
             }
 
-            if ((this.state & FATAL) == FATAL) {
+            if ((state & FATAL) == FATAL) {
                 this.iconLabels[i].setImage(SWTResourceManager.getImage(FleetComposite.class,
                         "/resources/icon/exclamation.png"));
-            } else if ((this.state & WARN) == WARN) {
+            } else if ((state & WARN) == WARN) {
                 this.iconLabels[i].setImage(SWTResourceManager.getImage(FleetComposite.class,
                         "/resources/icon/error.png"));
             } else {
@@ -322,6 +330,7 @@ public class FleetComposite extends Composite {
             this.maxhpLabels[i].setText("/" + maxhp);
             this.condLabels[i].setText(ship.getCond() + " cond.");
             this.bullstLabels[i].getParent().layout(true);
+            this.state |= state;
         }
         this.dock = dock;
         this.updateTabIcon();
