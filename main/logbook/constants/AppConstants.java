@@ -97,4 +97,22 @@ public class AppConstants {
 
     /** 所有艦娘グループ設定ファイル  */
     public static final File GROUP_CONFIG_FILE = new File("./config/group.xml");
+
+    /** /resources/icon/add.png */
+    public static final String R_ICON_ADD = "/resources/icon/add.png";
+
+    /** /resources/icon/delete.png */
+    public static final String R_ICON_DELETE = "/resources/icon/delete.png";
+
+    /** /resources/icon/error.png */
+    public static final String R_ICON_ERROR = "/resources/icon/error.png";
+
+    /** /resources/icon/exclamation.png */
+    public static final String R_ICON_EXCLAMATION = "/resources/icon/exclamation.png";
+
+    /** /resources/icon/folder_star.png */
+    public static final String R_ICON_FOLDER_STAR = "/resources/icon/folder_star.png";
+
+    /** /resources/icon/star.png */
+    public static final String R_ICON_STAR = "/resources/icon/star.png";
 }

@@ -316,10 +316,10 @@ public class FleetComposite extends Composite {
 
             if ((state & FATAL) == FATAL) {
                 this.iconLabels[i].setImage(SWTResourceManager.getImage(FleetComposite.class,
-                        "/resources/icon/exclamation.png"));
+                        AppConstants.R_ICON_EXCLAMATION));
             } else if ((state & WARN) == WARN) {
-                this.iconLabels[i].setImage(SWTResourceManager.getImage(FleetComposite.class,
-                        "/resources/icon/error.png"));
+                this.iconLabels[i].setImage(SWTResourceManager
+                        .getImage(FleetComposite.class, AppConstants.R_ICON_ERROR));
             } else {
                 this.iconLabels[i].setImage(null);
             }
@@ -345,9 +345,9 @@ public class FleetComposite extends Composite {
             this.tab.setImage(null);
         } else {
             if ((this.state & FATAL) == FATAL) {
-                this.tab.setImage(SWTResourceManager.getImage(FleetComposite.class, "/resources/icon/exclamation.png"));
+                this.tab.setImage(SWTResourceManager.getImage(FleetComposite.class, AppConstants.R_ICON_EXCLAMATION));
             } else if ((this.state & WARN) == WARN) {
-                this.tab.setImage(SWTResourceManager.getImage(FleetComposite.class, "/resources/icon/error.png"));
+                this.tab.setImage(SWTResourceManager.getImage(FleetComposite.class, AppConstants.R_ICON_ERROR));
             }
         }
     }

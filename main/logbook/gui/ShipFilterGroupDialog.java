@@ -13,6 +13,7 @@ import java.util.Map;
 import logbook.config.ShipGroupConfig;
 import logbook.config.bean.ShipGroupBean;
 import logbook.config.bean.ShipGroupListBean;
+import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.dto.ShipDto;
 import logbook.gui.logic.CreateReportLogic;
@@ -89,26 +90,26 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
 
         Button btnAdd = new Button(this.sideComposite, SWT.NONE);
         btnAdd.addSelectionListener(new AddGroupAdapter(this));
-        btnAdd.setImage(SWTResourceManager.getImage(ShipFilterGroupDialog.class, "/resources/icon/add.png"));
+        btnAdd.setImage(SWTResourceManager.getImage(ShipFilterGroupDialog.class, AppConstants.R_ICON_ADD));
 
         Button btnRemove = new Button(this.sideComposite, SWT.NONE);
         btnRemove.addSelectionListener(new RemoveGroupAdapter(this));
-        btnRemove.setImage(SWTResourceManager.getImage(ShipFilterGroupDialog.class, "/resources/icon/delete.png"));
+        btnRemove.setImage(SWTResourceManager.getImage(ShipFilterGroupDialog.class, AppConstants.R_ICON_DELETE));
 
         this.tree = new Tree(this.sideComposite, SWT.BORDER);
         this.tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
         this.tree.addSelectionListener(new TreeSelectionAdapter(this));
 
         this.treeItem = new TreeItem(this.tree, SWT.NONE);
-        this.treeItem.setImage(SWTResourceManager.getImage(ShipFilterGroupDialog.class, "/resources/icon/star.png"));
+        this.treeItem.setImage(SWTResourceManager.getImage(ShipFilterGroupDialog.class, AppConstants.R_ICON_STAR));
         this.treeItem.setText("グループ");
 
         ShipGroupListBean shipGroupList = ShipGroupConfig.get();
 
         for (ShipGroupBean bean : shipGroupList.getGroup()) {
             TreeItem groupItem = new TreeItem(this.treeItem, SWT.NONE);
-            groupItem.setImage(SWTResourceManager.getImage(ShipFilterGroupDialog.class,
-                    "/resources/icon/folder_star.png"));
+            groupItem.setImage(SWTResourceManager
+                    .getImage(ShipFilterGroupDialog.class, AppConstants.R_ICON_FOLDER_STAR));
             groupItem.setText(bean.getName());
             groupItem.setData(new GroupProperty(bean, groupItem));
         }
@@ -299,8 +300,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
             shipGroupList.add(bean);
 
             TreeItem item = new TreeItem(this.dialog.treeItem, SWT.NONE);
-            item.setImage(SWTResourceManager.getImage(ShipFilterGroupDialog.class,
-                    "/resources/icon/folder_star.png"));
+            item.setImage(SWTResourceManager.getImage(ShipFilterGroupDialog.class, AppConstants.R_ICON_FOLDER_STAR));
             item.setText(bean.getName());
             item.setData(new GroupProperty(bean, item));
             this.dialog.treeItem.setExpanded(true);
