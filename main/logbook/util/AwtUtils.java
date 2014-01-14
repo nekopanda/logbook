@@ -3,7 +3,7 @@
  * This program and the accompanying materials
  * are made available under the terms of the Public Domain.
  */
-package logbook.gui.logic;
+package logbook.util;
 
 import java.awt.Color;
 import java.awt.Rectangle;

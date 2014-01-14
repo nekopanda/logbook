@@ -18,8 +18,8 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
 
 import logbook.config.AppConfig;
-import logbook.gui.logic.AwtUtils;
 import logbook.gui.logic.LayoutLogic;
+import logbook.util.AwtUtils;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
