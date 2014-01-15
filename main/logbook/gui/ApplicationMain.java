@@ -206,14 +206,16 @@ public final class ApplicationMain {
                 AppConfig.get().setWidth(ApplicationMain.this.shell.getSize().x);
                 AppConfig.get().setHeight(ApplicationMain.this.shell.getSize().y);
 
-                MessageBox box = new MessageBox(ApplicationMain.this.shell, SWT.YES | SWT.NO
-                        | SWT.ICON_QUESTION);
-                box.setText("終了の確認");
-                box.setMessage("航海日誌を終了しますか？");
-                if (box.open() == SWT.YES) {
-                    e.doit = true;
-                } else {
-                    e.doit = false;
+                if (AppConfig.get().isCheckDoit()) {
+                    MessageBox box = new MessageBox(ApplicationMain.this.shell, SWT.YES | SWT.NO
+                            | SWT.ICON_QUESTION);
+                    box.setText("終了の確認");
+                    box.setMessage("航海日誌を終了しますか？");
+                    if (box.open() == SWT.YES) {
+                        e.doit = true;
+                    } else {
+                        e.doit = false;
+                    }
                 }
             }
         });

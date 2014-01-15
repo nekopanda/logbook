@@ -40,6 +40,9 @@ public final class AppConfigBean {
     /** アップデートチェック */
     private boolean checkUpdate = true;
 
+    /** 終了時に確認する */
+    private boolean checkDoit = true;
+
     /** タスクトレイに格納 */
     private boolean hideWindow;
 
@@ -224,6 +227,22 @@ public final class AppConfigBean {
     }
 
     /**
+     * 終了時に確認するを取得します。
+     * @return 終了時に確認する
+     */
+    public boolean isCheckDoit() {
+        return this.checkDoit;
+    }
+
+    /**
+     * 終了時に確認するを設定します。
+     * @param checkDoit 終了時に確認する
+     */
+    public void setCheckDoit(boolean checkDoit) {
+        this.checkDoit = checkDoit;
+    }
+
+    /**
      * タスクトレイに格納を取得します。
      * @return タスクトレイに格納
      */
@@ -400,16 +419,16 @@ public final class AppConfigBean {
     }
 
     /**
-     * 大破で致命的アイコンを取得します。
-     * @return 大破で致命的アイコン
+     * 大破状態で致命的アイコンを取得します。
+     * @return 大破状態で致命的アイコン
      */
     public boolean isFatalByBadlyDamage() {
         return this.fatalByBadlyDamage;
     }
 
     /**
-     * 大破で致命的アイコンを設定します。
-     * @param fatalByBadlyDamage 大破で致命的アイコン
+     * 大破状態で致命的アイコンを設定します。
+     * @param fatalByBadlyDamage 大破状態で致命的アイコン
      */
     public void setFatalByBadlyDamage(boolean fatalByBadlyDamage) {
         this.fatalByBadlyDamage = fatalByBadlyDamage;

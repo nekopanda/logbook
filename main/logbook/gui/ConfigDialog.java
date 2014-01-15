@@ -112,7 +112,6 @@ public final class ConfigDialog extends Dialog {
         Composite compositeSystem = new Composite(this.composite, SWT.NONE);
         this.compositeMap.put("system", compositeSystem);
         compositeSystem.setLayout(new GridLayout(3, false));
-        compositeSystem.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
 
         Label label = new Label(compositeSystem, SWT.NONE);
         label.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -172,43 +171,47 @@ public final class ConfigDialog extends Dialog {
         reportSavedirBtn.setText("選択...");
 
         final Button hidewindow = new Button(compositeSystem, SWT.CHECK);
-        hidewindow.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 3, 1));
+        hidewindow.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
         hidewindow.setText("最小化時にタスクトレイに格納");
         hidewindow.setSelection(AppConfig.get().isHideWindow());
 
         final Button ontop = new Button(compositeSystem, SWT.CHECK);
-        ontop.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 3, 1));
+        ontop.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
         ontop.setText("最前面に表示する*");
         ontop.setSelection(AppConfig.get().isOnTop());
 
         final Button checkUpdate = new Button(compositeSystem, SWT.CHECK);
-        checkUpdate.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 3, 1));
+        checkUpdate.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
         checkUpdate.setText("起動時にアップデートチェック*");
         checkUpdate.setSelection(AppConfig.get().isCheckUpdate());
+
+        final Button checkDoit = new Button(compositeSystem, SWT.CHECK);
+        checkDoit.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        checkDoit.setText("終了時に確認する");
+        checkDoit.setSelection(AppConfig.get().isCheckDoit());
 
         // 艦隊タブ タブ
         Composite compositeFleetTab = new Composite(this.composite, SWT.NONE);
         this.compositeMap.put("fleettab", compositeFleetTab);
         compositeFleetTab.setLayout(new GridLayout(1, false));
-        compositeFleetTab.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
 
         final Button warnByNeedSupply = new Button(compositeFleetTab, SWT.CHECK);
-        warnByNeedSupply.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 1, 1));
+        warnByNeedSupply.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         warnByNeedSupply.setText("補給不足で警告アイコン表示");
         warnByNeedSupply.setSelection(AppConfig.get().isWarnByNeedSupply());
 
         final Button warnByCondState = new Button(compositeFleetTab, SWT.CHECK);
-        warnByCondState.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 1, 1));
+        warnByCondState.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         warnByCondState.setText("疲労状態で警告アイコン表示");
         warnByCondState.setSelection(AppConfig.get().isWarnByCondState());
 
         final Button warnByHalfDamage = new Button(compositeFleetTab, SWT.CHECK);
-        warnByHalfDamage.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 1, 1));
+        warnByHalfDamage.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         warnByHalfDamage.setText("中破で警告アイコン表示");
         warnByHalfDamage.setSelection(AppConfig.get().isWarnByHalfDamage());
 
         final Button fatalBybadlyDamage = new Button(compositeFleetTab, SWT.CHECK);
-        fatalBybadlyDamage.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 1, 1));
+        fatalBybadlyDamage.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         fatalBybadlyDamage.setText("大破で致命的アイコン表示");
         fatalBybadlyDamage.setSelection(AppConfig.get().isFatalBybadlyDamage());
 
@@ -216,7 +219,6 @@ public final class ConfigDialog extends Dialog {
         Composite compositeCapture = new Composite(this.composite, SWT.NONE);
         this.compositeMap.put("capture", compositeCapture);
         compositeCapture.setLayout(new GridLayout(3, false));
-        compositeCapture.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
 
         Label label4 = new Label(compositeCapture, SWT.NONE);
         label4.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -262,7 +264,6 @@ public final class ConfigDialog extends Dialog {
         Composite compositeDevelopment = new Composite(this.composite, SWT.NONE);
         this.compositeMap.put("development", compositeDevelopment);
         compositeDevelopment.setLayout(new GridLayout(2, false));
-        compositeDevelopment.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
 
         new Label(compositeDevelopment, SWT.NONE);
         final Button btnJson = new Button(compositeDevelopment, SWT.CHECK);
@@ -297,6 +298,7 @@ public final class ConfigDialog extends Dialog {
                 }
                 AppConfig.get().setHideWindow(hidewindow.getSelection());
                 AppConfig.get().setOnTop(ontop.getSelection());
+                AppConfig.get().setCheckDoit(checkDoit.getSelection());
                 if (StringUtils.isNumeric(soundlevel.getText())) {
                     float level = (float) Integer.parseInt(soundlevel.getText()) / 100;
                     AppConfig.get().setSoundLevel(level);
