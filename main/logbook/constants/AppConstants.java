@@ -74,14 +74,14 @@ public class AppConstants {
     /** 中破(50%) */
     public static final float HALF_DAMAGE = 0.5f;
 
-    /** 中破(25%) */
+    /** 大破(25%) */
     public static final float BADLY_DAMAGE = 0.25f;
 
     /** 補給(少) */
-    public static final float LOW_SUPPLY = 0.99f;
+    public static final float LOW_SUPPLY = 0.77f;
 
     /** 補給(空) */
-    public static final float EMPTY_SUPPLY = 0.79f;
+    public static final float EMPTY_SUPPLY = 0.33f;
 
     /** 文字コード(Shift_JIS) */
     public static final Charset CHARSET = Charset.forName("MS932");
@@ -115,4 +115,185 @@ public class AppConstants {
 
     /** /resources/icon/star.png */
     public static final String R_ICON_STAR = "/resources/icon/star.png";
+
+    /** /resources/hpgauge/0.png */
+    public static final String R_HPGAUGE_0 = "/resources/hpgauge/0.png";
+
+    /** /resources/hpgauge/1.png */
+    public static final String R_HPGAUGE_1 = "/resources/hpgauge/1.png";
+
+    /** /resources/hpgauge/2.png */
+    public static final String R_HPGAUGE_2 = "/resources/hpgauge/2.png";
+
+    /** /resources/hpgauge/3.png */
+    public static final String R_HPGAUGE_3 = "/resources/hpgauge/3.png";
+
+    /** /resources/hpgauge/4.png */
+    public static final String R_HPGAUGE_4 = "/resources/hpgauge/4.png";
+
+    /** /resources/hpgauge/5.png */
+    public static final String R_HPGAUGE_5 = "/resources/hpgauge/5.png";
+
+    /** /resources/hpgauge/6.png */
+    public static final String R_HPGAUGE_6 = "/resources/hpgauge/6.png";
+
+    /** /resources/hpgauge/7.png */
+    public static final String R_HPGAUGE_7 = "/resources/hpgauge/7.png";
+
+    /** /resources/hpgauge/8.png */
+    public static final String R_HPGAUGE_8 = "/resources/hpgauge/8.png";
+
+    /** /resources/hpgauge/9.png */
+    public static final String R_HPGAUGE_9 = "/resources/hpgauge/9.png";
+
+    /** /resources/hpgauge/10.png */
+    public static final String R_HPGAUGE_10 = "/resources/hpgauge/10.png";
+
+    /** /resources/hpgauge/11.png */
+    public static final String R_HPGAUGE_11 = "/resources/hpgauge/11.png";
+
+    /** /resources/hpgauge/12.png */
+    public static final String R_HPGAUGE_12 = "/resources/hpgauge/12.png";
+
+    /** /resources/hpgauge/13.png */
+    public static final String R_HPGAUGE_13 = "/resources/hpgauge/13.png";
+
+    /** /resources/hpgauge/14.png */
+    public static final String R_HPGAUGE_14 = "/resources/hpgauge/14.png";
+
+    /** /resources/hpgauge/15.png */
+    public static final String R_HPGAUGE_15 = "/resources/hpgauge/15.png";
+
+    /** /resources/hpgauge/16.png */
+    public static final String R_HPGAUGE_16 = "/resources/hpgauge/16.png";
+
+    /** /resources/hpgauge/17.png */
+    public static final String R_HPGAUGE_17 = "/resources/hpgauge/17.png";
+
+    /** /resources/hpgauge/18.png */
+    public static final String R_HPGAUGE_18 = "/resources/hpgauge/18.png";
+
+    /** /resources/hpgauge/19.png */
+    public static final String R_HPGAUGE_19 = "/resources/hpgauge/19.png";
+
+    /** /resources/hpgauge/20.png */
+    public static final String R_HPGAUGE_20 = "/resources/hpgauge/20.png";
+
+    /** /resources/hpgauge/21.png */
+    public static final String R_HPGAUGE_21 = "/resources/hpgauge/21.png";
+
+    /** /resources/hpgauge/22.png */
+    public static final String R_HPGAUGE_22 = "/resources/hpgauge/22.png";
+
+    /** /resources/hpgauge/23.png */
+    public static final String R_HPGAUGE_23 = "/resources/hpgauge/23.png";
+
+    /** /resources/hpgauge/24.png */
+    public static final String R_HPGAUGE_24 = "/resources/hpgauge/24.png";
+
+    /** /resources/hpgauge/25.png */
+    public static final String R_HPGAUGE_25 = "/resources/hpgauge/25.png";
+
+    /** /resources/hpgauge/26.png */
+    public static final String R_HPGAUGE_26 = "/resources/hpgauge/26.png";
+
+    /** /resources/hpgauge/27.png */
+    public static final String R_HPGAUGE_27 = "/resources/hpgauge/27.png";
+
+    /** /resources/hpgauge/28.png */
+    public static final String R_HPGAUGE_28 = "/resources/hpgauge/28.png";
+
+    /** /resources/hpgauge/29.png */
+    public static final String R_HPGAUGE_29 = "/resources/hpgauge/29.png";
+
+    /** /resources/hpgauge/30.png */
+    public static final String R_HPGAUGE_30 = "/resources/hpgauge/30.png";
+
+    /** /resources/hpgauge/31.png */
+    public static final String R_HPGAUGE_31 = "/resources/hpgauge/31.png";
+
+    /** /resources/hpgauge/32.png */
+    public static final String R_HPGAUGE_32 = "/resources/hpgauge/32.png";
+
+    /** /resources/hpgauge/33.png */
+    public static final String R_HPGAUGE_33 = "/resources/hpgauge/33.png";
+
+    /** /resources/hpgauge/34.png */
+    public static final String R_HPGAUGE_34 = "/resources/hpgauge/34.png";
+
+    /** /resources/hpgauge/35.png */
+    public static final String R_HPGAUGE_35 = "/resources/hpgauge/35.png";
+
+    /** /resources/hpgauge/36.png */
+    public static final String R_HPGAUGE_36 = "/resources/hpgauge/36.png";
+
+    /** /resources/hpgauge/37.png */
+    public static final String R_HPGAUGE_37 = "/resources/hpgauge/37.png";
+
+    /** /resources/hpgauge/38.png */
+    public static final String R_HPGAUGE_38 = "/resources/hpgauge/38.png";
+
+    /** /resources/hpgauge/39.png */
+    public static final String R_HPGAUGE_39 = "/resources/hpgauge/39.png";
+
+    /** /resources/hpgauge/40.png */
+    public static final String R_HPGAUGE_40 = "/resources/hpgauge/40.png";
+
+    /** /resources/hpgauge/41.png */
+    public static final String R_HPGAUGE_41 = "/resources/hpgauge/41.png";
+
+    /** /resources/hpgauge/42.png */
+    public static final String R_HPGAUGE_42 = "/resources/hpgauge/42.png";
+
+    /** /resources/hpgauge/43.png */
+    public static final String R_HPGAUGE_43 = "/resources/hpgauge/43.png";
+
+    /** /resources/hpgauge/44.png */
+    public static final String R_HPGAUGE_44 = "/resources/hpgauge/44.png";
+
+    /** /resources/hpgauge/45.png */
+    public static final String R_HPGAUGE_45 = "/resources/hpgauge/45.png";
+
+    /** /resources/hpgauge/46.png */
+    public static final String R_HPGAUGE_46 = "/resources/hpgauge/46.png";
+
+    /** /resources/hpgauge/47.png */
+    public static final String R_HPGAUGE_47 = "/resources/hpgauge/47.png";
+
+    /** /resources/hpgauge/48.png */
+    public static final String R_HPGAUGE_48 = "/resources/hpgauge/48.png";
+
+    /** /resources/hpgauge/49.png */
+    public static final String R_HPGAUGE_49 = "/resources/hpgauge/49.png";
+
+    /** /resources/hpgauge/50.png */
+    public static final String R_HPGAUGE_50 = "/resources/hpgauge/50.png";
+
+    /** HPゲージイメージ */
+    public static final String[] R_HPGAUGE_IMAGES = { AppConstants.R_HPGAUGE_0, AppConstants.R_HPGAUGE_1,
+            AppConstants.R_HPGAUGE_2, AppConstants.R_HPGAUGE_3, AppConstants.R_HPGAUGE_4, AppConstants.R_HPGAUGE_5,
+            AppConstants.R_HPGAUGE_6, AppConstants.R_HPGAUGE_7, AppConstants.R_HPGAUGE_8, AppConstants.R_HPGAUGE_9,
+            AppConstants.R_HPGAUGE_10, AppConstants.R_HPGAUGE_11, AppConstants.R_HPGAUGE_12, AppConstants.R_HPGAUGE_13,
+            AppConstants.R_HPGAUGE_14, AppConstants.R_HPGAUGE_15, AppConstants.R_HPGAUGE_16, AppConstants.R_HPGAUGE_17,
+            AppConstants.R_HPGAUGE_18, AppConstants.R_HPGAUGE_19, AppConstants.R_HPGAUGE_20, AppConstants.R_HPGAUGE_21,
+            AppConstants.R_HPGAUGE_22, AppConstants.R_HPGAUGE_23, AppConstants.R_HPGAUGE_24, AppConstants.R_HPGAUGE_25,
+            AppConstants.R_HPGAUGE_26, AppConstants.R_HPGAUGE_27, AppConstants.R_HPGAUGE_28, AppConstants.R_HPGAUGE_29,
+            AppConstants.R_HPGAUGE_30, AppConstants.R_HPGAUGE_31, AppConstants.R_HPGAUGE_32, AppConstants.R_HPGAUGE_33,
+            AppConstants.R_HPGAUGE_34, AppConstants.R_HPGAUGE_35, AppConstants.R_HPGAUGE_36, AppConstants.R_HPGAUGE_37,
+            AppConstants.R_HPGAUGE_38, AppConstants.R_HPGAUGE_39, AppConstants.R_HPGAUGE_40, AppConstants.R_HPGAUGE_41,
+            AppConstants.R_HPGAUGE_42, AppConstants.R_HPGAUGE_43, AppConstants.R_HPGAUGE_44, AppConstants.R_HPGAUGE_45,
+            AppConstants.R_HPGAUGE_46, AppConstants.R_HPGAUGE_47, AppConstants.R_HPGAUGE_48, AppConstants.R_HPGAUGE_49,
+            AppConstants.R_HPGAUGE_50 };
+
+    /** 艦隊タブの艦娘ラベルに設定するツールチップテキスト */
+    public static final String TOOLTIP_FLEETTAB_SHIP = "HP:{0}/{1} 燃料:{2}/{3} 弾:{4}/{5}\nNext:{6}exp";
+
+    /** メッセージ 出撃できます。 */
+    public static final String MESSAGE_GOOD = "出撃できます。";
+
+    /** メッセージ 大破している艦娘がいます。出撃はできません。 */
+    public static final String MESSAGE_BADLY_DAMAGE = "大破している艦娘がいます。出撃はできません。";
+
+    /** メッセージ 疲労している艦娘がいます */
+    public static final String MESSAGE_COND = "疲労している艦娘がいます{0}頃に回復します。";
 }
