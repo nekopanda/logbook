@@ -393,13 +393,15 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
 
         @Override
         public void widgetSelected(SelectionEvent e) {
-            Object data = e.item.getData();
-            if (data instanceof GroupProperty) {
-                this.dialog.property = (GroupProperty) data;
-            } else {
-                this.dialog.property = null;
+            if (e.item != null) {
+                Object data = e.item.getData();
+                if (data instanceof GroupProperty) {
+                    this.dialog.property = (GroupProperty) data;
+                } else {
+                    this.dialog.property = null;
+                }
+                this.dialog.reloadTable();
             }
-            this.dialog.reloadTable();
         }
     }
 
