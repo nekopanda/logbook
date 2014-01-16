@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import logbook.config.AppConfig;
 import logbook.gui.listener.TableKeyShortcutAdapter;
 import logbook.gui.listener.TableToClipboardAdapter;
 import logbook.gui.listener.TableToCsvSaveAdapter;
@@ -116,6 +117,11 @@ public abstract class AbstractTableDialog extends Dialog {
         reload.setText("再読み込み(&R)\tF5");
         reload.setAccelerator(SWT.F5);
         reload.addSelectionListener(new TableReloadAdapter());
+
+        MenuItem selectVisible = new MenuItem(this.opemenu, SWT.NONE);
+        selectVisible.setText("列の表示・非表示(&V)");
+        selectVisible.addSelectionListener(new SelectVisibleColumnAdapter());
+
         // テーブル右クリックメニュー
         this.tablemenu = new Menu(this.table);
         this.table.setMenu(this.tablemenu);
@@ -201,9 +207,15 @@ public abstract class AbstractTableDialog extends Dialog {
      * テーブルヘッダーの幅を調節する
      */
     protected void packTableHeader() {
+        boolean[] visibles = AppConfig.get().getVisibleColumnMap().get(this.getClass().getName());
+
         TableColumn[] columns = this.table.getColumns();
-        for (TableColumn tableColumn : columns) {
-            tableColumn.pack();
+        for (int i = 0; i < columns.length; i++) {
+            if ((visibles == null) || visibles[i]) {
+                columns[i].pack();
+            } else {
+                columns[i].setWidth(0);
+            }
         }
     }
 
@@ -380,4 +392,15 @@ public abstract class AbstractTableDialog extends Dialog {
             AbstractTableDialog.this.reloadTable();
         }
     }
+
+    /**
+     * テーブルの列を表示・非表示選択するダイアログを表示する
+     */
+    protected class SelectVisibleColumnAdapter extends SelectionAdapter {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+            new SelectVisibleColumnDialog(AbstractTableDialog.this.shell, AbstractTableDialog.this).open();
+        }
+    }
+
 }

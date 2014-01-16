@@ -6,6 +6,8 @@
 package logbook.config.bean;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * アプリケーションの設定
@@ -81,6 +83,9 @@ public final class AppConfigBean {
 
     /** 開発者オプション-JSONの保存先 */
     private String storeJsonPath = "./json/";
+
+    /** テーブル列を表示する設定(キー:java.lang.Class.getName()) */
+    private Map<String, boolean[]> visibleColumnMap = new HashMap<String, boolean[]>();
 
     /**
      * ポート番号を取得します。
@@ -464,5 +469,21 @@ public final class AppConfigBean {
      */
     public void setStoreJsonPath(String storeJsonPath) {
         this.storeJsonPath = storeJsonPath;
+    }
+
+    /**
+     * テーブル列を表示する設定(キー:java.lang.Class.getName())を取得します。
+     * @return テーブル列を表示する設定(キー:java.lang.Class.getName())
+     */
+    public Map<String, boolean[]> getVisibleColumnMap() {
+        return this.visibleColumnMap;
+    }
+
+    /**
+     * テーブル列を表示する設定(キー:java.lang.Class.getName())を設定します。
+     * @param visiblecolumnMap テーブル列を表示する設定(キー:java.lang.Class.getName())
+     */
+    public void setVisibleColumnMap(Map<String, boolean[]> visibleColumnMap) {
+        this.visibleColumnMap = visibleColumnMap;
     }
 }
