@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.dto.DeckMissionDto;
@@ -170,13 +171,16 @@ public final class AsyncExecApplicationMain extends Thread {
             // 現在時刻
             Date now = Calendar.getInstance().getTime();
             List<String> notice = new ArrayList<String>();
+            boolean visibleHome = false;
             // 遠征を更新する
             if (this.updateDeck(now, notice)) {
                 Sound.randomExpeditionSoundPlay();
+                visibleHome |= AppConfig.get().isVisibleOnReturnMission();
             }
             // 入渠を更新する
             if (this.updateNdock(now, notice)) {
                 Sound.randomDockSoundPlay();
+                visibleHome |= AppConfig.get().isVisibleOnReturnBathwater();
             }
             try {
                 // 遠征・入渠のお知らせ
@@ -186,7 +190,9 @@ public final class AsyncExecApplicationMain extends Thread {
                     tip.setText("遠征・入渠");
                     tip.setMessage(StringUtils.join(notice, "\r\n"));
                     this.main.getTrayItem().setToolTip(tip);
-                    this.main.getTabFolder().setSelection(0);
+                    if (visibleHome) {
+                        this.main.getTabFolder().setSelection(0);
+                    }
                     tip.setVisible(true);
                 }
             } catch (Exception e) {
@@ -364,7 +370,7 @@ public final class AsyncExecApplicationMain extends Thread {
                         tabItem.setText(dock.getName());
 
                         // メインコンポジット
-                        tabComposite = new FleetComposite(this.main.getTabFolder(), tabItem);
+                        tabComposite = new FleetComposite(this.main.getTabFolder(), tabItem, this.main);
                         tabItem.setControl(tabComposite);
 
                         tabItems[i] = tabItem;

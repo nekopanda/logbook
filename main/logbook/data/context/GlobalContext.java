@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -118,6 +119,9 @@ public final class GlobalContext {
     private static NdockDto[] ndocks = new NdockDto[] { NdockDto.EMPTY, NdockDto.EMPTY, NdockDto.EMPTY,
             NdockDto.EMPTY };
 
+    /** 出撃中か */
+    private static boolean[] isSortie = new boolean[4];
+
     /** ログキュー */
     private static Queue<String> consoleQueue = new ArrayBlockingQueue<String>(10);
 
@@ -206,10 +210,43 @@ public final class GlobalContext {
     }
 
     /**
+     * 艦娘が入渠しているかを調べます
+     * 
+     * @param ship 艦娘
+     * @return 入渠している場合true
+     */
+    public static boolean isNdock(ShipDto ship) {
+        return isNdock(ship.getId());
+    }
+
+    /**
+     * 艦娘が入渠しているかを調べます
+     * @param ship 艦娘ID
+     * @return 入渠している場合true
+     */
+    public static boolean isNdock(long ship) {
+        for (NdockDto ndock : ndocks) {
+            if (ship == ndock.getNdockid()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * @return ドック
      */
     public static DockDto getDock(String id) {
         return dock.get(id);
+    }
+
+    /**
+     * 出撃中かを調べます
+     * @return 出撃中
+     */
+    public static boolean isSortie(String idstr) {
+        int id = Integer.parseInt(idstr);
+        return isSortie[id - 1];
     }
 
     /**
@@ -292,6 +329,10 @@ public final class GlobalContext {
             // 艦隊
             case DECK:
                 doDeck(data);
+                break;
+            // 出撃
+            case START:
+                doStart(data);
                 break;
             // 艦娘一覧
             case SHIP_MASTER:
@@ -513,6 +554,8 @@ public final class GlobalContext {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
 
             JsonArray shipdata = apidata.getJsonArray("api_ship_data");
+            // 出撃中ではない
+            Arrays.fill(isSortie, false);
             // 情報を破棄
             shipMap.clear();
             for (int i = 0; i < shipdata.size(); i++) {
@@ -801,6 +844,21 @@ public final class GlobalContext {
         }
 
         addConsole("艦娘一覧を更新しました");
+    }
+
+    /**
+     * 出撃を更新します
+     * 
+     * @param data
+     */
+    private static void doStart(Data data) {
+        String idstr = data.getField("api_deck_id");
+        if (idstr != null) {
+            int id = Integer.parseInt(idstr);
+            isSortie[id - 1] = true;
+        }
+
+        addConsole("出撃を更新しました");
     }
 
     /**

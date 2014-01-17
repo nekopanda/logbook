@@ -10,8 +10,10 @@ import java.util.List;
 
 import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
+import logbook.data.context.GlobalContext;
 import logbook.dto.DockDto;
 import logbook.dto.ShipDto;
+import logbook.gui.ApplicationMain;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -26,6 +28,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ToolTip;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
@@ -43,6 +46,8 @@ public class FleetComposite extends Composite {
 
     /** タブ */
     private final CTabItem tab;
+    /** メイン画面 */
+    private final ApplicationMain main;
     /** フォント大きい */
     private final Font large;
     /** フォント小さい */
@@ -58,7 +63,7 @@ public class FleetComposite extends Composite {
     private long cond;
     /** 疲労回復時間(メッセージ表示用) */
     private String clearDate;
-    /** HP割合(メッセージ表示用) */
+    /** 大破している */
     private boolean badlyDamage;
 
     /** アイコンラベル */
@@ -86,9 +91,10 @@ public class FleetComposite extends Composite {
      * @param parent 艦隊タブの親
      * @param tabItem 艦隊タブ
      */
-    public FleetComposite(CTabFolder parent, CTabItem tabItem) {
+    public FleetComposite(CTabFolder parent, CTabItem tabItem, ApplicationMain main) {
         super(parent, SWT.NONE);
         this.tab = tabItem;
+        this.main = main;
         this.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         GridLayout glParent = new GridLayout(1, false);
         glParent.horizontalSpacing = 0;
@@ -208,6 +214,7 @@ public class FleetComposite extends Composite {
         if (this.dock == dock) {
             return;
         }
+        this.dock = dock;
         this.state = 0;
         this.cond = 49;
         this.clearDate = null;
@@ -380,15 +387,37 @@ public class FleetComposite extends Composite {
             this.state |= state;
         }
         // メッセージを更新する
-        if (this.badlyDamage) {
+        // 入渠中の艦娘を探す・制空値を計算
+        boolean isBathwater = false;
+        for (ShipDto shipDto : ships) {
+            if (GlobalContext.isNdock(shipDto)) {
+                isBathwater = true;
+                break;
+            }
+        }
+        int seiku = 0;
+        for (ShipDto shipDto : ships) {
+            seiku += shipDto.getSeiku();
+        }
+        if (isBathwater) {
+            // 入渠中
+            StyleRange style = new StyleRange();
+            style.fontStyle = SWT.BOLD;
+            style.foreground = SWTResourceManager.getColor(SWT.COLOR_DARK_BLUE);
+            this.addStyledText(this.message,
+                    MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BATHWATER), style);
+        } else if (this.badlyDamage) {
+            // 大破
             StyleRange style = new StyleRange();
             style.fontStyle = SWT.BOLD;
             style.underline = true;
             style.underlineStyle = SWT.UNDERLINE_SQUIGGLE;
             style.underlineColor = SWTResourceManager.getColor(SWT.COLOR_RED);
             style.foreground = SWTResourceManager.getColor(SWT.COLOR_RED);
-            this.addStyledText(this.message, AppConstants.MESSAGE_BADLY_DAMAGE, style);
+            this.addStyledText(this.message,
+                    MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BADLY_DAMAGE), style);
         } else {
+            // 出撃可能
             StyleRange style = new StyleRange();
             style.fontStyle = SWT.BOLD;
             style.foreground = SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN);
@@ -397,11 +426,12 @@ public class FleetComposite extends Composite {
         if (this.clearDate != null) {
             this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_COND, this.clearDate), null);
         }
+        this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_SEIKU, seiku), null);
+
         this.updateTabIcon();
+        this.showTooltip();
 
         this.fleetGroup.layout();
-
-        this.dock = dock;
     }
 
     /**
@@ -416,6 +446,20 @@ public class FleetComposite extends Composite {
             } else if ((this.state & WARN) == WARN) {
                 this.tab.setImage(SWTResourceManager.getImage(FleetComposite.class, AppConstants.R_ICON_ERROR));
             }
+        }
+    }
+
+    /**
+     * 艦隊が出撃中で大破した場合にツールチップを表示します
+     */
+    private void showTooltip() {
+        if (((this.state & FATAL) == FATAL) && GlobalContext.isSortie(this.dock.getId())) {
+            ToolTip tip = new ToolTip(this.getShell(), SWT.BALLOON
+                    | SWT.ICON_ERROR);
+            tip.setText("大破警告");
+            tip.setMessage(MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BADLY_DAMAGE));
+            this.main.getTrayItem().setToolTip(tip);
+            tip.setVisible(true);
         }
     }
 

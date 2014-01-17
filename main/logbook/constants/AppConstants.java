@@ -291,9 +291,18 @@ public class AppConstants {
     /** メッセージ 出撃できます。 */
     public static final String MESSAGE_GOOD = "出撃できます。";
 
-    /** メッセージ 大破している艦娘がいます。出撃はできません。 */
-    public static final String MESSAGE_BADLY_DAMAGE = "大破している艦娘がいます。出撃はできません。";
+    /** メッセージ {0} 出撃はできません。 */
+    public static final String MESSAGE_BAD = "{0} 出撃はできません。";
+
+    /** メッセージ 大破している艦娘がいます。  */
+    public static final String MESSAGE_BADLY_DAMAGE = "大破している艦娘がいます、";
+
+    /** メッセージ 入渠中の艦娘がいます。  */
+    public static final String MESSAGE_BATHWATER = "入渠中の艦娘がいます、";
 
     /** メッセージ 疲労している艦娘がいます */
-    public static final String MESSAGE_COND = "疲労している艦娘がいます{0}頃に回復します。";
+    public static final String MESSAGE_COND = "疲労している艦娘がいます {0}頃に回復します。";
+
+    /** メッセージ 制空値:{0} */
+    public static final String MESSAGE_SEIKU = "制空値:{0}";
 }

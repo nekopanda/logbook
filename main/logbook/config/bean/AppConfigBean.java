@@ -78,6 +78,12 @@ public final class AppConfigBean {
     /** 大破状態で致命的アイコン */
     private boolean fatalByBadlyDamage = true;
 
+    /** 遠征からの帰還時に母港タブを表示 */
+    private boolean visibleOnReturnMission = true;
+
+    /** お風呂から上がる時に母港タブを表示 */
+    private boolean visibleOnReturnBathwater = true;
+
     /** 開発者オプション-JSONを保存する */
     private boolean storeJson;
 
@@ -440,6 +446,38 @@ public final class AppConfigBean {
     }
 
     /**
+     * 遠征からの帰還時に母港タブを表示を取得します。
+     * @return 遠征からの帰還時に母港タブを表示
+     */
+    public boolean isVisibleOnReturnMission() {
+        return this.visibleOnReturnMission;
+    }
+
+    /**
+     * 遠征からの帰還時に母港タブを表示を設定します。
+     * @param visibleOnReturnMission 遠征からの帰還時に母港タブを表示
+     */
+    public void setVisibleOnReturnMission(boolean visibleOnReturnMission) {
+        this.visibleOnReturnMission = visibleOnReturnMission;
+    }
+
+    /**
+     * お風呂から上がる時に母港タブを表示を取得します。
+     * @return お風呂から上がる時に母港タブを表示
+     */
+    public boolean isVisibleOnReturnBathwater() {
+        return this.visibleOnReturnBathwater;
+    }
+
+    /**
+     * お風呂から上がる時に母港タブを表示を設定します。
+     * @param visibleOnReturnBathwater お風呂から上がる時に母港タブを表示
+     */
+    public void setVisibleOnReturnBathwater(boolean visibleOnReturnBathwater) {
+        this.visibleOnReturnBathwater = visibleOnReturnBathwater;
+    }
+
+    /**
      * 開発者オプション-JSONを保存するを取得します。
      * @return 開発者オプション-JSONを保存する
      */
@@ -481,7 +519,7 @@ public final class AppConfigBean {
 
     /**
      * テーブル列を表示する設定(キー:java.lang.Class.getName())を設定します。
-     * @param visiblecolumnMap テーブル列を表示する設定(キー:java.lang.Class.getName())
+     * @param visibleColumnMap テーブル列を表示する設定(キー:java.lang.Class.getName())
      */
     public void setVisibleColumnMap(Map<String, boolean[]> visibleColumnMap) {
         this.visibleColumnMap = visibleColumnMap;

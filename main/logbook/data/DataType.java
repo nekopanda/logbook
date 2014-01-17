@@ -45,6 +45,8 @@ public enum DataType {
     KDOCK("/kcsapi/api_get_member/kdock"),
     /** 建造(入手) */
     GETSHIP("/kcsapi/api_req_kousyou/getship"),
+    /** 出撃 */
+    START("kcsapi/api_req_map/start"),
     /** アイテム一覧 */
     SLOTITEM_MASTER("/kcsapi/api_get_master/slotitem"),
     /** 艦娘一覧 */

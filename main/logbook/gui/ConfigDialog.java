@@ -215,6 +215,16 @@ public final class ConfigDialog extends Dialog {
         fatalBybadlyDamage.setText("大破で致命的アイコン表示");
         fatalBybadlyDamage.setSelection(AppConfig.get().isFatalBybadlyDamage());
 
+        final Button visibleOnReturnMission = new Button(compositeFleetTab, SWT.CHECK);
+        visibleOnReturnMission.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        visibleOnReturnMission.setText("遠征からの帰還時に母港タブを表示");
+        visibleOnReturnMission.setSelection(AppConfig.get().isVisibleOnReturnMission());
+
+        final Button visibleOnReturnBathwater = new Button(compositeFleetTab, SWT.CHECK);
+        visibleOnReturnBathwater.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        visibleOnReturnBathwater.setText("お風呂から上がる時に母港タブを表示");
+        visibleOnReturnBathwater.setSelection(AppConfig.get().isVisibleOnReturnBathwater());
+
         // キャプチャ タブ
         Composite compositeCapture = new Composite(this.composite, SWT.NONE);
         this.compositeMap.put("capture", compositeCapture);
@@ -313,6 +323,8 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setWarnByCondState(warnByCondState.getSelection());
                 AppConfig.get().setWarnByHalfDamage(warnByHalfDamage.getSelection());
                 AppConfig.get().setFatalBybadlyDamage(fatalBybadlyDamage.getSelection());
+                AppConfig.get().setVisibleOnReturnMission(visibleOnReturnMission.getSelection());
+                AppConfig.get().setVisibleOnReturnBathwater(visibleOnReturnBathwater.getSelection());
                 // capture
                 AppConfig.get().setCapturePath(captureDir.getText());
                 AppConfig.get().setImageFormat(imageformatCombo.getItem(imageformatCombo.getSelectionIndex()));
