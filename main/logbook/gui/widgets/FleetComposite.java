@@ -387,7 +387,7 @@ public class FleetComposite extends Composite {
             this.state |= state;
         }
         // メッセージを更新する
-        // 入渠中の艦娘を探す・制空値を計算
+        // 入渠中の艦娘を探す
         boolean isBathwater = false;
         for (ShipDto shipDto : ships) {
             if (GlobalContext.isNdock(shipDto)) {
@@ -395,11 +395,18 @@ public class FleetComposite extends Composite {
                 break;
             }
         }
+        // 制空値を計算
         int seiku = 0;
         for (ShipDto shipDto : ships) {
             seiku += shipDto.getSeiku();
         }
-        if (isBathwater) {
+        if (GlobalContext.isMission(this.dock.getId())) {
+            // 遠征中
+            StyleRange style = new StyleRange();
+            style.fontStyle = SWT.BOLD;
+            style.foreground = SWTResourceManager.getColor(SWT.COLOR_DARK_BLUE);
+            this.addStyledText(this.message, AppConstants.MESSAGE_MISSION, style);
+        } else if (isBathwater) {
             // 入渠中
             StyleRange style = new StyleRange();
             style.fontStyle = SWT.BOLD;
@@ -457,7 +464,7 @@ public class FleetComposite extends Composite {
             ToolTip tip = new ToolTip(this.getShell(), SWT.BALLOON
                     | SWT.ICON_ERROR);
             tip.setText("大破警告");
-            tip.setMessage(MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BADLY_DAMAGE));
+            tip.setMessage(AppConstants.MESSAGE_STOP_SORTIE);
             this.main.getTrayItem().setToolTip(tip);
             tip.setVisible(true);
         }

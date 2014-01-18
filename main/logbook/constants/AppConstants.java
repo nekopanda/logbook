@@ -294,15 +294,21 @@ public class AppConstants {
     /** メッセージ {0} 出撃はできません。 */
     public static final String MESSAGE_BAD = "{0} 出撃はできません。";
 
-    /** メッセージ 大破している艦娘がいます。  */
-    public static final String MESSAGE_BADLY_DAMAGE = "大破している艦娘がいます、";
+    /** メッセージ 大破している艦娘がいます  */
+    public static final String MESSAGE_BADLY_DAMAGE = "大破している艦娘がいます";
 
-    /** メッセージ 入渠中の艦娘がいます。  */
-    public static final String MESSAGE_BATHWATER = "入渠中の艦娘がいます、";
+    /** メッセージ 入渠中の艦娘がいます  */
+    public static final String MESSAGE_BATHWATER = "入渠中の艦娘がいます";
+
+    /** メッセージ 遠征中です。  */
+    public static final String MESSAGE_MISSION = "遠征中です。";
 
     /** メッセージ 疲労している艦娘がいます */
     public static final String MESSAGE_COND = "疲労している艦娘がいます {0}頃に回復します。";
 
     /** メッセージ 制空値:{0} */
     public static final String MESSAGE_SEIKU = "制空値:{0}";
+
+    /** メッセージ 大破している艦娘がいます、進撃はできません。 */
+    public static final String MESSAGE_STOP_SORTIE = "大破している艦娘がいます、進撃はできません。";
 }

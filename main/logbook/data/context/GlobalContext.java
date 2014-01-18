@@ -234,6 +234,21 @@ public final class GlobalContext {
     }
 
     /**
+     * 艦隊が遠征中かを調べます
+     * 
+     * @param 
+     */
+    public static boolean isMission(String idstr) {
+        int id = Integer.parseInt(idstr);
+        for (int i = 0; i < deckMissions.length; i++) {
+            if (deckMissions[i].getFleetid() == id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * @return ドック
      */
     public static DockDto getDock(String id) {
