@@ -241,7 +241,7 @@ public final class GlobalContext {
     public static boolean isMission(String idstr) {
         int id = Integer.parseInt(idstr);
         for (int i = 0; i < deckMissions.length; i++) {
-            if (deckMissions[i].getFleetid() == id) {
+            if ((deckMissions[i].getMission() != null) && (deckMissions[i].getFleetid() == id)) {
                 return true;
             }
         }
