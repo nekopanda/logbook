@@ -203,7 +203,7 @@ public final class ApplicationMain {
                 Point location = ApplicationMain.this.shell.getLocation();
                 AppConfig.get().setLocationX(location.x);
                 AppConfig.get().setLocationY(location.y);
-                if (AppConfig.get().isMinimumLayout()) {
+                if (!AppConfig.get().isMinimumLayout()) {
                     AppConfig.get().setWidth(ApplicationMain.this.shell.getSize().x);
                     AppConfig.get().setHeight(ApplicationMain.this.shell.getSize().y);
                 }
