@@ -84,6 +84,15 @@ public final class AppConfigBean {
     /** お風呂から上がる時に母港タブを表示 */
     private boolean visibleOnReturnBathwater = true;
 
+    /** 回数を表示 */
+    private boolean displayCount;
+
+    /** デフォルト海域 */
+    private String defaultSea = "3-2";
+
+    /** デフォルト評価 */
+    private String defaultEvaluate = "S勝利";
+
     /** 開発者オプション-JSONを保存する */
     private boolean storeJson;
 
@@ -475,6 +484,54 @@ public final class AppConfigBean {
      */
     public void setVisibleOnReturnBathwater(boolean visibleOnReturnBathwater) {
         this.visibleOnReturnBathwater = visibleOnReturnBathwater;
+    }
+
+    /**
+     * 回数を表示を取得します。
+     * @return 回数を表示
+     */
+    public boolean isDisplayCount() {
+        return this.displayCount;
+    }
+
+    /**
+     * 回数を表示を設定します。
+     * @param displayCount 回数を表示
+     */
+    public void setDisplayCount(boolean displayCount) {
+        this.displayCount = displayCount;
+    }
+
+    /**
+     * デフォルト海域を取得します。
+     * @return デフォルト海域
+     */
+    public String getDefaultSea() {
+        return this.defaultSea;
+    }
+
+    /**
+     * デフォルト海域を設定します。
+     * @param defaultSea デフォルト海域
+     */
+    public void setDefaultSea(String defaultSea) {
+        this.defaultSea = defaultSea;
+    }
+
+    /**
+     * デフォルト評価を取得します。
+     * @return デフォルト評価
+     */
+    public String getDefaultEvaluate() {
+        return this.defaultEvaluate;
+    }
+
+    /**
+     * デフォルト評価を設定します。
+     * @param defaultEvaluate デフォルト評価
+     */
+    public void setDefaultEvaluate(String defaultEvaluate) {
+        this.defaultEvaluate = defaultEvaluate;
     }
 
     /**

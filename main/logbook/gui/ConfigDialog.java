@@ -12,6 +12,8 @@ import java.util.Map.Entry;
 
 import logbook.config.AppConfig;
 import logbook.gui.logic.LayoutLogic;
+import logbook.internal.EvaluateExp;
+import logbook.internal.SeaExp;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
@@ -29,6 +31,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -195,6 +198,38 @@ public final class ConfigDialog extends Dialog {
         this.compositeMap.put("fleettab", compositeFleetTab);
         compositeFleetTab.setLayout(new GridLayout(1, false));
 
+        Group leveling = new Group(compositeFleetTab, SWT.NONE);
+        leveling.setText("レベリング");
+        leveling.setLayout(new RowLayout());
+        leveling.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        final Button displaycount = new Button(leveling, SWT.CHECK);
+        displaycount.setText("回数を表示");
+        displaycount.setSelection(AppConfig.get().isDisplayCount());
+
+        Label label9 = new Label(leveling, SWT.NONE);
+        label9.setText("海域");
+        final Combo seacombo = new Combo(leveling, SWT.READ_ONLY);
+        int count = 0;
+        for (Entry<String, Integer> entry : SeaExp.get().entrySet()) {
+            seacombo.add(entry.getKey());
+            if (entry.getKey().equals(AppConfig.get().getDefaultSea())) {
+                seacombo.select(count);
+            }
+            count++;
+        }
+        Label label10 = new Label(leveling, SWT.NONE);
+        label10.setText("評価");
+        final Combo evalcombo = new Combo(leveling, SWT.READ_ONLY);
+        count = 0;
+        for (Entry<String, Double> entry : EvaluateExp.get().entrySet()) {
+            evalcombo.add(entry.getKey());
+            if (entry.getKey().equals(AppConfig.get().getDefaultEvaluate())) {
+                evalcombo.select(count);
+            }
+            count++;
+        }
+
         final Button warnByNeedSupply = new Button(compositeFleetTab, SWT.CHECK);
         warnByNeedSupply.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         warnByNeedSupply.setText("補給不足で警告アイコン表示");
@@ -319,6 +354,9 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setReportPath(reportDir.getText());
                 AppConfig.get().setCheckUpdate(checkUpdate.getSelection());
                 // fleettab
+                AppConfig.get().setDisplayCount(displaycount.getSelection());
+                AppConfig.get().setDefaultSea(seacombo.getItem(seacombo.getSelectionIndex()));
+                AppConfig.get().setDefaultEvaluate(evalcombo.getItem(evalcombo.getSelectionIndex()));
                 AppConfig.get().setWarnByNeedSupply(warnByNeedSupply.getSelection());
                 AppConfig.get().setWarnByCondState(warnByCondState.getSelection());
                 AppConfig.get().setWarnByHalfDamage(warnByHalfDamage.getSelection());

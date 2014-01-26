@@ -8,12 +8,17 @@ package logbook.gui.widgets;
 import java.text.MessageFormat;
 import java.util.List;
 
+import javax.annotation.CheckForNull;
+
 import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.dto.DockDto;
 import logbook.dto.ShipDto;
 import logbook.gui.ApplicationMain;
+import logbook.internal.EvaluateExp;
+import logbook.internal.SeaExp;
+import logbook.util.CalcExpUtils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -84,6 +89,8 @@ public class FleetComposite extends Composite {
     private final Label[] bullstLabels = new Label[MAXCHARA];
     /** 燃料ステータス */
     private final Label[] fuelstLabels = new Label[MAXCHARA];
+    /** レベリングステータス */
+    private final Label[] nextLabels = new Label[MAXCHARA];
     /** メッセージ */
     private final StyledText message;
 
@@ -156,7 +163,7 @@ public class FleetComposite extends Composite {
             GridLayout glHp = new GridLayout(3, false);
             glHp.horizontalSpacing = 0;
             glHp.marginTop = 0;
-            glHp.marginWidth = 2;
+            glHp.marginWidth = 1;
             glHp.marginHeight = 0;
             glHp.marginBottom = 0;
             glHp.verticalSpacing = 0;
@@ -172,9 +179,10 @@ public class FleetComposite extends Composite {
             // ステータス
             new Label(this.fleetGroup, SWT.NONE);
             Composite stateComposite = new Composite(this.fleetGroup, SWT.NONE);
-            GridLayout glState = new GridLayout(3, false);
+            GridLayout glState = new GridLayout(4, false);
             glState.horizontalSpacing = 0;
             glState.marginTop = 0;
+            glState.marginWidth = 0;
             glState.marginHeight = 0;
             glState.marginBottom = 0;
             glState.verticalSpacing = 0;
@@ -187,6 +195,9 @@ public class FleetComposite extends Composite {
             fuelst.setText("燃");
             Label bullst = new Label(stateComposite, SWT.NONE);
             bullst.setText("弾");
+            Label next = new Label(stateComposite, SWT.NONE);
+            next.setFont(this.small);
+            next.setText("あと0回");
 
             // 疲労
             Label cond = new Label(this.fleetGroup, SWT.NONE);
@@ -202,6 +213,7 @@ public class FleetComposite extends Composite {
             this.condstLabels[i] = condst;
             this.bullstLabels[i] = bullst;
             this.fuelstLabels[i] = fuelst;
+            this.nextLabels[i] = next;
         }
     }
 
@@ -232,6 +244,7 @@ public class FleetComposite extends Composite {
             this.condstLabels[i].setText("");
             this.bullstLabels[i].setText("");
             this.fuelstLabels[i].setText("");
+            this.nextLabels[i].setText("");
         }
         for (int i = 0; i < ships.size(); i++) {
             int state = 0;
@@ -340,6 +353,18 @@ public class FleetComposite extends Composite {
                     this.bullstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
                 }
             }
+            // ステータス.あと何回
+            if (AppConfig.get().isDisplayCount()) {
+                Integer nextcount = this.getNextCount(ship, i == 0);
+                if (nextcount != null) {
+                    this.nextLabels[i].setText(MessageFormat.format("あと{0}回", nextcount));
+                } else {
+                    this.nextLabels[i].setText("");
+                }
+            } else {
+                this.nextLabels[i].setText("");
+            }
+
             // コンディション
             if (cond <= AppConstants.COND_RED) {
                 // 疲労19以下
@@ -377,13 +402,17 @@ public class FleetComposite extends Composite {
             }
 
             // ラベルを更新する
+            // 名前
             this.nameLabels[i].setText(name);
             this.nameLabels[i].setToolTipText(MessageFormat.format(AppConstants.TOOLTIP_FLEETTAB_SHIP, nowhp, maxhp,
                     fuel, fuelmax, bull, bullmax, ship.getNext()));
+            // HP
             this.hpLabels[i].setText(MessageFormat.format("{0}/{1} ", nowhp, maxhp));
+            // HPゲージ
             this.hpgaugeLabels[i].setImage(this.getHpGaugeImage(hpratio));
+            // コンディション
             this.condLabels[i].setText(MessageFormat.format("{0} cond.", cond));
-            this.bullstLabels[i].getParent().layout(true);
+            this.bullstLabels[i].getParent().layout();
             this.state |= state;
         }
         // メッセージを更新する
@@ -508,6 +537,35 @@ public class FleetComposite extends Composite {
 
         text.setText(beforeText + str);
         text.setStyleRanges(ranges);
+    }
+
+    /**
+     * あと何回戦闘すればよいかを取得します
+     * 
+     * @param ship 艦娘
+     * @param isFlagship 旗艦
+     * @return 回数
+     */
+    @CheckForNull
+    private Integer getNextCount(ShipDto ship, boolean isFlagship) {
+        // 次のレベルに必要な経験値
+        Long nextexp = CalcExpUtils.getNextLvExp((int) ship.getLv());
+        if (nextexp != null) {
+            // 必要経験値
+            long needexp = nextexp - ship.getExp();
+            // 海域Exp
+            Integer baseexp = SeaExp.get().get(AppConfig.get().getDefaultSea());
+            // 評価倍率
+            Double eval = EvaluateExp.get().get(AppConfig.get().getDefaultEvaluate());
+            if ((baseexp != null) && (eval != null)) {
+                // 得られる経験値
+                long getexpd = CalcExpUtils.getExp(baseexp, eval, isFlagship, false);
+                // 戦闘回数
+                int count = CalcExpUtils.getCount(needexp, getexpd);
+                return Integer.valueOf(count);
+            }
+        }
+        return null;
     }
 
     @Override

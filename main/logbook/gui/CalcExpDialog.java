@@ -15,11 +15,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import logbook.config.AppConfig;
 import logbook.data.context.GlobalContext;
 import logbook.dto.ShipDto;
 import logbook.internal.EvaluateExp;
 import logbook.internal.ExpTable;
 import logbook.internal.SeaExp;
+import logbook.util.CalcExpUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
@@ -45,12 +47,8 @@ import org.eclipse.swt.widgets.Text;
  */
 public final class CalcExpDialog extends Dialog {
 
-    /** 海域インデックス値 */
-    private static int seaidx;
-    /** 評価インデックス値 */
-    private static int evalidx;
     /** 旗艦 */
-    private static boolean flag;
+    private static boolean flag = true;
     /** MVP */
     private static boolean mvp;
 
@@ -203,9 +201,17 @@ public final class CalcExpDialog extends Dialog {
         this.battlecount.setLayoutData(gdBattlecount);
 
         // 海域のインデックス値を復元
-        this.seacombo.select(seaidx);
+        for (int i = 0; i < this.seacombo.getItemCount(); i++) {
+            if (this.seacombo.getItem(i).equals(AppConfig.get().getDefaultSea())) {
+                this.seacombo.select(i);
+            }
+        }
         // 評価のインデックス値を復元
-        this.evalcombo.select(evalidx);
+        for (int i = 0; i < this.evalcombo.getItemCount(); i++) {
+            if (this.evalcombo.getItem(i).equals(AppConfig.get().getDefaultEvaluate())) {
+                this.evalcombo.select(i);
+            }
+        }
         // 旗艦チェックを復元
         this.flagbtn.setSelection(flag);
         // MVPチェックを復元
@@ -271,29 +277,15 @@ public final class CalcExpDialog extends Dialog {
         // 評価
         double eval = EvaluateExp.get().get(this.evalcombo.getItem(this.evalcombo.getSelectionIndex()));
         // 得られる経験値
-        double getexpd = baseexp * eval;
-        if (this.flagbtn.getSelection()) {
-            getexpd *= 1.5;
-        }
-        if (this.mvpbtn.getSelection()) {
-            getexpd *= 2;
-        }
-        // 最大累積3.6倍
-        getexpd = Math.min(getexpd, baseexp * 3.6);
-
+        long getexp = CalcExpUtils.getExp(baseexp, eval, this.flagbtn.getSelection(), this.mvpbtn.getSelection());
         // 戦闘回数
-        int count = BigDecimal.valueOf(needexpint).divide(BigDecimal.valueOf(getexpd), RoundingMode.CEILING).intValue();
-
+        int count = BigDecimal.valueOf(needexpint).divide(BigDecimal.valueOf(getexp), RoundingMode.CEILING).intValue();
         // 1回の戦闘
-        this.getexp.setText(Long.toString(Math.round(getexpd)));
+        this.getexp.setText(Long.toString(getexp));
         // 必要経験値
         this.needexp.setText(Integer.toString(needexpint));
         // 戦闘回数
         this.battlecount.setText(Integer.toString(count));
-        // 海域コンボボックスのインデックス値を保存
-        seaidx = this.seacombo.getSelectionIndex();
-        // 評価コンボボックスのインデックス値を保存
-        evalidx = this.evalcombo.getSelectionIndex();
         // 旗艦チェックを保存
         CalcExpDialog.flag = this.flagbtn.getSelection();
         // MVPチェックを保存
