@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.TableColumn;
 public final class ShipTable extends AbstractTableDialog {
 
     /** 成長余地 */
-    private static boolean specdiff = false;
+    private boolean specdiff = false;
 
     /** フィルター */
     private ShipFilterDto filter = new ShipFilterDto();
@@ -89,11 +89,11 @@ public final class ShipTable extends AbstractTableDialog {
         // 成長の余地を表示メニュー
         final MenuItem switchdiff = new MenuItem(this.opemenu, SWT.CHECK);
         switchdiff.setText("成長の余地を表示");
-        switchdiff.setSelection(specdiff);
+        switchdiff.setSelection(this.specdiff);
         switchdiff.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                specdiff = switchdiff.getSelection();
+                ShipTable.this.specdiff = switchdiff.getSelection();
                 ShipTable.this.reloadTable();
             }
         });
@@ -126,7 +126,7 @@ public final class ShipTable extends AbstractTableDialog {
 
     @Override
     protected void updateTableBody() {
-        this.body = CreateReportLogic.getShipListBody(ShipTable.specdiff, this.filter);
+        this.body = CreateReportLogic.getShipListBody(this.specdiff, this.filter);
     }
 
     @Override
@@ -175,6 +175,11 @@ public final class ShipTable extends AbstractTableDialog {
                     ShipGroupBean group = (ShipGroupBean) item.getData();
                     this.dialog.getFilter().group = group;
                     this.dialog.reloadTable();
+                    if (group != null) {
+                        this.dialog.shell.setText(group.getName() + " - " + this.dialog.getTitle());
+                    } else {
+                        this.dialog.shell.setText(this.dialog.getTitle());
+                    }
                 }
             }
         }
