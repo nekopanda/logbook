@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import logbook.data.Data;
-import logbook.data.DataQueue;
+import logbook.data.DataProxy;
 import logbook.data.DataType;
 import logbook.data.UndefinedData;
 
@@ -92,7 +92,7 @@ public final class ReverseProxyServlet extends ProxyServlet {
                 Data data = new UndefinedData(request.getRequestURI(), postField, stream.toByteArray()).toDefinedData();
                 if (data.getDataType() != DataType.UNDEFINED) {
                     // 定義済みのデータの場合にキューに追加する
-                    DataQueue.add(data);
+                    DataProxy.add(data);
 
                     // サーバー名が不明の場合、サーバー名をセットする
                     if (!Filter.isServerDetected()) {

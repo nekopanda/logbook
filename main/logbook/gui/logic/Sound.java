@@ -9,7 +9,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import javax.sound.sampled.AudioFormat;
@@ -33,7 +32,7 @@ import org.apache.logging.log4j.Logger;
 public final class Sound {
 
     /** 再生待ち */
-    private static Queue<File> soundfileQueue = new ArrayBlockingQueue<File>(10);
+    private static ArrayBlockingQueue<File> soundfileQueue = new ArrayBlockingQueue<File>(10);
 
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(Sound.class);
@@ -187,11 +186,11 @@ public final class Sound {
         public void run() {
             try {
                 while (true) {
-                    File file = soundfileQueue.poll();
+                    File file = soundfileQueue.take();
                     if (file != null) {
                         play(file);
                     }
-                    Thread.sleep(500);
+                    //Thread.sleep(500);
                 }
             } catch (Exception e) {
                 LOG.fatal("スレッドが異常終了しました", e);

@@ -65,7 +65,7 @@ public final class ThreadStateObserver extends Thread {
                         this.observthread.remove(i);
                     }
                 }
-                Thread.sleep(100);
+                Thread.sleep(2000);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

@@ -8,6 +8,7 @@ package logbook.data.context;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -19,8 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ConcurrentSkipListMap;
 
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
@@ -31,7 +30,6 @@ import logbook.config.AppConfig;
 import logbook.config.KdockConfig;
 import logbook.constants.AppConstants;
 import logbook.data.Data;
-import logbook.data.DataQueue;
 import logbook.dto.AwaitingDecision;
 import logbook.dto.BattleDto;
 import logbook.dto.BattleResultDto;
@@ -46,6 +44,7 @@ import logbook.dto.ResourceDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
 import logbook.gui.logic.CreateReportLogic;
+import logbook.gui.logic.MainConsoleListener;
 import logbook.internal.Deck;
 import logbook.internal.Ship;
 import logbook.internal.ShipStyle;
@@ -64,10 +63,10 @@ public final class GlobalContext {
     private static final Logger LOG = LogManager.getLogger(GlobalContext.class);
 
     /** 装備Map */
-    private static Map<Long, ItemDto> itemMap = new ConcurrentSkipListMap<Long, ItemDto>();
+    private static Map<Long, ItemDto> itemMap = new HashMap<Long, ItemDto>();
 
     /** 艦娘Map */
-    private static Map<Long, ShipDto> shipMap = new ConcurrentSkipListMap<Long, ShipDto>();
+    private static Map<Long, ShipDto> shipMap = new HashMap<Long, ShipDto>();
 
     /** 秘書艦 */
     private static ShipDto secretary;
@@ -76,7 +75,7 @@ public final class GlobalContext {
     private static List<GetShipDto> getShipList = new ArrayList<GetShipDto>();
 
     /** 建造(艦娘名の確定待ち) */
-    private static Queue<AwaitingDecision> getShipQueue = new ArrayBlockingQueue<AwaitingDecision>(10);
+    private static Queue<AwaitingDecision> getShipQueue = new ArrayDeque<AwaitingDecision>(10);
 
     /** 建造(投入資源) */
     private static Map<String, ResourceDto> getShipResource = new HashMap<String, ResourceDto>();
@@ -85,7 +84,7 @@ public final class GlobalContext {
     private static List<CreateItemDto> createItemList = new ArrayList<CreateItemDto>();
 
     /** 開発(装備名の確定待ち) */
-    private static Queue<CreateItemDto> createItemQueue = new ArrayBlockingQueue<CreateItemDto>(10);
+    private static Queue<CreateItemDto> createItemQueue = new ArrayDeque<CreateItemDto>(10);
 
     /** 海戦・ドロップ */
     private static List<BattleResultDto> battleResultList = new ArrayList<BattleResultDto>();
@@ -106,7 +105,7 @@ public final class GlobalContext {
     private static String lastBuildKdock;
 
     /** 戦闘詳細 */
-    private static Queue<BattleDto> battleList = new ArrayBlockingQueue<BattleDto>(1);
+    private static Queue<BattleDto> battleList = new ArrayDeque<BattleDto>(1);
 
     /** 遠征リスト */
     private static DeckMissionDto[] deckMissions = new DeckMissionDto[] { DeckMissionDto.EMPTY, DeckMissionDto.EMPTY,
@@ -122,8 +121,15 @@ public final class GlobalContext {
     /** 出撃中か */
     private static boolean[] isSortie = new boolean[4];
 
-    /** ログキュー */
-    private static Queue<String> consoleQueue = new ArrayBlockingQueue<String>(10);
+    /** ログ表示 */
+    private static MainConsoleListener console;
+
+    /** updateContext() が呼ばれた数 */
+    private static int updateCounter = 0;
+
+    public static void setConsoleListener(MainConsoleListener console_) {
+        console = console_;
+    }
 
     /**
      * @return 装備Map
@@ -265,99 +271,94 @@ public final class GlobalContext {
     }
 
     /**
-     * @return ログメッセージ
-     */
-    public static String getConsoleMessage() {
-        return consoleQueue.poll();
-    }
-
-    /**
      * 情報を更新します
      * 
      * @return 更新する情報があった場合trueを返します
      */
-    public static boolean updateContext() {
-        boolean update = false;
-        Data data;
-        while ((data = DataQueue.poll()) != null) {
-            update = true;
-            // json保存設定
-            if (AppConfig.get().isStoreJson()) {
-                doStoreJson(data);
-            }
-            switch (data.getDataType()) {
-            // 保有装備
-            case SLOTITEM_MEMBER:
-                doSlotitemMember(data);
-                break;
-            // 保有艦
-            case SHIP3:
-                doShip3(data);
-                break;
-            // 保有艦
-            case SHIP2:
-                doShip2(data);
-                break;
-            // 基本
-            case BASIC:
-                doBasic(data);
-                break;
-            // 遠征
-            case DECK_PORT:
-                doDeckPort(data);
-                break;
-            // 遠征(帰還)
-            case MISSION_RESULT:
-                doMissionResult(data);
-                break;
-            // 入渠
-            case NDOCK:
-                doNdock(data);
-                break;
-            // 建造
-            case CREATESHIP:
-                doCreateship(data);
-                break;
-            // 建造ドック
-            case KDOCK:
-                doKdock(data);
-                break;
-            // 建造(入手)
-            case GETSHIP:
-                doGetship(data);
-                break;
-            // 装備開発
-            case CREATEITEM:
-                doCreateitem(data);
-                break;
-            // 海戦
-            case BATTLE:
-            case BATTLE_MIDNIGHT:
-            case BATTLE_SP_MIDNIGHT:
-            case BATTLE_NIGHT_TO_DAY:
-                doBattle(data);
-                break;
-            // 海戦結果
-            case BATTLERESULT:
-                doBattleresult(data);
-                break;
-            // 艦隊
-            case DECK:
-                doDeck(data);
-                break;
-            // 出撃
-            case START:
-                doStart(data);
-                break;
-            // 艦娘一覧
-            case SHIP_MASTER:
-                doShipMaster(data);
-                break;
-            default:
-                break;
-            }
+    public static void updateContext(Data data) {
+        // json保存設定
+        if (AppConfig.get().isStoreJson()) {
+            doStoreJson(data);
         }
-        return update;
+        switch (data.getDataType()) {
+        // 保有装備
+        case SLOTITEM_MEMBER:
+            doSlotitemMember(data);
+            break;
+        // 保有艦
+        case SHIP3:
+            doShip3(data);
+            break;
+        // 保有艦
+        case SHIP2:
+            doShip2(data);
+            break;
+        // 基本
+        case BASIC:
+            doBasic(data);
+            break;
+        // 遠征
+        case DECK_PORT:
+            doDeckPort(data);
+            break;
+        // 遠征(帰還)
+        case MISSION_RESULT:
+            doMissionResult(data);
+            break;
+        // 入渠
+        case NDOCK:
+            doNdock(data);
+            break;
+        // 建造
+        case CREATESHIP:
+            doCreateship(data);
+            break;
+        // 建造ドック
+        case KDOCK:
+            doKdock(data);
+            break;
+        // 建造(入手)
+        case GETSHIP:
+            doGetship(data);
+            break;
+        // 装備開発
+        case CREATEITEM:
+            doCreateitem(data);
+            break;
+        // 海戦
+        case BATTLE:
+        case BATTLE_MIDNIGHT:
+        case BATTLE_SP_MIDNIGHT:
+        case BATTLE_NIGHT_TO_DAY:
+            doBattle(data);
+            break;
+        // 海戦結果
+        case BATTLERESULT:
+            doBattleresult(data);
+            break;
+        // 艦隊
+        case DECK:
+            doDeck(data);
+            break;
+        // 出撃
+        case START:
+            doStart(data);
+            break;
+        // 艦娘一覧
+        case SHIP_MASTER:
+            doShipMaster(data);
+            break;
+        default:
+            break;
+        }
+        ++updateCounter;
+    }
+
+    /** 
+     * @return updateContext()が呼ばれた数
+     */
+    public static int getUpdateCounter() {
+        return updateCounter;
     }
 
     /**
@@ -907,7 +908,8 @@ public final class GlobalContext {
     }
 
     private static void addConsole(Object message) {
-        consoleQueue.add(new SimpleDateFormat(AppConstants.DATE_SHORT_FORMAT).format(Calendar.getInstance().getTime())
+        console.printMessage(new SimpleDateFormat(AppConstants.DATE_SHORT_FORMAT).format(Calendar.getInstance()
+                .getTime())
                 + "  " + message.toString());
     }
 }

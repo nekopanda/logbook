@@ -10,8 +10,8 @@ import logbook.config.ConfigMigration;
 import logbook.config.ShipConfig;
 import logbook.config.ShipGroupConfig;
 import logbook.constants.AppConstants;
+import logbook.data.context.GlobalContext;
 import logbook.gui.background.AsyncExecApplicationMain;
-import logbook.gui.background.AsyncExecApplicationMainConsole;
 import logbook.gui.background.AsyncExecUpdateCheck;
 import logbook.gui.listener.BathwaterTableAdapter;
 import logbook.gui.listener.CalcExpAdapter;
@@ -27,6 +27,7 @@ import logbook.gui.listener.MissionResultReportAdapter;
 import logbook.gui.listener.ShipListReportAdapter;
 import logbook.gui.listener.TraySelectionListener;
 import logbook.gui.logic.LayoutLogic;
+import logbook.gui.logic.MainConsoleListener;
 import logbook.gui.logic.Sound;
 import logbook.gui.widgets.FleetComposite;
 import logbook.server.proxy.ProxyServer;
@@ -620,13 +621,13 @@ public final class ApplicationMain {
      * スレッドを開始します
      */
     private void startThread() {
+        // ログ表示リスナをセット
+        GlobalContext.setConsoleListener(new MainConsoleListener(this.console));
+
         // プロキシサーバーを開始する
         ThreadManager.regist(ProxyServer.getInstance());
-
         // 非同期で画面を更新するスレッド
         ThreadManager.regist(new AsyncExecApplicationMain(this));
-        // 非同期でログを出すスレッド
-        ThreadManager.regist(new AsyncExecApplicationMainConsole(this.console));
         // サウンドを出すスレッド
         ThreadManager.regist(new Sound.PlayerThread());
         // スレッドを監視するスレッド

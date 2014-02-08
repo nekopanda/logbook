@@ -63,20 +63,33 @@ public final class AsyncExecApplicationMain extends Thread {
     public void run() {
 
         try {
+            long nextUpdateTime = 0;
+            int previousUpdateCounter = 0;
             while (true) {
-                boolean update = GlobalContext.updateContext();
-                if (update) {
+                // 更新されているかチェック
+                int currentUpdateCounter = GlobalContext.getUpdateCounter();
+                if (previousUpdateCounter != currentUpdateCounter) {
+
                     // 保有アイテム数を更新する
                     Display.getDefault().asyncExec(new UpdateItemCountTask(this.main));
                     // 保有艦娘数を更新する
                     Display.getDefault().asyncExec(new UpdateShipCountTask(this.main));
                     // 艦隊タブを更新する
                     Display.getDefault().asyncExec(new UpdateFleetTabTask(this.main));
+
+                    previousUpdateCounter = currentUpdateCounter;
                 }
+
                 // 遠征と入渠を更新する
                 Display.getDefault().asyncExec(new UpdateDeckNdockTask(this.main));
 
-                Thread.sleep(ONE_SECONDS_FORMILIS);
+                long currentTime = Calendar.getInstance().getTimeInMillis();
+                // 次のアップデートは1秒後
+                nextUpdateTime += ONE_SECONDS_FORMILIS;
+                if (nextUpdateTime < currentTime)
+                    nextUpdateTime = currentTime + ONE_SECONDS_FORMILIS;
+
+                Thread.sleep(nextUpdateTime - currentTime);
             }
         } catch (Exception e) {
             LOG.fatal("スレッドが異常終了しました", e);
