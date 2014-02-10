@@ -1,9 +1,7 @@
 /**
- * No Rights Reserved.
- * This program and the accompanying materials
- * are made available under the terms of the Public Domain.
+ * 
  */
-package logbook.server.proxy;
+package logbook.server.web;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,12 +12,12 @@ import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 /**
- * プロキシサーバーです
+ * Webサーバです
  *
  */
-public final class ProxyServer {
+public class WebServer {
 
-    private static final Logger LOG = LogManager.getLogger(ProxyServer.class);
+    private static final Logger LOG = LogManager.getLogger(WebServer.class);
 
     private static Server server;
 
@@ -35,13 +33,13 @@ public final class ProxyServer {
             server.setConnectors(new Connector[] { connector });
 
             ServletHandler servletHandler = new ServletHandler();
-            servletHandler.addServletWithMapping(ReverseProxyServlet.class, "/*");
+            servletHandler.addServletWithMapping(QueryHandler.class, "/query");
 
             server.setHandler(servletHandler);
 
             server.start();
         } catch (Exception e) {
-            LOG.fatal("Proxyサーバーの起動に失敗しました", e);
+            LOG.fatal("Webサーバーの起動に失敗しました", e);
             throw new RuntimeException(e);
         }
     }
@@ -56,4 +54,5 @@ public final class ProxyServer {
             e.printStackTrace();
         }
     }
+
 }

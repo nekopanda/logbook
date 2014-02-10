@@ -35,6 +35,12 @@ public final class ShipDto extends AbstractDto {
     /** 艦娘個人を識別するID */
     private final long id;
 
+    /** 艦娘の識別ID */
+    private final long shipId;
+
+    /** キャラクタ識別ID（その艦の最終形の艦ID） */
+    private final long charId;
+
     /** 鍵付き */
     private final boolean locked;
 
@@ -150,10 +156,19 @@ public final class ShipDto extends AbstractDto {
         this.id = object.getJsonNumber("api_id").longValue();
         this.locked = object.getJsonNumber("api_locked").longValue() == 1;
 
-        ShipInfoDto shipinfo = Ship.get(object.getJsonNumber("api_ship_id").toString());
+        this.shipId = object.getJsonNumber("api_ship_id").longValue();
+        ShipInfoDto shipinfo = Ship.get(String.valueOf(this.shipId));
         this.shipInfo = shipinfo;
         this.name = shipinfo.getName();
         this.type = shipinfo.getType();
+
+        long charId = this.shipId;
+        long afterShipId = shipinfo.getAftershipid();
+        while (afterShipId != 0) {
+            charId = afterShipId;
+            afterShipId = Ship.get(String.valueOf(afterShipId)).getAftershipid();
+        }
+        this.charId = charId;
 
         this.lv = object.getJsonNumber("api_lv").longValue();
         this.cond = object.getJsonNumber("api_cond").longValue();
@@ -209,6 +224,20 @@ public final class ShipDto extends AbstractDto {
      */
     public long getId() {
         return this.id;
+    }
+
+    /**
+     * @return 艦娘を識別するID
+     */
+    public long getShipId() {
+        return this.shipId;
+    }
+
+    /**
+     * @return 艦娘キャラを識別するID
+     */
+    public long getCharId() {
+        return this.charId;
     }
 
     /**
@@ -530,6 +559,13 @@ public final class ShipDto extends AbstractDto {
             next = Long.toString(nextLvExp - this.exp);
         }
         return next;
+    }
+
+    /**
+     * @return 疲労が抜けるまでの時間
+     */
+    public Calendar getCondClearTime() {
+        return this.time;
     }
 
     /**

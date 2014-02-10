@@ -31,6 +31,7 @@ import logbook.gui.logic.MainConsoleListener;
 import logbook.gui.logic.Sound;
 import logbook.gui.widgets.FleetComposite;
 import logbook.server.proxy.ProxyServer;
+import logbook.server.web.WebServer;
 import logbook.thread.ThreadManager;
 import logbook.thread.ThreadStateObserver;
 
@@ -158,6 +159,7 @@ public final class ApplicationMain {
             SWTResourceManager.dispose();
             // プロキシサーバーをシャットダウンする
             ProxyServer.end();
+            WebServer.end();
         }
     }
 
@@ -625,7 +627,11 @@ public final class ApplicationMain {
         GlobalContext.setConsoleListener(new MainConsoleListener(this.console));
 
         // プロキシサーバーを開始する
-        ThreadManager.regist(ProxyServer.getInstance());
+        ProxyServer.start(AppConfig.get().getListenPort());
+
+        // Webサーバーを開始する
+        WebServer.start(AppConfig.get().getListenPort() + 1);
+
         // 非同期で画面を更新するスレッド
         ThreadManager.regist(new AsyncExecApplicationMain(this));
         // サウンドを出すスレッド

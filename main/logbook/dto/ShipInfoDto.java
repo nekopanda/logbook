@@ -23,6 +23,9 @@ public final class ShipInfoDto extends AbstractDto {
     /** 改レベル */
     private int afterlv;
 
+    /** 改造後の艦 */
+    private int aftershipid;
+
     /** flagshipもしくはelite (敵艦のみ) */
     private String flagship;
 
@@ -46,6 +49,19 @@ public final class ShipInfoDto extends AbstractDto {
         this.name = name;
         this.type = type;
         this.afterlv = afterlv;
+        this.flagship = flagship;
+        this.maxBull = maxBull;
+        this.maxFuel = maxFuel;
+    }
+
+    /**
+     * コンストラクター
+     */
+    public ShipInfoDto(String name, String type, String flagship, int afterlv, int aftershipid, int maxBull, int maxFuel) {
+        this.name = name;
+        this.type = type;
+        this.afterlv = afterlv;
+        this.aftershipid = aftershipid;
         this.flagship = flagship;
         this.maxBull = maxBull;
         this.maxFuel = maxFuel;
@@ -96,6 +112,13 @@ public final class ShipInfoDto extends AbstractDto {
      */
     public int getAfterlv() {
         return this.afterlv;
+    }
+
+    /**
+     * @return 改造後の艦ID(改造ができない場合、0)
+     */
+    public int getAftershipid() {
+        return this.aftershipid;
     }
 
     /**

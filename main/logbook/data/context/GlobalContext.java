@@ -261,6 +261,10 @@ public final class GlobalContext {
         return dock.get(id);
     }
 
+    public static boolean[] getIsSortie() {
+        return isSortie;
+    }
+
     /**
      * 出撃中かを調べます
      * @return 出撃中
@@ -896,6 +900,7 @@ public final class GlobalContext {
             flagship = "";
         }
         int afterlv = object.getJsonNumber("api_afterlv").intValue();
+        int aftershipid = Integer.parseInt(object.getString("api_aftershipid"));
         int maxBull = 0;
         if (object.containsKey("api_bull_max")) {
             maxBull = object.getJsonNumber("api_bull_max").intValue();
@@ -904,7 +909,7 @@ public final class GlobalContext {
         if (object.containsKey("api_fuel_max")) {
             maxFuel = object.getJsonNumber("api_fuel_max").intValue();
         }
-        return new ShipInfoDto(name, type, flagship, afterlv, maxBull, maxFuel);
+        return new ShipInfoDto(name, type, flagship, afterlv, aftershipid, maxBull, maxFuel);
     }
 
     private static void addConsole(Object message) {

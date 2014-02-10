@@ -9,9 +9,9 @@
 	<classpathentry kind="lib" path="lib/server/jetty-http-9.0.5.v20130815.jar"/>
 	<classpathentry kind="lib" path="lib/server/jetty-io-9.0.5.v20130815.jar"/>
 	<classpathentry kind="lib" path="lib/server/jetty-proxy-9.0.5.v20130815.jar"/>
-	<classpathentry kind="lib" path="lib/server/jetty-server-9.0.5.v20130815.jar"/>
+	<classpathentry kind="lib" path="lib/server/jetty-server-9.0.5.v20130815.jar" sourcepath="T:/sandbox/t06/jetty-all-9.0.5.v20130815-sources.zip"/>
 	<classpathentry kind="lib" path="lib/server/jetty-servlet-9.0.5.v20130815.jar"/>
-	<classpathentry kind="lib" path="lib/server/jetty-util-9.0.5.v20130815.jar"/>
+	<classpathentry kind="lib" path="lib/server/jetty-util-9.0.5.v20130815.jar" sourcepath="T:/sandbox/t06/jetty-all-9.0.5.v20130815-sources.jar"/>
 	<classpathentry kind="lib" path="lib/server/servlet-api-3.0.jar"/>
 	<classpathentry kind="lib" path="lib/util/javax.json-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/gui/swt.jar" sourcepath="lib/gui/swt-source.jar"/>
