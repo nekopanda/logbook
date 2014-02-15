@@ -117,7 +117,7 @@ public final class CalcExpDialog extends Dialog {
         GridData gdBeforelv = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
         gdBeforelv.widthHint = 45;
         this.beforelv.setLayoutData(gdBeforelv);
-        this.beforelv.setMaximum(99);
+        this.beforelv.setMaximum(125);
         this.beforelv.setMinimum(1);
         Label label2 = new Label(plan, SWT.NONE);
         label2.setText("Lv");
@@ -135,7 +135,7 @@ public final class CalcExpDialog extends Dialog {
         GridData gdAfterlv = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
         gdAfterlv.widthHint = 45;
         this.afterlv.setLayoutData(gdAfterlv);
-        this.afterlv.setMaximum(99);
+        this.afterlv.setMaximum(125);
         this.afterlv.setMinimum(1);
         Label label5 = new Label(plan, SWT.NONE);
         label5.setText("Lv");
@@ -248,8 +248,8 @@ public final class CalcExpDialog extends Dialog {
                 if (before > after) {
                     after = before + 1;
                 }
-                // 目標レベルが99を超える場合は99に設定
-                after = Math.min(after, 99);
+                // 目標レベルが125を超える場合は125に設定
+                after = Math.min(after, 125);
 
                 String beforeexpstr = Long.toString(ship.getExp());
                 String afterexpstr = Long.toString(ExpTable.get().get(after));

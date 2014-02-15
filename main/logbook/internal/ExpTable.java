@@ -117,6 +117,32 @@ public class ExpTable {
             this.put(97, 761500l);
             this.put(98, 851500l);
             this.put(99, 1000000l);
+            this.put(100, 1000000l);
+            this.put(101, 1010000l);
+            this.put(102, 1011000l);
+            this.put(103, 1013000l);
+            this.put(104, 1016000l);
+            this.put(105, 1020000l);
+            this.put(106, 1025000l);
+            this.put(107, 1031000l);
+            this.put(108, 1038000l);
+            this.put(109, 1046000l);
+            this.put(110, 1055000l);
+            this.put(111, 1065000l);
+            this.put(112, 1077000l);
+            this.put(113, 1091000l);
+            this.put(114, 1107000l);
+            this.put(115, 1125000l);
+            this.put(116, 1145000l);
+            this.put(117, 1168000l);
+            this.put(118, 1194000l);
+            this.put(119, 1223000l);
+            this.put(120, 1255000l);
+            this.put(121, 1290000l);
+            this.put(122, 1329000l);
+            this.put(123, 1372000l);
+            this.put(124, 1419000l);
+            this.put(125, 1470000l);
         }
     };
 
