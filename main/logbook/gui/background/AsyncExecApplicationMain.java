@@ -182,21 +182,24 @@ public final class AsyncExecApplicationMain extends Thread {
                 Sound.randomDockSoundPlay();
                 visibleHome |= AppConfig.get().isVisibleOnReturnBathwater();
             }
-            try {
-                // 遠征・入渠のお知らせ
-                if (notice.size() > 0) {
-                    ToolTip tip = new ToolTip(this.main.getShell(), SWT.BALLOON
-                            | SWT.ICON_INFORMATION);
-                    tip.setText("遠征・入渠");
-                    tip.setMessage(StringUtils.join(notice, "\r\n"));
-                    this.main.getTrayItem().setToolTip(tip);
-                    if (visibleHome) {
-                        this.main.getTabFolder().setSelection(0);
+            if (AppConfig.get().isUseBalloon()) {
+                // バルーンツールチップを表示する
+                try {
+                    // 遠征・入渠のお知らせ
+                    if (notice.size() > 0) {
+                        ToolTip tip = new ToolTip(this.main.getShell(), SWT.BALLOON
+                                | SWT.ICON_INFORMATION);
+                        tip.setText("遠征・入渠");
+                        tip.setMessage(StringUtils.join(notice, "\r\n"));
+                        this.main.getTrayItem().setToolTip(tip);
+                        if (visibleHome) {
+                            this.main.getTabFolder().setSelection(0);
+                        }
+                        tip.setVisible(true);
                     }
-                    tip.setVisible(true);
+                } catch (Exception e) {
+                    LOG.warn("お知らせの表示に失敗しました", e);
                 }
-            } catch (Exception e) {
-                LOG.warn("お知らせの表示に失敗しました", e);
             }
         }
 
@@ -237,10 +240,15 @@ public final class AsyncExecApplicationMain extends Thread {
                             deckTimeTexts[i].setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
                         }
                         if (this.main.getDeckNotice().getSelection()) {
-                            if (((rest <= ONE_MINUTES) && !FLAG_NOTICE_DECK[i])) {
+                            if ((rest <= ONE_MINUTES) && !FLAG_NOTICE_DECK[i]) {
                                 notice.add(dispname + " がまもなく帰投します");
                                 noticeflg = true;
                                 FLAG_NOTICE_DECK[i] = true;
+                            } else if (AppConfig.get().isMissionRemind() && (rest < -1)
+                                    && ((rest % (ONE_MINUTES * 3)) == 0)) {
+                                // 3分毎にリマインドする
+                                notice.add(dispname + " がまもなく帰投します");
+                                noticeflg = true;
                             } else if (rest > ONE_MINUTES) {
                                 FLAG_NOTICE_DECK[i] = false;
                             }

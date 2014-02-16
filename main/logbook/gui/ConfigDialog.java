@@ -78,7 +78,7 @@ public final class ConfigDialog extends Dialog {
      */
     private void createContents() {
         this.shell = new Shell(this.getParent(), this.getStyle());
-        this.shell.setSize(470, 320);
+        this.shell.setSize(500, 360);
         this.shell.setText(this.getText());
         this.shell.setLayout(new GridLayout(1, false));
 
@@ -172,6 +172,16 @@ public final class ConfigDialog extends Dialog {
             }
         });
         reportSavedirBtn.setText("選択...");
+
+        final Button remind = new Button(compositeSystem, SWT.CHECK);
+        remind.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        remind.setText("遠征の通知をリマインドする(3分毎)");
+        remind.setSelection(AppConfig.get().isMissionRemind());
+
+        final Button balloon = new Button(compositeSystem, SWT.CHECK);
+        balloon.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        balloon.setText("遠征・入渠をバルーンで通知する");
+        balloon.setSelection(AppConfig.get().isUseBalloon());
 
         final Button hidewindow = new Button(compositeSystem, SWT.CHECK);
         hidewindow.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
@@ -353,6 +363,8 @@ public final class ConfigDialog extends Dialog {
                 }
                 AppConfig.get().setReportPath(reportDir.getText());
                 AppConfig.get().setCheckUpdate(checkUpdate.getSelection());
+                AppConfig.get().setMissionRemind(remind.getSelection());
+                AppConfig.get().setUseBalloon(balloon.getSelection());
                 // fleettab
                 AppConfig.get().setDisplayCount(displaycount.getSelection());
                 AppConfig.get().setDefaultSea(seacombo.getItem(seacombo.getSelectionIndex()));
