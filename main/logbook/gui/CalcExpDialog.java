@@ -104,7 +104,6 @@ public final class CalcExpDialog extends Dialog {
         select.setLayout(new RowLayout());
         select.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         this.shipcombo = new Combo(select, SWT.READ_ONLY);
-        this.setShipComboData();
         Button reload = new Button(select, SWT.NONE);
         reload.setText("更新");
 
@@ -228,6 +227,9 @@ public final class CalcExpDialog extends Dialog {
         this.mvpbtn.addSelectionListener(new UpdateListener());
 
         this.shell.pack();
+        this.setShipComboData();
+        this.preset();
+        this.calc();
     }
 
     /**
@@ -303,6 +305,12 @@ public final class CalcExpDialog extends Dialog {
         if (this.shipcombo.getSelectionIndex() >= 0) {
             ShipDto ship = this.shipmap.get(this.shipcombo.getItem(this.shipcombo.getSelectionIndex()));
             select = ship.getId();
+        } else {
+            // 誰も選択されてない状態の場合は秘書艦を選択する
+            ShipDto ship = GlobalContext.getSecretary();
+            if (ship != null) {
+                select = ship.getId();
+            }
         }
         // コンボボックスから全ての艦娘を削除
         this.shipcombo.removeAll();
