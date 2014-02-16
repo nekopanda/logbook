@@ -143,6 +143,11 @@ public class ExpTable {
             this.put(123, 1372000l);
             this.put(124, 1419000l);
             this.put(125, 1470000l);
+            this.put(126, 1525000l);
+            this.put(127, 1584000l);
+            this.put(128, 1647000l);
+            this.put(129, 1714000l);
+            this.put(130, 1785000l);
         }
     };
 
