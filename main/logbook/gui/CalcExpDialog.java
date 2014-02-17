@@ -104,7 +104,6 @@ public final class CalcExpDialog extends Dialog {
         select.setLayout(new RowLayout());
         select.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         this.shipcombo = new Combo(select, SWT.READ_ONLY);
-        this.setShipComboData();
         Button reload = new Button(select, SWT.NONE);
         reload.setText("更新");
 
@@ -117,7 +116,7 @@ public final class CalcExpDialog extends Dialog {
         GridData gdBeforelv = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
         gdBeforelv.widthHint = 45;
         this.beforelv.setLayoutData(gdBeforelv);
-        this.beforelv.setMaximum(99);
+        this.beforelv.setMaximum(130);
         this.beforelv.setMinimum(1);
         Label label2 = new Label(plan, SWT.NONE);
         label2.setText("Lv");
@@ -135,7 +134,7 @@ public final class CalcExpDialog extends Dialog {
         GridData gdAfterlv = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
         gdAfterlv.widthHint = 45;
         this.afterlv.setLayoutData(gdAfterlv);
-        this.afterlv.setMaximum(99);
+        this.afterlv.setMaximum(130);
         this.afterlv.setMinimum(1);
         Label label5 = new Label(plan, SWT.NONE);
         label5.setText("Lv");
@@ -228,6 +227,9 @@ public final class CalcExpDialog extends Dialog {
         this.mvpbtn.addSelectionListener(new UpdateListener());
 
         this.shell.pack();
+        this.setShipComboData();
+        this.preset();
+        this.calc();
     }
 
     /**
@@ -248,8 +250,8 @@ public final class CalcExpDialog extends Dialog {
                 if (before > after) {
                     after = before + 1;
                 }
-                // 目標レベルが99を超える場合は99に設定
-                after = Math.min(after, 99);
+                // 目標レベルが130を超える場合は130に設定
+                after = Math.min(after, 130);
 
                 String beforeexpstr = Long.toString(ship.getExp());
                 String afterexpstr = Long.toString(ExpTable.get().get(after));
@@ -303,6 +305,12 @@ public final class CalcExpDialog extends Dialog {
         if (this.shipcombo.getSelectionIndex() >= 0) {
             ShipDto ship = this.shipmap.get(this.shipcombo.getItem(this.shipcombo.getSelectionIndex()));
             select = ship.getId();
+        } else {
+            // 誰も選択されてない状態の場合は秘書艦を選択する
+            ShipDto ship = GlobalContext.getSecretary();
+            if (ship != null) {
+                select = ship.getId();
+            }
         }
         // コンボボックスから全ての艦娘を削除
         this.shipcombo.removeAll();
