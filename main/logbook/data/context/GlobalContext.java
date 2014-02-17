@@ -62,6 +62,11 @@ public final class GlobalContext {
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(GlobalContext.class);
 
+    /** 資源量
+     * 順に、燃料、弾薬、鋼材、ボーキ、高速建造、高速修理、開発資源
+     */
+    private static int[] materials = new int[7];
+
     /** 装備Map */
     private static Map<Long, ItemDto> itemMap = new HashMap<Long, ItemDto>();
 
@@ -129,6 +134,11 @@ public final class GlobalContext {
 
     public static void setConsoleListener(MainConsoleListener console_) {
         console = console_;
+    }
+
+    /** @return 燃料、弾薬、鋼材、ボーキ、高速建造、高速修理、開発資源 */
+    public static int[] getMaterials() {
+        return materials;
     }
 
     /**
@@ -286,6 +296,10 @@ public final class GlobalContext {
         }
         switch (data.getDataType()) {
         // 保有装備
+        case MATERIAL:
+            doMaterial(data);
+            break;
+        // 保有装備
         case SLOTITEM_MEMBER:
             doSlotitemMember(data);
             break;
@@ -388,6 +402,46 @@ public final class GlobalContext {
     }
 
     /**
+     * 資源量を更新します
+     * @param data
+     */
+    private static void doMaterial(Data data) {
+        try {
+            JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
+            for (int i = 0; i < apidata.size(); i++) {
+                if (i < materials.length) {
+                    materials[i] = ((JsonObject) apidata.get(i)).getJsonNumber("api_value").intValue();
+                }
+            }
+            addConsole("資源情報を更新しました");
+        } catch (Exception e) {
+            LOG.warn("資源量を更新しますに失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 開発や建造に使った資源を反映させます
+     * @param data
+     */
+    private static void updateMaterial(ResourceDto res) {
+        String[] reslist = new String[] {
+                res.getFuel(),
+                res.getAmmo(),
+                res.getMetal(),
+                res.getBauxite(),
+                null,
+                null,
+                res.getResearchMaterials()
+        };
+        for (int i = 0; i < materials.length; ++i) {
+            if (reslist[i] != null) {
+                materials[i] -= Integer.valueOf(reslist[i]);
+            }
+        }
+    }
+
+    /**
      * 海戦情報を更新します
      * @param data
      */
@@ -443,6 +497,9 @@ public final class GlobalContext {
             lastBuildKdock = kdockid;
             getShipResource.put(kdockid, resource);
             KdockConfig.store(kdockid, resource);
+
+            updateMaterial(resource);
+            CreateReportLogic.storeMaterialReport("建造", materials);
 
             addConsole("建造(投入資源)情報を更新しました");
         } catch (Exception e) {
@@ -520,6 +577,9 @@ public final class GlobalContext {
                 createItemList.add(item);
                 CreateReportLogic.storeCreateItemReport(item);
             }
+
+            updateMaterial(resources);
+            CreateReportLogic.storeMaterialReport("装備開発", materials);
 
             addConsole("装備開発情報を更新しました");
         } catch (Exception e) {
@@ -812,6 +872,8 @@ public final class GlobalContext {
             CreateReportLogic.storeCreateMissionReport(result);
             missionResultList.add(result);
 
+            CreateReportLogic.storeMaterialReport("遠征帰還", materials);
+
             addConsole("遠征(帰還)情報を更新しました");
         } catch (Exception e) {
             LOG.warn("遠征(帰還)を更新しますに失敗しました", e);
@@ -877,6 +939,8 @@ public final class GlobalContext {
             int id = Integer.parseInt(idstr);
             isSortie[id - 1] = true;
         }
+
+        CreateReportLogic.storeMaterialReport("出撃", materials);
 
         addConsole("出撃を更新しました");
     }

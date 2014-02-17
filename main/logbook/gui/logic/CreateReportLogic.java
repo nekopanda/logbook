@@ -5,11 +5,14 @@
  */
 package logbook.gui.logic;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
@@ -17,6 +20,7 @@ import java.nio.channels.FileLock;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -112,6 +116,9 @@ public final class CreateReportLogic {
             Long ship = Long.valueOf(text[1]);
 
             TableItem item = new TableItem(table, SWT.NONE);
+
+            item.setData(ship);
+
             // 偶数行に背景色を付ける
             if ((count % 2) != 0) {
                 item.setBackground(SWTResourceManager.getColor(AppConstants.ROW_BACKGROUND));
@@ -508,6 +515,25 @@ public final class CreateReportLogic {
         return toListStringArray(body);
     }
 
+    public static String[] getMaterialReportHeader() {
+        return new String[] { "", "日付", "直前のイベント", "燃料", "弾薬", "鋼材", "ボーキ", "高速建造", "高速修復", "開発資源" };
+    }
+
+    public static String[] getMaterialReportBody(String event, int[] materials) {
+        return new String[] {
+                Integer.toString(1),
+                new SimpleDateFormat(AppConstants.DATE_FORMAT).format(Calendar.getInstance().getTime()),
+                event,
+                Integer.toString(materials[0]), // 燃料
+                Integer.toString(materials[1]), // 弾薬
+                Integer.toString(materials[2]), // 鋼材
+                Integer.toString(materials[3]), // ボーキ
+                Integer.toString(materials[4]), // 高速建造
+                Integer.toString(materials[5]), // 高速修復
+                Integer.toString(materials[6]) // 開発資源
+        };
+    }
+
     /**
      * 報告書をCSVファイルに書き込む(最初の列を取り除く)
      * 
@@ -802,6 +828,23 @@ public final class CreateReportLogic {
     }
 
     /**
+     * 資源量報告書を書き込む
+     * 
+     * @param dto 遠征結果
+     */
+    public static void storeMaterialReport(String event, int[] materials) {
+        try {
+            File report = getStoreFile("資源量報告書.csv", "資源量報告書_alternativefile.csv");
+
+            CreateReportLogic.writeCsvStripFirstColumn(report,
+                    CreateReportLogic.getMaterialReportHeader(),
+                    Collections.singletonList(CreateReportLogic.getMaterialReportBody(event, materials)), true);
+        } catch (IOException e) {
+            LOG.warn("報告書の保存に失敗しました", e);
+        }
+    }
+
+    /**
      * 書き込み先のファイルを返します
      * 
      * @param name ファイル名
@@ -819,6 +862,12 @@ public final class CreateReportLogic {
         if (isLocked(report)) {
             // ロックされている場合は代替ファイルに書き込みます
             report = new File(FilenameUtils.concat(report.getParent(), altername));
+        }
+        else {
+            File alt_report = new File(FilenameUtils.concat(report.getParent(), altername));
+            if (alt_report.exists() && !isLocked(alt_report) && (FileUtils.sizeOf(alt_report) > 0)) {
+                mergeAltFile(report, alt_report);
+            }
         }
         return report;
     }
@@ -850,5 +899,34 @@ public final class CreateReportLogic {
         } catch (FileNotFoundException e) {
             return true;
         }
+    }
+
+    /**
+     * alternativeファイルを本体にマージして削除します
+     * 
+     * @param report ファイル本体
+     * @param alt_report alternativeファイル
+     * @return
+     * @throws IOException
+     */
+    private static void mergeAltFile(File report, File alt_report) throws IOException {
+        // report が空ファイルの場合は、alt ファイルをリネームして終了
+        if (!report.exists() || (FileUtils.sizeOf(report) <= 0)) {
+            report.delete();
+            alt_report.renameTo(report);
+            return;
+        }
+        OutputStream report_stream = new BufferedOutputStream(new FileOutputStream(report, true));
+        InputStream alt_stream = new BufferedInputStream(new FileInputStream(alt_report));
+        try {
+            List<String> lines = IOUtils.readLines(alt_stream, AppConstants.CHARSET);
+            // タイトル行は削除
+            lines.remove(0);
+            IOUtils.writeLines(lines, "\r\n", report_stream, AppConstants.CHARSET);
+        } finally {
+            report_stream.close();
+            alt_stream.close();
+        }
+        alt_report.delete();
     }
 }

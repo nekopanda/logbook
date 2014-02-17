@@ -38,8 +38,8 @@ public class QueryHandler extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         //
-        String qid_str = req.getParameter("qid");
-        System.out.println("qid=" + qid_str);
+        //String qid_str = req.getParameter("qid");
+        //System.out.println("qid=" + qid_str);
 
         resp.setContentType("text/plain");
         resp.setCharacterEncoding("UTF-8");
@@ -54,6 +54,14 @@ public class QueryHandler extends HttpServlet {
         Display.getDefault().syncExec(new Runnable() {
             @Override
             public void run() {
+                { // 資源量を配列で追加
+                    JsonArrayBuilder materials_array = Json.createArrayBuilder();
+                    for (int material : GlobalContext.getMaterials()) {
+                        materials_array.add(material);
+                    }
+                    jb.add("materials", materials_array);
+                }
+
                 { // 艦娘リストを配列で追加
                     JsonArrayBuilder ship_array = Json.createArrayBuilder();
                     for (ShipDto ship : GlobalContext.getShipMap().values()) {

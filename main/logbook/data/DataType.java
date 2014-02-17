@@ -11,6 +11,8 @@ package logbook.data;
  */
 public enum DataType {
 
+    /** 資源量 */
+    MATERIAL("/kcsapi/api_get_member/material"),
     /** 保有艦 */
     SHIP2("/kcsapi/api_get_member/ship2"),
     /** 保有艦 */

@@ -5,21 +5,30 @@
  */
 package logbook.gui;
 
+import java.util.Map;
+
 import logbook.config.ShipGroupConfig;
 import logbook.config.bean.ShipGroupBean;
+import logbook.data.context.GlobalContext;
+import logbook.dto.ShipDto;
 import logbook.dto.ShipFilterDto;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.TableItemCreator;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 
 /**
  * 所有艦娘一覧テーブル
@@ -106,6 +115,33 @@ public final class ShipTable extends AbstractTableDialog {
                 new ShipFilterDialog(ShipTable.this.shell, ShipTable.this, ShipTable.this.filter).open();
             }
         });
+        MenuItem idCopy = new MenuItem(this.tablemenu, SWT.NONE);
+        idCopy.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                StringBuilder sb = new StringBuilder();
+                for (TableItem item : ShipTable.this.table.getSelection()) {
+                    sb.append(item.getData()).append(", ");
+                }
+                Clipboard clipboard = new Clipboard(Display.getDefault());
+                clipboard.setContents(new Object[] { sb.toString() }, new Transfer[] { TextTransfer.getInstance() });
+            }
+        });
+        idCopy.setText("艦娘個人IDをコピー(&C)");
+        MenuItem shipCopy = new MenuItem(this.tablemenu, SWT.NONE);
+        shipCopy.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                StringBuilder sb = new StringBuilder();
+                Map<Long, ShipDto> shipMap = GlobalContext.getShipMap();
+                for (TableItem item : ShipTable.this.table.getSelection()) {
+                    sb.append(shipMap.get(item.getData()).getShipId()).append(", ");
+                }
+                Clipboard clipboard = new Clipboard(Display.getDefault());
+                clipboard.setContents(new Object[] { sb.toString() }, new Transfer[] { TextTransfer.getInstance() });
+            }
+        });
+        shipCopy.setText("艦娘IDをコピー(&C)");
 
     }
 

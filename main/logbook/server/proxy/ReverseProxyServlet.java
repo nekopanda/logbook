@@ -7,7 +7,10 @@ package logbook.server.proxy;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.net.URLDecoder;
+import java.util.Calendar;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -85,6 +88,18 @@ public final class ReverseProxyServlet extends ProxyServlet {
             Response proxyResponse) {
 
         if (Filter.isNeed(request.getServerName(), response.getContentType())) {
+
+            try {
+                System.out.println(request.getRequestURI() + "?"
+                        + URLDecoder.decode(new String((byte[]) request.getAttribute(Filter.REQUEST_BODY),
+                                "UTF-8"), "UTF-8")
+                        + ": "
+                        + Calendar.getInstance().getTimeInMillis());
+            } catch (UnsupportedEncodingException e) {
+                // TODO 自動生成された catch ブロック
+                e.printStackTrace();
+            }
+
             byte[] postField = (byte[]) request.getAttribute(Filter.REQUEST_BODY);
             ByteArrayOutputStream stream = (ByteArrayOutputStream) request.getAttribute(Filter.RESPONSE_BODY);
             if (stream != null) {
