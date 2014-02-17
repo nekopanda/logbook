@@ -36,6 +36,12 @@ public final class AppConfigBean {
     /** 透明度 */
     private int alpha = 255;
 
+    /** 遠征のリマインド */
+    private boolean missionRemind = true;
+
+    /** 遠征入渠をバルーンで通知する */
+    private boolean useBalloon = true;
+
     /** 報告書の保存先 */
     private String reportPath = new File("").getAbsolutePath();
 
@@ -212,6 +218,38 @@ public final class AppConfigBean {
      */
     public void setAlpha(int alpha) {
         this.alpha = alpha;
+    }
+
+    /**
+     * 遠征のリマインドを取得します。
+     * @return 遠征のリマインド
+     */
+    public boolean isMissionRemind() {
+        return this.missionRemind;
+    }
+
+    /**
+     * 遠征のリマインドを設定します。
+     * @param missionRemind 遠征のリマインド
+     */
+    public void setMissionRemind(boolean missionRemind) {
+        this.missionRemind = missionRemind;
+    }
+
+    /**
+     * 遠征入渠をバルーンで通知するを取得します。
+     * @return 遠征入渠をバルーンで通知する
+     */
+    public boolean isUseBalloon() {
+        return this.useBalloon;
+    }
+
+    /**
+     * 遠征入渠をバルーンで通知するを設定します。
+     * @param useBalloon 遠征入渠をバルーンで通知する
+     */
+    public void setUseBalloon(boolean useBalloon) {
+        this.useBalloon = useBalloon;
     }
 
     /**
