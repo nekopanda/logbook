@@ -9,6 +9,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.io.FilenameUtils;
+
 /**
  * アプリケーションの設定
  *
@@ -103,7 +105,7 @@ public final class AppConfigBean {
     private boolean storeJson;
 
     /** 開発者オプション-JSONの保存先 */
-    private String storeJsonPath = "./json/";
+    private String storeJsonPath = FilenameUtils.concat(new File("").getAbsolutePath(), "json");
 
     /** テーブル列を表示する設定(キー:java.lang.Class.getName()) */
     private Map<String, boolean[]> visibleColumnMap = new HashMap<String, boolean[]>();
