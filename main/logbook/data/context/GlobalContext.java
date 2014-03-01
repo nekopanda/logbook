@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -42,6 +43,7 @@ import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
 import logbook.dto.MissionResultDto;
 import logbook.dto.NdockDto;
+import logbook.dto.QuestDto;
 import logbook.dto.ResourceDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
@@ -118,6 +120,9 @@ public final class GlobalContext {
     /** 入渠リスト */
     private static NdockDto[] ndocks = new NdockDto[] { NdockDto.EMPTY, NdockDto.EMPTY, NdockDto.EMPTY,
             NdockDto.EMPTY };
+
+    /** 任務Map */
+    private static SortedMap<Integer, QuestDto> questMap = new ConcurrentSkipListMap<Integer, QuestDto>();
 
     /** 出撃中か */
     private static boolean[] isSortie = new boolean[4];
@@ -256,6 +261,14 @@ public final class GlobalContext {
     }
 
     /**
+     * 任務を取得します
+     * @return 任務
+     */
+    public static Map<Integer, QuestDto> getQuest() {
+        return Collections.unmodifiableMap(questMap);
+    }
+
+    /**
      * 出撃中かを調べます
      * @return 出撃中
      */
@@ -332,8 +345,17 @@ public final class GlobalContext {
                 break;
             // 海戦
             case BATTLE:
+                doBattle(data);
+                break;
+            // 海戦
             case BATTLE_MIDNIGHT:
+                doBattle(data);
+                break;
+            // 海戦
             case BATTLE_SP_MIDNIGHT:
+                doBattle(data);
+                break;
+            // 海戦
             case BATTLE_NIGHT_TO_DAY:
                 doBattle(data);
                 break;
@@ -348,6 +370,14 @@ public final class GlobalContext {
             // 出撃
             case START:
                 doStart(data);
+                break;
+            // 任務
+            case QUEST_LIST:
+                doQuest(data);
+                break;
+            // 任務消化
+            case QUEST_CLEAR:
+                doQuestClear(data);
                 break;
             // 艦娘一覧
             case SHIP_MASTER:
@@ -859,6 +889,62 @@ public final class GlobalContext {
         }
 
         addConsole("艦娘一覧を更新しました");
+    }
+
+    /**
+     * 任務を更新します
+     * 
+     * @param data
+     */
+    private static void doQuest(Data data) {
+        try {
+            JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+            JsonArray apilist = apidata.getJsonArray("api_list");
+            for (JsonValue value : apilist) {
+                if (value instanceof JsonObject) {
+                    JsonObject questobject = (JsonObject) value;
+                    // 任務を作成
+                    QuestDto quest = new QuestDto();
+                    quest.setNo(questobject.getInt("api_no"));
+                    quest.setCategory(questobject.getInt("api_category"));
+                    quest.setType(questobject.getInt("api_type"));
+                    quest.setState(questobject.getInt("api_state"));
+                    quest.setTitle(questobject.getString("api_title"));
+                    quest.setDetail(questobject.getString("api_detail"));
+                    JsonArray material = questobject.getJsonArray("api_get_material");
+                    quest.setFuel(material.getJsonNumber(0).toString());
+                    quest.setAmmo(material.getJsonNumber(1).toString());
+                    quest.setMetal(material.getJsonNumber(2).toString());
+                    quest.setBauxite(material.getJsonNumber(3).toString());
+                    quest.setBonusFlag(questobject.getInt("api_bonus_flag"));
+                    quest.setProgressFlag(questobject.getInt("api_progress_flag"));
+
+                    questMap.put(quest.getNo(), quest);
+                }
+            }
+            addConsole("任務を更新しました");
+        } catch (Exception e) {
+            LOG.warn("任務を更新しますに失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 消化した任務を除去します
+     * 
+     * @param data
+     */
+    private static void doQuestClear(Data data) {
+        try {
+            String idstr = data.getField("api_quest_id");
+            if (idstr != null) {
+                Integer id = Integer.valueOf(idstr);
+                questMap.remove(id);
+            }
+        } catch (Exception e) {
+            LOG.warn("消化した任務を除去しますに失敗しました", e);
+            LOG.warn(data);
+        }
     }
 
     /**

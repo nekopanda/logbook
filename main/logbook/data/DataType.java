@@ -47,6 +47,10 @@ public enum DataType {
     GETSHIP("/kcsapi/api_req_kousyou/getship"),
     /** 出撃 */
     START("kcsapi/api_req_map/start"),
+    /** 任務一覧 */
+    QUEST_LIST("/kcsapi/api_get_member/questlist"),
+    /** 任務消化 */
+    QUEST_CLEAR("/kcsapi/api_req_quest/clearitemget"),
     /** アイテム一覧 */
     SLOTITEM_MASTER("/kcsapi/api_get_master/slotitem"),
     /** 艦娘一覧 */
