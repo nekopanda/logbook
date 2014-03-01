@@ -36,6 +36,9 @@ public class ItemType {
             this.put("20", "上陸用舟艇");
             this.put("21", "オートジャイロ");
             this.put("22", "指揮連絡機");
+            this.put("23", "追加装甲");
+            this.put("24", "探照灯");
+            this.put("25", "簡易輸送部材");
         }
     };
 
