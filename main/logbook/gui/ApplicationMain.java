@@ -290,6 +290,18 @@ public final class ApplicationMain {
         cmdbathwaterlist.addSelectionListener(new BathwaterTableAdapter(this.shell));
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
+        // コマンド-任務一覧
+        MenuItem questlist = new MenuItem(cmdmenu, SWT.NONE);
+        questlist.setText("任務一覧(&Q)\tCtrl+Q");
+        questlist.setAccelerator(SWT.CTRL + 'Q');
+        questlist.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                new QuestTable(ApplicationMain.this.shell).open();
+            }
+        });
+        // セパレータ
+        new MenuItem(cmdmenu, SWT.SEPARATOR);
         // 表示-縮小表示
         final MenuItem dispsize = new MenuItem(cmdmenu, SWT.CHECK);
         dispsize.setText("縮小表示(&M)\tCtrl+M");

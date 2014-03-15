@@ -45,6 +45,7 @@ import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
 import logbook.dto.MissionResultDto;
 import logbook.dto.NdockDto;
+import logbook.dto.QuestDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipFilterDto;
 import logbook.dto.ShipInfoDto;
@@ -532,6 +533,52 @@ public final class CreateReportLogic {
                 Integer.toString(materials[5]), // 高速修復
                 Integer.toString(materials[6]) // 開発資源
         };
+    }
+
+    /**
+     * 任務一覧のヘッダー
+     * 
+     * @return
+     */
+    public static String[] getCreateQuestHeader() {
+        return new String[] { "", "状態", "タイトル", "内容", "燃料", "弾薬", "鋼材", "ボーキ" };
+    }
+
+    /**
+     * 任務一覧の内容
+     * 
+     * @return
+     */
+    public static List<String[]> getQuestBody() {
+        List<Object[]> body = new ArrayList<Object[]>();
+
+        for (Entry<Integer, QuestDto> entry : GlobalContext.getQuest().entrySet()) {
+            QuestDto quest = entry.getValue();
+
+            String state = "";
+            switch (quest.getState()) {
+            case 2:
+                state = "遂行中";
+                break;
+            case 3:
+                state = "達成";
+                break;
+            default:
+                continue;
+            }
+
+            body.add(new Object[] {
+                    quest.getNo(),
+                    state,
+                    quest.getTitle(),
+                    quest.getDetail(),
+                    quest.getFuel(),
+                    quest.getAmmo(),
+                    quest.getMetal(),
+                    quest.getBauxite()
+            });
+        }
+        return toListStringArray(body);
     }
 
     /**

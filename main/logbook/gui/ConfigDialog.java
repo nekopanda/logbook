@@ -5,6 +5,7 @@
  */
 package logbook.gui;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -381,7 +382,7 @@ public final class ConfigDialog extends Dialog {
 
                 // development
                 AppConfig.get().setStoreJson(btnJson.getSelection());
-                AppConfig.get().setStoreJsonPath(jsonpath.getText());
+                AppConfig.get().setStoreJsonPath(new File(jsonpath.getText()).getAbsolutePath());
                 try {
                     AppConfig.store();
                 } catch (IOException ex) {
