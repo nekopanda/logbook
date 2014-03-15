@@ -8,16 +8,21 @@ package logbook.dto;
 import java.util.Date;
 import java.util.Set;
 
+import logbook.internal.Deck;
+
 /**
  * 遠征を表します
  *
  */
 public final class DeckMissionDto extends AbstractDto {
 
-    public static final DeckMissionDto EMPTY = new DeckMissionDto(null, null, null, 0, null);
+    public static final DeckMissionDto EMPTY = new DeckMissionDto();
 
     /** 艦隊名 */
     private final String name;
+
+    /** 遠征名 */
+    private final int missionId;
 
     /** 遠征名 */
     private final String mission;
@@ -34,9 +39,22 @@ public final class DeckMissionDto extends AbstractDto {
     /**
      * コンストラクター
      */
-    public DeckMissionDto(String name, String mission, Date time, long fleetid, Set<Long> ships) {
+    private DeckMissionDto() {
+        this.name = null;
+        this.missionId = -1;
+        this.mission = null;
+        this.time = null;
+        this.fleetid = 0;
+        this.ships = null;
+    }
+
+    /**
+     * コンストラクター
+     */
+    public DeckMissionDto(String name, int missionId, Date time, long fleetid, Set<Long> ships) {
         this.name = name;
-        this.mission = mission;
+        this.missionId = missionId;
+        this.mission = Deck.get(Long.toString(missionId));
         this.time = time;
         this.fleetid = fleetid;
         this.ships = ships;
@@ -47,6 +65,13 @@ public final class DeckMissionDto extends AbstractDto {
      */
     public String getName() {
         return this.name;
+    }
+
+    /**
+     * @return 遠征ID
+     */
+    public int getMissionId() {
+        return this.missionId;
     }
 
     /**

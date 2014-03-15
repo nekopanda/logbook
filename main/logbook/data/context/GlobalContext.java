@@ -45,9 +45,7 @@ import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.MainConsoleListener;
-import logbook.internal.Deck;
 import logbook.internal.Ship;
-import logbook.internal.ShipStyle;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -818,8 +816,7 @@ public final class GlobalContext {
                 String name = object.getString("api_name");
                 JsonArray jmission = object.getJsonArray("api_mission");
 
-                long section = ((JsonNumber) jmission.get(1)).longValue();
-                String mission = Deck.get(Long.toString(section));
+                int section = ((JsonNumber) jmission.get(1)).intValue();
                 long milis = ((JsonNumber) jmission.get(2)).longValue();
                 long fleetid = object.getJsonNumber("api_id").longValue();
 
@@ -836,7 +833,7 @@ public final class GlobalContext {
                 if (milis > 0) {
                     time = new Date(milis);
                 }
-                deckMissions[i - 1] = new DeckMissionDto(name, mission, time, fleetid, ships);
+                deckMissions[i - 1] = new DeckMissionDto(name, section, time, fleetid, ships);
             }
 
             addConsole("遠征情報を更新しました");
@@ -958,7 +955,7 @@ public final class GlobalContext {
             return ShipInfoDto.EMPTY;
         }
 
-        String type = ShipStyle.get(object.getJsonNumber("api_stype").toString());
+        int stype = object.getJsonNumber("api_stype").intValue();
         String flagship = object.getString("api_yomi");
         if ("-".equals(flagship)) {
             flagship = "";
@@ -973,7 +970,7 @@ public final class GlobalContext {
         if (object.containsKey("api_fuel_max")) {
             maxFuel = object.getJsonNumber("api_fuel_max").intValue();
         }
-        return new ShipInfoDto(name, type, flagship, afterlv, aftershipid, maxBull, maxFuel);
+        return new ShipInfoDto(name, stype, flagship, afterlv, aftershipid, maxBull, maxFuel);
     }
 
     private static void addConsole(Object message) {

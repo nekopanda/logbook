@@ -69,9 +69,14 @@ public class QueryHandler extends HttpServlet {
                                 .add("id", ship.getId())
                                 .add("ship_id", ship.getShipId())
                                 .add("char_id", ship.getCharId())
+                                .add("ship_type", ship.getShipInfo().getStype())
                                 .add("level", ship.getLv())
                                 .add("cond", ship.getCond())
                                 .add("cond_clear_time", ship.getCondClearTime().getTimeInMillis())
+                                .add("bull", ship.getBull())
+                                .add("bull_max", ship.getBullMax())
+                                .add("fuel", ship.getFuel())
+                                .add("fuel_max", ship.getFuelMax())
                                 .add("now_hp", ship.getNowhp())
                                 .add("max_hp", ship.getMaxhp())
                                 .add("dock_time", ship.getDocktime()));
@@ -97,32 +102,38 @@ public class QueryHandler extends HttpServlet {
                 }
 
                 { // 入渠ドック情報
-                    JsonArrayBuilder ndock_ships = Json.createArrayBuilder();
-                    JsonArrayBuilder ndock_comp_time = Json.createArrayBuilder();
+                    JsonArrayBuilder ndock_root = Json.createArrayBuilder();
                     for (NdockDto ndock : GlobalContext.getNdocks()) {
+                        JsonArrayBuilder ndock_ship = Json.createArrayBuilder();
                         if (ndock.getNdockid() != 0) {
-                            ndock_ships.add(ndock.getNdockid());
-                            ndock_comp_time.add(ndock.getNdocktime().getTime());
+                            ndock_ship.add(ndock.getNdockid());
+                            ndock_ship.add(ndock.getNdocktime().getTime());
                         }
                         else {
-                            ndock_ships.add(-1);
-                            ndock_comp_time.add(0);
+                            ndock_ship.add(-1);
+                            ndock_ship.add(0);
                         }
+                        ndock_root.add(ndock_ship);
                     }
-                    jb.add("ndock_ships", ndock_ships);
-                    jb.add("ndock_complete_time", ndock_comp_time);
+                    jb.add("ndock", ndock_root);
                 }
 
                 { // 遠征情報
-                    JsonArrayBuilder mission_comp_time = Json.createArrayBuilder();
+                    JsonArrayBuilder mission_root = Json.createArrayBuilder();
                     for (DeckMissionDto mission : GlobalContext.getDeckMissions()) {
+                        JsonArrayBuilder mission_item = Json.createArrayBuilder();
                         Date comp_time = mission.getTime();
-                        if (comp_time != null)
-                            mission_comp_time.add(comp_time.getTime());
-                        else
-                            mission_comp_time.add(0);
+                        if (comp_time != null) {
+                            mission_item.add(mission.getMissionId());
+                            mission_item.add(comp_time.getTime());
+                        }
+                        else {
+                            mission_item.add(-1);
+                            mission_item.add(0);
+                        }
+                        mission_root.add(mission_item);
                     }
-                    jb.add("mission_complete_time", mission_comp_time);
+                    jb.add("mission", mission_root);
                 }
 
                 { // 出撃

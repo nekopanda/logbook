@@ -5,6 +5,8 @@
  */
 package logbook.dto;
 
+import logbook.internal.ShipStyle;
+
 /**
  * 艦娘の名前と種別を表します
  *
@@ -16,6 +18,9 @@ public final class ShipInfoDto extends AbstractDto {
 
     /** 名前 */
     private String name;
+
+    /** 艦種 */
+    private int stype;
 
     /** 艦種 */
     private String type;
@@ -57,9 +62,10 @@ public final class ShipInfoDto extends AbstractDto {
     /**
      * コンストラクター
      */
-    public ShipInfoDto(String name, String type, String flagship, int afterlv, int aftershipid, int maxBull, int maxFuel) {
+    public ShipInfoDto(String name, int stype, String flagship, int afterlv, int aftershipid, int maxBull, int maxFuel) {
         this.name = name;
-        this.type = type;
+        this.stype = stype;
+        this.type = ShipStyle.get(String.valueOf(stype));
         this.afterlv = afterlv;
         this.aftershipid = aftershipid;
         this.flagship = flagship;
@@ -92,11 +98,34 @@ public final class ShipInfoDto extends AbstractDto {
     }
 
     /**
+     * @return 改造後の艦ID(改造ができない場合、0)
+     */
+    public void setAftershipid(int aftershipid) {
+        this.aftershipid = aftershipid;
+    }
+
+    /**
+     * 艦種を設定します。
+     * @param type 艦種
+     */
+    public int getStype() {
+        return this.stype;
+    }
+
+    /**
      * 艦種を取得します。
      * @return 艦種
      */
     public String getType() {
         return this.type;
+    }
+
+    /**
+     * 艦種を設定します。
+     * @param type 艦種
+     */
+    public void setStype(int stype) {
+        this.stype = stype;
     }
 
     /**
