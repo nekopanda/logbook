@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import javax.json.JsonArray;
@@ -130,6 +129,9 @@ public final class GlobalContext {
 
     /** 出撃中か */
     private static boolean[] isSortie = new boolean[4];
+
+    /** 出撃中のマップ */
+    private static int[] sortieMap = new int[3];
 
     /** ログ表示 */
     private static MainConsoleListener console;
@@ -360,15 +362,15 @@ public final class GlobalContext {
         case BATTLE:
             doBattle(data);
             break;
-            // 海戦
+        // 海戦
         case BATTLE_MIDNIGHT:
             doBattle(data);
             break;
-            // 海戦
+        // 海戦
         case BATTLE_SP_MIDNIGHT:
             doBattle(data);
             break;
-            // 海戦
+        // 海戦
         case BATTLE_NIGHT_TO_DAY:
             doBattle(data);
             break;
@@ -383,6 +385,10 @@ public final class GlobalContext {
         // 出撃
         case START:
             doStart(data);
+            break;
+        // 進撃
+        case NEXT:
+            doNext(data);
             break;
         // 任務
         case QUEST_LIST:
@@ -477,12 +483,15 @@ public final class GlobalContext {
      */
     private static void doBattle(Data data) {
         try {
-            if (battleList.size() == 0) {
-                JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
-                battleList.add(new BattleDto(apidata));
+            JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+            BattleDto battleDto = new BattleDto(apidata);
 
-                addConsole("海戦情報を更新しました");
-            }
+            if (battleList.size() == 0)
+                battleList.add(battleDto);
+
+            addConsole("海戦情報を更新しました");
+            addConsole("自=" + Arrays.toString(battleDto.getNowFriendHp()));
+            addConsole("敵=" + Arrays.toString(battleDto.getNowEnemyHp()));
         } catch (Exception e) {
             LOG.warn("海戦情報を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -496,7 +505,7 @@ public final class GlobalContext {
     private static void doBattleresult(Data data) {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
-            BattleResultDto dto = new BattleResultDto(apidata, battleList.poll());
+            BattleResultDto dto = new BattleResultDto(apidata, battleList.poll(), sortieMap);
             battleResultList.add(dto);
             CreateReportLogic.storeBattleResultReport(dto);
 
@@ -1013,21 +1022,49 @@ public final class GlobalContext {
         }
     }
 
+    private static void readMapInfo(Data data) {
+        JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+        sortieMap[0] = apidata.getJsonNumber("api_maparea_id").intValue();
+        sortieMap[1] = apidata.getJsonNumber("api_mapinfo_no").intValue();
+        sortieMap[2] = apidata.getJsonNumber("api_no").intValue();
+    }
+
     /**
      * 出撃を更新します
      * 
      * @param data
      */
     private static void doStart(Data data) {
-        String idstr = data.getField("api_deck_id");
-        if (idstr != null) {
-            int id = Integer.parseInt(idstr);
-            isSortie[id - 1] = true;
+        try {
+            String idstr = data.getField("api_deck_id");
+            if (idstr != null) {
+                int id = Integer.parseInt(idstr);
+                isSortie[id - 1] = true;
+            }
+            readMapInfo(data);
+            CreateReportLogic.storeMaterialReport("出撃", materials);
+
+            addConsole("出撃を更新しました");
+            addConsole("行先=" + Arrays.toString(sortieMap));
+        } catch (Exception e) {
+            LOG.warn("出撃を更新しますに失敗しました", e);
+            LOG.warn(data);
         }
+    }
 
-        CreateReportLogic.storeMaterialReport("出撃", materials);
-
-        addConsole("出撃を更新しました");
+    /**
+     * 進撃を処理します
+     * 
+     * @param data
+     */
+    private static void doNext(Data data) {
+        try {
+            readMapInfo(data);
+            addConsole("行先=" + Arrays.toString(sortieMap));
+        } catch (Exception e) {
+            LOG.warn("進撃を処理しますに失敗しました", e);
+            LOG.warn(data);
+        }
     }
 
     /**

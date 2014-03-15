@@ -45,10 +45,11 @@ public final class BattleResultDto extends AbstractDto {
      * @param object JSON Object
      * @param battle 戦闘詳細
      */
-    public BattleResultDto(JsonObject object, BattleDto battle) {
+    public BattleResultDto(JsonObject object, BattleDto battle, int[] mapInfo) {
 
         this.battleDate = Calendar.getInstance().getTime();
-        this.questName = object.getString("api_quest_name");
+        this.questName = "(" + mapInfo[0] + "-" + mapInfo[1] + "-" + mapInfo[2] + ") "
+                + object.getString("api_quest_name");
         this.rank = object.getString("api_win_rank");
         this.enemyName = object.getJsonObject("api_enemy_info").getString("api_deck_name");
         this.dropFlag = object.containsKey("api_get_ship");

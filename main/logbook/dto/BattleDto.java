@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.json.JsonArray;
+import javax.json.JsonNumber;
 import javax.json.JsonObject;
+import javax.json.JsonValue;
 
 import logbook.data.context.GlobalContext;
 import logbook.internal.Ship;
@@ -77,6 +79,92 @@ public final class BattleDto extends AbstractDto {
                 this.maxFriendHp[i - 1] = maxhps.getJsonNumber(i).intValue();
             } else {
                 this.maxEnemyHp[i - 1 - 6] = maxhps.getJsonNumber(i).intValue();
+            }
+        }
+
+        // ダメージ計算 //
+
+        // 航空戦
+        this.doRaigeki(object.getJsonObject("api_kouku").get("api_stage3"));
+
+        // 開幕
+        this.doRaigeki(object.get("api_opening_atack"));
+
+        // 砲撃
+        this.doHougeki(object.get("api_hougeki"));
+        this.doHougeki(object.get("api_hougeki1"));
+        this.doHougeki(object.get("api_hougeki2"));
+        this.doHougeki(object.get("api_hougeki3"));
+
+        // 雷撃
+        this.doRaigeki(object.get("api_raigeki"));
+
+        // HP0以下を0にする
+        for (int i = 0; i < 6; i++) {
+            if (this.nowFriendHp[i] < 0)
+                this.nowFriendHp[i] = 0;
+            if (this.nowEnemyHp[i] < 0)
+                this.nowEnemyHp[i] = 0;
+        }
+    }
+
+    private void doRaigeki(JsonValue raigeki) {
+        if ((raigeki == null) || (raigeki == JsonValue.NULL))
+            return;
+
+        JsonObject raigeki_obj = (JsonObject) raigeki;
+        JsonArray fdam = raigeki_obj.getJsonArray("api_fdam");
+        JsonArray edam = raigeki_obj.getJsonArray("api_edam");
+        for (int i = 1; i <= 6; i++) {
+            this.nowFriendHp[i - 1] -= fdam.getJsonNumber(i).intValue();
+            this.nowEnemyHp[i - 1] -= edam.getJsonNumber(i).intValue();
+        }
+    }
+
+    private ArrayList<Integer> listupDamage(JsonArray damage_list) {
+        ArrayList<Integer> list = new ArrayList<Integer>();
+
+        for (JsonValue atack : damage_list) {
+            switch (atack.getValueType()) {
+            case NUMBER:
+                list.add(((JsonNumber) atack).intValue());
+                break;
+            case ARRAY:
+                for (JsonValue ship : (JsonArray) atack) {
+                    list.add(((JsonNumber) ship).intValue());
+                }
+                break;
+            }
+        }
+
+        return list;
+    }
+
+    /**
+     * api_hougeki* を処理する
+     * @param hougeki
+     */
+    private void doHougeki(JsonValue hougeki) {
+        if ((hougeki == null) || (hougeki == JsonValue.NULL))
+            return;
+
+        JsonObject hougeki_obj = (JsonObject) hougeki;
+        ArrayList<Integer> df_list = this.listupDamage(hougeki_obj.getJsonArray("api_df_list"));
+        ArrayList<Integer> damage = this.listupDamage(hougeki_obj.getJsonArray("api_damage"));
+
+        if (df_list.size() != damage.size()) {
+            throw new IndexOutOfBoundsException("df_list と damage の長さが合いません");
+        }
+
+        for (int i = 0; i < df_list.size(); ++i) {
+            int shipIdx = df_list.get(i);
+            if (shipIdx == -1)
+                continue;
+            if (shipIdx <= 6) {
+                this.nowFriendHp[shipIdx - 1] -= damage.get(i);
+            }
+            else {
+                this.nowEnemyHp[shipIdx - 1 - 6] -= damage.get(i);
             }
         }
     }

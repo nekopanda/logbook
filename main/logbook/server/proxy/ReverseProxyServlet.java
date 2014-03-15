@@ -90,11 +90,14 @@ public final class ReverseProxyServlet extends ProxyServlet {
         if (Filter.isNeed(request.getServerName(), response.getContentType())) {
 
             try {
+                ByteArrayOutputStream stream = (ByteArrayOutputStream) request.getAttribute(Filter.RESPONSE_BODY);
                 System.out.println(request.getRequestURI() + "?"
                         + URLDecoder.decode(new String((byte[]) request.getAttribute(Filter.REQUEST_BODY),
                                 "UTF-8"), "UTF-8")
                         + ": "
-                        + Calendar.getInstance().getTimeInMillis());
+                        + Calendar.getInstance().getTimeInMillis()
+                        + ": "
+                        + new String(stream.toByteArray()));
             } catch (UnsupportedEncodingException e) {
                 // TODO 自動生成された catch ブロック
                 e.printStackTrace();
