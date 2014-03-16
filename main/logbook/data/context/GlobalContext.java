@@ -130,6 +130,9 @@ public final class GlobalContext {
     /** ログキュー */
     private static Queue<String> consoleQueue = new ArrayBlockingQueue<String>(10);
 
+    /** 保有資源・資材 */
+    private static Map<Integer, Integer> materialMap = new HashMap<Integer, Integer>();
+
     /**
      * @return 装備Map
      */
@@ -278,6 +281,23 @@ public final class GlobalContext {
     }
 
     /**
+     * 保有資材を取得します
+     * 
+     * @param key 次のいずれか {@link AppConstants#MATERIAL_FUEL}、{@link AppConstants#MATERIAL_AMMO}、
+     *            {@link AppConstants#MATERIAL_METAL}、{@link AppConstants#MATERIAL_BAUXITE}、
+     *            {@link AppConstants#MATERIAL_BURNER}、{@link AppConstants#MATERIAL_BUCKET}、
+     *            {@link AppConstants#MATERIAL_RESEARCH}
+     * @return 保有量
+     */
+    public static int getMaterial(int key) {
+        Integer material = materialMap.get(key);
+        if (material != null) {
+            return material.intValue();
+        }
+        return 0;
+    }
+
+    /**
      * @return ログメッセージ
      */
     public static String getConsoleMessage() {
@@ -314,6 +334,10 @@ public final class GlobalContext {
             // 基本
             case BASIC:
                 doBasic(data);
+                break;
+            // 資材
+            case MATERIAL:
+                doMaterial(data);
                 break;
             // 遠征
             case DECK_PORT:
@@ -763,6 +787,27 @@ public final class GlobalContext {
             addConsole("司令部を更新しました");
         } catch (Exception e) {
             LOG.warn("司令部を更新するに失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 保有資材を更新する
+     * 
+     * @param data
+     */
+    private static void doMaterial(Data data) {
+        try {
+            JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
+
+            for (JsonValue value : apidata) {
+                JsonObject entry = (JsonObject) value;
+                materialMap.put(entry.getInt("api_id"), entry.getInt("api_value"));
+            }
+
+            addConsole("保有資材を更新しました");
+        } catch (Exception e) {
+            LOG.warn("保有資材を更新するに失敗しました", e);
             LOG.warn(data);
         }
     }

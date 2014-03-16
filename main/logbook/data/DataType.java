@@ -21,6 +21,8 @@ public enum DataType {
     MISSION_RESULT("/kcsapi/api_req_mission/result"),
     /** 基本 */
     BASIC("/kcsapi/api_get_member/basic"),
+    /** 資材 */
+    MATERIAL("/kcsapi/api_get_member/material"),
     /** 入渠ドック */
     NDOCK("/kcsapi/api_get_member/ndock"),
     /** アイテム一覧 */
