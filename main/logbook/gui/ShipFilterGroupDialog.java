@@ -77,15 +77,24 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
      */
     @Override
     protected void createContentsBefore() {
-        this.shell.setLayout(new GridLayout(1, false));
+        GridLayout shellLayout = new GridLayout(1, false);
+        shellLayout.verticalSpacing = 1;
+        shellLayout.marginWidth = 1;
+        shellLayout.marginHeight = 1;
+        shellLayout.marginBottom = 1;
+        shellLayout.horizontalSpacing = 1;
+        this.shell.setLayout(shellLayout);
 
         this.sashForm = new SashForm(this.shell, SWT.SMOOTH);
         this.sashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
         this.sideComposite = new Composite(this.sashForm, SWT.NONE);
         GridLayout sideLayout = new GridLayout(2, false);
-        sideLayout.marginWidth = 0;
-        sideLayout.marginHeight = 0;
+        sideLayout.verticalSpacing = 1;
+        sideLayout.marginWidth = 1;
+        sideLayout.marginHeight = 1;
+        sideLayout.marginBottom = 1;
+        sideLayout.horizontalSpacing = 1;
         this.sideComposite.setLayout(sideLayout);
 
         Button btnAdd = new Button(this.sideComposite, SWT.NONE);
@@ -117,8 +126,11 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
 
         this.mainComposite = new Composite(this.sashForm, SWT.NONE);
         GridLayout mainLayout = new GridLayout(3, false);
-        mainLayout.marginWidth = 0;
-        mainLayout.marginHeight = 0;
+        mainLayout.verticalSpacing = 1;
+        mainLayout.marginWidth = 1;
+        mainLayout.marginHeight = 1;
+        mainLayout.marginBottom = 1;
+        mainLayout.horizontalSpacing = 1;
         this.mainComposite.setLayout(mainLayout);
 
         this.text = new Text(this.mainComposite, SWT.BORDER);
