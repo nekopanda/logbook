@@ -197,7 +197,7 @@ public class FleetComposite extends Composite {
             bullst.setText("弾");
             Label next = new Label(stateComposite, SWT.NONE);
             next.setFont(this.small);
-            next.setText("あと0回");
+            next.setText("");
 
             // 疲労
             Label cond = new Label(this.fleetGroup, SWT.NONE);
@@ -226,6 +226,8 @@ public class FleetComposite extends Composite {
         if (this.dock == dock) {
             return;
         }
+        this.getShell().setRedraw(false);
+
         this.dock = dock;
         this.state = 0;
         this.cond = 49;
@@ -249,8 +251,6 @@ public class FleetComposite extends Composite {
         for (int i = 0; i < ships.size(); i++) {
             int state = 0;
             ShipDto ship = ships.get(i);
-            // 名前
-            String name = ship.getName();
             // HP
             long nowhp = ship.getNowhp();
             // MaxHP
@@ -361,8 +361,6 @@ public class FleetComposite extends Composite {
                 } else {
                     this.nextLabels[i].setText("");
                 }
-            } else {
-                this.nextLabels[i].setText("");
             }
 
             // コンディション
@@ -403,7 +401,7 @@ public class FleetComposite extends Composite {
 
             // ラベルを更新する
             // 名前
-            this.nameLabels[i].setText(name);
+            this.nameLabels[i].setText(ship.getName());
             this.nameLabels[i].setToolTipText(MessageFormat.format(AppConstants.TOOLTIP_FLEETTAB_SHIP, nowhp, maxhp,
                     fuel, fuelmax, bull, bullmax, ship.getNext()));
             // HP
@@ -468,6 +466,8 @@ public class FleetComposite extends Composite {
         this.showTooltip();
 
         this.fleetGroup.layout();
+
+        this.getShell().setRedraw(true);
     }
 
     /**
