@@ -20,6 +20,15 @@ public final class AppConfigBean {
     /** ポート番号 */
     private int listenPort = 8888;
 
+    /** プロキシ利用 */
+    private boolean useProxy;
+
+    /** プロキシホスト */
+    private String proxyHost = "localhost";
+
+    /** プロキシポート */
+    private int proxyPort = 8080;
+
     /** ウインドウサイズ(width) */
     private int width = 280;
 
@@ -124,6 +133,54 @@ public final class AppConfigBean {
      */
     public void setListenPort(int listenPort) {
         this.listenPort = listenPort;
+    }
+
+    /**
+     * プロキシ利用を取得します。
+     * @return プロキシ利用
+     */
+    public boolean isUseProxy() {
+        return this.useProxy;
+    }
+
+    /**
+     * プロキシ利用を設定します。
+     * @param useProxy プロキシ利用
+     */
+    public void setUseProxy(boolean useProxy) {
+        this.useProxy = useProxy;
+    }
+
+    /**
+     * プロキシホストを取得します。
+     * @return プロキシホスト
+     */
+    public String getProxyHost() {
+        return this.proxyHost;
+    }
+
+    /**
+     * プロキシホストを設定します。
+     * @param proxyHost プロキシホスト
+     */
+    public void setProxyHost(String proxyHost) {
+        this.proxyHost = proxyHost;
+    }
+
+    /**
+     * プロキシポートを取得します。
+     * @return プロキシポート
+     */
+    public int getProxyPort() {
+        return this.proxyPort;
+    }
+
+    /**
+     * プロキシポートを設定します。
+     * @param proxyPort プロキシポート
+     */
+    public void setProxyPort(int proxyPort) {
+        this.proxyPort = proxyPort;
     }
 
     /**

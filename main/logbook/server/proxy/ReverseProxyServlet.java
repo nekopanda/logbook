@@ -12,13 +12,16 @@ import java.lang.reflect.Field;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import logbook.config.AppConfig;
 import logbook.data.Data;
 import logbook.data.DataQueue;
 import logbook.data.DataType;
 import logbook.data.UndefinedData;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.HttpRequest;
+import org.eclipse.jetty.client.api.ProxyConfiguration;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.http.HttpHeader;
@@ -102,6 +105,24 @@ public final class ReverseProxyServlet extends ProxyServlet {
             }
         }
         super.onResponseSuccess(request, response, proxyResponse);
+    }
+
+    /*
+     * HttpClientを作成する
+     */
+    @Override
+    protected HttpClient newHttpClient() {
+        HttpClient client = super.newHttpClient();
+        // プロキシを設定する
+        if (AppConfig.get().isUseProxy()) {
+            // ポート
+            int port = AppConfig.get().getProxyPort();
+            // ホスト
+            String host = AppConfig.get().getProxyHost();
+            // 設定する
+            client.setProxyConfiguration(new ProxyConfiguration(host, port));
+        }
+        return client;
     }
 
     /**
