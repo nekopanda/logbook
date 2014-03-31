@@ -50,6 +50,9 @@ public final class AppConfigBean {
     /** 遠征のリマインド */
     private boolean missionRemind = true;
 
+    /** リマインドのインターバル */
+    private int remindInterbal = 120;
+
     /** 遠征入渠をバルーンで通知する */
     private boolean useBalloon = true;
 
@@ -293,6 +296,22 @@ public final class AppConfigBean {
      */
     public void setMissionRemind(boolean missionRemind) {
         this.missionRemind = missionRemind;
+    }
+
+    /**
+     * リマインドのインターバルを取得します。
+     * @return リマインドのインターバル
+     */
+    public int getRemindInterbal() {
+        return remindInterbal;
+    }
+
+    /**
+     * リマインドのインターバルを設定します。
+     * @param remindInterbal リマインドのインターバル
+     */
+    public void setRemindInterbal(int remindInterbal) {
+        this.remindInterbal = remindInterbal;
     }
 
     /**

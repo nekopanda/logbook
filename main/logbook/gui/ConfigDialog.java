@@ -80,7 +80,7 @@ public final class ConfigDialog extends Dialog {
      */
     private void createContents() {
         this.shell = new Shell(this.getParent(), this.getStyle());
-        this.shell.setSize(500, 360);
+        this.shell.setSize(550, 380);
         this.shell.setText(this.getText());
         this.shell.setLayout(new GridLayout(1, false));
 
@@ -181,8 +181,22 @@ public final class ConfigDialog extends Dialog {
 
         final Button remind = new Button(compositeSystem, SWT.CHECK);
         remind.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-        remind.setText("遠征の通知をリマインドする(3分毎)");
+        remind.setText("遠征の通知をリマインドする");
         remind.setSelection(AppConfig.get().isMissionRemind());
+
+        Label intervallabel = new Label(compositeSystem, SWT.NONE);
+        intervallabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        intervallabel.setText("間隔(秒)");
+
+        final Spinner intervalSpinner = new Spinner(compositeSystem, SWT.BORDER);
+        intervalSpinner.setMaximum(60 * 60);
+        intervalSpinner.setMinimum(10);
+        intervalSpinner.setSelection(AppConfig.get().getRemindInterbal());
+        GridData gdIntervalSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        gdIntervalSpinner.widthHint = 55;
+        intervalSpinner.setLayoutData(gdIntervalSpinner);
+
+        new Label(compositeSystem, SWT.NONE);
 
         final Button balloon = new Button(compositeSystem, SWT.CHECK);
         balloon.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
@@ -328,7 +342,7 @@ public final class ConfigDialog extends Dialog {
 
         final Button useProxyButton = new Button(compositeProxy, SWT.CHECK);
         useProxyButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
-        useProxyButton.setText("接続にプロキシを設定する*");
+        useProxyButton.setText("接続にプロキシを使用する*");
         useProxyButton.setSelection(AppConfig.get().isUseProxy());
 
         Label proxyHostLabel = new Label(compositeProxy, SWT.NONE);
@@ -369,7 +383,9 @@ public final class ConfigDialog extends Dialog {
         lblJson.setText("JSON保存先");
 
         final Text jsonpath = new Text(compositeDevelopment, SWT.BORDER);
-        jsonpath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+        GridData gdJsonpath = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        gdJsonpath.widthHint = 120;
+        jsonpath.setLayoutData(gdJsonpath);
         jsonpath.setText(AppConfig.get().getStoreJsonPath());
 
         Composite commandComposite = new Composite(this.shell, SWT.NONE);
@@ -428,6 +444,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setReportPath(reportDir.getText());
                 AppConfig.get().setCheckUpdate(checkUpdate.getSelection());
                 AppConfig.get().setMissionRemind(remind.getSelection());
+                AppConfig.get().setRemindInterbal(intervalSpinner.getSelection());
                 AppConfig.get().setUseBalloon(balloon.getSelection());
                 // fleettab
                 AppConfig.get().setDisplayCount(displaycount.getSelection());
