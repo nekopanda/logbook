@@ -256,6 +256,8 @@ public class FleetComposite extends Composite {
 
         for (int i = 0; i < ships.size(); i++) {
             ShipDto ship = ships.get(i);
+            // 艦娘のステータス
+            BitSet shipstatus = new BitSet();
             // HP
             long nowhp = ship.getNowhp();
             // MaxHP
@@ -288,6 +290,7 @@ public class FleetComposite extends Composite {
                 if (AppConfig.get().isFatalBybadlyDamage()) {
                     // 大破で致命的アイコン
                     this.state.set(FATAL);
+                    shipstatus.set(FATAL);
                 }
                 // 大破している艦娘がいる場合メッセージを表示
                 this.badlyDamage = true;
@@ -298,6 +301,7 @@ public class FleetComposite extends Composite {
                 if (AppConfig.get().isWarnByHalfDamage()) {
                     // 中破で警告アイコン
                     this.state.set(WARN);
+                    shipstatus.set(WARN);
                 }
 
                 this.hpmsgLabels[i].setText("中破");
@@ -330,6 +334,7 @@ public class FleetComposite extends Composite {
                 if (AppConfig.get().isWarnByNeedSupply()) {
                     // 補給不足で警告アイコン
                     this.state.set(WARN);
+                    shipstatus.set(WARN);
                 }
                 this.fuelstLabels[i].setEnabled(true);
                 if (fuelraito <= AppConstants.EMPTY_SUPPLY) {
@@ -350,6 +355,7 @@ public class FleetComposite extends Composite {
                 if (AppConfig.get().isWarnByNeedSupply()) {
                     // 補給不足で警告アイコン
                     this.state.set(WARN);
+                    shipstatus.set(WARN);
                 }
                 this.bullstLabels[i].setEnabled(true);
                 if (bullraito <= AppConstants.EMPTY_SUPPLY) {
@@ -374,6 +380,7 @@ public class FleetComposite extends Composite {
                 if (AppConfig.get().isWarnByCondState()) {
                     // 疲労状態で警告アイコン
                     this.state.set(WARN);
+                    shipstatus.set(WARN);
                 }
                 this.condLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
                 this.condstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
@@ -382,6 +389,7 @@ public class FleetComposite extends Composite {
                 if (AppConfig.get().isWarnByCondState()) {
                     // 疲労状態で警告アイコン
                     this.state.set(WARN);
+                    shipstatus.set(WARN);
                 }
                 this.condLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
                 this.condstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
@@ -394,10 +402,11 @@ public class FleetComposite extends Composite {
                 this.condstLabels[i].setForeground(null);
             }
 
-            if (this.state.get(FATAL)) {
+            // 艦娘の状態アイコンを更新
+            if (shipstatus.get(FATAL)) {
                 this.iconLabels[i].setImage(SWTResourceManager.getImage(FleetComposite.class,
                         AppConstants.R_ICON_EXCLAMATION));
-            } else if (this.state.get(WARN)) {
+            } else if (shipstatus.get(WARN)) {
                 this.iconLabels[i].setImage(SWTResourceManager
                         .getImage(FleetComposite.class, AppConstants.R_ICON_ERROR));
             } else {
