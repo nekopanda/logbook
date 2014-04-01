@@ -23,6 +23,7 @@ import java.util.SortedMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentSkipListMap;
 
+import javax.annotation.CheckForNull;
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
@@ -41,6 +42,7 @@ import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
+import logbook.dto.MaterialDto;
 import logbook.dto.MissionResultDto;
 import logbook.dto.NdockDto;
 import logbook.dto.QuestDto;
@@ -131,7 +133,10 @@ public final class GlobalContext {
     private static Queue<String> consoleQueue = new ArrayBlockingQueue<String>(10);
 
     /** 保有資源・資材 */
-    private static Map<Integer, Integer> materialMap = new HashMap<Integer, Integer>();
+    private static MaterialDto material = null;
+
+    /** 最後に資源ログに追加した時間 */
+    private static Date materialLogLastUpdate = null;
 
     /**
      * @return 装備Map
@@ -282,19 +287,11 @@ public final class GlobalContext {
 
     /**
      * 保有資材を取得します
-     * 
-     * @param key 次のいずれか {@link AppConstants#MATERIAL_FUEL}、{@link AppConstants#MATERIAL_AMMO}、
-     *            {@link AppConstants#MATERIAL_METAL}、{@link AppConstants#MATERIAL_BAUXITE}、
-     *            {@link AppConstants#MATERIAL_BURNER}、{@link AppConstants#MATERIAL_BUCKET}、
-     *            {@link AppConstants#MATERIAL_RESEARCH}
-     * @return 保有量
+     * @return 保有資材
      */
-    public static int getMaterial(int key) {
-        Integer material = materialMap.get(key);
-        if (material != null) {
-            return material.intValue();
-        }
-        return 0;
+    @CheckForNull
+    public static MaterialDto getMaterial() {
+        return material;
     }
 
     /**
@@ -800,9 +797,48 @@ public final class GlobalContext {
         try {
             JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
 
+            Date time = Calendar.getInstance().getTime();
+            MaterialDto dto = new MaterialDto();
+            dto.setTime(time);
+
             for (JsonValue value : apidata) {
                 JsonObject entry = (JsonObject) value;
-                materialMap.put(entry.getInt("api_id"), entry.getInt("api_value"));
+
+                switch (entry.getInt("api_id")) {
+                case AppConstants.MATERIAL_FUEL:
+                    dto.setFuel(entry.getInt("api_value"));
+                    break;
+                case AppConstants.MATERIAL_AMMO:
+                    dto.setAmmo(entry.getInt("api_value"));
+                    break;
+                case AppConstants.MATERIAL_METAL:
+                    dto.setMetal(entry.getInt("api_value"));
+                    break;
+                case AppConstants.MATERIAL_BAUXITE:
+                    dto.setBauxite(entry.getInt("api_value"));
+                    break;
+                case AppConstants.MATERIAL_BURNER:
+                    dto.setBurner(entry.getInt("api_value"));
+                    break;
+                case AppConstants.MATERIAL_BUCKET:
+                    dto.setBucket(entry.getInt("api_value"));
+                    break;
+                case AppConstants.MATERIAL_RESEARCH:
+                    dto.setResearch(entry.getInt("api_value"));
+                    break;
+                default:
+                    break;
+                }
+            }
+            material = dto;
+
+            // 資材ログに書き込む
+            if ((materialLogLastUpdate == null)
+                    || (((time.getTime() - materialLogLastUpdate.getTime()) / 1000) >
+                    AppConfig.get().getMaterialLogInterval())) {
+                CreateReportLogic.storeMaterialReport(material);
+
+                materialLogLastUpdate = time;
             }
 
             addConsole("保有資材を更新しました");

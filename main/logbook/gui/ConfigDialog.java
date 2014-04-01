@@ -179,6 +179,20 @@ public final class ConfigDialog extends Dialog {
         });
         reportSavedirBtn.setText("選択...");
 
+        Label materialintervallabel = new Label(compositeSystem, SWT.NONE);
+        materialintervallabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        materialintervallabel.setText("資材ログ保存間隔(秒)");
+
+        final Spinner materialintervalSpinner = new Spinner(compositeSystem, SWT.BORDER);
+        materialintervalSpinner.setMaximum(60 * 60 * 24);
+        materialintervalSpinner.setMinimum(10);
+        materialintervalSpinner.setSelection(AppConfig.get().getMaterialLogInterval());
+        GridData gdMaterialIntervalSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        gdMaterialIntervalSpinner.widthHint = 55;
+        materialintervalSpinner.setLayoutData(gdMaterialIntervalSpinner);
+
+        new Label(compositeSystem, SWT.NONE);
+
         final Button remind = new Button(compositeSystem, SWT.CHECK);
         remind.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
         remind.setText("遠征の通知をリマインドする");
@@ -442,6 +456,7 @@ public final class ConfigDialog extends Dialog {
                     AppConfig.get().setAlpha(Integer.parseInt(alpha.getText()));
                 }
                 AppConfig.get().setReportPath(reportDir.getText());
+                AppConfig.get().setMaterialLogInterval(materialintervalSpinner.getSelection());
                 AppConfig.get().setCheckUpdate(checkUpdate.getSelection());
                 AppConfig.get().setMissionRemind(remind.getSelection());
                 AppConfig.get().setRemindInterbal(intervalSpinner.getSelection());

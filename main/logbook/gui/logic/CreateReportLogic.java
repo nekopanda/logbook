@@ -39,6 +39,7 @@ import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
+import logbook.dto.MaterialDto;
 import logbook.dto.MissionResultDto;
 import logbook.dto.NdockDto;
 import logbook.dto.QuestDto;
@@ -556,6 +557,42 @@ public final class CreateReportLogic {
     }
 
     /**
+     * 資材のヘッダー
+     * 
+     * @return ヘッダー
+     */
+    public static String[] getMaterialHeader() {
+        return new String[] { "", "日付", "燃料", "弾薬", "鋼材", "ボーキ", "高速修復材", "高速建造材", "開発資材" };
+    }
+
+    /**
+     * 資材の内容
+     * 
+     * @param materials 資材
+     * @return
+     */
+    public static List<String[]> getMaterialStoreBody(List<MaterialDto> materials) {
+        List<String[]> body = new ArrayList<String[]>();
+
+        for (int i = 0; i < materials.size(); i++) {
+            MaterialDto material = materials.get(i);
+            body.add(new String[] {
+                    Integer.toString(i + 1),
+                    new SimpleDateFormat(AppConstants.DATE_FORMAT).format(material.getTime()),
+                    Integer.toString(material.getFuel()),
+                    Integer.toString(material.getAmmo()),
+                    Integer.toString(material.getMetal()),
+                    Integer.toString(material.getBauxite()),
+                    Integer.toString(material.getBucket()),
+                    Integer.toString(material.getBurner()),
+                    Integer.toString(material.getResearch())
+            });
+        }
+
+        return body;
+    }
+
+    /**
      * 報告書をCSVファイルに書き込む(最初の列を取り除く)
      * 
      * @param file ファイル
@@ -843,6 +880,25 @@ public final class CreateReportLogic {
             CreateReportLogic.writeCsvStripFirstColumn(report,
                     CreateReportLogic.getCreateMissionResultHeader(),
                     CreateReportLogic.getMissionResultBody(dtoList), true);
+        } catch (IOException e) {
+            LOG.warn("報告書の保存に失敗しました", e);
+        }
+    }
+
+    /**
+     * 資材ログを書き込む
+     * 
+     * @param material 資材
+     */
+    public static void storeMaterialReport(MaterialDto material) {
+        try {
+            List<MaterialDto> dtoList = Collections.singletonList(material);
+
+            File report = getStoreFile("資材ログ.csv", "資材ログ_alternativefile.csv");
+
+            CreateReportLogic.writeCsvStripFirstColumn(report,
+                    CreateReportLogic.getMaterialHeader(),
+                    CreateReportLogic.getMaterialStoreBody(dtoList), true);
         } catch (IOException e) {
             LOG.warn("報告書の保存に失敗しました", e);
         }

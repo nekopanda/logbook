@@ -59,6 +59,9 @@ public final class AppConfigBean {
     /** 報告書の保存先 */
     private String reportPath = new File("").getAbsolutePath();
 
+    /** 資源ログの書き込み間隔 */
+    private int materialLogInterval = 600;
+
     /** アップデートチェック */
     private boolean checkUpdate = true;
 
@@ -303,7 +306,7 @@ public final class AppConfigBean {
      * @return リマインドのインターバル
      */
     public int getRemindInterbal() {
-        return remindInterbal;
+        return this.remindInterbal;
     }
 
     /**
@@ -344,6 +347,22 @@ public final class AppConfigBean {
      */
     public void setReportPath(String reportPath) {
         this.reportPath = reportPath;
+    }
+
+    /**
+     * 資源ログの書き込み間隔を取得します。
+     * @return 資源ログの書き込み間隔
+     */
+    public int getMaterialLogInterval() {
+        return this.materialLogInterval;
+    }
+
+    /**
+     * 資源ログの書き込み間隔を設定します。
+     * @param materialLogInterval 資源ログの書き込み間隔
+     */
+    public void setMaterialLogInterval(int materialLogInterval) {
+        this.materialLogInterval = materialLogInterval;
     }
 
     /**
