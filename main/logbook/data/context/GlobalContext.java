@@ -111,7 +111,7 @@ public final class GlobalContext {
     private static String lastBuildKdock;
 
     /** 戦闘詳細 */
-    private static Queue<BattleDto> battleList = new ArrayDeque<BattleDto>(1);
+    private static BattleDto lastBattleDto = null;
 
     /** 遠征リスト */
     private static DeckMissionDto[] deckMissions = new DeckMissionDto[] { DeckMissionDto.EMPTY, DeckMissionDto.EMPTY,
@@ -211,6 +211,10 @@ public final class GlobalContext {
         return Collections.unmodifiableList(battleResultList);
     }
 
+    public static BattleDto getLastBattleDto() {
+        return lastBattleDto;
+    }
+
     /**
      * @return 遠征結果
      */
@@ -280,6 +284,10 @@ public final class GlobalContext {
 
     public static boolean[] getIsSortie() {
         return isSortie;
+    }
+
+    public static int[] getSortieMap() {
+        return sortieMap;
     }
 
     /**
@@ -484,14 +492,18 @@ public final class GlobalContext {
     private static void doBattle(Data data) {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
-            BattleDto battleDto = new BattleDto(apidata);
+            lastBattleDto = new BattleDto(apidata);
 
-            if (battleList.size() == 0)
-                battleList.add(battleDto);
+            // ShipDto をアップデート
+            List<ShipDto> ships = lastBattleDto.getDock().getShips();
+            int[] nowFriendHp = lastBattleDto.getNowFriendHp();
+            for (int i = 0; i < ships.size(); ++i) {
+                ships.get(i).setNowhp(nowFriendHp[i]);
+            }
 
             addConsole("海戦情報を更新しました");
-            addConsole("自=" + Arrays.toString(battleDto.getNowFriendHp()));
-            addConsole("敵=" + Arrays.toString(battleDto.getNowEnemyHp()));
+            addConsole("自=" + Arrays.toString(lastBattleDto.getNowFriendHp()));
+            addConsole("敵=" + Arrays.toString(lastBattleDto.getNowEnemyHp()));
         } catch (Exception e) {
             LOG.warn("海戦情報を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -505,7 +517,7 @@ public final class GlobalContext {
     private static void doBattleresult(Data data) {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
-            BattleResultDto dto = new BattleResultDto(apidata, battleList.poll(), sortieMap);
+            BattleResultDto dto = new BattleResultDto(apidata, lastBattleDto, sortieMap);
             battleResultList.add(dto);
             CreateReportLogic.storeBattleResultReport(dto);
 
@@ -726,6 +738,23 @@ public final class GlobalContext {
             for (int i = 0; i < apidata.size(); i++) {
                 ShipDto ship = new ShipDto((JsonObject) apidata.get(i));
                 shipMap.put(Long.valueOf(ship.getId()), ship);
+            }
+
+            // 戦闘結果がある場合、ダメージ計算があっているか検証します
+            if (lastBattleDto != null) {
+                List<ShipDto> dockShips = lastBattleDto.getDock().getShips();
+                int[] nowhp = lastBattleDto.getNowFriendHp();
+                for (int i = 0; i < dockShips.size(); ++i) {
+                    ShipDto new_ship = shipMap.get(dockShips.get(i).getId());
+                    if (new_ship == null)
+                        continue; // 轟沈した！
+                    if (new_ship.getNowhp() != nowhp[i]) {
+                        LOG.warn("ダメージ計算ミスが発生しています。" + new_ship.getName() + "の現在のHPは" + new_ship.getNowhp()
+                                + "ですが、ダメージ計算では" + nowhp[i] + "と計算されていました。");
+                        addConsole("ダメージ計算ミス発生！（詳細はログ）");
+                    }
+                }
+                lastBattleDto = null;
             }
 
             // 艦隊を設定
@@ -1080,6 +1109,7 @@ public final class GlobalContext {
             return ShipInfoDto.EMPTY;
         }
 
+        int shipId = object.getJsonNumber("api_id").intValue();
         int stype = object.getJsonNumber("api_stype").intValue();
         String flagship = object.getString("api_yomi");
         if ("-".equals(flagship)) {
@@ -1095,7 +1125,7 @@ public final class GlobalContext {
         if (object.containsKey("api_fuel_max")) {
             maxFuel = object.getJsonNumber("api_fuel_max").intValue();
         }
-        return new ShipInfoDto(name, stype, flagship, afterlv, aftershipid, maxBull, maxFuel);
+        return new ShipInfoDto(shipId, name, stype, flagship, afterlv, aftershipid, maxBull, maxFuel);
     }
 
     private static void addConsole(Object message) {

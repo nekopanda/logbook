@@ -35,9 +35,6 @@ public final class ShipDto extends AbstractDto {
     /** 艦娘個人を識別するID */
     private final long id;
 
-    /** 艦娘の識別ID */
-    private final long shipId;
-
     /** キャラクタ識別ID（その艦の最終形の艦ID） */
     private final long charId;
 
@@ -84,7 +81,7 @@ public final class ShipDto extends AbstractDto {
     private final long exp;
 
     /** HP */
-    private final long nowhp;
+    private long nowhp;
 
     /** MaxHP */
     private final long maxhp;
@@ -156,13 +153,13 @@ public final class ShipDto extends AbstractDto {
         this.id = object.getJsonNumber("api_id").longValue();
         this.locked = object.getJsonNumber("api_locked").longValue() == 1;
 
-        this.shipId = object.getJsonNumber("api_ship_id").longValue();
-        ShipInfoDto shipinfo = Ship.get(String.valueOf(this.shipId));
+        int shipId = object.getJsonNumber("api_ship_id").intValue();
+        ShipInfoDto shipinfo = Ship.get(String.valueOf(shipId));
         this.shipInfo = shipinfo;
         this.name = shipinfo.getName();
         this.type = shipinfo.getType();
 
-        long charId = this.shipId;
+        long charId = shipId;
         long afterShipId = shipinfo.getAftershipid();
         while (afterShipId != 0) {
             charId = afterShipId;
@@ -230,7 +227,7 @@ public final class ShipDto extends AbstractDto {
      * @return 艦娘を識別するID
      */
     public long getShipId() {
-        return this.shipId;
+        return this.shipInfo.getShipId();
     }
 
     /**
@@ -345,6 +342,10 @@ public final class ShipDto extends AbstractDto {
      */
     public long getExp() {
         return this.exp;
+    }
+
+    public void setNowhp(long v) {
+        this.nowhp = v;
     }
 
     /**

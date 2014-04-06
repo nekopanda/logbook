@@ -97,7 +97,8 @@ public final class ReverseProxyServlet extends ProxyServlet {
                         + ": "
                         + Calendar.getInstance().getTimeInMillis()
                         + ": "
-                        + new String(stream.toByteArray()));
+                        + new String(stream.toByteArray())
+                        );
             } catch (UnsupportedEncodingException e) {
                 // TODO 自動生成された catch ブロック
                 e.printStackTrace();

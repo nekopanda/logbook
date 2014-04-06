@@ -5,6 +5,7 @@ package logbook.server.web;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
@@ -17,10 +18,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import logbook.data.context.GlobalContext;
+import logbook.dto.BattleDto;
 import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
 import logbook.dto.NdockDto;
 import logbook.dto.ShipDto;
+import logbook.dto.ShipInfoDto;
 
 import org.eclipse.swt.widgets.Display;
 
@@ -45,11 +48,34 @@ public class QueryHandler extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
 
         JsonWriter writer = Json.createWriter(resp.getOutputStream());
-        writer.writeObject(createJsonRespons());
+        if (req.getRequestURI().endsWith("query")) {
+            writer.writeObject(createQueryRespons());
+        }
+        else { // battle
+            writer.writeObject(createBattleRespons());
+        }
         writer.close();
     }
 
-    private static JsonObject createJsonRespons() {
+    private static JsonObjectBuilder shipToJson(ShipDto ship) {
+        return Json.createObjectBuilder()
+                .add("id", ship.getId())
+                .add("ship_id", ship.getShipId())
+                .add("char_id", ship.getCharId())
+                .add("ship_type", ship.getShipInfo().getStype())
+                .add("level", ship.getLv())
+                .add("cond", ship.getCond())
+                .add("cond_clear_time", ship.getCondClearTime().getTimeInMillis())
+                .add("bull", ship.getBull())
+                .add("bull_max", ship.getBullMax())
+                .add("fuel", ship.getFuel())
+                .add("fuel_max", ship.getFuelMax())
+                .add("now_hp", ship.getNowhp())
+                .add("max_hp", ship.getMaxhp())
+                .add("dock_time", ship.getDocktime());
+    }
+
+    private static JsonObject createQueryRespons() {
         final JsonObjectBuilder jb = Json.createObjectBuilder();
         Display.getDefault().syncExec(new Runnable() {
             @Override
@@ -65,21 +91,7 @@ public class QueryHandler extends HttpServlet {
                 { // 艦娘リストを配列で追加
                     JsonArrayBuilder ship_array = Json.createArrayBuilder();
                     for (ShipDto ship : GlobalContext.getShipMap().values()) {
-                        ship_array.add(Json.createObjectBuilder()
-                                .add("id", ship.getId())
-                                .add("ship_id", ship.getShipId())
-                                .add("char_id", ship.getCharId())
-                                .add("ship_type", ship.getShipInfo().getStype())
-                                .add("level", ship.getLv())
-                                .add("cond", ship.getCond())
-                                .add("cond_clear_time", ship.getCondClearTime().getTimeInMillis())
-                                .add("bull", ship.getBull())
-                                .add("bull_max", ship.getBullMax())
-                                .add("fuel", ship.getFuel())
-                                .add("fuel_max", ship.getFuelMax())
-                                .add("now_hp", ship.getNowhp())
-                                .add("max_hp", ship.getMaxhp())
-                                .add("dock_time", ship.getDocktime()));
+                        ship_array.add(shipToJson(ship));
                     }
                     jb.add("ships", ship_array);
                 }
@@ -142,6 +154,57 @@ public class QueryHandler extends HttpServlet {
                         sortie.add(mission);
                     }
                     jb.add("sortie", sortie);
+                }
+            }
+        });
+
+        return jb.build();
+    }
+
+    private static JsonObject createBattleRespons() {
+        final JsonObjectBuilder jb = Json.createObjectBuilder();
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                BattleDto battleDto = GlobalContext.getLastBattleDto();
+                if (battleDto != null) {
+                    {// 戦闘中のマップ
+                        JsonArrayBuilder map_array = Json.createArrayBuilder();
+                        int[] sortieMap = GlobalContext.getSortieMap();
+                        map_array.add(sortieMap[0]);
+                        map_array.add(sortieMap[1]);
+                        map_array.add(sortieMap[2]);
+                        jb.add("map", map_array);
+                    }
+                    {// HP
+                        JsonArrayBuilder fship_array = Json.createArrayBuilder();
+                        JsonArrayBuilder eship_array = Json.createArrayBuilder();
+
+                        List<ShipDto> fships = battleDto.getDock().getShips();
+                        for (ShipDto ship : fships) {
+                            fship_array.add(shipToJson(ship));
+                        }
+
+                        List<ShipInfoDto> eships = battleDto.getEnemy();
+                        int[] enowhp = battleDto.getNowEnemyHp();
+                        int[] emaxhp = battleDto.getMaxEnemyHp();
+                        for (int i = 0; i < eships.size(); ++i) {
+                            ShipInfoDto ship = eships.get(i);
+                            String flagship = ship.getFlagship();
+                            int level = (flagship.equals("flagship") ? 2
+                                    : flagship.equals("elite") ? 1
+                                            : 0);
+                            eship_array.add(Json.createObjectBuilder()
+                                    .add("ship_id", ship.getShipId())
+                                    .add("ship_type", ship.getStype())
+                                    .add("level", level)
+                                    .add("now_hp", enowhp[i])
+                                    .add("max_hp", emaxhp[i]));
+                        }
+
+                        jb.add("friend", fship_array);
+                        jb.add("enemy", eship_array);
+                    }
                 }
             }
         });

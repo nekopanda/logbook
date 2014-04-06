@@ -34,6 +34,7 @@ public class WebServer {
 
             ServletHandler servletHandler = new ServletHandler();
             servletHandler.addServletWithMapping(QueryHandler.class, "/query");
+            servletHandler.addServletWithMapping(QueryHandler.class, "/battle");
 
             server.setHandler(servletHandler);
 

@@ -19,6 +19,9 @@ public final class ShipInfoDto extends AbstractDto {
     /** 名前 */
     private String name;
 
+    /** 艦ID */
+    private int shipId;
+
     /** 艦種 */
     private int stype;
 
@@ -62,8 +65,10 @@ public final class ShipInfoDto extends AbstractDto {
     /**
      * コンストラクター
      */
-    public ShipInfoDto(String name, int stype, String flagship, int afterlv, int aftershipid, int maxBull, int maxFuel) {
+    public ShipInfoDto(int shipId, String name, int stype, String flagship, int afterlv, int aftershipid, int maxBull,
+            int maxFuel) {
         this.name = name;
+        this.shipId = shipId;
         this.stype = stype;
         this.type = ShipStyle.get(String.valueOf(stype));
         this.afterlv = afterlv;
@@ -87,6 +92,21 @@ public final class ShipInfoDto extends AbstractDto {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * 艦IDを設定します。
+     * @param shipId 艦ID
+     */
+    public void setShipId(int shipId) {
+        this.shipId = shipId;
+    }
+
+    /**
+     * 艦IDを取得します。
+     */
+    public int getShipId() {
+        return this.shipId;
     }
 
     /**
