@@ -258,7 +258,7 @@ public final class AsyncExecApplicationMain extends Thread {
                                 noticeflg = true;
                                 FLAG_NOTICE_DECK[i] = true;
                             } else if (AppConfig.get().isMissionRemind() && (rest < -1)
-                                    && ((rest % (ONE_MINUTES * 3)) == 0)) {
+                                    && ((rest % AppConfig.get().getRemindInterbal()) == 0)) {
                                 // 3分毎にリマインドする
                                 notice.add(dispname + " がまもなく帰投します");
                                 noticeflg = true;

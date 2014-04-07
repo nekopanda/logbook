@@ -19,6 +19,7 @@ public class SeaExp {
             this.put("1-2", 50);
             this.put("1-3", 80);
             this.put("1-4", 100);
+            this.put("1-5", 150);
             this.put("2-1", 120);
             this.put("2-2", 150);
             this.put("2-3", 200);
@@ -35,6 +36,7 @@ public class SeaExp {
             this.put("5-2", 380);
             this.put("5-3", 400);
             this.put("5-4", 420);
+            this.put("5-5", 450);
         }
     };
 

@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
@@ -79,7 +80,7 @@ public final class ConfigDialog extends Dialog {
      */
     private void createContents() {
         this.shell = new Shell(this.getParent(), this.getStyle());
-        this.shell.setSize(500, 360);
+        this.shell.setSize(550, 380);
         this.shell.setText(this.getText());
         this.shell.setLayout(new GridLayout(1, false));
 
@@ -98,6 +99,9 @@ public final class ConfigDialog extends Dialog {
         TreeItem capture = new TreeItem(systemroot, SWT.NONE);
         capture.setText("キャプチャ");
         capture.setData("capture");
+        TreeItem proxy = new TreeItem(systemroot, SWT.NONE);
+        proxy.setText("プロキシ");
+        proxy.setData("proxy");
         TreeItem development = new TreeItem(tree, SWT.NONE);
         development.setText("Development");
         development.setData("development");
@@ -161,6 +165,7 @@ public final class ConfigDialog extends Dialog {
         reportDir.setText(AppConfig.get().getReportPath());
 
         Button reportSavedirBtn = new Button(compositeSystem, SWT.NONE);
+        reportSavedirBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         reportSavedirBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -174,10 +179,38 @@ public final class ConfigDialog extends Dialog {
         });
         reportSavedirBtn.setText("選択...");
 
+        Label materialintervallabel = new Label(compositeSystem, SWT.NONE);
+        materialintervallabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        materialintervallabel.setText("資材ログ保存間隔(秒)");
+
+        final Spinner materialintervalSpinner = new Spinner(compositeSystem, SWT.BORDER);
+        materialintervalSpinner.setMaximum(60 * 60 * 24);
+        materialintervalSpinner.setMinimum(10);
+        materialintervalSpinner.setSelection(AppConfig.get().getMaterialLogInterval());
+        GridData gdMaterialIntervalSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        gdMaterialIntervalSpinner.widthHint = 55;
+        materialintervalSpinner.setLayoutData(gdMaterialIntervalSpinner);
+
+        new Label(compositeSystem, SWT.NONE);
+
         final Button remind = new Button(compositeSystem, SWT.CHECK);
         remind.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-        remind.setText("遠征の通知をリマインドする(3分毎)");
+        remind.setText("遠征の通知をリマインドする");
         remind.setSelection(AppConfig.get().isMissionRemind());
+
+        Label intervallabel = new Label(compositeSystem, SWT.NONE);
+        intervallabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        intervallabel.setText("間隔(秒)");
+
+        final Spinner intervalSpinner = new Spinner(compositeSystem, SWT.BORDER);
+        intervalSpinner.setMaximum(60 * 60);
+        intervalSpinner.setMinimum(10);
+        intervalSpinner.setSelection(AppConfig.get().getRemindInterbal());
+        GridData gdIntervalSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        gdIntervalSpinner.widthHint = 55;
+        intervalSpinner.setLayoutData(gdIntervalSpinner);
+
+        new Label(compositeSystem, SWT.NONE);
 
         final Button balloon = new Button(compositeSystem, SWT.CHECK);
         balloon.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
@@ -287,6 +320,7 @@ public final class ConfigDialog extends Dialog {
         captureDir.setText(AppConfig.get().getCapturePath());
 
         Button savedirBtn = new Button(compositeCapture, SWT.NONE);
+        savedirBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         savedirBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -316,6 +350,37 @@ public final class ConfigDialog extends Dialog {
         }
         new Label(compositeCapture, SWT.NONE);
 
+        Composite compositeProxy = new Composite(this.composite, SWT.NONE);
+        this.compositeMap.put("proxy", compositeProxy);
+        compositeProxy.setLayout(new GridLayout(4, false));
+
+        final Button useProxyButton = new Button(compositeProxy, SWT.CHECK);
+        useProxyButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
+        useProxyButton.setText("接続にプロキシを使用する*");
+        useProxyButton.setSelection(AppConfig.get().isUseProxy());
+
+        Label proxyHostLabel = new Label(compositeProxy, SWT.NONE);
+        proxyHostLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        proxyHostLabel.setText("ホスト:");
+
+        final Text proxyHostText = new Text(compositeProxy, SWT.BORDER);
+        GridData gdProxyHostText = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        gdProxyHostText.widthHint = 100;
+        proxyHostText.setLayoutData(gdProxyHostText);
+        proxyHostText.setText(AppConfig.get().getProxyHost());
+
+        Label proxyPortLabel = new Label(compositeProxy, SWT.NONE);
+        proxyPortLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        proxyPortLabel.setText("ポート:");
+
+        final Spinner proxyPortSpinner = new Spinner(compositeProxy, SWT.BORDER);
+        proxyPortSpinner.setMaximum(65535);
+        proxyPortSpinner.setMinimum(1);
+        proxyPortSpinner.setSelection(AppConfig.get().getProxyPort());
+        GridData gdProxyPortSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        gdProxyPortSpinner.widthHint = 55;
+        proxyPortSpinner.setLayoutData(gdProxyPortSpinner);
+
         // Development タブ
         Composite compositeDevelopment = new Composite(this.composite, SWT.NONE);
         this.compositeMap.put("development", compositeDevelopment);
@@ -323,6 +388,7 @@ public final class ConfigDialog extends Dialog {
 
         new Label(compositeDevelopment, SWT.NONE);
         final Button btnJson = new Button(compositeDevelopment, SWT.CHECK);
+        btnJson.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         btnJson.setText("JSONを保存する");
         btnJson.setSelection(AppConfig.get().isStoreJson());
 
@@ -331,16 +397,43 @@ public final class ConfigDialog extends Dialog {
         lblJson.setText("JSON保存先");
 
         final Text jsonpath = new Text(compositeDevelopment, SWT.BORDER);
-        jsonpath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+        GridData gdJsonpath = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        gdJsonpath.widthHint = 120;
+        jsonpath.setLayoutData(gdJsonpath);
         jsonpath.setText(AppConfig.get().getStoreJsonPath());
 
-        Composite command = new Composite(this.shell, SWT.NONE);
-        RowLayout rlCommand = new RowLayout();
-        command.setLayout(rlCommand);
-        command.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
+        Composite commandComposite = new Composite(this.shell, SWT.NONE);
+        commandComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        GridLayout glCommandComposite = new GridLayout(2, false);
+        glCommandComposite.verticalSpacing = 0;
+        glCommandComposite.marginWidth = 0;
+        glCommandComposite.marginHeight = 0;
+        glCommandComposite.horizontalSpacing = 0;
+        commandComposite.setLayout(glCommandComposite);
+
+        // '*'の説明
+        Composite commandLeft = new Composite(commandComposite, SWT.NONE);
+        GridLayout glCommandLeft = new GridLayout(1, false);
+        glCommandLeft.horizontalSpacing = 0;
+        glCommandLeft.marginHeight = 0;
+        glCommandLeft.verticalSpacing = 0;
+        glCommandLeft.marginWidth = 0;
+        commandLeft.setLayout(glCommandLeft);
+
+        Label attentionLabel = new Label(commandLeft, SWT.NONE);
+        attentionLabel.setText("*再起動後に有効になります");
+
+        Composite commandRight = new Composite(commandComposite, SWT.NONE);
+        RowLayout rlCommandRight = new RowLayout(SWT.HORIZONTAL);
+        rlCommandRight.marginTop = 0;
+        rlCommandRight.marginLeft = 0;
+        rlCommandRight.marginRight = 0;
+        rlCommandRight.marginBottom = 0;
+        commandRight.setLayout(rlCommandRight);
+        commandRight.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
 
         // OK ボタン
-        Button applyBtn = new Button(command, SWT.NONE);
+        Button applyBtn = new Button(commandRight, SWT.NONE);
         applyBtn.setLayoutData(new RowData(100, SWT.DEFAULT));
         applyBtn.setText("OK");
         applyBtn.addSelectionListener(new SelectionAdapter() {
@@ -363,8 +456,10 @@ public final class ConfigDialog extends Dialog {
                     AppConfig.get().setAlpha(Integer.parseInt(alpha.getText()));
                 }
                 AppConfig.get().setReportPath(reportDir.getText());
+                AppConfig.get().setMaterialLogInterval(materialintervalSpinner.getSelection());
                 AppConfig.get().setCheckUpdate(checkUpdate.getSelection());
                 AppConfig.get().setMissionRemind(remind.getSelection());
+                AppConfig.get().setRemindInterbal(intervalSpinner.getSelection());
                 AppConfig.get().setUseBalloon(balloon.getSelection());
                 // fleettab
                 AppConfig.get().setDisplayCount(displaycount.getSelection());
@@ -379,6 +474,10 @@ public final class ConfigDialog extends Dialog {
                 // capture
                 AppConfig.get().setCapturePath(captureDir.getText());
                 AppConfig.get().setImageFormat(imageformatCombo.getItem(imageformatCombo.getSelectionIndex()));
+                // proxy
+                AppConfig.get().setUseProxy(useProxyButton.getSelection());
+                AppConfig.get().setProxyHost(proxyHostText.getText());
+                AppConfig.get().setProxyPort(proxyPortSpinner.getSelection());
 
                 // development
                 AppConfig.get().setStoreJson(btnJson.getSelection());
@@ -392,7 +491,7 @@ public final class ConfigDialog extends Dialog {
             }
         });
 
-        Button cancelBtn = new Button(command, SWT.NONE);
+        Button cancelBtn = new Button(commandRight, SWT.NONE);
         cancelBtn.setLayoutData(new RowData(100, SWT.DEFAULT));
         cancelBtn.setText("キャンセル");
         cancelBtn.addSelectionListener(new SelectionAdapter() {

@@ -18,7 +18,7 @@ import org.eclipse.swt.graphics.RGB;
 public class AppConstants {
 
     /** バージョン */
-    public static final String VERSION = "0.5.8";
+    public static final String VERSION = "0.5.12";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://kancolle.sanaechan.net/");
@@ -97,6 +97,27 @@ public class AppConstants {
 
     /** 所有艦娘グループ設定ファイル  */
     public static final File GROUP_CONFIG_FILE = new File("./config/group.xml");
+
+    /** 保有資材:燃料 */
+    public static final int MATERIAL_FUEL = 1;
+
+    /** 保有資材:弾薬 */
+    public static final int MATERIAL_AMMO = 2;
+
+    /** 保有資材:鋼材 */
+    public static final int MATERIAL_METAL = 3;
+
+    /** 保有資材:ボーキサイト */
+    public static final int MATERIAL_BAUXITE = 4;
+
+    /** 保有資材:バーナー */
+    public static final int MATERIAL_BURNER = 5;
+
+    /** 保有資材:高速修復材 */
+    public static final int MATERIAL_BUCKET = 6;
+
+    /** 保有資材:開発資材 */
+    public static final int MATERIAL_RESEARCH = 7;
 
     /** /resources/icon/add.png */
     public static final String R_ICON_ADD = "/resources/icon/add.png";

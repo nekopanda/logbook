@@ -20,6 +20,15 @@ public final class AppConfigBean {
     /** ポート番号 */
     private int listenPort = 8888;
 
+    /** プロキシ利用 */
+    private boolean useProxy;
+
+    /** プロキシホスト */
+    private String proxyHost = "localhost";
+
+    /** プロキシポート */
+    private int proxyPort = 8080;
+
     /** ウインドウサイズ(width) */
     private int width = 280;
 
@@ -41,11 +50,17 @@ public final class AppConfigBean {
     /** 遠征のリマインド */
     private boolean missionRemind = true;
 
+    /** リマインドのインターバル */
+    private int remindInterbal = 120;
+
     /** 遠征入渠をバルーンで通知する */
     private boolean useBalloon = true;
 
     /** 報告書の保存先 */
     private String reportPath = new File("").getAbsolutePath();
+
+    /** 資源ログの書き込み間隔 */
+    private int materialLogInterval = 600;
 
     /** アップデートチェック */
     private boolean checkUpdate = true;
@@ -124,6 +139,54 @@ public final class AppConfigBean {
      */
     public void setListenPort(int listenPort) {
         this.listenPort = listenPort;
+    }
+
+    /**
+     * プロキシ利用を取得します。
+     * @return プロキシ利用
+     */
+    public boolean isUseProxy() {
+        return this.useProxy;
+    }
+
+    /**
+     * プロキシ利用を設定します。
+     * @param useProxy プロキシ利用
+     */
+    public void setUseProxy(boolean useProxy) {
+        this.useProxy = useProxy;
+    }
+
+    /**
+     * プロキシホストを取得します。
+     * @return プロキシホスト
+     */
+    public String getProxyHost() {
+        return this.proxyHost;
+    }
+
+    /**
+     * プロキシホストを設定します。
+     * @param proxyHost プロキシホスト
+     */
+    public void setProxyHost(String proxyHost) {
+        this.proxyHost = proxyHost;
+    }
+
+    /**
+     * プロキシポートを取得します。
+     * @return プロキシポート
+     */
+    public int getProxyPort() {
+        return this.proxyPort;
+    }
+
+    /**
+     * プロキシポートを設定します。
+     * @param proxyPort プロキシポート
+     */
+    public void setProxyPort(int proxyPort) {
+        this.proxyPort = proxyPort;
     }
 
     /**
@@ -239,6 +302,22 @@ public final class AppConfigBean {
     }
 
     /**
+     * リマインドのインターバルを取得します。
+     * @return リマインドのインターバル
+     */
+    public int getRemindInterbal() {
+        return this.remindInterbal;
+    }
+
+    /**
+     * リマインドのインターバルを設定します。
+     * @param remindInterbal リマインドのインターバル
+     */
+    public void setRemindInterbal(int remindInterbal) {
+        this.remindInterbal = remindInterbal;
+    }
+
+    /**
      * 遠征入渠をバルーンで通知するを取得します。
      * @return 遠征入渠をバルーンで通知する
      */
@@ -268,6 +347,22 @@ public final class AppConfigBean {
      */
     public void setReportPath(String reportPath) {
         this.reportPath = reportPath;
+    }
+
+    /**
+     * 資源ログの書き込み間隔を取得します。
+     * @return 資源ログの書き込み間隔
+     */
+    public int getMaterialLogInterval() {
+        return this.materialLogInterval;
+    }
+
+    /**
+     * 資源ログの書き込み間隔を設定します。
+     * @param materialLogInterval 資源ログの書き込み間隔
+     */
+    public void setMaterialLogInterval(int materialLogInterval) {
+        this.materialLogInterval = materialLogInterval;
     }
 
     /**
