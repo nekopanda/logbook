@@ -131,6 +131,14 @@ public final class Sound {
     }
 
     /**
+     * 大破した時に再生するサウンドを再生します
+     * 
+     */
+    public static void randomBadlySoundPlay() {
+        randomPlay(getBadlySoundFiles());
+    }
+
+    /**
      * 遠征から帰投した時に再生するサウンドを取得します
      * 
      * @return サウンドファイル
@@ -150,6 +158,19 @@ public final class Sound {
      */
     private static List<File> getDockSoundFiles() {
         File dock = new File("./sound/dock");
+        if (dock.exists() && dock.isDirectory()) {
+            return new ArrayList<File>(FileUtils.listFiles(dock, EXTENSIONS, true));
+        }
+        return Collections.emptyList();
+    }
+
+    /**
+     * 大破した時に再生するサウンドを取得します
+     * 
+     * @return サウンドファイル
+     */
+    private static List<File> getBadlySoundFiles() {
+        File dock = new File("./sound/badly");
         if (dock.exists() && dock.isDirectory()) {
             return new ArrayList<File>(FileUtils.listFiles(dock, EXTENSIONS, true));
         }

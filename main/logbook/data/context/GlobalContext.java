@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
+import javax.annotation.CheckForNull;
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
@@ -40,6 +41,7 @@ import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
+import logbook.dto.MaterialDto;
 import logbook.dto.MissionResultDto;
 import logbook.dto.NdockDto;
 import logbook.dto.QuestDto;
@@ -66,7 +68,7 @@ public final class GlobalContext {
     /** 資源量
      * 順に、燃料、弾薬、鋼材、ボーキ、高速建造、高速修理、開発資源
      */
-    private static int[] materials = new int[7];
+    //private static int[] materials = new int[7];
 
     /** 装備Map */
     private static Map<Long, ItemDto> itemMap = new HashMap<Long, ItemDto>();
@@ -143,10 +145,11 @@ public final class GlobalContext {
         console = console_;
     }
 
-    /** @return 燃料、弾薬、鋼材、ボーキ、高速建造、高速修理、開発資源 */
-    public static int[] getMaterials() {
-        return materials;
-    }
+    /** 保有資源・資材 */
+    private static MaterialDto material = null;
+
+    /** 最後に資源ログに追加した時間 */
+    private static Date materialLogLastUpdate = null;
 
     /**
      * @return 装備Map
@@ -308,6 +311,22 @@ public final class GlobalContext {
     }
 
     /**
+     * 保有資材を取得します
+     * @return 保有資材
+     */
+    @CheckForNull
+    public static MaterialDto getMaterial() {
+        return material;
+    }
+
+    /**
+     * @return ログメッセージ
+     */
+    //    public static String getConsoleMessage() {
+    //        return consoleQueue.poll();
+    //    }
+
+    /**
      * 情報を更新します
      * 
      * @return 更新する情報があった場合trueを返します
@@ -318,10 +337,6 @@ public final class GlobalContext {
             doStoreJson(data);
         }
         switch (data.getDataType()) {
-        // 保有装備
-        case MATERIAL:
-            doMaterial(data);
-            break;
         // 保有装備
         case SLOTITEM_MEMBER:
             doSlotitemMember(data);
@@ -337,6 +352,10 @@ public final class GlobalContext {
         // 基本
         case BASIC:
             doBasic(data);
+            break;
+        // 資材
+        case MATERIAL:
+            doMaterial(data);
             break;
         // 遠征
         case DECK_PORT:
@@ -446,43 +465,24 @@ public final class GlobalContext {
     }
 
     /**
-     * 資源量を更新します
-     * @param data
-     */
-    private static void doMaterial(Data data) {
-        try {
-            JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
-            for (int i = 0; i < apidata.size(); i++) {
-                if (i < materials.length) {
-                    materials[i] = ((JsonObject) apidata.get(i)).getJsonNumber("api_value").intValue();
-                }
-            }
-            addConsole("資源情報を更新しました");
-        } catch (Exception e) {
-            LOG.warn("資源量を更新しますに失敗しました", e);
-            LOG.warn(data);
-        }
-    }
-
-    /**
      * 開発や建造に使った資源を反映させます
      * @param data
      */
-    private static void updateMaterial(ResourceDto res) {
-        String[] reslist = new String[] {
-                res.getFuel(),
-                res.getAmmo(),
-                res.getMetal(),
-                res.getBauxite(),
-                null,
-                null,
-                res.getResearchMaterials()
-        };
-        for (int i = 0; i < materials.length; ++i) {
-            if (reslist[i] != null) {
-                materials[i] -= Integer.valueOf(reslist[i]);
-            }
-        }
+    private static void updateMaterial(String event, ResourceDto res) {
+        if (material == null)
+            return;
+        Date time = Calendar.getInstance().getTime();
+        MaterialDto dto = new MaterialDto();
+        dto.setTime(time);
+        dto.setEvent(event);
+        dto.setFuel(material.getFuel() - Integer.valueOf(res.getFuel()));
+        dto.setAmmo(material.getAmmo() - Integer.valueOf(res.getAmmo()));
+        dto.setMetal(material.getMetal() - Integer.valueOf(res.getMetal()));
+        dto.setBauxite(material.getBauxite() - Integer.valueOf(res.getBauxite()));
+        dto.setBurner(material.getBurner());
+        dto.setBucket(material.getBucket());
+        dto.setResearch(material.getResearch() - Integer.valueOf(res.getResearchMaterials()));
+        material = dto;
     }
 
     /**
@@ -549,8 +549,8 @@ public final class GlobalContext {
             getShipResource.put(kdockid, resource);
             KdockConfig.store(kdockid, resource);
 
-            updateMaterial(resource);
-            CreateReportLogic.storeMaterialReport("建造", materials);
+            updateMaterial("建造", resource);
+            CreateReportLogic.storeMaterialReport(material);
 
             addConsole("建造(投入資源)情報を更新しました");
         } catch (Exception e) {
@@ -629,8 +629,8 @@ public final class GlobalContext {
                 CreateReportLogic.storeCreateItemReport(item);
             }
 
-            updateMaterial(resources);
-            CreateReportLogic.storeMaterialReport("装備開発", materials);
+            updateMaterial("装備開発", resources);
+            CreateReportLogic.storeMaterialReport(material);
 
             addConsole("装備開発情報を更新しました");
         } catch (Exception e) {
@@ -687,6 +687,7 @@ public final class GlobalContext {
             JsonArray shipdata = apidata.getJsonArray("api_ship_data");
             // 出撃中ではない
             Arrays.fill(isSortie, false);
+            lastBattleDto = null;
             // 情報を破棄
             shipMap.clear();
             for (int i = 0; i < shipdata.size(); i++) {
@@ -718,7 +719,7 @@ public final class GlobalContext {
                 }
             }
 
-            addConsole("保有艦娘情報を更新しました");
+            addConsole("保有艦娘情報3を更新しました");
         } catch (Exception e) {
             LOG.warn("保有艦娘を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -754,7 +755,6 @@ public final class GlobalContext {
                         addConsole("ダメージ計算ミス発生！（詳細はログ）");
                     }
                 }
-                lastBattleDto = null;
             }
 
             // 艦隊を設定
@@ -781,7 +781,7 @@ public final class GlobalContext {
                 }
             }
 
-            addConsole("保有艦娘情報を更新しました");
+            addConsole("保有艦娘情報2を更新しました");
         } catch (Exception e) {
             LOG.warn("保有艦娘を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -871,6 +871,67 @@ public final class GlobalContext {
     }
 
     /**
+     * 保有資材を更新する
+     * 
+     * @param data
+     */
+    private static void doMaterial(Data data) {
+        try {
+            JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
+
+            Date time = Calendar.getInstance().getTime();
+            MaterialDto dto = new MaterialDto();
+            dto.setTime(time);
+            dto.setEvent("定期更新");
+
+            for (JsonValue value : apidata) {
+                JsonObject entry = (JsonObject) value;
+
+                switch (entry.getInt("api_id")) {
+                case AppConstants.MATERIAL_FUEL:
+                    dto.setFuel(entry.getInt("api_value"));
+                    break;
+                case AppConstants.MATERIAL_AMMO:
+                    dto.setAmmo(entry.getInt("api_value"));
+                    break;
+                case AppConstants.MATERIAL_METAL:
+                    dto.setMetal(entry.getInt("api_value"));
+                    break;
+                case AppConstants.MATERIAL_BAUXITE:
+                    dto.setBauxite(entry.getInt("api_value"));
+                    break;
+                case AppConstants.MATERIAL_BURNER:
+                    dto.setBurner(entry.getInt("api_value"));
+                    break;
+                case AppConstants.MATERIAL_BUCKET:
+                    dto.setBucket(entry.getInt("api_value"));
+                    break;
+                case AppConstants.MATERIAL_RESEARCH:
+                    dto.setResearch(entry.getInt("api_value"));
+                    break;
+                default:
+                    break;
+                }
+            }
+            material = dto;
+
+            // 資材ログに書き込む
+            if ((materialLogLastUpdate == null)
+                    || (((time.getTime() - materialLogLastUpdate.getTime()) / 1000) >
+                    AppConfig.get().getMaterialLogInterval())) {
+                CreateReportLogic.storeMaterialReport(material);
+
+                materialLogLastUpdate = time;
+            }
+
+            addConsole("保有資材を更新しました");
+        } catch (Exception e) {
+            LOG.warn("保有資材を更新するに失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
      * 遠征を更新します
      * 
      * @param data
@@ -939,8 +1000,8 @@ public final class GlobalContext {
             CreateReportLogic.storeCreateMissionReport(result);
             missionResultList.add(result);
 
-            CreateReportLogic.storeMaterialReport("遠征帰還", materials);
-
+            material.setEvent("遠征帰還");
+            CreateReportLogic.storeMaterialReport(material);
             addConsole("遠征(帰還)情報を更新しました");
         } catch (Exception e) {
             LOG.warn("遠征(帰還)を更新しますに失敗しました", e);
@@ -1071,7 +1132,8 @@ public final class GlobalContext {
                 isSortie[id - 1] = true;
             }
             readMapInfo(data);
-            CreateReportLogic.storeMaterialReport("出撃", materials);
+            material.setEvent("出撃");
+            CreateReportLogic.storeMaterialReport(material);
 
             addConsole("出撃を更新しました");
             addConsole("行先=" + Arrays.toString(sortieMap));

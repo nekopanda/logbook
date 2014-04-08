@@ -21,6 +21,7 @@ import logbook.data.context.GlobalContext;
 import logbook.dto.BattleDto;
 import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
+import logbook.dto.MaterialDto;
 import logbook.dto.NdockDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
@@ -82,9 +83,14 @@ public class QueryHandler extends HttpServlet {
             public void run() {
                 { // 資源量を配列で追加
                     JsonArrayBuilder materials_array = Json.createArrayBuilder();
-                    for (int material : GlobalContext.getMaterials()) {
-                        materials_array.add(material);
-                    }
+                    MaterialDto dto = GlobalContext.getMaterial();
+                    materials_array.add(dto.getFuel()); // 燃料
+                    materials_array.add(dto.getAmmo()); // 弾薬
+                    materials_array.add(dto.getMetal()); // 鋼材
+                    materials_array.add(dto.getBauxite()); // ボーキ
+                    materials_array.add(dto.getBurner()); // 高速建造材
+                    materials_array.add(dto.getBucket()); // 高速修理材
+                    materials_array.add(dto.getResearch()); // 開発資源
                     jb.add("materials", materials_array);
                 }
 
@@ -167,7 +173,15 @@ public class QueryHandler extends HttpServlet {
             @Override
             public void run() {
                 BattleDto battleDto = GlobalContext.getLastBattleDto();
-                if (battleDto != null) {
+                boolean isSortie = false;
+                for (boolean sortie : GlobalContext.getIsSortie()) {
+                    if (sortie) {
+                        isSortie = true;
+                        break;
+                    }
+                }
+
+                if (isSortie) {
                     {// 戦闘中のマップ
                         JsonArrayBuilder map_array = Json.createArrayBuilder();
                         int[] sortieMap = GlobalContext.getSortieMap();
@@ -176,7 +190,7 @@ public class QueryHandler extends HttpServlet {
                         map_array.add(sortieMap[2]);
                         jb.add("map", map_array);
                     }
-                    {// HP
+                    if (battleDto != null) {// HP
                         JsonArrayBuilder fship_array = Json.createArrayBuilder();
                         JsonArrayBuilder eship_array = Json.createArrayBuilder();
 

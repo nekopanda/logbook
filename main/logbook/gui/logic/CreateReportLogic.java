@@ -20,7 +20,6 @@ import java.nio.channels.FileLock;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -43,6 +42,7 @@ import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
+import logbook.dto.MaterialDto;
 import logbook.dto.MissionResultDto;
 import logbook.dto.NdockDto;
 import logbook.dto.QuestDto;
@@ -516,25 +516,6 @@ public final class CreateReportLogic {
         return toListStringArray(body);
     }
 
-    public static String[] getMaterialReportHeader() {
-        return new String[] { "", "日付", "直前のイベント", "燃料", "弾薬", "鋼材", "ボーキ", "高速建造", "高速修復", "開発資源" };
-    }
-
-    public static String[] getMaterialReportBody(String event, int[] materials) {
-        return new String[] {
-                Integer.toString(1),
-                new SimpleDateFormat(AppConstants.DATE_FORMAT).format(Calendar.getInstance().getTime()),
-                event,
-                Integer.toString(materials[0]), // 燃料
-                Integer.toString(materials[1]), // 弾薬
-                Integer.toString(materials[2]), // 鋼材
-                Integer.toString(materials[3]), // ボーキ
-                Integer.toString(materials[4]), // 高速建造
-                Integer.toString(materials[5]), // 高速修復
-                Integer.toString(materials[6]) // 開発資源
-        };
-    }
-
     /**
      * 任務一覧のヘッダー
      * 
@@ -579,6 +560,43 @@ public final class CreateReportLogic {
             });
         }
         return toListStringArray(body);
+    }
+
+    /**
+     * 資材のヘッダー
+     * 
+     * @return ヘッダー
+     */
+    public static String[] getMaterialHeader() {
+        return new String[] { "", "日付", "直前のイベント", "燃料", "弾薬", "鋼材", "ボーキ", "高速建造", "高速修復", "開発資源" };
+    }
+
+    /**
+     * 資材の内容
+     * 
+     * @param materials 資材
+     * @return
+     */
+    public static List<String[]> getMaterialStoreBody(List<MaterialDto> materials) {
+        List<String[]> body = new ArrayList<String[]>();
+
+        for (int i = 0; i < materials.size(); i++) {
+            MaterialDto material = materials.get(i);
+            body.add(new String[] {
+                    Integer.toString(i + 1),
+                    new SimpleDateFormat(AppConstants.DATE_FORMAT).format(material.getTime()),
+                    material.getEvent(),
+                    Integer.toString(material.getFuel()),
+                    Integer.toString(material.getAmmo()),
+                    Integer.toString(material.getMetal()),
+                    Integer.toString(material.getBauxite()),
+                    Integer.toString(material.getBucket()),
+                    Integer.toString(material.getBurner()),
+                    Integer.toString(material.getResearch())
+            });
+        }
+
+        return body;
     }
 
     /**
@@ -875,17 +893,19 @@ public final class CreateReportLogic {
     }
 
     /**
-     * 資源量報告書を書き込む
+     * 資材ログを書き込む
      * 
-     * @param dto 遠征結果
+     * @param material 資材
      */
-    public static void storeMaterialReport(String event, int[] materials) {
+    public static void storeMaterialReport(MaterialDto material) {
         try {
-            File report = getStoreFile("資源量報告書.csv", "資源量報告書_alternativefile.csv");
+            List<MaterialDto> dtoList = Collections.singletonList(material);
+
+            File report = getStoreFile("資材ログ.csv", "資材ログ_alternativefile.csv");
 
             CreateReportLogic.writeCsvStripFirstColumn(report,
-                    CreateReportLogic.getMaterialReportHeader(),
-                    Collections.singletonList(CreateReportLogic.getMaterialReportBody(event, materials)), true);
+                    CreateReportLogic.getMaterialHeader(),
+                    CreateReportLogic.getMaterialStoreBody(dtoList), true);
         } catch (IOException e) {
             LOG.warn("報告書の保存に失敗しました", e);
         }

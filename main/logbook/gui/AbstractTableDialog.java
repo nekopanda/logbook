@@ -156,6 +156,8 @@ public abstract class AbstractTableDialog extends Dialog {
     protected void reloadTable() {
         this.shell.setRedraw(false);
         TableColumn sortColumn = this.table.getSortColumn();
+        int topindex = this.table.getTopIndex();
+        int selection = this.table.getSelectionIndex();
         this.table.setSortColumn(null);
         this.disposeTableBody();
         this.updateTableBody();
@@ -165,6 +167,8 @@ public abstract class AbstractTableDialog extends Dialog {
         this.setTableBody();
         this.packTableHeader();
         this.table.setSortColumn(sortColumn);
+        this.table.setTopIndex(topindex);
+        this.table.setSelection(selection);
         this.shell.setRedraw(true);
     }
 

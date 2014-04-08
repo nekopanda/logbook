@@ -36,7 +36,7 @@ public final class Deck {
             this.put("20", "潜水艦哨戒任務");
             this.put("21", "北方鼠輸送作戦");
             this.put("22", "艦隊演習");
-            this.put("23", "<UNKNOWN>");
+            this.put("23", "航空戦艦運用演習");
             this.put("24", "<UNKNOWN>");
             this.put("25", "通商破壊作戦");
             this.put("26", "敵母港空襲作戦");
@@ -44,14 +44,14 @@ public final class Deck {
             this.put("28", "西方海域封鎖作戦");
             this.put("29", "潜水艦派遣演習");
             this.put("30", "潜水艦派遣作戦");
-            this.put("31", "<UNKNOWN>");
+            this.put("31", "海外艦との接触");
             this.put("32", "<UNKNOWN>");
             this.put("33", "前衛支援任務");
             this.put("34", "艦隊決戦支援任務");
             this.put("35", "ＭＯ作戦");
             this.put("36", "水上機基地建設");
             this.put("37", "東京急行");
-            this.put("38", "<UNKNOWN>");
+            this.put("38", "東京急行(弐)");
             this.put("39", "<UNKNOWN>");
             this.put("40", "<UNKNOWN>");
             this.put("41", "<UNKNOWN>");
