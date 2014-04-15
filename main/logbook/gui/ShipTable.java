@@ -127,7 +127,7 @@ public final class ShipTable extends AbstractTableDialog {
                 clipboard.setContents(new Object[] { sb.toString() }, new Transfer[] { TextTransfer.getInstance() });
             }
         });
-        idCopy.setText("艦娘個人IDをコピー(&C)");
+        idCopy.setText("艦娘個人IDをコピー(&1)");
         MenuItem shipCopy = new MenuItem(this.tablemenu, SWT.NONE);
         shipCopy.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -141,7 +141,7 @@ public final class ShipTable extends AbstractTableDialog {
                 clipboard.setContents(new Object[] { sb.toString() }, new Transfer[] { TextTransfer.getInstance() });
             }
         });
-        shipCopy.setText("艦娘IDをコピー(&C)");
+        shipCopy.setText("艦娘IDをコピー(&2)");
 
     }
 

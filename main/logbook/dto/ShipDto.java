@@ -362,6 +362,10 @@ public final class ShipDto extends AbstractDto {
         return this.maxhp;
     }
 
+    public List<Long> getRawSlot() {
+        return this.slot;
+    }
+
     /**
      * @return 装備
      */

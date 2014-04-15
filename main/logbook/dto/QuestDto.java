@@ -14,6 +14,10 @@ public final class QuestDto extends AbstractDto {
     /** api_no */
     private int no;
 
+    private int page;
+
+    private int pos;
+
     /** api_category */
     private int category;
 
@@ -237,6 +241,34 @@ public final class QuestDto extends AbstractDto {
      */
     public void setProgressFlag(int progressFlag) {
         this.progressFlag = progressFlag;
+    }
+
+    /**
+     * @return page
+     */
+    public int getPage() {
+        return this.page;
+    }
+
+    /**
+     * @param page セットする page
+     */
+    public void setPage(int page) {
+        this.page = page;
+    }
+
+    /**
+     * @return pos
+     */
+    public int getPos() {
+        return this.pos;
+    }
+
+    /**
+     * @param pos セットする pos
+     */
+    public void setPos(int pos) {
+        this.pos = pos;
     }
 
 }

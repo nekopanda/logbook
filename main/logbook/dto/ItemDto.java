@@ -23,6 +23,7 @@ public final class ItemDto extends AbstractDto {
     private final long houk;
     private final long houm;
     private final long id;
+    private final long slotitem_id;
     private final long kaih;
     private final long leng;
     private final long luck;
@@ -55,6 +56,7 @@ public final class ItemDto extends AbstractDto {
         this.houk = object.getJsonNumber("api_houk").longValue();
         this.houm = object.getJsonNumber("api_houm").longValue();
         this.id = object.getJsonNumber("api_id").longValue();
+        this.slotitem_id = object.getJsonNumber("api_slotitem_id").longValue();
         this.kaih = object.getJsonNumber("api_kaih").longValue();
         this.leng = object.getJsonNumber("api_leng").longValue();
         this.luck = object.getJsonNumber("api_luck").longValue();
@@ -133,6 +135,13 @@ public final class ItemDto extends AbstractDto {
      */
     public long getId() {
         return this.id;
+    }
+
+    /**
+     * @return slotitem_id
+     */
+    public long getSlotitemId() {
+        return this.slotitem_id;
     }
 
     /**

@@ -522,7 +522,7 @@ public final class CreateReportLogic {
      * @return
      */
     public static String[] getCreateQuestHeader() {
-        return new String[] { "", "状態", "タイトル", "内容", "燃料", "弾薬", "鋼材", "ボーキ" };
+        return new String[] { "No.", "表示位置", "状態", "タイトル", "内容", "燃料", "弾薬", "鋼材", "ボーキ" };
     }
 
     /**
@@ -538,6 +538,9 @@ public final class CreateReportLogic {
 
             String state = "";
             switch (quest.getState()) {
+            case 1:
+                state = "";
+                break;
             case 2:
                 state = "遂行中";
                 break;
@@ -550,6 +553,7 @@ public final class CreateReportLogic {
 
             body.add(new Object[] {
                     quest.getNo(),
+                    "" + quest.getPage() + "-" + quest.getPos(),
                     state,
                     quest.getTitle(),
                     quest.getDetail(),

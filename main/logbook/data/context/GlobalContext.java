@@ -41,6 +41,7 @@ import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
+import logbook.dto.ItemInfoDto;
 import logbook.dto.MaterialDto;
 import logbook.dto.MissionResultDto;
 import logbook.dto.NdockDto;
@@ -50,6 +51,7 @@ import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.MainConsoleListener;
+import logbook.internal.Item;
 import logbook.internal.Ship;
 
 import org.apache.commons.io.FileUtils;
@@ -64,11 +66,6 @@ import org.apache.logging.log4j.Logger;
 public final class GlobalContext {
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(GlobalContext.class);
-
-    /** 資源量
-     * 順に、燃料、弾薬、鋼材、ボーキ、高速建造、高速修理、開発資源
-     */
-    //private static int[] materials = new int[7];
 
     /** 装備Map */
     private static Map<Long, ItemDto> itemMap = new HashMap<Long, ItemDto>();
@@ -425,6 +422,10 @@ public final class GlobalContext {
         case QUEST_CLEAR:
             doQuestClear(data);
             break;
+        // アイテム一覧
+        case SLOTITEM_MASTER:
+            doSlotitemMaster(data);
+            break;
         // 艦娘一覧
         case SHIP_MASTER:
             doShipMaster(data);
@@ -481,7 +482,8 @@ public final class GlobalContext {
         dto.setBauxite(material.getBauxite() - Integer.valueOf(res.getBauxite()));
         dto.setBurner(material.getBurner());
         dto.setBucket(material.getBucket());
-        dto.setResearch(material.getResearch() - Integer.valueOf(res.getResearchMaterials()));
+        if (res.getResearchMaterials() != null)
+            dto.setResearch(material.getResearch() - Integer.valueOf(res.getResearchMaterials()));
         material = dto;
     }
 
@@ -671,6 +673,27 @@ public final class GlobalContext {
             addConsole("保有装備情報を更新しました");
         } catch (Exception e) {
             LOG.warn("保有装備を更新しますに失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * アイテム一覧を更新します
+     * 
+     * @param data
+     */
+    private static void doSlotitemMaster(Data data) {
+        try {
+            JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
+            for (int i = 0; i < apidata.size(); i++) {
+                JsonObject object = (JsonObject) apidata.get(i);
+                int id = object.getJsonNumber("api_id").intValue();
+                Item.set(id, new ItemInfoDto(object));
+            }
+
+            addConsole("アイテム一覧を更新しました");
+        } catch (Exception e) {
+            LOG.warn("アイテム一覧を更新しますに失敗しました", e);
             LOG.warn(data);
         }
     }
@@ -1065,12 +1088,16 @@ public final class GlobalContext {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
             JsonArray apilist = apidata.getJsonArray("api_list");
+            int disp_page = apidata.getJsonNumber("api_disp_page").intValue();
+            int pos = 1;
             for (JsonValue value : apilist) {
                 if (value instanceof JsonObject) {
                     JsonObject questobject = (JsonObject) value;
                     // 任務を作成
                     QuestDto quest = new QuestDto();
                     quest.setNo(questobject.getInt("api_no"));
+                    quest.setPage(disp_page);
+                    quest.setPos(pos++);
                     quest.setCategory(questobject.getInt("api_category"));
                     quest.setType(questobject.getInt("api_type"));
                     quest.setState(questobject.getInt("api_state"));

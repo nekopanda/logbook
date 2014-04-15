@@ -21,10 +21,14 @@ import logbook.data.context.GlobalContext;
 import logbook.dto.BattleDto;
 import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
+import logbook.dto.ItemDto;
+import logbook.dto.ItemInfoDto;
 import logbook.dto.MaterialDto;
 import logbook.dto.NdockDto;
+import logbook.dto.QuestDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
+import logbook.internal.Item;
 
 import org.eclipse.swt.widgets.Display;
 
@@ -59,6 +63,10 @@ public class QueryHandler extends HttpServlet {
     }
 
     private static JsonObjectBuilder shipToJson(ShipDto ship) {
+        JsonArrayBuilder slot_array = Json.createArrayBuilder();
+        for (Long item_number : ship.getRawSlot()) {
+            slot_array.add(item_number);
+        }
         return Json.createObjectBuilder()
                 .add("id", ship.getId())
                 .add("ship_id", ship.getShipId())
@@ -73,7 +81,30 @@ public class QueryHandler extends HttpServlet {
                 .add("fuel_max", ship.getFuelMax())
                 .add("now_hp", ship.getNowhp())
                 .add("max_hp", ship.getMaxhp())
-                .add("dock_time", ship.getDocktime());
+                .add("dock_time", ship.getDocktime())
+                .add("slot_item", slot_array);
+    }
+
+    private static JsonObjectBuilder itemToJson(ItemDto item) {
+        return Json.createObjectBuilder()
+                .add("id", item.getId())
+                .add("item_id", item.getSlotitemId());
+    }
+
+    private static JsonObjectBuilder itemInfoToJson(ItemInfoDto item) {
+        return Json.createObjectBuilder()
+                .add("id", item.getId())
+                .add("sortno", item.getSortno())
+                .add("name", item.getName())
+                .add("type", item.getType()[2]);
+    }
+
+    private static JsonObjectBuilder questToJson(QuestDto item) {
+        return Json.createObjectBuilder()
+                .add("no", item.getNo())
+                .add("page", item.getPage())
+                .add("pos", item.getPos())
+                .add("state", item.getState());
     }
 
     private static JsonObject createQueryRespons() {
@@ -84,14 +115,16 @@ public class QueryHandler extends HttpServlet {
                 { // 資源量を配列で追加
                     JsonArrayBuilder materials_array = Json.createArrayBuilder();
                     MaterialDto dto = GlobalContext.getMaterial();
-                    materials_array.add(dto.getFuel()); // 燃料
-                    materials_array.add(dto.getAmmo()); // 弾薬
-                    materials_array.add(dto.getMetal()); // 鋼材
-                    materials_array.add(dto.getBauxite()); // ボーキ
-                    materials_array.add(dto.getBurner()); // 高速建造材
-                    materials_array.add(dto.getBucket()); // 高速修理材
-                    materials_array.add(dto.getResearch()); // 開発資源
-                    jb.add("materials", materials_array);
+                    if (dto != null) {
+                        materials_array.add(dto.getFuel()); // 燃料
+                        materials_array.add(dto.getAmmo()); // 弾薬
+                        materials_array.add(dto.getMetal()); // 鋼材
+                        materials_array.add(dto.getBauxite()); // ボーキ
+                        materials_array.add(dto.getBurner()); // 高速建造材
+                        materials_array.add(dto.getBucket()); // 高速修理材
+                        materials_array.add(dto.getResearch()); // 開発資源
+                        jb.add("materials", materials_array);
+                    }
                 }
 
                 { // 艦娘リストを配列で追加
@@ -152,6 +185,30 @@ public class QueryHandler extends HttpServlet {
                         mission_root.add(mission_item);
                     }
                     jb.add("mission", mission_root);
+                }
+
+                { // 装備
+                    JsonArrayBuilder item_array = Json.createArrayBuilder();
+                    for (Integer itemid : Item.keySet()) {
+                        item_array.add(itemInfoToJson(Item.get(itemid)));
+                    }
+                    jb.add("master_items", item_array);
+                }
+
+                { // 装備
+                    JsonArrayBuilder item_array = Json.createArrayBuilder();
+                    for (ItemDto item : GlobalContext.getItemMap().values()) {
+                        item_array.add(itemToJson(item));
+                    }
+                    jb.add("items", item_array);
+                }
+
+                { // クエスト
+                    JsonArrayBuilder quest_array = Json.createArrayBuilder();
+                    for (QuestDto quest : GlobalContext.getQuest().values()) {
+                        quest_array.add(questToJson(quest));
+                    }
+                    jb.add("quest", quest_array);
                 }
 
                 { // 出撃
