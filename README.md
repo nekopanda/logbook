@@ -2,7 +2,7 @@
 [@sanae_hirotaka](https://twitter.com/sanae_hirotaka)さんの[航海日誌（艦これ専用ソフトウェア）](http://kancolle.sanaechan.net/)を勝手に改造したバージョンです。
 使い方は本家のものとほぼ同じなので、[そちら](http://kancolle.sanaechan.net/)を参照してください。
 
-*ただし、本ソフトウェアのバグや不具合の報告は、本家ではなく[こちら](http://blogs.yahoo.co.jp/kirabagu)にお願いします。
+*ただし、本ソフトウェアのバグや不具合の報告は、本家ではなく[こちら](http://nekopanda.blog.jp/)にお願いします。
 
 本ソフトウェアは本家の機能に加えて以下の機能を実装しています。
 

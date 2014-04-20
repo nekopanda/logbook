@@ -12,9 +12,14 @@
         </jar>
         <delete dir="./dest/logbook_lib/"/>
         <mkdir dir="./dest/logbook_lib"/>
+        <copy file="./lib/client/fluent-hc-4.3.2.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/client/httpclient-4.3.2.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/client/httpclient-cache-4.3.2.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/client/httpcore-4.3.1.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/commons/commons-codec-1.6.jar" todir="./dest/logbook_lib"/>
         <copy file="./lib/commons/commons-io-2.4.jar" todir="./dest/logbook_lib"/>
         <copy file="./lib/commons/commons-lang3-3.1.jar" todir="./dest/logbook_lib"/>
-        <copy file="./lib/commons/commons-logging-1.1.1.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/commons/commons-logging-1.1.3.jar" todir="./dest/logbook_lib"/>
         <copy file="./lib/server/jetty-client-9.0.5.v20130815.jar" todir="./dest/logbook_lib"/>
         <copy file="./lib/server/jetty-http-9.0.5.v20130815.jar" todir="./dest/logbook_lib"/>
         <copy file="./lib/server/jetty-io-9.0.5.v20130815.jar" todir="./dest/logbook_lib"/>
