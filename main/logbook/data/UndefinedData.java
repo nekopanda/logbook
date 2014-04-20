@@ -6,22 +6,34 @@
 package logbook.data;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+
+import logbook.config.AppConfig;
+
+import org.apache.http.client.fluent.Form;
+import org.apache.http.client.fluent.Request;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * 同定されていない未加工のデータ
  * 
  */
 public class UndefinedData implements Data {
+
+    private static final Logger LOG = LogManager.getLogger(UndefinedData.class);
 
     private final String url;
 
@@ -117,5 +129,67 @@ public class UndefinedData implements Data {
             map.put(name, value);
         }
         return map;
+    }
+
+    // 艦これ統計データベース(仮) に送信する
+    private static String[] sendDatabaseUrls = new String[]
+    {
+            "api_get_member/ship2",
+            "api_get_member/ship3",
+            "api_get_member/deck",
+            "api_get_member/deck_port",
+            "api_get_member/basic",
+            "api_get_member/kdock",
+            "api_req_kousyou/createship",
+            "api_req_kousyou/getship",
+            "api_req_kousyou/createitem",
+            "api_req_map/start",
+            "api_req_map/next",
+            "api_req_sortie/battle",
+            "api_req_battle_midnight/battle",
+            "api_req_battle_midnight/sp_midnight",
+            "api_req_sortie/night_to_day",
+            "api_req_sortie/battleresult",
+            "api_req_practice/battle",
+            "api_req_practice/battle_result",
+    };
+    private static Pattern apiTokenPattern = Pattern.compile("&api(_|%5F)token=[0-9a-f]+");
+
+    public void sendToDatabase() {
+        if (AppConfig.get().isSendDatabase() && (AppConfig.get().getAccessKey().length() > 0)) {
+            Display.getDefault().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    for (String entry : sendDatabaseUrls)
+                    {
+                        if (UndefinedData.this.url.endsWith(entry))
+                        {
+                            try {
+                                // api_tokenを取り除く
+                                String sendRequestBody = apiTokenPattern.matcher(
+                                        new String(UndefinedData.this.request, "UTF-8"))
+                                        .replaceAll("");
+                                String sendResponseBody = new String(UndefinedData.this.response, "UTF-8");
+                                Request.Post("http://api.kancolle-db.net/1/")
+                                        .bodyForm(
+                                                Form.form()
+                                                        .add("token", AppConfig.get().getAccessKey())
+                                                        // このクライアントのエージェントキー
+                                                        .add("agent", "PEjwSXd9b7pGr3GuKzYh")
+                                                        .add("url", UndefinedData.this.url)
+                                                        .add("requestbody", sendRequestBody)
+                                                        .add("responsebody", sendResponseBody)
+                                                        .build())
+                                        .execute().returnContent();
+                            } catch (IOException e) {
+                                LOG.warn("データベースへの送信に失敗しました", e);
+                                LOG.warn(UndefinedData.this);
+                            }
+                            break;
+                        }
+                    }
+                }
+            });
+        }
     }
 }

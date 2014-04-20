@@ -7,10 +7,7 @@ package logbook.server.proxy;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
-import java.net.URLDecoder;
-import java.util.Calendar;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -91,27 +88,15 @@ public final class ReverseProxyServlet extends ProxyServlet {
             Response proxyResponse) {
 
         if (Filter.isNeed(request.getServerName(), response.getContentType())) {
-
-            try {
-                ByteArrayOutputStream stream = (ByteArrayOutputStream) request.getAttribute(Filter.RESPONSE_BODY);
-                System.out.println(request.getRequestURI() + "?"
-                        + URLDecoder.decode(new String((byte[]) request.getAttribute(Filter.REQUEST_BODY),
-                                "UTF-8"), "UTF-8")
-                        + ": "
-                        + Calendar.getInstance().getTimeInMillis()
-                        + ": "
-                        + new String(stream.toByteArray())
-                        );
-            } catch (UnsupportedEncodingException e) {
-                // TODO 自動生成された catch ブロック
-                e.printStackTrace();
-            }
-
             byte[] postField = (byte[]) request.getAttribute(Filter.REQUEST_BODY);
             ByteArrayOutputStream stream = (ByteArrayOutputStream) request.getAttribute(Filter.RESPONSE_BODY);
             if (stream != null) {
+                UndefinedData rawData = new UndefinedData(request.getRequestURL().toString(), postField,
+                        stream.toByteArray());
+                // 統計データベース(http://kancolle-db.net/)に送信する
+                rawData.sendToDatabase();
                 // キャプチャしたバイト配列は何のデータかを決定する
-                Data data = new UndefinedData(request.getRequestURI(), postField, stream.toByteArray()).toDefinedData();
+                Data data = rawData.toDefinedData();
                 if (data.getDataType() != DataType.UNDEFINED) {
                     // 定義済みのデータの場合にキューに追加する
                     DataProxy.add(data);

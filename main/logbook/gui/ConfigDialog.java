@@ -100,8 +100,8 @@ public final class ConfigDialog extends Dialog {
         capture.setText("キャプチャ");
         capture.setData("capture");
         TreeItem proxy = new TreeItem(systemroot, SWT.NONE);
-        proxy.setText("プロキシ");
-        proxy.setData("proxy");
+        proxy.setText("通信");
+        proxy.setData("connection");
         TreeItem development = new TreeItem(tree, SWT.NONE);
         development.setText("Development");
         development.setData("development");
@@ -351,7 +351,7 @@ public final class ConfigDialog extends Dialog {
         new Label(compositeCapture, SWT.NONE);
 
         Composite compositeProxy = new Composite(this.composite, SWT.NONE);
-        this.compositeMap.put("proxy", compositeProxy);
+        this.compositeMap.put("connection", compositeProxy);
         compositeProxy.setLayout(new GridLayout(4, false));
 
         final Button useProxyButton = new Button(compositeProxy, SWT.CHECK);
@@ -380,6 +380,21 @@ public final class ConfigDialog extends Dialog {
         GridData gdProxyPortSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
         gdProxyPortSpinner.widthHint = 55;
         proxyPortSpinner.setLayoutData(gdProxyPortSpinner);
+
+        final Button sendDatabaseButton = new Button(compositeProxy, SWT.CHECK);
+        sendDatabaseButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
+        sendDatabaseButton.setText("艦これ統計データベースへデータを送信する");
+        sendDatabaseButton.setSelection(AppConfig.get().isSendDatabase());
+
+        Label accessKeyLabel = new Label(compositeProxy, SWT.NONE);
+        accessKeyLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        accessKeyLabel.setText("アクセスキー:");
+
+        final Text accessKeyText = new Text(compositeProxy, SWT.BORDER);
+        GridData gdAccessKeyText = new GridData(SWT.FILL, SWT.CENTER, false, false, 3, 1);
+        // gdAccessKeyText.widthHint = 300;
+        accessKeyText.setLayoutData(gdAccessKeyText);
+        accessKeyText.setText(AppConfig.get().getAccessKey());
 
         // Development タブ
         Composite compositeDevelopment = new Composite(this.composite, SWT.NONE);
@@ -474,10 +489,12 @@ public final class ConfigDialog extends Dialog {
                 // capture
                 AppConfig.get().setCapturePath(captureDir.getText());
                 AppConfig.get().setImageFormat(imageformatCombo.getItem(imageformatCombo.getSelectionIndex()));
-                // proxy
+                // connection
                 AppConfig.get().setUseProxy(useProxyButton.getSelection());
                 AppConfig.get().setProxyHost(proxyHostText.getText());
                 AppConfig.get().setProxyPort(proxyPortSpinner.getSelection());
+                AppConfig.get().setSendDatabase(sendDatabaseButton.getSelection());
+                AppConfig.get().setAccessKey(accessKeyText.getText());
 
                 // development
                 AppConfig.get().setStoreJson(btnJson.getSelection());

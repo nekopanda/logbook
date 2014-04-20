@@ -125,6 +125,12 @@ public final class AppConfigBean {
     /** テーブル列を表示する設定(キー:java.lang.Class.getName()) */
     private Map<String, boolean[]> visibleColumnMap = new HashMap<String, boolean[]>();
 
+    /** 艦これ統計データベースへのデータ送信 */
+    private boolean sendDatabase = false;
+
+    /** 艦これ統計データベースへ送信するときのアクセスキー */
+    private String accessKey = "";
+
     /**
      * ポート番号を取得します。
      * @return ポート番号
@@ -715,5 +721,33 @@ public final class AppConfigBean {
      */
     public void setVisibleColumnMap(Map<String, boolean[]> visibleColumnMap) {
         this.visibleColumnMap = visibleColumnMap;
+    }
+
+    /**
+     * @return sendDatabase
+     */
+    public boolean isSendDatabase() {
+        return this.sendDatabase;
+    }
+
+    /**
+     * @param sendDatabase セットする sendDatabase
+     */
+    public void setSendDatabase(boolean sendDatabase) {
+        this.sendDatabase = sendDatabase;
+    }
+
+    /**
+     * @return accessKey
+     */
+    public String getAccessKey() {
+        return this.accessKey;
+    }
+
+    /**
+     * @param accessKey セットする accessKey
+     */
+    public void setAccessKey(String accessKey) {
+        this.accessKey = accessKey;
     }
 }
