@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.concurrent.ConcurrentSkipListMap;
 
 import javax.annotation.CheckForNull;
 import javax.json.JsonArray;
@@ -124,13 +122,16 @@ public final class GlobalContext {
             NdockDto.EMPTY };
 
     /** 任務Map */
-    private static SortedMap<Integer, QuestDto> questMap = new ConcurrentSkipListMap<Integer, QuestDto>();
+    private static ArrayList<QuestDto> questList = new ArrayList<QuestDto>();
 
     /** 出撃中か */
     private static boolean[] isSortie = new boolean[4];
 
     /** 出撃中のマップ */
     private static int[] sortieMap = new int[3];
+
+    /** 戦績: 出撃勝利, 出撃敗北, 演習勝利, 演習敗北, 遠征数, 遠征成功 */
+    private static int[] gameRecord = new int[6];
 
     /** ログ表示 */
     private static MainConsoleListener console;
@@ -294,8 +295,8 @@ public final class GlobalContext {
      * 任務を取得します
      * @return 任務
      */
-    public static Map<Integer, QuestDto> getQuest() {
-        return Collections.unmodifiableMap(questMap);
+    public static List<QuestDto> getQuest() {
+        return Collections.unmodifiableList(questList);
     }
 
     /**
@@ -316,12 +317,9 @@ public final class GlobalContext {
         return material;
     }
 
-    /**
-     * @return ログメッセージ
-     */
-    //    public static String getConsoleMessage() {
-    //        return consoleQueue.poll();
-    //    }
+    public static int[] getGameRecord() {
+        return gameRecord;
+    }
 
     /**
      * 情報を更新します
@@ -419,9 +417,9 @@ public final class GlobalContext {
             doQuest(data);
             break;
         // 任務消化
-        case QUEST_CLEAR:
-            doQuestClear(data);
-            break;
+        //case QUEST_CLEAR:
+        //    doQuestClear(data);
+        //    break;
         // アイテム一覧
         case SLOTITEM_MASTER:
             doSlotitemMaster(data);
@@ -886,6 +884,13 @@ public final class GlobalContext {
             // 最大所有装備数
             maxSlotitem = apidata.getJsonNumber("api_max_slotitem").intValue();
 
+            gameRecord[0] = apidata.getJsonNumber("api_st_win").intValue();
+            gameRecord[1] = apidata.getJsonNumber("api_st_lose").intValue();
+            gameRecord[2] = apidata.getJsonNumber("api_pt_win").intValue();
+            gameRecord[3] = apidata.getJsonNumber("api_pt_lose").intValue();
+            gameRecord[4] = apidata.getJsonNumber("api_ms_count").intValue();
+            gameRecord[5] = apidata.getJsonNumber("api_ms_success").intValue();
+
             addConsole("司令部を更新しました");
         } catch (Exception e) {
             LOG.warn("司令部を更新するに失敗しました", e);
@@ -1088,12 +1093,23 @@ public final class GlobalContext {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
             JsonArray apilist = apidata.getJsonArray("api_list");
+            int items_per_page = 5;
             int disp_page = apidata.getJsonNumber("api_disp_page").intValue();
+            int page_count = apidata.getJsonNumber("api_page_count").intValue();
+            // 足りない要素を足す
+            for (int i = questList.size(); i < (page_count * items_per_page); ++i) {
+                questList.add(null);
+            }
+            // 余分な要素は削る
+            for (int i = questList.size() - 1; i >= (page_count * items_per_page); --i) {
+                questList.remove(i);
+            }
             int pos = 1;
             for (JsonValue value : apilist) {
                 if (value instanceof JsonObject) {
                     JsonObject questobject = (JsonObject) value;
                     // 任務を作成
+                    int index = ((disp_page - 1) * items_per_page) + (pos - 1);
                     QuestDto quest = new QuestDto();
                     quest.setNo(questobject.getInt("api_no"));
                     quest.setPage(disp_page);
@@ -1111,7 +1127,13 @@ public final class GlobalContext {
                     quest.setBonusFlag(questobject.getInt("api_bonus_flag"));
                     quest.setProgressFlag(questobject.getInt("api_progress_flag"));
 
-                    questMap.put(quest.getNo(), quest);
+                    questList.set(index, quest);
+                }
+            }
+            if (pos <= items_per_page) {
+                // 空白がある場合は削る
+                for (int i = questList.size() - 1; i >= (((disp_page - 1) * items_per_page) + (pos - 1)); --i) {
+                    questList.remove(i);
                 }
             }
             addConsole("任務を更新しました");
@@ -1126,7 +1148,7 @@ public final class GlobalContext {
      * 
      * @param data
      */
-    private static void doQuestClear(Data data) {
+    /*private static void doQuestClear(Data data) {
         try {
             String idstr = data.getField("api_quest_id");
             if (idstr != null) {
@@ -1137,7 +1159,7 @@ public final class GlobalContext {
             LOG.warn("消化した任務を除去しますに失敗しました", e);
             LOG.warn(data);
         }
-    }
+    }*/
 
     private static void readMapInfo(Data data) {
         JsonObject apidata = data.getJsonObject().getJsonObject("api_data");

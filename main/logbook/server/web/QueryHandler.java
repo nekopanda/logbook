@@ -82,7 +82,9 @@ public class QueryHandler extends HttpServlet {
                 .add("now_hp", ship.getNowhp())
                 .add("max_hp", ship.getMaxhp())
                 .add("dock_time", ship.getDocktime())
-                .add("slot_item", slot_array);
+                .add("slot_num", ship.getSlotNum())
+                .add("slot_item", slot_array)
+                .add("name", ship.getName());
     }
 
     private static JsonObjectBuilder itemToJson(ItemDto item) {
@@ -104,6 +106,7 @@ public class QueryHandler extends HttpServlet {
                 .add("no", item.getNo())
                 .add("page", item.getPage())
                 .add("pos", item.getPos())
+                .add("title", item.getTitle())
                 .add("state", item.getState());
     }
 
@@ -205,10 +208,13 @@ public class QueryHandler extends HttpServlet {
 
                 { // クエスト
                     JsonArrayBuilder quest_array = Json.createArrayBuilder();
-                    for (QuestDto quest : GlobalContext.getQuest().values()) {
+                    for (QuestDto quest : GlobalContext.getQuest()) {
+                        if (quest == null)
+                            continue;
                         quest_array.add(questToJson(quest));
                     }
                     jb.add("quest", quest_array);
+                    jb.add("num_quest", GlobalContext.getQuest().size());
                 }
 
                 { // 出撃
@@ -217,6 +223,14 @@ public class QueryHandler extends HttpServlet {
                         sortie.add(mission);
                     }
                     jb.add("sortie", sortie);
+                }
+
+                { // 出撃数, 遠征数
+                    JsonArrayBuilder game_record = Json.createArrayBuilder();
+                    for (int rec : GlobalContext.getGameRecord()) {
+                        game_record.add(rec);
+                    }
+                    jb.add("game_record", game_record);
                 }
             }
         });

@@ -85,7 +85,9 @@ public final class BattleDto extends AbstractDto {
         // ダメージ計算 //
 
         // 航空戦
-        this.doRaigeki(object.getJsonObject("api_kouku").get("api_stage3"));
+        JsonObject kouku = object.getJsonObject("api_kouku");
+        if (kouku != null)
+            this.doRaigeki(kouku.get("api_stage3"));
 
         // 開幕
         this.doRaigeki(object.get("api_opening_atack"));

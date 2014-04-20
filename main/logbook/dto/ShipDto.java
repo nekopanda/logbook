@@ -86,10 +86,13 @@ public final class ShipDto extends AbstractDto {
     /** MaxHP */
     private final long maxhp;
 
+    /** 搭載可能装備数 */
+    private final int slotnum;
+
     /** 装備 */
     private final List<Long> slot;
 
-    /** 装備の搭載数 */
+    /** 艦載機の搭載数 */
     private final List<Integer> onslot;
 
     /** 火力 */
@@ -182,6 +185,7 @@ public final class ShipDto extends AbstractDto {
         this.exp = object.getJsonArray("api_exp").getJsonNumber(0).longValue();
         this.nowhp = object.getJsonNumber("api_nowhp").longValue();
         this.maxhp = object.getJsonNumber("api_maxhp").longValue();
+        this.slotnum = object.getJsonNumber("api_slotnum").intValue();
         this.slot = new ArrayList<Long>();
         JsonArray slot = object.getJsonArray("api_slot");
         for (JsonValue jsonValue : slot) {
@@ -364,6 +368,10 @@ public final class ShipDto extends AbstractDto {
 
     public List<Long> getRawSlot() {
         return this.slot;
+    }
+
+    public int getSlotNum() {
+        return this.slotnum;
     }
 
     /**

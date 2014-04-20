@@ -533,8 +533,9 @@ public final class CreateReportLogic {
     public static List<String[]> getQuestBody() {
         List<Object[]> body = new ArrayList<Object[]>();
 
-        for (Entry<Integer, QuestDto> entry : GlobalContext.getQuest().entrySet()) {
-            QuestDto quest = entry.getValue();
+        for (QuestDto quest : GlobalContext.getQuest()) {
+            if (quest == null)
+                continue;
 
             String state = "";
             switch (quest.getState()) {
