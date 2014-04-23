@@ -101,6 +101,9 @@ public final class AppConfigBean {
     /** 大破状態で致命的アイコン */
     private boolean fatalByBadlyDamage = true;
 
+    /** 大破状態で大破でバルーンツールチップ */
+    private boolean balloonBybadlyDamage = true;
+
     /** 遠征からの帰還時に母港タブを表示 */
     private boolean visibleOnReturnMission = true;
 
@@ -587,6 +590,22 @@ public final class AppConfigBean {
      */
     public void setFatalByBadlyDamage(boolean fatalByBadlyDamage) {
         this.fatalByBadlyDamage = fatalByBadlyDamage;
+    }
+
+    /**
+     * 大破状態で大破でバルーンツールチップを取得します。
+     * @return 大破状態で大破でバルーンツールチップ
+     */
+    public boolean isBalloonBybadlyDamage() {
+        return balloonBybadlyDamage;
+    }
+
+    /**
+     * 大破状態で大破でバルーンツールチップを設定します。
+     * @param balloonBybadlyDamage 大破状態で大破でバルーンツールチップ
+     */
+    public void setBalloonBybadlyDamage(boolean balloonBybadlyDamage) {
+        this.balloonBybadlyDamage = balloonBybadlyDamage;
     }
 
     /**
