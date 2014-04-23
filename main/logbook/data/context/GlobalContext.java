@@ -51,6 +51,7 @@ import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.internal.Deck;
+import logbook.internal.Item;
 import logbook.internal.Ship;
 import logbook.internal.ShipStyle;
 
@@ -316,6 +317,10 @@ public final class GlobalContext {
                 doStoreJson(data);
             }
             switch (data.getDataType()) {
+            // 母港
+            case PORT:
+                doPort(data);
+                break;
             // 保有装備
             case SLOTITEM_MEMBER:
                 doSlotitemMember(data);
@@ -404,6 +409,10 @@ public final class GlobalContext {
             case SHIP_MASTER:
                 doShipMaster(data);
                 break;
+            // 設定
+            case API_START2:
+                doApiStart2(data);
+                break;
             default:
                 break;
             }
@@ -431,6 +440,75 @@ public final class GlobalContext {
             LOG.warn(data);
         }
 
+    }
+
+    /**
+     * 母港を更新します
+     * @param data
+     */
+    private static void doPort(Data data) {
+        try {
+            JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+            if (apidata != null) {
+                // 保有艦娘を更新する
+                JsonArray apiShip = apidata.getJsonArray("api_ship");
+                for (int i = 0; i < apiShip.size(); i++) {
+                    ShipDto ship = new ShipDto((JsonObject) apiShip.get(i));
+                    shipMap.put(Long.valueOf(ship.getId()), ship);
+                }
+                JsonArray apiDeckPort = apidata.getJsonArray("api_deck_port");
+                doDeck(apiDeckPort);
+                addConsole("保有艦娘情報を更新しました");
+
+                // 入渠の状態を更新する
+                // TODO: 重複コード
+                JsonArray apiNdock = apidata.getJsonArray("api_ndock");
+                ndocks = new NdockDto[] { NdockDto.EMPTY, NdockDto.EMPTY, NdockDto.EMPTY, NdockDto.EMPTY };
+                for (int i = 0; i < apiNdock.size(); i++) {
+                    JsonObject object = (JsonObject) apiNdock.get(i);
+                    long id = object.getJsonNumber("api_ship_id").longValue();
+                    long milis = object.getJsonNumber("api_complete_time").longValue();
+                    Date time = null;
+                    if (milis > 0) {
+                        time = new Date(milis);
+                    }
+                    ndocks[i] = new NdockDto(id, time);
+                }
+                addConsole("入渠情報を更新しました");
+
+                // 遠征の状態を更新する
+                deckMissions = new DeckMissionDto[] { DeckMissionDto.EMPTY, DeckMissionDto.EMPTY, DeckMissionDto.EMPTY };
+                for (int i = 1; i < apiDeckPort.size(); i++) {
+                    JsonObject object = (JsonObject) apiDeckPort.get(i);
+                    String name = object.getString("api_name");
+                    JsonArray jmission = object.getJsonArray("api_mission");
+
+                    long section = ((JsonNumber) jmission.get(1)).longValue();
+                    String mission = Deck.get(Long.toString(section));
+                    long milis = ((JsonNumber) jmission.get(2)).longValue();
+                    long fleetid = object.getJsonNumber("api_id").longValue();
+
+                    Set<Long> ships = new LinkedHashSet<Long>();
+                    JsonArray shiparray = object.getJsonArray("api_ship");
+                    for (JsonValue jsonValue : shiparray) {
+                        long shipid = ((JsonNumber) jsonValue).longValue();
+                        if (shipid != -1) {
+                            ships.add(shipid);
+                        }
+                    }
+
+                    Date time = null;
+                    if (milis > 0) {
+                        time = new Date(milis);
+                    }
+                    deckMissions[i - 1] = new DeckMissionDto(name, mission, time, fleetid, ships);
+                }
+                addConsole("遠征情報を更新しました");
+            }
+        } catch (Exception e) {
+            LOG.warn("母港を更新しますに失敗しました", e);
+            LOG.warn(data);
+        }
     }
 
     /**
@@ -586,8 +664,12 @@ public final class GlobalContext {
             itemMap.clear();
             for (int i = 0; i < apidata.size(); i++) {
                 JsonObject object = (JsonObject) apidata.get(i);
-                ItemDto item = new ItemDto(object);
-                itemMap.put(Long.valueOf(item.getId()), item);
+                String typeid = object.getJsonNumber("api_slotitem_id").toString();
+                Long id = object.getJsonNumber("api_id").longValue();
+                ItemDto item = Item.get(typeid);
+                if (item != null) {
+                    itemMap.put(id, item);
+                }
             }
             // 確定待ちの開発装備がある場合、装備の名前を確定させます
             CreateItemDto createitem;
@@ -853,6 +935,7 @@ public final class GlobalContext {
      * 
      * @param data
      */
+    @Deprecated
     private static void doDeckPort(Data data) {
         try {
             JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
@@ -959,6 +1042,7 @@ public final class GlobalContext {
      * 
      * @param data
      */
+    @Deprecated
     private static void doShipMaster(Data data) {
         JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
         for (int i = 0; i < apidata.size(); i++) {
@@ -1041,6 +1125,43 @@ public final class GlobalContext {
         }
 
         addConsole("出撃を更新しました");
+    }
+
+    /**
+     * 設定を更新します
+     * 
+     * @param data
+     */
+    private static void doApiStart2(Data data) {
+        try {
+            JsonObject obj = data.getJsonObject().getJsonObject("api_data");
+            if (obj != null) {
+                // 艦娘一覧
+                JsonArray apiMstShip = obj.getJsonArray("api_mst_ship");
+                for (int i = 0; i < apiMstShip.size(); i++) {
+                    JsonObject object = (JsonObject) apiMstShip.get(i);
+                    String id = object.getJsonNumber("api_id").toString();
+                    Ship.set(id, toShipInfoDto(object));
+                }
+                addConsole("艦娘一覧を更新しました");
+
+                // 装備一覧
+                JsonArray apiMstSlotitem = obj.getJsonArray("api_mst_slotitem");
+                for (int i = 0; i < apiMstSlotitem.size(); i++) {
+                    JsonObject object = (JsonObject) apiMstSlotitem.get(i);
+                    ItemDto item = new ItemDto(object);
+                    String id = object.getJsonNumber("api_id").toString();
+                    Item.set(id, item);
+                }
+                addConsole("装備一覧を更新しました");
+
+            }
+
+            addConsole("設定を更新しました");
+        } catch (Exception e) {
+            LOG.warn("設定を更新しますに失敗しました", e);
+            LOG.warn(data);
+        }
     }
 
     /**

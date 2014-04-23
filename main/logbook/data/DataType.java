@@ -11,11 +11,14 @@ package logbook.data;
  */
 public enum DataType {
 
+    /** 母港 */
+    PORT("/kcsapi/api_port/port"),
     /** 保有艦 */
     SHIP2("/kcsapi/api_get_member/ship2"),
     /** 保有艦 */
     SHIP3("/kcsapi/api_get_member/ship3"),
     /** 遠征 */
+    @Deprecated
     DECK_PORT("/kcsapi/api_get_member/deck_port"),
     /** 遠征(帰還) */
     MISSION_RESULT("/kcsapi/api_req_mission/result"),
@@ -26,7 +29,7 @@ public enum DataType {
     /** 入渠ドック */
     NDOCK("/kcsapi/api_get_member/ndock"),
     /** アイテム一覧 */
-    SLOTITEM_MEMBER("/kcsapi/api_get_member/slotitem"),
+    SLOTITEM_MEMBER("/kcsapi/api_get_member/slot_item"),
     /** 艦隊 */
     DECK("/kcsapi/api_get_member/deck"),
     /** 戦闘 */
@@ -54,9 +57,13 @@ public enum DataType {
     /** 任務消化 */
     QUEST_CLEAR("/kcsapi/api_req_quest/clearitemget"),
     /** アイテム一覧 */
+    @Deprecated
     SLOTITEM_MASTER("/kcsapi/api_get_master/slotitem"),
     /** 艦娘一覧 */
+    @Deprecated
     SHIP_MASTER("/kcsapi/api_get_master/ship"),
+    /** 設定 */
+    API_START2("/kcsapi/api_start2"),
     /** フィルタ前のデータ */
     UNDEFINED(null);
 
