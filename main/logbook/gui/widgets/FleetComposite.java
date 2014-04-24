@@ -227,12 +227,14 @@ public class FleetComposite extends Composite {
      * @param dock
      */
     public void updateFleet(DockDto dock) {
-        if (this.dock == dock) {
+        if ((this.dock == dock) && !this.dock.isUpdate()) {
             return;
         }
+
         this.getShell().setRedraw(false);
 
         this.dock = dock;
+        this.dock.setUpdate(false);
         this.state.set(WARN, false);
         this.state.set(FATAL, false);
         this.cond = 49;

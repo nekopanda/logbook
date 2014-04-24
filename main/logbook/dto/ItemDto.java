@@ -23,8 +23,6 @@ public final class ItemDto extends AbstractDto {
     private final long houk;
     private final long houm;
     private final long id;
-    @Deprecated
-    private final long kaih = 0;
     private final long leng;
     private final long luck;
     private final String name;
@@ -133,14 +131,6 @@ public final class ItemDto extends AbstractDto {
      */
     public long getId() {
         return this.id;
-    }
-
-    /**
-     * @return kaih
-     */
-    @Deprecated
-    public long getKaih() {
-        return this.kaih;
     }
 
     /**

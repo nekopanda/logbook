@@ -11,11 +11,16 @@ package logbook.data;
  */
 public enum DataType {
 
+    /** 補給 */
+    CHARGE("/kcsapi/api_req_hokyu/charge"),
+    /** 編成 */
+    CHANGE("/kcsapi/api_req_hensei/change"),
     /** 母港 */
     PORT("/kcsapi/api_port/port"),
     /** 保有艦 */
     SHIP2("/kcsapi/api_get_member/ship2"),
     /** 保有艦 */
+    @Deprecated
     SHIP3("/kcsapi/api_get_member/ship3"),
     /** 遠征 */
     @Deprecated
@@ -41,15 +46,15 @@ public enum DataType {
     /** 戦闘(夜戦→昼戦) */
     BATTLE_NIGHT_TO_DAY("/kcsapi/api_req_sortie/night_to_day"),
     /** 戦闘結果 */
-    BATTLERESULT("/kcsapi/api_req_sortie/battleresult"),
+    BATTLE_RESULT("/kcsapi/api_req_sortie/battleresult"),
     /** 開発 */
-    CREATEITEM("/kcsapi/api_req_kousyou/createitem"),
+    CREATE_ITEM("/kcsapi/api_req_kousyou/createitem"),
     /** 建造 */
-    CREATESHIP("/kcsapi/api_req_kousyou/createship"),
+    CREATE_SHIP("/kcsapi/api_req_kousyou/createship"),
     /** 建造ドック */
     KDOCK("/kcsapi/api_get_member/kdock"),
     /** 建造(入手) */
-    GETSHIP("/kcsapi/api_req_kousyou/getship"),
+    GET_SHIP("/kcsapi/api_req_kousyou/getship"),
     /** 出撃 */
     START("kcsapi/api_req_map/start"),
     /** 任務一覧 */
@@ -63,7 +68,7 @@ public enum DataType {
     @Deprecated
     SHIP_MASTER("/kcsapi/api_get_master/ship"),
     /** 設定 */
-    API_START2("/kcsapi/api_start2"),
+    START2("/kcsapi/api_start2"),
     /** フィルタ前のデータ */
     UNDEFINED(null);
 
