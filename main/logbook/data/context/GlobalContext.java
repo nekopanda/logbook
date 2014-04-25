@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
 import java.util.SortedMap;
@@ -137,6 +138,20 @@ public final class GlobalContext {
      */
     public static Map<Long, ItemDto> getItemMap() {
         return Collections.unmodifiableMap(itemMap);
+    }
+
+    /**
+     * 装備を復元する
+     * @param map
+     */
+    public static void setItemMap(Map<Long, String> map) {
+        for (Entry<Long, String> entry : map.entrySet()) {
+            String id = entry.getValue();
+            ItemDto item = Item.get(id);
+            if (item != null) {
+                itemMap.put(entry.getKey(), item);
+            }
+        }
     }
 
     /**

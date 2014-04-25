@@ -7,6 +7,7 @@ package logbook.gui;
 
 import logbook.config.AppConfig;
 import logbook.config.ConfigMigration;
+import logbook.config.ItemConfig;
 import logbook.config.ShipConfig;
 import logbook.config.ShipGroupConfig;
 import logbook.constants.AppConstants;
@@ -139,6 +140,7 @@ public final class ApplicationMain {
             AppConfig.load();
             ShipConfig.load();
             ShipGroupConfig.load();
+            ItemConfig.load();
             // 旧設定ファイルを移行します
             ConfigMigration.migration();
             // アプリケーション開始
@@ -148,6 +150,7 @@ public final class ApplicationMain {
             AppConfig.store();
             ShipConfig.store();
             ShipGroupConfig.store();
+            ItemConfig.store();
         } catch (Error e) {
             LOG.fatal("メインスレッドが異常終了しました", e);
         } catch (Exception e) {
