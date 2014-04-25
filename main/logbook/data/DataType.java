@@ -20,11 +20,7 @@ public enum DataType {
     /** 保有艦 */
     SHIP2("/kcsapi/api_get_member/ship2"),
     /** 保有艦 */
-    @Deprecated
     SHIP3("/kcsapi/api_get_member/ship3"),
-    /** 遠征 */
-    @Deprecated
-    DECK_PORT("/kcsapi/api_get_member/deck_port"),
     /** 遠征(帰還) */
     MISSION_RESULT("/kcsapi/api_req_mission/result"),
     /** 基本 */
@@ -55,18 +51,18 @@ public enum DataType {
     KDOCK("/kcsapi/api_get_member/kdock"),
     /** 建造(入手) */
     GET_SHIP("/kcsapi/api_req_kousyou/getship"),
+    /** 解体 */
+    DESTROY_SHIP("/kcsapi/api_req_kousyou/destroyship"),
+    /** 廃棄 */
+    DESTROY_ITEM2("/kcsapi/api_req_kousyou/destroyitem2"),
+    /** 近代化改修 */
+    POWERUP("/kcsapi/api_req_kaisou/powerup"),
     /** 出撃 */
     START("kcsapi/api_req_map/start"),
     /** 任務一覧 */
     QUEST_LIST("/kcsapi/api_get_member/questlist"),
     /** 任務消化 */
     QUEST_CLEAR("/kcsapi/api_req_quest/clearitemget"),
-    /** アイテム一覧 */
-    @Deprecated
-    SLOTITEM_MASTER("/kcsapi/api_get_master/slotitem"),
-    /** 艦娘一覧 */
-    @Deprecated
-    SHIP_MASTER("/kcsapi/api_get_master/ship"),
     /** 設定 */
     START2("/kcsapi/api_start2"),
     /** フィルタ前のデータ */

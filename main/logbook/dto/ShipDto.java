@@ -8,6 +8,7 @@ package logbook.dto;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -386,6 +387,13 @@ public final class ShipDto extends AbstractDto {
             }
         }
         return items;
+    }
+
+    /**
+     * @return 装備ID
+     */
+    public List<Long> getItemId() {
+        return Collections.unmodifiableList(this.slot);
     }
 
     /**

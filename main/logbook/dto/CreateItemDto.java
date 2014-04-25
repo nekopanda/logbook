@@ -21,9 +21,6 @@ public final class CreateItemDto extends AbstractDto {
     /** 成功フラグ */
     private final boolean createFlag;
 
-    /** ID */
-    private final long id;
-
     /** 名称 */
     private String name;
 
@@ -43,11 +40,6 @@ public final class CreateItemDto extends AbstractDto {
 
         this.createDate = Calendar.getInstance().getTime();
         this.createFlag = object.getJsonNumber("api_create_flag").longValue() != 0;
-        if (this.createFlag) {
-            this.id = object.getJsonNumber("api_id").longValue();
-        } else {
-            this.id = 0;
-        }
         this.resources = resources != null ? resources : new ResourceDto("0", "0", "0", "0", null, 0);
     }
 
@@ -91,13 +83,6 @@ public final class CreateItemDto extends AbstractDto {
      */
     public boolean isCreateFlag() {
         return this.createFlag;
-    }
-
-    /**
-     * @return ID
-     */
-    public long getId() {
-        return this.id;
     }
 
     /**
