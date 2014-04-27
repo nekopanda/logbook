@@ -824,14 +824,25 @@ public final class GlobalContext {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
 
+            String shipidstr = data.getField("api_shipid");
             JsonArray shipdata = apidata.getJsonArray("api_ship_data");
             // 出撃中ではない
             Arrays.fill(isSortie, false);
-            // 情報を破棄
-            shipMap.clear();
-            for (int i = 0; i < shipdata.size(); i++) {
-                ShipDto ship = new ShipDto((JsonObject) shipdata.get(i));
-                shipMap.put(Long.valueOf(ship.getId()), ship);
+
+            if (shipidstr != null) {
+                // 艦娘の指定がある場合は艦娘を差し替える
+                Long shipid = Long.parseLong(shipidstr);
+                for (int i = 0; i < shipdata.size(); i++) {
+                    ShipDto ship = new ShipDto((JsonObject) shipdata.get(i));
+                    shipMap.put(shipid, ship);
+                }
+            } else {
+                // 情報を破棄
+                shipMap.clear();
+                for (int i = 0; i < shipdata.size(); i++) {
+                    ShipDto ship = new ShipDto((JsonObject) shipdata.get(i));
+                    shipMap.put(Long.valueOf(ship.getId()), ship);
+                }
             }
             // 艦隊を設定
             doDeck(apidata.getJsonArray("api_deck_data"));
