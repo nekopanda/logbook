@@ -27,9 +27,6 @@ import logbook.internal.Ship;
  */
 public final class ShipDto extends AbstractDto {
 
-    /** 日付フォーマット */
-    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("HH:mm");
-
     /** 日時 */
     private final Calendar time = Calendar.getInstance();
 
@@ -405,18 +402,12 @@ public final class ShipDto extends AbstractDto {
         for (int i = 0; i < 4; i++) {
             ItemDto item = items.get(i);
             if (item != null) {
-                switch (item.getTypeId()) {
-                case "6":
-                case "7":
-                case "8":
-                case "9":
-                case "10":
-                case "21":
-                case "22":
+                if ("6".equals(item.getTypeId3())
+                        || "7".equals(item.getTypeId3())
+                        || "8".equals(item.getTypeId3())
+                        || ("10".equals(item.getTypeId3()) && "11".equals(item.getTypeId2()))) {
+                    //6:艦上戦闘機,7:艦上爆撃機,8:艦上攻撃機,10:水上偵察機(ただし瑞雲のみ)の場合は制空値を計算する
                     seiku += (int) Math.floor(item.getTyku() * Math.sqrt(this.onslot.get(i)));
-                    break;
-                default:
-                    break;
                 }
             }
         }
@@ -559,7 +550,7 @@ public final class ShipDto extends AbstractDto {
      */
     public String getCondClearDate() {
         if (this.cond < 49) {
-            return FORMAT.format(this.time.getTime());
+            return new SimpleDateFormat("HH:mm").format(this.time.getTime());
         }
         return "";
     }

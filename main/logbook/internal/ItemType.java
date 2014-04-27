@@ -39,6 +39,7 @@ public class ItemType {
             this.put("23", "追加装甲");
             this.put("24", "探照灯");
             this.put("25", "簡易輸送部材");
+            this.put("26", "艦艇修理施設");
         }
     };
 

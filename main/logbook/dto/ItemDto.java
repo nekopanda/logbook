@@ -16,7 +16,8 @@ import logbook.internal.ItemType;
 public final class ItemDto extends AbstractDto {
 
     private long id;
-    private long type4;
+    private long type2;
+    private long type3;
     private long atap;
     private long bakk;
     private long baku;
@@ -51,7 +52,8 @@ public final class ItemDto extends AbstractDto {
      */
     public ItemDto(JsonObject object) {
 
-        this.type4 = object.getJsonArray("api_type").getInt(3);
+        this.type2 = object.getJsonArray("api_type").getInt(2);
+        this.type3 = object.getJsonArray("api_type").getInt(3);
 
         this.atap = object.getJsonNumber("api_atap").longValue();
         this.bakk = object.getJsonNumber("api_bakk").longValue();
@@ -80,7 +82,8 @@ public final class ItemDto extends AbstractDto {
      * コンストラクター
      * 
      * @param id
-     * @param type4
+     * @param type2
+     * @param type3
      * @param atap
      * @param bakk
      * @param baku
@@ -102,11 +105,12 @@ public final class ItemDto extends AbstractDto {
      * @param tais
      * @param tyku
      */
-    public ItemDto(long id, long type4, long atap, long bakk, long baku, long houg, long houk, long houm, long leng,
-            long luck, String name, long raig, long raik, long raim, long rare, long sakb, long saku, long soku,
-            long souk, long taik, long tais, long tyku) {
+    public ItemDto(long id, long type2, long type3, long atap, long bakk, long baku, long houg, long houk, long houm,
+            long leng, long luck, String name, long raig, long raik, long raim, long rare, long sakb, long saku,
+            long soku, long souk, long taik, long tais, long tyku) {
         this.id = id;
-        this.type4 = type4;
+        this.type2 = type2;
+        this.type3 = type3;
         this.atap = atap;
         this.bakk = bakk;
         this.baku = baku;
@@ -133,22 +137,37 @@ public final class ItemDto extends AbstractDto {
      * @return type
      */
     public String getType() {
-        return ItemType.get(Long.toString(this.type4));
+        return ItemType.get(Long.toString(this.type3));
     }
 
     /**
-     * @return type
+     * @return type2
      */
-    public String getTypeId() {
-        return Long.toString(this.type4);
+    public String getTypeId2() {
+        return Long.toString(this.type2);
     }
 
     /**
-     * type4を設定します。
-     * @param type4 type4
+     * type3を設定します。
+     * @param type2 type2
      */
-    public void setType4(long type4) {
-        this.type4 = type4;
+    public void setType2(long type2) {
+        this.type2 = type2;
+    }
+
+    /**
+     * @return type3
+     */
+    public String getTypeId3() {
+        return Long.toString(this.type3);
+    }
+
+    /**
+     * type3を設定します。
+     * @param type3 type3
+     */
+    public void setType3(long type3) {
+        this.type3 = type3;
     }
 
     /**
