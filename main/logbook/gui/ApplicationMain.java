@@ -10,6 +10,7 @@ import logbook.config.ConfigMigration;
 import logbook.config.ItemConfig;
 import logbook.config.ShipConfig;
 import logbook.config.ShipGroupConfig;
+import logbook.config.ShipTypeConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.gui.background.AsyncExecApplicationMain;
@@ -141,6 +142,7 @@ public final class ApplicationMain {
             // 設定読み込み
             AppConfig.load();
             ShipConfig.load();
+            ShipTypeConfig.load();
             ShipGroupConfig.load();
             ItemConfig.load();
             // 旧設定ファイルを移行します
@@ -151,6 +153,7 @@ public final class ApplicationMain {
             // ウインドウが閉じたタイミングで設定を書き込みます
             AppConfig.store();
             ShipConfig.store();
+            ShipTypeConfig.store();
             ShipGroupConfig.store();
             ItemConfig.store();
         } catch (Error e) {

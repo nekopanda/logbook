@@ -89,6 +89,23 @@ public final class BattleDto extends AbstractDto {
         if (kouku != null)
             this.doRaigeki(kouku.get("api_stage3"));
 
+        // 支援艦隊
+        JsonNumber support_flag = object.getJsonNumber("api_support_flag");
+        if ((support_flag != null) && (support_flag.intValue() != 0)) {
+            JsonObject support = object.getJsonObject("api_support_info");
+            if (support != null) {
+                JsonObject support_hourai = support.getJsonObject("api_support_hourai");
+                if (support_hourai != null) {
+                    JsonArray edam = support_hourai.getJsonArray("api_damage");
+                    if (edam != null) {
+                        for (int i = 1; i <= 6; i++) {
+                            this.nowEnemyHp[i - 1] -= edam.getJsonNumber(i).intValue();
+                        }
+                    }
+                }
+            }
+        }
+
         // 開幕
         this.doRaigeki(object.get("api_opening_atack"));
 

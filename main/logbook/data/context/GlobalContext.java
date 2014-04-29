@@ -119,7 +119,7 @@ public final class GlobalContext {
     private static boolean[] isSortie = new boolean[4];
 
     /** 出撃中のマップ */
-    private static int[] sortieMap = new int[3];
+    private static int[] sortieMap = new int[4];
 
     /** 戦績: 出撃勝利, 出撃敗北, 演習勝利, 演習敗北, 遠征数, 遠征成功 */
     private static int[] gameRecord = new int[6];
@@ -286,6 +286,13 @@ public final class GlobalContext {
      */
     public static DockDto getDock(String id) {
         return dock.get(id);
+    }
+
+    /**
+     * @return ドックMap
+     */
+    public static Map<String, DockDto> getDock() {
+        return Collections.unmodifiableMap(dock);
     }
 
     public static boolean[] getIsSortie() {
@@ -608,6 +615,25 @@ public final class GlobalContext {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
             if (apidata != null) {
 
+                // 出撃中ではない
+                // 戦闘結果がある場合、ダメージ計算があっているか検証します
+                if (lastBattleDto != null) {
+                    List<ShipDto> dockShips = lastBattleDto.getDock().getShips();
+                    int[] nowhp = lastBattleDto.getNowFriendHp();
+                    for (int i = 0; i < dockShips.size(); ++i) {
+                        ShipDto new_ship = shipMap.get(dockShips.get(i).getId());
+                        if (new_ship == null)
+                            continue; // 轟沈した！
+                        if (new_ship.getNowhp() != nowhp[i]) {
+                            LOG.warn("ダメージ計算ミスが発生しています。" + new_ship.getName() + "の現在のHPは" + new_ship.getNowhp()
+                                    + "ですが、ダメージ計算では" + nowhp[i] + "と計算されていました。");
+                            addConsole("ダメージ計算ミス発生！（詳細はログ）");
+                        }
+                    }
+                }
+                Arrays.fill(isSortie, false);
+                lastBattleDto = null;
+
                 // 基本情報を更新する
                 JsonObject apiBasic = apidata.getJsonObject("api_basic");
                 doBasicSub(apiBasic);
@@ -702,6 +728,9 @@ public final class GlobalContext {
             BattleResultDto dto = new BattleResultDto(apidata, lastBattleDto, sortieMap);
             battleResultList.add(dto);
             CreateReportLogic.storeBattleResultReport(dto);
+
+            // 警告を出すためにバージョンアップ
+            lastBattleDto.getDock().setUpdate(true);
 
             addConsole("海戦情報を更新しました");
         } catch (Exception e) {
@@ -1352,6 +1381,13 @@ public final class GlobalContext {
         sortieMap[0] = apidata.getJsonNumber("api_maparea_id").intValue();
         sortieMap[1] = apidata.getJsonNumber("api_mapinfo_no").intValue();
         sortieMap[2] = apidata.getJsonNumber("api_no").intValue();
+        JsonObject enemydata = apidata.getJsonObject("api_enemy");
+        if (enemydata != null) {
+            sortieMap[3] = enemydata.getJsonNumber("api_enemy_id").intValue();
+        }
+        else {
+            sortieMap[3] = -1;
+        }
     }
 
     /**
@@ -1371,11 +1407,19 @@ public final class GlobalContext {
             CreateReportLogic.storeMaterialReport(material);
 
             addConsole("出撃を更新しました");
-            addConsole("行先=" + Arrays.toString(sortieMap));
+            addConsole(sortieToString(sortieMap));
         } catch (Exception e) {
             LOG.warn("出撃を更新しますに失敗しました", e);
             LOG.warn(data);
         }
+    }
+
+    private static String sortieToString(int[] sortieMap) {
+        String ret = "行先 マップ:" + sortieMap[0] + "-" + sortieMap[1] + " セル:" + sortieMap[2];
+        if (sortieMap[3] != -1) {
+            ret += " e_id:" + sortieMap[3];
+        }
+        return ret;
     }
 
     /**
@@ -1422,7 +1466,7 @@ public final class GlobalContext {
     private static void doNext(Data data) {
         try {
             readMapInfo(data);
-            addConsole("行先=" + Arrays.toString(sortieMap));
+            addConsole(sortieToString(sortieMap));
         } catch (Exception e) {
             LOG.warn("進撃を処理しますに失敗しました", e);
             LOG.warn(data);

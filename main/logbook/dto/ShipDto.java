@@ -457,6 +457,22 @@ public final class ShipDto extends AbstractDto {
     }
 
     /**
+     * アイテムの索敵合計を計算します
+     * @return アイテムの索敵合計
+     */
+    public int getSlotSakuteki() {
+        List<ItemDto> items = this.getItem();
+        int sakuteki = 0;
+        for (int i = 0; i < 4; i++) {
+            ItemDto item = items.get(i);
+            if (item != null) {
+                sakuteki += item.getSaku();
+            }
+        }
+        return sakuteki;
+    }
+
+    /**
      * @return 火力
      */
     public long getKaryoku() {

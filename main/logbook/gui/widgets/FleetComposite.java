@@ -439,8 +439,12 @@ public class FleetComposite extends Composite {
         }
         // 制空値を計算
         int seiku = 0;
+        int shipSakuteki = 0;
+        int slotSakuteki = 0;
         for (ShipDto shipDto : ships) {
             seiku += shipDto.getSeiku();
+            shipSakuteki += shipDto.getSakuteki();
+            slotSakuteki += shipDto.getSlotSakuteki();
         }
         if (GlobalContext.isMission(this.dock.getId())) {
             // 遠征中
@@ -479,7 +483,8 @@ public class FleetComposite extends Composite {
         if (this.clearDate != null) {
             this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_COND, this.clearDate), null);
         }
-        this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_SEIKU, seiku), null);
+        this.addStyledText(this.message,
+                MessageFormat.format(AppConstants.MESSAGE_SEIKU, seiku, shipSakuteki, slotSakuteki), null);
 
         this.updateTabIcon();
         this.postFatal();

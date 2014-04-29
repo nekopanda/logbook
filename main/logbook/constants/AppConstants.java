@@ -95,6 +95,9 @@ public class AppConstants {
     /** 装備設定ファイル  */
     public static final File ITEM_CONFIG_FILE = new File("./config/item.xml");
 
+    /** 艦種設定ファイル  */
+    public static final File SHIPTYPE_CONFIG_FILE = new File("./config/shiptype.xml");
+
     /** 建造ドック設定ファイル  */
     public static final File KDOCK_CONFIG_FILE = new File("./config/kdock.xml");
 
@@ -330,8 +333,8 @@ public class AppConstants {
     /** メッセージ 疲労している艦娘がいます */
     public static final String MESSAGE_COND = "疲労している艦娘がいます {0}頃に回復します。";
 
-    /** メッセージ 制空値:{0} */
-    public static final String MESSAGE_SEIKU = "制空値:{0}";
+    /** メッセージ 制空値:{0} 索敵:{1}+{2} */
+    public static final String MESSAGE_SEIKU = "制空値:{0} 索敵:{1}+{2}";
 
     /** メッセージ 大破している艦娘がいます、進撃はできません。 */
     public static final String MESSAGE_STOP_SORTIE = "大破している艦娘がいます、進撃はできません。";

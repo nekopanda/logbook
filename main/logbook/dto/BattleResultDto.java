@@ -51,7 +51,8 @@ public final class BattleResultDto extends AbstractDto {
         this.questName = "(" + mapInfo[0] + "-" + mapInfo[1] + "-" + mapInfo[2] + ") "
                 + object.getString("api_quest_name");
         this.rank = object.getString("api_win_rank");
-        this.enemyName = object.getJsonObject("api_enemy_info").getString("api_deck_name");
+        this.enemyName = object.getJsonObject("api_enemy_info").getString("api_deck_name") + " (e_id: " + mapInfo[3]
+                + ")";
         this.dropFlag = object.containsKey("api_get_ship");
         if (this.dropFlag) {
             this.dropType = object.getJsonObject("api_get_ship").getString("api_ship_type");

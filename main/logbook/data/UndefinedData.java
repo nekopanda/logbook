@@ -134,12 +134,11 @@ public class UndefinedData implements Data {
     // 艦これ統計データベース(仮) に送信する
     private static String[] sendDatabaseUrls = new String[]
     {
+            "api_port/port",
+            "api_get_member/kdock",
             "api_get_member/ship2",
             "api_get_member/ship3",
-            "api_get_member/deck",
-            "api_get_member/deck_port",
-            "api_get_member/basic",
-            "api_get_member/kdock",
+            "api_req_hensei/change",
             "api_req_kousyou/createship",
             "api_req_kousyou/getship",
             "api_req_kousyou/createitem",
@@ -170,7 +169,7 @@ public class UndefinedData implements Data {
                                         new String(UndefinedData.this.request, "UTF-8"))
                                         .replaceAll("");
                                 String sendResponseBody = new String(UndefinedData.this.response, "UTF-8");
-                                Request.Post("http://api.kancolle-db.net/1/")
+                                Request.Post("http://api.kancolle-db.net/2/")
                                         .bodyForm(
                                                 Form.form()
                                                         .add("token", AppConfig.get().getAccessKey())

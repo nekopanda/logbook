@@ -903,13 +903,15 @@ public final class CreateReportLogic {
      */
     public static void storeMaterialReport(MaterialDto material) {
         try {
-            List<MaterialDto> dtoList = Collections.singletonList(material);
+            if (material != null) {
+                List<MaterialDto> dtoList = Collections.singletonList(material);
 
-            File report = getStoreFile("資材ログ.csv", "資材ログ_alternativefile.csv");
+                File report = getStoreFile("資材ログ.csv", "資材ログ_alternativefile.csv");
 
-            CreateReportLogic.writeCsvStripFirstColumn(report,
-                    CreateReportLogic.getMaterialHeader(),
-                    CreateReportLogic.getMaterialStoreBody(dtoList), true);
+                CreateReportLogic.writeCsvStripFirstColumn(report,
+                        CreateReportLogic.getMaterialHeader(),
+                        CreateReportLogic.getMaterialStoreBody(dtoList), true);
+            }
         } catch (IOException e) {
             LOG.warn("報告書の保存に失敗しました", e);
         }
