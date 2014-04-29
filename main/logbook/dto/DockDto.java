@@ -24,6 +24,9 @@ public final class DockDto extends AbstractDto {
     /** 艦娘達 */
     private final List<ShipDto> ships = new ArrayList<ShipDto>();
 
+    /** 更新フラグ */
+    private boolean update;
+
     /**
      * コンストラクター
      */
@@ -33,21 +36,11 @@ public final class DockDto extends AbstractDto {
     }
 
     /**
-     * ドックIDを取得します
-     * 
-     * @return
+     * ドックIDを取得します。
+     * @return ドックID
      */
     public String getId() {
         return this.id;
-    }
-
-    /**
-     * 艦隊名を取得します
-     * 
-     * @return
-     */
-    public String getName() {
-        return this.name;
     }
 
     /**
@@ -60,11 +53,34 @@ public final class DockDto extends AbstractDto {
     }
 
     /**
-     * 艦娘達を取得します
-     * 
-     * @return
+     * 艦隊名を取得します。
+     * @return 艦隊名
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    /**
+     * 艦娘達を取得します。
+     * @return 艦娘達
      */
     public List<ShipDto> getShips() {
         return Collections.unmodifiableList(this.ships);
+    }
+
+    /**
+     * 更新フラグを取得します。
+     * @return 更新フラグ
+     */
+    public boolean isUpdate() {
+        return this.update;
+    }
+
+    /**
+     * 更新フラグを設定します。
+     * @param update 更新フラグ
+     */
+    public void setUpdate(boolean update) {
+        this.update = update;
     }
 }

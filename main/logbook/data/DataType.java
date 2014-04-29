@@ -11,12 +11,16 @@ package logbook.data;
  */
 public enum DataType {
 
+    /** 補給 */
+    CHARGE("/kcsapi/api_req_hokyu/charge"),
+    /** 編成 */
+    CHANGE("/kcsapi/api_req_hensei/change"),
+    /** 母港 */
+    PORT("/kcsapi/api_port/port"),
     /** 保有艦 */
     SHIP2("/kcsapi/api_get_member/ship2"),
     /** 保有艦 */
     SHIP3("/kcsapi/api_get_member/ship3"),
-    /** 遠征 */
-    DECK_PORT("/kcsapi/api_get_member/deck_port"),
     /** 遠征(帰還) */
     MISSION_RESULT("/kcsapi/api_req_mission/result"),
     /** 基本 */
@@ -26,7 +30,7 @@ public enum DataType {
     /** 入渠ドック */
     NDOCK("/kcsapi/api_get_member/ndock"),
     /** アイテム一覧 */
-    SLOTITEM_MEMBER("/kcsapi/api_get_member/slotitem"),
+    SLOTITEM_MEMBER("/kcsapi/api_get_member/slot_item"),
     /** 艦隊 */
     DECK("/kcsapi/api_get_member/deck"),
     /** 戦闘 */
@@ -38,15 +42,21 @@ public enum DataType {
     /** 戦闘(夜戦→昼戦) */
     BATTLE_NIGHT_TO_DAY("/kcsapi/api_req_sortie/night_to_day"),
     /** 戦闘結果 */
-    BATTLERESULT("/kcsapi/api_req_sortie/battleresult"),
+    BATTLE_RESULT("/kcsapi/api_req_sortie/battleresult"),
     /** 開発 */
-    CREATEITEM("/kcsapi/api_req_kousyou/createitem"),
+    CREATE_ITEM("/kcsapi/api_req_kousyou/createitem"),
     /** 建造 */
-    CREATESHIP("/kcsapi/api_req_kousyou/createship"),
+    CREATE_SHIP("/kcsapi/api_req_kousyou/createship"),
     /** 建造ドック */
     KDOCK("/kcsapi/api_get_member/kdock"),
     /** 建造(入手) */
-    GETSHIP("/kcsapi/api_req_kousyou/getship"),
+    GET_SHIP("/kcsapi/api_req_kousyou/getship"),
+    /** 解体 */
+    DESTROY_SHIP("/kcsapi/api_req_kousyou/destroyship"),
+    /** 廃棄 */
+    DESTROY_ITEM2("/kcsapi/api_req_kousyou/destroyitem2"),
+    /** 近代化改修 */
+    POWERUP("/kcsapi/api_req_kaisou/powerup"),
     /** 出撃 */
     START("kcsapi/api_req_map/start"),
     /** 進撃 */
@@ -55,10 +65,8 @@ public enum DataType {
     QUEST_LIST("/kcsapi/api_get_member/questlist"),
     /** 任務消化 */
     QUEST_CLEAR("/kcsapi/api_req_quest/clearitemget"),
-    /** アイテム一覧 */
-    SLOTITEM_MASTER("/kcsapi/api_get_master/slotitem"),
-    /** 艦娘一覧 */
-    SHIP_MASTER("/kcsapi/api_get_master/ship"),
+    /** 設定 */
+    START2("/kcsapi/api_start2"),
     /** フィルタ前のデータ */
     UNDEFINED(null);
 

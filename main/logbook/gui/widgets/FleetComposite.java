@@ -227,12 +227,14 @@ public class FleetComposite extends Composite {
      * @param dock
      */
     public void updateFleet(DockDto dock) {
-        if (this.dock == dock) {
+        if ((this.dock == dock) && !this.dock.isUpdate()) {
             return;
         }
+
         this.getShell().setRedraw(false);
 
         this.dock = dock;
+        this.dock.setUpdate(false);
         this.state.set(WARN, false);
         this.state.set(FATAL, false);
         this.cond = 49;
@@ -505,16 +507,16 @@ public class FleetComposite extends Composite {
      */
     private void postFatal() {
         if (this.badlyDamage && !this.state.get(POSTED_BADLY) && GlobalContext.isSortie(this.dock.getId())) {
-            ToolTip tip = new ToolTip(this.getShell(), SWT.BALLOON
-                    | SWT.ICON_ERROR);
-            tip.setText("大破警告");
-            tip.setMessage(AppConstants.MESSAGE_STOP_SORTIE);
-            this.main.getTrayItem().setToolTip(tip);
-            tip.setVisible(true);
-
+            if (AppConfig.get().isBalloonBybadlyDamage()) {
+                ToolTip tip = new ToolTip(this.getShell(), SWT.BALLOON
+                        | SWT.ICON_ERROR);
+                tip.setText("大破警告");
+                tip.setMessage(AppConstants.MESSAGE_STOP_SORTIE);
+                this.main.getTrayItem().setToolTip(tip);
+                tip.setVisible(true);
+            }
             // 大破時にサウンドを再生する
             Sound.randomBadlySoundPlay();
-
             // 通知済みフラグをセットする
             this.state.set(POSTED_BADLY);
         }

@@ -22,7 +22,6 @@ import logbook.dto.BattleDto;
 import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
 import logbook.dto.ItemDto;
-import logbook.dto.ItemInfoDto;
 import logbook.dto.MaterialDto;
 import logbook.dto.NdockDto;
 import logbook.dto.QuestDto;
@@ -93,12 +92,11 @@ public class QueryHandler extends HttpServlet {
                 .add("item_id", item.getSlotitemId());
     }
 
-    private static JsonObjectBuilder itemInfoToJson(ItemInfoDto item) {
+    private static JsonObjectBuilder itemInfoToJson(ItemDto item) {
         return Json.createObjectBuilder()
                 .add("id", item.getId())
-                .add("sortno", item.getSortno())
                 .add("name", item.getName())
-                .add("type", item.getType()[2]);
+                .add("type", item.getTypeId2());
     }
 
     private static JsonObjectBuilder questToJson(QuestDto item) {
@@ -192,7 +190,7 @@ public class QueryHandler extends HttpServlet {
 
                 { // 装備
                     JsonArrayBuilder item_array = Json.createArrayBuilder();
-                    for (Integer itemid : Item.keySet()) {
+                    for (String itemid : Item.keySet()) {
                         item_array.add(itemInfoToJson(Item.get(itemid)));
                     }
                     jb.add("master_items", item_array);

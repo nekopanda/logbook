@@ -141,8 +141,8 @@ public final class ApplicationMain {
             // 設定読み込み
             AppConfig.load();
             ShipConfig.load();
-            ItemConfig.load();
             ShipGroupConfig.load();
+            ItemConfig.load();
             // 旧設定ファイルを移行します
             ConfigMigration.migration();
             // アプリケーション開始
@@ -151,8 +151,8 @@ public final class ApplicationMain {
             // ウインドウが閉じたタイミングで設定を書き込みます
             AppConfig.store();
             ShipConfig.store();
-            ItemConfig.store();
             ShipGroupConfig.store();
+            ItemConfig.store();
         } catch (Error e) {
             LOG.fatal("メインスレッドが異常終了しました", e);
         } catch (Exception e) {

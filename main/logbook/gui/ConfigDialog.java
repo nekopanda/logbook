@@ -294,6 +294,11 @@ public final class ConfigDialog extends Dialog {
         fatalBybadlyDamage.setText("大破で致命的アイコン表示");
         fatalBybadlyDamage.setSelection(AppConfig.get().isFatalBybadlyDamage());
 
+        final Button balloonBybadlyDamage = new Button(compositeFleetTab, SWT.CHECK);
+        balloonBybadlyDamage.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        balloonBybadlyDamage.setText("大破でバルーンツールチップを表示");
+        balloonBybadlyDamage.setSelection(AppConfig.get().isBalloonBybadlyDamage());
+
         final Button visibleOnReturnMission = new Button(compositeFleetTab, SWT.CHECK);
         visibleOnReturnMission.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         visibleOnReturnMission.setText("遠征からの帰還時に母港タブを表示");
@@ -484,6 +489,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setWarnByCondState(warnByCondState.getSelection());
                 AppConfig.get().setWarnByHalfDamage(warnByHalfDamage.getSelection());
                 AppConfig.get().setFatalBybadlyDamage(fatalBybadlyDamage.getSelection());
+                AppConfig.get().setBalloonBybadlyDamage(balloonBybadlyDamage.getSelection());
                 AppConfig.get().setVisibleOnReturnMission(visibleOnReturnMission.getSelection());
                 AppConfig.get().setVisibleOnReturnBathwater(visibleOnReturnBathwater.getSelection());
                 // capture
