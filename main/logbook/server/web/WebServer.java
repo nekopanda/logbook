@@ -33,6 +33,7 @@ public class WebServer {
             server.setConnectors(new Connector[] { connector });
 
             ServletHandler servletHandler = new ServletHandler();
+            servletHandler.addServletWithMapping(QueryHandler.class, "/master");
             servletHandler.addServletWithMapping(QueryHandler.class, "/query");
             servletHandler.addServletWithMapping(QueryHandler.class, "/battle");
 

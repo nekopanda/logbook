@@ -95,8 +95,8 @@ public class AppConstants {
     /** 装備設定ファイル  */
     public static final File ITEM_CONFIG_FILE = new File("./config/item.xml");
 
-    /** 艦種設定ファイル  */
-    public static final File SHIPTYPE_CONFIG_FILE = new File("./config/shiptype.xml");
+    /** マスターゲームデータ保存ファイル  */
+    public static final File MASTER_DATA_CONFIG = new File("./config/master.xml");
 
     /** 建造ドック設定ファイル  */
     public static final File KDOCK_CONFIG_FILE = new File("./config/kdock.xml");

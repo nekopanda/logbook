@@ -67,6 +67,10 @@ public enum DataType {
     QUEST_CLEAR("/kcsapi/api_req_quest/clearitemget"),
     /** 設定 */
     START2("/kcsapi/api_start2"),
+    /** マップ情報 */
+    MAPINFO("/kcsapi/api_get_member/mapinfo"),
+    /** 任務情報 */
+    MISSION("/kcsapi/api_get_member/mission"),
     /** フィルタ前のデータ */
     UNDEFINED(null);
 

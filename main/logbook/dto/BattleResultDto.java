@@ -45,14 +45,21 @@ public final class BattleResultDto extends AbstractDto {
      * @param object JSON Object
      * @param battle 戦闘詳細
      */
-    public BattleResultDto(JsonObject object, BattleDto battle, int[] mapInfo) {
+    public BattleResultDto(JsonObject object, BattleDto battle, MapCellDto mapInfo) {
+
+        String questNamePrefix = "";
+        String enemyNameSuffix = "";
+        if (mapInfo != null) {
+            int[] map = mapInfo.getMap();
+            questNamePrefix = "(" + map[0] + "-" + map[1] + "-" + map[2] + ") "
+                    + this.questName;
+            enemyNameSuffix = (mapInfo.isBoss() ? " (ボス)" : "") + " (e_id: " + mapInfo.getEnemyId() + ")";
+        }
 
         this.battleDate = Calendar.getInstance().getTime();
-        this.questName = "(" + mapInfo[0] + "-" + mapInfo[1] + "-" + mapInfo[2] + ") "
-                + object.getString("api_quest_name");
+        this.questName = questNamePrefix + object.getString("api_quest_name");
         this.rank = object.getString("api_win_rank");
-        this.enemyName = object.getJsonObject("api_enemy_info").getString("api_deck_name") + " (e_id: " + mapInfo[3]
-                + ")";
+        this.enemyName = object.getJsonObject("api_enemy_info").getString("api_deck_name") + enemyNameSuffix;
         this.dropFlag = object.containsKey("api_get_ship");
         if (this.dropFlag) {
             this.dropType = object.getJsonObject("api_get_ship").getString("api_ship_type");

@@ -14,7 +14,7 @@ import logbook.internal.Ship;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * @author iedeg_000
+ * @author Nekopanda
  *
  */
 public class ShipInfoToCSV {

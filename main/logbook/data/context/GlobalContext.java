@@ -28,6 +28,7 @@ import javax.json.JsonValue;
 
 import logbook.config.AppConfig;
 import logbook.config.KdockConfig;
+import logbook.config.MasterDataConfig;
 import logbook.constants.AppConstants;
 import logbook.data.Data;
 import logbook.dto.BattleDto;
@@ -37,6 +38,7 @@ import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
+import logbook.dto.MapCellDto;
 import logbook.dto.MaterialDto;
 import logbook.dto.MissionResultDto;
 import logbook.dto.NdockDto;
@@ -47,6 +49,7 @@ import logbook.dto.ShipInfoDto;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.MainConsoleListener;
 import logbook.internal.Item;
+import logbook.internal.MasterData;
 import logbook.internal.Ship;
 
 import org.apache.commons.io.FileUtils;
@@ -98,6 +101,9 @@ public final class GlobalContext {
     /** 最後に建造を行った建造ドック */
     private static String lastBuildKdock;
 
+    /** 現在のマップ位置 */
+    private static MapCellDto mapCellDto = null;
+
     /** 戦闘詳細 */
     private static BattleDto lastBattleDto = null;
 
@@ -117,9 +123,6 @@ public final class GlobalContext {
 
     /** 出撃中か */
     private static boolean[] isSortie = new boolean[4];
-
-    /** 出撃中のマップ */
-    private static int[] sortieMap = new int[4];
 
     /** 戦績: 出撃勝利, 出撃敗北, 演習勝利, 演習敗北, 遠征数, 遠征成功 */
     private static int[] gameRecord = new int[6];
@@ -299,8 +302,8 @@ public final class GlobalContext {
         return isSortie;
     }
 
-    public static int[] getSortieMap() {
-        return sortieMap;
+    public static MapCellDto getSortieMap() {
+        return mapCellDto;
     }
 
     /**
@@ -455,6 +458,14 @@ public final class GlobalContext {
         // 設定
         case START2:
             doStart2(data);
+            break;
+        // マップ情報
+        case MAPINFO:
+            doMapInfo(data);
+            break;
+        // 任務情報
+        case MISSION:
+            doMission(data);
             break;
         default:
             break;
@@ -632,6 +643,7 @@ public final class GlobalContext {
                     }
                 }
                 Arrays.fill(isSortie, false);
+                mapCellDto = null;
                 lastBattleDto = null;
 
                 // 基本情報を更新する
@@ -725,7 +737,7 @@ public final class GlobalContext {
     private static void doBattleresult(Data data) {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
-            BattleResultDto dto = new BattleResultDto(apidata, lastBattleDto, sortieMap);
+            BattleResultDto dto = new BattleResultDto(apidata, lastBattleDto, mapCellDto);
             battleResultList.add(dto);
             CreateReportLogic.storeBattleResultReport(dto);
 
@@ -1376,20 +1388,6 @@ public final class GlobalContext {
         }
     }*/
 
-    private static void readMapInfo(Data data) {
-        JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
-        sortieMap[0] = apidata.getJsonNumber("api_maparea_id").intValue();
-        sortieMap[1] = apidata.getJsonNumber("api_mapinfo_no").intValue();
-        sortieMap[2] = apidata.getJsonNumber("api_no").intValue();
-        JsonObject enemydata = apidata.getJsonObject("api_enemy");
-        if (enemydata != null) {
-            sortieMap[3] = enemydata.getJsonNumber("api_enemy_id").intValue();
-        }
-        else {
-            sortieMap[3] = -1;
-        }
-    }
-
     /**
      * 出撃を更新します
      * 
@@ -1402,24 +1400,16 @@ public final class GlobalContext {
                 int id = Integer.parseInt(idstr);
                 isSortie[id - 1] = true;
             }
-            readMapInfo(data);
+            mapCellDto = new MapCellDto(data.getJsonObject().getJsonObject("api_data"));
             material.setEvent("出撃");
             CreateReportLogic.storeMaterialReport(material);
 
             addConsole("出撃を更新しました");
-            addConsole(sortieToString(sortieMap));
+            addConsole(mapCellDto.toString());
         } catch (Exception e) {
             LOG.warn("出撃を更新しますに失敗しました", e);
             LOG.warn(data);
         }
-    }
-
-    private static String sortieToString(int[] sortieMap) {
-        String ret = "行先 マップ:" + sortieMap[0] + "-" + sortieMap[1] + " セル:" + sortieMap[2];
-        if (sortieMap[3] != -1) {
-            ret += " e_id:" + sortieMap[3];
-        }
-        return ret;
     }
 
     /**
@@ -1449,11 +1439,47 @@ public final class GlobalContext {
                     Item.set(id, item);
                 }
                 addConsole("装備一覧を更新しました");
+
+                MasterDataConfig.set(new MasterData(obj));
             }
 
             addConsole("設定を更新しました");
         } catch (Exception e) {
             LOG.warn("設定を更新しますに失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * マップ情報を処理します
+     * 
+     * @param data
+     */
+    private static void doMapInfo(Data data) {
+        try {
+            JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
+            if (apidata != null) {
+                MasterDataConfig.get().doMapInfo(apidata);
+            }
+        } catch (Exception e) {
+            LOG.warn("マップ情報更新に失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 任務情報を処理します
+     * 
+     * @param data
+     */
+    private static void doMission(Data data) {
+        try {
+            JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
+            if (apidata != null) {
+                MasterDataConfig.get().doMission(apidata);
+            }
+        } catch (Exception e) {
+            LOG.warn("任務情報更新に失敗しました", e);
             LOG.warn(data);
         }
     }
@@ -1465,8 +1491,8 @@ public final class GlobalContext {
      */
     private static void doNext(Data data) {
         try {
-            readMapInfo(data);
-            addConsole(sortieToString(sortieMap));
+            mapCellDto = new MapCellDto(data.getJsonObject().getJsonObject("api_data"));
+            addConsole(mapCellDto.toString());
         } catch (Exception e) {
             LOG.warn("進撃を処理しますに失敗しました", e);
             LOG.warn(data);
