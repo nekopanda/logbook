@@ -547,6 +547,10 @@ public final class GlobalContext {
                         }
                     }
                 }
+                if ("1".equals(fleetid)) {
+                    // 秘書艦を再設定
+                    setSecretary(newdock.getShips().get(0));
+                }
                 dock.put(fleetid, newdock);
             }
         } catch (Exception e) {
@@ -563,6 +567,8 @@ public final class GlobalContext {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
             if (apidata != null) {
+                // 出撃中ではない
+                Arrays.fill(isSortie, false);
 
                 // 基本情報を更新する
                 JsonObject apiBasic = apidata.getJsonObject("api_basic");
@@ -837,8 +843,6 @@ public final class GlobalContext {
 
             String shipidstr = data.getField("api_shipid");
             JsonArray shipdata = apidata.getJsonArray("api_ship_data");
-            // 出撃中ではない
-            Arrays.fill(isSortie, false);
 
             if (shipidstr != null) {
                 // 艦娘の指定がある場合は艦娘を差し替える
@@ -935,17 +939,26 @@ public final class GlobalContext {
                     dockdto.addShip(ship);
 
                     if ((i == 0) && (j == 0)) {
-                        if ((secretary == null) || (ship.getId() != secretary.getId())) {
-                            addConsole(ship.getName() + "(Lv" + ship.getLv() + ")" + " が秘書艦に任命されました");
-                        }
-                        // 秘書艦を設定
-                        secretary = ship;
+                        setSecretary(ship);
                     }
                     // 艦隊IDを設定
                     ship.setFleetid(fleetid);
                 }
             }
         }
+    }
+
+    /**
+     * 秘書艦を設定します
+     * 
+     * @param ship
+     */
+    private static void setSecretary(ShipDto ship) {
+        if ((secretary == null) || (ship.getId() != secretary.getId())) {
+            addConsole(ship.getName() + "(Lv" + ship.getLv() + ")" + " が秘書艦に任命されました");
+        }
+        // 秘書艦を設定
+        secretary = ship;
     }
 
     /**
