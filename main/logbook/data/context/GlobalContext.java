@@ -124,6 +124,9 @@ public final class GlobalContext {
     /** 出撃中か */
     private static boolean[] isSortie = new boolean[4];
 
+    /** 今いるマップ上のマスNo */
+    private static int mapCellNo;
+
     /** ログキュー */
     private static Queue<String> consoleQueue = new ArrayBlockingQueue<String>(10);
 
@@ -421,6 +424,10 @@ public final class GlobalContext {
             case START:
                 doStart(data);
                 break;
+            // 出撃
+            case NEXT:
+                doNext(data);
+                break;
             // 任務
             case QUEST_LIST:
                 doQuest(data);
@@ -655,7 +662,7 @@ public final class GlobalContext {
     private static void doBattleresult(Data data) {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
-            BattleResultDto dto = new BattleResultDto(apidata, battleList.poll());
+            BattleResultDto dto = new BattleResultDto(apidata, mapCellNo, battleList.poll());
             battleResultList.add(dto);
             CreateReportLogic.storeBattleResultReport(dto);
 
@@ -1262,13 +1269,40 @@ public final class GlobalContext {
      * @param data
      */
     private static void doStart(Data data) {
-        String idstr = data.getField("api_deck_id");
-        if (idstr != null) {
-            int id = Integer.parseInt(idstr);
-            isSortie[id - 1] = true;
-        }
+        try {
+            String idstr = data.getField("api_deck_id");
+            if (idstr != null) {
+                int id = Integer.parseInt(idstr);
+                isSortie[id - 1] = true;
+            }
 
-        addConsole("出撃を更新しました");
+            JsonObject obj = data.getJsonObject().getJsonObject("api_data");
+
+            mapCellNo = obj.getJsonNumber("api_no").intValue();
+
+            addConsole("出撃を更新しました");
+        } catch (Exception e) {
+            LOG.warn("出撃を更新しますに失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 進撃を更新します
+     * 
+     * @param data
+     */
+    private static void doNext(Data data) {
+        try {
+            JsonObject obj = data.getJsonObject().getJsonObject("api_data");
+
+            mapCellNo = obj.getJsonNumber("api_no").intValue();
+
+            addConsole("進撃を更新しました");
+        } catch (Exception e) {
+            LOG.warn("進撃を更新しますに失敗しました", e);
+            LOG.warn(data);
+        }
     }
 
     /**

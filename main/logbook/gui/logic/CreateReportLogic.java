@@ -150,7 +150,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getBattleResultHeader() {
-        return new String[] { "", "日付", "海域", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘" };
+        return new String[] { "", "日付", "海域", "マス", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘" };
     }
 
     /**
@@ -165,7 +165,7 @@ public final class CreateReportLogic {
             BattleResultDto item = results.get(i);
             body.add(new Object[] { Integer.toString(i + 1),
                     new SimpleDateFormat(AppConstants.DATE_FORMAT).format(item.getBattleDate()), item.getQuestName(),
-                    item.getRank(), item.getEnemyName(), item.getDropType(), item.getDropName() });
+                    item.getMapCellNo(), item.getRank(), item.getEnemyName(), item.getDropType(), item.getDropName() });
         }
         return toListStringArray(body);
     }
@@ -176,7 +176,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getBattleResultStoreHeader() {
-        return new String[] { "", "日付", "海域", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘",
+        return new String[] { "", "日付", "海域", "マス", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘",
                 "味方艦1", "味方艦1HP",
                 "味方艦2", "味方艦2HP",
                 "味方艦3", "味方艦3HP",
