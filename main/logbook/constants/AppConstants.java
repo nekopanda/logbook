@@ -333,6 +333,6 @@ public class AppConstants {
     /** メッセージ 制空値:{0} */
     public static final String MESSAGE_SEIKU = "制空値:{0}";
 
-    /** メッセージ 大破している艦娘がいます、進撃はできません。 */
+    /** メッセージ 大破している艦娘がいます */
     public static final String MESSAGE_STOP_SORTIE = "大破している艦娘がいます、進撃はできません。";
 }
