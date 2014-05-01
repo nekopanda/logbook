@@ -6,7 +6,6 @@
 package logbook.gui;
 
 import logbook.config.AppConfig;
-import logbook.config.ConfigMigration;
 import logbook.config.ItemConfig;
 import logbook.config.ShipConfig;
 import logbook.config.ShipGroupConfig;
@@ -141,8 +140,6 @@ public final class ApplicationMain {
             ShipConfig.load();
             ShipGroupConfig.load();
             ItemConfig.load();
-            // 旧設定ファイルを移行します
-            ConfigMigration.migration();
             // アプリケーション開始
             ApplicationMain window = new ApplicationMain();
             window.open();
