@@ -214,6 +214,15 @@ public abstract class AbstractTableDialog extends Dialog {
         boolean[] visibles = AppConfig.get().getVisibleColumnMap().get(this.getClass().getName());
 
         TableColumn[] columns = this.table.getColumns();
+
+        // 列の表示・非表示設定のサイズがカラム数と異なっている場合は破棄する
+        if (visibles != null) {
+            if (visibles.length != columns.length) {
+                AppConfig.get().getVisibleColumnMap().remove(this.getClass().getName());
+                visibles = null;
+            }
+        }
+
         for (int i = 0; i < columns.length; i++) {
             if ((visibles == null) || visibles[i]) {
                 columns[i].pack();
