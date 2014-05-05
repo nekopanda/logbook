@@ -25,6 +25,9 @@ public final class BattleDto extends AbstractDto {
     /** 味方艦隊 */
     private final DockDto dock;
 
+    /** 味方艦 */
+    private final List<ShipDto> fships = new ArrayList<ShipDto>();
+
     /** 敵艦隊 */
     private final List<ShipInfoDto> enemy = new ArrayList<ShipInfoDto>();
 
@@ -125,6 +128,13 @@ public final class BattleDto extends AbstractDto {
             if (this.nowEnemyHp[i] < 0)
                 this.nowEnemyHp[i] = 0;
         }
+
+        List<ShipDto> dock_ships = this.dock.getShips();
+        for (int i = 0; i < dock_ships.size(); i++) {
+            ShipDto ship = dock_ships.get(i);
+            this.fships.add(ship);
+            ship.setNowhp(this.nowFriendHp[i]);
+        }
     }
 
     private void doRaigeki(JsonValue raigeki) {
@@ -193,6 +203,10 @@ public final class BattleDto extends AbstractDto {
      */
     public DockDto getDock() {
         return this.dock;
+    }
+
+    public List<ShipDto> getFriendShips() {
+        return this.fships;
     }
 
     /**

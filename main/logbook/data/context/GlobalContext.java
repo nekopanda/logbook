@@ -38,6 +38,7 @@ import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
+import logbook.dto.LostEntityDto;
 import logbook.dto.MapCellDto;
 import logbook.dto.MaterialDto;
 import logbook.dto.MissionResultDto;
@@ -49,7 +50,6 @@ import logbook.dto.ShipInfoDto;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.MainConsoleListener;
 import logbook.internal.Item;
-import logbook.internal.MasterData;
 import logbook.internal.Ship;
 
 import org.apache.commons.io.FileUtils;
@@ -714,16 +714,18 @@ public final class GlobalContext {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
             lastBattleDto = new BattleDto(apidata);
 
-            // ShipDto をアップデート
             List<ShipDto> ships = lastBattleDto.getDock().getShips();
-            int[] nowFriendHp = lastBattleDto.getNowFriendHp();
-            for (int i = 0; i < ships.size(); ++i) {
-                ships.get(i).setNowhp(nowFriendHp[i]);
-            }
-
             addConsole("海戦情報を更新しました");
+            for (int i = 0; i < ships.size(); ++i) {
+                ShipDto ship = ships.get(i);
+                if (ship.getNowhp() == 0) {
+                    addConsole(ship.getName() + "(id:" + ship.getId() + ",lv:" + ship.getLv() + ") 轟沈しました！");
+                    CreateReportLogic.storeLostReport(LostEntityDto.make(ship));
+                }
+            }
             addConsole("自=" + Arrays.toString(lastBattleDto.getNowFriendHp()));
             addConsole("敵=" + Arrays.toString(lastBattleDto.getNowEnemyHp()));
+
         } catch (Exception e) {
             LOG.warn("海戦情報を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -955,7 +957,7 @@ public final class GlobalContext {
             // 艦隊を設定
             doDeck(apidata.getJsonArray("api_deck_data"));
 
-            addConsole("保有艦娘情報を更新しました");
+            addConsole("保有艦娘情報３を更新しました");
         } catch (Exception e) {
             LOG.warn("保有艦娘を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -996,7 +998,7 @@ public final class GlobalContext {
             // 艦隊を設定
             doDeck(data.getJsonObject().getJsonArray("api_data_deck"));
 
-            addConsole("保有艦娘情報を更新しました");
+            addConsole("保有艦娘情報２を更新しました");
         } catch (Exception e) {
             LOG.warn("保有艦娘を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1071,6 +1073,9 @@ public final class GlobalContext {
             Long shipid = Long.parseLong(data.getField("api_ship_id"));
             ShipDto ship = shipMap.get(shipid);
             if (ship != null) {
+                // レポート
+                CreateReportLogic.storeLostReport(LostEntityDto.make(ship));
+
                 // 持っている装備を廃棄する
                 List<Long> items = ship.getItemId();
                 for (Long item : items) {
@@ -1078,6 +1083,7 @@ public final class GlobalContext {
                 }
                 // 艦娘を外す
                 shipMap.remove(ship.getId());
+
             }
 
             addConsole("艦娘を解体しました");
@@ -1094,10 +1100,16 @@ public final class GlobalContext {
     private static void doDestroyItem2(Data data) {
         try {
             String itemids = data.getField("api_slotitem_ids");
+            List<LostEntityDto> dtoList = new ArrayList<LostEntityDto>();
             for (String itemid : itemids.split(",")) {
                 Long item = Long.parseLong(itemid);
+                ItemDto itemDto = itemMap.get(item);
+                if (itemDto != null) {
+                    dtoList.add(LostEntityDto.make(item, itemDto));
+                }
                 itemMap.remove(item);
             }
+            CreateReportLogic.storeLostReport(dtoList);
             addConsole("装備を廃棄しました");
         } catch (Exception e) {
             LOG.warn("装備を廃棄しますに失敗しました", e);
@@ -1440,7 +1452,7 @@ public final class GlobalContext {
                 }
                 addConsole("装備一覧を更新しました");
 
-                MasterDataConfig.set(new MasterData(obj));
+                MasterDataConfig.get().doMater(obj);
             }
 
             addConsole("設定を更新しました");

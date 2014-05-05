@@ -51,8 +51,7 @@ public final class BattleResultDto extends AbstractDto {
         String enemyNameSuffix = "";
         if (mapInfo != null) {
             int[] map = mapInfo.getMap();
-            questNamePrefix = "(" + map[0] + "-" + map[1] + "-" + map[2] + ") "
-                    + this.questName;
+            questNamePrefix = "(" + map[0] + "-" + map[1] + "-" + map[2] + ") ";
             enemyNameSuffix = (mapInfo.isBoss() ? " (ボス)" : "") + " (e_id: " + mapInfo.getEnemyId() + ")";
         }
 

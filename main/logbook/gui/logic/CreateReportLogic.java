@@ -42,6 +42,7 @@ import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
+import logbook.dto.LostEntityDto;
 import logbook.dto.MaterialDto;
 import logbook.dto.MissionResultDto;
 import logbook.dto.NdockDto;
@@ -604,6 +605,39 @@ public final class CreateReportLogic {
     }
 
     /**
+     * ロストログのヘッダー
+     * 
+     * @return ヘッダー
+     */
+    public static String[] getLostHeader() {
+        return new String[] { "", "日付", "種別", "個別ID", "名前", "原因" };
+    }
+
+    /**
+     * ロストログの内容
+     * 
+     * @param lostList ロストデータ
+     * @return
+     */
+    public static List<String[]> getLostStoreBody(List<LostEntityDto> lostList) {
+        List<String[]> body = new ArrayList<String[]>();
+
+        for (int i = 0; i < lostList.size(); i++) {
+            LostEntityDto lost = lostList.get(i);
+            body.add(new String[] {
+                    Integer.toString(i + 1),
+                    new SimpleDateFormat(AppConstants.DATE_FORMAT).format(lost.getTime()),
+                    lost.getLostEntity(),
+                    Integer.toString(lost.getEntityId()),
+                    lost.getName(),
+                    lost.getEventCaused()
+            });
+        }
+
+        return body;
+    }
+
+    /**
      * 報告書をCSVファイルに書き込む(最初の列を取り除く)
      * 
      * @param file ファイル
@@ -911,6 +945,25 @@ public final class CreateReportLogic {
                 CreateReportLogic.writeCsvStripFirstColumn(report,
                         CreateReportLogic.getMaterialHeader(),
                         CreateReportLogic.getMaterialStoreBody(dtoList), true);
+            }
+        } catch (IOException e) {
+            LOG.warn("報告書の保存に失敗しました", e);
+        }
+    }
+
+    /**
+     * 解体・廃棄ログを書き込む
+     * 
+     * @param dtoList 解体・廃棄情報
+     */
+    public static void storeLostReport(List<LostEntityDto> dtoList) {
+        try {
+            if (dtoList != null) {
+                File report = getStoreFile("解体・廃棄ログ.csv", "解体・廃棄ログ_alternativefile.csv");
+
+                CreateReportLogic.writeCsvStripFirstColumn(report,
+                        CreateReportLogic.getLostHeader(),
+                        CreateReportLogic.getLostStoreBody(dtoList), true);
             }
         } catch (IOException e) {
             LOG.warn("報告書の保存に失敗しました", e);

@@ -386,6 +386,10 @@ public final class ShipDto extends AbstractDto {
         return this.slotnum;
     }
 
+    public List<Integer> getOnSlot() {
+        return this.onslot;
+    }
+
     /**
      * @return 装備
      */

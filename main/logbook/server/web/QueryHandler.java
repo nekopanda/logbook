@@ -87,7 +87,7 @@ public class QueryHandler extends HttpServlet {
         return Json.createObjectBuilder()
                 .add("id", item.getId())
                 .add("name", item.getName())
-                .add("type", item.getTypeId2());
+                .add("type", Integer.parseInt(item.getTypeId2()));
     }
 
     private static JsonObjectBuilder mapAreaToJson(MapAreaDto item) {
@@ -96,28 +96,28 @@ public class QueryHandler extends HttpServlet {
                 .add("name", item.getName());
     }
 
-    private static JsonObjectBuilder mapInfoToJson(MapInfoDto item) {
+    private static JsonObjectBuilder mapInfoToJson(MapInfoDto item, Integer status) {
         return Json.createObjectBuilder()
                 .add("id", item.getId())
                 .add("maparea_id", item.getMaparea_id())
                 .add("name", item.getName())
-                .add("status", item.getStatus())
+                .add("status", (status == null) ? -1 : status)
                 .add("no", item.getNo());
     }
 
-    private static JsonObjectBuilder missionToJson(MissionDto item) {
+    private static JsonObjectBuilder missionToJson(MissionDto item, Integer status) {
         return Json.createObjectBuilder()
                 .add("id", item.getId())
                 .add("name", item.getName())
                 .add("maparea_id", item.getMaparea_id())
-                .add("status", item.getStatus())
+                .add("status", (status == null) ? -1 : status)
                 .add("time", item.getTime());
     }
 
     private static JsonObjectBuilder shipTypeToJson(ShipTypeDto item) {
         JsonArrayBuilder equip_type = Json.createArrayBuilder();
         for (Boolean item_number : item.getEquipType()) {
-            equip_type.add(item_number ? 1 : 0);
+            equip_type.add(item_number);
         }
         return Json.createObjectBuilder()
                 .add("id", item.getId())
@@ -158,16 +158,18 @@ public class QueryHandler extends HttpServlet {
 
                 { // マップ
                     JsonArrayBuilder mapinfo_array = Json.createArrayBuilder();
+                    Map<Integer, Integer> mapStatus = data.getMapStatus();
                     for (MapInfoDto dto : data.getMapinfo().values()) {
-                        mapinfo_array.add(mapInfoToJson(dto));
+                        mapinfo_array.add(mapInfoToJson(dto, mapStatus.get(dto.getId())));
                     }
                     jb.add("master_mapinfo", mapinfo_array);
                 }
 
-                { // マップ
+                { // 遠征
                     JsonArrayBuilder mission_array = Json.createArrayBuilder();
+                    Map<Integer, Integer> missionStatus = data.getMissionStatus();
                     for (MissionDto dto : data.getMission().values()) {
-                        mission_array.add(missionToJson(dto));
+                        mission_array.add(missionToJson(dto, missionStatus.get(dto.getId())));
                     }
                     jb.add("master_mission", mission_array);
                 }
@@ -179,6 +181,8 @@ public class QueryHandler extends HttpServlet {
                     }
                     jb.add("master_stype", item_array);
                 }
+
+                jb.add("last_update_time", data.getLastUpdateTime().getTime());
             }
         });
         return jb.build();
@@ -186,8 +190,12 @@ public class QueryHandler extends HttpServlet {
 
     private static JsonObjectBuilder shipToJson(ShipDto ship) {
         JsonArrayBuilder slot_array = Json.createArrayBuilder();
+        JsonArrayBuilder onSlot_array = Json.createArrayBuilder();
         for (Long item_number : ship.getRawSlot()) {
             slot_array.add(item_number);
+        }
+        for (Integer item_number : ship.getOnSlot()) {
+            onSlot_array.add(item_number);
         }
         return Json.createObjectBuilder()
                 .add("id", ship.getId())
@@ -207,6 +215,7 @@ public class QueryHandler extends HttpServlet {
                 .add("dock_time", ship.getDocktime())
                 .add("slot_num", ship.getSlotNum())
                 .add("slot_item", slot_array)
+                .add("on_slot", onSlot_array)
                 .add("name", ship.getName());
     }
 
@@ -340,6 +349,12 @@ public class QueryHandler extends HttpServlet {
                     }
                     jb.add("game_record", game_record);
                 }
+
+                {
+                    jb.add("max_ships", GlobalContext.maxChara());
+                    jb.add("max_slotitems", GlobalContext.maxSlotitem());
+                    jb.add("master_last_update_time", MasterDataConfig.get().getLastUpdateTime().getTime());
+                }
             }
         });
 
@@ -375,7 +390,7 @@ public class QueryHandler extends HttpServlet {
                         JsonArrayBuilder fship_array = Json.createArrayBuilder();
                         JsonArrayBuilder eship_array = Json.createArrayBuilder();
 
-                        List<ShipDto> fships = battleDto.getDock().getShips();
+                        List<ShipDto> fships = battleDto.getFriendShips();
                         for (ShipDto ship : fships) {
                             fship_array.add(shipToJson(ship));
                         }
