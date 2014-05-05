@@ -1,8 +1,3 @@
-/**
- * No Rights Reserved.
- * This program and the accompanying materials
- * are made available under the terms of the Public Domain.
- */
 package logbook.dto;
 
 import java.util.Calendar;
@@ -97,7 +92,7 @@ public final class BattleResultDto extends AbstractDto {
      * @return マス
      */
     public int getMapCellNo() {
-        return mapCellNo;
+        return this.mapCellNo;
     }
 
     /**
