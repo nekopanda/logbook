@@ -292,7 +292,12 @@ public class FleetComposite extends Composite {
                 }
                 // 大破している艦娘がいる場合メッセージを表示
                 this.badlyDamage = true;
-                this.hpmsgLabels[i].setText("大破");
+                if (ship.isSunk()) {
+                    this.hpmsgLabels[i].setText("轟沈");
+                }
+                else {
+                    this.hpmsgLabels[i].setText("大破");
+                }
                 this.hpmsgLabels[i].setBackground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
                 this.hpmsgLabels[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
             } else if (ship.isHalfDamage()) {

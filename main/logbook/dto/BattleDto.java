@@ -128,7 +128,6 @@ public final class BattleDto extends AbstractDto {
         for (int i = 0; i < dock_ships.size(); i++) {
             ShipDto ship = dock_ships.get(i);
             this.fships.add(ship);
-            ship.setNowhp(this.nowFriendHp[i]);
         }
     }
 

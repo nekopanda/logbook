@@ -71,7 +71,7 @@ public final class VersionDialog extends Dialog {
         versionGroup.setLayout(new GridLayout(2, true));
 
         label("航海日誌", versionGroup);
-        label(AppConstants.VERSION, versionGroup);
+        label(AppConstants.VERSION + " ex", versionGroup);
 
         Link gowebsite = new Link(versionGroup, SWT.NONE);
         gowebsite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));

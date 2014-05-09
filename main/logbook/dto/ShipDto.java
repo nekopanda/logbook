@@ -621,6 +621,14 @@ public final class ShipDto extends AbstractDto {
     }
 
     /**
+     * 艦娘が轟沈しているかを調べます
+     * @return 轟沈したの場合
+     */
+    public boolean isSunk() {
+        return (this.nowhp == 0);
+    }
+
+    /**
      * 艦娘が大破しているかを調べます
      * @return 大破以上の場合
      */

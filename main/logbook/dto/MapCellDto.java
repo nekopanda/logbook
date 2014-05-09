@@ -40,7 +40,7 @@ public class MapCellDto {
 
     @Override
     public String toString() {
-        String ret = "行先 マップ:" + this.map[0] + "-" + this.map[1] + " セル:" + this.map[2];
+        String ret = "マップ:" + this.map[0] + "-" + this.map[1] + " セル:" + this.map[2];
         if (this.enemyId != -1) {
             if (this.bosscellNo == this.map[2]) {
                 ret += " (ボス)";

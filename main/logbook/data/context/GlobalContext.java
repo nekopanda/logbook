@@ -713,17 +713,26 @@ public final class GlobalContext {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
             lastBattleDto = new BattleDto(apidata);
 
+            List<ShipDto> sunkShips = new ArrayList<ShipDto>();
             List<ShipDto> ships = lastBattleDto.getDock().getShips();
-            addConsole("海戦情報を更新しました");
+            int[] nowFriendHp = lastBattleDto.getNowFriendHp();
             for (int i = 0; i < ships.size(); ++i) {
                 ShipDto ship = ships.get(i);
-                if (ship.getNowhp() == 0) {
-                    addConsole(ship.getName() + "(id:" + ship.getId() + ",lv:" + ship.getLv() + ") 轟沈しました！");
-                    CreateReportLogic.storeLostReport(LostEntityDto.make(ship, "艦娘の轟沈"));
+                if (ship.getNowhp() > 0) { // 轟沈している艦は更新しない
+                    ship.setNowhp(nowFriendHp[i]);
+                    if (ship.getNowhp() == 0) { // 轟沈した
+                        sunkShips.add(ship);
+                        CreateReportLogic.storeLostReport(LostEntityDto.make(ship, "艦娘の轟沈"));
+                    }
                 }
             }
+
+            addConsole("海戦情報を更新しました");
             addConsole("自=" + Arrays.toString(lastBattleDto.getNowFriendHp()));
             addConsole("敵=" + Arrays.toString(lastBattleDto.getNowEnemyHp()));
+            for (ShipDto ship : sunkShips) {
+                addConsole(ship.getName() + "(id:" + ship.getId() + ",lv:" + ship.getLv() + ") 轟沈しました！");
+            }
 
         } catch (Exception e) {
             LOG.warn("海戦情報を更新しますに失敗しました", e);
@@ -1429,7 +1438,7 @@ public final class GlobalContext {
             CreateReportLogic.storeMaterialReport(material);
 
             addConsole("出撃を更新しました");
-            addConsole(mapCellDto.toString());
+            addConsole("行先 " + mapCellDto.toString());
         } catch (Exception e) {
             LOG.warn("出撃を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1446,7 +1455,7 @@ public final class GlobalContext {
             JsonObject obj = data.getJsonObject().getJsonObject("api_data");
 
             mapCellDto = new MapCellDto(obj);
-            addConsole(mapCellDto.toString());
+            addConsole("行先 " + mapCellDto.toString());
         } catch (Exception e) {
             LOG.warn("進撃を更新しますに失敗しました", e);
             LOG.warn(data);
