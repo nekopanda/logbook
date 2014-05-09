@@ -19,18 +19,11 @@ public class LostEntityDto {
     private String name;
     private String eventCaused;
 
-    private LostEntityDto(ShipDto lostShip) {
+    private LostEntityDto(ShipDto lostShip, String eventCaused) {
         this.setLostEntity("艦娘");
         this.setEntityId((int) lostShip.getId());
         this.setName(lostShip.getName() + " (Lv:" + lostShip.getLv() + ")");
-        if (lostShip.getNowhp() != 0) {
-            // 解体
-            this.setEventCaused("艦娘の解体");
-        }
-        else {
-            // 轟沈
-            this.setEventCaused("艦娘の轟沈");
-        }
+        this.setEventCaused(eventCaused);
     }
 
     private LostEntityDto(long id, String itemName, String causedBy) {
@@ -41,8 +34,8 @@ public class LostEntityDto {
     }
 
     /** ロストした艦からデータ作成 */
-    public static List<LostEntityDto> make(ShipDto lostShip) {
-        LostEntityDto lostShipDto = new LostEntityDto(lostShip);
+    public static List<LostEntityDto> make(ShipDto lostShip, String eventCaused) {
+        LostEntityDto lostShipDto = new LostEntityDto(lostShip, eventCaused);
         List<LostEntityDto> list = new ArrayList<LostEntityDto>();
         list.add(lostShipDto);
         List<ItemDto> itemList = lostShip.getItem();

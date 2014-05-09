@@ -720,7 +720,7 @@ public final class GlobalContext {
                 ShipDto ship = ships.get(i);
                 if (ship.getNowhp() == 0) {
                     addConsole(ship.getName() + "(id:" + ship.getId() + ",lv:" + ship.getLv() + ") 轟沈しました！");
-                    CreateReportLogic.storeLostReport(LostEntityDto.make(ship));
+                    CreateReportLogic.storeLostReport(LostEntityDto.make(ship, "艦娘の轟沈"));
                 }
             }
             addConsole("自=" + Arrays.toString(lastBattleDto.getNowFriendHp()));
@@ -1074,7 +1074,7 @@ public final class GlobalContext {
             ShipDto ship = shipMap.get(shipid);
             if (ship != null) {
                 // レポート
-                CreateReportLogic.storeLostReport(LostEntityDto.make(ship));
+                CreateReportLogic.storeLostReport(LostEntityDto.make(ship, "艦娘の解体"));
 
                 // 持っている装備を廃棄する
                 List<Long> items = ship.getItemId();
@@ -1109,6 +1109,7 @@ public final class GlobalContext {
                 }
                 itemMap.remove(item);
             }
+            // 記録する
             CreateReportLogic.storeLostReport(dtoList);
             addConsole("装備を廃棄しました");
         } catch (Exception e) {
@@ -1127,6 +1128,8 @@ public final class GlobalContext {
             for (String shipid : shipids.split(",")) {
                 ShipDto ship = shipMap.get(Long.parseLong(shipid));
                 if (ship != null) {
+                    // 記録する
+                    CreateReportLogic.storeLostReport(LostEntityDto.make(ship, "近代化改修"));
                     // 持っている装備を廃棄する
                     List<Long> items = ship.getItemId();
                     for (Long item : items) {
