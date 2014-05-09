@@ -46,19 +46,11 @@ public final class BattleResultDto extends AbstractDto {
      */
     public BattleResultDto(JsonObject object, BattleDto battle, MapCellDto mapInfo) {
 
-        String questNamePrefix = "";
-        String enemyNameSuffix = "";
-        if (mapInfo != null) {
-            int[] map = mapInfo.getMap();
-            questNamePrefix = "(" + map[0] + "-" + map[1] + "-" + map[2] + ") ";
-            enemyNameSuffix = (mapInfo.isBoss() ? " (ボス)" : "") + " (e_id: " + mapInfo.getEnemyId() + ")";
-        }
-
         this.battleDate = Calendar.getInstance().getTime();
-        this.questName = questNamePrefix + object.getString("api_quest_name");
+        this.questName = object.getString("api_quest_name");
         this.rank = object.getString("api_win_rank");
-		this.mapCelldto = mapInfo;
-        this.enemyName = object.getJsonObject("api_enemy_info").getString("api_deck_name") + enemyNameSuffix;
+        this.mapCelldto = mapInfo;
+        this.enemyName = object.getJsonObject("api_enemy_info").getString("api_deck_name");
         this.dropFlag = object.containsKey("api_get_ship");
         if (this.dropFlag) {
             this.dropType = object.getJsonObject("api_get_ship").getString("api_ship_type");
@@ -99,8 +91,8 @@ public final class BattleResultDto extends AbstractDto {
      * マスを取得します。
      * @return マス
      */
-    public int getMapCellNo() {
-        return this.mapCellNo;
+    public MapCellDto getMapCellDto() {
+        return this.mapCelldto;
     }
 
     /**

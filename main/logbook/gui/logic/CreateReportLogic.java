@@ -167,7 +167,8 @@ public final class CreateReportLogic {
             BattleResultDto item = results.get(i);
             body.add(new Object[] { Integer.toString(i + 1),
                     new SimpleDateFormat(AppConstants.DATE_FORMAT).format(item.getBattleDate()), item.getQuestName(),
-                    item.getMapCellNo(), item.getRank(), item.getEnemyName(), item.getDropType(), item.getDropName() });
+                    item.getMapCellDto().toString(), item.getRank(), item.getEnemyName(), item.getDropType(),
+                    item.getDropName() });
         }
         return toListStringArray(body);
     }
@@ -243,7 +244,8 @@ public final class CreateReportLogic {
 
             body.add(new Object[] { Integer.toString(i + 1),
                     new SimpleDateFormat(AppConstants.DATE_FORMAT).format(item.getBattleDate()), item.getQuestName(),
-                    item.getMapCellNo(), item.getRank(), item.getEnemyName(), item.getDropType(), item.getDropName(),
+                    item.getMapCellDto().toString(), item.getRank(), item.getEnemyName(), item.getDropType(),
+                    item.getDropName(),
                     friend[0], friendHp[0], friend[1], friendHp[1], friend[2], friendHp[2], friend[3], friendHp[3],
                     friend[4], friendHp[4], friend[5], friendHp[5], enemy[0], enemyHp[0], enemy[1], enemyHp[1],
                     enemy[2], enemyHp[2], enemy[3], enemyHp[3], enemy[4], enemyHp[4], enemy[5], enemyHp[5] });
