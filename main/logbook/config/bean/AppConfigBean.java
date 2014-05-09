@@ -1,8 +1,3 @@
-/**
- * No Rights Reserved.
- * This program and the accompanying materials
- * are made available under the terms of the Public Domain.
- */
 package logbook.config.bean;
 
 import java.io.File;
@@ -603,7 +598,7 @@ public final class AppConfigBean {
      * @return 大破状態で大破でバルーンツールチップ
      */
     public boolean isBalloonBybadlyDamage() {
-        return balloonBybadlyDamage;
+        return this.balloonBybadlyDamage;
     }
 
     /**

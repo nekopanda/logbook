@@ -1,12 +1,6 @@
-/**
- * No Rights Reserved.
- * This program and the accompanying materials
- * are made available under the terms of the Public Domain.
- */
 package logbook.gui;
 
 import logbook.config.AppConfig;
-import logbook.config.ConfigMigration;
 import logbook.config.ItemConfig;
 import logbook.config.MasterDataConfig;
 import logbook.config.ShipConfig;
@@ -145,8 +139,6 @@ public final class ApplicationMain {
             MasterDataConfig.load();
             ShipGroupConfig.load();
             ItemConfig.load();
-            // 旧設定ファイルを移行します
-            ConfigMigration.migration();
             // アプリケーション開始
             ApplicationMain window = new ApplicationMain();
             window.open();

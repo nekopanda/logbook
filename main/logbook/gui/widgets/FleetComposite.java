@@ -1,11 +1,7 @@
-/**
- * No Rights Reserved.
- * This program and the accompanying materials
- * are made available under the terms of the Public Domain.
- */
 package logbook.gui.widgets;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
@@ -15,6 +11,7 @@ import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.dto.DockDto;
+import logbook.dto.ItemDto;
 import logbook.dto.ShipDto;
 import logbook.gui.ApplicationMain;
 import logbook.gui.logic.Sound;
@@ -22,6 +19,7 @@ import logbook.internal.EvaluateExp;
 import logbook.internal.SeaExp;
 import logbook.util.CalcExpUtils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -48,8 +46,6 @@ public class FleetComposite extends Composite {
     private static final int WARN = 1;
     /** 致命的 */
     private static final int FATAL = 2;
-    /** 通知済み(大破) */
-    private static final int POSTED_BADLY = 3;
     /** 1艦隊に編成できる艦娘の数 */
     private static final int MAXCHARA = 6;
 
@@ -288,7 +284,7 @@ public class FleetComposite extends Composite {
             }
 
             // 体力メッセージ
-            if (hpratio <= AppConstants.BADLY_DAMAGE) {
+            if (ship.isBadlyDamage()) {
                 if (AppConfig.get().isFatalBybadlyDamage()) {
                     // 大破で致命的アイコン
                     this.state.set(FATAL);
@@ -299,7 +295,7 @@ public class FleetComposite extends Composite {
                 this.hpmsgLabels[i].setText("大破");
                 this.hpmsgLabels[i].setBackground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
                 this.hpmsgLabels[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-            } else if (hpratio <= AppConstants.HALF_DAMAGE) {
+            } else if (ship.isHalfDamage()) {
                 if (AppConfig.get().isWarnByHalfDamage()) {
                     // 中破で警告アイコン
                     this.state.set(WARN);
@@ -309,7 +305,7 @@ public class FleetComposite extends Composite {
                 this.hpmsgLabels[i].setText("中破");
                 this.hpmsgLabels[i].setBackground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
                 this.hpmsgLabels[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-            } else if (hpratio <= AppConstants.SLIGHT_DAMAGE) {
+            } else if (ship.isSlightDamage()) {
                 this.hpmsgLabels[i].setText("小破");
                 this.hpmsgLabels[i].setBackground(null);
                 this.hpmsgLabels[i].setForeground(null);
@@ -476,10 +472,6 @@ public class FleetComposite extends Composite {
             style.foreground = SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN);
             this.addStyledText(this.message, AppConstants.MESSAGE_GOOD, style);
         }
-        if (!GlobalContext.isSortie(this.dock.getId())) {
-            // 戦闘中ではない場合、大破通知済みフラグをクリア
-            this.state.set(POSTED_BADLY, false);
-        }
         if (this.clearDate != null) {
             this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_COND, this.clearDate), null);
         }
@@ -511,19 +503,38 @@ public class FleetComposite extends Composite {
      * 艦隊が出撃中で大破した場合に警告を行います
      */
     private void postFatal() {
-        if (this.badlyDamage && !this.state.get(POSTED_BADLY) && GlobalContext.isSortie(this.dock.getId())) {
+        if (this.badlyDamage && GlobalContext.isSortie(this.dock.getId())) {
             if (AppConfig.get().isBalloonBybadlyDamage()) {
+                List<ShipDto> ships = this.dock.getShips();
+                StringBuilder sb = new StringBuilder();
+                sb.append(AppConstants.MESSAGE_STOP_SORTIE);
+                sb.append("\n");
+                for (ShipDto shipDto : ships) {
+                    if (shipDto.isBadlyDamage()) {
+                        sb.append(shipDto.getName());
+                        sb.append("(" + shipDto.getLv() + ")");
+                        sb.append(" : ");
+                        List<ItemDto> items = shipDto.getItem();
+                        List<String> names = new ArrayList<String>();
+                        for (ItemDto itemDto : items) {
+                            if (itemDto != null) {
+                                names.add(itemDto.getName());
+                            }
+                        }
+                        sb.append(StringUtils.join(names, ","));
+                    }
+                    sb.append("\n");
+                }
                 ToolTip tip = new ToolTip(this.getShell(), SWT.BALLOON
                         | SWT.ICON_ERROR);
                 tip.setText("大破警告");
-                tip.setMessage(AppConstants.MESSAGE_STOP_SORTIE);
+                tip.setMessage(sb.toString());
+
                 this.main.getTrayItem().setToolTip(tip);
                 tip.setVisible(true);
             }
             // 大破時にサウンドを再生する
             Sound.randomBadlySoundPlay();
-            // 通知済みフラグをセットする
-            this.state.set(POSTED_BADLY);
         }
     }
 

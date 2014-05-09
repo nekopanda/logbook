@@ -1,8 +1,3 @@
-/**
- * No Rights Reserved.
- * This program and the accompanying materials
- * are made available under the terms of the Public Domain.
- */
 package logbook.gui.logic;
 
 import java.io.BufferedInputStream;
@@ -157,7 +152,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getBattleResultHeader() {
-        return new String[] { "", "日付", "海域", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘" };
+        return new String[] { "", "日付", "海域", "マス", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘" };
     }
 
     /**
@@ -172,7 +167,7 @@ public final class CreateReportLogic {
             BattleResultDto item = results.get(i);
             body.add(new Object[] { Integer.toString(i + 1),
                     new SimpleDateFormat(AppConstants.DATE_FORMAT).format(item.getBattleDate()), item.getQuestName(),
-                    item.getRank(), item.getEnemyName(), item.getDropType(), item.getDropName() });
+                    item.getMapCellNo(), item.getRank(), item.getEnemyName(), item.getDropType(), item.getDropName() });
         }
         return toListStringArray(body);
     }
@@ -183,7 +178,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getBattleResultStoreHeader() {
-        return new String[] { "", "日付", "海域", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘",
+        return new String[] { "", "日付", "海域", "マス", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘",
                 "味方艦1", "味方艦1HP",
                 "味方艦2", "味方艦2HP",
                 "味方艦3", "味方艦3HP",
@@ -248,10 +243,10 @@ public final class CreateReportLogic {
 
             body.add(new Object[] { Integer.toString(i + 1),
                     new SimpleDateFormat(AppConstants.DATE_FORMAT).format(item.getBattleDate()), item.getQuestName(),
-                    item.getRank(), item.getEnemyName(), item.getDropType(), item.getDropName(), friend[0],
-                    friendHp[0], friend[1], friendHp[1], friend[2], friendHp[2], friend[3], friendHp[3], friend[4],
-                    friendHp[4], friend[5], friendHp[5], enemy[0], enemyHp[0], enemy[1], enemyHp[1], enemy[2],
-                    enemyHp[2], enemy[3], enemyHp[3], enemy[4], enemyHp[4], enemy[5], enemyHp[5] });
+                    item.getMapCellNo(), item.getRank(), item.getEnemyName(), item.getDropType(), item.getDropName(),
+                    friend[0], friendHp[0], friend[1], friendHp[1], friend[2], friendHp[2], friend[3], friendHp[3],
+                    friend[4], friendHp[4], friend[5], friendHp[5], enemy[0], enemyHp[0], enemy[1], enemyHp[1],
+                    enemy[2], enemyHp[2], enemy[3], enemyHp[3], enemy[4], enemyHp[4], enemy[5], enemyHp[5] });
         }
         return toListStringArray(body);
     }

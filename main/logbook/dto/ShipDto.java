@@ -1,8 +1,3 @@
-/**
- * No Rights Reserved.
- * This program and the accompanying materials
- * are made available under the terms of the Public Domain.
- */
 package logbook.dto;
 
 import java.text.SimpleDateFormat;
@@ -17,6 +12,7 @@ import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
+import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.internal.ExpTable;
 import logbook.internal.Ship;
@@ -622,5 +618,29 @@ public final class ShipDto extends AbstractDto {
             return new SimpleDateFormat("HH:mm").format(this.time.getTime());
         }
         return "";
+    }
+
+    /**
+     * 艦娘が大破しているかを調べます
+     * @return 大破以上の場合
+     */
+    public boolean isBadlyDamage() {
+        return ((float) this.nowhp / (float) this.maxhp) <= AppConstants.BADLY_DAMAGE;
+    }
+
+    /**
+     * 艦娘が中破しているかを調べます
+     * @return 中破以上の場合
+     */
+    public boolean isHalfDamage() {
+        return ((float) this.nowhp / (float) this.maxhp) <= AppConstants.HALF_DAMAGE;
+    }
+
+    /**
+     * 艦娘が小破しているかを調べます
+     * @return 小破以上の場合
+     */
+    public boolean isSlightDamage() {
+        return ((float) this.nowhp / (float) this.maxhp) <= AppConstants.SLIGHT_DAMAGE;
     }
 }

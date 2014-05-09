@@ -1,6 +1,3 @@
-/**
- * 
- */
 package logbook.gui.listener;
 
 import logbook.gui.BathwaterTableDialog;

@@ -1,8 +1,3 @@
-/**
- * No Rights Reserved.
- * This program and the accompanying materials
- * are made available under the terms of the Public Domain.
- */
 package logbook.constants;
 
 import java.io.File;
@@ -18,7 +13,7 @@ import org.eclipse.swt.graphics.RGB;
 public class AppConstants {
 
     /** バージョン */
-    public static final String VERSION = "0.5.14";
+    public static final String VERSION = "0.5.16";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://kancolle.sanaechan.net/");
@@ -336,6 +331,6 @@ public class AppConstants {
     /** メッセージ 制空値:{0} 索敵:{1}+{2} */
     public static final String MESSAGE_SEIKU = "制空値:{0} 索敵:{1}+{2}";
 
-    /** メッセージ 大破している艦娘がいます、進撃はできません。 */
+    /** メッセージ 大破している艦娘がいます */
     public static final String MESSAGE_STOP_SORTIE = "大破している艦娘がいます、進撃はできません。";
 }

@@ -1,8 +1,3 @@
-/**
- * No Rights Reserved.
- * This program and the accompanying materials
- * are made available under the terms of the Public Domain.
- */
 package logbook.dto;
 
 import java.util.Calendar;
@@ -24,6 +19,9 @@ public final class BattleResultDto extends AbstractDto {
     /** ランク */
     private final String rank;
 
+    /** マス */
+    private final MapCellDto mapCelldto;
+
     /** 敵艦隊名 */
     private final String enemyName;
 
@@ -43,6 +41,7 @@ public final class BattleResultDto extends AbstractDto {
      * コンストラクター
      * 
      * @param object JSON Object
+     * @param cell マップ上のマス
      * @param battle 戦闘詳細
      */
     public BattleResultDto(JsonObject object, BattleDto battle, MapCellDto mapInfo) {
@@ -58,6 +57,7 @@ public final class BattleResultDto extends AbstractDto {
         this.battleDate = Calendar.getInstance().getTime();
         this.questName = questNamePrefix + object.getString("api_quest_name");
         this.rank = object.getString("api_win_rank");
+		this.mapCelldto = mapInfo;
         this.enemyName = object.getJsonObject("api_enemy_info").getString("api_deck_name") + enemyNameSuffix;
         this.dropFlag = object.containsKey("api_get_ship");
         if (this.dropFlag) {
@@ -72,6 +72,7 @@ public final class BattleResultDto extends AbstractDto {
     }
 
     /**
+     * 日付を取得します。
      * @return 日付
      */
     public Date getBattleDate() {
@@ -79,6 +80,7 @@ public final class BattleResultDto extends AbstractDto {
     }
 
     /**
+     * 海域名を取得します。
      * @return 海域名
      */
     public String getQuestName() {
@@ -86,6 +88,7 @@ public final class BattleResultDto extends AbstractDto {
     }
 
     /**
+     * ランクを取得します。
      * @return ランク
      */
     public String getRank() {
@@ -93,6 +96,15 @@ public final class BattleResultDto extends AbstractDto {
     }
 
     /**
+     * マスを取得します。
+     * @return マス
+     */
+    public int getMapCellNo() {
+        return this.mapCellNo;
+    }
+
+    /**
+     * 敵艦隊名を取得します。
      * @return 敵艦隊名
      */
     public String getEnemyName() {
@@ -100,6 +112,7 @@ public final class BattleResultDto extends AbstractDto {
     }
 
     /**
+     * ドロップフラグを取得します。
      * @return ドロップフラグ
      */
     public boolean isDropFlag() {
@@ -107,6 +120,7 @@ public final class BattleResultDto extends AbstractDto {
     }
 
     /**
+     * 艦種を取得します。
      * @return 艦種
      */
     public String getDropType() {
@@ -114,6 +128,14 @@ public final class BattleResultDto extends AbstractDto {
     }
 
     /**
+     * @return 戦闘詳細
+     */
+    public BattleDto getBattleDto() {
+        return this.battle;
+    }
+
+    /**
+     * 艦名を取得します。
      * @return 艦名
      */
     public String getDropName() {
@@ -121,9 +143,10 @@ public final class BattleResultDto extends AbstractDto {
     }
 
     /**
+     * 戦闘詳細を取得します。
      * @return 戦闘詳細
      */
-    public BattleDto getBattleDto() {
+    public BattleDto getBattle() {
         return this.battle;
     }
 }

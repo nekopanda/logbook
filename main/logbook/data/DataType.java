@@ -1,8 +1,3 @@
-/**
- * No Rights Reserved.
- * This program and the accompanying materials
- * are made available under the terms of the Public Domain.
- */
 package logbook.data;
 
 /**
@@ -60,7 +55,7 @@ public enum DataType {
     /** 出撃 */
     START("kcsapi/api_req_map/start"),
     /** 進撃 */
-    NEXT("kcsapi/api_req_map/next"),
+    NEXT("/kcsapi/api_req_map/next"),
     /** 任務一覧 */
     QUEST_LIST("/kcsapi/api_get_member/questlist"),
     /** 任務消化 */

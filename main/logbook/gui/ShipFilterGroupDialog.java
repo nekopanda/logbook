@@ -1,6 +1,3 @@
-/**
- * 
- */
 package logbook.gui;
 
 import java.util.ArrayList;

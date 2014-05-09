@@ -1,8 +1,3 @@
-/**
- * No Rights Reserved.
- * This program and the accompanying materials
- * are made available under the terms of the Public Domain.
- */
 package logbook.data.context;
 
 import java.io.File;
@@ -609,6 +604,10 @@ public final class GlobalContext {
                         }
                     }
                 }
+                if ("1".equals(fleetid)) {
+                    // 秘書艦を再設定
+                    setSecretary(newdock.getShips().get(0));
+                }
                 dock.put(fleetid, newdock);
             }
         } catch (Exception e) {
@@ -625,8 +624,9 @@ public final class GlobalContext {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
             if (apidata != null) {
-
                 // 出撃中ではない
+                Arrays.fill(isSortie, false);
+
                 // 戦闘結果がある場合、ダメージ計算があっているか検証します
                 if (lastBattleDto != null) {
                     List<ShipDto> dockShips = lastBattleDto.getDock().getShips();
@@ -642,7 +642,6 @@ public final class GlobalContext {
                         }
                     }
                 }
-                Arrays.fill(isSortie, false);
                 mapCellDto = null;
                 lastBattleDto = null;
 
@@ -936,8 +935,6 @@ public final class GlobalContext {
 
             String shipidstr = data.getField("api_shipid");
             JsonArray shipdata = apidata.getJsonArray("api_ship_data");
-            // 出撃中ではない
-            Arrays.fill(isSortie, false);
 
             if (shipidstr != null) {
                 // 艦娘の指定がある場合は艦娘を差し替える
@@ -1051,17 +1048,26 @@ public final class GlobalContext {
                     dockdto.addShip(ship);
 
                     if ((i == 0) && (j == 0)) {
-                        if ((secretary == null) || (ship.getId() != secretary.getId())) {
-                            addConsole(ship.getName() + "(Lv" + ship.getLv() + ")" + " が秘書艦に任命されました");
-                        }
-                        // 秘書艦を設定
-                        secretary = ship;
+                        setSecretary(ship);
                     }
                     // 艦隊IDを設定
                     ship.setFleetid(fleetid);
                 }
             }
         }
+    }
+
+    /**
+     * 秘書艦を設定します
+     * 
+     * @param ship
+     */
+    private static void setSecretary(ShipDto ship) {
+        if ((secretary == null) || (ship.getId() != secretary.getId())) {
+            addConsole(ship.getName() + "(Lv" + ship.getLv() + ")" + " が秘書艦に任命されました");
+        }
+        // 秘書艦を設定
+        secretary = ship;
     }
 
     /**
@@ -1415,7 +1421,10 @@ public final class GlobalContext {
                 int id = Integer.parseInt(idstr);
                 isSortie[id - 1] = true;
             }
-            mapCellDto = new MapCellDto(data.getJsonObject().getJsonObject("api_data"));
+
+            JsonObject obj = data.getJsonObject().getJsonObject("api_data");
+
+            mapCellDto = new MapCellDto(obj);
             material.setEvent("出撃");
             CreateReportLogic.storeMaterialReport(material);
 
@@ -1423,6 +1432,23 @@ public final class GlobalContext {
             addConsole(mapCellDto.toString());
         } catch (Exception e) {
             LOG.warn("出撃を更新しますに失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 進撃を更新します
+     * 
+     * @param data
+     */
+    private static void doNext(Data data) {
+        try {
+            JsonObject obj = data.getJsonObject().getJsonObject("api_data");
+
+            mapCellDto = new MapCellDto(obj);
+            addConsole(mapCellDto.toString());
+        } catch (Exception e) {
+            LOG.warn("進撃を更新しますに失敗しました", e);
             LOG.warn(data);
         }
     }
@@ -1495,21 +1521,6 @@ public final class GlobalContext {
             }
         } catch (Exception e) {
             LOG.warn("任務情報更新に失敗しました", e);
-            LOG.warn(data);
-        }
-    }
-
-    /**
-     * 進撃を処理します
-     * 
-     * @param data
-     */
-    private static void doNext(Data data) {
-        try {
-            mapCellDto = new MapCellDto(data.getJsonObject().getJsonObject("api_data"));
-            addConsole(mapCellDto.toString());
-        } catch (Exception e) {
-            LOG.warn("進撃を処理しますに失敗しました", e);
             LOG.warn(data);
         }
     }
