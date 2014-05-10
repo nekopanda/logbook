@@ -48,6 +48,15 @@ public final class DockDto extends AbstractDto {
     }
 
     /**
+     * 艦隊から艦娘を削除します
+     * 
+     * @param ship
+     */
+    public void removeShip(ShipDto ship) {
+        this.ships.remove(ship);
+    }
+
+    /**
      * 艦隊名を取得します。
      * @return 艦隊名
      */

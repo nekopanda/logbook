@@ -130,13 +130,13 @@ public final class ShipTable extends AbstractTableDialog {
                 StringBuilder sb = new StringBuilder();
                 Map<Long, ShipDto> shipMap = GlobalContext.getShipMap();
                 for (TableItem item : ShipTable.this.table.getSelection()) {
-                    sb.append(shipMap.get(item.getData()).getShipId()).append(", ");
+                    sb.append("\"").append(shipMap.get(item.getData()).getName()).append("\", ");
                 }
                 Clipboard clipboard = new Clipboard(Display.getDefault());
                 clipboard.setContents(new Object[] { sb.toString() }, new Transfer[] { TextTransfer.getInstance() });
             }
         });
-        shipCopy.setText("艦娘IDをコピー(&2)");
+        shipCopy.setText("艦娘の名前をコピー(&2)");
 
     }
 

@@ -656,6 +656,7 @@ public final class GlobalContext {
                 addConsole("保有資材を更新しました");
 
                 // 保有艦娘を更新する
+                shipMap.clear();
                 JsonArray apiShip = apidata.getJsonArray("api_ship");
                 for (int i = 0; i < apiShip.size(); i++) {
                     ShipDto ship = new ShipDto((JsonObject) apiShip.get(i));
@@ -1098,7 +1099,15 @@ public final class GlobalContext {
                 }
                 // 艦娘を外す
                 shipMap.remove(ship.getId());
-
+                // 艦隊からも外す
+                String fleetid = ship.getFleetid();
+                if (fleetid != null) {
+                    DockDto dockdto = dock.get(fleetid);
+                    if (dockdto != null) {
+                        dockdto.removeShip(ship);
+                        dockdto.setUpdate(true);
+                    }
+                }
             }
 
             addConsole("艦娘を解体しました");
