@@ -112,7 +112,7 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
             if (ship.isBadlyDamage()) {
                 status = "大破";
             } else if (ship.isHalfDamage()) {
-                status = "中波";
+                status = "中破";
             } else if (ship.isSlightDamage()) {
                 status = "小破";
             }
