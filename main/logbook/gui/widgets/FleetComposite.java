@@ -89,6 +89,10 @@ public class FleetComposite extends Composite {
     private final Label[] bullstLabels = new Label[MAXCHARA];
     /** 燃料ステータス */
     private final Label[] fuelstLabels = new Label[MAXCHARA];
+    /** ダメコンステータス(要員) */
+    private final Label[] dmgcstyLabels = new Label[MAXCHARA];
+    /** ダメコンステータス(女神) */
+    private final Label[] dmgcstmLabels = new Label[MAXCHARA];
     /** レベリングステータス */
     private final Label[] nextLabels = new Label[MAXCHARA];
     /** メッセージ */
@@ -179,7 +183,7 @@ public class FleetComposite extends Composite {
             // ステータス
             new Label(this.fleetGroup, SWT.NONE);
             Composite stateComposite = new Composite(this.fleetGroup, SWT.NONE);
-            GridLayout glState = new GridLayout(4, false);
+            GridLayout glState = new GridLayout(6, false);
             glState.horizontalSpacing = 0;
             glState.marginTop = 0;
             glState.marginWidth = 0;
@@ -195,6 +199,10 @@ public class FleetComposite extends Composite {
             fuelst.setText("燃");
             Label bullst = new Label(stateComposite, SWT.NONE);
             bullst.setText("弾");
+            Label dmgcsty = new Label(stateComposite, SWT.NONE);
+            dmgcsty.setText("ダ");
+            Label dmgcstm = new Label(stateComposite, SWT.NONE);
+            dmgcstm.setText("ダ");
             Label next = new Label(stateComposite, SWT.NONE);
             next.setFont(this.small);
             next.setText("");
@@ -212,6 +220,8 @@ public class FleetComposite extends Composite {
             this.condLabels[i] = cond;
             this.condstLabels[i] = condst;
             this.bullstLabels[i] = bullst;
+            this.dmgcstyLabels[i] = dmgcsty;
+            this.dmgcstmLabels[i] = dmgcstm;
             this.fuelstLabels[i] = fuelst;
             this.nextLabels[i] = next;
         }
@@ -248,6 +258,8 @@ public class FleetComposite extends Composite {
             this.condLabels[i].setText("");
             this.condstLabels[i].setText("");
             this.bullstLabels[i].setText("");
+            this.dmgcstyLabels[i].setText("");
+            this.dmgcstmLabels[i].setText("");
             this.fuelstLabels[i].setText("");
             this.nextLabels[i].setText("");
         }
@@ -361,6 +373,39 @@ public class FleetComposite extends Composite {
                 } else if (bullraito <= AppConstants.LOW_SUPPLY) {
                     this.bullstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
                 }
+            }
+            // ステータス.ダメコン
+            List<ItemDto> item = ship.getItem();
+            int dmgcsty = 0;
+            int dmgcstm = 0;
+            for (ItemDto itemDto : item) {
+                if (itemDto != null) {
+                    if (itemDto.getName().equals("応急修理要員")) {
+                        dmgcsty++;
+                    } else if (itemDto.getName().equals("応急修理女神")) {
+                        dmgcstm++;
+                    }
+                }
+            }
+            if (dmgcsty > 0) {
+                this.dmgcstyLabels[i].setText("要員x" + dmgcsty);
+                this.dmgcstyLabels[i].setEnabled(true);
+                this.dmgcstyLabels[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN));
+
+            } else {
+                this.dmgcstyLabels[i].setText("");
+                this.dmgcstyLabels[i].setEnabled(false);
+                this.dmgcstyLabels[i].setForeground(null);
+            }
+            if (dmgcstm > 0) {
+                this.dmgcstmLabels[i].setText("女神x" + dmgcstm);
+                this.dmgcstmLabels[i].setEnabled(true);
+                this.dmgcstmLabels[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN));
+
+            } else {
+                this.dmgcstmLabels[i].setText("");
+                this.dmgcstmLabels[i].setEnabled(false);
+                this.dmgcstmLabels[i].setForeground(null);
             }
             // ステータス.あと何回
             if (AppConfig.get().isDisplayCount()) {
@@ -517,8 +562,8 @@ public class FleetComposite extends Composite {
                             }
                         }
                         sb.append(StringUtils.join(names, ","));
+                        sb.append("\n");
                     }
-                    sb.append("\n");
                 }
                 ToolTip tip = new ToolTip(this.getShell(), SWT.BALLOON
                         | SWT.ICON_ERROR);
