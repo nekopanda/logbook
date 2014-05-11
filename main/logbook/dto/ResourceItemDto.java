@@ -76,9 +76,21 @@ public class ResourceItemDto {
             JsonObject item = bounus.getJsonObject(i);
             int itemId = item.getInt("api_type");
             int itemCount = item.getInt("api_count");
-            if ((itemId >= 1) && (itemId <= 3)) { // 1,2,3以外は知らん
-                this.items.put(itemId,
-                        new UseItemDto(itemId, itemCount));
+            switch (itemId) {
+            case 1:
+                this.items.put(AppConstants.USEITEM_BURNER,
+                        new UseItemDto(AppConstants.USEITEM_BURNER, itemCount));
+                break;
+            case 2:
+                this.items.put(AppConstants.USEITEM_BUCKET,
+                        new UseItemDto(AppConstants.USEITEM_BUCKET, itemCount));
+                break;
+            case 3:
+                this.items.put(AppConstants.USEITEM_RESEARCH,
+                        new UseItemDto(AppConstants.USEITEM_RESEARCH, itemCount));
+                break;
+            default: // 1,2,3以外は知らん
+                break;
             }
         }
     }
