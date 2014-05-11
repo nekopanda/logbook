@@ -13,7 +13,7 @@ import org.eclipse.swt.graphics.RGB;
 public class AppConstants {
 
     /** バージョン */
-    public static final String VERSION = "0.5.17";
+    public static final String VERSION = "0.5.18";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://kancolle.sanaechan.net/");
