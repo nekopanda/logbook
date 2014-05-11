@@ -75,6 +75,8 @@ public class FleetComposite extends Composite {
     private final Label[] iconLabels = new Label[MAXCHARA];
     /** 名前ラベル */
     private final Label[] nameLabels = new Label[MAXCHARA];
+    /** Lvラベル */
+    private final Label[] lvLabels = new Label[MAXCHARA];
     /** HP */
     private final Label[] hpLabels = new Label[MAXCHARA];
     /** HPゲージ */
@@ -158,10 +160,24 @@ public class FleetComposite extends Composite {
             gdIconlabel.widthHint = 16;
             iconlabel.setLayoutData(gdIconlabel);
             // 名前
-            Label namelabel = new Label(this.fleetGroup, SWT.NONE);
-            namelabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            Composite nameComposite = new Composite(this.fleetGroup, SWT.NONE);
+            GridLayout glName = new GridLayout(2, false);
+            glName.horizontalSpacing = 0;
+            glName.marginTop = 0;
+            glName.marginWidth = 1;
+            glName.marginHeight = 0;
+            glName.marginBottom = 0;
+            glName.verticalSpacing = 0;
+            nameComposite.setLayout(glName);
+            nameComposite.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
+
+            Label namelabel = new Label(nameComposite, SWT.NONE);
             namelabel.setFont(this.large);
             namelabel.setText("名前");
+
+            Label lvlabel = new Label(nameComposite, SWT.NONE);
+            lvlabel.setFont(this.small);
+            lvlabel.setText("Lv.0");
             // HP
             Composite hpComposite = new Composite(this.fleetGroup, SWT.NONE);
             GridLayout glHp = new GridLayout(3, false);
@@ -214,6 +230,7 @@ public class FleetComposite extends Composite {
 
             this.iconLabels[i] = iconlabel;
             this.nameLabels[i] = namelabel;
+            this.lvLabels[i] = lvlabel;
             this.hpLabels[i] = hp;
             this.hpgaugeLabels[i] = hpgauge;
             this.hpmsgLabels[i] = hpmsg;
@@ -252,6 +269,7 @@ public class FleetComposite extends Composite {
         for (int i = ships.size(); i < MAXCHARA; i++) {
             this.iconLabels[i].setImage(null);
             this.nameLabels[i].setText("");
+            this.lvLabels[i].setText("");
             this.hpLabels[i].setText("");
             this.hpgaugeLabels[i].setImage(null);
             this.hpmsgLabels[i].setText("");
@@ -461,6 +479,7 @@ public class FleetComposite extends Composite {
             this.nameLabels[i].setText(ship.getName());
             this.nameLabels[i].setToolTipText(MessageFormat.format(AppConstants.TOOLTIP_FLEETTAB_SHIP, nowhp, maxhp,
                     fuel, fuelmax, bull, bullmax, ship.getNext()));
+            this.lvLabels[i].setText(MessageFormat.format("(Lv.{0})", ship.getLv()));
             // HP
             this.hpLabels[i].setText(MessageFormat.format("{0}/{1} ", nowhp, maxhp));
             // HPゲージ
