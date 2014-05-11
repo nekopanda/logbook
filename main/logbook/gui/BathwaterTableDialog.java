@@ -76,7 +76,7 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
 
     @Override
     protected String[] getTableHeader() {
-        return new String[] { "", "艦娘ID", "艦隊", "疲労", "名前", "Lv", "HP", "時間", "燃料", "鋼材", "遠征" };
+        return new String[] { "", "艦娘ID", "艦隊", "疲労", "名前", "Lv", "HP", "時間", "燃料", "鋼材", "状態", "HP1あたり" };
     }
 
     @Override
@@ -106,23 +106,33 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
         List<String[]> body = new ArrayList<String[]>();
         for (int i = 0; i < ships.size(); i++) {
             ShipDto ship = ships.get(i);
-            // 遠征の文字が入る
-            String action = "";
+            // 状態
+            String status = "";
 
+            if (ship.isBadlyDamage()) {
+                status = "大破";
+            } else if (ship.isHalfDamage()) {
+                status = "中波";
+            } else if (ship.isSlightDamage()) {
+                status = "小破";
+            }
             if (this.deckMissionShips.contains(ship.getId())) {
                 // 遠征中の艦娘を外すフラグが立っていたら遠征中の艦娘を外す
                 if (removeflg) {
                     continue;
                 }
-                action = "遠征";
+                status = "遠征";
             }
+            // HP1あたりの時間
+            String time = TimeLogic.toDateRestString((long) (ship.getDocktime()
+                    / (float) (ship.getMaxhp() - ship.getNowhp()) / 1000));
             // 整形
             body.add(new String[] {
                     Integer.toString(i + 1), Long.toString(ship.getId()), ship.getFleetid(),
                     Long.toString(ship.getCond()), ship.getName(), Long.toString(ship.getLv()),
                     Long.toString(ship.getNowhp()) + "/" + Long.toString(ship.getMaxhp()),
                     TimeLogic.toDateRestString(ship.getDocktime() / 1000), Long.toString(ship.getDockfuel()),
-                    Long.toString(ship.getDockmetal()), action
+                    Long.toString(ship.getDockmetal()), status, time
             });
         }
         this.body = body;
@@ -144,7 +154,7 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
                     item.setBackground(SWTResourceManager.getColor(AppConstants.ROW_BACKGROUND));
                 }
                 item.setText(text);
-                if (text[text.length - 1].equals("遠征")) {
+                if (text[10].equals("遠征")) {
                     item.setForeground(SWTResourceManager.getColor(AppConstants.MISSION_COLOR));
                 }
                 return item;
