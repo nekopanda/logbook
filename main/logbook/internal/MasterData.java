@@ -6,12 +6,15 @@ package logbook.internal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
+
+import logbook.dto.UseItemDto;
 
 /**
  * @author Nekopanda
@@ -35,7 +38,10 @@ public class MasterData {
     private Map<Integer, Integer> missionStatus = new HashMap<Integer, Integer>();
 
     /** 艦種 */
-    private ArrayList<ShipTypeDto> stype = new ArrayList<ShipTypeDto>();
+    private List<ShipTypeDto> stype = new ArrayList<ShipTypeDto>();
+
+    /** UseItem　（バケツとか、家具箱とか） */
+    private Map<Integer, UseItemInfoDto> useItem = new HashMap<Integer, UseItemInfoDto>();
 
     /** 最終更新日時 */
     private Date lastUpdateTime = new Date();
@@ -43,9 +49,9 @@ public class MasterData {
     public MasterData() {
     }
 
-    public void doMater(JsonObject json_data) {
+    public void doMater(JsonObject data) {
 
-        JsonArray json_maparea = json_data.getJsonArray("api_mst_maparea");
+        JsonArray json_maparea = data.getJsonArray("api_mst_maparea");
         if (json_maparea != null) {
             this.maparea.clear();
             for (JsonValue elem : json_maparea) {
@@ -53,7 +59,7 @@ public class MasterData {
             }
         }
 
-        JsonArray json_mapinfo = json_data.getJsonArray("api_mst_mapinfo");
+        JsonArray json_mapinfo = data.getJsonArray("api_mst_mapinfo");
         if (json_mapinfo != null) {
             this.mapinfo.clear();
             for (JsonValue elem : json_mapinfo) {
@@ -62,7 +68,7 @@ public class MasterData {
             }
         }
 
-        JsonArray json_mission = json_data.getJsonArray("api_mst_mission");
+        JsonArray json_mission = data.getJsonArray("api_mst_mission");
         if (json_mission != null) {
             this.mission.clear();
             for (JsonValue elem : json_mission) {
@@ -71,11 +77,20 @@ public class MasterData {
             }
         }
 
-        JsonArray json_stype = json_data.getJsonArray("api_mst_stype");
+        JsonArray json_stype = data.getJsonArray("api_mst_stype");
         if (json_stype != null) {
-            this.getStype().clear();
+            this.stype.clear();
             for (JsonValue elem : json_stype) {
                 this.stype.add(new ShipTypeDto((JsonObject) elem));
+            }
+        }
+
+        JsonArray json_useitem = data.getJsonArray("api_mst_useitem");
+        if (json_useitem != null) {
+            this.useItem.clear();
+            for (JsonValue elem : json_useitem) {
+                UseItemInfoDto dto = new UseItemInfoDto((JsonObject) elem);
+                this.useItem.put(dto.getId(), dto);
             }
         }
 
@@ -155,14 +170,14 @@ public class MasterData {
     /**
      * @return stype
      */
-    public ArrayList<ShipTypeDto> getStype() {
+    public List<ShipTypeDto> getStype() {
         return this.stype;
     }
 
     /**
      * @param stype セットする stype
      */
-    public void setStype(ArrayList<ShipTypeDto> stype) {
+    public void setStype(List<ShipTypeDto> stype) {
         this.stype = stype;
     }
 
@@ -208,6 +223,25 @@ public class MasterData {
         this.lastUpdateTime = lastUpdateTime;
     }
 
+    /**
+     * @return useItem
+     */
+    public Map<Integer, UseItemInfoDto> getUseItem() {
+        return this.useItem;
+    }
+
+    public UseItemInfoDto getUseItem(int id) {
+        Integer key = id;
+        return this.useItem.get(key);
+    }
+
+    /**
+     * @param useItem セットする useItem
+     */
+    public void setUseItem(Map<Integer, UseItemInfoDto> useItem) {
+        this.useItem = useItem;
+    }
+
     public static class MapAreaDto {
         private int id;
         private String name;
@@ -251,7 +285,7 @@ public class MasterData {
 
     public static class MapInfoDto {
         private int id;
-        private int maparea_id;
+        private int mapareaId;
         private int no;
         private String name;
 
@@ -260,7 +294,7 @@ public class MasterData {
 
         public MapInfoDto(JsonObject json_data) {
             this.id = json_data.getInt("api_id");
-            this.maparea_id = json_data.getInt("api_maparea_id");
+            this.mapareaId = json_data.getInt("api_maparea_id");
             this.no = json_data.getInt("api_no");
             this.name = json_data.getString("api_name");
         }
@@ -283,14 +317,14 @@ public class MasterData {
          * @return maparea_id
          */
         public int getMaparea_id() {
-            return this.maparea_id;
+            return this.mapareaId;
         }
 
         /**
-         * @param maparea_id セットする maparea_id
+         * @param mapareaId セットする maparea_id
          */
-        public void setMaparea_id(int maparea_id) {
-            this.maparea_id = maparea_id;
+        public void setMaparea_id(int mapareaId) {
+            this.mapareaId = mapareaId;
         }
 
         /**
@@ -327,17 +361,20 @@ public class MasterData {
         private int maparea_id;
         private String name;
         private int time;
+        private UseItemDto[] winItem = new UseItemDto[2];
 
         // 
 
         public MissionDto() {
         }
 
-        public MissionDto(JsonObject json_data) {
-            this.id = json_data.getInt("api_id");
-            this.maparea_id = json_data.getInt("api_maparea_id");
-            this.name = json_data.getString("api_name");
-            this.time = json_data.getInt("api_time");
+        public MissionDto(JsonObject data) {
+            this.id = data.getInt("api_id");
+            this.maparea_id = data.getInt("api_maparea_id");
+            this.name = data.getString("api_name");
+            this.time = data.getInt("api_time");
+            this.winItem[0] = new UseItemDto(data.getJsonArray("api_win_item1"));
+            this.winItem[1] = new UseItemDto(data.getJsonArray("api_win_item2"));
         }
 
         /**
@@ -362,10 +399,10 @@ public class MasterData {
         }
 
         /**
-         * @param maparea_id セットする maparea_id
+         * @param mapareaId セットする maparea_id
          */
-        public void setMaparea_id(int maparea_id) {
-            this.maparea_id = maparea_id;
+        public void setMaparea_id(int mapareaId) {
+            this.maparea_id = mapareaId;
         }
 
         /**
@@ -394,6 +431,20 @@ public class MasterData {
          */
         public void setTime(int time) {
             this.time = time;
+        }
+
+        /**
+         * @return winItem
+         */
+        public UseItemDto[] getWinItem() {
+            return this.winItem;
+        }
+
+        /**
+         * @param winItem セットする winItem
+         */
+        public void setWinItem(UseItemDto[] winItem) {
+            this.winItem = winItem;
         }
     }
 
@@ -457,6 +508,79 @@ public class MasterData {
          */
         public void setEquipType(ArrayList<Boolean> equipType) {
             this.equipType = equipType;
+        }
+    }
+
+    public static class UseItemInfoDto {
+        private int id;
+        private int usetype;
+        private String name;
+        private String description;
+
+        public UseItemInfoDto() {
+        }
+
+        public UseItemInfoDto(JsonObject object) {
+            this.setId(object.getJsonNumber("api_id").intValue());
+            this.setUsetype(object.getJsonNumber("api_usetype").intValue());
+            this.setName(object.getString("api_name"));
+            this.setDescription(object.getJsonArray("api_description").getString(0));
+        }
+
+        /**
+         * @return id
+         */
+        public int getId() {
+            return this.id;
+        }
+
+        /**
+         * @param id セットする id
+         */
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        /**
+         * @return usetype
+         */
+        public int getUsetype() {
+            return this.usetype;
+        }
+
+        /**
+         * @param usetype セットする usetype
+         */
+        public void setUsetype(int usetype) {
+            this.usetype = usetype;
+        }
+
+        /**
+         * @return name
+         */
+        public String getName() {
+            return this.name;
+        }
+
+        /**
+         * @param name セットする name
+         */
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        /**
+         * @return description
+         */
+        public String getDescription() {
+            return this.description;
+        }
+
+        /**
+         * @param description セットする description
+         */
+        public void setDescription(String description) {
+            this.description = description;
         }
     }
 }

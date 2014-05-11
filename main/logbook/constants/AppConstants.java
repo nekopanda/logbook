@@ -120,6 +120,10 @@ public class AppConstants {
     /** 保有資材:開発資材 */
     public static final int MATERIAL_RESEARCH = 7;
 
+    public static final int USEITEM_BUCKET = 1;
+    public static final int USEITEM_BURNER = 2;
+    public static final int USEITEM_RESEARCH = 3;
+
     /** /resources/icon/add.png */
     public static final String R_ICON_ADD = "/resources/icon/add.png";
 

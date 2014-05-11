@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import logbook.config.AppConfig;
+import logbook.config.MasterDataConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.dto.BattleDto;
@@ -42,9 +43,12 @@ import logbook.dto.MaterialDto;
 import logbook.dto.MissionResultDto;
 import logbook.dto.NdockDto;
 import logbook.dto.QuestDto;
+import logbook.dto.ResourceItemDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipFilterDto;
 import logbook.dto.ShipInfoDto;
+import logbook.dto.UseItemDto;
+import logbook.internal.MasterData;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -485,7 +489,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getCreateMissionResultHeader() {
-        return new String[] { "", "日付", "結果", "遠征", "燃料", "弾薬", "鋼材", "ボーキ" };
+        return new String[] { "", "日付", "結果", "遠征", "燃料", "弾薬", "鋼材", "ボーキ", "アイテム1", "個数", "アイテム2", "個数" };
     }
 
     /**
@@ -499,6 +503,21 @@ public final class CreateReportLogic {
         for (int i = 0; i < resultlist.size(); i++) {
             MissionResultDto result = resultlist.get(i);
 
+            String[] itemName = new String[] { "", "" };
+            String[] itemCount = new String[] { "", "" };
+            MasterData masterData = MasterDataConfig.get();
+            ResourceItemDto resItems = result.getItems();
+            if (resItems != null) {
+                Map<Integer, UseItemDto> items = resItems.getItems();
+                int index = 0;
+                for (UseItemDto item : items.values()) {
+                    itemName[index] = item.getItemName(masterData);
+                    itemCount[index] = String.valueOf(item.getItemCount());
+                    if (++index >= 2)
+                        break;
+                }
+            }
+
             body.add(new Object[] {
                     Integer.toString(i + 1),
                     new SimpleDateFormat(AppConstants.DATE_FORMAT).format(result.getDate()),
@@ -507,7 +526,11 @@ public final class CreateReportLogic {
                     result.getFuel(),
                     result.getAmmo(),
                     result.getMetal(),
-                    result.getBauxite()
+                    result.getBauxite(),
+                    itemName[0],
+                    itemCount[0],
+                    itemName[1],
+                    itemCount[1],
             });
         }
         return toListStringArray(body);

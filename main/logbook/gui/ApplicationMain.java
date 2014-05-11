@@ -26,6 +26,7 @@ import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.MainConsoleListener;
 import logbook.gui.logic.Sound;
 import logbook.gui.widgets.FleetComposite;
+import logbook.server.proxy.DatabaseClient;
 import logbook.server.proxy.ProxyServer;
 import logbook.server.web.WebServer;
 import logbook.thread.ThreadManager;
@@ -158,6 +159,7 @@ public final class ApplicationMain {
             // プロキシサーバーをシャットダウンする
             ProxyServer.end();
             WebServer.end();
+            DatabaseClient.end();
         }
     }
 

@@ -89,7 +89,7 @@ public final class ReverseProxyServlet extends ProxyServlet {
                 UndefinedData rawData = new UndefinedData(request.getRequestURL().toString(), postField,
                         stream.toByteArray());
                 // 統計データベース(http://kancolle-db.net/)に送信する
-                rawData.sendToDatabase();
+                DatabaseClient.send(rawData);
                 // キャプチャしたバイト配列は何のデータかを決定する
                 Data data = rawData.toDefinedData();
                 if (data.getDataType() != DataType.UNDEFINED) {

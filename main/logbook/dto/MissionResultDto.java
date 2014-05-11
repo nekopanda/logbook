@@ -30,6 +30,9 @@ public final class MissionResultDto extends AbstractDto {
     /** ボーキイト */
     private String bauxite;
 
+    /** アイテム */
+    private ResourceItemDto items;
+
     /**
      * コンストラクター
      */
@@ -158,5 +161,19 @@ public final class MissionResultDto extends AbstractDto {
      */
     public void setBauxite(String bauxite) {
         this.bauxite = bauxite;
+    }
+
+    /**
+     * @return item
+     */
+    public ResourceItemDto getItems() {
+        return this.items;
+    }
+
+    /**
+     * @param item セットする item
+     */
+    public void setItems(ResourceItemDto items) {
+        this.items = items;
     }
 }

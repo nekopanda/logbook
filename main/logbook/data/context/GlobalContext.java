@@ -40,6 +40,7 @@ import logbook.dto.MissionResultDto;
 import logbook.dto.NdockDto;
 import logbook.dto.QuestDto;
 import logbook.dto.ResourceDto;
+import logbook.dto.ResourceItemDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
 import logbook.gui.logic.CreateReportLogic;
@@ -447,9 +448,9 @@ public final class GlobalContext {
             doQuest(data);
             break;
         // 任務消化
-        //case QUEST_CLEAR:
-        //    doQuestClear(data);
-        //    break;
+        case QUEST_CLEAR:
+            doQuestClear(data);
+            break;
         // 設定
         case START2:
             doStart2(data);
@@ -495,28 +496,6 @@ public final class GlobalContext {
             LOG.warn(data);
         }
 
-    }
-
-    /**
-     * 開発や建造に使った資源を反映させます
-     * @param data
-     */
-    private static void updateMaterial(String event, ResourceDto res) {
-        if (material == null)
-            return;
-        Date time = Calendar.getInstance().getTime();
-        MaterialDto dto = new MaterialDto();
-        dto.setTime(time);
-        dto.setEvent(event);
-        dto.setFuel(material.getFuel() - Integer.valueOf(res.getFuel()));
-        dto.setAmmo(material.getAmmo() - Integer.valueOf(res.getAmmo()));
-        dto.setMetal(material.getMetal() - Integer.valueOf(res.getMetal()));
-        dto.setBauxite(material.getBauxite() - Integer.valueOf(res.getBauxite()));
-        dto.setBurner(material.getBurner());
-        dto.setBucket(material.getBucket());
-        if (res.getResearchMaterials() != null)
-            dto.setResearch(material.getResearch() - Integer.valueOf(res.getResearchMaterials()));
-        material = dto;
     }
 
     /**
@@ -783,7 +762,12 @@ public final class GlobalContext {
             getShipResource.put(kdockid, resource);
             KdockConfig.store(kdockid, resource);
 
-            updateMaterial("建造", resource);
+            // 資源に反映させてレポート
+            ResourceItemDto items = new ResourceItemDto();
+            items.loadBaseMaterialsFromField(data);
+            items.setResearchMaterials(Integer.parseInt(data.getField("api_item5")));
+            material = material.clone().consumed(items);
+            material.setEvent("建造");
             CreateReportLogic.storeMaterialReport(material);
 
             addConsole("建造(投入資源)情報を更新しました");
@@ -897,8 +881,15 @@ public final class GlobalContext {
             }
             CreateReportLogic.storeCreateItemReport(createitem);
 
-            updateMaterial("装備開発", resources);
-            CreateReportLogic.storeMaterialReport(material);
+            // 資源に反映させてレポート
+            if (apidata.getInt("api_shizai_flag") > 0) {
+                JsonArray newMaterial = apidata.getJsonArray("api_material");
+                ResourceItemDto items = new ResourceItemDto();
+                items.loadMaterialFronJson(newMaterial);
+                material = items.toMaterialDto();
+                material.setEvent("装備開発");
+                CreateReportLogic.storeMaterialReport(material);
+            }
 
             addConsole("装備開発情報を更新しました");
         } catch (Exception e) {
@@ -1294,18 +1285,24 @@ public final class GlobalContext {
             result.setQuestName(apidata.getString("api_quest_name"));
 
             if (clearResult != 0) {
-                JsonArray material = apidata.getJsonArray("api_get_material");
-                result.setFuel(material.getJsonNumber(0).toString());
-                result.setAmmo(material.getJsonNumber(1).toString());
-                result.setMetal(material.getJsonNumber(2).toString());
-                result.setBauxite(material.getJsonNumber(3).toString());
+                JsonArray getMaterial = apidata.getJsonArray("api_get_material");
+                result.setFuel(getMaterial.getJsonNumber(0).toString());
+                result.setAmmo(getMaterial.getJsonNumber(1).toString());
+                result.setMetal(getMaterial.getJsonNumber(2).toString());
+                result.setBauxite(getMaterial.getJsonNumber(3).toString());
+
+                // 資源に反映させてレポート
+                ResourceItemDto items = new ResourceItemDto();
+                items.loadMissionResult(apidata);
+                result.setItems(items);
+                material = material.clone().obtained(items);
+                material.setEvent("遠征帰還");
+                CreateReportLogic.storeMaterialReport(material);
             }
 
             CreateReportLogic.storeCreateMissionReport(result);
             missionResultList.add(result);
 
-            material.setEvent("遠征帰還");
-            CreateReportLogic.storeMaterialReport(material);
             addConsole("遠征(帰還)情報を更新しました");
         } catch (Exception e) {
             LOG.warn("遠征(帰還)を更新しますに失敗しました", e);
@@ -1414,18 +1411,27 @@ public final class GlobalContext {
      * 
      * @param data
      */
-    /*private static void doQuestClear(Data data) {
+    private static void doQuestClear(Data data) {
         try {
+            /*
             String idstr = data.getField("api_quest_id");
             if (idstr != null) {
                 Integer id = Integer.valueOf(idstr);
                 questMap.remove(id);
             }
+            */
+            // 資源に反映させてレポート
+            JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+            ResourceItemDto items = new ResourceItemDto();
+            items.loadQuestClear(apidata);
+            material = material.clone().obtained(items);
+            material.setEvent("任務をクリア");
+
         } catch (Exception e) {
             LOG.warn("消化した任務を除去しますに失敗しました", e);
             LOG.warn(data);
         }
-    }*/
+    }
 
     /**
      * 出撃を更新します

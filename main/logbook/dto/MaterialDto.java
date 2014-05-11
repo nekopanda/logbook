@@ -6,10 +6,10 @@ import java.util.Date;
  * 保有資材を表します
  *
  */
-public final class MaterialDto extends AbstractDto {
+public final class MaterialDto extends AbstractDto implements Cloneable {
 
     /** 日付 */
-    private Date time;
+    private Date time = new Date();
 
     /** 直前のイベント */
     private String event;
@@ -34,6 +34,39 @@ public final class MaterialDto extends AbstractDto {
 
     /** 開発資材 */
     private int research;
+
+    @Override
+    public MaterialDto clone() {
+        try {
+            return (MaterialDto) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.toString());
+        }
+    }
+
+    public MaterialDto consumed(ResourceItemDto res) {
+        this.time = new Date();
+        this.fuel -= res.getFuel();
+        this.ammo -= res.getAmmo();
+        this.metal -= res.getMetal();
+        this.bauxite -= res.getBauxite();
+        this.burner -= res.getBurners();
+        this.bucket -= res.getBuckets();
+        this.research -= res.getResearch();
+        return this;
+    }
+
+    public MaterialDto obtained(ResourceItemDto res) {
+        this.time = new Date();
+        this.fuel += res.getFuel();
+        this.ammo += res.getAmmo();
+        this.metal += res.getMetal();
+        this.bauxite += res.getBauxite();
+        this.burner += res.getBurners();
+        this.bucket += res.getBuckets();
+        this.research += res.getResearch();
+        return this;
+    }
 
     /**
      * 日付を取得します。
