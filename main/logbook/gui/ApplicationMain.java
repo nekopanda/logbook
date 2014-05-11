@@ -71,6 +71,38 @@ public final class ApplicationMain {
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(ApplicationMain.class);
 
+    /**
+     * <p>
+     * 終了処理を行います
+     * </p>
+     */
+    private static final class ShutdownHookThread implements Runnable {
+
+        /** ロガー */
+        private static final Logger LOG = LogManager.getLogger(ShutdownHookThread.class);
+
+        @Override
+        public void run() {
+            try {
+                // リソースを開放する
+                SWTResourceManager.dispose();
+                // プロキシサーバーをシャットダウンする
+                ProxyServer.end();
+                WebServer.end();
+                DatabaseClient.end();
+
+                // 設定を書き込みます
+                AppConfig.store();
+                ShipConfig.store();
+                ShipGroupConfig.store();
+                ItemConfig.store();
+                MasterDataConfig.store();
+            } catch (Exception e) {
+                LOG.fatal("シャットダウンスレッドで異常終了しました", e);
+            }
+        }
+    }
+
     /** シェル */
     private Shell shell;
 
@@ -140,27 +172,18 @@ public final class ApplicationMain {
             MasterDataConfig.load();
             ShipGroupConfig.load();
             ItemConfig.load();
+            // シャットダウンフックを登録します
+            Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHookThread()));
             // アプリケーション開始
             ApplicationMain window = new ApplicationMain();
             window.open();
-            // ウインドウが閉じたタイミングで設定を書き込みます
-            AppConfig.store();
-            ShipConfig.store();
-            MasterDataConfig.store();
-            ShipGroupConfig.store();
-            ItemConfig.store();
         } catch (Error e) {
             LOG.fatal("メインスレッドが異常終了しました", e);
         } catch (Exception e) {
             LOG.fatal("メインスレッドが異常終了しました", e);
-        } finally {
-            // リソースを開放する
-            SWTResourceManager.dispose();
-            // プロキシサーバーをシャットダウンする
-            ProxyServer.end();
-            WebServer.end();
-            DatabaseClient.end();
         }
+        // 
+        new Thread(new ShutdownHookThread()).start();
     }
 
     /**
