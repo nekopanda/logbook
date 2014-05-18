@@ -325,9 +325,12 @@ public class AppConstants {
     /** メッセージ 疲労している艦娘がいます */
     public static final String MESSAGE_COND = "疲労している艦娘がいます {0}頃に回復します。";
 
-    /** メッセージ 制空値:{0} */
-    public static final String MESSAGE_SEIKU = "制空値:{0}";
-
     /** メッセージ 大破している艦娘がいます */
     public static final String MESSAGE_STOP_SORTIE = "大破している艦娘がいます、進撃はできません。";
+
+    /** メッセージ 制空値:{0} */
+    public static final String MESSAGE_SEIKU = "制空値:{0}。";
+
+    /** メッセージ  艦隊合計Lv:{0} */
+    public static final String MESSAGE_TOTAL_LV = "艦隊合計Lv:{0}。";
 }
