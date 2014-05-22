@@ -511,9 +511,10 @@ public class FleetComposite extends Composite {
         int shipSakuteki = 0;
         int slotSakuteki = 0;
         for (ShipDto shipDto : ships) {
+            int shipSlotSakuteki = shipDto.getSlotSakuteki();
             seiku += shipDto.getSeiku();
-            shipSakuteki += shipDto.getSakuteki();
-            slotSakuteki += shipDto.getSlotSakuteki();
+            shipSakuteki += shipDto.getSakuteki() - shipSlotSakuteki;
+            slotSakuteki += shipSlotSakuteki;
         }
         if (GlobalContext.isMission(this.dock.getId())) {
             // 遠征中
@@ -549,7 +550,8 @@ public class FleetComposite extends Composite {
             this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_COND, this.clearDate), null);
         }
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_SEIKU, seiku), null);
-        this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_SAKUTEKI, shipSakuteki, slotSakuteki), null);
+        this.addStyledText(this.message,
+                MessageFormat.format(AppConstants.MESSAGE_SAKUTEKI, shipSakuteki, slotSakuteki), null);
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_TOTAL_LV, totallv), null);
 
         this.updateTabIcon();
