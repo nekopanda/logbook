@@ -72,6 +72,8 @@ public final class ShipFilterDialog extends Dialog {
     private Button landingship;
     /** 艦種.装甲空母 */
     private Button armoredcarrier;
+    /** 艦種.工作艦 */
+    private Button repairship;
     /** 全て選択 */
     private Button selectall;
     /** 装備 */
@@ -219,6 +221,11 @@ public final class ShipFilterDialog extends Dialog {
         this.armoredcarrier.setSelection(true);
         this.armoredcarrier.addSelectionListener(new ApplyFilterSelectionAdapter());
 
+        this.repairship = new Button(shiptypegroup, SWT.CHECK);
+        this.repairship.setText("工作艦");
+        this.repairship.setSelection(true);
+        this.repairship.addSelectionListener(new ApplyFilterSelectionAdapter());
+
         this.selectall = new Button(shiptypegroup, SWT.CHECK);
         this.selectall.setText("全て選択");
         this.selectall.setSelection(true);
@@ -307,6 +314,8 @@ public final class ShipFilterDialog extends Dialog {
             this.landingship.setSelection(this.filter.landingship);
             // 艦種.装甲空母
             this.armoredcarrier.setSelection(this.filter.armoredcarrier);
+            // 艦種.工作艦
+            this.repairship.setSelection(this.filter.repairship);
 
             if (!StringUtils.isEmpty(this.filter.itemname)) {
                 // 装備
@@ -357,6 +366,7 @@ public final class ShipFilterDialog extends Dialog {
         filter.carrierSubmarine = this.carrierSubmarine.getSelection();
         filter.landingship = this.landingship.getSelection();
         filter.armoredcarrier = this.armoredcarrier.getSelection();
+        filter.repairship = this.repairship.getSelection();
         if (ShipFilterDialog.this.item.getSelection()) {
             if (ShipFilterDialog.this.itemcombo.getSelectionIndex() >= 0) {
                 filter.itemname = this.itemcombo.getItem(ShipFilterDialog.this.itemcombo
@@ -405,6 +415,7 @@ public final class ShipFilterDialog extends Dialog {
             ShipFilterDialog.this.carrierSubmarine.setSelection(select);
             ShipFilterDialog.this.landingship.setSelection(select);
             ShipFilterDialog.this.armoredcarrier.setSelection(select);
+            ShipFilterDialog.this.repairship.setSelection(select);
 
             ShipFilterDialog.this.shipTable.updateFilter(ShipFilterDialog.this.createFilter());
         }

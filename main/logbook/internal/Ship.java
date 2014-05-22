@@ -199,12 +199,12 @@ public class Ship {
             this.put("179", new ShipInfoDto("Z1zwei", "駆逐艦", "レーベレヒト・マース", 0, 25, 20));
             this.put("180", new ShipInfoDto("Z3zwei", "駆逐艦", "マックス・シュルツ", 0, 25, 20));
             this.put("181", new ShipInfoDto("天津風", "駆逐艦", "あまつかぜ", 20, 20, 20));
-            this.put("182", new ShipInfoDto("明石", "", "あかし", 35, 10, 50));
+            this.put("182", new ShipInfoDto("明石", "工作艦", "あかし", 35, 10, 50));
             this.put("183", new ShipInfoDto("ハルナ", "戦艦", "アルはるな", 0, 275, 200));
             this.put("184", ShipInfoDto.EMPTY);
             this.put("185", ShipInfoDto.EMPTY);
             this.put("186", ShipInfoDto.EMPTY);
-            this.put("187", new ShipInfoDto("明石改", "", "あかし", 0, 15, 55));
+            this.put("187", new ShipInfoDto("明石改", "工作艦", "あかし", 0, 15, 55));
             this.put("188", new ShipInfoDto("利根改二", "航空巡洋艦", "とね", 0, 65, 50));
             this.put("189", new ShipInfoDto("筑摩改二", "航空巡洋艦", "ちくま", 0, 65, 50));
             this.put("190", new ShipInfoDto("初風", "駆逐艦", "はつかぜ", 20, 20, 15));

@@ -13,7 +13,7 @@ import org.eclipse.swt.graphics.RGB;
 public class AppConstants {
 
     /** バージョン */
-    public static final String VERSION = "0.5.18";
+    public static final String VERSION = "0.5.19";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://nekopanda.blog.jp/");
@@ -332,9 +332,15 @@ public class AppConstants {
     /** メッセージ 疲労している艦娘がいます */
     public static final String MESSAGE_COND = "疲労している艦娘がいます {0}頃に回復します。";
 
-    /** メッセージ 制空値:{0} 索敵:{1}+{2} */
-    public static final String MESSAGE_SEIKU = "制空値:{0} 索敵:{1}+{2}";
-
     /** メッセージ 大破している艦娘がいます */
     public static final String MESSAGE_STOP_SORTIE = "大破している艦娘がいます、進撃はできません。";
+
+    /** メッセージ 制空値:{0} */
+    public static final String MESSAGE_SEIKU = "制空値:{0}。";
+
+    /** メッセージ 索敵:{0}+{1} */
+    public static final String MESSAGE_SAKUTEKI = "索敵:{0}+{1}。";
+
+    /** メッセージ  艦隊合計Lv:{0} */
+    public static final String MESSAGE_TOTAL_LV = "艦隊合計Lv:{0}。";
 }

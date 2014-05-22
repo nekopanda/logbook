@@ -44,6 +44,8 @@ public final class ShipFilterDto extends AbstractDto {
     public boolean landingship = true;
     /** 艦種.装甲空母 */
     public boolean armoredcarrier = true;
+    /** 艦種.装甲空母 */
+    public boolean repairship = true;
 
     /** グループ */
     public ShipGroupBean group;

@@ -281,6 +281,8 @@ public class FleetComposite extends Composite {
             this.fuelstLabels[i].setText("");
             this.nextLabels[i].setText("");
         }
+        // 艦隊合計Lv
+        int totallv = 0;
 
         for (int i = 0; i < ships.size(); i++) {
             ShipDto ship = ships.get(i);
@@ -306,6 +308,8 @@ public class FleetComposite extends Composite {
             int fuelmax = ship.getFuelMax();
             // 残燃料比
             float fuelraito = fuelmax != 0 ? (float) fuel / (float) fuelmax : 1f;
+            // 艦隊合計Lv
+            totallv += ship.getLv();
 
             // 疲労している艦娘がいる場合メッセージを表示
             if (this.cond > cond) {
@@ -544,8 +548,9 @@ public class FleetComposite extends Composite {
         if (this.clearDate != null) {
             this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_COND, this.clearDate), null);
         }
-        this.addStyledText(this.message,
-                MessageFormat.format(AppConstants.MESSAGE_SEIKU, seiku, shipSakuteki, slotSakuteki), null);
+        this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_SEIKU, seiku), null);
+        this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_SAKUTEKI, shipSakuteki, slotSakuteki), null);
+        this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_TOTAL_LV, totallv), null);
 
         this.updateTabIcon();
         this.postFatal();
