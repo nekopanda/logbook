@@ -593,7 +593,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getMaterialHeader() {
-        return new String[] { "", "日付", "直前のイベント", "燃料", "弾薬", "鋼材", "ボーキ", "高速建造", "高速修復", "開発資源" };
+        return new String[] { "", "日付", "直前のイベント", "燃料", "弾薬", "鋼材", "ボーキ", "高速修復材", "高速建造材", "開発資材" };
     }
 
     /**

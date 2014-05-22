@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import logbook.config.MasterDataConfig;
 import logbook.data.context.GlobalContext;
+import logbook.dto.BasicInfoDto;
 import logbook.dto.BattleDto;
 import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
@@ -343,11 +344,21 @@ public class QueryHandler extends HttpServlet {
                 }
 
                 { // 出撃数, 遠征数
-                    JsonArrayBuilder game_record = Json.createArrayBuilder();
-                    for (int rec : GlobalContext.getGameRecord()) {
-                        game_record.add(rec);
+                    JsonObjectBuilder basic = Json.createObjectBuilder();
+                    BasicInfoDto basicDto = GlobalContext.getBasicInfo();
+                    if (basicDto != null) {
+                        basic.add("nickname", basicDto.getNickname());
+                        basic.add("deck_count", basicDto.getDeckCount());
+                        basic.add("kdock_count", basicDto.getKdockCount());
+                        basic.add("ndock_count", basicDto.getNdockCount());
+                        basic.add("ms_count", basicDto.getMissionCount());
+                        basic.add("ms_success", basicDto.getMissionSuccess());
+                        basic.add("pt_win", basicDto.getPracticeWin());
+                        basic.add("pt_lose", basicDto.getPracticeLose());
+                        basic.add("st_win", basicDto.getSortieWin());
+                        basic.add("st_lose", basicDto.getSortieLose());
                     }
-                    jb.add("game_record", game_record);
+                    jb.add("basic", basic);
                 }
 
                 {

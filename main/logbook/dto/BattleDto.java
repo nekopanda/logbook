@@ -157,6 +157,8 @@ public final class BattleDto extends AbstractDto {
                     list.add(((JsonNumber) ship).intValue());
                 }
                 break;
+            default: // あり得ない
+                break;
             }
         }
 

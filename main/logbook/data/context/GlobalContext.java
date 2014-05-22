@@ -26,6 +26,7 @@ import logbook.config.KdockConfig;
 import logbook.config.MasterDataConfig;
 import logbook.constants.AppConstants;
 import logbook.data.Data;
+import logbook.dto.BasicInfoDto;
 import logbook.dto.BattleDto;
 import logbook.dto.BattleResultDto;
 import logbook.dto.CreateItemDto;
@@ -120,8 +121,7 @@ public final class GlobalContext {
     /** 出撃中か */
     private static boolean[] isSortie = new boolean[4];
 
-    /** 戦績: 出撃勝利, 出撃敗北, 演習勝利, 演習敗北, 遠征数, 遠征成功 */
-    private static int[] gameRecord = new int[6];
+    private static BasicInfoDto basic;
 
     /** ログ表示 */
     private static MainConsoleListener console;
@@ -328,8 +328,13 @@ public final class GlobalContext {
         return material;
     }
 
-    public static int[] getGameRecord() {
-        return gameRecord;
+    /**
+     * 提督の名前や入渠ドックの数など基本的なユーザの情報を取得します
+     * @return 基本ユーザ情報
+     */
+    @CheckForNull
+    public static BasicInfoDto getBasicInfo() {
+        return basic;
     }
 
     /**
@@ -1190,13 +1195,8 @@ public final class GlobalContext {
         maxChara = apidata.getJsonNumber("api_max_chara").intValue();
         // 最大所有装備数
         maxSlotitem = apidata.getJsonNumber("api_max_slotitem").intValue();
-
-        gameRecord[0] = apidata.getJsonNumber("api_st_win").intValue();
-        gameRecord[1] = apidata.getJsonNumber("api_st_lose").intValue();
-        gameRecord[2] = apidata.getJsonNumber("api_pt_win").intValue();
-        gameRecord[3] = apidata.getJsonNumber("api_pt_lose").intValue();
-        gameRecord[4] = apidata.getJsonNumber("api_ms_count").intValue();
-        gameRecord[5] = apidata.getJsonNumber("api_ms_success").intValue();
+        // 残り全部
+        basic = new BasicInfoDto(apidata);
     }
 
     /**

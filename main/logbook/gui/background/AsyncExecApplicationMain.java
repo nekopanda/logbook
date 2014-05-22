@@ -9,6 +9,7 @@ import java.util.Map;
 import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
+import logbook.dto.BasicInfoDto;
 import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
 import logbook.dto.NdockDto;
@@ -220,6 +221,11 @@ public final class AsyncExecApplicationMain extends Thread {
          */
         private boolean updateDeck(Date now, List<String> notice) {
             boolean noticeflg = false;
+
+            BasicInfoDto basicDto = GlobalContext.getBasicInfo();
+            if (basicDto != null) {
+                this.main.getShell().setText(basicDto.getNickname() + " - 航海日誌");
+            }
 
             Label[] deckNameLabels = { this.main.getDeck1name(), this.main.getDeck2name(), this.main.getDeck3name() };
             Text[] deckTimeTexts = { this.main.getDeck1time(), this.main.getDeck2time(), this.main.getDeck3time() };

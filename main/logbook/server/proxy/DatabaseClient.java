@@ -133,13 +133,15 @@ public class DatabaseClient extends Thread {
                         break;
                     }
                     else {
-                        LOG.warn("データベースへの送信に失敗しました. " + response.getReason());
                         // 少し時間をおいてリトライ
-                        Thread.sleep(500);
+                        Thread.sleep(1000);
                         if (retly >= 4) {
                             // リトライが多すぎたらエラーにする
                             skipCount = (errorCount++) * 4;
-                            LOG.warn("以降 " + skipCount + " 個の送信をスキップします.");
+                            LOG.warn("データベースへの送信に失敗しました. " + response.getReason());
+                            if (skipCount > 0) {
+                                LOG.warn("以降 " + skipCount + " 個の送信をスキップします.");
+                            }
                             break;
                         }
                     }
