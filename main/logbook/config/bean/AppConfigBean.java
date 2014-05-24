@@ -63,6 +63,9 @@ public final class AppConfigBean {
     /** 終了時に確認する */
     private boolean checkDoit = true;
 
+    /** タイトルバーに提督名を表示する */
+    private boolean nameOnTitlebar = false;
+
     /** タスクトレイに格納 */
     private boolean hideWindow;
 
@@ -399,6 +402,22 @@ public final class AppConfigBean {
      */
     public void setCheckDoit(boolean checkDoit) {
         this.checkDoit = checkDoit;
+    }
+
+    /**
+     *タイトルバーに提督名を表示するを取得します。
+     * @return タイトルバーに提督名を表示する
+     */
+    public boolean isNameOnTitlebar() {
+        return this.nameOnTitlebar;
+    }
+
+    /**
+     * タイトルバーに提督名を表示するを設定します。
+     * @param nameOnTitlebar タイトルバーに提督名を表示する
+     */
+    public void setNameOnTitlebar(boolean nameOnTitlebar) {
+        this.nameOnTitlebar = nameOnTitlebar;
     }
 
     /**

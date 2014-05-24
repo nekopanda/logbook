@@ -232,6 +232,11 @@ public final class ConfigDialog extends Dialog {
         checkDoit.setText("終了時に確認する");
         checkDoit.setSelection(AppConfig.get().isCheckDoit());
 
+        final Button nameOnTitlebar = new Button(compositeSystem, SWT.CHECK);
+        nameOnTitlebar.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        nameOnTitlebar.setText("タイトルバーに提督名を表示する");
+        nameOnTitlebar.setSelection(AppConfig.get().isNameOnTitlebar());
+
         // 艦隊タブ タブ
         Composite compositeFleetTab = new Composite(this.composite, SWT.NONE);
         this.compositeMap.put("fleettab", compositeFleetTab);
@@ -463,6 +468,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setHideWindow(hidewindow.getSelection());
                 AppConfig.get().setOnTop(ontop.getSelection());
                 AppConfig.get().setCheckDoit(checkDoit.getSelection());
+                AppConfig.get().setNameOnTitlebar(nameOnTitlebar.getSelection());
                 if (StringUtils.isNumeric(soundlevel.getText())) {
                     float level = (float) Integer.parseInt(soundlevel.getText()) / 100;
                     AppConfig.get().setSoundLevel(level);

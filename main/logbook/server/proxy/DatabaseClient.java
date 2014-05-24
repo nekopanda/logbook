@@ -126,19 +126,27 @@ public class DatabaseClient extends Thread {
                     continue;
                 }
                 for (int retly = 0;; ++retly) {
-                    ContentResponse response = this.createRequest(data).send();
-                    if (HttpStatus.isSuccess(response.getStatus())) {
-                        // 成功したらエラーカウンタをリセット
-                        skipCount = errorCount = 0;
-                        break;
+                    String errorReason = null;
+                    try {
+                        ContentResponse response = this.createRequest(data).send();
+                        if (HttpStatus.isSuccess(response.getStatus())) {
+                            // 成功したらエラーカウンタをリセット
+                            skipCount = errorCount = 0;
+                            break;
+                        }
+                        else {
+                            errorReason = response.getReason();
+                        }
+                    } catch (Exception e) {
+                        errorReason = e.getMessage();
                     }
-                    else {
+                    if (errorReason != null) {
                         // 少し時間をおいてリトライ
                         Thread.sleep(1000);
                         if (retly >= 4) {
                             // リトライが多すぎたらエラーにする
                             skipCount = (errorCount++) * 4;
-                            LOG.warn("データベースへの送信に失敗しました. " + response.getReason());
+                            LOG.warn("データベースへの送信に失敗しました. " + errorReason);
                             if (skipCount > 0) {
                                 LOG.warn("以降 " + skipCount + " 個の送信をスキップします.");
                             }

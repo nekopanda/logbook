@@ -223,8 +223,11 @@ public final class AsyncExecApplicationMain extends Thread {
             boolean noticeflg = false;
 
             BasicInfoDto basicDto = GlobalContext.getBasicInfo();
-            if (basicDto != null) {
+            if (AppConfig.get().isNameOnTitlebar() && (basicDto != null)) {
                 this.main.getShell().setText(basicDto.getNickname() + " - 航海日誌");
+            }
+            else {
+                this.main.getShell().setText(AppConstants.TITLEBAR_TEXT);
             }
 
             Label[] deckNameLabels = { this.main.getDeck1name(), this.main.getDeck2name(), this.main.getDeck3name() };

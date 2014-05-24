@@ -343,4 +343,7 @@ public class AppConstants {
 
     /** メッセージ  艦隊合計Lv:{0} */
     public static final String MESSAGE_TOTAL_LV = "艦隊合計Lv:{0}。";
+
+    /** タイトルバーに表示するデフォルトテキスト */
+    public static final String TITLEBAR_TEXT = "航海日誌 " + VERSION + " ex";
 }

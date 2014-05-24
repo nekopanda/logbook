@@ -212,7 +212,7 @@ public final class ApplicationMain {
             shellStyle |= SWT.ON_TOP;
         }
         this.shell = new Shell(shellStyle);
-        this.shell.setText("航海日誌 " + AppConstants.VERSION + " ex");
+        this.shell.setText(AppConstants.TITLEBAR_TEXT);
         this.shell.setAlpha(AppConfig.get().getAlpha());
         GridLayout glShell = new GridLayout(1, false);
         glShell.horizontalSpacing = 1;
