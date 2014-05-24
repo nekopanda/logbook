@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.annotation.CheckForNull;
 import javax.json.JsonArray;
@@ -63,10 +64,10 @@ public final class GlobalContext {
     private static final Logger LOG = LogManager.getLogger(GlobalContext.class);
 
     /** 装備Map */
-    private static Map<Long, ItemDto> itemMap = new HashMap<Long, ItemDto>();
+    private static Map<Long, ItemDto> itemMap = new TreeMap<Long, ItemDto>();
 
     /** 艦娘Map */
-    private static Map<Long, ShipDto> shipMap = new HashMap<Long, ShipDto>();
+    private static Map<Long, ShipDto> shipMap = new TreeMap<Long, ShipDto>();
 
     /** 秘書艦 */
     private static ShipDto secretary;
