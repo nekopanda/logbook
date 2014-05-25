@@ -331,6 +331,9 @@ public class AppConstants {
     /** メッセージ 制空値:{0} */
     public static final String MESSAGE_SEIKU = "制空値:{0}。";
 
+    /** メッセージ  索敵値計:{0} */
+    public static final String MESSAGE_SAKUTEKI = "索敵値計:{0}。";
+
     /** メッセージ  艦隊合計Lv:{0} */
     public static final String MESSAGE_TOTAL_LV = "艦隊合計Lv:{0}。";
 }
