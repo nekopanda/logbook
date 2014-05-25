@@ -15,6 +15,7 @@ import javax.annotation.CheckForNull;
 import logbook.dto.AbstractDto;
 
 import org.apache.commons.io.LineIterator;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.eclipse.swt.graphics.RGB;
 
 /**
@@ -58,17 +59,27 @@ public class ResourceLog extends AbstractDto {
             }
             while (ite.hasNext()) {
                 String line = ite.next();
-                // 日付,燃料,弾薬,鋼材,ボーキ,高速修復材,高速建造材,開発資材
+                // 日付,（直前のイベント,）燃料,弾薬,鋼材,ボーキ,高速修復材,高速建造材,開発資材
                 String[] colums = line.split(",");
                 if (colums.length < 8) {
                     continue;
                 }
                 try {
                     Date date = format.parse(colums[0]);
-                    int ifuel = Integer.parseInt(colums[1]);
-                    int iammo = Integer.parseInt(colums[2]);
-                    int imetal = Integer.parseInt(colums[3]);
-                    int ibauxite = Integer.parseInt(colums[4]);
+                    int baseIdx;
+                    // 拡張版の方は１列追加してしまったので、両方に対応させる！
+                    if (NumberUtils.isNumber(colums[1])) {
+                        // 本家のログ
+                        baseIdx = 1;
+                    }
+                    else {
+                        // 拡張版のログ
+                        baseIdx = 2;
+                    }
+                    int ifuel = Integer.parseInt(colums[baseIdx + 0]);
+                    int iammo = Integer.parseInt(colums[baseIdx + 1]);
+                    int imetal = Integer.parseInt(colums[baseIdx + 2]);
+                    int ibauxite = Integer.parseInt(colums[baseIdx + 3]);
 
                     time.add(date.getTime());
                     fuel.add(ifuel);

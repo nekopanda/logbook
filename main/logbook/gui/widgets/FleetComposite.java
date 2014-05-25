@@ -285,6 +285,8 @@ public class FleetComposite extends Composite {
         int totallv = 0;
         // 索敵値計
         int totalSakuteki = 0;
+        // 装備の索敵値計
+        int slotSakuteki = 0;
 
         for (int i = 0; i < ships.size(); i++) {
             ShipDto ship = ships.get(i);
@@ -314,6 +316,8 @@ public class FleetComposite extends Composite {
             totallv += ship.getLv();
             // 索敵値計
             totalSakuteki += ship.getSakuteki();
+            // 装備の索敵値計
+            slotSakuteki += ship.getSlotSakuteki();
 
             // 疲労している艦娘がいる場合メッセージを表示
             if (this.cond > cond) {
@@ -512,13 +516,8 @@ public class FleetComposite extends Composite {
         }
         // 制空値を計算
         int seiku = 0;
-        int shipSakuteki = 0;
-        int slotSakuteki = 0;
         for (ShipDto shipDto : ships) {
-            int shipSlotSakuteki = shipDto.getSlotSakuteki();
             seiku += shipDto.getSeiku();
-            shipSakuteki += shipDto.getSakuteki() - shipSlotSakuteki;
-            slotSakuteki += shipSlotSakuteki;
         }
         if (GlobalContext.isMission(this.dock.getId())) {
             // 遠征中
