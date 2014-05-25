@@ -13,6 +13,8 @@ import logbook.dto.chart.ResourceLog;
 import logbook.gui.logic.ResourceChart;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -41,6 +43,9 @@ import org.eclipse.swt.widgets.Shell;
  *
  */
 public final class ResourceChartDialog extends Dialog {
+
+    /** ロガー */
+    private static final Logger LOG = LogManager.getLogger(ResourceChartDialog.class);
 
     /** スケールテキスト */
     private static final String[] SCALE_TEXT = { "1日", "1週間", "2週間", "1ヶ月", "2ヶ月", "3ヶ月", "半年", "1年" };
@@ -175,8 +180,9 @@ public final class ResourceChartDialog extends Dialog {
             } finally {
                 gc.dispose();
             }
-        } catch (Exception t) {
+        } catch (Exception e) {
             image.dispose();
+            LOG.warn("グラフの描画で例外が発生しました", e);
         }
         return image;
     }
