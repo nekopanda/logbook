@@ -356,6 +356,15 @@ public final class ApplicationMain {
                 new ShipFilterGroupDialog(ApplicationMain.this.shell).open();
             }
         });
+        // その他-資材ログチャート
+        MenuItem resourceChart = new MenuItem(etcmenu, SWT.NONE);
+        resourceChart.setText("資材ログチャート(&R)");
+        resourceChart.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                new ResourceChartDialog(ApplicationMain.this.shell).open();
+            }
+        });
         // その他-自動プロキシ構成スクリプトファイル生成
         MenuItem pack = new MenuItem(etcmenu, SWT.NONE);
         pack.setText("自動プロキシ構成スクリプト");
