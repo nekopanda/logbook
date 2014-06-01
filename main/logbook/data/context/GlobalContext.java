@@ -736,14 +736,16 @@ public final class GlobalContext {
             String dock = data.getField("api_kdock_id");
 
             // 艦娘の装備を追加します
-            JsonArray slotitem = apidata.getJsonArray("api_slotitem");
-            for (int i = 0; i < slotitem.size(); i++) {
-                JsonObject object = (JsonObject) slotitem.get(i);
-                String typeid = object.getJsonNumber("api_slotitem_id").toString();
-                Long id = object.getJsonNumber("api_id").longValue();
-                ItemDto item = Item.get(typeid);
-                if (item != null) {
-                    itemMap.put(id, item);
+            if (!apidata.isNull("api_slotitem")) {
+                JsonArray slotitem = apidata.getJsonArray("api_slotitem");
+                for (int i = 0; i < slotitem.size(); i++) {
+                    JsonObject object = (JsonObject) slotitem.get(i);
+                    String typeid = object.getJsonNumber("api_slotitem_id").toString();
+                    Long id = object.getJsonNumber("api_id").longValue();
+                    ItemDto item = Item.get(typeid);
+                    if (item != null) {
+                        itemMap.put(id, item);
+                    }
                 }
             }
             // 艦娘を追加します
