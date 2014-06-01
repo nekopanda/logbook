@@ -50,7 +50,17 @@ public class AwtUtils {
      * @param image
      * @return
      */
-    public static BufferedImage trim(BufferedImage image) {
+    public static BufferedImage trim(BufferedImage image, Rectangle trimRect) {
+        return image.getSubimage(trimRect.x, trimRect.y, trimRect.width, trimRect.height);
+    }
+
+    /**
+     * トリムサイズを返します
+     * 
+     * @param image
+     * @return
+     */
+    public static Rectangle getTrimSize(BufferedImage image) {
         int width = image.getWidth();
         int height = image.getHeight();
         int startwidth = width / 2;
@@ -104,10 +114,11 @@ public class AwtUtils {
                 break;
             }
         }
+
         if ((w == 0) || (h == 0)) {
-            return image;
+            return new Rectangle(0, 0, image.getWidth(), image.getHeight());
         } else {
-            return image.getSubimage(x, y, w, h);
+            return new Rectangle(x, y, w, h);
         }
     }
 }

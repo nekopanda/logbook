@@ -350,6 +350,11 @@ public final class ConfigDialog extends Dialog {
         }
         new Label(compositeCapture, SWT.NONE);
 
+        final Button createDateFolder = new Button(compositeCapture, SWT.CHECK);
+        createDateFolder.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        createDateFolder.setText("日付のフォルダを作成する");
+        createDateFolder.setSelection(AppConfig.get().isCreateDateFolder());
+
         Composite compositeProxy = new Composite(this.composite, SWT.NONE);
         this.compositeMap.put("proxy", compositeProxy);
         compositeProxy.setLayout(new GridLayout(4, false));
@@ -475,6 +480,7 @@ public final class ConfigDialog extends Dialog {
                 // capture
                 AppConfig.get().setCapturePath(captureDir.getText());
                 AppConfig.get().setImageFormat(imageformatCombo.getItem(imageformatCombo.getSelectionIndex()));
+                AppConfig.get().setCreateDateFolder(createDateFolder.getSelection());
                 // proxy
                 AppConfig.get().setUseProxy(useProxyButton.getSelection());
                 AppConfig.get().setProxyHost(proxyHostText.getText());
