@@ -249,7 +249,7 @@ public class ResourceChart {
         long t = value;
         long half = notch / 2;
         long mod = t % notch;
-        if (mod > half) {
+        if (mod >= half) {
             t += notch - mod;
         } else {
             t -= mod;
