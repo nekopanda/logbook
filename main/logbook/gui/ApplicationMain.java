@@ -348,9 +348,9 @@ public final class ApplicationMain {
                 new ShipFilterGroupDialog(ApplicationMain.this.shell).open();
             }
         });
-        // その他-資材ログチャート
+        // その他-資材チャート
         MenuItem resourceChart = new MenuItem(etcmenu, SWT.NONE);
-        resourceChart.setText("資材ログチャート(&R)");
+        resourceChart.setText("資材チャート(&R)");
         resourceChart.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
