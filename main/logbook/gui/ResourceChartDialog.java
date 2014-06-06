@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * 資材ログチャートのダイアログ
+ * 資材チャートのダイアログ
  *
  */
 public final class ResourceChartDialog extends Dialog {
@@ -71,7 +71,7 @@ public final class ResourceChartDialog extends Dialog {
      */
     public ResourceChartDialog(Shell parent) {
         super(parent, SWT.SHELL_TRIM);
-        this.setText("資材ログチャート");
+        this.setText("資材チャート");
     }
 
     /**
@@ -146,12 +146,13 @@ public final class ResourceChartDialog extends Dialog {
             public void paintControl(PaintEvent e) {
                 ResourceLog log = ResourceChartDialog.this.log;
                 int scale = SCALE_DAYS[ResourceChartDialog.this.combo.getSelectionIndex()];
+                String scaleText = "スケール:" + ResourceChartDialog.this.combo.getText();
                 Point size = ResourceChartDialog.this.canvas.getSize();
                 int width = size.x - 1;
                 int height = size.y - 1;
 
                 if (log != null) {
-                    Image image = createImage(log, scale, width, height);
+                    Image image = createImage(log, scale, scaleText, width, height);
                     e.gc.drawImage(image, 0, 0);
                     image.dispose();
                 }
@@ -170,12 +171,12 @@ public final class ResourceChartDialog extends Dialog {
      * @param height 高さ
      * @return グラフイメージ
      */
-    private static Image createImage(ResourceLog log, int scale, int width, int height) {
+    private static Image createImage(ResourceLog log, int scale, String scaleText, int width, int height) {
         Image image = new Image(Display.getCurrent(), width, height);
         try {
             GC gc = new GC(image);
             try {
-                ResourceChart chart = new ResourceChart(log, scale, width, height);
+                ResourceChart chart = new ResourceChart(log, scale, scaleText, width, height);
                 chart.draw(gc);
             } finally {
                 gc.dispose();
@@ -234,12 +235,13 @@ public final class ResourceChartDialog extends Dialog {
                         }
                     }
                     int scale = SCALE_DAYS[this.combo.getSelectionIndex()];
+                    String scaleText = "スケール:" + this.combo.getText();
                     Point size = this.canvas.getSize();
                     int width = size.x - 1;
                     int height = size.y - 1;
                     try (OutputStream out = new BufferedOutputStream(new FileOutputStream(file))) {
                         // イメージの生成
-                        Image image = createImage(this.log, scale, width, height);
+                        Image image = createImage(this.log, scale, scaleText, width, height);
                         try {
                             ImageLoader loader = new ImageLoader();
                             loader.data = new ImageData[] { image.getImageData() };

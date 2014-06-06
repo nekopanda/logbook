@@ -2,6 +2,7 @@ package logbook.gui;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -271,10 +272,14 @@ public final class CaptureDialog extends Dialog {
         private static final Logger LOG = LogManager.getLogger(CaptureThread.class);
         /** Jpeg品質 */
         private static final float QUALITY = 0.9f;
-        /** 日付フォーマット */
-        private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss.SSS");
+        /** 日付フォーマット(ファイル名) */
+        private final SimpleDateFormat fileNameFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss.SSS");
+        /** 日付フォーマット(ディレクトリ名) */
+        private final SimpleDateFormat dirNameFormat = new SimpleDateFormat("yyyy-MM-dd");
         /** キャプチャ範囲 */
         private final Rectangle rectangle;
+        /** トリム範囲 */
+        private java.awt.Rectangle trimRect;
         /** 周期キャプチャ */
         private boolean interval;
         /** 周期キャプチャ間隔(ms) */
@@ -292,9 +297,31 @@ public final class CaptureDialog extends Dialog {
                 do {
                     // 時刻からファイル名を作成
                     Date now = Calendar.getInstance().getTime();
-                    String fname = FilenameUtils.concat(AppConfig.get().getCapturePath(), this.format.format(now) + "."
+
+                    String dir = null;
+                    if (AppConfig.get().isCreateDateFolder()) {
+                        dir = FilenameUtils.concat(AppConfig.get().getCapturePath(), this.dirNameFormat.format(now));
+                    } else {
+                        dir = AppConfig.get().getCapturePath();
+                    }
+
+                    String fname = FilenameUtils.concat(dir, this.fileNameFormat.format(now) + "."
                             + AppConfig.get().getImageFormat());
                     File file = new File(fname);
+
+                    if (file.exists()) {
+                        if (file.isDirectory()) {
+                            throw new IOException("File '" + file + "' exists but is a directory");
+                        }
+                        if (!(file.canWrite()))
+                            throw new IOException("File '" + file + "' cannot be written to");
+                    } else {
+                        File parent = file.getParentFile();
+                        if ((parent != null) &&
+                                (!(parent.mkdirs())) && (!(parent.isDirectory()))) {
+                            throw new IOException("Directory '" + parent + "' could not be created");
+                        }
+                    }
 
                     // 範囲をキャプチャする
                     BufferedImage image = AwtUtils.getCapture(this.rectangle);
@@ -311,7 +338,12 @@ public final class CaptureDialog extends Dialog {
                                     iwp.setCompressionQuality(QUALITY);
                                 }
                                 writer.setOutput(ios);
-                                writer.write(null, new IIOImage(AwtUtils.trim(image), null, null), iwp);
+
+                                if (this.trimRect == null) {
+                                    this.trimRect = AwtUtils.getTrimSize(image);
+                                }
+
+                                writer.write(null, new IIOImage(AwtUtils.trim(image, this.trimRect), null, null), iwp);
                             } finally {
                                 writer.dispose();
                             }

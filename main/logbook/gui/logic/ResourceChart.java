@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
- * 資材ログチャートを描画する
+ * 資材チャートを描画する
  *
  */
 public class ResourceChart {
@@ -35,6 +35,8 @@ public class ResourceChart {
     private final ResourceLog log;
     /** 期間 */
     private final long term;
+    /** スケールテキスト */
+    private final String scaleText;
     /** 刻み */
     private final long notch;
     /** Width */
@@ -47,16 +49,17 @@ public class ResourceChart {
     private Resource[] resources = {};
 
     /**
-     * 資材ログチャート
+     * 資材チャート
      * 
      * @param log 資材ログ
      * @param scale 日単位のスケール
      * @param width 幅
      * @param height 高さ
      */
-    public ResourceChart(ResourceLog log, int scale, int width, int height) {
+    public ResourceChart(ResourceLog log, int scale, String scaleText, int width, int height) {
         this.log = log;
         this.term = TimeUnit.DAYS.toMillis(scale);
+        this.scaleText = scaleText;
         this.notch = (long) (this.term / ((double) (width - LEFT_WIDTH - RIGHT_WIDTH) / 4));
         this.width = width;
         this.height = height;
@@ -70,6 +73,7 @@ public class ResourceChart {
      * @param gc グラフィックコンテキスト
      */
     public void draw(GC gc) {
+
         // グラフエリアの幅
         float w = this.width - LEFT_WIDTH - RIGHT_WIDTH;
         // グラフエリアの高さ
@@ -130,6 +134,12 @@ public class ResourceChart {
             gc.drawText(label, hx, hy, true);
             hx += labelWidth + 2;
         }
+        // スケールテキストを描く
+        int sx = this.width - RIGHT_WIDTH - getStringWidth(gc, this.scaleText);
+        int sy = 5;
+        gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+        gc.drawText(this.scaleText, sx, sy, true);
+
         // グラフを描く
         for (int i = 0; i < this.resources.length; i++) {
             gc.setLineWidth(2);
@@ -229,13 +239,7 @@ public class ResourceChart {
      * @return 文字列幅
      */
     private static int getStringWidth(GC gc, String str) {
-        // drawTextを呼んでおかないと何故かgetCharWidthが正しい値を返さないのでおまじない
-        gc.drawText(" ", 0, 0);
-        int size = 0;
-        for (int i = 0; i < str.length(); i++) {
-            size += gc.getAdvanceWidth(str.charAt(i));
-        }
-        return size;
+        return gc.textExtent(str).x;
     }
 
     /**
@@ -249,7 +253,7 @@ public class ResourceChart {
         long t = value;
         long half = notch / 2;
         long mod = t % notch;
-        if (mod > half) {
+        if (mod >= half) {
             t += notch - mod;
         } else {
             t -= mod;

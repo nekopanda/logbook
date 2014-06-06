@@ -13,7 +13,7 @@ import org.eclipse.swt.graphics.RGB;
 public class AppConstants {
 
     /** バージョン */
-    public static final String VERSION = "0.6.0";
+    public static final String VERSION = "0.6.1";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://nekopanda.blog.jp/");
@@ -87,8 +87,11 @@ public class AppConstants {
     /** 艦娘設定ファイル  */
     public static final File SHIP_CONFIG_FILE = new File("./config/ship.xml");
 
-    /** 装備設定ファイル  */
+    /** 装備一覧設定ファイル  */
     public static final File ITEM_CONFIG_FILE = new File("./config/item.xml");
+
+    /** 装備マスター設定ファイル  */
+    public static final File ITEM_MST_CONFIG_FILE = new File("./config/itemmst.xml");
 
     /** マスターゲームデータ保存ファイル  */
     public static final File MASTER_DATA_CONFIG = new File("./config/master.xml");

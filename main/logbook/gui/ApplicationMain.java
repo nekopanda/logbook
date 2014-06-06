@@ -2,6 +2,7 @@ package logbook.gui;
 
 import logbook.config.AppConfig;
 import logbook.config.ItemConfig;
+import logbook.config.ItemMasterConfig;
 import logbook.config.MasterDataConfig;
 import logbook.config.ShipConfig;
 import logbook.config.ShipGroupConfig;
@@ -95,6 +96,7 @@ public final class ApplicationMain {
                 AppConfig.store();
                 ShipConfig.store();
                 ShipGroupConfig.store();
+                ItemMasterConfig.store();
                 ItemConfig.store();
                 MasterDataConfig.store();
             } catch (Exception e) {
@@ -171,6 +173,7 @@ public final class ApplicationMain {
             ShipConfig.load();
             MasterDataConfig.load();
             ShipGroupConfig.load();
+            ItemMasterConfig.load();
             ItemConfig.load();
             // シャットダウンフックを登録します
             Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHookThread()));
@@ -356,9 +359,9 @@ public final class ApplicationMain {
                 new ShipFilterGroupDialog(ApplicationMain.this.shell).open();
             }
         });
-        // その他-資材ログチャート
+        // その他-資材チャート
         MenuItem resourceChart = new MenuItem(etcmenu, SWT.NONE);
-        resourceChart.setText("資材ログチャート(&R)");
+        resourceChart.setText("資材チャート(&R)");
         resourceChart.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
