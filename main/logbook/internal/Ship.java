@@ -201,8 +201,8 @@ public class Ship {
             this.put("181", new ShipInfoDto("天津風", "駆逐艦", "あまつかぜ", 20, 20, 20));
             this.put("182", new ShipInfoDto("明石", "工作艦", "あかし", 35, 10, 50));
             this.put("183", new ShipInfoDto("ハルナ", "戦艦", "アルはるな", 0, 275, 200));
-            this.put("184", ShipInfoDto.EMPTY);
-            this.put("185", ShipInfoDto.EMPTY);
+            this.put("184", new ShipInfoDto("大鯨", "潜水母艦", "たいげい・りゅうほう", 25, 10, 35));
+            this.put("185", new ShipInfoDto("龍鳳", "軽空母", "たいげい・りゅうほう", 50, 35, 35));
             this.put("186", ShipInfoDto.EMPTY);
             this.put("187", new ShipInfoDto("明石改", "工作艦", "あかし", 0, 15, 55));
             this.put("188", new ShipInfoDto("利根改二", "航空巡洋艦", "とね", 0, 65, 50));
@@ -213,7 +213,7 @@ public class Ship {
             this.put("193", ShipInfoDto.EMPTY);
             this.put("194", new ShipInfoDto("羽黒改二", "重巡洋艦", "はぐろ", 0, 75, 45));
             this.put("195", ShipInfoDto.EMPTY);
-            this.put("196", ShipInfoDto.EMPTY);
+            this.put("196", new ShipInfoDto("飛龍改二", "正規空母", "ひりゅう", 0, 75, 70));
             this.put("197", ShipInfoDto.EMPTY);
             this.put("198", ShipInfoDto.EMPTY);
             this.put("199", ShipInfoDto.EMPTY);
@@ -297,7 +297,7 @@ public class Ship {
             this.put("277", new ShipInfoDto("赤城改", "正規空母", "あかぎ", 0, 75, 75));
             this.put("278", new ShipInfoDto("加賀改", "正規空母", "かが", 0, 80, 80));
             this.put("279", new ShipInfoDto("蒼龍改", "正規空母", "そうりゅう", 0, 65, 65));
-            this.put("280", new ShipInfoDto("飛龍改", "正規空母", "ひりゅう", 0, 65, 65));
+            this.put("280", new ShipInfoDto("飛龍改", "正規空母", "ひりゅう", 77, 65, 65));
             this.put("281", new ShipInfoDto("龍驤改", "軽空母", "りゅうじょう", 75, 40, 40));
             this.put("282", new ShipInfoDto("祥鳳改", "軽空母", "しょうほう", 0, 40, 40));
             this.put("283", new ShipInfoDto("飛鷹改", "軽空母", "ひよう", 0, 45, 45));
@@ -335,7 +335,7 @@ public class Ship {
             this.put("315", ShipInfoDto.EMPTY);
             this.put("316", new ShipInfoDto("天津風改", "駆逐艦", "あまつかぜ", 0, 20, 20));
             this.put("317", new ShipInfoDto("浦風改", "駆逐艦", "うらかぜ", 0, 20, 15));
-            this.put("318", ShipInfoDto.EMPTY);
+            this.put("318", new ShipInfoDto("龍鳳改", "軽空母", "たいげい・りゅうほう", 0, 40, 35));
             this.put("319", ShipInfoDto.EMPTY);
             this.put("320", ShipInfoDto.EMPTY);
             this.put("321", ShipInfoDto.EMPTY);

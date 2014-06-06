@@ -33,6 +33,7 @@ public class ShipStyle {
             this.put("17", "揚陸艦");
             this.put("18", "装甲空母");
             this.put("19", "工作艦");
+            this.put("20", "潜水母艦");
         }
     };
 
