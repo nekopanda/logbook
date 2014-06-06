@@ -3,6 +3,9 @@ package logbook.gui;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import logbook.config.AppConfig;
 import logbook.gui.listener.TableKeyShortcutAdapter;
@@ -32,6 +35,9 @@ import org.eclipse.swt.widgets.TableItem;
  *
  */
 public abstract class AbstractTableDialog extends Dialog {
+
+    /** タイマー */
+    protected Timer timer;
 
     /** ヘッダー */
     protected String[] header = this.getTableHeader();
@@ -113,9 +119,16 @@ public abstract class AbstractTableDialog extends Dialog {
         reload.setAccelerator(SWT.F5);
         reload.addSelectionListener(new TableReloadAdapter());
 
+        MenuItem cyclicReload = new MenuItem(this.opemenu, SWT.CHECK);
+        cyclicReload.setText("定期的に再読み込み(3秒)(&A)\tCtrl+F5");
+        cyclicReload.setAccelerator(SWT.CTRL + SWT.F5);
+        cyclicReload.addSelectionListener(new CyclicReloadAdapter(cyclicReload));
+
         MenuItem selectVisible = new MenuItem(this.opemenu, SWT.NONE);
         selectVisible.setText("列の表示・非表示(&V)");
         selectVisible.addSelectionListener(new SelectVisibleColumnAdapter());
+
+        new MenuItem(this.opemenu, SWT.SEPARATOR);
 
         // テーブル右クリックメニュー
         this.tablemenu = new Menu(this.table);
@@ -142,6 +155,10 @@ public abstract class AbstractTableDialog extends Dialog {
             if (!this.display.readAndDispatch()) {
                 this.display.sleep();
             }
+        }
+        // タイマーの終了
+        if (this.timer != null) {
+            this.timer.cancel();
         }
     }
 
@@ -411,4 +428,61 @@ public abstract class AbstractTableDialog extends Dialog {
         }
     }
 
+    /**
+     * テーブルを定期的に再読み込みする
+     */
+    protected class CyclicReloadAdapter extends SelectionAdapter {
+
+        private final MenuItem menuitem;
+
+        public CyclicReloadAdapter(MenuItem menuitem) {
+            this.menuitem = menuitem;
+        }
+
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+            if (this.menuitem.getSelection()) {
+                // タイマーを作成
+                if (AbstractTableDialog.this.timer == null) {
+                    AbstractTableDialog.this.timer = new Timer(true);
+                }
+                // 5秒毎に再読み込みするようにスケジュールする
+                AbstractTableDialog.this.timer.schedule(new CyclicReloadTask(AbstractTableDialog.this), 0,
+                        TimeUnit.SECONDS.toMillis(3));
+            } else {
+                // タイマーを終了
+                AbstractTableDialog.this.timer.cancel();
+                AbstractTableDialog.this.timer = null;
+            }
+        }
+    }
+
+    /**
+     * テーブルを定期的に再読み込みする
+     */
+    protected static class CyclicReloadTask extends TimerTask {
+
+        private final AbstractTableDialog dialog;
+
+        public CyclicReloadTask(AbstractTableDialog dialog) {
+            this.dialog = dialog;
+        }
+
+        @Override
+        public void run() {
+            synchronized (this.dialog.shell) {
+                if (!this.dialog.shell.isDisposed()) {
+                    this.dialog.display.asyncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            CyclicReloadTask.this.dialog.reloadTable();
+                        }
+                    });
+                } else {
+                    // ウインドウが消えていたらタスクをキャンセルする
+                    this.cancel();
+                }
+            }
+        }
+    }
 }
