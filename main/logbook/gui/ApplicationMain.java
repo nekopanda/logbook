@@ -2,6 +2,7 @@ package logbook.gui;
 
 import logbook.config.AppConfig;
 import logbook.config.ItemConfig;
+import logbook.config.ItemMasterConfig;
 import logbook.config.ShipConfig;
 import logbook.config.ShipGroupConfig;
 import logbook.constants.AppConstants;
@@ -89,6 +90,7 @@ public final class ApplicationMain {
                 AppConfig.store();
                 ShipConfig.store();
                 ShipGroupConfig.store();
+                ItemMasterConfig.store();
                 ItemConfig.store();
             } catch (Exception e) {
                 LOG.fatal("シャットダウンスレッドで異常終了しました", e);
@@ -163,6 +165,7 @@ public final class ApplicationMain {
             AppConfig.load();
             ShipConfig.load();
             ShipGroupConfig.load();
+            ItemMasterConfig.load();
             ItemConfig.load();
             // シャットダウンフックを登録します
             Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHookThread()));
