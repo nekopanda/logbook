@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -54,7 +56,8 @@ public final class CaptureDialog extends Dialog {
     private Spinner intervalms;
 
     private Rectangle rectangle;
-    private CaptureThread thread;
+    private Timer timer;
+    private boolean isAlive;
 
     private Font font;
 
@@ -83,9 +86,9 @@ public final class CaptureDialog extends Dialog {
                 }
             }
         } finally {
-            // キャプチャスレッドを停止させる
-            if ((this.thread != null) && this.thread.isAlive()) {
-                this.thread.shutdown();
+            // タイマーを停止させる
+            if (this.timer != null) {
+                this.timer.cancel();
             }
             // フォントを開放
             if (this.font != null) {
@@ -236,23 +239,33 @@ public final class CaptureDialog extends Dialog {
 
         @Override
         public void widgetSelected(SelectionEvent e) {
-            CaptureThread thread = CaptureDialog.this.thread;
+            Timer timer = CaptureDialog.this.timer;
 
             Rectangle rectangle = CaptureDialog.this.rectangle;
             boolean interval = CaptureDialog.this.interval.getSelection();
             int intervalms = CaptureDialog.this.intervalms.getSelection();
 
-            if ((thread != null) && thread.isAlive()) {
-                // スレッドが生存している場合、停止させる
-                thread.shutdown();
+            if (timer != null) {
+                // タイマーを停止させる
+                timer.cancel();
+                timer = null;
+            }
+
+            if (CaptureDialog.this.isAlive) {
 
                 CaptureDialog.this.capture.setText(getCaptureButtonText(false, interval));
                 LayoutLogic.enable(CaptureDialog.this.composite, true);
+                CaptureDialog.this.isAlive = false;
             } else {
-                // スレッドが生存していない場合キャプチャする
-                thread = new CaptureThread(rectangle, interval, intervalms);
-                thread.start();
-                CaptureDialog.this.thread = thread;
+                timer = new Timer(true);
+                if (interval) {
+                    // 固定レートで周期キャプチャ
+                    timer.scheduleAtFixedRate(new CaptureTask(rectangle), 0, intervalms);
+                    CaptureDialog.this.isAlive = true;
+                } else {
+                    // 一回だけキャプチャ
+                    timer.schedule(new CaptureTask(rectangle), 0);
+                }
 
                 CaptureDialog.this.capture.setText(getCaptureButtonText(true, interval));
 
@@ -260,6 +273,7 @@ public final class CaptureDialog extends Dialog {
                     LayoutLogic.enable(CaptureDialog.this.composite, false);
                 }
             }
+            CaptureDialog.this.timer = timer;
         }
     }
 
@@ -267,9 +281,9 @@ public final class CaptureDialog extends Dialog {
      * 画面キャプチャスレッド
      *
      */
-    public static final class CaptureThread extends Thread {
+    public static final class CaptureTask extends TimerTask {
         /** ロガー */
-        private static final Logger LOG = LogManager.getLogger(CaptureThread.class);
+        private static final Logger LOG = LogManager.getLogger(CaptureTask.class);
         /** Jpeg品質 */
         private static final float QUALITY = 0.9f;
         /** 日付フォーマット(ファイル名) */
@@ -280,88 +294,73 @@ public final class CaptureDialog extends Dialog {
         private final Rectangle rectangle;
         /** トリム範囲 */
         private java.awt.Rectangle trimRect;
-        /** 周期キャプチャ */
-        private boolean interval;
-        /** 周期キャプチャ間隔(ms) */
-        private final int ms;
 
-        public CaptureThread(Rectangle rectangle, boolean interval, int intervalms) {
+        public CaptureTask(Rectangle rectangle) {
             this.rectangle = rectangle;
-            this.interval = interval;
-            this.ms = intervalms;
         }
 
         @Override
         public void run() {
             try {
-                do {
-                    // 時刻からファイル名を作成
-                    Date now = Calendar.getInstance().getTime();
+                // 時刻からファイル名を作成
+                Date now = Calendar.getInstance().getTime();
 
-                    String dir = null;
-                    if (AppConfig.get().isCreateDateFolder()) {
-                        dir = FilenameUtils.concat(AppConfig.get().getCapturePath(), this.dirNameFormat.format(now));
-                    } else {
-                        dir = AppConfig.get().getCapturePath();
+                String dir = null;
+                if (AppConfig.get().isCreateDateFolder()) {
+                    dir = FilenameUtils.concat(AppConfig.get().getCapturePath(), this.dirNameFormat.format(now));
+                } else {
+                    dir = AppConfig.get().getCapturePath();
+                }
+
+                String fname = FilenameUtils.concat(dir, this.fileNameFormat.format(now) + "."
+                        + AppConfig.get().getImageFormat());
+                File file = new File(fname);
+
+                if (file.exists()) {
+                    if (file.isDirectory()) {
+                        throw new IOException("File '" + file + "' exists but is a directory");
                     }
-
-                    String fname = FilenameUtils.concat(dir, this.fileNameFormat.format(now) + "."
-                            + AppConfig.get().getImageFormat());
-                    File file = new File(fname);
-
-                    if (file.exists()) {
-                        if (file.isDirectory()) {
-                            throw new IOException("File '" + file + "' exists but is a directory");
-                        }
-                        if (!(file.canWrite()))
-                            throw new IOException("File '" + file + "' cannot be written to");
-                    } else {
-                        File parent = file.getParentFile();
-                        if ((parent != null) &&
-                                (!(parent.mkdirs())) && (!(parent.isDirectory()))) {
-                            throw new IOException("Directory '" + parent + "' could not be created");
-                        }
+                    if (!(file.canWrite()))
+                        throw new IOException("File '" + file + "' cannot be written to");
+                } else {
+                    File parent = file.getParentFile();
+                    if ((parent != null) &&
+                            (!(parent.mkdirs())) && (!(parent.isDirectory()))) {
+                        throw new IOException("Directory '" + parent + "' could not be created");
                     }
+                }
 
-                    // 範囲をキャプチャする
-                    BufferedImage image = AwtUtils.getCapture(this.rectangle);
-                    if (image != null) {
+                // 範囲をキャプチャする
+                BufferedImage image = AwtUtils.getCapture(this.rectangle);
+                if (image != null) {
 
-                        ImageOutputStream ios = ImageIO.createImageOutputStream(file);
+                    ImageOutputStream ios = ImageIO.createImageOutputStream(file);
+                    try {
+                        ImageWriter writer = ImageIO.getImageWritersByFormatName(AppConfig.get().getImageFormat())
+                                .next();
                         try {
-                            ImageWriter writer = ImageIO.getImageWritersByFormatName(AppConfig.get().getImageFormat())
-                                    .next();
-                            try {
-                                ImageWriteParam iwp = writer.getDefaultWriteParam();
-                                if (iwp.canWriteCompressed()) {
-                                    iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                                    iwp.setCompressionQuality(QUALITY);
-                                }
-                                writer.setOutput(ios);
-
-                                if (this.trimRect == null) {
-                                    this.trimRect = AwtUtils.getTrimSize(image);
-                                }
-
-                                writer.write(null, new IIOImage(AwtUtils.trim(image, this.trimRect), null, null), iwp);
-                            } finally {
-                                writer.dispose();
+                            ImageWriteParam iwp = writer.getDefaultWriteParam();
+                            if (iwp.canWriteCompressed()) {
+                                iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                                iwp.setCompressionQuality(QUALITY);
                             }
+                            writer.setOutput(ios);
+
+                            if (this.trimRect == null) {
+                                this.trimRect = AwtUtils.getTrimSize(image);
+                            }
+
+                            writer.write(null, new IIOImage(AwtUtils.trim(image, this.trimRect), null, null), iwp);
                         } finally {
-                            ios.close();
+                            writer.dispose();
                         }
+                    } finally {
+                        ios.close();
                     }
-                    if (this.interval) {
-                        Thread.sleep(this.ms);
-                    }
-                } while (this.interval);
+                }
             } catch (Exception e) {
                 LOG.warn("キャプチャ中に例外が発生しました", e);
             }
-        }
-
-        public void shutdown() {
-            this.interval = false;
         }
     }
 }
