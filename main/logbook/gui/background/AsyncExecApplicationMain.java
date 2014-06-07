@@ -1,5 +1,6 @@
 package logbook.gui.background;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -154,6 +155,9 @@ public final class AsyncExecApplicationMain extends Thread {
 
         private final ApplicationMain main;
 
+        /** 日付フォーマット */
+        private final SimpleDateFormat format = new SimpleDateFormat(AppConstants.DATE_SHORT_FORMAT);
+
         /**
          * コンストラクター
          */
@@ -221,6 +225,10 @@ public final class AsyncExecApplicationMain extends Thread {
 
                     if (deckMissions[i].getTime() != null) {
                         long rest = getRest(now, deckMissions[i].getTime());
+
+                        // ツールチップテキストで時刻を表示する
+                        deckTimeTexts[i].setToolTipText(this.format.format(deckMissions[i].getTime()));
+
                         // 20分前、10分前、5分前になったら背景色を変更する
                         if (rest <= (ONE_MINUTES * 5)) {
                             deckTimeTexts[i].setBackground(SWTResourceManager
@@ -241,7 +249,7 @@ public final class AsyncExecApplicationMain extends Thread {
                                 FLAG_NOTICE_DECK[i] = true;
                             } else if (AppConfig.get().isMissionRemind() && (rest < -1)
                                     && ((rest % AppConfig.get().getRemindInterbal()) == 0)) {
-                                // 3分毎にリマインドする
+                                // 定期的にリマインドする
                                 notice.add(dispname + " がまもなく帰投します");
                                 noticeflg = true;
                             } else if (rest > ONE_MINUTES) {
@@ -292,6 +300,10 @@ public final class AsyncExecApplicationMain extends Thread {
                     if (ship != null) {
                         name = ship.getName() + " (Lv" + ship.getLv() + ")";
                         long rest = getRest(now, ndocks[i].getNdocktime());
+
+                        // ツールチップテキストで時刻を表示する
+                        ndockTimeTexts[i].setToolTipText(this.format.format(ndocks[i].getNdocktime()));
+
                         // 20分前、10分前、5分前になったら背景色を変更する
                         if (rest <= (ONE_MINUTES * 5)) {
                             ndockTimeTexts[i].setBackground(SWTResourceManager
