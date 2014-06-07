@@ -179,8 +179,8 @@ public abstract class AbstractTableDialog extends Dialog {
         this.setTableBody();
         this.packTableHeader();
         this.table.setSortColumn(sortColumn);
-        this.table.setTopIndex(topindex);
         this.table.setSelection(selection);
+        this.table.setTopIndex(topindex);
         this.shell.setRedraw(true);
     }
 
