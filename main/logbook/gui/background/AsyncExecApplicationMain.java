@@ -265,6 +265,7 @@ public final class AsyncExecApplicationMain extends Thread {
                     }
                 } else {
                     deckTimeTexts[i].setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+                    deckTimeTexts[i].setToolTipText(null);
                 }
                 deckNameLabels[i].setText(dispname);
                 deckTimeTexts[i].setText(time);
@@ -337,6 +338,7 @@ public final class AsyncExecApplicationMain extends Thread {
                     }
                 } else {
                     ndockTimeTexts[i].setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+                    ndockTimeTexts[i].setToolTipText(null);
                 }
                 ndockNameLabels[i].setText(name);
                 ndockTimeTexts[i].setText(time);
