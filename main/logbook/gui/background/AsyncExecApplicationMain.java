@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
@@ -36,7 +37,6 @@ import org.eclipse.wb.swt.SWTResourceManager;
 public final class AsyncExecApplicationMain extends Thread {
     private static final Logger LOG = LogManager.getLogger(AsyncExecApplicationMain.class);
 
-    private static final int ONE_SECONDS_FORMILIS = 1000;
     private static final int ONE_MINUTES = 60;
 
     private final ApplicationMain main;
@@ -71,7 +71,7 @@ public final class AsyncExecApplicationMain extends Thread {
                 // 遠征と入渠を更新する
                 Display.getDefault().asyncExec(new UpdateDeckNdockTask(this.main));
 
-                Thread.sleep(ONE_SECONDS_FORMILIS);
+                TimeUnit.SECONDS.sleep(1);
             }
         } catch (Exception e) {
             LOG.fatal("スレッドが異常終了しました", e);
@@ -87,7 +87,7 @@ public final class AsyncExecApplicationMain extends Thread {
      * @return
      */
     private static long getRest(Date date1, Date date2) {
-        return ((date2.getTime() - date1.getTime()) / ONE_SECONDS_FORMILIS);
+        return TimeUnit.MILLISECONDS.toSeconds(date2.getTime() - date1.getTime());
     }
 
     /**

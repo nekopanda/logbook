@@ -1,5 +1,7 @@
 package logbook.gui.background;
 
+import java.util.concurrent.TimeUnit;
+
 import logbook.data.context.GlobalContext;
 
 import org.apache.logging.log4j.LogManager;
@@ -13,7 +15,7 @@ import org.eclipse.swt.widgets.List;
  */
 public final class AsyncExecApplicationMainConsole extends Thread {
     private static final Logger LOG = LogManager.getLogger(AsyncExecApplicationMainConsole.class);
-    private static final int UPDATE_FORMILIS = 500;
+    private static final int CYCLE = 500;
     private static final int MAX_LOG_LINES = 200;
 
     private final List console;
@@ -39,9 +41,9 @@ public final class AsyncExecApplicationMainConsole extends Thread {
                 // ログメッセージを取り出す
                 String message;
                 while ((message = GlobalContext.getConsoleMessage()) != null) {
-                    Display.getDefault().asyncExec(new UpdateConsoleTask(this.console, message));
+                    Display.getDefault().syncExec(new UpdateConsoleTask(this.console, message));
                 }
-                Thread.sleep(UPDATE_FORMILIS);
+                TimeUnit.MILLISECONDS.sleep(CYCLE);
             }
         } catch (Exception e) {
             LOG.fatal("スレッドが異常終了しました", e);
