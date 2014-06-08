@@ -212,7 +212,9 @@ public final class CaptureDialog extends Dialog {
 
                 try {
                     // 範囲を取得する
-                    Rectangle rectangle = new FullScreenDialog(CaptureDialog.this.shell, image).open();
+                    Rectangle rectangle = new FullScreenDialog(CaptureDialog.this.shell, image,
+                            CaptureDialog.this.shell.getMonitor())
+                            .open();
 
                     if ((rectangle != null) && (rectangle.width > 1) && (rectangle.height > 1)) {
                         CaptureDialog.this.rectangle = rectangle;
