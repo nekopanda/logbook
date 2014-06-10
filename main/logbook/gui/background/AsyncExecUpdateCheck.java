@@ -41,14 +41,20 @@ public final class AsyncExecUpdateCheck extends Thread {
                 Display.getDefault().asyncExec(new Runnable() {
                     @Override
                     public void run() {
+                        Shell shell = AsyncExecUpdateCheck.this.shell;
 
-                        MessageBox box = new MessageBox(AsyncExecUpdateCheck.this.shell, SWT.YES | SWT.NO
+                        if (shell.isDisposed()) {
+                            // ウインドウが閉じられていたらなにもしない
+                            return;
+                        }
+
+                        MessageBox box = new MessageBox(shell, SWT.YES | SWT.NO
                                 | SWT.ICON_QUESTION);
                         box.setText("新しいバージョン");
                         box.setMessage("新しいバージョンがあります。ホームページを開きますか？\r\n"
                                 + "現在のバージョン:" + AppConstants.VERSION + "\r\n"
                                 + "新しいバージョン:" + newversion + "\r\n"
-                                + "※自動アップデートチェックは[ヘルプ]-[設定]からOFFに出来ます");
+                                + "※自動アップデートチェックは[その他]-[設定]からOFFに出来ます");
 
                         // OKを押されたらホームページへ移動する
                         if (box.open() == SWT.YES) {

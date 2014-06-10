@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.CheckForNull;
 import javax.json.JsonArray;
@@ -1262,7 +1263,7 @@ public final class GlobalContext {
 
         // 資材ログに書き込む
         if ((materialLogLastUpdate == null)
-                || (((time.getTime() - materialLogLastUpdate.getTime()) / 1000) >
+                || (TimeUnit.MILLISECONDS.toSeconds(time.getTime() - materialLogLastUpdate.getTime()) >
                 AppConfig.get().getMaterialLogInterval())) {
             CreateReportLogic.storeMaterialReport(material);
 

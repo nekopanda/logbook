@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -42,14 +43,10 @@ public class ResourceLog extends AbstractDto {
      */
     @CheckForNull
     public static ResourceLog getInstance(File file) throws IOException {
+        // 日付フォーマット
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        List<Long> time = new ArrayList<>();
-        List<Integer> fuel = new ArrayList<>();
-        List<Integer> ammo = new ArrayList<>();
-        List<Integer> metal = new ArrayList<>();
-        List<Integer> bauxite = new ArrayList<>();
-
+        List<SortableLog> logs = new ArrayList<>();
         // データを読み込む
         try (Reader reader = new BufferedReader(new FileReader(file))) {
             LineIterator ite = new LineIterator(reader);
@@ -61,9 +58,6 @@ public class ResourceLog extends AbstractDto {
                 String line = ite.next();
                 // 日付,（直前のイベント,）燃料,弾薬,鋼材,ボーキ,高速修復材,高速建造材,開発資材
                 String[] colums = line.split(",");
-                if (colums.length < 8) {
-                    continue;
-                }
                 try {
                     Date date = format.parse(colums[0]);
                     int baseIdx;
@@ -76,31 +70,34 @@ public class ResourceLog extends AbstractDto {
                         // 拡張版のログ
                         baseIdx = 2;
                     }
-                    int ifuel = Integer.parseInt(colums[baseIdx + 0]);
-                    int iammo = Integer.parseInt(colums[baseIdx + 1]);
-                    int imetal = Integer.parseInt(colums[baseIdx + 2]);
-                    int ibauxite = Integer.parseInt(colums[baseIdx + 3]);
-
-                    time.add(date.getTime());
-                    fuel.add(ifuel);
-                    ammo.add(iammo);
-                    metal.add(imetal);
-                    bauxite.add(ibauxite);
+                    logs.add(new SortableLog(date.getTime(),
+							Integer.parseInt(colums[baseIdx + 0]), Integer.parseInt(colums[baseIdx + 1]),
+                            Integer.parseInt(colums[baseIdx + 2]), Integer.parseInt(colums[baseIdx + 3])));
 
                 } catch (Exception e) {
                     continue;
                 }
             }
         }
-
         // 資材ログが2行以下の場合はグラフを描画出来ないのでnullを返す
-        if (time.size() <= 2) {
+        if (logs.size() <= 2) {
             return null;
         }
+        // ソート
+        Collections.sort(logs);
 
-        long[] t = new long[time.size()];
-        for (int i = 0; i < time.size(); i++) {
-            t[i] = time.get(i);
+        long[] time = new long[logs.size()];
+        int[] fuel = new int[logs.size()];
+        int[] ammo = new int[logs.size()];
+        int[] metal = new int[logs.size()];
+        int[] bauxite = new int[logs.size()];
+        for (int i = 0; i < logs.size(); i++) {
+            SortableLog log = logs.get(i);
+            time[i] = log.time;
+            fuel[i] = log.fuel;
+            ammo[i] = log.ammo;
+            metal[i] = log.metal;
+            bauxite[i] = log.bauxite;
         }
         Resource[] resources = new Resource[] {
                 new Resource("燃料", new RGB(0x00, 0x80, 0x00), fuel),
@@ -108,7 +105,31 @@ public class ResourceLog extends AbstractDto {
                 new Resource("鋼材", new RGB(0x80, 0x80, 0x80), metal),
                 new Resource("ボーキ", new RGB(0xCC, 0x33, 0x00), bauxite)
         };
+        return new ResourceLog(time, resources);
+    }
 
-        return new ResourceLog(t, resources);
+    /**
+     * 資材ログの行
+     */
+    private static final class SortableLog implements Comparable<SortableLog> {
+
+        long time;
+        int fuel;
+        int ammo;
+        int metal;
+        int bauxite;
+
+        public SortableLog(long time, int fuel, int ammo, int metal, int bauxite) {
+            this.time = time;
+            this.fuel = fuel;
+            this.ammo = ammo;
+            this.metal = metal;
+            this.bauxite = bauxite;
+        }
+
+        @Override
+        public int compareTo(SortableLog o) {
+            return Long.compare(this.time, o.time);
+        }
     }
 }
