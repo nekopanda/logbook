@@ -493,9 +493,6 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setReportPath(reportDir.getText());
                 AppConfig.get().setMaterialLogInterval(materialintervalSpinner.getSelection());
                 AppConfig.get().setCheckUpdate(checkUpdate.getSelection());
-                AppConfig.get().setMissionRemind(remind.getSelection());
-                AppConfig.get().setRemindInterbal(intervalSpinner.getSelection());
-                AppConfig.get().setUseBalloon(balloon.getSelection());
                 // fleettab
                 AppConfig.get().setDisplayCount(displaycount.getSelection());
                 AppConfig.get().setDefaultSea(seacombo.getItem(seacombo.getSelectionIndex()));
@@ -507,7 +504,12 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setBalloonBybadlyDamage(balloonBybadlyDamage.getSelection());
                 AppConfig.get().setVisibleOnReturnMission(visibleOnReturnMission.getSelection());
                 AppConfig.get().setVisibleOnReturnBathwater(visibleOnReturnBathwater.getSelection());
-
+                // notify
+                AppConfig.get().setMissionRemind(remind.getSelection());
+                AppConfig.get().setRemindInterbal(intervalSpinner.getSelection());
+                AppConfig.get().setUseBalloon(balloon.getSelection());
+                AppConfig.get().setUseTaskbarNotify(taskbar.getSelection());
+                AppConfig.get().setNotifyFully(fullySpinner.getSelection());
                 // capture
                 AppConfig.get().setCapturePath(captureDir.getText());
                 AppConfig.get().setImageFormat(imageformatCombo.getItem(imageformatCombo.getSelectionIndex()));
