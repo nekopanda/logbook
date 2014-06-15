@@ -117,6 +117,12 @@ public final class AppConfigBean {
     /** デフォルト評価 */
     private String defaultEvaluate = "S勝利";
 
+    /** タスクバー通知を使用する */
+    private boolean useTaskbarNotify = true;
+
+    /** 母港の空きがこれ以下で警告表示に変える */
+    private int notifyFully = 1;
+
     /** 開発者オプション-JSONを保存する */
     private boolean storeJson;
 
@@ -700,6 +706,38 @@ public final class AppConfigBean {
      */
     public void setDefaultEvaluate(String defaultEvaluate) {
         this.defaultEvaluate = defaultEvaluate;
+    }
+
+    /**
+     * タスクバー通知を使用するを取得します。
+     * @return タスクバー通知を使用する
+     */
+    public boolean isUseTaskbarNotify() {
+        return this.useTaskbarNotify;
+    }
+
+    /**
+     * タスクバー通知を使用するを設定します。
+     * @param useTaskbarNotify タスクバー通知を使用する
+     */
+    public void setUseTaskbarNotify(boolean useTaskbarNotify) {
+        this.useTaskbarNotify = useTaskbarNotify;
+    }
+
+    /**
+     * 母港の空きがこれ以下で警告表示に変えるを取得します。
+     * @return 母港の空きがこれ以下で警告表示に変える
+     */
+    public int getNotifyFully() {
+        return this.notifyFully;
+    }
+
+    /**
+     * 母港の空きがこれ以下で警告表示に変えるを設定します。
+     * @param notifyFully 母港の空きがこれ以下で警告表示に変える
+     */
+    public void setNotifyFully(int notifyFully) {
+        this.notifyFully = notifyFully;
     }
 
     /**

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import logbook.config.AppConfig;
+import logbook.data.context.GlobalContext;
 import logbook.gui.logic.LayoutLogic;
 import logbook.internal.EvaluateExp;
 import logbook.internal.SeaExp;
@@ -91,6 +92,9 @@ public final class ConfigDialog extends Dialog {
         TreeItem fleettab = new TreeItem(systemroot, SWT.NONE);
         fleettab.setText("艦隊タブ");
         fleettab.setData("fleettab");
+        TreeItem notify = new TreeItem(systemroot, SWT.NONE);
+        notify.setText("通知");
+        notify.setData("notify");
         TreeItem capture = new TreeItem(systemroot, SWT.NONE);
         capture.setText("キャプチャ");
         capture.setData("capture");
@@ -188,30 +192,6 @@ public final class ConfigDialog extends Dialog {
 
         new Label(compositeSystem, SWT.NONE);
 
-        final Button remind = new Button(compositeSystem, SWT.CHECK);
-        remind.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-        remind.setText("遠征の通知をリマインドする");
-        remind.setSelection(AppConfig.get().isMissionRemind());
-
-        Label intervallabel = new Label(compositeSystem, SWT.NONE);
-        intervallabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        intervallabel.setText("間隔(秒)");
-
-        final Spinner intervalSpinner = new Spinner(compositeSystem, SWT.BORDER);
-        intervalSpinner.setMaximum(60 * 60);
-        intervalSpinner.setMinimum(10);
-        intervalSpinner.setSelection(AppConfig.get().getRemindInterbal());
-        GridData gdIntervalSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdIntervalSpinner.widthHint = 55;
-        intervalSpinner.setLayoutData(gdIntervalSpinner);
-
-        new Label(compositeSystem, SWT.NONE);
-
-        final Button balloon = new Button(compositeSystem, SWT.CHECK);
-        balloon.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-        balloon.setText("遠征・入渠をバルーンで通知する");
-        balloon.setSelection(AppConfig.get().isUseBalloon());
-
         final Button hidewindow = new Button(compositeSystem, SWT.CHECK);
         hidewindow.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
         hidewindow.setText("最小化時にタスクトレイに格納");
@@ -303,6 +283,56 @@ public final class ConfigDialog extends Dialog {
         visibleOnReturnBathwater.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         visibleOnReturnBathwater.setText("お風呂から上がる時に母港タブを表示");
         visibleOnReturnBathwater.setSelection(AppConfig.get().isVisibleOnReturnBathwater());
+
+        // 通知
+        Composite compositeNotify = new Composite(this.composite, SWT.NONE);
+        this.compositeMap.put("notify", compositeNotify);
+        compositeNotify.setLayout(new GridLayout(3, false));
+
+        final Button remind = new Button(compositeNotify, SWT.CHECK);
+        remind.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        remind.setText("遠征の通知をリマインドする");
+        remind.setSelection(AppConfig.get().isMissionRemind());
+
+        Label intervallabel = new Label(compositeNotify, SWT.NONE);
+        intervallabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        intervallabel.setText("間隔(秒)");
+
+        final Spinner intervalSpinner = new Spinner(compositeNotify, SWT.BORDER);
+        intervalSpinner.setMaximum(60 * 60);
+        intervalSpinner.setMinimum(10);
+        intervalSpinner.setSelection(AppConfig.get().getRemindInterbal());
+        GridData gdIntervalSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        gdIntervalSpinner.widthHint = 55;
+        intervalSpinner.setLayoutData(gdIntervalSpinner);
+
+        new Label(compositeNotify, SWT.NONE);
+
+        final Button balloon = new Button(compositeNotify, SWT.CHECK);
+        balloon.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        balloon.setText("遠征・入渠をバルーンで通知する");
+        balloon.setSelection(AppConfig.get().isUseBalloon());
+
+        final Button taskbar = new Button(compositeNotify, SWT.CHECK);
+        taskbar.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        taskbar.setText("母港の空きをタスクバーで通知する");
+        taskbar.setSelection(AppConfig.get().isUseTaskbarNotify());
+
+        Label fullyLabel1 = new Label(compositeNotify, SWT.NONE);
+        fullyLabel1.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        fullyLabel1.setText("母港の空きが");
+
+        final Spinner fullySpinner = new Spinner(compositeNotify, SWT.BORDER);
+        fullySpinner.setMaximum(Math.max(100, GlobalContext.maxChara()));
+        fullySpinner.setMinimum(0);
+        fullySpinner.setSelection(AppConfig.get().getNotifyFully());
+        GridData gdFullySpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        gdFullySpinner.widthHint = 55;
+        fullySpinner.setLayoutData(gdFullySpinner);
+
+        Label fullyLabel2 = new Label(compositeNotify, SWT.NONE);
+        fullyLabel2.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        fullyLabel2.setText("以下で警告表示");
 
         // キャプチャ タブ
         Composite compositeCapture = new Composite(this.composite, SWT.NONE);
@@ -477,6 +507,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setBalloonBybadlyDamage(balloonBybadlyDamage.getSelection());
                 AppConfig.get().setVisibleOnReturnMission(visibleOnReturnMission.getSelection());
                 AppConfig.get().setVisibleOnReturnBathwater(visibleOnReturnBathwater.getSelection());
+
                 // capture
                 AppConfig.get().setCapturePath(captureDir.getText());
                 AppConfig.get().setImageFormat(imageformatCombo.getItem(imageformatCombo.getSelectionIndex()));

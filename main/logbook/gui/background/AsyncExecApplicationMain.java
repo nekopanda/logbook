@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import logbook.config.AppConfig;
@@ -19,6 +20,7 @@ import logbook.gui.ApplicationMain;
 import logbook.gui.logic.Sound;
 import logbook.gui.logic.TimeLogic;
 import logbook.gui.widgets.FleetComposite;
+import logbook.util.SwtUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -28,6 +30,7 @@ import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.TaskItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolTip;
 import org.eclipse.wb.swt.SWTResourceManager;
@@ -136,9 +139,34 @@ public final class AsyncExecApplicationMain extends Thread {
             Button shipList = this.main.getShipList();
             String setText = "所有艦娘(" + GlobalContext.getShipMap().size() + "/" + GlobalContext.maxChara()
                     + ")";
-            if (!setText.equals(shipList.getText())) {
-                shipList.setText(setText);
-                shipList.getParent().layout();
+            if (setText.equals(shipList.getText())) {
+                return;
+            }
+
+            shipList.setText(setText);
+            shipList.getParent().layout();
+
+            if (AppConfig.get().isUseTaskbarNotify()) {
+                TaskItem item = SwtUtils.getTaskBarItem(this.main.getShell());
+                if (item != null) {
+                    int max = GlobalContext.maxChara();
+                    int size = GlobalContext.getShipMap().size();
+                    int locked = 0;
+                    for (Entry<Long, ShipDto> entry : GlobalContext.getShipMap().entrySet()) {
+                        if (entry.getValue().getLocked()) {
+                            locked++;
+                        }
+                    }
+                    int r = Math.round(((float) (size - locked) / (float) (max - locked)) * 100);
+
+                    item.setProgress(r);
+
+                    if (max <= (size + AppConfig.get().getNotifyFully())) {
+                        item.setProgressState(SWT.PAUSED);
+                    } else {
+                        item.setProgressState(SWT.NORMAL);
+                    }
+                }
             }
         }
     }
