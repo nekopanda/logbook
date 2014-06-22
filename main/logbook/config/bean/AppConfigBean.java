@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
+import org.eclipse.swt.graphics.RGB;
 
 /**
  * アプリケーションの設定
@@ -122,6 +123,18 @@ public final class AppConfigBean {
 
     /** 母港の空きがこれ以下で警告表示に変える */
     private int notifyFully = 1;
+
+    /** 燃料の色 */
+    private RGB fuelColor = new RGB(0x00, 0x80, 0x00);
+
+    /** 弾薬の色 */
+    private RGB ammoColor = new RGB(0x66, 0x33, 0x00);
+
+    /** 鋼材の色 */
+    private RGB metalColor = new RGB(0x80, 0x80, 0x80);
+
+    /** ボーキの色 */
+    private RGB bauxiteColor = new RGB(0xCC, 0x33, 0x00);
 
     /** 開発者オプション-JSONを保存する */
     private boolean storeJson;
@@ -738,6 +751,70 @@ public final class AppConfigBean {
      */
     public void setNotifyFully(int notifyFully) {
         this.notifyFully = notifyFully;
+    }
+
+    /**
+     * 燃料の色を取得します。
+     * @return 燃料の色
+     */
+    public RGB getFuelColor() {
+        return this.fuelColor;
+    }
+
+    /**
+     * 燃料の色を設定します。
+     * @param fuelColor 燃料の色
+     */
+    public void setFuelColor(RGB fuelColor) {
+        this.fuelColor = fuelColor;
+    }
+
+    /**
+     * 弾薬の色を取得します。
+     * @return 弾薬の色
+     */
+    public RGB getAmmoColor() {
+        return this.ammoColor;
+    }
+
+    /**
+     * 弾薬の色を設定します。
+     * @param ammoColor 弾薬の色
+     */
+    public void setAmmoColor(RGB ammoColor) {
+        this.ammoColor = ammoColor;
+    }
+
+    /**
+     * 鋼材の色を取得します。
+     * @return 鋼材の色
+     */
+    public RGB getMetalColor() {
+        return this.metalColor;
+    }
+
+    /**
+     * 鋼材の色を設定します。
+     * @param metalColor 鋼材の色
+     */
+    public void setMetalColor(RGB metalColor) {
+        this.metalColor = metalColor;
+    }
+
+    /**
+     * ボーキの色を取得します。
+     * @return ボーキの色
+     */
+    public RGB getBauxiteColor() {
+        return this.bauxiteColor;
+    }
+
+    /**
+     * ボーキの色を設定します。
+     * @param bauxiteColor ボーキの色
+     */
+    public void setBauxiteColor(RGB bauxiteColor) {
+        this.bauxiteColor = bauxiteColor;
     }
 
     /**
