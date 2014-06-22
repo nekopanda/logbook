@@ -446,13 +446,15 @@ public abstract class AbstractTableDialog extends Dialog {
                 if (AbstractTableDialog.this.timer == null) {
                     AbstractTableDialog.this.timer = new Timer(true);
                 }
-                // 5秒毎に再読み込みするようにスケジュールする
+                // 3秒毎に再読み込みするようにスケジュールする
                 AbstractTableDialog.this.timer.schedule(new CyclicReloadTask(AbstractTableDialog.this), 0,
                         TimeUnit.SECONDS.toMillis(3));
             } else {
                 // タイマーを終了
-                AbstractTableDialog.this.timer.cancel();
-                AbstractTableDialog.this.timer = null;
+                if (AbstractTableDialog.this.timer != null) {
+                    AbstractTableDialog.this.timer.cancel();
+                    AbstractTableDialog.this.timer = null;
+                }
             }
         }
     }
