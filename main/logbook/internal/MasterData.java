@@ -32,10 +32,10 @@ public class MasterData {
     private Map<Integer, MissionDto> mission = new HashMap<Integer, MissionDto>();
 
     /** マップクリア情報 -1: 非表示 or 未更新 0: クリアしていない 1: クリア済み */
-    private Map<Integer, Integer> mapStatus = new HashMap<Integer, Integer>();
+    private Map<Integer, Integer> mapState = new HashMap<Integer, Integer>();
 
     /** 遠征クリア情報 -1: 非表示 or 未更新 0: NEW 1: 無印 2:　達成 */
-    private Map<Integer, Integer> missionStatus = new HashMap<Integer, Integer>();
+    private Map<Integer, Integer> missionState = new HashMap<Integer, Integer>();
 
     /** 艦種 */
     private List<ShipTypeDto> stype = new ArrayList<ShipTypeDto>();
@@ -99,13 +99,13 @@ public class MasterData {
 
     public void doMapInfo(JsonArray json_mapinfo) {
         if (json_mapinfo != null) {
-            Map<Integer, Integer> newStatus = new HashMap<Integer, Integer>();
+            Map<Integer, Integer> newState = new HashMap<Integer, Integer>();
             for (JsonValue elem : json_mapinfo) {
                 JsonObject obj = (JsonObject) elem;
-                newStatus.put(obj.getInt("api_id"), obj.getInt("api_cleared"));
+                newState.put(obj.getInt("api_id"), obj.getInt("api_cleared"));
             }
-            if (newStatus.equals(this.mapStatus) == false) {
-                this.mapStatus = newStatus;
+            if (newState.equals(this.mapState) == false) {
+                this.mapState = newState;
                 this.lastUpdateTime = new Date();
             }
         }
@@ -113,13 +113,13 @@ public class MasterData {
 
     public void doMission(JsonArray json_mission) {
         if (json_mission != null) {
-            Map<Integer, Integer> newStatus = new HashMap<Integer, Integer>();
+            Map<Integer, Integer> newState = new HashMap<Integer, Integer>();
             for (JsonValue elem : json_mission) {
                 JsonObject obj = (JsonObject) elem;
-                newStatus.put(obj.getInt("api_mission_id"), obj.getInt("api_state"));
+                newState.put(obj.getInt("api_mission_id"), obj.getInt("api_state"));
             }
-            if (newStatus.equals(this.missionStatus) == false) {
-                this.missionStatus = newStatus;
+            if (newState.equals(this.missionState) == false) {
+                this.missionState = newState;
                 this.lastUpdateTime = new Date();
             }
         }
@@ -182,31 +182,31 @@ public class MasterData {
     }
 
     /**
-     * @return mapStatus
+     * @return mapState
      */
-    public Map<Integer, Integer> getMapStatus() {
-        return this.mapStatus;
+    public Map<Integer, Integer> getMapState() {
+        return this.mapState;
     }
 
     /**
-     * @param mapStatus セットする mapStatus
+     * @param mapState セットする mapState
      */
-    public void setMapStatus(Map<Integer, Integer> mapStatus) {
-        this.mapStatus = mapStatus;
+    public void setMapState(Map<Integer, Integer> mapState) {
+        this.mapState = mapState;
     }
 
     /**
-     * @return missionStatus
+     * @return missionState
      */
-    public Map<Integer, Integer> getMissionStatus() {
-        return this.missionStatus;
+    public Map<Integer, Integer> getMissionState() {
+        return this.missionState;
     }
 
     /**
-     * @param missionStatus セットする missionStatus
+     * @param missionState セットする missionState
      */
-    public void setMissionStatus(Map<Integer, Integer> missionStatus) {
-        this.missionStatus = missionStatus;
+    public void setMissionState(Map<Integer, Integer> missionState) {
+        this.missionState = missionState;
     }
 
     /**

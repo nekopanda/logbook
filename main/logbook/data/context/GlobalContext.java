@@ -36,6 +36,7 @@ import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
+import logbook.dto.KdockDto;
 import logbook.dto.LostEntityDto;
 import logbook.dto.MapCellDto;
 import logbook.dto.MaterialDto;
@@ -105,6 +106,7 @@ public final class GlobalContext {
 
     /** 戦闘詳細 */
     private static BattleDto lastBattleDto = null;
+    private static boolean firstBattle = true;
 
     /** 遠征リスト */
     private static DeckMissionDto[] deckMissions = new DeckMissionDto[] { DeckMissionDto.EMPTY, DeckMissionDto.EMPTY,
@@ -116,6 +118,10 @@ public final class GlobalContext {
     /** 入渠リスト */
     private static NdockDto[] ndocks = new NdockDto[] { NdockDto.EMPTY, NdockDto.EMPTY, NdockDto.EMPTY,
             NdockDto.EMPTY };
+
+    /** 建造リスト */
+    private static KdockDto[] kdocks = new KdockDto[] { KdockDto.EMPTY, KdockDto.EMPTY, KdockDto.EMPTY,
+            KdockDto.EMPTY };
 
     /** 任務Map */
     private static ArrayList<QuestDto> questList = new ArrayList<QuestDto>();
@@ -241,6 +247,13 @@ public final class GlobalContext {
      */
     public static NdockDto[] getNdocks() {
         return ndocks;
+    }
+
+    /**
+     * @return 建造ドックリスト
+     */
+    public static KdockDto[] getKdocks() {
+        return kdocks;
     }
 
     /**
@@ -698,7 +711,7 @@ public final class GlobalContext {
     private static void doBattle(Data data) {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
-            lastBattleDto = new BattleDto(apidata);
+            lastBattleDto = new BattleDto(apidata, firstBattle ? null : lastBattleDto);
 
             List<ShipDto> sunkShips = new ArrayList<ShipDto>();
             List<ShipDto> ships = lastBattleDto.getDock().getShips();
@@ -740,6 +753,13 @@ public final class GlobalContext {
 
             // 警告を出すためにバージョンアップ
             lastBattleDto.getDock().setUpdate(true);
+
+            firstBattle = true;
+
+            // ランクが合っているかチェック
+            if (!dto.getRank().equals(lastBattleDto.getRank().rank())) {
+                LOG.info("戦闘結果ランク判定ミス情報: 正解ランク:" + dto.getRank() + " " + lastBattleDto.getRankCalcInfo());
+            }
 
             addConsole("海戦情報を更新しました");
         } catch (Exception e) {
@@ -790,12 +810,13 @@ public final class GlobalContext {
      */
     private static void doKdock(Data data) {
         try {
+            JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
+
             // 建造ドックの空きをカウントします
             if (lastBuildKdock != null) {
                 ResourceDto resource = getShipResource.get(lastBuildKdock);
                 if (resource != null) {
                     int freecount = 0;
-                    JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
                     for (int i = 0; i < apidata.size(); i++) {
                         int state = ((JsonObject) apidata.get(i)).getJsonNumber("api_state").intValue();
                         if (state == 0) {
@@ -807,10 +828,33 @@ public final class GlobalContext {
                     KdockConfig.store(lastBuildKdock, resource);
                 }
             }
+
+            // 建造ドック更新
+            doKdockSub(apidata);
+
             addConsole("建造を更新しました");
         } catch (Exception e) {
             LOG.warn("建造を更新しますに失敗しました", e);
             LOG.warn(data);
+        }
+    }
+
+    private static void doKdockSub(JsonArray apidata) {
+        kdocks = new KdockDto[] { KdockDto.EMPTY, KdockDto.EMPTY, KdockDto.EMPTY, KdockDto.EMPTY };
+        for (int i = 0; i < apidata.size(); i++) {
+            JsonObject object = (JsonObject) apidata.get(i);
+            int state = object.getJsonNumber("api_state").intValue();
+            long milis = object.getJsonNumber("api_complete_time").longValue();
+
+            Date time = null;
+            if (milis > 0) {
+                time = new Date(milis);
+                kdocks[i] = new KdockDto(true, time);
+            }
+            else {
+                // 完了してる or 空いてる
+                kdocks[i] = new KdockDto(state == 3, null);
+            }
         }
     }
 
@@ -849,6 +893,9 @@ public final class GlobalContext {
             // 投入資源を除去する
             getShipResource.remove(dock);
             KdockConfig.remove(dock);
+
+            // 建造ドック更新
+            doKdockSub(apidata.getJsonArray("api_kdock"));
 
             addConsole("建造(入手)情報を更新しました");
         } catch (Exception e) {
@@ -1000,6 +1047,8 @@ public final class GlobalContext {
                 }
             }
 
+            lastBattleDto = null;
+
             // 艦隊を設定
             doDeck(data.getJsonObject().getJsonArray("api_data_deck"));
 
@@ -1146,6 +1195,7 @@ public final class GlobalContext {
      */
     private static void doPowerup(Data data) {
         try {
+            // 近代化改修に使った艦を取り除く
             String shipids = data.getField("api_id_items");
             for (String shipid : shipids.split(",")) {
                 ShipDto ship = shipMap.get(Long.parseLong(shipid));
@@ -1159,11 +1209,26 @@ public final class GlobalContext {
                     }
                     // 艦娘を外す
                     shipMap.remove(ship.getId());
+                    // 艦隊からも外す
+                    String fleetid = ship.getFleetid();
+                    if (fleetid != null) {
+                        DockDto dockdto = dock.get(fleetid);
+                        if (dockdto != null) {
+                            dockdto.removeShip(ship);
+                            dockdto.setUpdate(true);
+                        }
+                    }
                 }
             }
-            addConsole("装備を廃棄しました");
+
+            // 近代化改修された艦を更新する
+            JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+            ShipDto ship = new ShipDto(apidata.getJsonObject("api_ship"));
+            shipMap.put(Long.valueOf(ship.getId()), ship);
+
+            addConsole("近代化改修しました");
         } catch (Exception e) {
-            LOG.warn("装備を廃棄しますに失敗しました", e);
+            LOG.warn("近代化改修しますに失敗しました", e);
             LOG.warn(data);
         }
     }
@@ -1358,51 +1423,51 @@ public final class GlobalContext {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
             if (!apidata.isNull("api_list")) {
-	            JsonArray apilist = apidata.getJsonArray("api_list");
-	            int items_per_page = 5;
-	            int disp_page = apidata.getJsonNumber("api_disp_page").intValue();
-	            int page_count = apidata.getJsonNumber("api_page_count").intValue();
-	            // 足りない要素を足す
-	            for (int i = questList.size(); i < (page_count * items_per_page); ++i) {
-	                questList.add(null);
-	            }
-	            // 余分な要素は削る
-	            for (int i = questList.size() - 1; i >= (page_count * items_per_page); --i) {
-	                questList.remove(i);
-	            }
-	            int pos = 1;
-	            for (JsonValue value : apilist) {
-	                if (value instanceof JsonObject) {
-	                    JsonObject questobject = (JsonObject) value;
-	                    // 任務を作成
-	                    int index = ((disp_page - 1) * items_per_page) + (pos - 1);
-	                    QuestDto quest = new QuestDto();
-	                    quest.setNo(questobject.getInt("api_no"));
-	                    quest.setPage(disp_page);
-	                    quest.setPos(pos++);
-	                    quest.setCategory(questobject.getInt("api_category"));
-	                    quest.setType(questobject.getInt("api_type"));
-	                    quest.setState(questobject.getInt("api_state"));
-	                    quest.setTitle(questobject.getString("api_title"));
-	                    quest.setDetail(questobject.getString("api_detail"));
-	                    JsonArray material = questobject.getJsonArray("api_get_material");
-	                    quest.setFuel(material.getJsonNumber(0).toString());
-	                    quest.setAmmo(material.getJsonNumber(1).toString());
-	                    quest.setMetal(material.getJsonNumber(2).toString());
-	                    quest.setBauxite(material.getJsonNumber(3).toString());
-	                    quest.setBonusFlag(questobject.getInt("api_bonus_flag"));
-	                    quest.setProgressFlag(questobject.getInt("api_progress_flag"));
-	
-	                    questList.set(index, quest);
-	                }
-	            }
-	            if (pos <= items_per_page) {
-	                // 空白がある場合は削る
-	                for (int i = questList.size() - 1; i >= (((disp_page - 1) * items_per_page) + (pos - 1)); --i) {
-	                    questList.remove(i);
-	                }
-	            }
-			}
+                JsonArray apilist = apidata.getJsonArray("api_list");
+                int items_per_page = 5;
+                int disp_page = apidata.getJsonNumber("api_disp_page").intValue();
+                int page_count = apidata.getJsonNumber("api_page_count").intValue();
+                // 足りない要素を足す
+                for (int i = questList.size(); i < (page_count * items_per_page); ++i) {
+                    questList.add(null);
+                }
+                // 余分な要素は削る
+                for (int i = questList.size() - 1; i >= (page_count * items_per_page); --i) {
+                    questList.remove(i);
+                }
+                int pos = 1;
+                for (JsonValue value : apilist) {
+                    if (value instanceof JsonObject) {
+                        JsonObject questobject = (JsonObject) value;
+                        // 任務を作成
+                        int index = ((disp_page - 1) * items_per_page) + (pos - 1);
+                        QuestDto quest = new QuestDto();
+                        quest.setNo(questobject.getInt("api_no"));
+                        quest.setPage(disp_page);
+                        quest.setPos(pos++);
+                        quest.setCategory(questobject.getInt("api_category"));
+                        quest.setType(questobject.getInt("api_type"));
+                        quest.setState(questobject.getInt("api_state"));
+                        quest.setTitle(questobject.getString("api_title"));
+                        quest.setDetail(questobject.getString("api_detail"));
+                        JsonArray material = questobject.getJsonArray("api_get_material");
+                        quest.setFuel(material.getJsonNumber(0).toString());
+                        quest.setAmmo(material.getJsonNumber(1).toString());
+                        quest.setMetal(material.getJsonNumber(2).toString());
+                        quest.setBauxite(material.getJsonNumber(3).toString());
+                        quest.setBonusFlag(questobject.getInt("api_bonus_flag"));
+                        quest.setProgressFlag(questobject.getInt("api_progress_flag"));
+
+                        questList.set(index, quest);
+                    }
+                }
+                if (pos <= items_per_page) {
+                    // 空白がある場合は削る
+                    for (int i = questList.size() - 1; i >= (((disp_page - 1) * items_per_page) + (pos - 1)); --i) {
+                        questList.remove(i);
+                    }
+                }
+            }
             addConsole("任務を更新しました");
         } catch (Exception e) {
             LOG.warn("任務を更新しますに失敗しました", e);
@@ -1582,7 +1647,12 @@ public final class GlobalContext {
         if (object.containsKey("api_fuel_max")) {
             maxFuel = object.getJsonNumber("api_fuel_max").intValue();
         }
-        return new ShipInfoDto(shipId, name, stype, flagship, afterlv, aftershipid, maxBull, maxFuel);
+        JsonArray apiPowup = object.getJsonArray("api_powup");
+        int[] powup = new int[apiPowup.size()];
+        for (int i = 0; i < apiPowup.size(); i++) {
+            powup[i] = ((JsonNumber) apiPowup.get(i)).intValue();
+        }
+        return new ShipInfoDto(shipId, name, stype, flagship, afterlv, aftershipid, maxBull, maxFuel, powup);
     }
 
     private static void addConsole(Object message) {

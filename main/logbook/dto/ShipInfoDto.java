@@ -38,6 +38,9 @@ public final class ShipInfoDto extends AbstractDto {
     /** 燃料 */
     private int maxFuel;
 
+    /** 近代化改修時のup項目 */
+    private int[] powup = new int[4];
+
     /**
      * コンストラクター
      */
@@ -61,7 +64,7 @@ public final class ShipInfoDto extends AbstractDto {
      * コンストラクター
      */
     public ShipInfoDto(int shipId, String name, int stype, String flagship, int afterlv, int aftershipid, int maxBull,
-            int maxFuel) {
+            int maxFuel, int[] powup) {
         this.name = name;
         this.shipId = shipId;
         this.stype = stype;
@@ -71,6 +74,7 @@ public final class ShipInfoDto extends AbstractDto {
         this.flagship = flagship;
         this.maxBull = maxBull;
         this.maxFuel = maxFuel;
+        this.powup = powup;
     }
 
     /**
@@ -211,5 +215,13 @@ public final class ShipInfoDto extends AbstractDto {
      */
     public void setMaxFuel(int maxFuel) {
         this.maxFuel = maxFuel;
+    }
+
+    /**
+     * powupを取得します。
+     * @return powup
+     */
+    public int[] getPowup() {
+        return this.powup;
     }
 }
