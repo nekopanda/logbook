@@ -25,6 +25,7 @@ import logbook.dto.BattleDto;
 import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
 import logbook.dto.ItemDto;
+import logbook.dto.KdockDto;
 import logbook.dto.MapCellDto;
 import logbook.dto.MaterialDto;
 import logbook.dto.NdockDto;
@@ -76,12 +77,17 @@ public class QueryHandler extends HttpServlet {
     }
 
     private static JsonObjectBuilder shipInfoToJson(ShipInfoDto ship) {
+        JsonArrayBuilder powup_array = Json.createArrayBuilder();
+        for (int item_number : ship.getPowup()) {
+            powup_array.add(item_number);
+        }
         return Json.createObjectBuilder()
                 .add("ship_id", ship.getShipId())
                 .add("ship_type", ship.getStype())
                 .add("name", ship.getName())
                 .add("afterlv", ship.getAfterlv())
-                .add("aftershipid", ship.getAftershipid());
+                .add("aftershipid", ship.getAftershipid())
+                .add("powup", powup_array);
     }
 
     private static JsonObjectBuilder itemInfoToJson(ItemDto item) {
@@ -97,21 +103,21 @@ public class QueryHandler extends HttpServlet {
                 .add("name", item.getName());
     }
 
-    private static JsonObjectBuilder mapInfoToJson(MapInfoDto item, Integer status) {
+    private static JsonObjectBuilder mapInfoToJson(MapInfoDto item, Integer state) {
         return Json.createObjectBuilder()
                 .add("id", item.getId())
                 .add("maparea_id", item.getMaparea_id())
                 .add("name", item.getName())
-                .add("status", (status == null) ? -1 : status)
+                .add("state", (state == null) ? -1 : state)
                 .add("no", item.getNo());
     }
 
-    private static JsonObjectBuilder missionToJson(MissionDto item, Integer status) {
+    private static JsonObjectBuilder missionToJson(MissionDto item, Integer state) {
         return Json.createObjectBuilder()
                 .add("id", item.getId())
                 .add("name", item.getName())
                 .add("maparea_id", item.getMaparea_id())
-                .add("status", (status == null) ? -1 : status)
+                .add("state", (state == null) ? -1 : state)
                 .add("time", item.getTime());
     }
 
@@ -159,18 +165,18 @@ public class QueryHandler extends HttpServlet {
 
                 { // マップ
                     JsonArrayBuilder mapinfo_array = Json.createArrayBuilder();
-                    Map<Integer, Integer> mapStatus = data.getMapStatus();
+                    Map<Integer, Integer> mapState = data.getMapState();
                     for (MapInfoDto dto : data.getMapinfo().values()) {
-                        mapinfo_array.add(mapInfoToJson(dto, mapStatus.get(dto.getId())));
+                        mapinfo_array.add(mapInfoToJson(dto, mapState.get(dto.getId())));
                     }
                     jb.add("master_mapinfo", mapinfo_array);
                 }
 
                 { // 遠征
                     JsonArrayBuilder mission_array = Json.createArrayBuilder();
-                    Map<Integer, Integer> missionStatus = data.getMissionStatus();
+                    Map<Integer, Integer> missionState = data.getMissionState();
                     for (MissionDto dto : data.getMission().values()) {
-                        mission_array.add(missionToJson(dto, missionStatus.get(dto.getId())));
+                        mission_array.add(missionToJson(dto, missionState.get(dto.getId())));
                     }
                     jb.add("master_mission", mission_array);
                 }
@@ -198,6 +204,20 @@ public class QueryHandler extends HttpServlet {
         for (Integer item_number : ship.getOnSlot()) {
             onSlot_array.add(item_number);
         }
+
+        JsonArrayBuilder status_array = Json.createArrayBuilder();
+        JsonArrayBuilder statusMax_array = Json.createArrayBuilder();
+        status_array.add(ship.getKaryoku()); // 火力
+        status_array.add(ship.getRaisou()); // 雷装
+        status_array.add(ship.getTaiku()); // 対空
+        status_array.add(ship.getSoukou()); // 装甲
+        status_array.add(ship.getLucky()); // 運
+        statusMax_array.add(ship.getKaryokuMax()); // 火力Max
+        statusMax_array.add(ship.getRaisouMax()); // 雷装Max
+        statusMax_array.add(ship.getTaikuMax()); // 対空Max
+        statusMax_array.add(ship.getSoukouMax()); // 装甲Max
+        statusMax_array.add(ship.getLuckyMax()); // 運Max
+
         return Json.createObjectBuilder()
                 .add("id", ship.getId())
                 .add("ship_id", ship.getShipId())
@@ -217,6 +237,8 @@ public class QueryHandler extends HttpServlet {
                 .add("slot_num", ship.getSlotNum())
                 .add("slot_item", slot_array)
                 .add("on_slot", onSlot_array)
+                .add("status", status_array)
+                .add("status_max", statusMax_array)
                 .add("name", ship.getName());
     }
 
@@ -283,18 +305,29 @@ public class QueryHandler extends HttpServlet {
                 { // 入渠ドック情報
                     JsonArrayBuilder ndock_root = Json.createArrayBuilder();
                     for (NdockDto ndock : GlobalContext.getNdocks()) {
-                        JsonArrayBuilder ndock_ship = Json.createArrayBuilder();
+                        JsonObjectBuilder ndock_ship = Json.createObjectBuilder();
                         if (ndock.getNdockid() != 0) {
-                            ndock_ship.add(ndock.getNdockid());
-                            ndock_ship.add(ndock.getNdocktime().getTime());
+                            ndock_ship.add("ship_id", ndock.getNdockid());
+                            ndock_ship.add("comp_time", ndock.getNdocktime().getTime());
                         }
                         else {
-                            ndock_ship.add(-1);
-                            ndock_ship.add(0);
+                            ndock_ship.add("ship_id", -1);
+                            ndock_ship.add("comp_time", 0);
                         }
                         ndock_root.add(ndock_ship);
                     }
                     jb.add("ndock", ndock_root);
+                }
+
+                { // 建造ドック情報
+                    JsonArrayBuilder kdock_root = Json.createArrayBuilder();
+                    for (KdockDto kdock : GlobalContext.getKdocks()) {
+                        JsonObjectBuilder kdock_item = Json.createObjectBuilder();
+                        kdock_item.add("now_using", kdock.getNowUsing());
+                        kdock_item.add("comp_time", kdock.getKdocktime() != null ? kdock.getKdocktime().getTime() : 0);
+                        kdock_root.add(kdock_item);
+                    }
+                    jb.add("kdock", kdock_root);
                 }
 
                 { // 遠征情報
