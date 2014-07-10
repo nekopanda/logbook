@@ -228,7 +228,7 @@ public class ResourceChart {
             }
         }
         // 資材の最大数を1000単位にする、資材の最大数が1000未満なら1000に設定
-        this.max = (int) Math.max(normalize(this.max, 1000), 1000);
+        this.max = (int) Math.max(normalize(this.max + 600, 1000), 1000);
     }
 
     /**
