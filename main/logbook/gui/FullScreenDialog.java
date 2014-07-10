@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
@@ -32,6 +33,7 @@ public final class FullScreenDialog extends Dialog {
     private ScreenCanvas canvas;
 
     private final Image image;
+    private final Monitor monitor;
 
     /**
      * Create the dialog.
@@ -39,11 +41,12 @@ public final class FullScreenDialog extends Dialog {
      * @param parent
      * @param image 矩形選択の背景画像
      */
-    public FullScreenDialog(Shell parent, Image image) {
+    public FullScreenDialog(Shell parent, Image image, Monitor monitor) {
         super(parent, SWT.NO_TRIM);
         this.setText("矩形選択");
 
         this.image = image;
+        this.monitor = monitor;
     }
 
     /**
@@ -65,7 +68,7 @@ public final class FullScreenDialog extends Dialog {
         } finally {
             this.canvas.dispose();
         }
-        return this.canvas.getRectangle();
+        return this.canvas.getAbsoluteRectangle();
     }
 
     /**
@@ -75,7 +78,7 @@ public final class FullScreenDialog extends Dialog {
         // フルスクリーンのウインドウを作成します
         this.shell = new Shell(this.getParent(), this.getStyle());
         this.shell.setText(this.getText());
-        this.shell.setBounds(Display.getDefault().getPrimaryMonitor().getBounds());
+        this.shell.setBounds(this.monitor.getBounds());
         this.shell.setFullScreen(true);
 
         GridLayout glShell = new GridLayout(1, false);
@@ -86,7 +89,7 @@ public final class FullScreenDialog extends Dialog {
         this.shell.setLayout(glShell);
 
         // ウインドウいっぱいにキャプチャした画像を貼り付けます
-        this.canvas = new ScreenCanvas(this.shell, this.image);
+        this.canvas = new ScreenCanvas(this.shell, this.image, this.monitor);
         this.canvas.setLayoutData(new GridData(GridData.FILL_BOTH));
         this.canvas.addPaintListener(this.canvas);
         this.canvas.addMouseListener(this.canvas);
@@ -103,6 +106,7 @@ public final class FullScreenDialog extends Dialog {
     private static final class ScreenCanvas extends Canvas implements PaintListener, MouseListener, MouseMoveListener {
 
         private final Image image;
+        private final Monitor monitor;
 
         private final Color white = SWTResourceManager.getColor(new RGB(255, 255, 255));
         private final Color black = SWTResourceManager.getColor(new RGB(0, 0, 0));
@@ -114,9 +118,10 @@ public final class FullScreenDialog extends Dialog {
         private int x2;
         private int y2;
 
-        public ScreenCanvas(Shell shell, Image image) {
+        public ScreenCanvas(Shell shell, Image image, Monitor monitor) {
             super(shell, SWT.NO_BACKGROUND);
             this.image = image;
+            this.monitor = monitor;
             // 描画に使用するフォントを設定します
             FontData normal = shell.getFont().getFontData()[0];
             FontData large = new FontData(normal.getName(), 18, normal.getStyle());
@@ -126,8 +131,10 @@ public final class FullScreenDialog extends Dialog {
 
         @Override
         public void paintControl(PaintEvent e) {
+            Rectangle m = this.monitor.getBounds();
+
             GC gc = e.gc;
-            gc.drawImage(this.image, 0, 0);
+            gc.drawImage(this.image, m.x, m.y, m.width, m.height, 0, 0, m.width, m.height);
             gc.setFont(this.largefont);
             gc.setForeground(this.black);
             gc.setBackground(this.white);
@@ -205,6 +212,12 @@ public final class FullScreenDialog extends Dialog {
         public Rectangle getRectangle() {
             return new Rectangle(Math.min(this.x1, this.x2), Math.min(this.y1, this.y2), Math.abs(this.x2 - this.x1),
                     Math.abs(this.y2 - this.y1));
+        }
+
+        public Rectangle getAbsoluteRectangle() {
+            Rectangle m = this.monitor.getBounds();
+            Rectangle r = this.getRectangle();
+            return new Rectangle(r.x + m.x, r.y + m.y, r.width, r.height);
         }
     }
 }

@@ -830,6 +830,11 @@ public final class CreateReportLogic {
                 return false;
             }
         }
+        if (!filter.submarineTender) {
+            if ("潜水母艦".equals(ship.getType())) {
+                return false;
+            }
+        }
         // グループでフィルタ
         if (filter.group != null) {
             if (!filter.group.getShips().contains(ship.getId())) {
