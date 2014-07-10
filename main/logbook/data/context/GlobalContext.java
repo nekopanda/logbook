@@ -713,6 +713,8 @@ public final class GlobalContext {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
             lastBattleDto = new BattleDto(apidata, firstBattle ? null : lastBattleDto);
 
+            firstBattle = false;
+
             List<ShipDto> sunkShips = new ArrayList<ShipDto>();
             List<ShipDto> ships = lastBattleDto.getDock().getShips();
             int[] nowFriendHp = lastBattleDto.getNowFriendHp();
@@ -730,6 +732,7 @@ public final class GlobalContext {
             addConsole("海戦情報を更新しました");
             addConsole("自=" + Arrays.toString(lastBattleDto.getNowFriendHp()));
             addConsole("敵=" + Arrays.toString(lastBattleDto.getNowEnemyHp()));
+            addConsole("→ " + lastBattleDto.getRank().toString());
             for (ShipDto ship : sunkShips) {
                 addConsole(ship.getName() + "(id:" + ship.getId() + ",lv:" + ship.getLv() + ") 轟沈しました！");
             }
@@ -758,12 +761,12 @@ public final class GlobalContext {
 
             // ランクが合っているかチェック
             if (!dto.getRank().equals(lastBattleDto.getRank().rank())) {
-                LOG.info("戦闘結果ランク判定ミス情報: 正解ランク:" + dto.getRank() + " " + lastBattleDto.getRankCalcInfo());
+                LOG.info("戦闘結果判定ミス: 正解ランク:" + dto.getRank() + " " + lastBattleDto.getRankCalcInfo());
             }
 
-            addConsole("海戦情報を更新しました");
+            addConsole("海戦結果を更新しました");
         } catch (Exception e) {
-            LOG.warn("海戦情報を更新しますに失敗しました", e);
+            LOG.warn("海戦結果を更新しますに失敗しました", e);
             LOG.warn(data);
         }
     }

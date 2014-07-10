@@ -27,22 +27,22 @@ public final class BattleDto extends AbstractDto {
     private final List<ShipInfoDto> enemy = new ArrayList<ShipInfoDto>();
 
     /** 味方HP */
-    private final int[] nowFriendHp = new int[6];
+    private final int[] nowFriendHp;
 
     /** 敵HP */
-    private final int[] nowEnemyHp = new int[6];
+    private final int[] nowEnemyHp;
 
     /** 味方MaxHP */
-    private final int[] maxFriendHp = new int[6];
+    private final int[] maxFriendHp;
 
     /** 敵MaxHP */
-    private final int[] maxEnemyHp = new int[6];
+    private final int[] maxEnemyHp;
 
     /** 味方戦闘開始時HP */
-    private int[] startFriendHp = new int[6];
+    public int[] startFriendHp;
 
     /** 敵戦闘開始時HP */
-    private int[] startEnemyHp = new int[6];
+    public int[] startEnemyHp;
 
     /** 戦闘前の味方総HP */
     private int friendGaugeMax = 0;
@@ -83,36 +83,43 @@ public final class BattleDto extends AbstractDto {
             }
         }
 
-        // この戦闘の開始前HPを取得
-        JsonArray nowhps = object.getJsonArray("api_nowhps");
-        for (int i = 1; i < nowhps.size(); i++) {
-            int hp = nowhps.getJsonNumber(i).intValue();
-            if (i <= 6) {
-                this.nowFriendHp[i - 1] = hp;
-                if (firstBattle == null)
-                    this.friendGaugeMax += this.startFriendHp[i - 1] = hp;
-            } else {
-                this.nowEnemyHp[i - 1 - 6] = hp;
-                if (firstBattle == null)
-                    this.enemyGaugeMax += this.startEnemyHp[i - 1] = hp;
-            }
-        }
-
-        JsonArray maxhps = object.getJsonArray("api_maxhps");
-        for (int i = 1; i < maxhps.size(); i++) {
-            if (i <= 6) {
-                this.maxFriendHp[i - 1] = maxhps.getJsonNumber(i).intValue();
-            } else {
-                this.maxEnemyHp[i - 1 - 6] = maxhps.getJsonNumber(i).intValue();
-            }
-        }
-
         // このマスでの最初の戦闘がこれでない場合は、その時の値を取得
         if (firstBattle != null) {
             this.startFriendHp = firstBattle.startFriendHp;
             this.startEnemyHp = firstBattle.startEnemyHp;
             this.friendGaugeMax = firstBattle.friendGaugeMax;
             this.enemyGaugeMax = firstBattle.enemyGaugeMax;
+        }
+        else {
+            this.startFriendHp = new int[this.fships.size()];
+            this.startEnemyHp = new int[this.enemy.size()];
+        }
+        this.nowFriendHp = new int[this.fships.size()];
+        this.nowEnemyHp = new int[this.enemy.size()];
+        this.maxFriendHp = new int[this.fships.size()];
+        this.maxEnemyHp = new int[this.enemy.size()];
+
+        // この戦闘の開始前HPを取得
+        JsonArray nowhps = object.getJsonArray("api_nowhps");
+        JsonArray maxhps = object.getJsonArray("api_maxhps");
+        for (int i = 1; i < nowhps.size(); i++) {
+            int hp = nowhps.getJsonNumber(i).intValue();
+            int maxHp = maxhps.getJsonNumber(i).intValue();
+            if (i <= 6) {
+                if (i <= this.fships.size()) {
+                    this.nowFriendHp[i - 1] = hp;
+                    this.maxFriendHp[i - 1] = maxHp;
+                    if (firstBattle == null)
+                        this.friendGaugeMax += this.startFriendHp[i - 1] = hp;
+                }
+            } else {
+                if ((i - 6) <= this.enemy.size()) {
+                    this.nowEnemyHp[i - 1 - 6] = hp;
+                    this.maxEnemyHp[i - 1 - 6] = maxHp;
+                    if (firstBattle == null)
+                        this.enemyGaugeMax += this.startEnemyHp[i - 1 - 6] = hp;
+                }
+            }
         }
 
         // ダメージ計算 //
@@ -131,7 +138,7 @@ public final class BattleDto extends AbstractDto {
                 if (support_hourai != null) {
                     JsonArray edam = support_hourai.getJsonArray("api_damage");
                     if (edam != null) {
-                        for (int i = 1; i <= 6; i++) {
+                        for (int i = 1; i <= this.fships.size(); i++) {
                             this.nowEnemyHp[i - 1] -= edam.getJsonNumber(i).intValue();
                         }
                     }
@@ -152,9 +159,11 @@ public final class BattleDto extends AbstractDto {
         this.doRaigeki(object.get("api_raigeki"));
 
         // HP0以下を0にする
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < this.fships.size(); i++) {
             if (this.nowFriendHp[i] <= 0)
                 this.nowFriendHp[i] = 0;
+        }
+        for (int i = 0; i < this.enemy.size(); i++) {
             if (this.nowEnemyHp[i] <= 0)
                 this.nowEnemyHp[i] = 0;
         }
@@ -172,14 +181,16 @@ public final class BattleDto extends AbstractDto {
         int friendGauge = 0;
         int enemyGauge = 0;
 
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < this.fships.size(); i++) {
             if (this.nowFriendHp[i] > 0)
                 ++friendNowShips;
 
+            friendGauge += this.startFriendHp[i] - this.nowFriendHp[i];
+        }
+        for (int i = 0; i < this.enemy.size(); i++) {
             if (this.nowEnemyHp[i] > 0)
                 ++enemyNowShips;
 
-            friendGauge += this.startFriendHp[i] - this.nowFriendHp[i];
             enemyGauge += this.startEnemyHp[i] - this.nowEnemyHp[i];
         }
 
@@ -207,7 +218,7 @@ public final class BattleDto extends AbstractDto {
                     }
                 }
                 // 半数以上撃沈？
-                else if (enemySunk >= (this.enemy.size() / 2)) {
+                else if ((enemySunk * 2) >= this.enemy.size()) {
                     return ResultRank.A;
                 }
                 // 敵旗艦を撃沈 or 戦果ゲージが2.5倍以上
@@ -226,7 +237,7 @@ public final class BattleDto extends AbstractDto {
                     }
                 }
                 // 半数以上撃沈？
-                else if (enemySunk >= (this.enemy.size() / 2)) {
+                else if ((enemySunk * 2) >= this.enemy.size()) {
                     return ResultRank.B;
                 }
             }
@@ -259,8 +270,10 @@ public final class BattleDto extends AbstractDto {
         JsonArray fdam = raigeki_obj.getJsonArray("api_fdam");
         JsonArray edam = raigeki_obj.getJsonArray("api_edam");
         for (int i = 1; i <= 6; i++) {
-            this.nowFriendHp[i - 1] -= fdam.getJsonNumber(i).intValue();
-            this.nowEnemyHp[i - 1] -= edam.getJsonNumber(i).intValue();
+            if (i <= this.fships.size())
+                this.nowFriendHp[i - 1] -= fdam.getJsonNumber(i).intValue();
+            if (i <= this.enemy.size())
+                this.nowEnemyHp[i - 1] -= edam.getJsonNumber(i).intValue();
         }
     }
 
@@ -375,19 +388,21 @@ public final class BattleDto extends AbstractDto {
         int friendGauge = 0;
         int enemyGauge = 0;
 
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < this.fships.size(); i++) {
             if (this.nowFriendHp[i] > 0)
                 ++friendNowShips;
 
+            friendGauge += this.startFriendHp[i] - this.nowFriendHp[i];
+        }
+        for (int i = 0; i < this.enemy.size(); i++) {
             if (this.nowEnemyHp[i] > 0)
                 ++enemyNowShips;
 
-            friendGauge += this.startFriendHp[i] - this.nowFriendHp[i];
             enemyGauge += this.startEnemyHp[i] - this.nowEnemyHp[i];
         }
 
         return "味方[艦:" + this.fships.size() + "→" + friendNowShips + " ゲージ:" + friendGauge + "/" + this.friendGaugeMax +
                 "] 敵[艦:" + this.enemy.size() + "→" + enemyNowShips + " ゲージ:" + enemyGauge + "/" + this.enemyGaugeMax
-                + "] ミス判定:" + this.rank.rank();
+                + "] 判定:" + this.rank.rank();
     }
 }
