@@ -144,7 +144,14 @@ public final class GlobalContext {
      */
     public static void setItemMap(Map<Long, Integer> map) {
         for (Entry<Long, Integer> entry : map.entrySet()) {
-            Integer id = Integer.parseInt(entry.getValue().toString());
+            Object obj = entry.getValue();
+            Integer id;
+            if (obj instanceof Integer) {
+                id = (Integer) obj;
+            } else {
+                // 旧設定ファイル用
+                id = Integer.parseInt(obj.toString());
+            }
             ItemDto item = Item.get(id);
             if (item != null) {
                 itemMap.put(entry.getKey(), item);
