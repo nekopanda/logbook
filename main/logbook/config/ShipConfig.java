@@ -11,11 +11,16 @@ import logbook.dto.ShipInfoDto;
 import logbook.internal.Ship;
 import logbook.util.BeanUtils;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * 艦娘のIDと名前の紐付けを保存・復元します
  * 
  */
 public class ShipConfig {
+    /** ロガー */
+    private static final Logger LOG = LogManager.getLogger(ShipConfig.class);
 
     /**
      * 設定ファイルに書き込みます
@@ -37,11 +42,15 @@ public class ShipConfig {
      * @return
      */
     public static void load() {
-        Map<String, ShipInfoDto> map = BeanUtils.readObject(AppConstants.SHIP_CONFIG_FILE, Map.class);
-        if (map != null) {
-            for (Entry<String, ShipInfoDto> entry : map.entrySet()) {
-                Ship.set(entry.getKey(), entry.getValue());
+        try {
+            Map<String, ShipInfoDto> map = BeanUtils.readObject(AppConstants.SHIP_CONFIG_FILE, Map.class);
+            if (map != null) {
+                for (Entry<String, ShipInfoDto> entry : map.entrySet()) {
+                    Ship.set(entry.getKey(), entry.getValue());
+                }
             }
+        } catch (Exception e) {
+            LOG.warn("艦娘のIDと名前の紐付けを設定ファイルから読み込みますに失敗しました", e);
         }
     }
 }
