@@ -224,4 +224,12 @@ public final class ShipInfoDto extends AbstractDto {
     public int[] getPowup() {
         return this.powup;
     }
+
+    /**
+     * powupを設定します。
+     * @param powup
+     */
+    public void setPowup(int[] powup) {
+        this.powup = powup;
+    }
 }

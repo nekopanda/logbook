@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @author iedeg_000
+ * @author Nekopanda
  *
  */
 public class LostEntityDto {

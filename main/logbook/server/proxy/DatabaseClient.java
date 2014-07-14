@@ -102,7 +102,6 @@ public class DatabaseClient extends Thread {
         body.add("url", data.getUrl());
         body.add("requestbody", sendRequestBody);
         body.add("responsebody", sendResponseBody); // 
-        //return this.httpClient.POST("http://www.george24.com/~iedegorogoro/")
         return this.httpClient.POST("http://api.kancolle-db.net/2/")
                 .agent("logbook/v" + AppConstants.VERSION)
                 .content(new StringContentProvider(body.encode()), "application/x-www-form-urlencoded");

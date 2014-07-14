@@ -29,6 +29,7 @@ import logbook.dto.KdockDto;
 import logbook.dto.MapCellDto;
 import logbook.dto.MaterialDto;
 import logbook.dto.NdockDto;
+import logbook.dto.PracticeUserDto;
 import logbook.dto.QuestDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
@@ -205,18 +206,33 @@ public class QueryHandler extends HttpServlet {
             onSlot_array.add(item_number);
         }
 
+        // 成長の余地
+        long karyoku = ship.getKaryokuMax() - ship.getKaryoku();
+        long raisou = ship.getRaisouMax() - ship.getRaisou();
+        long taiku = ship.getTaikuMax() - ship.getTaiku();
+        long souko = ship.getSoukouMax() - ship.getSoukou();
+        long lucky = ship.getLuckyMax() - ship.getLucky();
+        for (ItemDto item : ship.getItem()) {
+            if (item != null) {
+                karyoku += item.getHoug();
+                raisou += item.getRaig();
+                taiku += item.getTyku();
+                lucky += item.getLuck();
+            }
+        }
+
         JsonArrayBuilder status_array = Json.createArrayBuilder();
-        JsonArrayBuilder statusMax_array = Json.createArrayBuilder();
+        JsonArrayBuilder statusSpace_array = Json.createArrayBuilder();
         status_array.add(ship.getKaryoku()); // 火力
         status_array.add(ship.getRaisou()); // 雷装
         status_array.add(ship.getTaiku()); // 対空
         status_array.add(ship.getSoukou()); // 装甲
         status_array.add(ship.getLucky()); // 運
-        statusMax_array.add(ship.getKaryokuMax()); // 火力Max
-        statusMax_array.add(ship.getRaisouMax()); // 雷装Max
-        statusMax_array.add(ship.getTaikuMax()); // 対空Max
-        statusMax_array.add(ship.getSoukouMax()); // 装甲Max
-        statusMax_array.add(ship.getLuckyMax()); // 運Max
+        statusSpace_array.add(karyoku); // 火力
+        statusSpace_array.add(raisou); // 雷装
+        statusSpace_array.add(taiku); // 対空
+        statusSpace_array.add(souko); // 装甲
+        statusSpace_array.add(lucky); // 運
 
         return Json.createObjectBuilder()
                 .add("id", ship.getId())
@@ -238,7 +254,7 @@ public class QueryHandler extends HttpServlet {
                 .add("slot_item", slot_array)
                 .add("on_slot", onSlot_array)
                 .add("status", status_array)
-                .add("status_max", statusMax_array)
+                .add("status_space", statusSpace_array)
                 .add("name", ship.getName());
     }
 
@@ -376,6 +392,20 @@ public class QueryHandler extends HttpServlet {
                     jb.add("sortie", sortie);
                 }
 
+                { // 演習相手
+                    JsonArrayBuilder ensyu_root = Json.createArrayBuilder();
+                    for (PracticeUserDto dto : GlobalContext.getPracticeUser()) {
+                        if (dto != null) {
+                            JsonObjectBuilder user_item = Json.createObjectBuilder();
+                            user_item.add("id", dto.getId());
+                            user_item.add("name", dto.getName());
+                            user_item.add("state", dto.getState());
+                            ensyu_root.add(user_item);
+                        }
+                    }
+                    jb.add("practice", ensyu_root);
+                }
+
                 { // 出撃数, 遠征数
                     JsonObjectBuilder basic = Json.createObjectBuilder();
                     BasicInfoDto basicDto = GlobalContext.getBasicInfo();
@@ -458,6 +488,7 @@ public class QueryHandler extends HttpServlet {
 
                         jb.add("friend", fship_array);
                         jb.add("enemy", eship_array);
+                        jb.add("rank", battleDto.getRank().rank());
                     }
                 }
             }

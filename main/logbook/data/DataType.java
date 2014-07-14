@@ -66,6 +66,8 @@ public enum DataType {
     MAPINFO("/kcsapi/api_get_member/mapinfo"),
     /** 任務情報 */
     MISSION("/kcsapi/api_get_member/mission"),
+    /** 演習情報 */
+    PRACTICE("/kcsapi/api_get_member/practice"),
     /** フィルタ前のデータ */
     UNDEFINED(null);
 

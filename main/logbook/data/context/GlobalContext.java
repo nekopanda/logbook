@@ -42,9 +42,11 @@ import logbook.dto.MapCellDto;
 import logbook.dto.MaterialDto;
 import logbook.dto.MissionResultDto;
 import logbook.dto.NdockDto;
+import logbook.dto.PracticeUserDto;
 import logbook.dto.QuestDto;
 import logbook.dto.ResourceDto;
 import logbook.dto.ResourceItemDto;
+import logbook.dto.ResultRank;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
 import logbook.gui.logic.CreateReportLogic;
@@ -122,6 +124,9 @@ public final class GlobalContext {
     /** 建造リスト */
     private static KdockDto[] kdocks = new KdockDto[] { KdockDto.EMPTY, KdockDto.EMPTY, KdockDto.EMPTY,
             KdockDto.EMPTY };
+
+    /** 演習リスト */
+    private static PracticeUserDto[] practiceUser = new PracticeUserDto[] { null, null, null, null, null };
 
     /** 任務Map */
     private static ArrayList<QuestDto> questList = new ArrayList<QuestDto>();
@@ -278,6 +283,10 @@ public final class GlobalContext {
             }
         }
         return false;
+    }
+
+    public static PracticeUserDto[] getPracticeUser() {
+        return practiceUser;
     }
 
     /**
@@ -482,6 +491,10 @@ public final class GlobalContext {
         // 任務情報
         case MISSION:
             doMission(data);
+            break;
+        // 任務
+        case PRACTICE:
+            doPractice(data);
             break;
         default:
             break;
@@ -761,7 +774,10 @@ public final class GlobalContext {
 
             // ランクが合っているかチェック
             if (!dto.getRank().equals(lastBattleDto.getRank().rank())) {
-                LOG.info("戦闘結果判定ミス: 正解ランク:" + dto.getRank() + " " + lastBattleDto.getRankCalcInfo());
+                if ((lastBattleDto.getRank() == ResultRank.B_OR_C) && dto.getRank().equals("B"))
+                    ;// 確率的にBになることがある判定だったのでOK
+                else
+                    LOG.info("戦闘結果判定ミス: 正解ランク:" + dto.getRank() + " " + lastBattleDto.getRankCalcInfo());
             }
 
             addConsole("海戦結果を更新しました");
@@ -871,14 +887,17 @@ public final class GlobalContext {
             String dock = data.getField("api_kdock_id");
 
             // 艦娘の装備を追加します
-            JsonArray slotitem = apidata.getJsonArray("api_slotitem");
-            for (int i = 0; i < slotitem.size(); i++) {
-                JsonObject object = (JsonObject) slotitem.get(i);
-                String typeid = object.getJsonNumber("api_slotitem_id").toString();
-                Long id = object.getJsonNumber("api_id").longValue();
-                ItemDto item = Item.get(typeid);
-                if (item != null) {
-                    itemMap.put(id, item);
+            JsonValue slotitem = apidata.get("api_slotitem");
+            if (slotitem != null) {
+                JsonArray slotitemArray = (JsonArray) slotitem;
+                for (int i = 0; i < slotitemArray.size(); i++) {
+                    JsonObject object = (JsonObject) slotitemArray.get(i);
+                    String typeid = object.getJsonNumber("api_slotitem_id").toString();
+                    Long id = object.getJsonNumber("api_id").longValue();
+                    ItemDto item = Item.get(typeid);
+                    if (item != null) {
+                        itemMap.put(id, item);
+                    }
                 }
             }
             // 艦娘を追加します
@@ -1617,6 +1636,24 @@ public final class GlobalContext {
             }
         } catch (Exception e) {
             LOG.warn("任務情報更新に失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 演習情報を処理します
+     * 
+     * @param data
+     */
+    private static void doPractice(Data data) {
+        try {
+            JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
+            for (int i = 0; i < apidata.size(); ++i) {
+                practiceUser[i] = new PracticeUserDto((JsonObject) apidata.get(i));
+            }
+            addConsole("演習情報を更新しました");
+        } catch (Exception e) {
+            LOG.warn("演習情報更新に失敗しました", e);
             LOG.warn(data);
         }
     }
