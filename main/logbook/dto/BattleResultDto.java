@@ -47,7 +47,13 @@ public final class BattleResultDto extends AbstractDto {
     public BattleResultDto(JsonObject object, BattleDto battle, MapCellDto mapInfo) {
 
         this.battleDate = Calendar.getInstance().getTime();
-        this.questName = object.getString("api_quest_name");
+        if (object.get("api_quest_name") != null) {
+            this.questName = object.getString("api_quest_name");
+        }
+        else {
+            // 演習の場合はない
+            this.questName = null;
+        }
         this.rank = object.getString("api_win_rank");
         this.mapCelldto = mapInfo;
         this.enemyName = object.getJsonObject("api_enemy_info").getString("api_deck_name");

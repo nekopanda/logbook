@@ -49,7 +49,7 @@ public final class DeckMissionDto extends AbstractDto {
     public DeckMissionDto(String name, int missionId, Date time, long fleetid, Set<Long> ships) {
         this.name = name;
         this.missionId = missionId;
-        this.mission = Deck.get(Long.toString(missionId));
+        this.mission = Deck.get(missionId);
         this.time = time;
         this.fleetid = fleetid;
         this.ships = ships;

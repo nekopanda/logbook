@@ -236,6 +236,13 @@ public final class GlobalContext {
     }
 
     /**
+     * @return 最後に行った海戦情報
+     */
+    public static BattleDto getLastBattleDto() {
+        return battle;
+    }
+
+    /**
      * @return 遠征結果
      */
     public static List<MissionResultDto> getMissionResultList() {
@@ -317,7 +324,7 @@ public final class GlobalContext {
      * @return ドックMap
      */
     public static Map<String, DockDto> getDock() {
-        return Collections.unmodifiableMap(dock);
+        return dock;
     }
 
     public static boolean[] getIsSortie() {
@@ -654,9 +661,9 @@ public final class GlobalContext {
                 Arrays.fill(isSortie, false);
 
                 // 戦闘結果がある場合、ダメージ計算があっているか検証します
-                if (lastBattleDto != null) {
-                    List<ShipDto> dockShips = lastBattleDto.getDock().getShips();
-                    int[] nowhp = lastBattleDto.getNowFriendHp();
+                if (battle != null) {
+                    List<ShipDto> dockShips = battle.getDock().getShips();
+                    int[] nowhp = battle.getNowFriendHp();
                     for (int i = 0; i < dockShips.size(); ++i) {
                         ShipDto new_ship = shipMap.get(dockShips.get(i).getId());
                         if (new_ship == null)
@@ -669,7 +676,7 @@ public final class GlobalContext {
                     }
                 }
                 mapCellDto = null;
-                lastBattleDto = null;
+                battle = null;
 
                 // 基本情報を更新する
                 JsonObject apiBasic = apidata.getJsonObject("api_basic");
@@ -738,13 +745,13 @@ public final class GlobalContext {
     private static void doBattle(Data data) {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
-            lastBattleDto = new BattleDto(apidata, firstBattle ? null : lastBattleDto);
+            battle = new BattleDto(apidata, firstBattle ? null : battle);
 
             firstBattle = false;
 
             List<ShipDto> sunkShips = new ArrayList<ShipDto>();
-            List<ShipDto> ships = lastBattleDto.getDock().getShips();
-            int[] nowFriendHp = lastBattleDto.getNowFriendHp();
+            List<ShipDto> ships = battle.getDock().getShips();
+            int[] nowFriendHp = battle.getNowFriendHp();
             for (int i = 0; i < ships.size(); ++i) {
                 ShipDto ship = ships.get(i);
                 if (ship.getNowhp() > 0) { // 轟沈している艦は更新しない
@@ -757,9 +764,9 @@ public final class GlobalContext {
             }
 
             addConsole("海戦情報を更新しました");
-            addConsole("自=" + Arrays.toString(lastBattleDto.getNowFriendHp()));
-            addConsole("敵=" + Arrays.toString(lastBattleDto.getNowEnemyHp()));
-            addConsole("→ " + lastBattleDto.getRank().toString());
+            addConsole("自=" + Arrays.toString(battle.getNowFriendHp()));
+            addConsole("敵=" + Arrays.toString(battle.getNowEnemyHp()));
+            addConsole("→ " + battle.getRank().toString());
             for (ShipDto ship : sunkShips) {
                 addConsole(ship.getName() + "(id:" + ship.getId() + ",lv:" + ship.getLv() + ") 轟沈しました！");
             }
@@ -777,28 +784,28 @@ public final class GlobalContext {
     private static void doBattleresult(Data data) {
         try {
             if (battle != null) {
-	            JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
-	            BattleResultDto dto = new BattleResultDto(apidata, lastBattleDto, mapCellDto);
-	            battleResultList.add(dto);
-	            CreateReportLogic.storeBattleResultReport(dto);
-	
-	            // 警告を出すためにバージョンアップ
-	            lastBattleDto.getDock().setUpdate(true);
-	
-	            firstBattle = true;
-	
-	            // ランクが合っているかチェック
-	            if (!dto.getRank().equals(lastBattleDto.getRank().rank())) {
-	                if ((lastBattleDto.getRank() == ResultRank.B_OR_C) && dto.getRank().equals("B"))
-	                    ;// 確率的にBになることがある判定だったのでOK
-	                else
-	                    LOG.info("戦闘結果判定ミス: 正解ランク:" + dto.getRank() + " " + lastBattleDto.getRankCalcInfo());
-	            }
+                JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+                BattleResultDto dto = new BattleResultDto(apidata, battle, mapCellDto);
+                battleResultList.add(dto);
+                CreateReportLogic.storeBattleResultReport(dto);
+
+                // 警告を出すためにバージョンアップ
+                battle.getDock().setUpdate(true);
+
+                firstBattle = true;
+
+                // ランクが合っているかチェック
+                if (!dto.getRank().equals(battle.getRank().rank())) {
+                    if ((battle.getRank() == ResultRank.B_OR_C) && dto.getRank().equals("B"))
+                        ;// 確率的にBになることがある判定だったのでOK
+                    else
+                        LOG.info("戦闘結果判定ミス: 正解ランク:" + dto.getRank() + " " + battle.getRankCalcInfo());
+                }
 
                 for (int i = 0; i < (battleResultList.size() - AppConstants.MAX_LOG_SIZE); i++) {
                     battleResultList.remove(0);
                 }
-			}
+            }
             addConsole("海戦結果を更新しました");
         } catch (Exception e) {
             LOG.warn("海戦結果を更新しますに失敗しました", e);
@@ -911,7 +918,7 @@ public final class GlobalContext {
                 JsonArray slotitemArray = (JsonArray) slotitem;
                 for (int i = 0; i < slotitemArray.size(); i++) {
                     JsonObject object = (JsonObject) slotitemArray.get(i);
-                    String typeid = object.getJsonNumber("api_slotitem_id").toString();
+                    int typeid = object.getInt("api_slotitem_id");
                     Long id = object.getJsonNumber("api_id").longValue();
                     ItemDto item = Item.get(typeid);
                     if (item != null) {
@@ -1073,9 +1080,9 @@ public final class GlobalContext {
             }
 
             // 戦闘結果がある場合、ダメージ計算があっているか検証します
-            if (lastBattleDto != null) {
-                List<ShipDto> dockShips = lastBattleDto.getDock().getShips();
-                int[] nowhp = lastBattleDto.getNowFriendHp();
+            if (battle != null) {
+                List<ShipDto> dockShips = battle.getDock().getShips();
+                int[] nowhp = battle.getNowFriendHp();
                 for (int i = 0; i < dockShips.size(); ++i) {
                     ShipDto new_ship = shipMap.get(dockShips.get(i).getId());
                     if (new_ship == null)
@@ -1088,7 +1095,7 @@ public final class GlobalContext {
                 }
             }
 
-            lastBattleDto = null;
+            battle = null;
 
             // 艦隊を設定
             doDeck(data.getJsonObject().getJsonArray("api_data_deck"));

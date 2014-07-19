@@ -148,7 +148,7 @@ public class QueryHandler extends HttpServlet {
 
                 { // 装備
                     JsonArrayBuilder item_array = Json.createArrayBuilder();
-                    for (String itemid : Item.keySet()) {
+                    for (int itemid : Item.keySet()) {
                         item_array.add(itemInfoToJson(Item.get(itemid)));
                     }
                     jb.add("master_items", item_array);
