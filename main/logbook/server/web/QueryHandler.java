@@ -460,36 +460,37 @@ public class QueryHandler extends HttpServlet {
                         jb.add("enemy_id", map.getEnemyId());
                         jb.add("is_boss", map.isBoss());
                     }
-                    if (battleDto != null) {// HP
-                        JsonArrayBuilder fship_array = Json.createArrayBuilder();
-                        JsonArrayBuilder eship_array = Json.createArrayBuilder();
+                }
+                // 演習もあるので
+                if (battleDto != null) {// HP
+                    JsonArrayBuilder fship_array = Json.createArrayBuilder();
+                    JsonArrayBuilder eship_array = Json.createArrayBuilder();
 
-                        List<ShipDto> fships = battleDto.getFriendShips();
-                        for (ShipDto ship : fships) {
-                            fship_array.add(shipToJson(ship));
-                        }
-
-                        List<ShipInfoDto> eships = battleDto.getEnemy();
-                        int[] enowhp = battleDto.getNowEnemyHp();
-                        int[] emaxhp = battleDto.getMaxEnemyHp();
-                        for (int i = 0; i < eships.size(); ++i) {
-                            ShipInfoDto ship = eships.get(i);
-                            String flagship = ship.getFlagship();
-                            int level = (flagship.equals("flagship") ? 2
-                                    : flagship.equals("elite") ? 1
-                                            : 0);
-                            eship_array.add(Json.createObjectBuilder()
-                                    .add("ship_id", ship.getShipId())
-                                    .add("ship_type", ship.getStype())
-                                    .add("level", level)
-                                    .add("now_hp", enowhp[i])
-                                    .add("max_hp", emaxhp[i]));
-                        }
-
-                        jb.add("friend", fship_array);
-                        jb.add("enemy", eship_array);
-                        jb.add("rank", battleDto.getRank().rank());
+                    List<ShipDto> fships = battleDto.getFriendShips();
+                    for (ShipDto ship : fships) {
+                        fship_array.add(shipToJson(ship));
                     }
+
+                    List<ShipInfoDto> eships = battleDto.getEnemy();
+                    int[] enowhp = battleDto.getNowEnemyHp();
+                    int[] emaxhp = battleDto.getMaxEnemyHp();
+                    for (int i = 0; i < eships.size(); ++i) {
+                        ShipInfoDto ship = eships.get(i);
+                        String flagship = ship.getFlagship();
+                        int level = (flagship.equals("flagship") ? 2
+                                : flagship.equals("elite") ? 1
+                                        : 0);
+                        eship_array.add(Json.createObjectBuilder()
+                                .add("ship_id", ship.getShipId())
+                                .add("ship_type", ship.getStype())
+                                .add("level", level)
+                                .add("now_hp", enowhp[i])
+                                .add("max_hp", emaxhp[i]));
+                    }
+
+                    jb.add("friend", fship_array);
+                    jb.add("enemy", eship_array);
+                    jb.add("rank", battleDto.getRank().rank());
                 }
             }
         });

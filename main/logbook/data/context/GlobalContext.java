@@ -460,6 +460,18 @@ public final class GlobalContext {
         case BATTLE_RESULT:
             doBattleresult(data);
             break;
+        // 演習
+        case PRACTICE_BATTLE:
+            doBattle(data);
+            break;
+        // 演習
+        case PRACTICE_BATTLE_MIDNIGHT:
+            doBattle(data);
+            break;
+        // 演習結果
+        case PRACTICE_BATTLE_RESULT:
+            doBattleresult(data);
+            break;
         // 艦隊
         case DECK:
             doDeck(data);

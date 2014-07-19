@@ -68,6 +68,12 @@ public enum DataType {
     MISSION("/kcsapi/api_get_member/mission"),
     /** 演習情報 */
     PRACTICE("/kcsapi/api_get_member/practice"),
+    /** 戦闘 */
+    PRACTICE_BATTLE("/kcsapi/api_req_practice/battle"),
+    /** 戦闘(夜戦) */
+    PRACTICE_BATTLE_MIDNIGHT("/kcsapi/api_req_practice/midnight_battle"),
+    /** 戦闘結果 */
+    PRACTICE_BATTLE_RESULT("/kcsapi/api_req_practice/battle_result"),
     /** フィルタ前のデータ */
     UNDEFINED(null);
 
