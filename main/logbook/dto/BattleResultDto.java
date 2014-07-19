@@ -147,4 +147,8 @@ public final class BattleResultDto extends AbstractDto {
     public BattleDto getBattle() {
         return this.battle;
     }
+
+    public boolean isPractice() {
+        return this.questName == null;
+    }
 }

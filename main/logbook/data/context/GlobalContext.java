@@ -787,7 +787,9 @@ public final class GlobalContext {
                 JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
                 BattleResultDto dto = new BattleResultDto(apidata, battle, mapCellDto);
                 battleResultList.add(dto);
-                CreateReportLogic.storeBattleResultReport(dto);
+                if (dto.isPractice() == false) { // 演習は記録しない
+                    CreateReportLogic.storeBattleResultReport(dto);
+                }
 
                 // 警告を出すためにバージョンアップ
                 battle.getDock().setUpdate(true);
