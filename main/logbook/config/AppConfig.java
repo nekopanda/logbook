@@ -6,11 +6,16 @@ import logbook.config.bean.AppConfigBean;
 import logbook.constants.AppConstants;
 import logbook.util.BeanUtils;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * アプリケーション設定を保存・復元します
  * 
  */
 public class AppConfig {
+    /** ロガー */
+    private static final Logger LOG = LogManager.getLogger(AppConfig.class);
 
     /** アプリケーション設定 */
     private static AppConfigBean configBean;
@@ -29,11 +34,15 @@ public class AppConfig {
      * アプリケーション設定を読み込みます
      */
     public static void load() {
-        AppConfigBean bean = BeanUtils.readObject(AppConstants.APP_CONFIG_FILE, AppConfigBean.class);
-        if (bean != null) {
-            configBean = bean;
-        } else {
-            configBean = new AppConfigBean();
+        try {
+            AppConfigBean bean = BeanUtils.readObject(AppConstants.APP_CONFIG_FILE, AppConfigBean.class);
+            if (bean != null) {
+                configBean = bean;
+            } else {
+                configBean = new AppConfigBean();
+            }
+        } catch (Exception e) {
+            LOG.warn("アプリケーション設定を読み込みますに失敗しました", e);
         }
     }
 

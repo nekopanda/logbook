@@ -10,29 +10,29 @@ import logbook.internal.ItemType;
  */
 public final class ItemDto extends AbstractDto {
 
-    private long id;
-    private long type2;
-    private long type3;
-    private long atap;
-    private long bakk;
-    private long baku;
-    private long houg;
-    private long houk;
-    private long houm;
-    private long leng;
-    private long luck;
+    private int id;
+    private int type2;
+    private int type3;
+    private int atap;
+    private int bakk;
+    private int baku;
+    private int houg;
+    private int houk;
+    private int houm;
+    private int leng;
+    private int luck;
     private String name;
-    private long raig;
-    private long raik;
-    private long raim;
-    private long rare;
-    private long sakb;
-    private long saku;
-    private long soku;
-    private long souk;
-    private long taik;
-    private long tais;
-    private long tyku;
+    private int raig;
+    private int raik;
+    private int raim;
+    private int rare;
+    private int sakb;
+    private int saku;
+    private int soku;
+    private int souk;
+    private int taik;
+    private int tais;
+    private int tyku;
 
     /**
      * コンストラクター
@@ -50,27 +50,27 @@ public final class ItemDto extends AbstractDto {
         this.type2 = object.getJsonArray("api_type").getInt(2);
         this.type3 = object.getJsonArray("api_type").getInt(3);
 
-        this.id = object.getJsonNumber("api_id").longValue();
-        this.atap = object.getJsonNumber("api_atap").longValue();
-        this.bakk = object.getJsonNumber("api_bakk").longValue();
-        this.baku = object.getJsonNumber("api_baku").longValue();
-        this.houg = object.getJsonNumber("api_houg").longValue();
-        this.houk = object.getJsonNumber("api_houk").longValue();
-        this.houm = object.getJsonNumber("api_houm").longValue();
-        this.leng = object.getJsonNumber("api_leng").longValue();
-        this.luck = object.getJsonNumber("api_luck").longValue();
+        this.atap = object.getJsonNumber("api_atap").intValue();
+        this.bakk = object.getJsonNumber("api_bakk").intValue();
+        this.baku = object.getJsonNumber("api_baku").intValue();
+        this.houg = object.getJsonNumber("api_houg").intValue();
+        this.houk = object.getJsonNumber("api_houk").intValue();
+        this.houm = object.getJsonNumber("api_houm").intValue();
+        this.id = object.getJsonNumber("api_id").intValue();
+        this.leng = object.getJsonNumber("api_leng").intValue();
+        this.luck = object.getJsonNumber("api_luck").intValue();
         this.name = object.getString("api_name");
-        this.raig = object.getJsonNumber("api_raig").longValue();
-        this.raik = object.getJsonNumber("api_raik").longValue();
-        this.raim = object.getJsonNumber("api_raim").longValue();
-        this.rare = object.getJsonNumber("api_rare").longValue();
-        this.sakb = object.getJsonNumber("api_sakb").longValue();
-        this.saku = object.getJsonNumber("api_saku").longValue();
-        this.soku = object.getJsonNumber("api_soku").longValue();
-        this.souk = object.getJsonNumber("api_souk").longValue();
-        this.taik = object.getJsonNumber("api_taik").longValue();
-        this.tais = object.getJsonNumber("api_tais").longValue();
-        this.tyku = object.getJsonNumber("api_tyku").longValue();
+        this.raig = object.getJsonNumber("api_raig").intValue();
+        this.raik = object.getJsonNumber("api_raik").intValue();
+        this.raim = object.getJsonNumber("api_raim").intValue();
+        this.rare = object.getJsonNumber("api_rare").intValue();
+        this.sakb = object.getJsonNumber("api_sakb").intValue();
+        this.saku = object.getJsonNumber("api_saku").intValue();
+        this.soku = object.getJsonNumber("api_soku").intValue();
+        this.souk = object.getJsonNumber("api_souk").intValue();
+        this.taik = object.getJsonNumber("api_taik").intValue();
+        this.tais = object.getJsonNumber("api_tais").intValue();
+        this.tyku = object.getJsonNumber("api_tyku").intValue();
     }
 
     /**
@@ -100,9 +100,9 @@ public final class ItemDto extends AbstractDto {
      * @param tais
      * @param tyku
      */
-    public ItemDto(long id, long type2, long type3, long atap, long bakk, long baku, long houg, long houk, long houm,
-            long leng, long luck, String name, long raig, long raik, long raim, long rare, long sakb, long saku,
-            long soku, long souk, long taik, long tais, long tyku) {
+    public ItemDto(int id, int type2, int type3, int atap, int bakk, int baku, int houg, int houk, int houm,
+            int leng, int luck, String name, int raig, int raik, int raim, int rare, int sakb, int saku,
+            int soku, int souk, int taik, int tais, int tyku) {
         this.id = id;
         this.type2 = type2;
         this.type3 = type3;
@@ -132,7 +132,7 @@ public final class ItemDto extends AbstractDto {
      * @return type
      */
     public String getType() {
-        return ItemType.get(Long.toString(this.type3));
+        return ItemType.get(this.type3);
     }
 
     /**
@@ -153,15 +153,15 @@ public final class ItemDto extends AbstractDto {
      * type2を取得します。
      * @return type2
      */
-    public long getType2() {
-        return type2;
+    public int getType2() {
+        return this.type2;
     }
 
     /**
      * type2を設定します。
      * @param type2 type2
      */
-    public void setType2(long type2) {
+    public void setType2(int type2) {
         this.type2 = type2;
     }
 
@@ -169,7 +169,7 @@ public final class ItemDto extends AbstractDto {
      * type3を設定します。
      * @param type3 type3
      */
-    public void setType3(long type3) {
+    public void setType3(int type3) {
         this.type3 = type3;
     }
 
@@ -177,15 +177,15 @@ public final class ItemDto extends AbstractDto {
      * type3を取得します。
      * @return type3
      */
-    public long getType3() {
-        return type3;
+    public int getType3() {
+        return this.type3;
     }
 
     /**
      * atapを取得します。
      * @return atap
      */
-    public long getAtap() {
+    public int getAtap() {
         return this.atap;
     }
 
@@ -193,7 +193,7 @@ public final class ItemDto extends AbstractDto {
      * atapを設定します。
      * @param atap atap
      */
-    public void setAtap(long atap) {
+    public void setAtap(int atap) {
         this.atap = atap;
     }
 
@@ -201,7 +201,7 @@ public final class ItemDto extends AbstractDto {
      * bakkを取得します。
      * @return bakk
      */
-    public long getBakk() {
+    public int getBakk() {
         return this.bakk;
     }
 
@@ -209,7 +209,7 @@ public final class ItemDto extends AbstractDto {
      * bakkを設定します。
      * @param bakk bakk
      */
-    public void setBakk(long bakk) {
+    public void setBakk(int bakk) {
         this.bakk = bakk;
     }
 
@@ -217,7 +217,7 @@ public final class ItemDto extends AbstractDto {
      * bakuを取得します。
      * @return baku
      */
-    public long getBaku() {
+    public int getBaku() {
         return this.baku;
     }
 
@@ -225,7 +225,7 @@ public final class ItemDto extends AbstractDto {
      * bakuを設定します。
      * @param baku baku
      */
-    public void setBaku(long baku) {
+    public void setBaku(int baku) {
         this.baku = baku;
     }
 
@@ -233,7 +233,7 @@ public final class ItemDto extends AbstractDto {
      * hougを取得します。
      * @return houg
      */
-    public long getHoug() {
+    public int getHoug() {
         return this.houg;
     }
 
@@ -241,7 +241,7 @@ public final class ItemDto extends AbstractDto {
      * hougを設定します。
      * @param houg houg
      */
-    public void setHoug(long houg) {
+    public void setHoug(int houg) {
         this.houg = houg;
     }
 
@@ -249,7 +249,7 @@ public final class ItemDto extends AbstractDto {
      * houkを取得します。
      * @return houk
      */
-    public long getHouk() {
+    public int getHouk() {
         return this.houk;
     }
 
@@ -257,7 +257,7 @@ public final class ItemDto extends AbstractDto {
      * houkを設定します。
      * @param houk houk
      */
-    public void setHouk(long houk) {
+    public void setHouk(int houk) {
         this.houk = houk;
     }
 
@@ -265,7 +265,7 @@ public final class ItemDto extends AbstractDto {
      * houmを取得します。
      * @return houm
      */
-    public long getHoum() {
+    public int getHoum() {
         return this.houm;
     }
 
@@ -273,7 +273,7 @@ public final class ItemDto extends AbstractDto {
      * houmを設定します。
      * @param houm houm
      */
-    public void setHoum(long houm) {
+    public void setHoum(int houm) {
         this.houm = houm;
     }
 
@@ -281,7 +281,7 @@ public final class ItemDto extends AbstractDto {
      * idを取得します。
      * @return id
      */
-    public long getId() {
+    public Integer getId() {
         return this.id;
     }
 
@@ -289,7 +289,7 @@ public final class ItemDto extends AbstractDto {
      * idを設定します。
      * @param id id
      */
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -297,7 +297,7 @@ public final class ItemDto extends AbstractDto {
      * lengを取得します。
      * @return leng
      */
-    public long getLeng() {
+    public int getLeng() {
         return this.leng;
     }
 
@@ -305,7 +305,7 @@ public final class ItemDto extends AbstractDto {
      * lengを設定します。
      * @param leng leng
      */
-    public void setLeng(long leng) {
+    public void setLeng(int leng) {
         this.leng = leng;
     }
 
@@ -313,7 +313,7 @@ public final class ItemDto extends AbstractDto {
      * luckを取得します。
      * @return luck
      */
-    public long getLuck() {
+    public int getLuck() {
         return this.luck;
     }
 
@@ -321,7 +321,7 @@ public final class ItemDto extends AbstractDto {
      * luckを設定します。
      * @param luck luck
      */
-    public void setLuck(long luck) {
+    public void setLuck(int luck) {
         this.luck = luck;
     }
 
@@ -345,7 +345,7 @@ public final class ItemDto extends AbstractDto {
      * raigを取得します。
      * @return raig
      */
-    public long getRaig() {
+    public int getRaig() {
         return this.raig;
     }
 
@@ -353,7 +353,7 @@ public final class ItemDto extends AbstractDto {
      * raigを設定します。
      * @param raig raig
      */
-    public void setRaig(long raig) {
+    public void setRaig(int raig) {
         this.raig = raig;
     }
 
@@ -361,7 +361,7 @@ public final class ItemDto extends AbstractDto {
      * raikを取得します。
      * @return raik
      */
-    public long getRaik() {
+    public int getRaik() {
         return this.raik;
     }
 
@@ -369,7 +369,7 @@ public final class ItemDto extends AbstractDto {
      * raikを設定します。
      * @param raik raik
      */
-    public void setRaik(long raik) {
+    public void setRaik(int raik) {
         this.raik = raik;
     }
 
@@ -377,7 +377,7 @@ public final class ItemDto extends AbstractDto {
      * raimを取得します。
      * @return raim
      */
-    public long getRaim() {
+    public int getRaim() {
         return this.raim;
     }
 
@@ -385,7 +385,7 @@ public final class ItemDto extends AbstractDto {
      * raimを設定します。
      * @param raim raim
      */
-    public void setRaim(long raim) {
+    public void setRaim(int raim) {
         this.raim = raim;
     }
 
@@ -393,7 +393,7 @@ public final class ItemDto extends AbstractDto {
      * rareを取得します。
      * @return rare
      */
-    public long getRare() {
+    public int getRare() {
         return this.rare;
     }
 
@@ -401,7 +401,7 @@ public final class ItemDto extends AbstractDto {
      * rareを設定します。
      * @param rare rare
      */
-    public void setRare(long rare) {
+    public void setRare(int rare) {
         this.rare = rare;
     }
 
@@ -409,7 +409,7 @@ public final class ItemDto extends AbstractDto {
      * sakbを取得します。
      * @return sakb
      */
-    public long getSakb() {
+    public int getSakb() {
         return this.sakb;
     }
 
@@ -417,7 +417,7 @@ public final class ItemDto extends AbstractDto {
      * sakbを設定します。
      * @param sakb sakb
      */
-    public void setSakb(long sakb) {
+    public void setSakb(int sakb) {
         this.sakb = sakb;
     }
 
@@ -425,7 +425,7 @@ public final class ItemDto extends AbstractDto {
      * sakuを取得します。
      * @return saku
      */
-    public long getSaku() {
+    public int getSaku() {
         return this.saku;
     }
 
@@ -433,7 +433,7 @@ public final class ItemDto extends AbstractDto {
      * sakuを設定します。
      * @param saku saku
      */
-    public void setSaku(long saku) {
+    public void setSaku(int saku) {
         this.saku = saku;
     }
 
@@ -441,7 +441,7 @@ public final class ItemDto extends AbstractDto {
      * sokuを取得します。
      * @return soku
      */
-    public long getSoku() {
+    public int getSoku() {
         return this.soku;
     }
 
@@ -449,7 +449,7 @@ public final class ItemDto extends AbstractDto {
      * sokuを設定します。
      * @param soku soku
      */
-    public void setSoku(long soku) {
+    public void setSoku(int soku) {
         this.soku = soku;
     }
 
@@ -457,7 +457,7 @@ public final class ItemDto extends AbstractDto {
      * soukを取得します。
      * @return souk
      */
-    public long getSouk() {
+    public int getSouk() {
         return this.souk;
     }
 
@@ -465,7 +465,7 @@ public final class ItemDto extends AbstractDto {
      * soukを設定します。
      * @param souk souk
      */
-    public void setSouk(long souk) {
+    public void setSouk(int souk) {
         this.souk = souk;
     }
 
@@ -473,7 +473,7 @@ public final class ItemDto extends AbstractDto {
      * taikを取得します。
      * @return taik
      */
-    public long getTaik() {
+    public int getTaik() {
         return this.taik;
     }
 
@@ -481,7 +481,7 @@ public final class ItemDto extends AbstractDto {
      * taikを設定します。
      * @param taik taik
      */
-    public void setTaik(long taik) {
+    public void setTaik(int taik) {
         this.taik = taik;
     }
 
@@ -489,7 +489,7 @@ public final class ItemDto extends AbstractDto {
      * taisを取得します。
      * @return tais
      */
-    public long getTais() {
+    public int getTais() {
         return this.tais;
     }
 
@@ -497,7 +497,7 @@ public final class ItemDto extends AbstractDto {
      * taisを設定します。
      * @param tais tais
      */
-    public void setTais(long tais) {
+    public void setTais(int tais) {
         this.tais = tais;
     }
 
@@ -505,7 +505,7 @@ public final class ItemDto extends AbstractDto {
      * tykuを取得します。
      * @return tyku
      */
-    public long getTyku() {
+    public int getTyku() {
         return this.tyku;
     }
 
@@ -513,7 +513,7 @@ public final class ItemDto extends AbstractDto {
      * tykuを設定します。
      * @param tyku tyku
      */
-    public void setTyku(long tyku) {
+    public void setTyku(int tyku) {
         this.tyku = tyku;
     }
 

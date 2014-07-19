@@ -10,19 +10,24 @@ import logbook.data.context.GlobalContext;
 import logbook.dto.ItemDto;
 import logbook.util.BeanUtils;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * 装備のIDと装備IDの紐付けを保存・復元します
  * 
  */
 public class ItemConfig {
+    /** ロガー */
+    private static final Logger LOG = LogManager.getLogger(ItemConfig.class);
 
     /**
      * 設定ファイルに書き込みます
      */
     public static void store() throws IOException {
-        Map<Long, String> map = new HashMap<Long, String>();
+        Map<Long, Integer> map = new HashMap<Long, Integer>();
         for (Entry<Long, ItemDto> entry : GlobalContext.getItemMap().entrySet()) {
-            map.put(entry.getKey(), Long.toString(entry.getValue().getId()));
+            map.put(entry.getKey(), entry.getValue().getId());
         }
         BeanUtils.writeObject(AppConstants.ITEM_CONFIG_FILE, map);
     }
@@ -34,9 +39,13 @@ public class ItemConfig {
      * @return
      */
     public static void load() {
-        Map<Long, String> map = BeanUtils.readObject(AppConstants.ITEM_CONFIG_FILE, Map.class);
-        if (map != null) {
-            GlobalContext.setItemMap(map);
+        try {
+            Map<Long, Integer> map = BeanUtils.readObject(AppConstants.ITEM_CONFIG_FILE, Map.class);
+            if (map != null) {
+                GlobalContext.setItemMap(map);
+            }
+        } catch (Exception e) {
+            LOG.warn("艦娘のIDと名前の紐付けを設定ファイルから読み込みますに失敗しました", e);
         }
     }
 }

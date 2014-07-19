@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -107,7 +106,7 @@ public final class GlobalContext {
     private static MapCellDto mapCellDto = null;
 
     /** 戦闘詳細 */
-    private static BattleDto lastBattleDto = null;
+    private static BattleDto battle = null;
     private static boolean firstBattle = true;
 
     /** 遠征リスト */
@@ -156,16 +155,23 @@ public final class GlobalContext {
      * @return 装備Map
      */
     public static Map<Long, ItemDto> getItemMap() {
-        return Collections.unmodifiableMap(itemMap);
+        return itemMap;
     }
 
     /**
      * 装備を復元する
      * @param map
      */
-    public static void setItemMap(Map<Long, String> map) {
-        for (Entry<Long, String> entry : map.entrySet()) {
-            String id = entry.getValue();
+    public static void setItemMap(Map<Long, Integer> map) {
+        for (Entry<Long, Integer> entry : map.entrySet()) {
+            Object obj = entry.getValue();
+            Integer id;
+            if (obj instanceof Integer) {
+                id = (Integer) obj;
+            } else {
+                // 旧設定ファイル用
+                id = Integer.parseInt(obj.toString());
+            }
             ItemDto item = Item.get(id);
             if (item != null) {
                 itemMap.put(entry.getKey(), item);
@@ -177,7 +183,7 @@ public final class GlobalContext {
      * @return 艦娘Map
      */
     public static Map<Long, ShipDto> getShipMap() {
-        return Collections.unmodifiableMap(shipMap);
+        return shipMap;
     }
 
     /**
@@ -212,32 +218,28 @@ public final class GlobalContext {
      * @return 建造艦娘List
      */
     public static List<GetShipDto> getGetshipList() {
-        return Collections.unmodifiableList(getShipList);
+        return getShipList;
     }
 
     /**
      * @return 開発アイテムList
      */
     public static List<CreateItemDto> getCreateItemList() {
-        return Collections.unmodifiableList(createItemList);
+        return createItemList;
     }
 
     /**
      * @return 海戦・ドロップList
      */
     public static List<BattleResultDto> getBattleResultList() {
-        return Collections.unmodifiableList(battleResultList);
-    }
-
-    public static BattleDto getLastBattleDto() {
-        return lastBattleDto;
+        return battleResultList;
     }
 
     /**
      * @return 遠征結果
      */
     public static List<MissionResultDto> getMissionResultList() {
-        return Collections.unmodifiableList(missionResultList);
+        return missionResultList;
     }
 
     /**
@@ -331,7 +333,7 @@ public final class GlobalContext {
      * @return 任務
      */
     public static List<QuestDto> getQuest() {
-        return Collections.unmodifiableList(questList);
+        return questList;
     }
 
     /**
@@ -774,24 +776,29 @@ public final class GlobalContext {
      */
     private static void doBattleresult(Data data) {
         try {
-            JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
-            BattleResultDto dto = new BattleResultDto(apidata, lastBattleDto, mapCellDto);
-            battleResultList.add(dto);
-            CreateReportLogic.storeBattleResultReport(dto);
+            if (battle != null) {
+	            JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+	            BattleResultDto dto = new BattleResultDto(apidata, lastBattleDto, mapCellDto);
+	            battleResultList.add(dto);
+	            CreateReportLogic.storeBattleResultReport(dto);
+	
+	            // 警告を出すためにバージョンアップ
+	            lastBattleDto.getDock().setUpdate(true);
+	
+	            firstBattle = true;
+	
+	            // ランクが合っているかチェック
+	            if (!dto.getRank().equals(lastBattleDto.getRank().rank())) {
+	                if ((lastBattleDto.getRank() == ResultRank.B_OR_C) && dto.getRank().equals("B"))
+	                    ;// 確率的にBになることがある判定だったのでOK
+	                else
+	                    LOG.info("戦闘結果判定ミス: 正解ランク:" + dto.getRank() + " " + lastBattleDto.getRankCalcInfo());
+	            }
 
-            // 警告を出すためにバージョンアップ
-            lastBattleDto.getDock().setUpdate(true);
-
-            firstBattle = true;
-
-            // ランクが合っているかチェック
-            if (!dto.getRank().equals(lastBattleDto.getRank().rank())) {
-                if ((lastBattleDto.getRank() == ResultRank.B_OR_C) && dto.getRank().equals("B"))
-                    ;// 確率的にBになることがある判定だったのでOK
-                else
-                    LOG.info("戦闘結果判定ミス: 正解ランク:" + dto.getRank() + " " + lastBattleDto.getRankCalcInfo());
-            }
-
+                for (int i = 0; i < (battleResultList.size() - AppConstants.MAX_LOG_SIZE); i++) {
+                    battleResultList.remove(0);
+                }
+			}
             addConsole("海戦結果を更新しました");
         } catch (Exception e) {
             LOG.warn("海戦結果を更新しますに失敗しました", e);
@@ -954,7 +961,7 @@ public final class GlobalContext {
             CreateItemDto createitem = new CreateItemDto(apidata, resources);
             if (createitem.isCreateFlag()) {
                 JsonObject object = apidata.getJsonObject("api_slot_item");
-                String typeid = object.getJsonNumber("api_slotitem_id").toString();
+                int typeid = object.getJsonNumber("api_slotitem_id").intValue();
                 Long id = object.getJsonNumber("api_id").longValue();
                 ItemDto item = Item.get(typeid);
                 if (item != null) {
@@ -998,7 +1005,7 @@ public final class GlobalContext {
             itemMap.clear();
             for (int i = 0; i < apidata.size(); i++) {
                 JsonObject object = (JsonObject) apidata.get(i);
-                String typeid = object.getJsonNumber("api_slotitem_id").toString();
+                int typeid = object.getJsonNumber("api_slotitem_id").intValue();
                 Long id = object.getJsonNumber("api_id").longValue();
                 ItemDto item = Item.get(typeid);
                 if (item != null) {
@@ -1603,7 +1610,7 @@ public final class GlobalContext {
                 for (int i = 0; i < apiMstSlotitem.size(); i++) {
                     JsonObject object = (JsonObject) apiMstSlotitem.get(i);
                     ItemDto item = new ItemDto(object);
-                    String id = object.getJsonNumber("api_id").toString();
+                    int id = object.getJsonNumber("api_id").intValue();
                     Item.set(id, item);
                 }
                 addConsole("装備一覧を更新しました");

@@ -13,7 +13,7 @@ import org.eclipse.swt.graphics.RGB;
 public class AppConstants {
 
     /** バージョン */
-    public static final String VERSION = "0.6.4";
+    public static final String VERSION = "0.6.5";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://nekopanda.blog.jp/");
@@ -122,6 +122,9 @@ public class AppConstants {
 
     /** 保有資材:開発資材 */
     public static final int MATERIAL_RESEARCH = 7;
+
+    /** 報告書のオンメモリ記憶数 */
+    public static final int MAX_LOG_SIZE = 5000;
 
     public static final int USEITEM_BUCKET = 1;
     public static final int USEITEM_BURNER = 2;

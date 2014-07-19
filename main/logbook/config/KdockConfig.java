@@ -13,11 +13,16 @@ import logbook.dto.ResourceDto;
 import logbook.dto.ShipDto;
 import logbook.util.BeanUtils;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * 建造ドックの投入資源を保存・復元します
  *
  */
 public class KdockConfig {
+    /** ロガー */
+    private static final Logger LOG = LogManager.getLogger(KdockConfig.class);
 
     /** 建造ドックのBean */
     private static KdockMapBean mapBean;
@@ -56,25 +61,29 @@ public class KdockConfig {
      */
     @CheckForNull
     public static ResourceDto load(String dock) {
-        if (mapBean == null) {
-            mapBean = BeanUtils.readObject(AppConstants.KDOCK_CONFIG_FILE, KdockMapBean.class);
-        }
-        if (mapBean != null) {
-            KdockBean kdock = mapBean.getKdockMap().get(dock);
-
-            if (kdock == null) {
-                return null;
+        try {
+            if (mapBean == null) {
+                mapBean = BeanUtils.readObject(AppConstants.KDOCK_CONFIG_FILE, KdockMapBean.class);
             }
+            if (mapBean != null) {
+                KdockBean kdock = mapBean.getKdockMap().get(dock);
 
-            Map<Long, ShipDto> ships = GlobalContext.getShipMap();
-            if (!ships.isEmpty() && ships.containsKey(kdock.getShipId())) {
-                ResourceDto resource = new ResourceDto(kdock.getType(), kdock.getFuel(), kdock.getAmmo(),
-                        kdock.getMetal(),
-                        kdock.getBauxite(), kdock.getResearchMaterials(), ships.get(kdock.getShipId()),
-                        kdock.getHqLevel());
-                resource.setFreeDock(kdock.getFreeDock());
-                return resource;
+                if (kdock == null) {
+                    return null;
+                }
+
+                Map<Long, ShipDto> ships = GlobalContext.getShipMap();
+                if (!ships.isEmpty() && ships.containsKey(kdock.getShipId())) {
+                    ResourceDto resource = new ResourceDto(kdock.getType(), kdock.getFuel(), kdock.getAmmo(),
+                            kdock.getMetal(),
+                            kdock.getBauxite(), kdock.getResearchMaterials(), ships.get(kdock.getShipId()),
+                            kdock.getHqLevel());
+                    resource.setFreeDock(kdock.getFreeDock());
+                    return resource;
+                }
             }
+        } catch (Exception e) {
+            LOG.warn("建造ドックの投入資源を取得しますに失敗しました", e);
         }
         return null;
     }
