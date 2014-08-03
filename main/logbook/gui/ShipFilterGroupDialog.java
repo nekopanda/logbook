@@ -191,7 +191,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
                         ship.getName(),
                         ship.getType(),
                         Long.toString(ship.getLv()),
-                        Long.toString(ship.getCond())
+                        Long.toString(ship.getEstimatedCond())
                 });
             }
         }

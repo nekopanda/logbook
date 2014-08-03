@@ -405,7 +405,7 @@ public final class CreateReportLogic {
                         ship.getFleetid(),
                         ship.getName(),
                         ship.getType(),
-                        ship.getCond(),
+                        ship.getEstimatedCond(),
                         ship.getCondClearDate(),
                         ship.getLv(),
                         ship.getNext(),

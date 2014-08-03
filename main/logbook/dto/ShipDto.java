@@ -287,8 +287,13 @@ public final class ShipDto extends AbstractDto {
      * @return 現在の疲労推定値（下限値）
      */
     public long getEstimatedCond() {
+        if (this.cond >= 49)
+            return this.cond;
         long elapsedTime = new Date().getTime() - this.time.getTime().getTime();
-        return this.cond + ((elapsedTime / (3 * 60 * 1000)) * 3);
+        long estimatedCond = this.cond + ((elapsedTime / (3 * 60 * 1000)) * 3);
+        if (estimatedCond > 49)
+            return 49;
+        return estimatedCond;
     }
 
     /**
