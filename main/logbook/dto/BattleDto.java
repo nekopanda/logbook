@@ -212,11 +212,11 @@ public final class BattleDto extends AbstractDto {
 
         double enemyGaugeRate = (double) enemyGauge / this.enemyGaugeMax;
         double friendGaugeRate = (double) friendGauge / this.friendGaugeMax;
-        // 0.9倍以上（0.9~0.92のどれか、逆に敵の1.1倍かも）
-        boolean equalOrMore = enemyGaugeRate >= (0.90 * friendGaugeRate);
+        // 0.91倍以上（0.902~0.92のどれか、逆に敵の1.1倍かも）
+        boolean equalOrMore = (1.1 * enemyGaugeRate) >= friendGaugeRate;
         // 2.5倍以上
-        boolean superior1 = enemyGaugeRate >= (2.5 * friendGaugeRate);
-        boolean superior2 = enemyGaugeRate >= (2.3 * friendGaugeRate);
+        boolean superior1 = (enemyGaugeRate != 0) && (enemyGaugeRate >= (2.5 * friendGaugeRate));
+        boolean superior2 = (enemyGaugeRate != 0) && (enemyGaugeRate >= (2.3 * friendGaugeRate));
         boolean superior = superior1;
 
         if (friendSunk == 0) { // 味方轟沈数ゼロ
@@ -276,7 +276,8 @@ public final class BattleDto extends AbstractDto {
             return ResultRank.C;
         }
         // 味方轟沈艦ゼロで敵に１以上のダメージ
-        if ((friendSunk == 0) && (enemyGauge > 0)) {
+        // 轟沈艦なしで味方が最大ダメージを受けて（残りHP1）、かつ敵へのダメージがゼロなのにDなったという報告があったので「敵に１以上のダメージ」という条件は怪しい
+        if (friendSunk == 0) {
             return ResultRank.D;
         }
         // 敵へのダメージゼロで、味方ダメージが一定以下（データが少なすぎてここのボーダーは不明。0.2~0.7のどれかだと思う。
