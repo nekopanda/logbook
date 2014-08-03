@@ -77,7 +77,7 @@ public final class BattleDialog extends Dialog {
 
         Label top = new Label(kaiteki, SWT.NONE);
         top.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
-        top.setText("交戦戦力");
+        top.setText("交戦結果");
 
         Label label1 = new Label(kaiteki, SWT.NONE);
         label1.setText("味方艦隊名が入ります");

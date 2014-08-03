@@ -31,7 +31,7 @@ public final class ProxyServer {
 
             ServletHandler servletHandler = new ServletHandler();
             servletHandler.addServletWithMapping(ReverseProxyServlet.class, "/*");
-            servletHandler.setServer(this.server);
+            servletHandler.setServer(server);
 
             server.setHandler(servletHandler);
 
