@@ -209,6 +209,9 @@ public final class AsyncExecApplicationMain extends Thread {
                 Sound.randomDockSoundPlay();
                 visibleHome |= AppConfig.get().isVisibleOnReturnBathwater();
             }
+            if (visibleHome) {
+                this.main.getTabFolder().setSelection(0);
+            }
             if (AppConfig.get().isUseBalloon()) {
                 // バルーンツールチップを表示する
                 try {
@@ -219,9 +222,6 @@ public final class AsyncExecApplicationMain extends Thread {
                         tip.setText("遠征・入渠");
                         tip.setMessage(StringUtils.join(notice, "\r\n"));
                         this.main.getTrayItem().setToolTip(tip);
-                        if (visibleHome) {
-                            this.main.getTabFolder().setSelection(0);
-                        }
                         tip.setVisible(true);
                     }
                 } catch (Exception e) {
