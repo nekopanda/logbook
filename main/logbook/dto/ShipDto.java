@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -208,10 +209,6 @@ public final class ShipDto extends AbstractDto {
         this.sakutekiMax = ((JsonNumber) object.getJsonArray("api_sakuteki").get(1)).longValue();
         this.lucky = ((JsonNumber) object.getJsonArray("api_lucky").get(0)).longValue();
         this.luckyMax = ((JsonNumber) object.getJsonArray("api_lucky").get(1)).longValue();
-        // 疲労が抜ける時間を計算する
-        if (this.cond < 49) {
-            this.time.add(Calendar.MINUTE, Math.max(49 - (int) this.cond, 3));
-        }
     }
 
     /**
@@ -284,6 +281,14 @@ public final class ShipDto extends AbstractDto {
      */
     public long getCond() {
         return this.cond;
+    }
+
+    /**
+     * @return 現在の疲労推定値（下限値）
+     */
+    public long getEstimatedCond() {
+        long elapsedTime = new Date().getTime() - this.time.getTime().getTime();
+        return this.cond + ((elapsedTime / (3 * 60 * 1000)) * 3);
     }
 
     /**
@@ -607,7 +612,10 @@ public final class ShipDto extends AbstractDto {
      * @return 疲労が抜けるまでの時間
      */
     public Calendar getCondClearTime() {
-        return this.time;
+        // 疲労が抜ける時間を計算する
+        Calendar condClearTime = (Calendar) this.time.clone();
+        condClearTime.add(Calendar.MINUTE, Math.max(49 - (int) this.cond, 3));
+        return condClearTime;
     }
 
     /**
@@ -615,7 +623,7 @@ public final class ShipDto extends AbstractDto {
      */
     public String getCondClearDate() {
         if (this.cond < 49) {
-            return new SimpleDateFormat("HH:mm").format(this.time.getTime());
+            return new SimpleDateFormat("HH:mm").format(this.getCondClearTime().getTime());
         }
         return "";
     }

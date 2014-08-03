@@ -133,6 +133,7 @@ public final class GlobalContext {
     /** 出撃中か */
     private static boolean[] isSortie = new boolean[4];
 
+    /**　ユーザ基本情報 */
     private static BasicInfoDto basic;
 
     /** ログ表示 */

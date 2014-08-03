@@ -240,7 +240,7 @@ public class QueryHandler extends HttpServlet {
                 .add("char_id", ship.getCharId())
                 .add("ship_type", ship.getShipInfo().getStype())
                 .add("level", ship.getLv())
-                .add("cond", ship.getCond())
+                .add("cond", ship.getEstimatedCond())
                 .add("cond_clear_time", ship.getCondClearTime().getTimeInMillis())
                 .add("bull", ship.getBull())
                 .add("bull_max", ship.getBullMax())
