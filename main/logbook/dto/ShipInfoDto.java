@@ -41,6 +41,9 @@ public final class ShipInfoDto extends AbstractDto {
     /** 近代化改修時のup項目 */
     private int[] powup = new int[4];
 
+    /** スロット数最大 */
+    private int[] maxeq = new int[5];
+
     /**
      * コンストラクター
      */
@@ -64,7 +67,7 @@ public final class ShipInfoDto extends AbstractDto {
      * コンストラクター
      */
     public ShipInfoDto(int shipId, String name, int stype, String flagship, int afterlv, int aftershipid, int maxBull,
-            int maxFuel, int[] powup) {
+            int maxFuel, int[] powup, int[] maxeq) {
         this.name = name;
         this.shipId = shipId;
         this.stype = stype;
@@ -75,6 +78,7 @@ public final class ShipInfoDto extends AbstractDto {
         this.maxBull = maxBull;
         this.maxFuel = maxFuel;
         this.powup = powup;
+        this.maxeq = maxeq;
     }
 
     /**
@@ -231,5 +235,21 @@ public final class ShipInfoDto extends AbstractDto {
      */
     public void setPowup(int[] powup) {
         this.powup = powup;
+    }
+
+    /**
+     * maxeqを取得します。
+     * @return maxeq
+     */
+    public int[] getMaxeq() {
+        return this.maxeq;
+    }
+
+    /**
+     * maxeqを設定します。
+     * @param maxeq
+     */
+    public void setMaxeq(int[] maxeq) {
+        this.maxeq = maxeq;
     }
 }

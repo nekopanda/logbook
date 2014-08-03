@@ -57,6 +57,19 @@ public final class DockDto extends AbstractDto {
     }
 
     /**
+     * 艦隊の艦娘を入れ替えます
+     * 
+     * @param oldShip
+     * @param newShip
+     */
+    public void replaceShip(ShipDto oldShip, ShipDto newShip) {
+        int index = this.ships.indexOf(oldShip);
+        if (index != -1) {
+            this.ships.set(index, newShip);
+        }
+    }
+
+    /**
      * 艦隊名を取得します。
      * @return 艦隊名
      */

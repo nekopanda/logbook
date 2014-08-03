@@ -82,13 +82,18 @@ public class QueryHandler extends HttpServlet {
         for (int item_number : ship.getPowup()) {
             powup_array.add(item_number);
         }
+        JsonArrayBuilder maxeq_array = Json.createArrayBuilder();
+        for (int item_number : ship.getMaxeq()) {
+            maxeq_array.add(item_number);
+        }
         return Json.createObjectBuilder()
                 .add("ship_id", ship.getShipId())
                 .add("ship_type", ship.getStype())
                 .add("name", ship.getName())
                 .add("afterlv", ship.getAfterlv())
                 .add("aftershipid", ship.getAftershipid())
-                .add("powup", powup_array);
+                .add("powup", powup_array)
+                .add("maxeq", maxeq_array);
     }
 
     private static JsonObjectBuilder itemInfoToJson(ItemDto item) {

@@ -787,8 +787,8 @@ public final class GlobalContext {
             if (battle != null) {
                 JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
                 BattleResultDto dto = new BattleResultDto(apidata, battle, mapCellDto);
-                battleResultList.add(dto);
-                if (dto.isPractice() == false) { // 演習は記録しない
+                if (dto.isCompleteSortieBattle()) { // 演習は記録しない
+                    battleResultList.add(dto);
                     CreateReportLogic.storeBattleResultReport(dto);
                 }
 
@@ -1275,7 +1275,18 @@ public final class GlobalContext {
             // 近代化改修された艦を更新する
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
             ShipDto ship = new ShipDto(apidata.getJsonObject("api_ship"));
-            shipMap.put(Long.valueOf(ship.getId()), ship);
+            Long id = Long.valueOf(ship.getId());
+            // 艦隊情報を引き継ぐ
+            ShipDto oldShip = shipMap.get(id);
+            String fleetid = oldShip.getFleetid();
+            if (fleetid != null) {
+                DockDto dockdto = dock.get(fleetid);
+                if (dockdto != null) {
+                    dockdto.replaceShip(oldShip, ship);
+                    ship.setFleetid(fleetid);
+                }
+            }
+            shipMap.put(id, ship);
 
             addConsole("近代化改修しました");
         } catch (Exception e) {
@@ -1473,7 +1484,11 @@ public final class GlobalContext {
     private static void doQuest(Data data) {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
-            if (!apidata.isNull("api_list")) {
+            if (apidata.isNull("api_list")) {
+                LOG.info("任務が空でした");
+                questList.clear();
+            }
+            else {
                 JsonArray apilist = apidata.getJsonArray("api_list");
                 int items_per_page = 5;
                 int disp_page = apidata.getJsonNumber("api_disp_page").intValue();
@@ -1721,7 +1736,12 @@ public final class GlobalContext {
         for (int i = 0; i < apiPowup.size(); i++) {
             powup[i] = ((JsonNumber) apiPowup.get(i)).intValue();
         }
-        return new ShipInfoDto(shipId, name, stype, flagship, afterlv, aftershipid, maxBull, maxFuel, powup);
+        JsonArray apiMaxeq = object.getJsonArray("api_maxeq");
+        int[] maxeq = new int[apiMaxeq.size()];
+        for (int i = 0; i < apiMaxeq.size(); i++) {
+            maxeq[i] = ((JsonNumber) apiMaxeq.get(i)).intValue();
+        }
+        return new ShipInfoDto(shipId, name, stype, flagship, afterlv, aftershipid, maxBull, maxFuel, powup, maxeq);
     }
 
     private static void addConsole(Object message) {
