@@ -27,6 +27,9 @@ public final class ShipDto extends AbstractDto {
     /** 日時 */
     private final Calendar time = Calendar.getInstance();
 
+    /** 日時 */
+    private final Calendar condClearTime = Calendar.getInstance();
+
     /** 艦娘個人を識別するID */
     private final long id;
 
@@ -209,6 +212,10 @@ public final class ShipDto extends AbstractDto {
         this.sakutekiMax = ((JsonNumber) object.getJsonArray("api_sakuteki").get(1)).longValue();
         this.lucky = ((JsonNumber) object.getJsonArray("api_lucky").get(0)).longValue();
         this.luckyMax = ((JsonNumber) object.getJsonArray("api_lucky").get(1)).longValue();
+        if (this.cond < 49) {
+            // 疲労が抜ける時間を計算する
+            this.condClearTime.add(Calendar.MINUTE, Math.max(49 - (int) this.cond, 3));
+        }
     }
 
     /**
@@ -617,10 +624,7 @@ public final class ShipDto extends AbstractDto {
      * @return 疲労が抜けるまでの時間
      */
     public Calendar getCondClearTime() {
-        // 疲労が抜ける時間を計算する
-        Calendar condClearTime = (Calendar) this.time.clone();
-        condClearTime.add(Calendar.MINUTE, Math.max(49 - (int) this.cond, 3));
-        return condClearTime;
+        return this.condClearTime;
     }
 
     /**
@@ -628,7 +632,7 @@ public final class ShipDto extends AbstractDto {
      */
     public String getCondClearDate() {
         if (this.cond < 49) {
-            return new SimpleDateFormat("HH:mm").format(this.getCondClearTime().getTime());
+            return new SimpleDateFormat("HH:mm").format(this.condClearTime.getTime());
         }
         return "";
     }
