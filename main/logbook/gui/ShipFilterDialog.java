@@ -1,8 +1,11 @@
 package logbook.gui;
 
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import logbook.config.ShipGroupConfig;
+import logbook.config.bean.ShipGroupBean;
 import logbook.data.context.GlobalContext;
 import logbook.dto.ItemDto;
 import logbook.dto.ShipFilterDto;
@@ -39,6 +42,9 @@ public final class ShipFilterDialog extends Dialog {
     private final ShipTable shipTable;
 
     private final ShipFilterDto filter;
+
+    /** グループ一覧 */
+    private final List<ShipGroupBean> groups = ShipGroupConfig.get().getGroup();
 
     /** 名前 */
     private Text nametext;
@@ -79,6 +85,10 @@ public final class ShipFilterDialog extends Dialog {
     private Button submarineTender;
     /** 全て選択 */
     private Button selectall;
+    /** グループ */
+    private Button group;
+    /** グループ選択 */
+    private Combo groupcombo;
     /** 装備 */
     private Button item;
     /** 装備 */
@@ -127,13 +137,23 @@ public final class ShipFilterDialog extends Dialog {
     private void createContents() {
         this.shell = new Shell(this.getParent(), this.getStyle());
         this.shell.setText("フィルター");
-        this.shell.setLayout(new GridLayout(1, false));
+        GridLayout glShell = new GridLayout(1, false);
+        glShell.verticalSpacing = 2;
+        glShell.horizontalSpacing = 2;
+        glShell.marginHeight = 2;
+        glShell.marginWidth = 2;
+        this.shell.setLayout(glShell);
 
         SelectionListener listener = new ApplyFilterSelectionAdapter();
 
         Composite composite = new Composite(this.shell, SWT.NONE);
         composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        composite.setLayout(new GridLayout(1, false));
+        GridLayout glComposite = new GridLayout(1, false);
+        glComposite.verticalSpacing = 2;
+        glComposite.horizontalSpacing = 2;
+        glComposite.marginHeight = 2;
+        glComposite.marginWidth = 2;
+        composite.setLayout(glComposite);
 
         Group namegroup = new Group(composite, SWT.NONE);
         namegroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -153,7 +173,12 @@ public final class ShipFilterDialog extends Dialog {
 
         Group shiptypegroup = new Group(composite, SWT.NONE);
         shiptypegroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        shiptypegroup.setLayout(new GridLayout(3, false));
+        GridLayout glShiptypegroup = new GridLayout(3, false);
+        glShiptypegroup.verticalSpacing = 2;
+        glShiptypegroup.horizontalSpacing = 2;
+        glShiptypegroup.marginHeight = 2;
+        glShiptypegroup.marginWidth = 2;
+        shiptypegroup.setLayout(glShiptypegroup);
         shiptypegroup.setText("艦種");
 
         this.destroyer = new Button(shiptypegroup, SWT.CHECK);
@@ -243,20 +268,32 @@ public final class ShipFilterDialog extends Dialog {
 
         Group etcgroup = new Group(composite, SWT.NONE);
         etcgroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        etcgroup.setLayout(new GridLayout(2, false));
+        GridLayout glEtcgroup = new GridLayout(2, false);
+        glEtcgroup.horizontalSpacing = 2;
+        glEtcgroup.marginHeight = 2;
+        glEtcgroup.marginWidth = 2;
+        etcgroup.setLayout(glEtcgroup);
         etcgroup.setText("その他");
 
-        Composite itemcomposite = new Composite(etcgroup, SWT.NONE);
-        itemcomposite.setLayout(new RowLayout());
-        itemcomposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
+        this.group = new Button(etcgroup, SWT.CHECK);
+        this.group.setText("グループ");
+        this.group.setSelection(false);
+        this.group.addSelectionListener(listener);
 
-        this.item = new Button(itemcomposite, SWT.CHECK);
+        this.groupcombo = new Combo(etcgroup, SWT.READ_ONLY);
+        this.groupcombo.setEnabled(false);
+        this.groupcombo.addSelectionListener(listener);
+        for (ShipGroupBean groupBean : this.groups) {
+            this.groupcombo.add(groupBean.getName());
+        }
+        this.group.addSelectionListener(new CheckAdapter(this.group, this.groupcombo));
+
+        this.item = new Button(etcgroup, SWT.CHECK);
         this.item.setText("装備");
         this.item.setSelection(false);
-        this.item.addSelectionListener(new ItemCheckAdapter());
         this.item.addSelectionListener(listener);
 
-        this.itemcombo = new Combo(itemcomposite, SWT.READ_ONLY);
+        this.itemcombo = new Combo(etcgroup, SWT.READ_ONLY);
         this.itemcombo.setEnabled(false);
         this.itemcombo.addSelectionListener(listener);
         Set<String> items = new TreeSet<String>();
@@ -266,6 +303,7 @@ public final class ShipFilterDialog extends Dialog {
         for (String name : items) {
             this.itemcombo.add(name);
         }
+        this.item.addSelectionListener(new CheckAdapter(this.item, this.itemcombo));
 
         this.onfleet = new Button(etcgroup, SWT.CHECK);
         this.onfleet.setText("艦隊に所属");
@@ -380,6 +418,13 @@ public final class ShipFilterDialog extends Dialog {
         filter.armoredcarrier = this.armoredcarrier.getSelection();
         filter.repairship = this.repairship.getSelection();
         filter.submarineTender = this.submarineTender.getSelection();
+        filter.group = null;
+        if (ShipFilterDialog.this.group.getSelection()) {
+            int idx = ShipFilterDialog.this.groupcombo.getSelectionIndex();
+            if ((idx >= 0) && (idx < this.groups.size())) {
+                filter.group = this.groups.get(idx);
+            }
+        }
         if (ShipFilterDialog.this.item.getSelection()) {
             if (ShipFilterDialog.this.itemcombo.getSelectionIndex() >= 0) {
                 filter.itemname = this.itemcombo.getItem(ShipFilterDialog.this.itemcombo
@@ -397,12 +442,21 @@ public final class ShipFilterDialog extends Dialog {
     }
 
     /**
-     * 装備を選択した時に装備のコンボボックスを制御する
+     * 選択した時にコンボボックスを制御する
      */
-    private final class ItemCheckAdapter extends SelectionAdapter {
+    private final class CheckAdapter extends SelectionAdapter {
+
+        private final Button button;
+        private final Composite composite;
+
+        public CheckAdapter(Button button, Composite composite) {
+            this.button = button;
+            this.composite = composite;
+        }
+
         @Override
         public void widgetSelected(SelectionEvent e) {
-            ShipFilterDialog.this.itemcombo.setEnabled(ShipFilterDialog.this.item.getSelection());
+            this.composite.setEnabled(this.button.getSelection());
         }
     }
 
