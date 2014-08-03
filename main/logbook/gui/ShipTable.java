@@ -1,6 +1,7 @@
 package logbook.gui;
 
 import java.util.Map;
+import java.util.List;
 
 import logbook.config.ShipGroupConfig;
 import logbook.config.bean.ShipGroupBean;
@@ -57,28 +58,6 @@ public final class ShipTable extends AbstractTableDialog {
     protected void createContents() {
         // メニューバーに追加する
         // フィルターメニュー
-        SelectionListener groupListener = new GroupFilterSelectionAdapter(this);
-        MenuItem groupCascade = new MenuItem(this.opemenu, SWT.CASCADE);
-        groupCascade.setText("グループフィルター(&G)");
-        Menu groupMenu = new Menu(groupCascade);
-        groupCascade.setMenu(groupMenu);
-        MenuItem nullGroupItem = new MenuItem(groupMenu, SWT.RADIO);
-        nullGroupItem.setText("選択なし\tF6");
-        nullGroupItem.setAccelerator(SWT.F6);
-        nullGroupItem.setSelection(true);
-        nullGroupItem.addSelectionListener(groupListener);
-        for (int i = 0; i < ShipGroupConfig.get().getGroup().size(); i++) {
-            ShipGroupBean group = ShipGroupConfig.get().getGroup().get(i);
-            MenuItem groupItem = new MenuItem(groupMenu, SWT.RADIO);
-            if ((SWT.F7 + i) <= SWT.F20) {
-                groupItem.setText(group.getName() + "\t" + "F" + (i + 7));
-                groupItem.setAccelerator(SWT.F7 + i);
-            } else {
-                groupItem.setText(group.getName());
-            }
-            groupItem.setData(group);
-            groupItem.addSelectionListener(groupListener);
-        }
         final MenuItem filter = new MenuItem(this.opemenu, SWT.PUSH);
         filter.setText("フィルター(&F)\tCtrl+F");
         filter.setAccelerator(SWT.CTRL + 'F');
@@ -101,6 +80,8 @@ public final class ShipTable extends AbstractTableDialog {
                 ShipTable.this.reloadTable();
             }
         });
+        // セパレータ
+        new MenuItem(this.tablemenu, SWT.SEPARATOR);
         // 右クリックメニューに追加する
         final MenuItem filtertable = new MenuItem(this.tablemenu, SWT.NONE);
         filtertable.setText("フィルター(&F)");
@@ -138,6 +119,48 @@ public final class ShipTable extends AbstractTableDialog {
         });
         shipCopy.setText("艦娘の名前をコピー(&2)");
 
+        List<ShipGroupBean> groups = ShipGroupConfig.get().getGroup();
+        MenuItem addGroupCascade = new MenuItem(this.tablemenu, SWT.CASCADE);
+        addGroupCascade.setText("選択した艦娘をグループに追加(&A)");
+        Menu addGroupMenu = new Menu(addGroupCascade);
+        addGroupCascade.setMenu(addGroupMenu);
+        for (ShipGroupBean groupBean : groups) {
+            final MenuItem groupItem = new MenuItem(addGroupMenu, SWT.NONE);
+            groupItem.setText(groupBean.getName());
+            groupItem.setData(groupBean);
+            groupItem.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    TableItem[] tableItems = ShipTable.this.table.getSelection();
+                    for (int i = 0; i < tableItems.length; i++) {
+                        long id = Long.parseLong(tableItems[i].getText(1));
+                        ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
+                        bean.getShips().add(id);
+                    }
+                }
+            });
+        }
+
+        MenuItem removeGroupCascade = new MenuItem(this.tablemenu, SWT.CASCADE);
+        removeGroupCascade.setText("選択した艦娘をグループから除去(&R)");
+        Menu removeGroupMenu = new Menu(removeGroupCascade);
+        removeGroupCascade.setMenu(removeGroupMenu);
+        for (ShipGroupBean groupBean : groups) {
+            final MenuItem groupItem = new MenuItem(removeGroupMenu, SWT.NONE);
+            groupItem.setText(groupBean.getName());
+            groupItem.setData(groupBean);
+            groupItem.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    TableItem[] tableItems = ShipTable.this.table.getSelection();
+                    for (int i = 0; i < tableItems.length; i++) {
+                        long id = Long.parseLong(tableItems[i].getText(1));
+                        ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
+                        bean.getShips().remove(id);
+                    }
+                }
+            });
+        }
     }
 
     @Override
@@ -183,36 +206,5 @@ public final class ShipTable extends AbstractTableDialog {
      */
     public ShipFilterDto getFilter() {
         return this.filter;
-    }
-
-    /**
-     * グループフィルターを選択した時に呼び出されるアダプター
-     *
-     */
-    private static final class GroupFilterSelectionAdapter extends SelectionAdapter {
-
-        /** ダイアログ */
-        private final ShipTable dialog;
-
-        public GroupFilterSelectionAdapter(ShipTable dialog) {
-            this.dialog = dialog;
-        }
-
-        @Override
-        public void widgetSelected(SelectionEvent e) {
-            if (e.widget instanceof MenuItem) {
-                MenuItem item = (MenuItem) e.widget;
-                if (item.getSelection()) {
-                    ShipGroupBean group = (ShipGroupBean) item.getData();
-                    this.dialog.getFilter().group = group;
-                    this.dialog.reloadTable();
-                    if (group != null) {
-                        this.dialog.shell.setText(group.getName() + " - " + this.dialog.getTitle());
-                    } else {
-                        this.dialog.shell.setText(this.dialog.getTitle());
-                    }
-                }
-            }
-        }
     }
 }
