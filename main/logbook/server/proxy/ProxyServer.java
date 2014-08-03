@@ -33,6 +33,7 @@ public final class ProxyServer extends Thread {
 
             ServletHandler servletHandler = new ServletHandler();
             servletHandler.addServletWithMapping(ReverseProxyServlet.class, "/*");
+            servletHandler.setServer(this.server);
 
             this.server.setHandler(servletHandler);
 
