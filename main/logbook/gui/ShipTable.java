@@ -108,7 +108,7 @@ public final class ShipTable extends AbstractTableDialog {
         }
 
         MenuItem removeGroupCascade = new MenuItem(this.tablemenu, SWT.CASCADE);
-        removeGroupCascade.setText("選択した艦娘をグループから除去(&R)");
+        removeGroupCascade.setText("選択した艦娘をグループから除去(&D)");
         Menu removeGroupMenu = new Menu(removeGroupCascade);
         removeGroupCascade.setMenu(removeGroupMenu);
         for (ShipGroupBean groupBean : groups) {
