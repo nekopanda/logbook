@@ -42,7 +42,7 @@ public class MapCellDto {
     public String toString() {
         String ret = "マップ:" + this.map[0] + "-" + this.map[1] + " セル:" + this.map[2];
         if (this.enemyId != -1) {
-            if (this.bosscellNo == this.map[2]) {
+            if (this.isBoss()) {
                 ret += " (ボス)";
             }
             ret += " e_id:" + this.enemyId;
@@ -107,7 +107,7 @@ public class MapCellDto {
     }
 
     public boolean isBoss() {
-        return this.bosscellNo == this.map[2];
+        return (this.bosscellNo == this.map[2]) || (this.colorNo == 5);
     }
 
 }
