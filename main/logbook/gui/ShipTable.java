@@ -45,6 +45,7 @@ public final class ShipTable extends AbstractTableDialog {
     public void updateFilter(ShipFilterDto filter) {
         this.filter = filter;
         this.reloadTable();
+        this.shell.setText(this.getTitle());
     }
 
     @Override
@@ -131,6 +132,9 @@ public final class ShipTable extends AbstractTableDialog {
 
     @Override
     protected String getTitle() {
+        if ((this.filter != null) && (this.filter.group != null)) {
+            return "所有艦娘一覧 (" + this.filter.group.getName() + ")";
+        }
         return "所有艦娘一覧";
     }
 
