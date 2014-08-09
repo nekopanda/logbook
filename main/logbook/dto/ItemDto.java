@@ -1,5 +1,6 @@
 package logbook.dto;
 
+import javax.json.JsonArray;
 import javax.json.JsonObject;
 
 import logbook.internal.ItemType;
@@ -11,8 +12,13 @@ import logbook.internal.ItemType;
 public final class ItemDto extends AbstractDto {
 
     private int id;
-    private int type2;
-    private int type3;
+    /**
+     * [0]: 大分類（砲、魚雷、艦載機、...）
+     * [1]: 種別(夜戦判定)（主砲、副砲、魚雷、...）
+     * [2]: 装備可能艦種別分類
+     * [3]: 表示用の分類
+     */
+    private int[] type = new int[4];
     private int atap;
     private int bakk;
     private int baku;
@@ -47,8 +53,10 @@ public final class ItemDto extends AbstractDto {
      */
     public ItemDto(JsonObject object) {
 
-        this.type2 = object.getJsonArray("api_type").getInt(2);
-        this.type3 = object.getJsonArray("api_type").getInt(3);
+        JsonArray typeArray = object.getJsonArray("api_type");
+        for (int i = 0; i < 4; ++i) {
+            this.type[i] = typeArray.getInt(i);
+        }
 
         this.atap = object.getJsonNumber("api_atap").intValue();
         this.bakk = object.getJsonNumber("api_bakk").intValue();
@@ -104,8 +112,8 @@ public final class ItemDto extends AbstractDto {
             int leng, int luck, String name, int raig, int raik, int raim, int rare, int sakb, int saku,
             int soku, int souk, int taik, int tais, int tyku) {
         this.id = id;
-        this.type2 = type2;
-        this.type3 = type3;
+        this.type[2] = type2;
+        this.type[3] = type3;
         this.atap = atap;
         this.bakk = bakk;
         this.baku = baku;
@@ -129,24 +137,42 @@ public final class ItemDto extends AbstractDto {
     }
 
     /**
+     * @return 表示分類名
+     */
+    public String getTypeName() {
+        return ItemType.get(this.type[3]);
+    }
+
+    /**
+     * typeを設定します。
+     * @param type type
+     */
+    public void setType(int[] type) {
+        this.type = type;
+    }
+
+    /**
+     * typeを取得します。
      * @return type
      */
-    public String getType() {
-        return ItemType.get(this.type3);
+    public int[] getType() {
+        return this.type;
     }
 
     /**
-     * @return type2
+     * type0を取得します。
+     * @return type0
      */
-    public String getTypeId2() {
-        return Long.toString(this.type2);
+    public int getType0() {
+        return this.type[0];
     }
 
     /**
-     * @return type3
+     * type1を取得します。
+     * @return type1
      */
-    public String getTypeId3() {
-        return Long.toString(this.type3);
+    public int getType1() {
+        return this.type[1];
     }
 
     /**
@@ -154,23 +180,7 @@ public final class ItemDto extends AbstractDto {
      * @return type2
      */
     public int getType2() {
-        return this.type2;
-    }
-
-    /**
-     * type2を設定します。
-     * @param type2 type2
-     */
-    public void setType2(int type2) {
-        this.type2 = type2;
-    }
-
-    /**
-     * type3を設定します。
-     * @param type3 type3
-     */
-    public void setType3(int type3) {
-        this.type3 = type3;
+        return this.type[2];
     }
 
     /**
@@ -178,7 +188,7 @@ public final class ItemDto extends AbstractDto {
      * @return type3
      */
     public int getType3() {
-        return this.type3;
+        return this.type[3];
     }
 
     /**

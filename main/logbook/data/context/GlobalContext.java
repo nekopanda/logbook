@@ -978,7 +978,7 @@ public final class GlobalContext {
                     itemMap.put(id, item);
 
                     createitem.setName(item.getName());
-                    createitem.setType(item.getType());
+                    createitem.setType(item.getTypeName());
                     createItemList.add(createitem);
                 }
             } else {
@@ -987,14 +987,12 @@ public final class GlobalContext {
             CreateReportLogic.storeCreateItemReport(createitem);
 
             // 資源に反映させてレポート
-            if (apidata.getInt("api_shizai_flag") > 0) {
-                JsonArray newMaterial = apidata.getJsonArray("api_material");
-                ResourceItemDto items = new ResourceItemDto();
-                items.loadMaterialFronJson(newMaterial);
-                material = items.toMaterialDto();
-                material.setEvent("装備開発");
-                CreateReportLogic.storeMaterialReport(material);
-            }
+            JsonArray newMaterial = apidata.getJsonArray("api_material");
+            ResourceItemDto items = new ResourceItemDto();
+            items.loadMaterialFronJson(newMaterial);
+            material = items.toMaterialDto();
+            material.setEvent("装備開発");
+            CreateReportLogic.storeMaterialReport(material);
 
             addConsole("装備開発情報を更新しました");
         } catch (Exception e) {

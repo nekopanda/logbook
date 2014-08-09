@@ -124,6 +124,9 @@ public final class AppConfigBean {
     /** デフォルト評価 */
     private String defaultEvaluate = "S勝利";
 
+    /** 索敵表示形式 */
+    private int sakutekiMethod = 0;
+
     /** タスクバー通知を使用する */
     private boolean useTaskbarNotify = true;
 
@@ -763,6 +766,22 @@ public final class AppConfigBean {
      */
     public void setDefaultEvaluate(String defaultEvaluate) {
         this.defaultEvaluate = defaultEvaluate;
+    }
+
+    /**
+     * 索敵値の表示形式を取得します。
+     * @return 索敵値の表示形式
+     */
+    public int getSakutekiMethod() {
+        return this.sakutekiMethod;
+    }
+
+    /**
+     * 索敵値の表示形式を設定します。
+     * @param sakutekiMethod 索敵値の表示形式
+     */
+    public void setSakutekiMethod(int sakutekiMethod) {
+        this.sakutekiMethod = sakutekiMethod;
     }
 
     /**

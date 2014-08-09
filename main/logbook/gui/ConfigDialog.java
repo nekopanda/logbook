@@ -300,6 +300,14 @@ public final class ConfigDialog extends Dialog {
         visibleOnReturnBathwater.setText("お風呂から上がる時に母港タブを表示");
         visibleOnReturnBathwater.setSelection(AppConfig.get().isVisibleOnReturnBathwater());
 
+        Label sakutekiMethodLabel = new Label(compositeFleetTab, SWT.NONE);
+        sakutekiMethodLabel.setText("索敵表示形式");
+        final Combo sakutekiCombo = new Combo(compositeFleetTab, SWT.READ_ONLY);
+        sakutekiCombo.add("A.艦隊素の索敵値 + 装備の索敵値");
+        sakutekiCombo.add("B.右の計算結果(偵察機×2 + 電探 + √(装備込みの艦隊索敵値-偵察機-電探))");
+        sakutekiCombo.add("C.装備込みの艦隊索敵値(Bの計算結果)");
+        sakutekiCombo.select(AppConfig.get().getSakutekiMethod());
+
         // 通知
         Composite compositeNotify = new Composite(this.composite, SWT.NONE);
         this.compositeMap.put("notify", compositeNotify);
@@ -659,6 +667,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setBalloonBybadlyDamage(balloonBybadlyDamage.getSelection());
                 AppConfig.get().setVisibleOnReturnMission(visibleOnReturnMission.getSelection());
                 AppConfig.get().setVisibleOnReturnBathwater(visibleOnReturnBathwater.getSelection());
+                AppConfig.get().setSakutekiMethod(sakutekiCombo.getSelectionIndex());
                 // notify
                 AppConfig.get().setMissionRemind(remind.getSelection());
                 AppConfig.get().setRemindInterbal(intervalSpinner.getSelection());

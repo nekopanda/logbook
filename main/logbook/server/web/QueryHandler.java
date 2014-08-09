@@ -100,7 +100,7 @@ public class QueryHandler extends HttpServlet {
         return Json.createObjectBuilder()
                 .add("id", item.getId())
                 .add("name", item.getName())
-                .add("type", Integer.parseInt(item.getTypeId2()));
+                .add("type", item.getType2());
     }
 
     private static JsonObjectBuilder mapAreaToJson(MapAreaDto item) {

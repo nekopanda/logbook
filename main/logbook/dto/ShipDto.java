@@ -470,10 +470,10 @@ public final class ShipDto extends AbstractDto {
         for (int i = 0; i < 4; i++) {
             ItemDto item = items.get(i);
             if (item != null) {
-                if ("6".equals(item.getTypeId3())
-                        || "7".equals(item.getTypeId3())
-                        || "8".equals(item.getTypeId3())
-                        || ("10".equals(item.getTypeId3()) && "11".equals(item.getTypeId2()))) {
+                if ((item.getType3() == 6)
+                        || (item.getType3() == 7)
+                        || (item.getType3() == 8)
+                        || ((item.getType3() == 10) && (item.getType2() == 11))) {
                     //6:艦上戦闘機,7:艦上爆撃機,8:艦上攻撃機,10:水上偵察機(ただし瑞雲のみ)の場合は制空値を計算する
                     seiku += (int) Math.floor(item.getTyku() * Math.sqrt(this.onslot.get(i)));
                 }

@@ -285,8 +285,6 @@ public class FleetComposite extends Composite {
         int totallv = 0;
         // 索敵値計
         int totalSakuteki = 0;
-        // 装備の索敵値計
-        int slotSakuteki = 0;
 
         for (int i = 0; i < ships.size(); i++) {
             ShipDto ship = ships.get(i);
@@ -316,8 +314,6 @@ public class FleetComposite extends Composite {
             totallv += ship.getLv();
             // 索敵値計
             totalSakuteki += ship.getSakuteki();
-            // 装備の索敵値計
-            slotSakuteki += ship.getSlotSakuteki();
 
             // 疲労している艦娘がいる場合メッセージを表示
             if (this.cond > cond) {
@@ -552,10 +548,11 @@ public class FleetComposite extends Composite {
         if (this.clearDate != null) {
             this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_COND, this.clearDate), null);
         }
+        FleetStatus fleetStatus = new FleetStatus(ships);
         // 制空
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_SEIKU, seiku), null);
         this.addStyledText(this.message,
-                MessageFormat.format(AppConstants.MESSAGE_SAKUTEKI, totalSakuteki - slotSakuteki, slotSakuteki), null);
+                MessageFormat.format(AppConstants.MESSAGE_SAKUTEKI, fleetStatus.getSakuteki()), null);
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_TOTAL_LV, totallv), null);
 
         this.updateTabIcon();

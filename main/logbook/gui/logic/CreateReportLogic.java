@@ -47,9 +47,9 @@ import logbook.dto.ResourceItemDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipFilterDto;
 import logbook.dto.ShipInfoDto;
-import logbook.internal.SallyArea;
 import logbook.dto.UseItemDto;
 import logbook.internal.MasterData;
+import logbook.internal.SallyArea;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -360,7 +360,7 @@ public final class CreateReportLogic {
         for (Entry<ItemDto, Integer> entry : countitems) {
             ItemDto item = entry.getKey();
             count++;
-            body.add(new Object[] { count, item.getName(), item.getType(), entry.getValue(), item.getHoug(),
+            body.add(new Object[] { count, item.getName(), item.getTypeName(), entry.getValue(), item.getHoug(),
                     item.getHoum(), item.getLeng(), item.getLuck(), item.getHouk(), item.getBaku(), item.getRaig(),
                     item.getSaku(), item.getTais(), item.getTyku()
             });
