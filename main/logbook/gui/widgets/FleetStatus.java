@@ -23,6 +23,8 @@ public class FleetStatus {
     int teisatsuSakuteki = 0;
     // 電探の索敵値計
     int dentanSakuteki = 0;
+    // 情報が不足してて計算できなかった
+    boolean sakutekiFailed = false;
 
     public FleetStatus(List<ShipDto> ships) {
         this.ships = ships;
@@ -40,6 +42,9 @@ public class FleetStatus {
                 if (item != null) {
                     // 装備の索敵値
                     slotSakuteki += item.getSaku();
+                    if (item.getType1() == 0) { // 取得できていない
+                        this.sakutekiFailed = true;
+                    }
                     if ((item.getType1() == 7) && (onslot.get(i) > 0)) { // 7: 偵察機 (搭載数>0の場合のみ)
                         teisatsuSakuteki += item.getSaku();
                     }
@@ -58,15 +63,22 @@ public class FleetStatus {
     public String getSakuteki() {
         double base = Math.sqrt(this.totalSakuteki - this.teisatsuSakuteki - this.dentanSakuteki);
         double b = (this.teisatsuSakuteki * 2) + this.dentanSakuteki + base;
+        String failedMessage = "<ゲーム画面をリロードしてください>";
         switch (AppConfig.get().getSakutekiMethod()) {
         case 0: // 艦隊素の索敵値 + 装備の索敵値
             return String.format("%d+%d",
                     this.totalSakuteki - this.slotSakuteki, this.slotSakuteki);
         case 1: // 右の計算結果(偵察機×2 + 電探 + √(装備込みの艦隊索敵値合計-偵察機-電探))
-            return String.format("%.1f (%d+%d+%.1f)",
-                    b, this.teisatsuSakuteki * 2, this.dentanSakuteki, base);
+            if (this.sakutekiFailed)
+                return failedMessage;
+            else
+                return String.format("%.1f (%d+%d+%.1f)",
+                        b, this.teisatsuSakuteki * 2, this.dentanSakuteki, base);
         case 2: // 装備込みの艦隊索敵値合計(Bの計算結果)
-            return String.format("%d (%.1f)", this.totalSakuteki, b);
+            if (this.sakutekiFailed)
+                return failedMessage;
+            else
+                return String.format("%d (%.1f)", this.totalSakuteki, b);
         }
         return Integer.toString(this.totalSakuteki);
     }
