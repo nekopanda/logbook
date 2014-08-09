@@ -31,6 +31,22 @@ public final class ReverseProxyServlet extends ProxyServlet {
     /** ライブラリバグ対応 (HttpRequest#queryを上書きする) */
     private static final Field QUERY_FIELD = getDeclaredField(HttpRequest.class, "query");
 
+    /** ローカルループバックアドレスからの接続のみ受け入れる */
+    private final boolean allowOnlyFromLocalhost = AppConfig.get().isAllowOnlyFromLocalhost();
+
+    /*
+     * リモートホストがローカルループバックアドレス以外の場合400を返し通信しない
+     */
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
+            IOException {
+        if (this.allowOnlyFromLocalhost && !InetAddress.getByName(request.getRemoteAddr()).isLoopbackAddress()) {
+            response.setStatus(400);
+            return;
+        }
+        super.service(request, response);
+    }
+
     /*
      * Hop-by-Hop ヘッダーを除去します
      */

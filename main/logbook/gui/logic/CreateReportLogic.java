@@ -47,6 +47,7 @@ import logbook.dto.ResourceItemDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipFilterDto;
 import logbook.dto.ShipInfoDto;
+import logbook.internal.SallyArea;
 import logbook.dto.UseItemDto;
 import logbook.internal.MasterData;
 
@@ -373,7 +374,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getShipListHeader() {
-        return new String[] { "", "ID", "艦隊", "名前", "艦種", "疲労", "回復", "Lv", "Next", "経験値", "制空", "装備1", "装備2",
+        return new String[] { "", "ID", "艦隊", "名前", "艦種", "疲労", "回復", "Lv", "Next", "経験値", "出撃海域", "制空", "装備1", "装備2",
                 "装備3", "装備4", "HP", "火力", "雷装", "対空", "装甲", "回避", "対潜", "索敵", "運" };
     }
 
@@ -410,6 +411,7 @@ public final class CreateReportLogic {
                         ship.getLv(),
                         ship.getNext(),
                         ship.getExp(),
+                        SallyArea.valueOf(ship.getSallyArea()).getName(),
                         ship.getSeiku(),
                         ship.getSlot().get(0),
                         ship.getSlot().get(1),
@@ -463,6 +465,7 @@ public final class CreateReportLogic {
                         ship.getLv(),
                         ship.getNext(),
                         ship.getExp(),
+                        SallyArea.valueOf(ship.getSallyArea()).getName(),
                         ship.getSeiku(),
                         ship.getSlot().get(0),
                         ship.getSlot().get(1),

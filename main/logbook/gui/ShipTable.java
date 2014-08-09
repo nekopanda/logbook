@@ -52,6 +52,7 @@ public final class ShipTable extends AbstractTableDialog {
     public void updateFilter(ShipFilterDto filter) {
         this.filter = filter;
         this.reloadTable();
+        this.shell.setText(this.getTitle());
     }
 
     @Override
@@ -142,7 +143,7 @@ public final class ShipTable extends AbstractTableDialog {
         }
 
         MenuItem removeGroupCascade = new MenuItem(this.tablemenu, SWT.CASCADE);
-        removeGroupCascade.setText("選択した艦娘をグループから除去(&R)");
+        removeGroupCascade.setText("選択した艦娘をグループから除去(&D)");
         Menu removeGroupMenu = new Menu(removeGroupCascade);
         removeGroupCascade.setMenu(removeGroupMenu);
         for (ShipGroupBean groupBean : groups) {
@@ -165,6 +166,9 @@ public final class ShipTable extends AbstractTableDialog {
 
     @Override
     protected String getTitle() {
+        if ((this.filter != null) && (this.filter.group != null)) {
+            return "所有艦娘一覧 (" + this.filter.group.getName() + ")";
+        }
         return "所有艦娘一覧";
     }
 

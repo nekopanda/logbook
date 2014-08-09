@@ -70,6 +70,9 @@ public final class AppConfigBean {
     /** タスクトレイに格納 */
     private boolean hideWindow;
 
+    /** ローカルループバックアドレスからの接続のみ受け入れる */
+    private boolean allowOnlyFromLocalhost = true;
+
     /** 遠征-1分前に通知する */
     private boolean noticeDeckmission = true;
 
@@ -456,6 +459,22 @@ public final class AppConfigBean {
      */
     public void setHideWindow(boolean hideWindow) {
         this.hideWindow = hideWindow;
+    }
+
+    /**
+     * ローカルループバックアドレスからの接続のみ受け入れるを取得します。
+     * @return ローカルループバックアドレスからの接続のみ受け入れる
+     */
+    public boolean isAllowOnlyFromLocalhost() {
+        return this.allowOnlyFromLocalhost;
+    }
+
+    /**
+     * ローカルループバックアドレスからの接続のみ受け入れるを設定します。
+     * @param allowOnlyFromLocalhost ローカルループバックアドレスからの接続のみ受け入れる
+     */
+    public void setAllowOnlyFromLocalhost(boolean allowOnlyFromLocalhost) {
+        this.allowOnlyFromLocalhost = allowOnlyFromLocalhost;
     }
 
     /**

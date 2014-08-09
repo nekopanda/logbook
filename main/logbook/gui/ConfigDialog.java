@@ -223,6 +223,11 @@ public final class ConfigDialog extends Dialog {
         nameOnTitlebar.setText("タイトルバーに提督名を表示する");
         nameOnTitlebar.setSelection(AppConfig.get().isNameOnTitlebar());
 
+        final Button onlyFromLocalhost = new Button(compositeSystem, SWT.CHECK);
+        onlyFromLocalhost.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        onlyFromLocalhost.setText("ローカルループバックアドレスからの接続のみ受け入れる*");
+        onlyFromLocalhost.setSelection(AppConfig.get().isAllowOnlyFromLocalhost());
+
         // 艦隊タブ タブ
         Composite compositeFleetTab = new Composite(this.composite, SWT.NONE);
         this.compositeMap.put("fleettab", compositeFleetTab);
@@ -642,6 +647,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setReportPath(reportDir.getText());
                 AppConfig.get().setMaterialLogInterval(materialintervalSpinner.getSelection());
                 AppConfig.get().setCheckUpdate(checkUpdate.getSelection());
+                AppConfig.get().setAllowOnlyFromLocalhost(onlyFromLocalhost.getSelection());
                 // fleettab
                 AppConfig.get().setDisplayCount(displaycount.getSelection());
                 AppConfig.get().setDefaultSea(seacombo.getItem(seacombo.getSelectionIndex()));

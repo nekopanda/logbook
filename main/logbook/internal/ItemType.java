@@ -40,6 +40,9 @@ public class ItemType {
             this.put(24, "探照灯");
             this.put(25, "簡易輸送部材");
             this.put(26, "艦艇修理施設");
+            this.put(27, "照明弾");
+            this.put(28, "司令部施設");
+            this.put(29, "航空要員");
         }
     };
 
