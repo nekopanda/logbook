@@ -3,9 +3,9 @@
  */
 package logbook.test;
 
-import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 
 import logbook.config.ShipConfig;
 import logbook.dto.ShipInfoDto;
@@ -25,7 +25,7 @@ public class ShipInfoToCSV {
      */
     public static void main(String[] args) throws IOException {
         ShipConfig.load();
-        FileWriter fw = new FileWriter(new File("shipInfo.csv"));
+        OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream("shipInfo.csv"), "MS932");
 
         fw.write(StringUtils.join(new String[] {
                 "名前", "艦ID", "タイプID", "タイプ名", "改造Lv", "改造後の艦ID", "Flagship", "Max弾", "Max燃料" }, ','));
