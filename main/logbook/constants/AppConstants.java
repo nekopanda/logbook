@@ -19,7 +19,8 @@ public class AppConstants {
     public static final URI HOME_PAGE_URI = URI.create("http://nekopanda.blog.jp/");
 
     /** アップデートチェック先 */
-    public static final URI UPDATE_CHECK_URI = URI.create("http://kancolle.sanaechan.net/checkversion.txt");
+    public static final URI UPDATE_CHECK_URI = URI
+            .create("https://googledrive.com/host/0B83tioTzFacPdnlSRW5vcEVFUFk/checkversion.txt");
 
     /** 日付書式 */
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -340,6 +341,9 @@ public class AppConstants {
 
     /** メッセージ 大破している艦娘がいます */
     public static final String MESSAGE_STOP_SORTIE = "大破している艦娘がいます、進撃はできません。";
+
+    /** メッセージ 連合艦隊 */
+    public static final String MESSAGE_COMBINED = "連合艦隊編成中。";
 
     /** メッセージ 制空値:{0} */
     public static final String MESSAGE_SEIKU = "制空値:{0}。";

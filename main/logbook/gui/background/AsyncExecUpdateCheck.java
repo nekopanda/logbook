@@ -1,6 +1,7 @@
 package logbook.gui.background;
 
 import java.awt.Desktop;
+import java.nio.charset.Charset;
 
 import logbook.constants.AppConstants;
 
@@ -35,7 +36,7 @@ public final class AsyncExecUpdateCheck extends Thread {
     @Override
     public void run() {
         try {
-            final String newversion = IOUtils.toString(AppConstants.UPDATE_CHECK_URI);
+            final String newversion = IOUtils.toString(AppConstants.UPDATE_CHECK_URI, Charset.forName("UTF-8"));
 
             if (!AppConstants.VERSION.equals(newversion)) {
                 Display.getDefault().asyncExec(new Runnable() {

@@ -74,6 +74,8 @@ public enum DataType {
     PRACTICE_BATTLE_MIDNIGHT("/kcsapi/api_req_practice/midnight_battle"),
     /** 戦闘結果 */
     PRACTICE_BATTLE_RESULT("/kcsapi/api_req_practice/battle_result"),
+    /** 連合艦隊操作 */
+    COMBINED("/kcsapi/api_req_hensei/combined"),
     /** フィルタ前のデータ */
     UNDEFINED(null);
 
