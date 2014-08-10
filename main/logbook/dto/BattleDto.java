@@ -150,7 +150,7 @@ public final class BattleDto extends AbstractDto {
                 if (support_hourai != null) {
                     JsonArray edam = support_hourai.getJsonArray("api_damage");
                     if (edam != null) {
-                        for (int i = 1; i <= this.fships.size(); i++) {
+                        for (int i = 1; i <= this.enemy.size(); i++) {
                             this.nowEnemyHp[i - 1] -= edam.getJsonNumber(i).intValue();
                         }
                     }
