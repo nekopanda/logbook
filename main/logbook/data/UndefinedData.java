@@ -70,29 +70,28 @@ public class UndefinedData implements Data {
      */
     public final Data toDefinedData() {
         if (this.response.length != 0) {
+            DataType type = DataType.TYPEMAP.get(this.url);
 
-            for (DataType entry : DataType.values()) {
-                if ((entry.getUrl() != null) && this.url.endsWith(entry.getUrl())) {
-                    try {
-                        // リクエストのフィールドを復号します
-                        Map<String, String> field = null;
-                        if (this.request != null) {
-                            field = getQueryMap(URLDecoder.decode(new String(this.request).trim(), "UTF-8"));
-                        }
-                        // レスポンスのJSONを復号します
-                        InputStream stream = new ByteArrayInputStream(this.response);
-                        // レスポンスボディのJSONはsvdata=から始まるので除去します
-                        int read;
-                        while (((read = stream.read()) != -1) && (read != '=')) {
-                        }
-
-                        JsonReader jsonreader = Json.createReader(stream);
-                        JsonObject json = jsonreader.readObject();
-
-                        return new ActionData(entry, this.date, json, field);
-                    } catch (Exception e) {
-                        return this;
+            if (type != null) {
+                try {
+                    // リクエストのフィールドを復号します
+                    Map<String, String> field = null;
+                    if (this.request != null) {
+                        field = getQueryMap(URLDecoder.decode(new String(this.request).trim(), "UTF-8"));
                     }
+                    // レスポンスのJSONを復号します
+                    InputStream stream = new ByteArrayInputStream(this.response);
+                    // レスポンスボディのJSONはsvdata=から始まるので除去します
+                    int read;
+                    while (((read = stream.read()) != -1) && (read != '=')) {
+                    }
+
+                    JsonReader jsonreader = Json.createReader(stream);
+                    JsonObject json = jsonreader.readObject();
+
+                    return new ActionData(type, this.date, json, field);
+                } catch (Exception e) {
+                    return this;
                 }
             }
         }
