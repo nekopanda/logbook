@@ -136,9 +136,6 @@ public final class GlobalContext {
     /**　ユーザ基本情報 */
     private static BasicInfoDto basic;
 
-    /** 連合艦隊を組んでる？ */
-    private static boolean isCombined = false;
-
     /** ログ表示 */
     private static MainConsoleListener console;
 
@@ -154,6 +151,9 @@ public final class GlobalContext {
 
     /** 最後に資源ログに追加した時間 */
     volatile private static Date materialLogLastUpdate = null;
+
+    /** 連合艦隊 */
+    private static boolean combined;
 
     /**
      * @return 装備Map
@@ -477,8 +477,20 @@ public final class GlobalContext {
         case BATTLE_NIGHT_TO_DAY:
             doBattle(data);
             break;
+            // 海戦
+            case COMBINED_AIR_BATTLE:
+                doBattle(data);
+                break;
+            // 海戦
+            case COMBINED_BATTLE:
+                doBattle(data);
+                break;
         // 海戦結果
         case BATTLE_RESULT:
+            doBattleresult(data);
+            break;
+        // 海戦結果
+        case COMBINED_BATTLE_RESULT:
             doBattleresult(data);
             break;
         // 演習
@@ -699,9 +711,6 @@ public final class GlobalContext {
                 doBasicSub(apiBasic);
                 addConsole("司令部を更新しました");
 
-                // 連合艦隊フラグ
-                isCombined = (apidata.getInt("api_combined_flag") != 0);
-
                 // 保有資材を更新する
                 JsonArray apiMaterial = apidata.getJsonArray("api_material");
                 doMaterialSub(apiMaterial);
@@ -750,6 +759,19 @@ public final class GlobalContext {
                     deckMissions[i - 1] = new DeckMissionDto(name, section, time, fleetid, ships);
                 }
                 addConsole("遠征情報を更新しました");
+
+                // 連合艦隊を更新する
+                combined = false;
+                if (apidata.containsKey("api_combined_flag")) {
+                    switch (apidata.getJsonNumber("api_combined_flag").intValue()) {
+                    case 1:
+                        combined = true;
+                        break;
+                    default:
+                        break;
+                    }
+                }
+                addConsole("連合艦隊を更新しました");
             }
         } catch (Exception e) {
             LOG.warn("母港を更新しますに失敗しました", e);
@@ -1726,7 +1748,7 @@ public final class GlobalContext {
     private static void doCombined(Data data) {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
-            isCombined = (apidata.getInt("api_combined") != 0);
+            combined = (apidata.getInt("api_combined") != 0);
             for (int i = 0; i < 2; ++i) {
                 DockDto dockdto = dock.get(Integer.toString(i + 1));
                 if (dockdto != null) {
