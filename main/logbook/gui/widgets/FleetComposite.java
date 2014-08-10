@@ -545,6 +545,13 @@ public class FleetComposite extends Composite {
             style.foreground = SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN);
             this.addStyledText(this.message, AppConstants.MESSAGE_GOOD, style);
         }
+        if ((Integer.parseInt(this.dock.getId()) <= 2) && GlobalContext.getIsCombined()) {
+            // 連合艦隊
+            StyleRange style = new StyleRange();
+            style.fontStyle = SWT.BOLD;
+            style.foreground = SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN);
+            this.addStyledText(this.message, AppConstants.MESSAGE_COMBINED, style);
+        }
         if (this.clearDate != null) {
             this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_COND, this.clearDate), null);
         }

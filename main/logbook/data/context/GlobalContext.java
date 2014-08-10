@@ -136,6 +136,9 @@ public final class GlobalContext {
     /**　ユーザ基本情報 */
     private static BasicInfoDto basic;
 
+    /** 連合艦隊を組んでる？ */
+    private static boolean isCombined = false;
+
     /** ログ表示 */
     private static MainConsoleListener console;
 
@@ -372,6 +375,14 @@ public final class GlobalContext {
     }
 
     /**
+     * 連合艦隊を組んでいるかを取得します
+     * @return 連合艦隊を組んでいるか
+     */
+    public static boolean getIsCombined() {
+        return isCombined;
+    }
+
+    /**
      * 情報を更新します
      * 
      * @return 更新する情報があった場合trueを返します
@@ -514,9 +525,13 @@ public final class GlobalContext {
         case MISSION:
             doMission(data);
             break;
-        // 任務
+        // 演習
         case PRACTICE:
             doPractice(data);
+            break;
+        // 連合艦隊
+        case COMBINED:
+            doCombined(data);
             break;
         default:
             break;
@@ -683,6 +698,9 @@ public final class GlobalContext {
                 JsonObject apiBasic = apidata.getJsonObject("api_basic");
                 doBasicSub(apiBasic);
                 addConsole("司令部を更新しました");
+
+                // 連合艦隊フラグ
+                isCombined = (apidata.getInt("api_combined_flag") != 0);
 
                 // 保有資材を更新する
                 JsonArray apiMaterial = apidata.getJsonArray("api_material");
@@ -1696,6 +1714,28 @@ public final class GlobalContext {
             addConsole("演習情報を更新しました");
         } catch (Exception e) {
             LOG.warn("演習情報更新に失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 連合艦隊操作を処理します
+     * 
+     * @param data
+     */
+    private static void doCombined(Data data) {
+        try {
+            JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+            isCombined = (apidata.getInt("api_combined") != 0);
+            for (int i = 0; i < 2; ++i) {
+                DockDto dockdto = dock.get(Integer.toString(i + 1));
+                if (dockdto != null) {
+                    dockdto.setUpdate(true);
+                }
+            }
+            addConsole("連合艦隊情報を更新しました");
+        } catch (Exception e) {
+            LOG.warn("連合艦隊情報更新に失敗しました", e);
             LOG.warn(data);
         }
     }
