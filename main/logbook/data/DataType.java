@@ -62,7 +62,7 @@ public enum DataType {
     /** 近代化改修 */
     POWERUP("/kcsapi/api_req_kaisou/powerup"),
     /** 出撃 */
-    START("kcsapi/api_req_map/start"),
+    START("/kcsapi/api_req_map/start"),
     /** 進撃 */
     NEXT("/kcsapi/api_req_map/next"),
     /** 任務一覧 */

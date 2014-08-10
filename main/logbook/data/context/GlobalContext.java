@@ -131,6 +131,9 @@ public final class GlobalContext {
     /** 最後に資源ログに追加した時間 */
     volatile private static Date materialLogLastUpdate = null;
 
+    /** 連合艦隊 */
+    private static boolean combined;
+
     /**
      * @return 装備Map
      */
@@ -414,8 +417,20 @@ public final class GlobalContext {
             case BATTLE_NIGHT_TO_DAY:
                 doBattle(data);
                 break;
+            // 海戦
+            case COMBINED_AIR_BATTLE:
+                doBattle(data);
+                break;
+            // 海戦
+            case COMBINED_BATTLE:
+                doBattle(data);
+                break;
             // 海戦結果
             case BATTLE_RESULT:
+                doBattleresult(data);
+                break;
+            // 海戦結果
+            case COMBINED_BATTLE_RESULT:
                 doBattleresult(data);
                 break;
             // 艦隊
@@ -632,6 +647,19 @@ public final class GlobalContext {
                     deckMissions[i - 1] = new DeckMissionDto(name, mission, time, fleetid, ships);
                 }
                 addConsole("遠征情報を更新しました");
+
+                // 連合艦隊を更新する
+                combined = false;
+                if (apidata.containsKey("api_combined_flag")) {
+                    switch (apidata.getJsonNumber("api_combined_flag").intValue()) {
+                    case 1:
+                        combined = true;
+                        break;
+                    default:
+                        break;
+                    }
+                }
+                addConsole("連合艦隊を更新しました");
             }
         } catch (Exception e) {
             LOG.warn("母港を更新しますに失敗しました", e);
@@ -1289,6 +1317,10 @@ public final class GlobalContext {
             if (idstr != null) {
                 int id = Integer.parseInt(idstr);
                 isSortie[id - 1] = true;
+            }
+            // 連合艦隊第2艦隊の出撃
+            if (combined) {
+                isSortie[1] = true;
             }
 
             JsonObject obj = data.getJsonObject().getJsonObject("api_data");
