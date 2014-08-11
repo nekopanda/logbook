@@ -432,7 +432,7 @@ public class QueryHandler extends HttpServlet {
                 {
                     jb.add("max_ships", GlobalContext.maxChara());
                     jb.add("max_slotitems", GlobalContext.maxSlotitem());
-                    jb.add("is_combined", GlobalContext.getIsCombined());
+                    jb.add("is_combined", GlobalContext.isCombined());
                     jb.add("master_last_update_time", MasterDataConfig.get().getLastUpdateTime().getTime());
                 }
             }

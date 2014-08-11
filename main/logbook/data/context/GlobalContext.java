@@ -378,8 +378,8 @@ public final class GlobalContext {
      * 連合艦隊を組んでいるかを取得します
      * @return 連合艦隊を組んでいるか
      */
-    public static boolean getIsCombined() {
-        return isCombined;
+    public static boolean isCombined() {
+        return combined;
     }
 
     /**
@@ -477,14 +477,14 @@ public final class GlobalContext {
         case BATTLE_NIGHT_TO_DAY:
             doBattle(data);
             break;
-            // 海戦
-            case COMBINED_AIR_BATTLE:
-                doBattle(data);
-                break;
-            // 海戦
-            case COMBINED_BATTLE:
-                doBattle(data);
-                break;
+        // 海戦
+        case COMBINED_AIR_BATTLE:
+            doBattle(data);
+            break;
+        // 海戦
+        case COMBINED_BATTLE:
+            doBattle(data);
+            break;
         // 海戦結果
         case BATTLE_RESULT:
             doBattleresult(data);
