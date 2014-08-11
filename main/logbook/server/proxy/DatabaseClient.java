@@ -99,7 +99,7 @@ public class DatabaseClient extends Thread {
         body.add("token", AppConfig.get().getAccessKey());
         // このクライアントのエージェントキー
         body.add("agent", "6nENnnGzRgSTVeuU652r");
-        body.add("url", data.getUrl());
+        body.add("url", data.getFullUrl());
         body.add("requestbody", sendRequestBody);
         body.add("responsebody", sendResponseBody); // 
         return this.httpClient.POST("http://api.kancolle-db.net/2/")

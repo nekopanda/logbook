@@ -497,6 +497,15 @@ public class QueryHandler extends HttpServlet {
                     jb.add("friend", fship_array);
                     jb.add("enemy", eship_array);
                     jb.add("rank", battleDto.getRank().rank());
+
+                    if (battleDto.isCombined()) {
+                        JsonArrayBuilder fship_combined_array = Json.createArrayBuilder();
+                        List<ShipDto> fshipsCombined = battleDto.getFriendShipsCombined();
+                        for (ShipDto ship : fshipsCombined) {
+                            fship_combined_array.add(shipToJson(ship));
+                        }
+                        jb.add("friend_combined", fship_combined_array);
+                    }
                 }
             }
         });

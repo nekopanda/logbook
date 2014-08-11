@@ -18,6 +18,10 @@ import javax.json.JsonReader;
  */
 public class UndefinedData implements Data {
 
+    // "http://...."
+    private final String fullUrl;
+
+    // "/ksapi/..."
     private final String url;
 
     private final byte[] request;
@@ -32,7 +36,8 @@ public class UndefinedData implements Data {
      * @param url URL
      * @param response レスポンスのバイト配列
      */
-    public UndefinedData(String url, byte[] request, byte[] response) {
+    public UndefinedData(String fullUrl, String url, byte[] request, byte[] response) {
+        this.fullUrl = fullUrl;
         this.url = url;
         this.request = request;
         this.response = response;
@@ -111,6 +116,10 @@ public class UndefinedData implements Data {
             map.put(name, value);
         }
         return map;
+    }
+
+    public String getFullUrl() {
+        return this.fullUrl;
     }
 
     public String getUrl() {

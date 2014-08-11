@@ -104,8 +104,8 @@ public final class ReverseProxyServlet extends ProxyServlet {
             byte[] postField = (byte[]) request.getAttribute(Filter.REQUEST_BODY);
             ByteArrayOutputStream stream = (ByteArrayOutputStream) request.getAttribute(Filter.RESPONSE_BODY);
             if (stream != null) {
-                UndefinedData rawData = new UndefinedData(request.getRequestURL().toString(), postField,
-                        stream.toByteArray());
+                UndefinedData rawData = new UndefinedData(request.getRequestURL().toString(),
+                        request.getRequestURI(), postField, stream.toByteArray());
                 // 統計データベース(http://kancolle-db.net/)に送信する
                 DatabaseClient.send(rawData);
                 // キャプチャしたバイト配列は何のデータかを決定する

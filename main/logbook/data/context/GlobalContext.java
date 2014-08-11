@@ -463,27 +463,31 @@ public final class GlobalContext {
             break;
         // 海戦
         case BATTLE:
-            doBattle(data);
+            doBattle(data, false);
             break;
         // 海戦
         case BATTLE_MIDNIGHT:
-            doBattle(data);
+            doBattle(data, true);
             break;
         // 海戦
         case BATTLE_SP_MIDNIGHT:
-            doBattle(data);
+            doBattle(data, true);
             break;
         // 海戦
         case BATTLE_NIGHT_TO_DAY:
-            doBattle(data);
+            doBattle(data, true);
             break;
         // 海戦
         case COMBINED_AIR_BATTLE:
-            doBattle(data);
+            doBattle(data, false);
             break;
         // 海戦
         case COMBINED_BATTLE:
-            doBattle(data);
+            doBattle(data, false);
+            break;
+        // 海戦
+        case COMBINED_BATTLE_MIDNIGHT:
+            doBattle(data, true);
             break;
         // 海戦結果
         case BATTLE_RESULT:
@@ -495,11 +499,11 @@ public final class GlobalContext {
             break;
         // 演習
         case PRACTICE_BATTLE:
-            doBattle(data);
+            doBattle(data, false);
             break;
         // 演習
         case PRACTICE_BATTLE_MIDNIGHT:
-            doBattle(data);
+            doBattle(data, true);
             break;
         // 演習結果
         case PRACTICE_BATTLE_RESULT:
@@ -678,6 +682,24 @@ public final class GlobalContext {
     }
 
     /**
+     * ダメージ計算があっているか検証します
+     * @param dockShips 更新されたShipDto
+     * @param nowhp ダメージ計算結果
+     */
+    private static void checkBattleDamage(List<ShipDto> dockShips, int[] nowhp) {
+        for (int i = 0; i < dockShips.size(); ++i) {
+            ShipDto new_ship = shipMap.get(dockShips.get(i).getId());
+            if (new_ship == null)
+                continue; // 轟沈した！
+            if (new_ship.getNowhp() != nowhp[i]) {
+                LOG.warn("ダメージ計算ミスが発生しています。" + new_ship.getName() + "の現在のHPは" + new_ship.getNowhp()
+                        + "ですが、ダメージ計算では" + nowhp[i] + "と計算されていました。");
+                addConsole("ダメージ計算ミス発生！（詳細はログ）");
+            }
+        }
+    }
+
+    /**
      * 母港を更新します
      * @param data
      */
@@ -690,17 +712,9 @@ public final class GlobalContext {
 
                 // 戦闘結果がある場合、ダメージ計算があっているか検証します
                 if (battle != null) {
-                    List<ShipDto> dockShips = battle.getDock().getShips();
-                    int[] nowhp = battle.getNowFriendHp();
-                    for (int i = 0; i < dockShips.size(); ++i) {
-                        ShipDto new_ship = shipMap.get(dockShips.get(i).getId());
-                        if (new_ship == null)
-                            continue; // 轟沈した！
-                        if (new_ship.getNowhp() != nowhp[i]) {
-                            LOG.warn("ダメージ計算ミスが発生しています。" + new_ship.getName() + "の現在のHPは" + new_ship.getNowhp()
-                                    + "ですが、ダメージ計算では" + nowhp[i] + "と計算されていました。");
-                            addConsole("ダメージ計算ミス発生！（詳細はログ）");
-                        }
+                    checkBattleDamage(battle.getDock().getShips(), battle.getNowFriendHp());
+                    if (battle.isCombined()) {
+                        checkBattleDamage(battle.getDockCombined().getShips(), battle.getNowFriendHpCombined());
                     }
                 }
                 mapCellDto = null;
@@ -779,14 +793,24 @@ public final class GlobalContext {
         }
     }
 
+    private static void checkShipSunk(ShipDto ship, int nowhp, List<ShipDto> sunkShips) {
+        if (ship.getNowhp() > 0) { // 轟沈している艦は更新しない
+            ship.setNowhp(nowhp);
+            if (ship.getNowhp() == 0) { // 轟沈した
+                sunkShips.add(ship);
+                CreateReportLogic.storeLostReport(LostEntityDto.make(ship, "艦娘の轟沈"));
+            }
+        }
+    }
+
     /**
      * 海戦情報を更新します
      * @param data
      */
-    private static void doBattle(Data data) {
+    private static void doBattle(Data data, boolean isYasen) {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
-            battle = new BattleDto(apidata, firstBattle ? null : battle);
+            battle = new BattleDto(apidata, firstBattle ? null : battle, isYasen);
 
             firstBattle = false;
 
@@ -794,18 +818,21 @@ public final class GlobalContext {
             List<ShipDto> ships = battle.getDock().getShips();
             int[] nowFriendHp = battle.getNowFriendHp();
             for (int i = 0; i < ships.size(); ++i) {
-                ShipDto ship = ships.get(i);
-                if (ship.getNowhp() > 0) { // 轟沈している艦は更新しない
-                    ship.setNowhp(nowFriendHp[i]);
-                    if (ship.getNowhp() == 0) { // 轟沈した
-                        sunkShips.add(ship);
-                        CreateReportLogic.storeLostReport(LostEntityDto.make(ship, "艦娘の轟沈"));
-                    }
+                checkShipSunk(ships.get(i), nowFriendHp[i], sunkShips);
+            }
+            if (battle.isCombined()) {
+                List<ShipDto> shipsCombined = battle.getDockCombined().getShips();
+                int[] nowFriendHpCombined = battle.getNowFriendHpCombined();
+                for (int i = 0; i < shipsCombined.size(); ++i) {
+                    checkShipSunk(shipsCombined.get(i), nowFriendHpCombined[i], sunkShips);
                 }
             }
 
             addConsole("海戦情報を更新しました");
             addConsole("自=" + Arrays.toString(battle.getNowFriendHp()));
+            if (battle.isCombined()) {
+                addConsole("連=" + Arrays.toString(battle.getNowFriendHpCombined()));
+            }
             addConsole("敵=" + Arrays.toString(battle.getNowEnemyHp()));
             addConsole("→ " + battle.getRank().toString());
             for (ShipDto ship : sunkShips) {
@@ -834,6 +861,9 @@ public final class GlobalContext {
 
                 // 警告を出すためにバージョンアップ
                 battle.getDock().setUpdate(true);
+                if (battle.isCombined()) {
+                    battle.getDockCombined().setUpdate(true);
+                }
 
                 firstBattle = true;
 
@@ -1122,17 +1152,9 @@ public final class GlobalContext {
 
             // 戦闘結果がある場合、ダメージ計算があっているか検証します
             if (battle != null) {
-                List<ShipDto> dockShips = battle.getDock().getShips();
-                int[] nowhp = battle.getNowFriendHp();
-                for (int i = 0; i < dockShips.size(); ++i) {
-                    ShipDto new_ship = shipMap.get(dockShips.get(i).getId());
-                    if (new_ship == null)
-                        continue; // 轟沈した！
-                    if (new_ship.getNowhp() != nowhp[i]) {
-                        LOG.warn("ダメージ計算ミスが発生しています。" + new_ship.getName() + "の現在のHPは" + new_ship.getNowhp()
-                                + "ですが、ダメージ計算では" + nowhp[i] + "と計算されていました。");
-                        addConsole("ダメージ計算ミス発生！（詳細はログ）");
-                    }
+                checkBattleDamage(battle.getDock().getShips(), battle.getNowFriendHp());
+                if (battle.isCombined()) {
+                    checkBattleDamage(battle.getDockCombined().getShips(), battle.getNowFriendHpCombined());
                 }
             }
 

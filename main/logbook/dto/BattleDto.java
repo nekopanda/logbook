@@ -20,8 +20,12 @@ public final class BattleDto extends AbstractDto {
     /** 味方艦隊 */
     private final DockDto dock;
 
+    private final DockDto dockCombined;
+
     /** 味方艦 */
     private final List<ShipDto> fships = new ArrayList<ShipDto>();
+
+    private final List<ShipDto> fshipsCombined = new ArrayList<ShipDto>();
 
     /** 敵艦隊 */
     private final List<ShipInfoDto> enemy = new ArrayList<ShipInfoDto>();
@@ -29,17 +33,23 @@ public final class BattleDto extends AbstractDto {
     /** 味方HP */
     private final int[] nowFriendHp;
 
+    private final int[] nowFriendHpCombined;
+
     /** 敵HP */
     private final int[] nowEnemyHp;
 
     /** 味方MaxHP */
     private final int[] maxFriendHp;
 
+    private final int[] maxFriendHpCombined;
+
     /** 敵MaxHP */
     private final int[] maxEnemyHp;
 
     /** 味方戦闘開始時HP */
     public int[] startFriendHp;
+
+    public int[] startFriendHpCombined;
 
     /** 敵戦闘開始時HP */
     public int[] startEnemyHp;
@@ -53,10 +63,12 @@ public final class BattleDto extends AbstractDto {
     /** ランク */
     private final ResultRank rank;
 
+    private final boolean isYasen;
+
     /**
      * コンストラクター
      */
-    public BattleDto(JsonObject object, BattleDto firstBattle) {
+    public BattleDto(JsonObject object, BattleDto firstBattle, boolean isYasen) {
 
         String dockId;
 
@@ -66,16 +78,21 @@ public final class BattleDto extends AbstractDto {
             dockId = object.get("api_deck_id").toString();
         }
 
+        this.isYasen = isYasen;
+
         JsonArray nowhps = object.getJsonArray("api_nowhps");
         JsonArray maxhps = object.getJsonArray("api_maxhps");
+        JsonArray nowhpsCombined = object.getJsonArray("api_nowhps_combined");
+        JsonArray maxhpsCombined = object.getJsonArray("api_maxhps_combined");
+        boolean isCombined = (nowhpsCombined != null);
 
         this.dock = GlobalContext.getDock(dockId);
+        this.dockCombined = isCombined ? GlobalContext.getDock(Integer.toString(2)) : null;
 
         if (this.dock != null) {
-            List<ShipDto> dock_ships = this.dock.getShips();
-            for (int i = 0; i < dock_ships.size(); i++) {
-                ShipDto ship = dock_ships.get(i);
-                this.fships.add(ship);
+            dockToList(this.dock, this.fships);
+            if (this.dockCombined != null) {
+                dockToList(this.dockCombined, this.fshipsCombined);
             }
         }
         else {
@@ -101,22 +118,34 @@ public final class BattleDto extends AbstractDto {
         if (firstBattle != null) {
             this.startFriendHp = firstBattle.startFriendHp;
             this.startEnemyHp = firstBattle.startEnemyHp;
+            this.startFriendHpCombined = firstBattle.startFriendHpCombined;
             this.friendGaugeMax = firstBattle.friendGaugeMax;
             this.enemyGaugeMax = firstBattle.enemyGaugeMax;
         }
         else {
             this.startFriendHp = new int[this.fships.size()];
             this.startEnemyHp = new int[this.enemy.size()];
+            if (isCombined) {
+                this.startFriendHpCombined = new int[this.fshipsCombined.size()];
+            }
         }
         this.nowFriendHp = new int[this.fships.size()];
         this.nowEnemyHp = new int[this.enemy.size()];
         this.maxFriendHp = new int[this.fships.size()];
         this.maxEnemyHp = new int[this.enemy.size()];
+        if (isCombined) {
+            this.nowFriendHpCombined = new int[this.fshipsCombined.size()];
+            this.maxFriendHpCombined = new int[this.fshipsCombined.size()];
+        }
+        else {
+            this.nowFriendHpCombined = null;
+            this.maxFriendHpCombined = null;
+        }
 
         // この戦闘の開始前HPを取得
         for (int i = 1; i < nowhps.size(); i++) {
-            int hp = nowhps.getJsonNumber(i).intValue();
-            int maxHp = maxhps.getJsonNumber(i).intValue();
+            int hp = nowhps.getInt(i);
+            int maxHp = maxhps.getInt(i);
             if (i <= 6) {
                 if (i <= this.fships.size()) {
                     this.nowFriendHp[i - 1] = hp;
@@ -133,13 +162,26 @@ public final class BattleDto extends AbstractDto {
                 }
             }
         }
+        if (isCombined) {
+            for (int i = 1; i < nowhpsCombined.size(); i++) {
+                int hp = nowhpsCombined.getInt(i);
+                int maxHp = maxhpsCombined.getInt(i);
+                this.nowFriendHpCombined[i - 1] = hp;
+                this.maxFriendHpCombined[i - 1] = maxHp;
+            }
+        }
 
         // ダメージ計算 //
 
-        // 航空戦
+        // 航空戦（通常）
         JsonObject kouku = object.getJsonObject("api_kouku");
         if (kouku != null)
-            this.doRaigeki(kouku.get("api_stage3"));
+            this.doKouku(kouku.get("api_stage3"), isCombined ? kouku.get("api_stage3_combined") : null);
+
+        // 航空戦（連合艦隊のみ？）
+        JsonObject kouku2 = object.getJsonObject("api_kouku2");
+        if (kouku2 != null)
+            this.doKouku(kouku2.get("api_stage3"), isCombined ? kouku2.get("api_stage3_combined") : null);
 
         // 支援艦隊
         JsonNumber support_flag = object.getJsonNumber("api_support_flag");
@@ -159,16 +201,16 @@ public final class BattleDto extends AbstractDto {
         }
 
         // 開幕
-        this.doRaigeki(object.get("api_opening_atack"));
+        this.doRaigeki(object.get("api_opening_atack"), this.isCombined());
 
         // 砲撃
-        this.doHougeki(object.get("api_hougeki"));
-        this.doHougeki(object.get("api_hougeki1"));
-        this.doHougeki(object.get("api_hougeki2"));
-        this.doHougeki(object.get("api_hougeki3"));
+        this.doHougeki(object.get("api_hougeki"), (this.isCombined() && isYasen)); // 夜戦
+        this.doHougeki(object.get("api_hougeki1"), this.isCombined());
+        this.doHougeki(object.get("api_hougeki2"), false);
+        this.doHougeki(object.get("api_hougeki3"), false);
 
         // 雷撃
-        this.doRaigeki(object.get("api_raigeki"));
+        this.doRaigeki(object.get("api_raigeki"), this.isCombined());
 
         // HP0以下を0にする
         for (int i = 0; i < this.fships.size(); i++) {
@@ -179,13 +221,28 @@ public final class BattleDto extends AbstractDto {
             if (this.nowEnemyHp[i] <= 0)
                 this.nowEnemyHp[i] = 0;
         }
+        if (isCombined) {
+            for (int i = 0; i < this.fshipsCombined.size(); i++) {
+                if (this.nowFriendHpCombined[i] <= 0)
+                    this.nowFriendHpCombined[i] = 0;
+            }
+        }
 
         // 判定を計算
         this.rank = this.calcResultRank();
     }
 
+    private static void dockToList(DockDto dock, List<ShipDto> array) {
+        List<ShipDto> dock_ships = dock.getShips();
+        for (int i = 0; i < dock_ships.size(); i++) {
+            ShipDto ship = dock_ships.get(i);
+            array.add(ship);
+        }
+    }
+
     // 勝利判定 //
     private ResultRank calcResultRank() {
+        boolean isCombined = (this.nowFriendHpCombined != null);
         // 戦闘後に残っている艦数
         int friendNowShips = 0;
         int enemyNowShips = 0;
@@ -194,10 +251,17 @@ public final class BattleDto extends AbstractDto {
         int enemyGauge = 0;
 
         for (int i = 0; i < this.fships.size(); i++) {
-            if (this.nowFriendHp[i] > 0)
+            if (this.nowFriendHp[i] > 0) {
                 ++friendNowShips;
-
+            }
             friendGauge += this.startFriendHp[i] - this.nowFriendHp[i];
+
+            if (isCombined) {
+                if (this.nowFriendHpCombined[i] > 0) {
+                    ++friendNowShips;
+                }
+                friendGauge += this.startFriendHpCombined[i] - this.nowFriendHpCombined[i];
+            }
         }
         for (int i = 0; i < this.enemy.size(); i++) {
             if (this.nowEnemyHp[i] > 0)
@@ -207,7 +271,7 @@ public final class BattleDto extends AbstractDto {
         }
 
         // 轟沈・撃沈数
-        int friendSunk = this.fships.size() - friendNowShips;
+        int friendSunk = (this.fships.size() + this.fshipsCombined.size()) - friendNowShips;
         int enemySunk = this.enemy.size() - enemyNowShips;
 
         double enemyGaugeRate = (double) enemyGauge / this.enemyGaugeMax;
@@ -288,18 +352,40 @@ public final class BattleDto extends AbstractDto {
         return ResultRank.D_OR_E;
     }
 
-    private void doRaigeki(JsonValue raigeki) {
+    private void doKouku(JsonValue raigeki, JsonValue combined) {
         if ((raigeki == null) || (raigeki == JsonValue.NULL))
             return;
 
         JsonObject raigeki_obj = (JsonObject) raigeki;
         JsonArray fdam = raigeki_obj.getJsonArray("api_fdam");
         JsonArray edam = raigeki_obj.getJsonArray("api_edam");
+        JsonArray fdamCombined = null;
+        if ((combined != null) && (combined != JsonValue.NULL)) {
+            fdamCombined = ((JsonObject) combined).getJsonArray("api_fdam");
+        }
         for (int i = 1; i <= 6; i++) {
             if (i <= this.fships.size())
-                this.nowFriendHp[i - 1] -= fdam.getJsonNumber(i).intValue();
+                this.nowFriendHp[i - 1] -= fdam.getInt(i);
             if (i <= this.enemy.size())
-                this.nowEnemyHp[i - 1] -= edam.getJsonNumber(i).intValue();
+                this.nowEnemyHp[i - 1] -= edam.getInt(i);
+            if ((fdamCombined != null) && (i <= this.fshipsCombined.size()))
+                this.nowFriendHpCombined[i - 1] -= fdamCombined.getInt(i);
+        }
+    }
+
+    private void doRaigeki(JsonValue raigeki, boolean second) {
+        if ((raigeki == null) || (raigeki == JsonValue.NULL))
+            return;
+
+        JsonObject raigeki_obj = (JsonObject) raigeki;
+        JsonArray fdam = raigeki_obj.getJsonArray("api_fdam");
+        JsonArray edam = raigeki_obj.getJsonArray("api_edam");
+        int[] targetFriendHp = second ? this.nowFriendHpCombined : this.nowFriendHp;
+        for (int i = 1; i <= 6; i++) {
+            if (i <= this.fships.size())
+                targetFriendHp[i - 1] -= fdam.getInt(i);
+            if (i <= this.enemy.size())
+                this.nowEnemyHp[i - 1] -= edam.getInt(i);
         }
     }
 
@@ -328,7 +414,7 @@ public final class BattleDto extends AbstractDto {
      * api_hougeki* を処理する
      * @param hougeki
      */
-    private void doHougeki(JsonValue hougeki) {
+    private void doHougeki(JsonValue hougeki, boolean second) {
         if ((hougeki == null) || (hougeki == JsonValue.NULL))
             return;
 
@@ -340,12 +426,13 @@ public final class BattleDto extends AbstractDto {
             throw new IndexOutOfBoundsException("df_list と damage の長さが合いません");
         }
 
+        int[] targetFriendHp = second ? this.nowFriendHpCombined : this.nowFriendHp;
         for (int i = 0; i < df_list.size(); ++i) {
             int shipIdx = df_list.get(i);
             if (shipIdx == -1)
                 continue;
             if (shipIdx <= 6) {
-                this.nowFriendHp[shipIdx - 1] -= damage.get(i);
+                targetFriendHp[shipIdx - 1] -= damage.get(i);
             }
             else {
                 this.nowEnemyHp[shipIdx - 1 - 6] -= damage.get(i);
@@ -360,8 +447,16 @@ public final class BattleDto extends AbstractDto {
         return this.dock;
     }
 
+    public DockDto getDockCombined() {
+        return this.dockCombined;
+    }
+
     public List<ShipDto> getFriendShips() {
         return this.fships;
+    }
+
+    public List<ShipDto> getFriendShipsCombined() {
+        return this.fshipsCombined;
     }
 
     /**
@@ -378,6 +473,10 @@ public final class BattleDto extends AbstractDto {
         return this.nowFriendHp;
     }
 
+    public int[] getNowFriendHpCombined() {
+        return this.nowFriendHpCombined;
+    }
+
     /**
      * @return nowEnemyHp
      */
@@ -390,6 +489,10 @@ public final class BattleDto extends AbstractDto {
      */
     public int[] getMaxFriendHp() {
         return this.maxFriendHp;
+    }
+
+    public int[] getMaxFriendHpCombined() {
+        return this.maxFriendHpCombined;
     }
 
     /**
@@ -406,7 +509,12 @@ public final class BattleDto extends AbstractDto {
         return this.rank;
     }
 
+    public boolean isCombined() {
+        return (this.nowFriendHpCombined != null);
+    }
+
     public String getRankCalcInfo() {
+        boolean isCombined = (this.nowFriendHpCombined != null);
         // 戦闘後に残っている艦数
         int friendNowShips = 0;
         int enemyNowShips = 0;
@@ -415,10 +523,17 @@ public final class BattleDto extends AbstractDto {
         int enemyGauge = 0;
 
         for (int i = 0; i < this.fships.size(); i++) {
-            if (this.nowFriendHp[i] > 0)
+            if (this.nowFriendHp[i] > 0) {
                 ++friendNowShips;
-
+            }
             friendGauge += this.startFriendHp[i] - this.nowFriendHp[i];
+
+            if (isCombined) {
+                if (this.nowFriendHpCombined[i] > 0) {
+                    ++friendNowShips;
+                }
+                friendGauge += this.startFriendHpCombined[i] - this.nowFriendHpCombined[i];
+            }
         }
         for (int i = 0; i < this.enemy.size(); i++) {
             if (this.nowEnemyHp[i] > 0)
@@ -427,7 +542,8 @@ public final class BattleDto extends AbstractDto {
             enemyGauge += this.startEnemyHp[i] - this.nowEnemyHp[i];
         }
 
-        return "味方[艦:" + this.fships.size() + "→" + friendNowShips + " ゲージ:" + friendGauge + "/" + this.friendGaugeMax +
+        return "味方[艦:" + (this.fships.size() + this.fshipsCombined.size()) + "→" + friendNowShips + " ゲージ:"
+                + friendGauge + "/" + this.friendGaugeMax +
                 "] 敵[艦:" + this.enemy.size() + "→" + enemyNowShips + " ゲージ:" + enemyGauge + "/" + this.enemyGaugeMax
                 + "] 判定:" + this.rank.rank();
     }

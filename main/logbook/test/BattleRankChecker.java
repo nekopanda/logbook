@@ -44,7 +44,8 @@ public class BattleRankChecker {
             BattleDto lastBattle = null;
             for (int i = 0; i < fileNameList.length; ++i) {
                 String fileName = fileNameList[i];
-                boolean isBattle = fileName.endsWith("BATTLE.json") || fileName.endsWith("BATTLE_MIDNIGHT.json");
+                boolean isYasen = fileName.endsWith("BATTLE_MIDNIGHT.json");
+                boolean isBattle = fileName.endsWith("BATTLE.json") || isYasen;
                 boolean isBattleResult = fileName.endsWith("BATTLE_RESULT.json");
                 if (isBattle || isBattleResult) {
                     String jsonString = FileUtils.readFileToString(new File(fileName), Charset.forName("MS932"));
@@ -54,7 +55,7 @@ public class BattleRankChecker {
                     if (data == null)
                         continue;
                     if (isBattle) {
-                        lastBattle = new BattleDto(data, lastBattle);
+                        lastBattle = new BattleDto(data, lastBattle, isYasen);
                     }
                     else {
                         BattleResultDto dto = new BattleResultDto(data, lastBattle, null);
