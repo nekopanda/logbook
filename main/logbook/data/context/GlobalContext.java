@@ -723,12 +723,12 @@ public final class GlobalContext {
                 // 基本情報を更新する
                 JsonObject apiBasic = apidata.getJsonObject("api_basic");
                 doBasicSub(apiBasic);
-                addConsole("司令部を更新しました");
+                //addConsole("司令部を更新しました");
 
                 // 保有資材を更新する
                 JsonArray apiMaterial = apidata.getJsonArray("api_material");
                 doMaterialSub(apiMaterial);
-                addConsole("保有資材を更新しました");
+                //addConsole("保有資材を更新しました");
 
                 // 保有艦娘を更新する
                 shipMap.clear();
@@ -739,12 +739,12 @@ public final class GlobalContext {
                 }
                 JsonArray apiDeckPort = apidata.getJsonArray("api_deck_port");
                 doDeck(apiDeckPort);
-                addConsole("保有艦娘情報を更新しました");
+                //addConsole("保有艦娘情報を更新しました");
 
                 // 入渠の状態を更新する
                 JsonArray apiNdock = apidata.getJsonArray("api_ndock");
                 doNdockSub(apiNdock);
-                addConsole("入渠情報を更新しました");
+                //addConsole("入渠情報を更新しました");
 
                 // 遠征の状態を更新する
                 deckMissions = new DeckMissionDto[] { DeckMissionDto.EMPTY, DeckMissionDto.EMPTY, DeckMissionDto.EMPTY };
@@ -772,7 +772,7 @@ public final class GlobalContext {
                     }
                     deckMissions[i - 1] = new DeckMissionDto(name, section, time, fleetid, ships);
                 }
-                addConsole("遠征情報を更新しました");
+                //addConsole("遠征情報を更新しました");
 
                 // 連合艦隊を更新する
                 combined = false;
@@ -785,7 +785,8 @@ public final class GlobalContext {
                         break;
                     }
                 }
-                addConsole("連合艦隊を更新しました");
+                //addConsole("連合艦隊を更新しました");
+                addConsole("母港情報を更新しました");
             }
         } catch (Exception e) {
             LOG.warn("母港を更新しますに失敗しました", e);
@@ -1639,6 +1640,10 @@ public final class GlobalContext {
             if (idstr != null) {
                 int id = Integer.parseInt(idstr);
                 isSortie[id - 1] = true;
+                // 連合艦隊
+                if ((id == 1) && combined) {
+                    isSortie[1] = true;
+                }
             }
 
             JsonObject obj = data.getJsonObject().getJsonObject("api_data");

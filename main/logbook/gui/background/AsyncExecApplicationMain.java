@@ -425,6 +425,13 @@ public final class AsyncExecApplicationMain extends Thread {
                             + " 艦娘:" + GlobalContext.getShipMap().size() + "/"
                             + GlobalContext.maxChara());
 
+            boolean combinedFleetBadlyDamaed = false;
+            if (GlobalContext.isCombined()) {
+                combinedFleetBadlyDamaed =
+                        GlobalContext.getDock("1").isBadlyDamaged() ||
+                                GlobalContext.getDock("2").isBadlyDamaged();
+            }
+
             for (int i = 0; i < 4; i++) {
                 DockDto dock = GlobalContext.getDock(Integer.toString(i + 1));
                 if (dock != null) {
@@ -446,7 +453,7 @@ public final class AsyncExecApplicationMain extends Thread {
                     if (!dock.getName().equals(dockname[i])) {
                         dockname[i] = dock.getName();
                     }
-                    tabComposite.updateFleet(dock);
+                    tabComposite.updateFleet(dock, (i < 2) ? combinedFleetBadlyDamaed : false);
                     tabItem.setText(dock.getName());
                 }
             }

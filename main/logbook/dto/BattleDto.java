@@ -169,6 +169,8 @@ public final class BattleDto extends AbstractDto {
                 if (i <= this.fshipsCombined.size()) {
                     this.nowFriendHpCombined[i - 1] = hp;
                     this.maxFriendHpCombined[i - 1] = maxHp;
+                    if (firstBattle == null)
+                        this.friendGaugeMax += this.startFriendHpCombined[i - 1] = hp;
                 }
             }
         }
@@ -257,8 +259,9 @@ public final class BattleDto extends AbstractDto {
                 ++friendNowShips;
             }
             friendGauge += this.startFriendHp[i] - this.nowFriendHp[i];
-
-            if (isCombined) {
+        }
+        if (isCombined) {
+            for (int i = 0; i < this.fshipsCombined.size(); i++) {
                 if (this.nowFriendHpCombined[i] > 0) {
                     ++friendNowShips;
                 }
@@ -384,7 +387,7 @@ public final class BattleDto extends AbstractDto {
         JsonArray edam = raigeki_obj.getJsonArray("api_edam");
         int[] targetFriendHp = second ? this.nowFriendHpCombined : this.nowFriendHp;
         for (int i = 1; i <= 6; i++) {
-            if (i <= this.fships.size())
+            if (i <= targetFriendHp.length)
                 targetFriendHp[i - 1] -= fdam.getInt(i);
             if (i <= this.enemy.size())
                 this.nowEnemyHp[i - 1] -= edam.getInt(i);
@@ -530,7 +533,9 @@ public final class BattleDto extends AbstractDto {
             }
             friendGauge += this.startFriendHp[i] - this.nowFriendHp[i];
 
-            if (isCombined) {
+        }
+        if (isCombined) {
+            for (int i = 0; i < this.fshipsCombined.size(); i++) {
                 if (this.nowFriendHpCombined[i] > 0) {
                     ++friendNowShips;
                 }

@@ -248,8 +248,9 @@ public class FleetComposite extends Composite {
      * 艦隊を更新します
      * 
      * @param dock
+     * @param combinedFleetbadlyDamaed 連合艦隊の他の艦隊の艦が大破している
      */
-    public void updateFleet(DockDto dock) {
+    public void updateFleet(DockDto dock, boolean combinedFleetBadlyDamaed) {
         if ((this.dock == dock) && !this.dock.isUpdate()) {
             return;
         }
@@ -515,42 +516,58 @@ public class FleetComposite extends Composite {
         for (ShipDto shipDto : ships) {
             seiku += shipDto.getSeiku();
         }
+
+        StyleRange messageStyle = new StyleRange();
+        messageStyle.fontStyle = SWT.BOLD;
+        messageStyle.foreground = SWTResourceManager.getColor(SWT.COLOR_DARK_BLUE);
+        StyleRange taihaStyle = new StyleRange();
+        taihaStyle.fontStyle = SWT.BOLD;
+        taihaStyle.underline = true;
+        taihaStyle.underlineStyle = SWT.UNDERLINE_SQUIGGLE;
+        taihaStyle.underlineColor = SWTResourceManager.getColor(SWT.COLOR_RED);
+        taihaStyle.foreground = SWTResourceManager.getColor(SWT.COLOR_RED);
+
         if (GlobalContext.isMission(this.dock.getId())) {
             // 遠征中
-            StyleRange style = new StyleRange();
-            style.fontStyle = SWT.BOLD;
-            style.foreground = SWTResourceManager.getColor(SWT.COLOR_DARK_BLUE);
-            this.addStyledText(this.message, AppConstants.MESSAGE_MISSION, style);
+            this.addStyledText(this.message, AppConstants.MESSAGE_MISSION, messageStyle);
         } else if (isBathwater) {
             // 入渠中
-            StyleRange style = new StyleRange();
-            style.fontStyle = SWT.BOLD;
-            style.foreground = SWTResourceManager.getColor(SWT.COLOR_DARK_BLUE);
             this.addStyledText(this.message,
-                    MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BATHWATER), style);
-        } else if (this.badlyDamage) {
+                    MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BATHWATER), messageStyle);
+        } else if (GlobalContext.isSortie(this.dock.getId())) {
+            // 出撃中
+            this.addStyledText(this.message, AppConstants.MESSAGE_SORTIE, messageStyle);
+            if (this.badlyDamage) {
+                // 大破
+                this.addStyledText(this.message, AppConstants.MESSAGE_STOP_SORTIE, taihaStyle);
+            }
+            else if (combinedFleetBadlyDamaed) {
+                // 連合艦隊の他の艦隊に大破艦がある
+                this.addStyledText(this.message, AppConstants.MESSAGE_IN_COMBINED + AppConstants.MESSAGE_STOP_SORTIE,
+                        taihaStyle);
+            }
+            else {
+                // 進撃可能
+                this.addStyledText(this.message, AppConstants.MESSAGE_GO_NEXT, messageStyle);
+            }
+        }
+        else if (this.badlyDamage) {
             // 大破
-            StyleRange style = new StyleRange();
-            style.fontStyle = SWT.BOLD;
-            style.underline = true;
-            style.underlineStyle = SWT.UNDERLINE_SQUIGGLE;
-            style.underlineColor = SWTResourceManager.getColor(SWT.COLOR_RED);
-            style.foreground = SWTResourceManager.getColor(SWT.COLOR_RED);
             this.addStyledText(this.message,
-                    MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BADLY_DAMAGE), style);
-        } else {
+                    MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BADLY_DAMAGE), taihaStyle);
+        }
+        else if (combinedFleetBadlyDamaed) {
+            // 連合艦隊の他の艦隊に大破艦がある
+            this.addStyledText(this.message, AppConstants.MESSAGE_IN_COMBINED +
+                    MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BADLY_DAMAGE), taihaStyle);
+        }
+        else {
             // 出撃可能
-            StyleRange style = new StyleRange();
-            style.fontStyle = SWT.BOLD;
-            style.foreground = SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN);
-            this.addStyledText(this.message, AppConstants.MESSAGE_GOOD, style);
+            this.addStyledText(this.message, AppConstants.MESSAGE_GOOD, messageStyle);
         }
         if ((Integer.parseInt(this.dock.getId()) <= 2) && GlobalContext.isCombined()) {
             // 連合艦隊
-            StyleRange style = new StyleRange();
-            style.fontStyle = SWT.BOLD;
-            style.foreground = SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN);
-            this.addStyledText(this.message, AppConstants.MESSAGE_COMBINED, style);
+            this.addStyledText(this.message, AppConstants.MESSAGE_COMBINED, messageStyle);
         }
         if (this.clearDate != null) {
             this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_COND, this.clearDate), null);

@@ -324,8 +324,17 @@ public class AppConstants {
     /** メッセージ 出撃できます。 */
     public static final String MESSAGE_GOOD = "出撃できます。";
 
+    /** メッセージ 進撃できます。 */
+    public static final String MESSAGE_GO_NEXT = "進撃できます。";
+
     /** メッセージ {0} 出撃はできません。 */
     public static final String MESSAGE_BAD = "{0} 出撃はできません。";
+
+    /** メッセージ 出撃中です。  */
+    public static final String MESSAGE_SORTIE = "出撃中です。";
+
+    /** メッセージ 連合艦隊に */
+    public static final String MESSAGE_IN_COMBINED = "連合艦隊に";
 
     /** メッセージ 大破している艦娘がいます  */
     public static final String MESSAGE_BADLY_DAMAGE = "大破している艦娘がいます";

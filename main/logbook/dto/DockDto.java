@@ -100,4 +100,17 @@ public final class DockDto extends AbstractDto {
     public void setUpdate(boolean update) {
         this.update = update;
     }
+
+    /**
+     * 大破艦がいるか？を取得します
+     * @return 大破艦がいるか？
+     */
+    public boolean isBadlyDamaged() {
+        for (ShipDto ship : this.ships) {
+            if (ship.isBadlyDamage()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
