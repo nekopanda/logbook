@@ -166,8 +166,10 @@ public final class BattleDto extends AbstractDto {
             for (int i = 1; i < nowhpsCombined.size(); i++) {
                 int hp = nowhpsCombined.getInt(i);
                 int maxHp = maxhpsCombined.getInt(i);
-                this.nowFriendHpCombined[i - 1] = hp;
-                this.maxFriendHpCombined[i - 1] = maxHp;
+                if (i <= this.fshipsCombined.size()) {
+                    this.nowFriendHpCombined[i - 1] = hp;
+                    this.maxFriendHpCombined[i - 1] = maxHp;
+                }
             }
         }
 
