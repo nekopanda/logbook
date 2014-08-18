@@ -145,7 +145,7 @@ public final class BattleDialog extends Dialog {
             lblfItem3.setText("装備3");
             GridData gdfItem3 = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
             gdfItem3.widthHint = 100;
-            lblfItem1.setLayoutData(gdfItem3);
+            lblfItem3.setLayoutData(gdfItem3);
 
             Label lblfItem4 = new Label(fComposite, SWT.NONE);
             lblfItem4.setFont(SWTResourceManager.getFont(fontName, size, SWT.BOLD));
