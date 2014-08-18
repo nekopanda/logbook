@@ -210,8 +210,9 @@ public final class CreateReportLogic {
             Arrays.fill(enemyHp, "");
 
             if (battle != null) {
-                DockDto dock = battle.getDock();
-                if (dock != null) {
+                List<DockDto> docks = battle.getFriends();
+                if (docks != null) {
+                    DockDto dock = docks.get(0);
                     List<ShipDto> friendships = dock.getShips();
                     int[] fnowhps = battle.getNowFriendHp();
                     int[] fmaxhps = battle.getMaxFriendHp();
