@@ -270,7 +270,7 @@ public final class BattleDialog extends Dialog {
 
         Button save = new Button(this.shell, SWT.NONE);
         save.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        save.setText("HTMLファイルに保存");
+        save.setText("HTMLファイルとして保存");
         save.addSelectionListener(new SaveAdapter());
 
         this.shell.pack();
@@ -289,7 +289,7 @@ public final class BattleDialog extends Dialog {
         sb.append("<!DOCTYPE html>").append("\r\n");
         sb.append("<html>").append("\r\n");
         sb.append("<head>").append("\r\n");
-        sb.append("<meta charset=\"Shift_JIS\">").append("\r\n");
+        sb.append("<meta charset=\"UTF-8\">").append("\r\n");
         sb.append("<title>会敵報告</title>").append("\r\n");
         sb.append("<style type=\"text/css\">").append("\r\n");
         sb.append("body,table {").append("\r\n");
@@ -401,6 +401,10 @@ public final class BattleDialog extends Dialog {
         return sb.toString();
     }
 
+    /**
+     * HTMLファイルとして保存のリスナー
+     *
+     */
     private class SaveAdapter extends SelectionAdapter {
 
         @Override
@@ -421,11 +425,11 @@ public final class BattleDialog extends Dialog {
                     }
                 }
                 try {
-                    FileUtils.write(file, BattleDialog.this.getHtml());
-                } catch (IOException e1) {
+                    FileUtils.writeStringToFile(file, BattleDialog.this.getHtml(), "UTF-8");
+                } catch (IOException ex) {
                     MessageBox messageBox = new MessageBox(BattleDialog.this.shell, SWT.ICON_ERROR);
                     messageBox.setText("書き込めませんでした");
-                    messageBox.setMessage(e.toString());
+                    messageBox.setMessage(ex.toString());
                     messageBox.open();
                 }
             }
