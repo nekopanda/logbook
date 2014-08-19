@@ -311,7 +311,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getItemListHeader() {
-        return new String[] { "", "名称", "種別", "個数", "火力", "命中", "射程", "運", "回避", "爆装", "雷装", "索敵", "対潜", "対空" };
+        return new String[] { "", "名称", "種別", "個数", "火力", "命中", "射程", "運", "回避", "爆装", "雷装", "索敵", "対潜", "対空", "装甲" };
     }
 
     /**
@@ -350,7 +350,7 @@ public final class CreateReportLogic {
             count++;
             body.add(new Object[] { count, item.getName(), item.getType(), entry.getValue(), item.getHoug(),
                     item.getHoum(), item.getLeng(), item.getLuck(), item.getHouk(), item.getBaku(), item.getRaig(),
-                    item.getSaku(), item.getTais(), item.getTyku()
+                    item.getSaku(), item.getTais(), item.getTyku(), item.getSouk()
             });
         }
         return toListStringArray(body);
@@ -423,6 +423,8 @@ public final class CreateReportLogic {
                 long raisou = ship.getRaisouMax() - ship.getRaisou();
                 // 対空
                 long taiku = ship.getTaikuMax() - ship.getTaiku();
+                // 装甲
+                long soukou = ship.getSoukouMax() - ship.getSoukou();
                 // 回避
                 long kaihi = ship.getKaihiMax() - ship.getKaihi();
                 // 対潜
@@ -437,6 +439,7 @@ public final class CreateReportLogic {
                         karyoku += item.getHoug();
                         raisou += item.getRaig();
                         taiku += item.getTyku();
+                        soukou += item.getSouk();
                         taisen += item.getTais();
                         sakuteki += item.getSaku();
                         lucky += item.getLuck();
@@ -463,7 +466,7 @@ public final class CreateReportLogic {
                         karyoku,
                         raisou,
                         taiku,
-                        ship.getSoukouMax() - ship.getSoukou(),
+                        soukou,
                         kaihi,
                         taisen,
                         sakuteki,
