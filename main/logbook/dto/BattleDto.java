@@ -98,20 +98,25 @@ public final class BattleDto extends AbstractDto {
             }
         }
 
-        JsonArray formation = object.getJsonArray("api_formation");
-        switch (formation.get(0).getValueType()) {
-        case NUMBER:
-            this.friendFormation = toFormation(formation.getInt(0));
-            break;
-        default:
-            this.friendFormation = toFormation(Integer.parseInt(formation.getString(0)));
-        }
-        switch (formation.get(1).getValueType()) {
-        case NUMBER:
-            this.enemyFormation = toFormation(formation.getInt(1));
-            break;
-        default:
-            this.enemyFormation = toFormation(Integer.parseInt(formation.getString(1)));
+        if (object.containsKey("api_formation")) {
+            JsonArray formation = object.getJsonArray("api_formation");
+            switch (formation.get(0).getValueType()) {
+            case NUMBER:
+                this.friendFormation = toFormation(formation.getInt(0));
+                break;
+            default:
+                this.friendFormation = toFormation(Integer.parseInt(formation.getString(0)));
+            }
+            switch (formation.get(1).getValueType()) {
+            case NUMBER:
+                this.enemyFormation = toFormation(formation.getInt(1));
+                break;
+            default:
+                this.enemyFormation = toFormation(Integer.parseInt(formation.getString(1)));
+            }
+        } else {
+            this.friendFormation = "陣形不明";
+            this.enemyFormation = "陣形不明";
         }
     }
 
