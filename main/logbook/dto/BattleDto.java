@@ -99,13 +99,10 @@ public final class BattleDto extends AbstractDto {
         JsonArray maxhpsCombined = object.getJsonArray("api_maxhps_combined");
         boolean isCombined = (nowhpsCombined != null);
 
-        this.dock = GlobalContext.getDock(dockId);
-        this.dockCombined = isCombined ? GlobalContext.getDock(Integer.toString(2)) : null;
-
-        if (this.dock != null) {
-            dockToList(this.dock, this.fships);
-            if (this.dockCombined != null) {
-                dockToList(this.dockCombined, this.fshipsCombined);
+        if (this.friends.size() >= 1) {
+            dockToList(this.friends.get(0), this.fships);
+            if (this.friends.size() >= 2) {
+                dockToList(this.friends.get(1), this.fshipsCombined);
             }
         }
         else {
@@ -137,6 +134,29 @@ public final class BattleDto extends AbstractDto {
             this.enemySlot.add(slot);
         }
 
+        String fFormation;
+        String eFormation;
+        if (object.containsKey("api_formation")) {
+            JsonArray formation = object.getJsonArray("api_formation");
+            switch (formation.get(0).getValueType()) {
+            case NUMBER:
+                fFormation = toFormation(formation.getInt(0));
+                break;
+            default:
+                fFormation = toFormation(Integer.parseInt(formation.getString(0)));
+            }
+            switch (formation.get(1).getValueType()) {
+            case NUMBER:
+                eFormation = toFormation(formation.getInt(1));
+                break;
+            default:
+                eFormation = toFormation(Integer.parseInt(formation.getString(1)));
+            }
+        } else {
+            fFormation = "陣形不明";
+            eFormation = "陣形不明";
+        }
+
         // このマスでの最初の戦闘がこれでない場合は、その時の値を取得
         if (firstBattle != null) {
             this.startFriendHp = firstBattle.startFriendHp;
@@ -144,6 +164,8 @@ public final class BattleDto extends AbstractDto {
             this.startFriendHpCombined = firstBattle.startFriendHpCombined;
             this.friendGaugeMax = firstBattle.friendGaugeMax;
             this.enemyGaugeMax = firstBattle.enemyGaugeMax;
+            fFormation = firstBattle.friendFormation;
+            eFormation = firstBattle.enemyFormation;
         }
         else {
             this.startFriendHp = new int[this.fships.size()];
@@ -164,6 +186,8 @@ public final class BattleDto extends AbstractDto {
             this.nowFriendHpCombined = null;
             this.maxFriendHpCombined = null;
         }
+        this.friendFormation = fFormation;
+        this.enemyFormation = eFormation;
 
         // この戦闘の開始前HPを取得
         for (int i = 1; i < nowhps.size(); i++) {
@@ -466,27 +490,6 @@ public final class BattleDto extends AbstractDto {
                 this.nowEnemyHp[shipIdx - 1 - 6] -= damage.get(i);
             }
         }
-
-        if (object.containsKey("api_formation")) {
-            JsonArray formation = object.getJsonArray("api_formation");
-            switch (formation.get(0).getValueType()) {
-            case NUMBER:
-                this.friendFormation = toFormation(formation.getInt(0));
-                break;
-            default:
-                this.friendFormation = toFormation(Integer.parseInt(formation.getString(0)));
-            }
-            switch (formation.get(1).getValueType()) {
-            case NUMBER:
-                this.enemyFormation = toFormation(formation.getInt(1));
-                break;
-            default:
-                this.enemyFormation = toFormation(Integer.parseInt(formation.getString(1)));
-            }
-        } else {
-            this.friendFormation = "陣形不明";
-            this.enemyFormation = "陣形不明";
-        }
     }
 
     private static String toFormation(int f) {
@@ -534,8 +537,12 @@ public final class BattleDto extends AbstractDto {
         return this.friends;
     }
 
+    public DockDto getDock() {
+        return (this.friends.size() >= 1) ? this.friends.get(0) : null;
+    }
+
     public DockDto getDockCombined() {
-        return this.dockCombined;
+        return (this.friends.size() >= 2) ? this.friends.get(1) : null;
     }
 
     public List<ShipDto> getFriendShips() {
