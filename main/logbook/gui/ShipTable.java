@@ -121,6 +121,26 @@ public final class ShipTable extends AbstractTableDialog {
         shipCopy.setText("艦娘の名前をコピー(&2)");
 
         List<ShipGroupBean> groups = ShipGroupConfig.get().getGroup();
+
+        MenuItem groupFilterCascade = new MenuItem(this.tablemenu, SWT.CASCADE);
+        groupFilterCascade.setText("グループフィルター(&G)");
+        Menu groupFilterMenu = new Menu(groupFilterCascade);
+        groupFilterCascade.setMenu(groupFilterMenu);
+        for (ShipGroupBean groupBean : groups) {
+            final MenuItem groupItem = new MenuItem(groupFilterMenu, SWT.NONE);
+            groupItem.setText(groupBean.getName());
+            groupItem.setData(groupBean);
+            groupItem.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
+                    ShipFilterDto filter = ShipTable.this.getFilter();
+                    filter.group = bean;
+                    ShipTable.this.updateFilter(filter);
+                }
+            });
+        }
+
         MenuItem addGroupCascade = new MenuItem(this.tablemenu, SWT.CASCADE);
         addGroupCascade.setText("選択した艦娘をグループに追加(&A)");
         Menu addGroupMenu = new Menu(addGroupCascade);

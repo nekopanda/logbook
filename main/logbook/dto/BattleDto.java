@@ -9,6 +9,7 @@ import javax.json.JsonObject;
 import javax.json.JsonValue;
 
 import logbook.data.context.GlobalContext;
+import logbook.internal.Item;
 import logbook.internal.Ship;
 
 /**
@@ -18,9 +19,7 @@ import logbook.internal.Ship;
 public final class BattleDto extends AbstractDto {
 
     /** 味方艦隊 */
-    private final DockDto dock;
-
-    private final DockDto dockCombined;
+    private final List<DockDto> friends = new ArrayList<>();
 
     /** 味方艦 */
     private final List<ShipDto> fships = new ArrayList<ShipDto>();
@@ -28,7 +27,10 @@ public final class BattleDto extends AbstractDto {
     private final List<ShipDto> fshipsCombined = new ArrayList<ShipDto>();
 
     /** 敵艦隊 */
-    private final List<ShipInfoDto> enemy = new ArrayList<ShipInfoDto>();
+    private final List<ShipInfoDto> enemy = new ArrayList<>();
+
+    /** 敵装備 */
+    private final List<ItemDto[]> enemySlot = new ArrayList<>();
 
     /** 味方HP */
     private final int[] nowFriendHp;
@@ -65,6 +67,12 @@ public final class BattleDto extends AbstractDto {
 
     private final boolean isYasen;
 
+    /** 味方陣形 */
+    private final String friendFormation;
+
+    /** 敵陣形 */
+    private final String enemyFormation;
+
     /**
      * コンストラクター
      */
@@ -76,6 +84,11 @@ public final class BattleDto extends AbstractDto {
             dockId = object.get("api_dock_id").toString();
         } else {
             dockId = object.get("api_deck_id").toString();
+        }
+        this.friends.add(GlobalContext.getDock(dockId));
+
+        if (object.containsKey("api_fParam_combined")) {
+            this.friends.add(GlobalContext.getDock("2"));
         }
 
         this.isYasen = isYasen;
@@ -112,6 +125,16 @@ public final class BattleDto extends AbstractDto {
             if (dto != null) {
                 this.enemy.add(dto);
             }
+        }
+
+        JsonArray eSlots = object.getJsonArray("api_eSlot");
+        for (int i = 0; i < eSlots.size(); i++) {
+            JsonArray eSlot = eSlots.getJsonArray(i);
+            ItemDto[] slot = new ItemDto[5];
+            for (int j = 0; j < eSlot.size(); j++) {
+                slot[j] = Item.get(eSlot.getInt(j));
+            }
+            this.enemySlot.add(slot);
         }
 
         // このマスでの最初の戦闘がこれでない場合は、その時の値を取得
@@ -443,13 +466,72 @@ public final class BattleDto extends AbstractDto {
                 this.nowEnemyHp[shipIdx - 1 - 6] -= damage.get(i);
             }
         }
+
+        if (object.containsKey("api_formation")) {
+            JsonArray formation = object.getJsonArray("api_formation");
+            switch (formation.get(0).getValueType()) {
+            case NUMBER:
+                this.friendFormation = toFormation(formation.getInt(0));
+                break;
+            default:
+                this.friendFormation = toFormation(Integer.parseInt(formation.getString(0)));
+            }
+            switch (formation.get(1).getValueType()) {
+            case NUMBER:
+                this.enemyFormation = toFormation(formation.getInt(1));
+                break;
+            default:
+                this.enemyFormation = toFormation(Integer.parseInt(formation.getString(1)));
+            }
+        } else {
+            this.friendFormation = "陣形不明";
+            this.enemyFormation = "陣形不明";
+        }
+    }
+
+    private static String toFormation(int f) {
+        String formation;
+        switch (f) {
+        case 1:
+            formation = "単縦陣";
+            break;
+        case 2:
+            formation = "複縦陣";
+            break;
+        case 3:
+            formation = "輪形陣";
+            break;
+        case 4:
+            formation = "梯形陣";
+            break;
+        case 5:
+            formation = "単横陣";
+            break;
+        case 11:
+            formation = "第一警戒航行序列";
+            break;
+        case 12:
+            formation = "第二警戒航行序列";
+            break;
+        case 13:
+            formation = "第三警戒航行序列";
+            break;
+        case 14:
+            formation = "第四警戒航行序列";
+            break;
+        default:
+            formation = "単縦陣";
+            break;
+        }
+        return formation;
     }
 
     /**
-     * @return dock
+     * 味方艦隊を取得します。
+     * @return 味方艦隊
      */
-    public DockDto getDock() {
-        return this.dock;
+    public List<DockDto> getFriends() {
+        return this.friends;
     }
 
     public DockDto getDockCombined() {
@@ -465,14 +547,24 @@ public final class BattleDto extends AbstractDto {
     }
 
     /**
-     * @return enemy
+     * 敵艦隊を取得します。
+     * @return 敵艦隊
      */
     public List<ShipInfoDto> getEnemy() {
         return this.enemy;
     }
 
     /**
-     * @return nowFriendHp
+     * 敵装備を取得します。
+     * @return 敵装備
+     */
+    public List<ItemDto[]> getEnemySlot() {
+        return this.enemySlot;
+    }
+
+    /**
+     * 味方HPを取得します。
+     * @return 味方HP
      */
     public int[] getNowFriendHp() {
         return this.nowFriendHp;
@@ -483,14 +575,16 @@ public final class BattleDto extends AbstractDto {
     }
 
     /**
-     * @return nowEnemyHp
+     * 敵HPを取得します。
+     * @return 敵HP
      */
     public int[] getNowEnemyHp() {
         return this.nowEnemyHp;
     }
 
     /**
-     * @return maxFriendHp
+     * 味方MaxHPを取得します。
+     * @return 味方MaxHP
      */
     public int[] getMaxFriendHp() {
         return this.maxFriendHp;
@@ -501,10 +595,27 @@ public final class BattleDto extends AbstractDto {
     }
 
     /**
-     * @return maxEnemyHp
+     * 敵MaxHPを取得します。
+     * @return 敵MaxHP
      */
     public int[] getMaxEnemyHp() {
         return this.maxEnemyHp;
+    }
+
+    /**
+     * 味方陣形を取得します。
+     * @return 味方陣形
+     */
+    public String getFriendFormation() {
+        return this.friendFormation;
+    }
+
+    /**
+     * 敵陣形を取得します。
+     * @return 敵陣形
+     */
+    public String getEnemyFormation() {
+        return this.enemyFormation;
     }
 
     /**
