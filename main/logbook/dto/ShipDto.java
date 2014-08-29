@@ -144,9 +144,6 @@ public final class ShipDto extends AbstractDto {
     /** 艦娘 */
     private final ShipInfoDto shipInfo;
 
-    /** 出撃海域 */
-    private final int sallyArea;
-
     /** */
     private final int lockedEquip;
 
@@ -219,7 +216,6 @@ public final class ShipDto extends AbstractDto {
         this.lucky = ((JsonNumber) object.getJsonArray("api_lucky").get(0)).longValue();
         this.luckyMax = ((JsonNumber) object.getJsonArray("api_lucky").get(1)).longValue();
         this.lockedEquip = object.getJsonNumber("api_locked_equip").intValue();
-        this.sallyArea = object.getJsonNumber("api_sally_area").intValue();
 
         // 疲労が抜ける時間を計算する
         if (this.cond < 49) {
@@ -676,14 +672,6 @@ public final class ShipDto extends AbstractDto {
      */
     public boolean isSlightDamage() {
         return ((float) this.nowhp / (float) this.maxhp) <= AppConstants.SLIGHT_DAMAGE;
-    }
-
-    /**
-     * 出撃海域を取得します。
-     * @return 出撃海域
-     */
-    public int getSallyArea() {
-        return this.sallyArea;
     }
 
     /**
