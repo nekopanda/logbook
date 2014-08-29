@@ -788,8 +788,8 @@ public final class GlobalContext {
                     default:
                         break;
                     }
+                    //addConsole("連合艦隊を更新しました");
                 }
-                //addConsole("連合艦隊を更新しました");
                 addConsole("母港情報を更新しました");
             }
         } catch (Exception e) {

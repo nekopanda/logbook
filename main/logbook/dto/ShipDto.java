@@ -216,7 +216,6 @@ public final class ShipDto extends AbstractDto {
         this.lucky = ((JsonNumber) object.getJsonArray("api_lucky").get(0)).longValue();
         this.luckyMax = ((JsonNumber) object.getJsonArray("api_lucky").get(1)).longValue();
         this.lockedEquip = object.getJsonNumber("api_locked_equip").intValue();
-
         // 疲労が抜ける時間を計算する
         if (this.cond < 49) {
             this.condClearTime.add(Calendar.MINUTE, Math.max(49 - (int) this.cond, 3));
