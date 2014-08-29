@@ -654,8 +654,8 @@ public final class GlobalContext {
                     default:
                         break;
                     }
+                    addConsole("連合艦隊を更新しました");
                 }
-                addConsole("連合艦隊を更新しました");
             }
         } catch (Exception e) {
             LOG.warn("母港を更新しますに失敗しました", e);

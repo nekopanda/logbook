@@ -199,7 +199,11 @@ public final class ShipDto extends AbstractDto {
         this.lucky = ((JsonNumber) object.getJsonArray("api_lucky").get(0)).longValue();
         this.luckyMax = ((JsonNumber) object.getJsonArray("api_lucky").get(1)).longValue();
         this.lockedEquip = object.getJsonNumber("api_locked_equip").intValue();
-        this.sallyArea = object.getJsonNumber("api_sally_area").intValue();
+        if (object.containsKey("api_sally_area")) {
+            this.sallyArea = object.getJsonNumber("api_sally_area").intValue();
+        } else {
+            this.sallyArea = 0;
+        }
         // 疲労が抜ける時間を計算する
         if (this.cond < 49) {
             this.time.add(Calendar.MINUTE, Math.max(49 - (int) this.cond, 3));
