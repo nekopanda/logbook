@@ -472,7 +472,7 @@ public class QueryHandler extends HttpServlet {
                     JsonArrayBuilder fship_array = Json.createArrayBuilder();
                     JsonArrayBuilder eship_array = Json.createArrayBuilder();
 
-                    List<ShipDto> fships = battleDto.getFriendShips();
+                    List<ShipDto> fships = battleDto.getDock().getShips();
                     for (ShipDto ship : fships) {
                         fship_array.add(shipToJson(ship));
                     }
@@ -500,7 +500,7 @@ public class QueryHandler extends HttpServlet {
 
                     if (battleDto.isCombined()) {
                         JsonArrayBuilder fship_combined_array = Json.createArrayBuilder();
-                        List<ShipDto> fshipsCombined = battleDto.getFriendShipsCombined();
+                        List<ShipDto> fshipsCombined = battleDto.getDockCombined().getShips();
                         for (ShipDto ship : fshipsCombined) {
                             fship_combined_array.add(shipToJson(ship));
                         }

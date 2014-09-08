@@ -16,7 +16,6 @@ import javax.json.JsonReader;
 import logbook.config.ShipConfig;
 import logbook.dto.BattleDto;
 import logbook.dto.BattleResultDto;
-import logbook.dto.ResultRank;
 
 import org.apache.commons.io.FileUtils;
 
@@ -40,6 +39,7 @@ public class BattleRankChecker {
         }
         Arrays.sort(fileNameList);
         int resultCount = 0;
+        int[] rankCount = new int[10];
         try {
             BattleDto lastBattle = null;
             for (int i = 0; i < fileNameList.length; ++i) {
@@ -57,16 +57,34 @@ public class BattleRankChecker {
                     if (isBattle) {
                         lastBattle = new BattleDto(data, lastBattle, isYasen);
                     }
-                    else {
+                    else if (lastBattle != null) {
                         BattleResultDto dto = new BattleResultDto(data, lastBattle, null);
                         // ランクが合っているかチェック
                         if (!dto.getRank().equals(lastBattle.getRank().rank())) {
-                            if ((lastBattle.getRank() == ResultRank.B_OR_C) && dto.getRank().equals("B"))
-                                ;// 確率的にBになることがある判定だったのでOK
+                            if ((lastBattle.getRank().match(dto.getRank())))
+                                ;
                             else
                                 System.out.println("戦闘結果判定ミス: 正解ランク:" + dto.getRank() + " "
                                         + lastBattle.getRankCalcInfo());
                         }
+
+                        // 判定を特定できない場合の統計
+                        if ((lastBattle.getRank().match(dto.getRank()))) {
+                            switch (lastBattle.getRank()) {
+                            case B_OR_C:
+                                rankCount[dto.getRank().equals("B") ? 0 : 1]++;
+                                break;
+                            case C_OR_B:
+                                rankCount[dto.getRank().equals("C") ? 2 : 3]++;
+                                break;
+                            case D_OR_C:
+                                rankCount[dto.getRank().equals("D") ? 4 : 5]++;
+                                break;
+                            default:
+                                break;
+                            }
+                        }
+
                         lastBattle = null;
                         ++resultCount;
                     }
@@ -74,6 +92,7 @@ public class BattleRankChecker {
                 }
             }
             System.out.println(resultCount + "件の戦闘結果を処理");
+            System.out.println(Arrays.toString(rankCount));
         } catch (IOException e) {
             System.out.println("なんかエラーっぽい");
             e.printStackTrace();
