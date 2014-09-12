@@ -103,6 +103,9 @@ public class AppConstants {
     /** 所有艦娘グループ設定ファイル  */
     public static final File GROUP_CONFIG_FILE = new File("./config/group.xml");
 
+    /** 敵データファイル  */
+    public static final File ENEMY_DATA_FILE = new File("./config/KCRDB-enemyid.csv");
+
     /** 保有資材:燃料 */
     public static final int MATERIAL_FUEL = 1;
 

@@ -45,11 +45,11 @@ import logbook.dto.PracticeUserDto;
 import logbook.dto.QuestDto;
 import logbook.dto.ResourceDto;
 import logbook.dto.ResourceItemDto;
-import logbook.dto.ResultRank;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
 import logbook.gui.logic.CreateReportLogic;
-import logbook.gui.logic.MainConsoleListener;
+import logbook.gui.logic.MainAppListener;
+import logbook.internal.EnemyData;
 import logbook.internal.Item;
 import logbook.internal.Ship;
 
@@ -137,13 +137,13 @@ public final class GlobalContext {
     private static BasicInfoDto basic;
 
     /** ログ表示 */
-    private static MainConsoleListener console;
+    private static MainAppListener appListener;
 
     /** updateContext() が呼ばれた数 */
     private static int updateCounter = 0;
 
-    public static void setConsoleListener(MainConsoleListener console_) {
-        console = console_;
+    public static void setConsoleListener(MainAppListener console_) {
+        appListener = console_;
     }
 
     /** 保有資源・資材 */
@@ -712,6 +712,12 @@ public final class GlobalContext {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
             if (apidata != null) {
                 // 出撃中ではない
+                for (int i = 0; i < isSortie.length; ++i) {
+                    if (isSortie[i]) {
+                        appListener.endSortie();
+                        break;
+                    }
+                }
                 Arrays.fill(isSortie, false);
 
                 // 戦闘結果がある場合、ダメージ計算があっているか検証します
@@ -844,6 +850,12 @@ public final class GlobalContext {
                 addConsole(ship.getName() + "(id:" + ship.getId() + ",lv:" + ship.getLv() + ") 轟沈しました！");
             }
 
+            if (mapCellDto == null) {
+                // 出撃していない場合は出撃させる
+                appListener.startSortie();
+            }
+            appListener.updateBattle(battle);
+
         } catch (Exception e) {
             LOG.warn("海戦情報を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -862,6 +874,14 @@ public final class GlobalContext {
                 if (dto.isCompleteSortieBattle()) { // 演習は記録しない
                     battleResultList.add(dto);
                     CreateReportLogic.storeBattleResultReport(dto);
+
+                    // EnemyData更新
+                    if (mapCellDto != null) {
+                        int enemyId = mapCellDto.getEnemyId();
+                        EnemyData enemyData = battle.getEnemyData(enemyId, dto.getEnemyName());
+                        EnemyData.set(enemyId, enemyData);
+                        mapCellDto.setEnemyData(enemyData);
+                    }
                 }
 
                 // 警告を出すためにバージョンアップ
@@ -874,8 +894,8 @@ public final class GlobalContext {
 
                 // ランクが合っているかチェック
                 if (!dto.getRank().equals(battle.getRank().rank())) {
-                    if ((battle.getRank() == ResultRank.B_OR_C) && dto.getRank().equals("B"))
-                        ;// 確率的にBになることがある判定だったのでOK
+                    if ((battle.getRank().match(dto.getRank())))
+                        ;
                     else
                         LOG.info("戦闘結果判定ミス: 正解ランク:" + dto.getRank() + " " + battle.getRankCalcInfo());
                 }
@@ -1163,10 +1183,14 @@ public final class GlobalContext {
                 }
             }
 
-            battle = null;
-
             // 艦隊を設定
             doDeck(data.getJsonObject().getJsonArray("api_data_deck"));
+
+            if (battle != null) {
+                appListener.updateSortieDock();
+            }
+
+            battle = null;
 
             addConsole("保有艦娘情報２を更新しました");
         } catch (Exception e) {
@@ -1656,6 +1680,9 @@ public final class GlobalContext {
             material.setEvent("出撃");
             CreateReportLogic.storeMaterialReport(material);
 
+            appListener.startSortie();
+            appListener.updateMapCell(mapCellDto);
+
             addConsole("出撃を更新しました");
             addConsole("行先 " + mapCellDto.toString());
         } catch (Exception e) {
@@ -1674,6 +1701,7 @@ public final class GlobalContext {
             JsonObject obj = data.getJsonObject().getJsonObject("api_data");
 
             mapCellDto = new MapCellDto(obj);
+            appListener.updateMapCell(mapCellDto);
             addConsole("行先 " + mapCellDto.toString());
         } catch (Exception e) {
             LOG.warn("進撃を更新しますに失敗しました", e);
@@ -1836,7 +1864,7 @@ public final class GlobalContext {
     }
 
     private static void addConsole(Object message) {
-        console.printMessage(new SimpleDateFormat(AppConstants.DATE_SHORT_FORMAT).format(Calendar.getInstance()
+        appListener.printMessage(new SimpleDateFormat(AppConstants.DATE_SHORT_FORMAT).format(Calendar.getInstance()
                 .getTime())
                 + "  " + message.toString());
     }

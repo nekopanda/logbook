@@ -24,9 +24,10 @@ import logbook.gui.listener.MissionResultReportAdapter;
 import logbook.gui.listener.ShipListReportAdapter;
 import logbook.gui.listener.TraySelectionListener;
 import logbook.gui.logic.LayoutLogic;
-import logbook.gui.logic.MainConsoleListener;
+import logbook.gui.logic.MainAppListener;
 import logbook.gui.logic.Sound;
 import logbook.gui.widgets.FleetComposite;
+import logbook.internal.EnemyData;
 import logbook.server.proxy.DatabaseClient;
 import logbook.server.proxy.ProxyServer;
 import logbook.server.web.WebServer;
@@ -99,6 +100,7 @@ public final class ApplicationMain {
                 ItemMasterConfig.store();
                 ItemConfig.store();
                 MasterDataConfig.store();
+                EnemyData.store();
             } catch (Exception e) {
                 LOG.fatal("シャットダウンスレッドで異常終了しました", e);
             }
@@ -161,6 +163,10 @@ public final class ApplicationMain {
     private Composite consoleComposite;
     /** コンソール **/
     private List console;
+    /** 戦況 */
+    private BattleWindow battleWindow;
+    /** 自軍敵軍パラメータ */
+    private BattleShipWindow battleShipWindow;
 
     /**
      * Launch the application.
@@ -175,6 +181,7 @@ public final class ApplicationMain {
             ShipGroupConfig.load();
             ItemMasterConfig.load();
             ItemConfig.load();
+            EnemyData.load();
             // シャットダウンフックを登録します
             Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHookThread()));
             // アプリケーション開始
@@ -328,6 +335,59 @@ public final class ApplicationMain {
         });
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
+
+        // 表示-戦況ウィンドウ 
+        final MenuItem battlewin = new MenuItem(cmdmenu, SWT.CHECK);
+        battlewin.setText("戦況(&W)\tCtrl+W");
+        battlewin.setAccelerator(SWT.CTRL + 'W');
+        battlewin.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                boolean open = battlewin.getSelection();
+                if (open) {
+                    ApplicationMain.this.battleWindow.open();
+                }
+                else {
+                    ApplicationMain.this.battleWindow.close();
+                }
+            }
+        });
+        this.battleWindow = new BattleWindow(this.shell);
+        this.battleWindow.addShellListener(new ShellAdapter() {
+            @Override
+            public void shellClosed(ShellEvent e) {
+                e.doit = false;
+                battlewin.setSelection(false);
+                ApplicationMain.this.battleWindow.close();
+            }
+        });
+
+        // 表示-敵味方パラメータ
+        final MenuItem battleshipwin = new MenuItem(cmdmenu, SWT.CHECK);
+        battleshipwin.setText("自軍敵軍パラメータ(&P)\tCtrl+P");
+        battleshipwin.setAccelerator(SWT.CTRL + 'P');
+        battleshipwin.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                boolean open = battleshipwin.getSelection();
+                if (open) {
+                    ApplicationMain.this.battleShipWindow.open();
+                }
+                else {
+                    ApplicationMain.this.battleShipWindow.close();
+                }
+            }
+        });
+        this.battleShipWindow = new BattleShipWindow(this.shell);
+        this.battleShipWindow.addShellListener(new ShellAdapter() {
+            @Override
+            public void shellClosed(ShellEvent e) {
+                e.doit = false;
+                battleshipwin.setSelection(false);
+                ApplicationMain.this.battleShipWindow.close();
+            }
+        });
+
         // 表示-縮小表示
         final MenuItem dispsize = new MenuItem(cmdmenu, SWT.CHECK);
         dispsize.setText("縮小表示(&M)\tCtrl+M");
@@ -671,7 +731,7 @@ public final class ApplicationMain {
      */
     private void startThread() {
         // ログ表示リスナをセット
-        GlobalContext.setConsoleListener(new MainConsoleListener(this.console));
+        GlobalContext.setConsoleListener(new MainAppListener(this));
 
         // プロキシサーバーを開始する
         ProxyServer.start(AppConfig.get().getListenPort());
@@ -874,6 +934,14 @@ public final class ApplicationMain {
      */
     public Composite getConsoleComposite() {
         return this.consoleComposite;
+    }
+
+    public BattleWindow getBattleWindow() {
+        return this.battleWindow;
+    }
+
+    public BattleShipWindow getBattleShipWindow() {
+        return this.battleShipWindow;
     }
 
     /**

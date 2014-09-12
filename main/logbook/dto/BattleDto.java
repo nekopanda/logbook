@@ -6,9 +6,9 @@ import java.util.List;
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
-import javax.json.JsonValue;
 
 import logbook.data.context.GlobalContext;
+import logbook.internal.EnemyData;
 import logbook.internal.Item;
 import logbook.internal.Ship;
 
@@ -27,6 +27,9 @@ public final class BattleDto extends AbstractDto {
     /** 敵装備 */
     private final List<ItemDto[]> enemySlot = new ArrayList<>();
 
+    /** 敵パラメータ */
+    private final List<int[]> enemyParam = new ArrayList<>();
+
     /** 味方HP */
     private final int[] nowFriendHp;
 
@@ -44,9 +47,9 @@ public final class BattleDto extends AbstractDto {
     private final int[] maxEnemyHp;
 
     /** 味方戦闘開始時HP */
-    public int[] startFriendHp;
+    private int[] startFriendHp;
 
-    public int[] startFriendHpCombined;
+    private int[] startFriendHpCombined;
 
     /** 敵戦闘開始時HP */
     public int[] startEnemyHp;
@@ -64,10 +67,39 @@ public final class BattleDto extends AbstractDto {
     private final boolean isNight;
 
     /** 味方陣形 */
-    private final String friendFormation;
+    private String friendFormation = "陣形不明";
 
     /** 敵陣形 */
-    private final String enemyFormation;
+    private String enemyFormation = "陣形不明";
+
+    /** 同航戦とか　*/
+    private String formationMatch = "不明";
+
+    /** 索敵状態（味方・敵） */
+    private String sakuteki[];
+
+    /** 制空状態（味方・敵） */
+    private String seiku;
+
+    /** 支援攻撃のタイプ */
+    private String supportType;
+
+    /** 接触（味方・敵） */
+    public boolean[] touchPlane;
+
+    /** 損害率（味方・敵） */
+    private double[] damageRate;
+
+    /** 攻撃シーケンス */
+    private AirBattleDto air = null;
+    private List<BattleAtackDto> support = null;
+    private AirBattleDto air2 = null;
+    private List<BattleAtackDto> opening = null;
+    private List<BattleAtackDto> hougeki = null;
+    private List<BattleAtackDto> hougeki1 = null;
+    private List<BattleAtackDto> raigeki = null;
+    private List<BattleAtackDto> hougeki2 = null;
+    private List<BattleAtackDto> hougeki3 = null;
 
     /**
      * コンストラクター
@@ -122,36 +154,20 @@ public final class BattleDto extends AbstractDto {
         int numEships = this.enemy.size();
 
         JsonArray eSlots = object.getJsonArray("api_eSlot");
-        for (int i = 0; i < eSlots.size(); i++) {
+        JsonArray eParams = object.getJsonArray("api_eParam");
+        for (int i = 0; i < this.enemy.size(); i++) {
             JsonArray eSlot = eSlots.getJsonArray(i);
             ItemDto[] slot = new ItemDto[5];
             for (int j = 0; j < eSlot.size(); j++) {
                 slot[j] = Item.get(eSlot.getInt(j));
             }
             this.enemySlot.add(slot);
-        }
-
-        String fFormation;
-        String eFormation;
-        if (object.containsKey("api_formation")) {
-            JsonArray formation = object.getJsonArray("api_formation");
-            switch (formation.get(0).getValueType()) {
-            case NUMBER:
-                fFormation = toFormation(formation.getInt(0));
-                break;
-            default:
-                fFormation = toFormation(Integer.parseInt(formation.getString(0)));
+            JsonArray eParam = eParams.getJsonArray(i);
+            int[] param = new int[4];
+            for (int j = 0; j < eParam.size(); j++) {
+                param[j] = eParam.getInt(j);
             }
-            switch (formation.get(1).getValueType()) {
-            case NUMBER:
-                eFormation = toFormation(formation.getInt(1));
-                break;
-            default:
-                eFormation = toFormation(Integer.parseInt(formation.getString(1)));
-            }
-        } else {
-            fFormation = "陣形不明";
-            eFormation = "陣形不明";
+            this.enemyParam.add(param);
         }
 
         // このマスでの最初の戦闘がこれでない場合は、その時の値を取得
@@ -161,8 +177,12 @@ public final class BattleDto extends AbstractDto {
             this.startFriendHpCombined = firstBattle.startFriendHpCombined;
             this.friendGaugeMax = firstBattle.friendGaugeMax;
             this.enemyGaugeMax = firstBattle.enemyGaugeMax;
-            fFormation = firstBattle.friendFormation;
-            eFormation = firstBattle.enemyFormation;
+            this.friendFormation = firstBattle.friendFormation;
+            this.enemyFormation = firstBattle.enemyFormation;
+            this.formationMatch = firstBattle.formationMatch;
+            this.sakuteki = firstBattle.sakuteki;
+            this.seiku = firstBattle.seiku;
+            this.supportType = firstBattle.supportType;
         }
         else {
             this.startFriendHp = new int[numFships];
@@ -183,8 +203,44 @@ public final class BattleDto extends AbstractDto {
             this.nowFriendHpCombined = null;
             this.maxFriendHpCombined = null;
         }
-        this.friendFormation = fFormation;
-        this.enemyFormation = eFormation;
+
+        // 陣形
+        if (object.containsKey("api_formation")) {
+            JsonArray formation = object.getJsonArray("api_formation");
+            switch (formation.get(0).getValueType()) {
+            case NUMBER:
+                this.friendFormation = toFormation(formation.getInt(0));
+                break;
+            default:
+                this.friendFormation = toFormation(Integer.parseInt(formation.getString(0)));
+            }
+            switch (formation.get(1).getValueType()) {
+            case NUMBER:
+                this.enemyFormation = toFormation(formation.getInt(1));
+                break;
+            default:
+                this.enemyFormation = toFormation(Integer.parseInt(formation.getString(1)));
+            }
+            this.formationMatch = toMatch(formation.getInt(2));
+        }
+
+        // 索敵
+        JsonArray jsonSearch = object.getJsonArray("api_search");
+        if (jsonSearch != null) {
+            this.sakuteki = new String[] {
+                    toSearch(jsonSearch.getInt(0)),
+                    toSearch(jsonSearch.getInt(1))
+            };
+        }
+
+        // 接触
+        JsonArray jsonTouchPlane = object.getJsonArray("api_touch_plane");
+        if (jsonTouchPlane != null) {
+            this.touchPlane = new boolean[] {
+                    (jsonTouchPlane.getInt(0) != -1),
+                    (jsonTouchPlane.getInt(1) != -1)
+            };
+        }
 
         // この戦闘の開始前HPを取得
         for (int i = 1; i < nowhps.size(); i++) {
@@ -219,17 +275,16 @@ public final class BattleDto extends AbstractDto {
             }
         }
 
-        // ダメージ計算 //
+        // 攻撃シーケンスを読み取る //
 
         // 航空戦（通常）
         JsonObject kouku = object.getJsonObject("api_kouku");
-        if (kouku != null)
-            this.doKouku(kouku.get("api_stage3"), isCombined ? kouku.get("api_stage3_combined") : null);
-
-        // 航空戦（連合艦隊のみ？）
-        JsonObject kouku2 = object.getJsonObject("api_kouku2");
-        if (kouku2 != null)
-            this.doKouku(kouku2.get("api_stage3"), isCombined ? kouku2.get("api_stage3_combined") : null);
+        if (kouku != null) {
+            this.air = new AirBattleDto(kouku, isCombined);
+            // 航空戦がある場合の接触はここにある
+            this.touchPlane = this.air.touchPlane;
+            this.seiku = toSeiku(this.air.seiku);
+        }
 
         // 支援艦隊
         JsonNumber support_flag = object.getJsonNumber("api_support_flag");
@@ -240,25 +295,48 @@ public final class BattleDto extends AbstractDto {
                 if (support_hourai != null) {
                     JsonArray edam = support_hourai.getJsonArray("api_damage");
                     if (edam != null) {
-                        for (int i = 1; i <= this.enemy.size(); i++) {
-                            this.nowEnemyHp[i - 1] -= edam.getJsonNumber(i).intValue();
-                        }
+                        this.support = BattleAtackDto.makeSupport(edam);
                     }
                 }
             }
+            this.supportType = toSupport(support_flag.intValue());
+        }
+        else {
+            this.supportType = "";
         }
 
+        // 航空戦（連合艦隊のみ？）
+        JsonObject kouku2 = object.getJsonObject("api_kouku2");
+        if (kouku2 != null)
+            this.air2 = new AirBattleDto(kouku2, isCombined);
+
         // 開幕
-        this.doRaigeki(object.get("api_opening_atack"), this.isCombined());
+        this.opening = BattleAtackDto.makeRaigeki(object.get("api_opening_atack"), this.isCombined());
 
         // 砲撃
-        this.doHougeki(object.get("api_hougeki"), (this.isCombined() && isNight)); // 夜戦
-        this.doHougeki(object.get("api_hougeki1"), this.isCombined());
-        this.doHougeki(object.get("api_hougeki2"), false);
-        this.doHougeki(object.get("api_hougeki3"), false);
+        this.hougeki = BattleAtackDto.makeHougeki(object.get("api_hougeki"), (this.isCombined() && isNight)); // 夜戦
+        this.hougeki1 = BattleAtackDto.makeHougeki(object.get("api_hougeki1"), this.isCombined());
 
         // 雷撃
-        this.doRaigeki(object.get("api_raigeki"), this.isCombined());
+        this.raigeki = BattleAtackDto.makeRaigeki(object.get("api_raigeki"), this.isCombined());
+
+        // 砲撃（連合艦隊用）
+        this.hougeki2 = BattleAtackDto.makeHougeki(object.get("api_hougeki2"), false);
+        this.hougeki3 = BattleAtackDto.makeHougeki(object.get("api_hougeki3"), false);
+
+        // ダメージを反映 //
+
+        if (this.air != null)
+            this.doAtack(this.air.atacks);
+        this.doAtack(this.support);
+        if (this.air2 != null)
+            this.doAtack(this.air2.atacks);
+        this.doAtack(this.opening);
+        this.doAtack(this.hougeki);
+        this.doAtack(this.hougeki1);
+        this.doAtack(this.raigeki);
+        this.doAtack(this.hougeki2);
+        this.doAtack(this.hougeki3);
 
         // HP0以下を0にする
         for (int i = 0; i < numFships; i++) {
@@ -278,14 +356,6 @@ public final class BattleDto extends AbstractDto {
 
         // 判定を計算
         this.rank = this.calcResultRank();
-    }
-
-    private static void dockToList(DockDto dock, List<ShipDto> array) {
-        List<ShipDto> dock_ships = dock.getShips();
-        for (int i = 0; i < dock_ships.size(); i++) {
-            ShipDto ship = dock_ships.get(i);
-            array.add(ship);
-        }
     }
 
     // 勝利判定 //
@@ -326,8 +396,13 @@ public final class BattleDto extends AbstractDto {
         int friendSunk = (numFships + numFshipsCombined) - friendNowShips;
         int enemySunk = numEships - enemyNowShips;
 
-        double enemyGaugeRate = (double) enemyGauge / this.enemyGaugeMax;
-        double friendGaugeRate = (double) friendGauge / this.friendGaugeMax;
+        this.damageRate = new double[] {
+                (double) friendGauge / this.friendGaugeMax,
+                (double) enemyGauge / this.enemyGaugeMax
+        };
+
+        double friendGaugeRate = this.getDamageRate()[0];
+        double enemyGaugeRate = this.getDamageRate()[1];
         // 1.1
         boolean equalOrMore = (1.095 * enemyGaugeRate) >= friendGaugeRate;
         boolean equalOrMore1 = (1.12 * enemyGaugeRate) >= friendGaugeRate;
@@ -397,8 +472,8 @@ public final class BattleDto extends AbstractDto {
         // 敵に与えたダメージが一定以上 and 戦果ゲージが1.0倍以上
         if (enemyGauge > 0) {
             if (equalOrMore) {
-            return ResultRank.C;
-        }
+                return ResultRank.C;
+            }
             else if (equalOrMore1) {
                 return ResultRank.D_OR_C;
             }
@@ -408,97 +483,29 @@ public final class BattleDto extends AbstractDto {
             return ResultRank.E;
         }
         // 残りはD
-            return ResultRank.D;
-        }
-
-    private void doKouku(JsonValue raigeki, JsonValue combined) {
-        if ((raigeki == null) || (raigeki == JsonValue.NULL))
-            return;
-
-        JsonObject raigeki_obj = (JsonObject) raigeki;
-        JsonArray fdam = raigeki_obj.getJsonArray("api_fdam");
-        JsonArray edam = raigeki_obj.getJsonArray("api_edam");
-        int numFships = this.nowFriendHp.length;
-        int numFshipsCombined = (this.nowFriendHpCombined != null) ?
-                this.nowFriendHpCombined.length : 0;
-        int numEships = this.enemy.size();
-        JsonArray fdamCombined = null;
-        if ((combined != null) && (combined != JsonValue.NULL)) {
-            fdamCombined = ((JsonObject) combined).getJsonArray("api_fdam");
-        }
-        for (int i = 1; i <= 6; i++) {
-            if (i <= numFships)
-                this.nowFriendHp[i - 1] -= fdam.getInt(i);
-            if (i <= numEships)
-                this.nowEnemyHp[i - 1] -= edam.getInt(i);
-            if ((fdamCombined != null) && (i <= numFshipsCombined))
-                this.nowFriendHpCombined[i - 1] -= fdamCombined.getInt(i);
-        }
+        return ResultRank.D;
     }
 
-    private void doRaigeki(JsonValue raigeki, boolean second) {
-        if ((raigeki == null) || (raigeki == JsonValue.NULL))
+    // ダメージを反映
+    private void doAtack(List<BattleAtackDto> seq) {
+        if (seq == null)
             return;
 
-        JsonObject raigeki_obj = (JsonObject) raigeki;
-        JsonArray fdam = raigeki_obj.getJsonArray("api_fdam");
-        JsonArray edam = raigeki_obj.getJsonArray("api_edam");
-        int[] targetFriendHp = second ? this.nowFriendHpCombined : this.nowFriendHp;
-        for (int i = 1; i <= 6; i++) {
-            if (i <= targetFriendHp.length)
-                targetFriendHp[i - 1] -= fdam.getInt(i);
-            if (i <= this.nowEnemyHp.length)
-                this.nowEnemyHp[i - 1] -= edam.getInt(i);
-        }
-    }
-
-    private ArrayList<Integer> listupDamage(JsonArray damage_list) {
-        ArrayList<Integer> list = new ArrayList<Integer>();
-
-        for (JsonValue atack : damage_list) {
-            switch (atack.getValueType()) {
-            case NUMBER:
-                list.add(((JsonNumber) atack).intValue());
-                break;
-            case ARRAY:
-                for (JsonValue ship : (JsonArray) atack) {
-                    list.add(((JsonNumber) ship).intValue());
+        for (BattleAtackDto dto : seq) {
+            for (int i = 0; i < dto.target.length; ++i) {
+                int target = dto.target[i];
+                int damage = dto.damage[i];
+                if (dto.friendAtack) {
+                    this.nowEnemyHp[target] -= damage;
                 }
-                break;
-            default: // あり得ない
-                break;
-            }
-        }
-
-        return list;
-    }
-
-    /**
-     * api_hougeki* を処理する
-     * @param hougeki
-     */
-    private void doHougeki(JsonValue hougeki, boolean second) {
-        if ((hougeki == null) || (hougeki == JsonValue.NULL))
-            return;
-
-        JsonObject hougeki_obj = (JsonObject) hougeki;
-        ArrayList<Integer> df_list = this.listupDamage(hougeki_obj.getJsonArray("api_df_list"));
-        ArrayList<Integer> damage = this.listupDamage(hougeki_obj.getJsonArray("api_damage"));
-
-        if (df_list.size() != damage.size()) {
-            throw new IndexOutOfBoundsException("df_list と damage の長さが合いません");
-        }
-
-        int[] targetFriendHp = second ? this.nowFriendHpCombined : this.nowFriendHp;
-        for (int i = 0; i < df_list.size(); ++i) {
-            int shipIdx = df_list.get(i);
-            if (shipIdx == -1)
-                continue;
-            if (shipIdx <= 6) {
-                targetFriendHp[shipIdx - 1] -= damage.get(i);
-            }
-            else {
-                this.nowEnemyHp[shipIdx - 1 - 6] -= damage.get(i);
+                else {
+                    if (target < 6) {
+                        this.nowFriendHp[target] -= damage;
+                    }
+                    else {
+                        this.nowFriendHpCombined[target - 6] -= damage;
+                    }
+                }
             }
         }
     }
@@ -540,6 +547,70 @@ public final class BattleDto extends AbstractDto {
         return formation;
     }
 
+    private static String toMatch(int id) {
+        switch (id) {
+        case 1:
+            return "同航戦";
+        case 2:
+            return "反航戦";
+        case 3:
+            return "Ｔ字有利";
+        case 4:
+            return "Ｔ字不利";
+        default:
+            return "不明(" + id + ")";
+        }
+    }
+
+    private static String toSupport(int id) {
+        switch (id) {
+        case 1:
+            return "航空支援";
+        case 2:
+            return "支援射撃";
+        case 3:
+            return "支援長距離雷撃";
+        default:
+            return "不明(" + id + ")";
+        }
+    }
+
+    private static String toSeiku(int id) {
+        switch (id) {
+        case 1:
+            return "制空権確保";
+        case 2:
+            return "航空優勢";
+        case 0:
+            return "航空互角";
+        case 3:
+            return "航空劣勢";
+        case 4:
+            return "制空権喪失";
+        default:
+            return "不明(" + id + ")";
+        }
+    }
+
+    private static String toSearch(int id) {
+        switch (id) {
+        case 1:
+            return "発見!";
+        case 2:
+            return "発見!索敵機未帰還機あり";
+        case 3:
+            return "発見できず…索敵機未帰還機あり";
+        case 4:
+            return "発見できず…";
+        case 5:
+            return "発見!(索敵機なし)";
+        case 6:
+            return "なし";
+        default:
+            return "不明(" + id + ")";
+        }
+    }
+
     /**
      * 味方艦隊を取得します。
      * @return 味方艦隊
@@ -570,6 +641,10 @@ public final class BattleDto extends AbstractDto {
      */
     public List<ItemDto[]> getEnemySlot() {
         return this.enemySlot;
+    }
+
+    public List<int[]> getEnemyParam() {
+        return this.enemyParam;
     }
 
     /**
@@ -628,6 +703,26 @@ public final class BattleDto extends AbstractDto {
         return this.enemyFormation;
     }
 
+    public String getFormationMatch() {
+        return this.formationMatch;
+    }
+
+    public String[] getSakuteki() {
+        return this.sakuteki;
+    }
+
+    public String getSeiku() {
+        return this.seiku;
+    }
+
+    public String getSupportType() {
+        return this.supportType;
+    }
+
+    public boolean[] getTouchPlane() {
+        return this.air == null ? new boolean[] { false, false } : this.air.touchPlane;
+    }
+
     /**
      * @return rank
      */
@@ -644,6 +739,40 @@ public final class BattleDto extends AbstractDto {
 
     public boolean isCombined() {
         return (this.nowFriendHpCombined != null);
+    }
+
+    public EnemyData getEnemyData(int enemyId, String enemyName) {
+        String[] enemyShips = new String[] { "", "", "", "", "", "" };
+        for (int i = 0; i < this.enemy.size(); ++i) {
+            enemyShips[i] = this.enemy.get(i).getEnemyShipName();
+        }
+        return new EnemyData(enemyId, enemyName, enemyShips, this.enemyFormation);
+    }
+
+    private BattleAtackDto[] toArray(List<BattleAtackDto> list) {
+        return list.toArray(new BattleAtackDto[list.size()]);
+    }
+
+    public BattleAtackDto[][] getAtackSequence() {
+        return new BattleAtackDto[][] {
+                ((this.air == null) || (this.air.atacks == null)) ? null :
+                        this.toArray(this.air.atacks),
+                this.support == null ? null : this.toArray(this.support),
+                ((this.air2 == null) || (this.air2.atacks == null)) ? null :
+                        this.toArray(this.air2.atacks),
+                this.opening == null ? null : this.toArray(this.opening),
+                this.hougeki == null ? null : this.toArray(this.hougeki),
+                this.hougeki1 == null ? null : this.toArray(this.hougeki1),
+                this.raigeki == null ? null : this.toArray(this.raigeki),
+                this.hougeki2 == null ? null : this.toArray(this.hougeki2),
+                this.hougeki3 == null ? null : this.toArray(this.hougeki3),
+        };
+    }
+
+    public AirBattleDto[] getAirBattleDto() {
+        return new AirBattleDto[] {
+                this.air, this.air2
+        };
     }
 
     public String getRankCalcInfo() {
@@ -689,5 +818,26 @@ public final class BattleDto extends AbstractDto {
                 "]" +
                 //"(" + (enemyGaugeRate / friendGaugeRate) + "/" + (friendGaugeRate / enemyGaugeRate) + ") " +
                 "判定:" + this.rank.rank();
+    }
+
+    /**
+     * @return damageRate
+     */
+    public double[] getDamageRate() {
+        return this.damageRate;
+    }
+
+    /**
+     * @return startFriendHp
+     */
+    public int[] getStartFriendHp() {
+        return this.startFriendHp;
+    }
+
+    /**
+     * @return startFriendHpCombined
+     */
+    public int[] getStartFriendHpCombined() {
+        return this.startFriendHpCombined;
     }
 }

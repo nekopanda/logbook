@@ -258,7 +258,6 @@ public class FleetComposite extends Composite {
         this.getShell().setRedraw(false);
 
         this.dock = dock;
-        this.dock.setUpdate(false);
         this.state.set(WARN, false);
         this.state.set(FATAL, false);
         this.cond = 49;

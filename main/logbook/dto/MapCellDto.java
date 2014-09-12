@@ -5,6 +5,10 @@ package logbook.dto;
 
 import javax.json.JsonObject;
 
+import logbook.config.MasterDataConfig;
+import logbook.internal.EnemyData;
+import logbook.internal.MasterData;
+
 /**
  * @author Nekopanda
  *
@@ -23,6 +27,8 @@ public class MapCellDto {
     /** ボスマス */
     private int bosscellNo;
 
+    private EnemyData enemyData;
+
     public MapCellDto(JsonObject object) {
         this.map[0] = object.getInt("api_maparea_id");
         this.map[1] = object.getInt("api_mapinfo_no");
@@ -36,11 +42,19 @@ public class MapCellDto {
         }
         this.colorNo = object.getInt("api_color_no");
         this.bosscellNo = object.getInt("api_bosscell_no");
+        this.enemyData = EnemyData.get(this.enemyId);
     }
 
-    @Override
-    public String toString() {
+    private String toString(boolean detailed) {
+        int id = (this.map[0] * 10) + this.map[1];
         String ret = "マップ:" + this.map[0] + "-" + this.map[1] + " セル:" + this.map[2];
+        if (detailed) {
+            MasterData.MapInfoDto mapInfo = MasterDataConfig.get().getMapinfo().get(id);
+            if (mapInfo != null) {
+                String mapName = mapInfo.getName();
+                ret = "マップ: " + mapName + "(" + this.map[0] + "-" + this.map[1] + ") セル:" + this.map[2];
+            }
+        }
         if (this.enemyId != -1) {
             if (this.isBoss()) {
                 ret += " (ボス)";
@@ -48,6 +62,15 @@ public class MapCellDto {
             ret += " e_id:" + this.enemyId;
         }
         return ret;
+    }
+
+    @Override
+    public String toString() {
+        return this.toString(false);
+    }
+
+    public String detailedString() {
+        return this.toString(true);
     }
 
     /**
@@ -108,6 +131,20 @@ public class MapCellDto {
 
     public boolean isBoss() {
         return (this.bosscellNo == this.map[2]) || (this.colorNo == 5);
+    }
+
+    /**
+     * @return enemyData
+     */
+    public EnemyData getEnemyData() {
+        return this.enemyData;
+    }
+
+    /**
+     * @param enemyData セットする enemyData
+     */
+    public void setEnemyData(EnemyData enemyData) {
+        this.enemyData = enemyData;
     }
 
 }

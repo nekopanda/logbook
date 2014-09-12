@@ -2,6 +2,8 @@ package logbook.dto;
 
 import logbook.internal.ShipStyle;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * 艦娘の名前と種別を表します
  *
@@ -251,5 +253,13 @@ public final class ShipInfoDto extends AbstractDto {
      */
     public void setMaxeq(int[] maxeq) {
         this.maxeq = maxeq;
+    }
+
+    public String getEnemyShipName() {
+        String name = this.name;
+        if (!StringUtils.isEmpty(this.flagship)) {
+            name += " " + this.flagship;
+        }
+        return name;
     }
 }
