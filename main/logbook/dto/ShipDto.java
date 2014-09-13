@@ -17,6 +17,8 @@ import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.internal.ExpTable;
 import logbook.internal.Ship;
+import logbook.proto.LogbookEx.ShipDtoPb;
+import logbook.proto.Tag;
 
 /**
  * 艦娘を表します
@@ -31,117 +33,155 @@ public final class ShipDto extends AbstractDto {
     private final Calendar condClearTime = Calendar.getInstance();
 
     /** 艦娘個人を識別するID */
+    @Tag(1)
     private final long id;
 
     /** キャラクタ識別ID（その艦の最終形の艦ID） */
+    @Tag(2)
     private final long charId;
 
     /** 鍵付き */
+    @Tag(3)
     private final boolean locked;
 
     /** 艦隊ID */
+    @Tag(4)
     private String fleetid = "";
 
     /** 名前 */
+    @Tag(5)
     private final String name;
 
     /** 艦種 */
+    @Tag(6)
     private final String type;
 
     /** Lv */
+    @Tag(7)
     private final long lv;
 
     /** 疲労 */
+    @Tag(8)
     private final long cond;
 
     /** 入渠時間 */
+    @Tag(9)
     private final long docktime;
 
     /** 修復資材 燃料 */
+    @Tag(10)
     private final long dockfuel;
 
     /** 修復資材 鋼材 */
+    @Tag(11)
     private final long dockmetal;
 
     /** 残弾 */
+    @Tag(12)
     private int bull;
 
     /** 弾Max */
+    @Tag(13)
     private final int bullmax;
 
     /** 残燃料 */
+    @Tag(14)
     private int fuel;
 
     /** 燃料Max */
+    @Tag(15)
     private final int fuelmax;
 
     /** 経験値 */
+    @Tag(16)
     private final long exp;
 
     /** HP */
+    @Tag(17)
     private long nowhp;
 
     /** MaxHP */
+    @Tag(18)
     private final long maxhp;
 
     /** 搭載可能装備数 */
+    @Tag(19)
     private final int slotnum;
 
     /** 装備 */
+    @Tag(20)
     private final List<Long> slot;
 
     /** 艦載機の搭載数 */
+    @Tag(21)
     private final List<Integer> onslot;
 
     /** 火力 */
+    @Tag(22)
     private final long karyoku;
 
     /** 火力(最大) */
+    @Tag(23)
     private final long karyokuMax;
 
     /** 雷装 */
+    @Tag(24)
     private final long raisou;
 
     /** 雷装(最大) */
+    @Tag(25)
     private final long raisouMax;
 
     /** 対空 */
+    @Tag(26)
     private final long taiku;
 
     /** 対空(最大) */
+    @Tag(27)
     private final long taikuMax;
 
     /** 装甲 */
+    @Tag(28)
     private final long soukou;
 
     /** 装甲(最大) */
+    @Tag(29)
     private final long soukouMax;
 
     /** 回避 */
+    @Tag(30)
     private final long kaihi;
 
     /** 回避(最大) */
+    @Tag(31)
     private final long kaihiMax;
 
     /** 対潜 */
+    @Tag(32)
     private final long taisen;
 
     /** 対潜(最大) */
+    @Tag(33)
     private final long taisenMax;
 
     /** 索敵 */
+    @Tag(34)
     private final long sakuteki;
 
     /** 索敵(最大) */
+    @Tag(35)
     private final long sakutekiMax;
 
     /** 運 */
+    @Tag(36)
     private final long lucky;
 
     /** 運(最大) */
+    @Tag(37)
     private final long luckyMax;
 
     /** 艦娘 */
+    @Tag(38)
     private final ShipInfoDto shipInfo;
 
     /** */
@@ -220,6 +260,65 @@ public final class ShipDto extends AbstractDto {
         if (this.cond < 49) {
             this.condClearTime.add(Calendar.MINUTE, Math.max(49 - (int) this.cond, 3));
         }
+    }
+
+    public ShipDtoPb toProto() {
+        ShipDtoPb.Builder builder = ShipDtoPb.newBuilder();
+        builder.setId(this.id);
+        builder.setCharId(this.charId);
+        builder.setLocked(this.locked);
+        if (this.fleetid != null) {
+            builder.setFleetid(this.fleetid);
+        }
+        if (this.name != null) {
+            builder.setName(this.name);
+        }
+        if (this.type != null) {
+            builder.setType(this.type);
+        }
+        builder.setLv(this.lv);
+        builder.setCond(this.cond);
+        builder.setDocktime(this.docktime);
+        builder.setDockfuel(this.dockfuel);
+        builder.setDockmetal(this.dockmetal);
+        builder.setBull(this.bull);
+        builder.setBullmax(this.bullmax);
+        builder.setFuel(this.fuel);
+        builder.setFuelmax(this.fuelmax);
+        builder.setExp(this.exp);
+        builder.setNowhp(this.nowhp);
+        builder.setMaxhp(this.maxhp);
+        builder.setSlotnum(this.slotnum);
+        for (Long b : this.slot) {
+            if (b != null) {
+                builder.addSlot(b);
+            }
+        }
+        for (Integer b : this.onslot) {
+            if (b != null) {
+                builder.addOnslot(b);
+            }
+        }
+        builder.setKaryoku(this.karyoku);
+        builder.setKaryokuMax(this.karyokuMax);
+        builder.setRaisou(this.raisou);
+        builder.setRaisouMax(this.raisouMax);
+        builder.setTaiku(this.taiku);
+        builder.setTaikuMax(this.taikuMax);
+        builder.setSoukou(this.soukou);
+        builder.setSoukouMax(this.soukouMax);
+        builder.setKaihi(this.kaihi);
+        builder.setKaihiMax(this.kaihiMax);
+        builder.setTaisen(this.taisen);
+        builder.setTaisenMax(this.taisenMax);
+        builder.setSakuteki(this.sakuteki);
+        builder.setSakutekiMax(this.sakutekiMax);
+        builder.setLucky(this.lucky);
+        builder.setLuckyMax(this.luckyMax);
+        if (this.shipInfo != null) {
+            builder.setShipInfo(this.shipInfo.toProto());
+        }
+        return builder.build();
     }
 
     /**

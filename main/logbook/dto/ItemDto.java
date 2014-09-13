@@ -4,6 +4,8 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 
 import logbook.internal.ItemType;
+import logbook.proto.LogbookEx.ItemDtoPb;
+import logbook.proto.Tag;
 
 /**
  * 装備を表します
@@ -11,6 +13,7 @@ import logbook.internal.ItemType;
  */
 public final class ItemDto extends AbstractDto {
 
+    @Tag(1)
     private int id;
     /**
      * [0]: 大分類（砲、魚雷、艦載機、...）
@@ -18,26 +21,47 @@ public final class ItemDto extends AbstractDto {
      * [2]: 装備可能艦種別分類
      * [3]: 表示用の分類
      */
+    @Tag(2)
     private int[] type = new int[4];
+    @Tag(3)
     private int atap;
+    @Tag(4)
     private int bakk;
+    @Tag(5)
     private int baku;
+    @Tag(6)
     private int houg;
+    @Tag(7)
     private int houk;
+    @Tag(8)
     private int houm;
+    @Tag(9)
     private int leng;
+    @Tag(10)
     private int luck;
+    @Tag(11)
     private String name;
+    @Tag(12)
     private int raig;
+    @Tag(13)
     private int raik;
+    @Tag(14)
     private int raim;
+    @Tag(15)
     private int rare;
+    @Tag(16)
     private int sakb;
+    @Tag(17)
     private int saku;
+    @Tag(18)
     private int soku;
+    @Tag(19)
     private int souk;
+    @Tag(20)
     private int taik;
+    @Tag(21)
     private int tais;
+    @Tag(22)
     private int tyku;
 
     /**
@@ -134,6 +158,37 @@ public final class ItemDto extends AbstractDto {
         this.taik = taik;
         this.tais = tais;
         this.tyku = tyku;
+    }
+
+    public ItemDtoPb toProto() {
+        ItemDtoPb.Builder builder = ItemDtoPb.newBuilder();
+        builder.setId(this.id);
+        for (int b : this.type) {
+            builder.addType(b);
+        }
+        builder.setAtap(this.atap);
+        builder.setBakk(this.bakk);
+        builder.setBaku(this.baku);
+        builder.setHoug(this.houg);
+        builder.setHouk(this.houk);
+        builder.setHoum(this.houm);
+        builder.setLeng(this.leng);
+        builder.setLuck(this.luck);
+        if (this.name != null) {
+            builder.setName(this.name);
+        }
+        builder.setRaig(this.raig);
+        builder.setRaik(this.raik);
+        builder.setRaim(this.raim);
+        builder.setRare(this.rare);
+        builder.setSakb(this.sakb);
+        builder.setSaku(this.saku);
+        builder.setSoku(this.soku);
+        builder.setSouk(this.souk);
+        builder.setTaik(this.taik);
+        builder.setTais(this.tais);
+        builder.setTyku(this.tyku);
+        return builder.build();
     }
 
     /**

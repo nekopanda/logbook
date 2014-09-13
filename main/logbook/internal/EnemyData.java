@@ -16,6 +16,8 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import logbook.constants.AppConstants;
+import logbook.proto.LogbookEx.EnemyDataPb;
+import logbook.proto.Tag;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
@@ -27,9 +29,13 @@ public class EnemyData {
 
     private static Map<Integer, EnemyData> ENEMY = new TreeMap<Integer, EnemyData>();
 
+    @Tag(1)
     private final int enemyId;
+    @Tag(2)
     private final String enemyName;
+    @Tag(3)
     private final String[] enemyShips;
+    @Tag(4)
     private final String formation;
 
     public EnemyData(int enemyId, String enemyName, String[] enemyShips, String formation) {
@@ -37,6 +43,23 @@ public class EnemyData {
         this.enemyName = enemyName;
         this.enemyShips = enemyShips;
         this.formation = formation;
+    }
+
+    public EnemyDataPb toProto() {
+        EnemyDataPb.Builder builder = EnemyDataPb.newBuilder();
+        builder.setEnemyId(this.enemyId);
+        if (this.enemyName != null) {
+            builder.setEnemyName(this.enemyName);
+        }
+        for (String b : this.enemyShips) {
+            if (b != null) {
+                builder.addEnemyShips(b);
+            }
+        }
+        if (this.formation != null) {
+            builder.setFormation(this.formation);
+        }
+        return builder.build();
     }
 
     /**

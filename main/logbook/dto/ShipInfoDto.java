@@ -1,6 +1,8 @@
 package logbook.dto;
 
 import logbook.internal.ShipStyle;
+import logbook.proto.LogbookEx.ShipInfoDtoPb;
+import logbook.proto.Tag;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -14,36 +16,47 @@ public final class ShipInfoDto extends AbstractDto {
     public static final ShipInfoDto EMPTY = new ShipInfoDto();
 
     /** 名前 */
+    @Tag(2)
     private String name;
 
     /** 艦ID */
+    @Tag(1)
     private int shipId;
 
     /** 艦種 */
+    @Tag(3)
     private int stype;
 
     /** 艦種 */
+    @Tag(4)
     private String type;
 
     /** 改レベル */
+    @Tag(5)
     private int afterlv;
 
     /** 改造後の艦 */
+    @Tag(6)
     private int aftershipid;
 
     /** flagshipもしくはelite (敵艦のみ) */
+    @Tag(7)
     private String flagship;
 
     /** 弾 */
+    @Tag(8)
     private int maxBull;
 
     /** 燃料 */
+    @Tag(9)
     private int maxFuel;
 
     /** 近代化改修時のup項目 */
+    @Tag(10)
     private int[] powup = new int[4];
 
     /** スロット数最大 */
+    @Tag(11)
     private int[] maxeq = new int[5];
 
     /**
@@ -81,6 +94,32 @@ public final class ShipInfoDto extends AbstractDto {
         this.maxFuel = maxFuel;
         this.powup = powup;
         this.maxeq = maxeq;
+    }
+
+    public ShipInfoDtoPb toProto() {
+        ShipInfoDtoPb.Builder builder = ShipInfoDtoPb.newBuilder();
+        if (this.name != null) {
+            builder.setName(this.name);
+        }
+        builder.setShipId(this.shipId);
+        builder.setStype(this.stype);
+        if (this.type != null) {
+            builder.setType(this.type);
+        }
+        builder.setAfterlv(this.afterlv);
+        builder.setAftershipid(this.aftershipid);
+        if (this.flagship != null) {
+            builder.setFlagship(this.flagship);
+        }
+        builder.setMaxBull(this.maxBull);
+        builder.setMaxFuel(this.maxFuel);
+        for (int b : this.powup) {
+            builder.addPowup(b);
+        }
+        for (int b : this.maxeq) {
+            builder.addMaxeq(b);
+        }
+        return builder.build();
     }
 
     /**

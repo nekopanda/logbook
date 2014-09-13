@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import logbook.proto.LogbookEx.DockDtoPb;
+import logbook.proto.Tag;
+
 /**
  * 艦隊のドックを表します
  *
@@ -11,12 +14,15 @@ import java.util.List;
 public final class DockDto extends AbstractDto {
 
     /** ドックID */
+    @Tag(1)
     private final String id;
 
     /** 艦隊名 */
+    @Tag(2)
     private final String name;
 
     /** 艦娘達 */
+    @Tag(3)
     private final List<ShipDto> ships = new ArrayList<ShipDto>();
 
     /** 更新フラグ */
@@ -28,6 +34,22 @@ public final class DockDto extends AbstractDto {
     public DockDto(String id, String name) {
         this.id = id;
         this.name = name;
+    }
+
+    public DockDtoPb toProto() {
+        DockDtoPb.Builder builder = DockDtoPb.newBuilder();
+        if (this.id != null) {
+            builder.setId(this.id);
+        }
+        if (this.name != null) {
+            builder.setName(this.name);
+        }
+        for (ShipDto b : this.ships) {
+            if (b != null) {
+                builder.addShips(b.toProto());
+            }
+        }
+        return builder.build();
     }
 
     /**

@@ -8,6 +8,8 @@ import javax.json.JsonObject;
 import logbook.config.MasterDataConfig;
 import logbook.internal.EnemyData;
 import logbook.internal.MasterData;
+import logbook.proto.LogbookEx.MapCellDtoPb;
+import logbook.proto.Tag;
 
 /**
  * @author Nekopanda
@@ -16,17 +18,18 @@ import logbook.internal.MasterData;
 public class MapCellDto {
 
     /** マップ */
+    @Tag(1)
     private int[] map = new int[3];
-
     /** 敵ID */
+    @Tag(2)
     private int enemyId;
-
     /** マスの色 */
+    @Tag(3)
     private int colorNo;
-
     /** ボスマス */
+    @Tag(4)
     private int bosscellNo;
-
+    @Tag(5)
     private EnemyData enemyData;
 
     public MapCellDto(JsonObject object) {
@@ -43,6 +46,20 @@ public class MapCellDto {
         this.colorNo = object.getInt("api_color_no");
         this.bosscellNo = object.getInt("api_bosscell_no");
         this.enemyData = EnemyData.get(this.enemyId);
+    }
+
+    public MapCellDtoPb toProto() {
+        MapCellDtoPb.Builder builder = MapCellDtoPb.newBuilder();
+        for (int b : this.map) {
+            builder.addMap(b);
+        }
+        builder.setEnemyId(this.enemyId);
+        builder.setColorNo(this.colorNo);
+        builder.setBosscellNo(this.bosscellNo);
+        if (this.enemyData != null) {
+            builder.setEnemyData(this.enemyData.toProto());
+        }
+        return builder.build();
     }
 
     private String toString(boolean detailed) {

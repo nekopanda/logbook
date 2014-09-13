@@ -171,7 +171,7 @@ public final class CreateReportLogic {
             BattleResultDto item = results.get(i);
             body.add(new Object[] { Integer.toString(i + 1),
                     new SimpleDateFormat(AppConstants.DATE_FORMAT).format(item.getBattleDate()), item.getQuestName(),
-                    item.getMapCellDto().toString(), item.getRank(), item.getEnemyName(), item.getDropType(),
+                    item.getMapCellNo(), item.getRank(), item.getEnemyName(), item.getDropType(),
                     item.getDropName() });
         }
         return toListStringArray(body);

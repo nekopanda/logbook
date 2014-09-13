@@ -114,7 +114,7 @@ public final class BattleDto extends AbstractDto {
             default:
                 this.enemyFormation = toFormation(Integer.parseInt(formation.getString(1)));
             }
-            } else {
+        } else {
             this.friendFormation = "陣形不明";
             this.enemyFormation = "陣形不明";
         }

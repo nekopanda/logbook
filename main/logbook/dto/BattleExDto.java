@@ -16,6 +16,11 @@ import logbook.data.context.GlobalContext;
 import logbook.internal.EnemyData;
 import logbook.internal.Item;
 import logbook.internal.Ship;
+import logbook.proto.LogbookEx.BattleExDtoPb;
+import logbook.proto.LogbookEx.ItemDtoListPb;
+import logbook.proto.LogbookEx.PhasePb;
+import logbook.proto.LogbookEx.intListPb;
+import logbook.proto.Tag;
 
 /**
  * @author Nekopanda
@@ -24,113 +29,156 @@ import logbook.internal.Ship;
 public class BattleExDto extends AbstractDto {
 
     /** 日付 */
+    @Tag(1)
     private final Date battleDate;
 
     /** 味方艦隊 */
+    @Tag(2)
     private final List<DockDto> friends = new ArrayList<>();
 
     /** 敵艦隊 */
+    @Tag(3)
     private final List<ShipInfoDto> enemy = new ArrayList<>();
 
     /** 敵装備 */
+    @Tag(4)
     private final List<ItemDto[]> enemySlot = new ArrayList<>();
 
     /** 敵パラメータ */
+    @Tag(5)
     private final List<int[]> enemyParam = new ArrayList<>();
 
     /** 味方MaxHP */
+    @Tag(6)
     private int[] maxFriendHp;
 
+    @Tag(7)
     private int[] maxFriendHpCombined;
 
     /** 敵MaxHP */
+    @Tag(8)
     private int[] maxEnemyHp;
 
     /** 味方戦闘開始時HP */
+    @Tag(9)
     private int[] startFriendHp;
 
+    @Tag(10)
     private int[] startFriendHpCombined;
 
     /** 敵戦闘開始時HP */
+    @Tag(11)
     private int[] startEnemyHp;
 
     /** 戦闘前の味方総HP */
+    @Tag(12)
     private int friendGaugeMax = 0;
 
     /** 戦闘前の敵総HP */
+    @Tag(13)
     private int enemyGaugeMax = 0;
 
     /** 陣形（味方・敵） */
+    @Tag(14)
     private final String[] formation = new String[] { "陣形不明", "陣形不明" };
 
     /** 同航戦とか　*/
+    @Tag(15)
     private String formationMatch = "不明";
 
     /** 索敵状態（味方・敵） */
+    @Tag(16)
     private String sakuteki[];
 
     /** 海域名 */
+    @Tag(17)
     private String questName;
 
     /** ランク */
+    @Tag(18)
     private String rank;
 
     /** マス */
+    @Tag(19)
     private MapCellDto mapCellDto;
 
     /** 敵艦隊名 */
+    @Tag(20)
     private String enemyName;
 
     /** ドロップフラグ */
+    @Tag(21)
     private boolean dropFlag;
 
     /** 艦種 */
+    @Tag(22)
     private String dropType;
 
     /** 艦名 */
+    @Tag(23)
     private String dropName;
 
+    @Tag(24)
     private final List<Phase> phaseList = new ArrayList<Phase>();
 
     /////////////////////////////////////////////////
 
     public class Phase {
 
+        @Tag(1)
         private final BattlePhaseKind kind;
         /** 味方HP */
+        @Tag(2)
         private final int[] nowFriendHp;
 
+        @Tag(3)
         private final int[] nowFriendHpCombined;
 
         /** 敵HP */
+        @Tag(4)
         private final int[] nowEnemyHp;
 
         /** ランク */
+        @Tag(5)
         private final ResultRank estimatedRank;
 
         /** 夜戦 */
+        @Tag(6)
         private final boolean isNight;
 
         /** 支援攻撃のタイプ */
+        @Tag(7)
         private String supportType;
 
         /** 接触機（味方・敵） -1の場合は「接触なし」 */
+        @Tag(8)
         private int[] touchPlane;
 
+        @Tag(9)
         private String seiku;
 
         /** 損害率（味方・敵） */
+        @Tag(10)
         private double[] damageRate;
 
         /** 攻撃シーケンス */
+        @Tag(11)
         private AirBattleDto air = null;
+        @Tag(12)
         private AirBattleDto air2 = null;
+        @Tag(13)
         private List<BattleAtackDto> support = null;
+        @Tag(14)
         private List<BattleAtackDto> opening = null;
+        @Tag(15)
         private List<BattleAtackDto> raigeki = null;
+        @Tag(16)
         private List<BattleAtackDto> hougeki = null;
+        @Tag(17)
         private List<BattleAtackDto> hougeki1 = null;
+        @Tag(18)
         private List<BattleAtackDto> hougeki2 = null;
+        @Tag(19)
         private List<BattleAtackDto> hougeki3 = null;
 
         public Phase(JsonObject object, BattlePhaseKind kind,
@@ -244,6 +292,76 @@ public class BattleExDto extends AbstractDto {
 
             // 判定を計算
             this.estimatedRank = this.calcResultRank();
+        }
+
+        public PhasePb toProto() {
+            PhasePb.Builder builder = PhasePb.newBuilder();
+            builder.setKind(this.kind.toProto());
+            for (int b : this.nowFriendHp) {
+                builder.addNowFriendHp(b);
+            }
+            for (int b : this.nowFriendHpCombined) {
+                builder.addNowFriendHpCombined(b);
+            }
+            for (int b : this.nowEnemyHp) {
+                builder.addNowEnemyHp(b);
+            }
+            builder.setEstimatedRank(this.estimatedRank.toProto());
+            builder.setIsNight(this.isNight);
+            if (this.supportType != null) {
+                builder.setSupportType(this.supportType);
+            }
+            for (int b : this.touchPlane) {
+                builder.addTouchPlane(b);
+            }
+            if (this.seiku != null) {
+                builder.setSeiku(this.seiku);
+            }
+            for (double b : this.damageRate) {
+                builder.addDamageRate(b);
+            }
+            if (this.air != null) {
+                builder.setAir(this.air.toProto());
+            }
+            if (this.air2 != null) {
+                builder.setAir2(this.air2.toProto());
+            }
+            for (BattleAtackDto b : this.support) {
+                if (b != null) {
+                    builder.addSupport(b.toProto());
+                }
+            }
+            for (BattleAtackDto b : this.opening) {
+                if (b != null) {
+                    builder.addOpening(b.toProto());
+                }
+            }
+            for (BattleAtackDto b : this.raigeki) {
+                if (b != null) {
+                    builder.addRaigeki(b.toProto());
+                }
+            }
+            for (BattleAtackDto b : this.hougeki) {
+                if (b != null) {
+                    builder.addHougeki(b.toProto());
+                }
+            }
+            for (BattleAtackDto b : this.hougeki1) {
+                if (b != null) {
+                    builder.addHougeki1(b.toProto());
+                }
+            }
+            for (BattleAtackDto b : this.hougeki2) {
+                if (b != null) {
+                    builder.addHougeki2(b.toProto());
+                }
+            }
+            for (BattleAtackDto b : this.hougeki3) {
+                if (b != null) {
+                    builder.addHougeki3(b.toProto());
+                }
+            }
+            return builder.build();
         }
 
         // 勝利判定 //
@@ -610,6 +728,97 @@ public class BattleExDto extends AbstractDto {
 
     public BattleExDto() {
         this.battleDate = Calendar.getInstance().getTime();
+    }
+
+    public BattleExDtoPb toProto() {
+        BattleExDtoPb.Builder builder = BattleExDtoPb.newBuilder();
+        if (this.battleDate != null) {
+            builder.setBattleDate(this.battleDate.getTime());
+        }
+        for (DockDto b : this.friends) {
+            if (b != null) {
+                builder.addFriends(b.toProto());
+            }
+        }
+        for (ShipInfoDto b : this.enemy) {
+            if (b != null) {
+                builder.addEnemy(b.toProto());
+            }
+        }
+        for (ItemDto[] b : this.enemySlot) {
+            ItemDtoListPb.Builder builder1 = ItemDtoListPb.newBuilder();
+            for (ItemDto c : b) {
+                if (c != null) {
+                    builder1.addData(c.toProto());
+                }
+            }
+            builder.addEnemySlot(builder1.build());
+        }
+        for (int[] b : this.enemyParam) {
+            intListPb.Builder builder2 = intListPb.newBuilder();
+            for (int c : b) {
+                builder2.addData(c);
+            }
+            builder.addEnemyParam(builder2.build());
+        }
+        for (int b : this.maxFriendHp) {
+            builder.addMaxFriendHp(b);
+        }
+        for (int b : this.maxFriendHpCombined) {
+            builder.addMaxFriendHpCombined(b);
+        }
+        for (int b : this.maxEnemyHp) {
+            builder.addMaxEnemyHp(b);
+        }
+        for (int b : this.startFriendHp) {
+            builder.addStartFriendHp(b);
+        }
+        for (int b : this.startFriendHpCombined) {
+            builder.addStartFriendHpCombined(b);
+        }
+        for (int b : this.startEnemyHp) {
+            builder.addStartEnemyHp(b);
+        }
+        builder.setFriendGaugeMax(this.friendGaugeMax);
+        builder.setEnemyGaugeMax(this.enemyGaugeMax);
+        for (String b : this.formation) {
+            if (b != null) {
+                builder.addFormation(b);
+            }
+        }
+        if (this.formationMatch != null) {
+            builder.setFormationMatch(this.formationMatch);
+        }
+        for (String b : this.sakuteki) {
+            if (b != null) {
+                builder.addSakuteki(b);
+            }
+        }
+        if (this.questName != null) {
+            builder.setQuestName(this.questName);
+        }
+        if (this.rank != null) {
+            builder.setRank(this.rank);
+        }
+        if (this.mapCellDto != null) {
+            builder.setMapCellDto(this.mapCellDto.toProto());
+        }
+        if (this.enemyName != null) {
+            builder.setEnemyName(this.enemyName);
+        }
+        builder.setDropFlag(this.dropFlag);
+        if (this.dropType != null) {
+            builder.setDropType(this.dropType);
+        }
+        if (this.dropName != null) {
+            builder.setDropName(this.dropName);
+        }
+        for (Phase b : this.phaseList) {
+            if (b != null) {
+                builder.addPhaseList(b.toProto());
+            }
+        }
+        return builder.build();
     }
 
     public Phase addPhase(JsonObject object, BattlePhaseKind kind) {

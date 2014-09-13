@@ -3,6 +3,8 @@
  */
 package logbook.dto;
 
+import logbook.proto.LogbookEx.ResultRankPb;
+
 /**
  * @author Nekopanda
  *
@@ -35,6 +37,32 @@ public enum ResultRank {
         this.rank = rank;
         this.perhaps = perhaps;
         this.description = desc;
+    }
+
+    public ResultRankPb toProto() {
+        switch (this) {
+        case PERFECT:
+            return ResultRankPb.PERFECT;
+        case S:
+            return ResultRankPb.S;
+        case A:
+            return ResultRankPb.A;
+        case B:
+            return ResultRankPb.B;
+        case C:
+            return ResultRankPb.C;
+        case D:
+            return ResultRankPb.D;
+        case E:
+            return ResultRankPb.E;
+        case B_OR_C:
+            return ResultRankPb.B_OR_C;
+        case C_OR_B:
+            return ResultRankPb.C_OR_B;
+        case D_OR_C:
+            return ResultRankPb.D_OR_C;
+        }
+        return null;
     }
 
     @Override

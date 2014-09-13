@@ -9,21 +9,27 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
+import logbook.proto.LogbookEx.AirBattleDtoPb;
+import logbook.proto.Tag;
+
 /**
  * @author Nekopanda
  *
  */
 public class AirBattleDto {
 
+    @Tag(1)
     public List<BattleAtackDto> atacks;
-
     /** 接触（味方・敵） */
+    @Tag(2)
     public int[] touchPlane;
     /** 制空 */
+    @Tag(3)
     public String seiku;
-
     /** 艦載機数 [味方ロスト, 味方全, 敵ロスト, 敵全] */
+    @Tag(4)
     public int[] stage1;
+    @Tag(5)
     public int[] stage2;
 
     private static int[] readPlaneCount(JsonObject stage) {
@@ -58,6 +64,28 @@ public class AirBattleDto {
                 kouku.getJsonArray("api_plane_from"),
                 kouku.get("api_stage3"),
                 isCombined ? kouku.get("api_stage3_combined") : null);
+    }
+
+    public AirBattleDtoPb toProto() {
+        AirBattleDtoPb.Builder builder = AirBattleDtoPb.newBuilder();
+        for (BattleAtackDto b : this.atacks) {
+            if (b != null) {
+                builder.addAtacks(b.toProto());
+            }
+        }
+        for (int b : this.touchPlane) {
+            builder.addTouchPlane(b);
+        }
+        if (this.seiku != null) {
+            builder.setSeiku(this.seiku);
+        }
+        for (int b : this.stage1) {
+            builder.addStage1(b);
+        }
+        for (int b : this.stage2) {
+            builder.addStage2(b);
+        }
+        return builder.build();
     }
 
     private static String toSeiku(int id) {
