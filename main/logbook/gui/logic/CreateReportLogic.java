@@ -31,7 +31,7 @@ import logbook.config.AppConfig;
 import logbook.config.MasterDataConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
-import logbook.dto.BattleDto;
+import logbook.dto.BattleExDto;
 import logbook.dto.BattleResultDto;
 import logbook.dto.CreateItemDto;
 import logbook.dto.DeckMissionDto;
@@ -204,12 +204,11 @@ public final class CreateReportLogic {
      * 
      * @return 内容
      */
-    public static List<String[]> getBattleResultStoreBody(List<BattleResultDto> results) {
+    public static List<String[]> getBattleResultStoreBody(List<BattleExDto> results) {
         List<Object[]> body = new ArrayList<Object[]>();
 
         for (int i = 0; i < results.size(); i++) {
-            BattleResultDto item = results.get(i);
-            BattleDto battle = item.getBattleDto();
+            BattleExDto battle = results.get(i);
             String[] friend = new String[6];
             String[] friendHp = new String[6];
             String[] enemy = new String[6];
@@ -220,37 +219,36 @@ public final class CreateReportLogic {
             Arrays.fill(enemy, "");
             Arrays.fill(enemyHp, "");
 
-            if (battle != null) {
-                List<DockDto> docks = battle.getFriends();
-                if (docks != null) {
-                    DockDto dock = docks.get(0);
-                    List<ShipDto> friendships = dock.getShips();
-                    int[] fnowhps = battle.getNowFriendHp();
-                    int[] fmaxhps = battle.getMaxFriendHp();
-                    for (int j = 0; j < friendships.size(); j++) {
-                        ShipDto ship = friendships.get(j);
-                        friend[j] = ship.getName() + "(Lv" + ship.getLv() + ")";
-                        friendHp[j] = fnowhps[j] + "/" + fmaxhps[j];
+            List<DockDto> docks = battle.getFriends();
+            if (docks != null) {
+                DockDto dock = docks.get(0);
+                List<ShipDto> friendships = dock.getShips();
+                int[] fnowhps = battle.getNowFriendHp();
+                int[] fmaxhps = battle.getMaxFriendHp();
+                for (int j = 0; j < friendships.size(); j++) {
+                    ShipDto ship = friendships.get(j);
+                    friend[j] = ship.getName() + "(Lv" + ship.getLv() + ")";
+                    friendHp[j] = fnowhps[j] + "/" + fmaxhps[j];
+                }
+                List<ShipInfoDto> enemyships = battle.getEnemy();
+                int[] enowhps = battle.getNowEnemyHp();
+                int[] emaxhps = battle.getMaxEnemyHp();
+                for (int j = 0; j < enemyships.size(); j++) {
+                    ShipInfoDto ship = enemyships.get(j);
+                    if (!StringUtils.isEmpty(ship.getFlagship())) {
+                        enemy[j] = ship.getName() + "(" + ship.getFlagship() + ")";
+                    } else {
+                        enemy[j] = ship.getName();
                     }
-                    List<ShipInfoDto> enemyships = battle.getEnemy();
-                    int[] enowhps = battle.getNowEnemyHp();
-                    int[] emaxhps = battle.getMaxEnemyHp();
-                    for (int j = 0; j < enemyships.size(); j++) {
-                        ShipInfoDto ship = enemyships.get(j);
-                        if (!StringUtils.isEmpty(ship.getFlagship())) {
-                            enemy[j] = ship.getName() + "(" + ship.getFlagship() + ")";
-                        } else {
-                            enemy[j] = ship.getName();
-                        }
-                        enemyHp[j] = enowhps[j] + "/" + emaxhps[j];
-                    }
+                    enemyHp[j] = enowhps[j] + "/" + emaxhps[j];
                 }
             }
 
             body.add(new Object[] { Integer.toString(i + 1),
-                    new SimpleDateFormat(AppConstants.DATE_FORMAT).format(item.getBattleDate()), item.getQuestName(),
-                    item.getMapCellDto().toString(), item.getRank(), item.getEnemyName(), item.getDropType(),
-                    item.getDropName(),
+                    new SimpleDateFormat(AppConstants.DATE_FORMAT).format(battle.getBattleDate()),
+                    battle.getQuestName(),
+                    battle.getMapCellDto().toString(), battle.getRank(), battle.getEnemyName(), battle.getDropType(),
+                    battle.getDropName(),
                     friend[0], friendHp[0], friend[1], friendHp[1], friend[2], friendHp[2], friend[3], friendHp[3],
                     friend[4], friendHp[4], friend[5], friendHp[5], enemy[0], enemyHp[0], enemy[1], enemyHp[1],
                     enemy[2], enemyHp[2], enemy[3], enemyHp[3], enemy[4], enemyHp[4], enemy[5], enemyHp[5] });
@@ -893,9 +891,9 @@ public final class CreateReportLogic {
      * 
      * @param dto 海戦・ドロップ報告
      */
-    public static void storeBattleResultReport(BattleResultDto dto) {
+    public static void storeBattleResultReport(BattleExDto dto) {
         try {
-            List<BattleResultDto> dtoList = Collections.singletonList(dto);
+            List<BattleExDto> dtoList = Collections.singletonList(dto);
 
             File report = getStoreFile("海戦・ドロップ報告書.csv", "海戦・ドロップ報告書_alternativefile.csv");
 

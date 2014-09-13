@@ -12,7 +12,7 @@ import logbook.config.bean.WindowPositionBean;
 import logbook.constants.AppConstants;
 import logbook.dto.AirBattleDto;
 import logbook.dto.BattleAtackDto;
-import logbook.dto.BattleDto;
+import logbook.dto.BattleExDto;
 import logbook.dto.DockDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
@@ -424,8 +424,8 @@ public class BattleWindow extends BattleWindowBase {
         }
     }
 
-    private int computeDamages(int[] friend, int[] enemy, int[] ydam, BattleDto battle) {
-        BattleAtackDto[][] sequence = battle.getAtackSequence();
+    private int computeDamages(int[] friend, int[] enemy, int[] ydam, BattleExDto.Phase phase) {
+        BattleAtackDto[][] sequence = phase.getAtackSequence();
 
         for (int i = 0; i < friend.length; ++i)
             friend[i] = 0;
@@ -475,22 +475,22 @@ public class BattleWindow extends BattleWindowBase {
     }
 
     private void printBattle() {
-        BattleDto battle1 = this.getBattleDto().get(0);
-        BattleDto battle2 = (this.getBattleDto().size() >= 2) ? this.getBattleDto().get(1) : null;
-        // 最後の戦闘
-        BattleDto battle = (battle2 != null) ? battle2 : battle1;
+        BattleExDto battle = this.getBattle();
+        BattleExDto.Phase phase1 = battle.getPhase1();
+        BattleExDto.Phase phase2 = battle.getPhase2();
+        BattleExDto.Phase lastPhase = battle.getLastPhase();
 
-        if (battle == null)
+        if (lastPhase == null)
             return;
 
         // ダメージ計算
         int airDamage = 0;
         for (int i = 0; i < this.yDamages.length; ++i)
             this.yDamages[i] = 0;
-        if (battle1 != null)
-            airDamage += this.computeDamages(this.friendDamages[0], this.enemyDamages[0], this.yDamages, battle1);
-        if (battle2 != null)
-            airDamage += this.computeDamages(this.friendDamages[1], this.enemyDamages[1], this.yDamages, battle2);
+        if (phase1 != null)
+            airDamage += this.computeDamages(this.friendDamages[0], this.enemyDamages[0], this.yDamages, phase1);
+        if (phase2 != null)
+            airDamage += this.computeDamages(this.friendDamages[1], this.enemyDamages[1], this.yDamages, phase2);
         int[][] sortArray = new int[this.yDamages.length][2];
         for (int i = 0; i < this.yDamages.length; ++i) {
             sortArray[i][0] = this.yDamages[i];
@@ -514,7 +514,7 @@ public class BattleWindow extends BattleWindowBase {
         }
 
         // 初戦が夜戦？
-        if (battle1.isNight()) {
+        if (phase1.isNight()) {
             this.hpLabels[0].setText(AFTER_NIGHT);
             this.hpLabels[1].setText(AFTER_DAY);
         }
@@ -524,18 +524,18 @@ public class BattleWindow extends BattleWindowBase {
         }
 
         // 情報表示
-        String[] formation = new String[] { battle.getFriendFormation(), battle.getEnemyFormation() };
-        boolean[] touchPlane = battle.getTouchPlane();
+        String[] formation = battle.getFormation();
+        int[] touchPlane = lastPhase.getTouchPlane();
         String[] sakuteki = battle.getSakuteki();
-        String seiku = battle.getSeiku();
-        AirBattleDto[] air = battle.getAirBattleDto();
-        double[] damageRate = battle.getDamageRate();
+        String seiku = lastPhase.getSeiku();
+        AirBattleDto[] air = lastPhase.getAirBattleDto();
+        double[] damageRate = lastPhase.getDamageRate();
 
         for (int i = 0; i < 2; ++i) {
             if (formation[i] != null)
                 this.infoLabels[i][1].setText(FORM_PREFIX + formation[i]);
             if (touchPlane != null)
-                this.infoLabels[i][2].setText(TOUCH_PREFIX + (touchPlane[i] ? "あり" : "なし"));
+                this.infoLabels[i][2].setText(TOUCH_PREFIX + ((touchPlane[i] != -1) ? "あり" : "なし"));
             if (sakuteki != null)
                 this.infoLabels[i][3].setText(SAKUTEKI_PREFIX + sakuteki[i]);
             if (i == 0) {
@@ -569,7 +569,7 @@ public class BattleWindow extends BattleWindowBase {
                 damageRate[0] * 100, damageRate[1] * 100, rateString, battle.getRank().toString()));
 
         // 味方
-        int[][] friendStartHp = new int[][] { battle1.getStartFriendHp(), battle1.getStartFriendHpCombined() };
+        int[][] friendStartHp = new int[][] { battle.getStartFriendHp(), battle.getStartFriendHpCombined() };
         int[][] friendMaxHp = new int[][] { battle.getMaxFriendHp(), battle.getMaxFriendHpCombined() };
         for (int i = 0; i < friendStartHp.length; ++i) {
             int[] startHp = friendStartHp[i];
@@ -591,22 +591,22 @@ public class BattleWindow extends BattleWindowBase {
         }
 
         // 昼戦後HP
-        this.printHp(this.friendHpLabels, 2, 0, this.friendDamages[0], battle1.getNowFriendHp(), friendMaxHp[0], true);
+        this.printHp(this.friendHpLabels, 2, 0, this.friendDamages[0], phase1.getNowFriendHp(), friendMaxHp[0], true);
         if (battle.isCombined()) {
-            this.printHp(this.friendHpLabels, 2, 6, this.friendDamages[0], battle1.getNowFriendHpCombined(),
+            this.printHp(this.friendHpLabels, 2, 6, this.friendDamages[0], phase1.getNowFriendHpCombined(),
                     friendMaxHp[1], true);
         }
-        this.printHp(this.enemyHpLabels, 2, 0, this.enemyDamages[0], battle1.getNowEnemyHp(), maxEnemyHp, false);
+        this.printHp(this.enemyHpLabels, 2, 0, this.enemyDamages[0], phase1.getNowEnemyHp(), maxEnemyHp, false);
 
         // 夜戦後HP
-        if (battle2 != null) {
-            this.printHp(this.friendHpLabels, 5, 0, this.friendDamages[1], battle2.getNowFriendHp(), friendMaxHp[0],
+        if (phase2 != null) {
+            this.printHp(this.friendHpLabels, 5, 0, this.friendDamages[1], phase2.getNowFriendHp(), friendMaxHp[0],
                     true);
             if (battle.isCombined()) {
-                this.printHp(this.friendHpLabels, 5, 6, this.friendDamages[1], battle2.getNowFriendHpCombined(),
+                this.printHp(this.friendHpLabels, 5, 6, this.friendDamages[1], phase2.getNowFriendHpCombined(),
                         friendMaxHp[1], true);
             }
-            this.printHp(this.enemyHpLabels, 5, 0, this.enemyDamages[1], battle2.getNowEnemyHp(), maxEnemyHp, false);
+            this.printHp(this.enemyHpLabels, 5, 0, this.enemyDamages[1], phase2.getNowEnemyHp(), maxEnemyHp, false);
         }
     }
 
@@ -614,7 +614,7 @@ public class BattleWindow extends BattleWindowBase {
     protected void updateData(boolean start) {
         this.beginDraw();
         try {
-            if (this.getBattleDto().size() > 0) {
+            if (this.getBattle() != null) {
                 this.printDock();
                 this.printMap();
                 this.printBattle();

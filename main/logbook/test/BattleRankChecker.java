@@ -14,8 +14,9 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 
 import logbook.config.ShipConfig;
-import logbook.dto.BattleDto;
-import logbook.dto.BattleResultDto;
+import logbook.dto.BattleExDto;
+import logbook.dto.BattlePhaseKind;
+import logbook.dto.ResultRank;
 
 import org.apache.commons.io.FileUtils;
 
@@ -41,51 +42,99 @@ public class BattleRankChecker {
         int resultCount = 0;
         int[] rankCount = new int[10];
         try {
-            BattleDto lastBattle = null;
+            BattleExDto battle = null;
             for (int i = 0; i < fileNameList.length; ++i) {
                 String fileName = fileNameList[i];
-                boolean isYasen = fileName.endsWith("BATTLE_MIDNIGHT.json");
-                boolean isBattle = fileName.endsWith("BATTLE.json") || isYasen;
-                boolean isBattleResult = fileName.endsWith("BATTLE_RESULT.json");
-                if (isBattle || isBattleResult) {
+                boolean ignore = false;
+                boolean isBattleResult = false;
+                BattlePhaseKind kind = BattlePhaseKind.BATTLE;
+
+                if (fileName.endsWith("COMBINED_BATTLE_MIDNIGHT.json")) {
+                    kind = BattlePhaseKind.COMBINED_MIDNIGHT;
+                }
+                else if (fileName.endsWith("COMBINED_BATTLE_SP_MIDNIGHT.json")) {
+                    kind = BattlePhaseKind.COMBINED_SP_MIDNIGHT;
+                }
+                else if (fileName.endsWith("COMBINED_BATTLE.json")) {
+                    kind = BattlePhaseKind.COMBINED_BATTLE;
+                }
+                else if (fileName.endsWith("COMBINED_AIR_BATTLE.json")) {
+                    kind = BattlePhaseKind.COMBINED_AIR;
+                }
+                else if (fileName.endsWith("PRACTICE_BATTLE_MIDNIGHT.json")) {
+                    kind = BattlePhaseKind.MIDNIGHT;
+                }
+                else if (fileName.endsWith("PRACTICE_BATTLE.json")) {
+                    kind = BattlePhaseKind.BATTLE;
+                }
+                else if (fileName.endsWith("BATTLE_NIGHT_TO_DAY.json")) {
+                    kind = BattlePhaseKind.NIGHT_TO_DAY;
+                }
+                else if (fileName.endsWith("BATTLE_SP_MIDNIGHT.json")) {
+                    kind = BattlePhaseKind.SP_MIDNIGHT;
+                }
+                else if (fileName.endsWith("BATTLE_MIDNIGHT.json")) {
+                    kind = BattlePhaseKind.MIDNIGHT;
+                }
+                else if (fileName.endsWith("BATTLE.json")) {
+                    kind = BattlePhaseKind.BATTLE;
+                }
+                else if (fileName.endsWith("BATTLE_RESULT.json")) {
+                    isBattleResult = true;
+                }
+                else if (fileName.endsWith("COMBINED_BATTLE_RESULT.json")) {
+                    isBattleResult = true;
+                }
+                else if (fileName.endsWith("PRACTICE_BATTLE_RESULT.json")) {
+                    isBattleResult = true;
+                }
+                else {
+                    ignore = true;
+                }
+
+                if (ignore == false) {
                     String jsonString = FileUtils.readFileToString(new File(fileName), Charset.forName("MS932"));
                     JsonReader jsonreader = Json.createReader(new StringReader(jsonString));
                     JsonObject json = jsonreader.readObject();
                     JsonObject data = json.getJsonObject("api_data");
                     if (data == null)
                         continue;
-                    if (isBattle) {
-                        lastBattle = new BattleDto(data, lastBattle, isYasen);
+                    if (isBattleResult == false) {
+                        if (battle == null) {
+                            battle = new BattleExDto();
+                        }
+                        battle.addPhase(data, kind);
                     }
-                    else if (lastBattle != null) {
-                        BattleResultDto dto = new BattleResultDto(data, lastBattle, null);
+                    else if (battle != null) {
+                        battle.setResult(data, null);
                         // ランクが合っているかチェック
-                        if (!dto.getRank().equals(lastBattle.getRank().rank())) {
-                            if ((lastBattle.getRank().match(dto.getRank())))
+                        ResultRank estimatedRank = battle.getLastPhase().getEstimatedRank();
+                        if (!battle.getRank().equals(estimatedRank.rank())) {
+                            if ((estimatedRank.match(battle.getRank())))
                                 ;
                             else
-                                System.out.println("戦闘結果判定ミス: 正解ランク:" + dto.getRank() + " "
-                                        + lastBattle.getRankCalcInfo());
+                                System.out.println("戦闘結果判定ミス: 正解ランク:" + battle.getRank() + " "
+                                        + battle.getLastPhase().getRankCalcInfo());
                         }
 
                         // 判定を特定できない場合の統計
-                        if ((lastBattle.getRank().match(dto.getRank()))) {
-                            switch (lastBattle.getRank()) {
+                        if (estimatedRank.match(battle.getRank())) {
+                            switch (estimatedRank) {
                             case B_OR_C:
-                                rankCount[dto.getRank().equals("B") ? 0 : 1]++;
+                                rankCount[battle.getRank().equals("B") ? 0 : 1]++;
                                 break;
                             case C_OR_B:
-                                rankCount[dto.getRank().equals("C") ? 2 : 3]++;
+                                rankCount[battle.getRank().equals("C") ? 2 : 3]++;
                                 break;
                             case D_OR_C:
-                                rankCount[dto.getRank().equals("D") ? 4 : 5]++;
+                                rankCount[battle.getRank().equals("D") ? 4 : 5]++;
                                 break;
                             default:
                                 break;
                             }
                         }
 
-                        lastBattle = null;
+                        battle = null;
                         ++resultCount;
                     }
                     jsonreader.close();

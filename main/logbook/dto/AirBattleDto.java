@@ -18,9 +18,9 @@ public class AirBattleDto {
     public List<BattleAtackDto> atacks;
 
     /** 接触（味方・敵） */
-    public boolean[] touchPlane;
+    public int[] touchPlane;
     /** 制空 */
-    public int seiku;
+    public String seiku;
 
     /** 艦載機数 [味方ロスト, 味方全, 敵ロスト, 敵全] */
     public int[] stage1;
@@ -41,11 +41,11 @@ public class AirBattleDto {
             JsonObject jsonStage1Obj = kouku.getJsonObject("api_stage1");
             this.stage1 = readPlaneCount(jsonStage1Obj);
             JsonArray jsonTouchPlane = jsonStage1Obj.getJsonArray("api_touch_plane");
-            this.touchPlane = new boolean[] {
-                    (jsonTouchPlane.getInt(0) != -1),
-                    (jsonTouchPlane.getInt(1) != -1)
+            this.touchPlane = new int[] {
+                    jsonTouchPlane.getInt(0),
+                    jsonTouchPlane.getInt(1)
             };
-            this.seiku = jsonStage1Obj.getInt("api_disp_seiku");
+            this.seiku = toSeiku(jsonStage1Obj.getInt("api_disp_seiku"));
         }
 
         JsonValue jsonStage2 = kouku.get("api_stage2");
@@ -58,5 +58,22 @@ public class AirBattleDto {
                 kouku.getJsonArray("api_plane_from"),
                 kouku.get("api_stage3"),
                 isCombined ? kouku.get("api_stage3_combined") : null);
+    }
+
+    private static String toSeiku(int id) {
+        switch (id) {
+        case 1:
+            return "制空権確保";
+        case 2:
+            return "航空優勢";
+        case 0:
+            return "航空互角";
+        case 3:
+            return "航空劣勢";
+        case 4:
+            return "制空権喪失";
+        default:
+            return "不明(" + id + ")";
+        }
     }
 }

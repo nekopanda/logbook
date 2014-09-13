@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import logbook.config.bean.WindowPositionBean;
-import logbook.dto.BattleDto;
+import logbook.dto.BattleExDto;
 import logbook.dto.DockDto;
 import logbook.dto.MapCellDto;
 import logbook.dto.ShipDto;
@@ -56,7 +56,7 @@ public class BattleWindowBase {
 
     private List<DockDto> docks;
     private MapCellDto mapCellDto;
-    private final List<BattleDto> battleDto = new ArrayList<BattleDto>();
+    private BattleExDto battle;
 
     /**
      * Create the dialog.
@@ -214,7 +214,7 @@ public class BattleWindowBase {
 
     public void endSortie() {
         this.mapCellDto = null;
-        this.battleDto.clear();
+        this.battle = null;
         this.docks = null;
         for (int i = 0; i < this.friendShips.length; ++i) {
             this.friendShips[i] = null;
@@ -231,7 +231,7 @@ public class BattleWindowBase {
         boolean start = (this.docks == null);
         // 開始！
         this.mapCellDto = null;
-        this.battleDto.clear();
+        this.battle = null;
         this.docks = docks;
         for (int i = 0; (i < 2) && (i < docks.size()); ++i) {
             List<ShipDto> dockShips = docks.get(i).getShips();
@@ -251,8 +251,8 @@ public class BattleWindowBase {
         }
     }
 
-    public void updateBattle(BattleDto data) {
-        this.battleDto.add(data);
+    public void updateBattle(BattleExDto data) {
+        this.battle = data;
         List<ShipInfoDto> enemyShips = data.getEnemy();
         for (int i = 0; i < enemyShips.size(); ++i) {
             this.enemyShips[i] = enemyShips.get(i);
@@ -295,8 +295,8 @@ public class BattleWindowBase {
     /**
      * @return battleDto
      */
-    protected List<BattleDto> getBattleDto() {
-        return this.battleDto;
+    protected BattleExDto getBattle() {
+        return this.battle;
     }
 
     /**

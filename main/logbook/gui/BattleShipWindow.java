@@ -6,7 +6,7 @@ package logbook.gui;
 import java.util.List;
 
 import logbook.config.bean.WindowPositionBean;
-import logbook.dto.BattleDto;
+import logbook.dto.BattleExDto;
 import logbook.dto.DockDto;
 import logbook.dto.ItemDto;
 import logbook.dto.ShipDto;
@@ -100,10 +100,10 @@ public class BattleShipWindow extends BattleWindowBase {
 
     private void enemyUpdatetSlotitem(int newIndex) {
         if (newIndex != -1) {
-            if ((this.getBattleDto().size() > 0) && (newIndex < this.getBattleDto().get(0).getEnemy().size())) {
+            if ((this.getBattle() != null) && (newIndex < this.getBattle().getEnemy().size())) {
                 this.enemyLabels[newIndex].setFont(this.getBoldFont());
-                ItemDto[] slots = this.getBattleDto().get(0).getEnemySlot().get(newIndex);
-                ShipInfoDto shipInfo = this.getBattleDto().get(0).getEnemy().get(newIndex);
+                ItemDto[] slots = this.getBattle().getEnemySlot().get(newIndex);
+                ShipInfoDto shipInfo = this.getBattle().getEnemy().get(newIndex);
                 int[] maxeq = (shipInfo == null) ? null : shipInfo.getMaxeq(); // 艦載機最大搭載数
                 for (int i = 0; i < 5; ++i) {
                     if (i < slots.length) {
@@ -348,7 +348,7 @@ public class BattleShipWindow extends BattleWindowBase {
     }
 
     private void printBattle() {
-        BattleDto battle = this.getBattleDto().get(0);
+        BattleExDto battle = this.getBattle();
         if (battle == null)
             return;
 
@@ -369,7 +369,7 @@ public class BattleShipWindow extends BattleWindowBase {
     protected void updateData(boolean start) {
         this.beginDraw();
         try {
-            if (this.getBattleDto().size() > 0) {
+            if (this.getBattle() != null) {
                 this.printDock();
                 this.printMap();
                 this.printBattle();

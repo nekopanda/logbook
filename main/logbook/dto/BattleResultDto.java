@@ -20,7 +20,7 @@ public final class BattleResultDto extends AbstractDto {
     private final String rank;
 
     /** マス */
-    private final MapCellDto mapCelldto;
+    private final int mapCellNo;
 
     /** 敵艦隊名 */
     private final String enemyName;
@@ -44,18 +44,12 @@ public final class BattleResultDto extends AbstractDto {
      * @param cell マップ上のマス
      * @param battle 戦闘詳細
      */
-    public BattleResultDto(JsonObject object, BattleDto battle, MapCellDto mapInfo) {
+    public BattleResultDto(JsonObject object, int mapCellNo, BattleDto battle) {
 
         this.battleDate = Calendar.getInstance().getTime();
-        if (object.get("api_quest_name") != null) {
             this.questName = object.getString("api_quest_name");
-        }
-        else {
-            // 演習の場合はない
-            this.questName = null;
-        }
         this.rank = object.getString("api_win_rank");
-        this.mapCelldto = mapInfo;
+        this.mapCellNo = mapCellNo;
         this.enemyName = object.getJsonObject("api_enemy_info").getString("api_deck_name");
         this.dropFlag = object.containsKey("api_get_ship");
         if (this.dropFlag) {
@@ -97,8 +91,8 @@ public final class BattleResultDto extends AbstractDto {
      * マスを取得します。
      * @return マス
      */
-    public MapCellDto getMapCellDto() {
-        return this.mapCelldto;
+    public int getMapCellNo() {
+        return this.mapCellNo;
     }
 
     /**
@@ -146,9 +140,5 @@ public final class BattleResultDto extends AbstractDto {
      */
     public BattleDto getBattle() {
         return this.battle;
-    }
-
-    public boolean isCompleteSortieBattle() {
-        return (this.questName != null) && (this.mapCelldto != null);
     }
 }

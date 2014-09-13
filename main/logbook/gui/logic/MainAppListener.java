@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import logbook.data.context.GlobalContext;
-import logbook.dto.BattleDto;
+import logbook.dto.BattleExDto;
 import logbook.dto.DockDto;
 import logbook.dto.MapCellDto;
 import logbook.gui.ApplicationMain;
@@ -89,7 +89,7 @@ public class MainAppListener {
         this.main.getBattleShipWindow().updateMapCell(mapCellDto);
     }
 
-    public void updateBattle(BattleDto battleDto) {
+    public void updateBattle(BattleExDto battleDto) {
         this.main.getBattleWindow().updateBattle(battleDto);
         this.main.getBattleShipWindow().updateBattle(battleDto);
     }

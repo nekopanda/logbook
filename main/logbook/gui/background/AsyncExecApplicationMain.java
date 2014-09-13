@@ -398,7 +398,7 @@ public final class AsyncExecApplicationMain extends Thread {
     }
 
     /**
-     * 艦隊タブと戦況ウィンドウを更新する
+     * 艦隊タブを更新する
      */
     private static final class UpdateFleetTabTask implements Runnable {
 
@@ -432,7 +432,6 @@ public final class AsyncExecApplicationMain extends Thread {
                                 GlobalContext.getDock("2").isBadlyDamaged();
             }
 
-            // 艦隊タブ更新
             for (int i = 0; i < 4; i++) {
                 DockDto dock = GlobalContext.getDock(Integer.toString(i + 1));
                 if (dock != null) {

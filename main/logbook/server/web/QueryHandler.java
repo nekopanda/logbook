@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import logbook.config.MasterDataConfig;
 import logbook.data.context.GlobalContext;
 import logbook.dto.BasicInfoDto;
-import logbook.dto.BattleDto;
+import logbook.dto.BattleExDto;
 import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
 import logbook.dto.ItemDto;
@@ -446,7 +446,7 @@ public class QueryHandler extends HttpServlet {
         Display.getDefault().syncExec(new Runnable() {
             @Override
             public void run() {
-                BattleDto battleDto = GlobalContext.getLastBattleDto();
+                BattleExDto battleDto = GlobalContext.getLastBattleDto();
                 MapCellDto map = GlobalContext.getSortieMap();
 
                 if (map != null) {
@@ -489,7 +489,7 @@ public class QueryHandler extends HttpServlet {
 
                     jb.add("friend", fship_array);
                     jb.add("enemy", eship_array);
-                    jb.add("rank", battleDto.getRank().rank());
+                    jb.add("rank", battleDto.getLastPhase().getEstimatedRank().rank());
 
                     if (battleDto.isCombined()) {
                         JsonArrayBuilder fship_combined_array = Json.createArrayBuilder();

@@ -28,7 +28,9 @@ import logbook.config.MasterDataConfig;
 import logbook.constants.AppConstants;
 import logbook.data.Data;
 import logbook.dto.BasicInfoDto;
-import logbook.dto.BattleDto;
+import logbook.dto.BattleExDto;
+import logbook.dto.BattleExDto.Phase;
+import logbook.dto.BattlePhaseKind;
 import logbook.dto.BattleResultDto;
 import logbook.dto.CreateItemDto;
 import logbook.dto.DeckMissionDto;
@@ -106,7 +108,7 @@ public final class GlobalContext {
     private static MapCellDto mapCellDto = null;
 
     /** 戦闘詳細 */
-    private static BattleDto battle = null;
+    private static BattleExDto battle = null;
     private static boolean firstBattle = true;
 
     /** 遠征リスト */
@@ -242,7 +244,7 @@ public final class GlobalContext {
     /**
      * @return 最後に行った海戦情報
      */
-    public static BattleDto getLastBattleDto() {
+    public static BattleExDto getLastBattleDto() {
         return battle;
     }
 
@@ -463,35 +465,35 @@ public final class GlobalContext {
             break;
         // 海戦
         case BATTLE:
-            doBattle(data, false);
+            doBattle(data, BattlePhaseKind.BATTLE);
             break;
         // 海戦
         case BATTLE_MIDNIGHT:
-            doBattle(data, true);
+            doBattle(data, BattlePhaseKind.MIDNIGHT);
             break;
         // 海戦
         case BATTLE_SP_MIDNIGHT:
-            doBattle(data, true);
+            doBattle(data, BattlePhaseKind.SP_MIDNIGHT);
             break;
         // 海戦
         case BATTLE_NIGHT_TO_DAY:
-            doBattle(data, true);
+            doBattle(data, BattlePhaseKind.NIGHT_TO_DAY);
             break;
         // 海戦
         case COMBINED_AIR_BATTLE:
-            doBattle(data, false);
+            doBattle(data, BattlePhaseKind.COMBINED_AIR);
             break;
         // 海戦
         case COMBINED_BATTLE:
-            doBattle(data, false);
+            doBattle(data, BattlePhaseKind.COMBINED_BATTLE);
             break;
         // 海戦
         case COMBINED_BATTLE_MIDNIGHT:
-            doBattle(data, true);
+            doBattle(data, BattlePhaseKind.COMBINED_MIDNIGHT);
             break;
         // 海戦
         case COMBINED_BATTLE_SP_MIDNIGHT:
-            doBattle(data, true);
+            doBattle(data, BattlePhaseKind.COMBINED_SP_MIDNIGHT);
             break;
         // 海戦結果
         case BATTLE_RESULT:
@@ -503,11 +505,11 @@ public final class GlobalContext {
             break;
         // 演習
         case PRACTICE_BATTLE:
-            doBattle(data, false);
+            doBattle(data, BattlePhaseKind.BATTLE);
             break;
         // 演習
         case PRACTICE_BATTLE_MIDNIGHT:
-            doBattle(data, true);
+            doBattle(data, BattlePhaseKind.MIDNIGHT);
             break;
         // 演習結果
         case PRACTICE_BATTLE_RESULT:
@@ -722,9 +724,10 @@ public final class GlobalContext {
 
                 // 戦闘結果がある場合、ダメージ計算があっているか検証します
                 if (battle != null) {
-                    checkBattleDamage(battle.getDock().getShips(), battle.getNowFriendHp());
+                    checkBattleDamage(battle.getFriends().get(0).getShips(), battle.getLastPhase().getNowFriendHp());
                     if (battle.isCombined()) {
-                        checkBattleDamage(battle.getDockCombined().getShips(), battle.getNowFriendHpCombined());
+                        checkBattleDamage(battle.getFriends().get(1).getShips(),
+                                battle.getLastPhase().getNowFriendHpCombined());
                     }
                 }
                 mapCellDto = null;
@@ -818,34 +821,35 @@ public final class GlobalContext {
      * 海戦情報を更新します
      * @param data
      */
-    private static void doBattle(Data data, boolean isYasen) {
+    private static void doBattle(Data data, BattlePhaseKind phaseKind) {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
-            battle = new BattleDto(apidata, firstBattle ? null : battle, isYasen);
-
-            firstBattle = false;
+            if (battle == null) {
+                battle = new BattleExDto();
+            }
+            BattleExDto.Phase phase = battle.addPhase(apidata, phaseKind);
 
             List<ShipDto> sunkShips = new ArrayList<ShipDto>();
-            List<ShipDto> ships = battle.getDock().getShips();
-            int[] nowFriendHp = battle.getNowFriendHp();
+            List<ShipDto> ships = battle.getFriends().get(0).getShips();
+            int[] nowFriendHp = phase.getNowFriendHp();
             for (int i = 0; i < ships.size(); ++i) {
                 checkShipSunk(ships.get(i), nowFriendHp[i], sunkShips);
             }
             if (battle.isCombined()) {
-                List<ShipDto> shipsCombined = battle.getDockCombined().getShips();
-                int[] nowFriendHpCombined = battle.getNowFriendHpCombined();
+                List<ShipDto> shipsCombined = battle.getFriends().get(1).getShips();
+                int[] nowFriendHpCombined = phase.getNowFriendHpCombined();
                 for (int i = 0; i < shipsCombined.size(); ++i) {
                     checkShipSunk(shipsCombined.get(i), nowFriendHpCombined[i], sunkShips);
                 }
             }
 
             addConsole("海戦情報を更新しました");
-            addConsole("自=" + Arrays.toString(battle.getNowFriendHp()));
+            addConsole("自=" + Arrays.toString(phase.getNowFriendHp()));
             if (battle.isCombined()) {
-                addConsole("連=" + Arrays.toString(battle.getNowFriendHpCombined()));
+                addConsole("連=" + Arrays.toString(phase.getNowFriendHpCombined()));
             }
-            addConsole("敵=" + Arrays.toString(battle.getNowEnemyHp()));
-            addConsole("→ " + battle.getRank().toString());
+            addConsole("敵=" + Arrays.toString(phase.getNowEnemyHp()));
+            addConsole("→ " + phase.getEstimatedRank().toString());
             for (ShipDto ship : sunkShips) {
                 addConsole(ship.getName() + "(id:" + ship.getId() + ",lv:" + ship.getLv() + ") 轟沈しました！");
             }
@@ -873,15 +877,15 @@ public final class GlobalContext {
         try {
             if (battle != null) {
                 JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
-                BattleResultDto dto = new BattleResultDto(apidata, battle, mapCellDto);
-                if (dto.isCompleteSortieBattle()) { // 演習は記録しない
-                    battleResultList.add(dto);
-                    CreateReportLogic.storeBattleResultReport(dto);
+                battle.setResult(apidata, mapCellDto);
+                if (battle.isCompleteSortieBattle()) { // 演習は記録しない
+                    //battleResultList.add(battle);
+                    CreateReportLogic.storeBattleResultReport(battle);
 
                     // EnemyData更新
                     if (mapCellDto != null) {
                         int enemyId = mapCellDto.getEnemyId();
-                        EnemyData enemyData = battle.getEnemyData(enemyId, dto.getEnemyName());
+                        EnemyData enemyData = battle.getEnemyData(enemyId, battle.getEnemyName());
                         EnemyData.set(enemyId, enemyData);
                         mapCellDto.setEnemyData(enemyData);
                     }
@@ -896,11 +900,12 @@ public final class GlobalContext {
                 firstBattle = true;
 
                 // ランクが合っているかチェック
-                if (!dto.getRank().equals(battle.getRank().rank())) {
-                    if ((battle.getRank().match(dto.getRank())))
+                Phase lastPhase = battle.getLastPhase();
+                if (!battle.getRank().equals(lastPhase.getEstimatedRank().rank())) {
+                    if ((lastPhase.getEstimatedRank().match(battle.getRank())))
                         ;
                     else
-                        LOG.info("戦闘結果判定ミス: 正解ランク:" + dto.getRank() + " " + battle.getRankCalcInfo());
+                        LOG.info("戦闘結果判定ミス: 正解ランク:" + battle.getRank() + " " + lastPhase.getRankCalcInfo());
                 }
 
                 for (int i = 0; i < (battleResultList.size() - AppConstants.MAX_LOG_SIZE); i++) {
