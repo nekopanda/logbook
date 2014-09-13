@@ -163,9 +163,12 @@ public final class ApplicationMain {
     private Composite consoleComposite;
     /** コンソール **/
     private List console;
+
     /** 戦況 */
+    private MenuItem battleWinMenu;
     private BattleWindow battleWindow;
     /** 自軍敵軍パラメータ */
+    private MenuItem battleShipWinMenu;
     private BattleShipWindow battleShipWindow;
 
     /**
@@ -204,6 +207,7 @@ public final class ApplicationMain {
         this.createContents();
         this.shell.open();
         this.shell.layout();
+        this.createChildWindow();
         while (!this.shell.isDisposed()) {
             if (!display.readAndDispatch()) {
                 display.sleep();
@@ -243,6 +247,9 @@ public final class ApplicationMain {
                     AppConfig.get().setWidth(ApplicationMain.this.shell.getSize().x);
                     AppConfig.get().setHeight(ApplicationMain.this.shell.getSize().y);
                 }
+
+                AppConfig.get().setBattleShipWindowPos(ApplicationMain.this.battleShipWindow.getWindowPos());
+                AppConfig.get().setBattleWindowPos(ApplicationMain.this.battleWindow.getWindowPos());
 
                 if (AppConfig.get().isCheckDoit()) {
                     MessageBox box = new MessageBox(ApplicationMain.this.shell, SWT.YES | SWT.NO
@@ -337,56 +344,14 @@ public final class ApplicationMain {
         new MenuItem(cmdmenu, SWT.SEPARATOR);
 
         // 表示-戦況ウィンドウ 
-        final MenuItem battlewin = new MenuItem(cmdmenu, SWT.CHECK);
-        battlewin.setText("戦況(&W)\tCtrl+W");
-        battlewin.setAccelerator(SWT.CTRL + 'W');
-        battlewin.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                boolean open = battlewin.getSelection();
-                if (open) {
-                    ApplicationMain.this.battleWindow.open();
-                }
-                else {
-                    ApplicationMain.this.battleWindow.close();
-                }
-            }
-        });
-        this.battleWindow = new BattleWindow(this.shell);
-        this.battleWindow.addShellListener(new ShellAdapter() {
-            @Override
-            public void shellClosed(ShellEvent e) {
-                e.doit = false;
-                battlewin.setSelection(false);
-                ApplicationMain.this.battleWindow.close();
-            }
-        });
+        this.battleWinMenu = new MenuItem(cmdmenu, SWT.CHECK);
+        this.battleWinMenu.setText("戦況(&W)\tCtrl+W");
+        this.battleWinMenu.setAccelerator(SWT.CTRL + 'W');
 
         // 表示-敵味方パラメータ
-        final MenuItem battleshipwin = new MenuItem(cmdmenu, SWT.CHECK);
-        battleshipwin.setText("自軍敵軍パラメータ(&P)\tCtrl+P");
-        battleshipwin.setAccelerator(SWT.CTRL + 'P');
-        battleshipwin.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                boolean open = battleshipwin.getSelection();
-                if (open) {
-                    ApplicationMain.this.battleShipWindow.open();
-                }
-                else {
-                    ApplicationMain.this.battleShipWindow.close();
-                }
-            }
-        });
-        this.battleShipWindow = new BattleShipWindow(this.shell);
-        this.battleShipWindow.addShellListener(new ShellAdapter() {
-            @Override
-            public void shellClosed(ShellEvent e) {
-                e.doit = false;
-                battleshipwin.setSelection(false);
-                ApplicationMain.this.battleShipWindow.close();
-            }
-        });
+        this.battleShipWinMenu = new MenuItem(cmdmenu, SWT.CHECK);
+        this.battleShipWinMenu.setText("自軍敵軍パラメータ(&P)\tCtrl+P");
+        this.battleShipWinMenu.setAccelerator(SWT.CTRL + 'P');
 
         // 表示-縮小表示
         final MenuItem dispsize = new MenuItem(cmdmenu, SWT.CHECK);
@@ -695,6 +660,19 @@ public final class ApplicationMain {
         }
 
         this.startThread();
+    }
+
+    /** 子ウィンドウを作ります */
+    private void createChildWindow() {
+        this.battleWindow = new BattleWindow(this.shell, this.battleWinMenu,
+                AppConfig.get().getBattleWindowPos());
+        if (AppConfig.get().getBattleWindowPos().isOpened())
+            this.battleWindow.open();
+
+        this.battleShipWindow = new BattleShipWindow(this.shell, this.battleShipWinMenu,
+                AppConfig.get().getBattleShipWindowPos());
+        if (AppConfig.get().getBattleShipWindowPos().isOpened())
+            this.battleShipWindow.open();
     }
 
     /**

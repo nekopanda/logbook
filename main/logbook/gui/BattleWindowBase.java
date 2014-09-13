@@ -6,6 +6,7 @@ package logbook.gui;
 import java.util.ArrayList;
 import java.util.List;
 
+import logbook.config.bean.WindowPositionBean;
 import logbook.dto.BattleDto;
 import logbook.dto.DockDto;
 import logbook.dto.MapCellDto;
@@ -14,11 +15,16 @@ import logbook.dto.ShipInfoDto;
 import logbook.gui.logic.LayoutLogic;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ShellListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
@@ -29,6 +35,10 @@ import org.eclipse.wb.swt.SWTResourceManager;
 public class BattleWindowBase {
 
     private final Shell shell;
+
+    private final MenuItem menuItem;
+
+    private final WindowPositionBean windowPos;
 
     private final Font normalFont;
     private final Font boldFont;
@@ -52,18 +62,43 @@ public class BattleWindowBase {
      * Create the dialog.
      * @param parent
      */
-    public BattleWindowBase(Shell parent, String windowText) {
+    public BattleWindowBase(Shell parent, MenuItem menuItem, WindowPositionBean windowPos, String windowText) {
         this.shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE);
+        this.menuItem = menuItem;
+        this.windowPos = windowPos;
         this.windowText = windowText;
         this.normalFont = this.getShell().getFont();
         FontData fontData = this.normalFont.getFontData()[0];
         String fontName = fontData.getName();
         int size = fontData.getHeight();
         this.boldFont = SWTResourceManager.getFont(fontName, size, SWT.BOLD);
-    }
 
-    public void addShellListener(ShellListener listener) {
-        this.shell.addShellListener(listener);
+        this.menuItem.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                boolean open = BattleWindowBase.this.menuItem.getSelection();
+                if (open) {
+                    BattleWindowBase.this.open();
+                }
+                else {
+                    BattleWindowBase.this.close();
+                }
+            }
+        });
+        this.shell.addShellListener(new ShellAdapter() {
+            @Override
+            public void shellClosed(ShellEvent e) {
+                e.doit = false;
+                BattleWindowBase.this.menuItem.setSelection(false);
+                BattleWindowBase.this.close();
+            }
+        });
+
+        int locationX = windowPos.getLocationX();
+        int locationY = windowPos.getLocationY();
+        if ((locationX != -1) && (locationY != -1)) {
+            this.shell.setLocation(new Point(locationX, locationY));
+        }
     }
 
     public void open() {
@@ -76,6 +111,7 @@ public class BattleWindowBase {
                 this.setCombinedMode(false);
                 this.getShell().pack();
             }
+            this.menuItem.setSelection(true);
             this.shell.open();
             this.updateData(false);
             this.shell.layout();
@@ -84,8 +120,20 @@ public class BattleWindowBase {
 
     public void close() {
         if (this.shell.getVisible()) {
+            this.menuItem.setSelection(false);
             this.shell.setVisible(false);
         }
+    }
+
+    public WindowPositionBean getWindowPos() {
+        boolean opened = this.shell.getVisible();
+        this.windowPos.setOpened(opened);
+        if (opened) {
+            Point location = this.shell.getLocation();
+            this.windowPos.setLocationX(location.x);
+            this.windowPos.setLocationY(location.y);
+        }
+        return this.windowPos;
     }
 
     protected void beginDraw() {

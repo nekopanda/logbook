@@ -447,18 +447,11 @@ public class QueryHandler extends HttpServlet {
             @Override
             public void run() {
                 BattleDto battleDto = GlobalContext.getLastBattleDto();
-                boolean isSortie = false;
-                for (boolean sortie : GlobalContext.getIsSortie()) {
-                    if (sortie) {
-                        isSortie = true;
-                        break;
-                    }
-                }
+                MapCellDto map = GlobalContext.getSortieMap();
 
-                if (isSortie) {
+                if (map != null) {
                     {// 戦闘中のマップ
                         JsonArrayBuilder map_array = Json.createArrayBuilder();
-                        MapCellDto map = GlobalContext.getSortieMap();
                         map_array.add(map.getMap()[0]);
                         map_array.add(map.getMap()[1]);
                         map_array.add(map.getMap()[2]);

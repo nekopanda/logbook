@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import logbook.config.bean.WindowPositionBean;
 import logbook.constants.AppConstants;
 import logbook.dto.AirBattleDto;
 import logbook.dto.BattleAtackDto;
@@ -21,6 +22,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
@@ -60,8 +62,8 @@ public class BattleWindow extends BattleWindowBase {
      * Create the dialog.
      * @param parent
      */
-    public BattleWindow(Shell parent) {
-        super(parent, "戦況");
+    public BattleWindow(Shell parent, MenuItem menuItem, WindowPositionBean windowPos) {
+        super(parent, menuItem, windowPos, "戦況");
     }
 
     private void addInfoLabel(Label[] labels, int row, int width) {
@@ -530,17 +532,22 @@ public class BattleWindow extends BattleWindowBase {
         double[] damageRate = battle.getDamageRate();
 
         for (int i = 0; i < 2; ++i) {
-            this.infoLabels[i][1].setText(FORM_PREFIX + formation[i]);
-            this.infoLabels[i][2].setText(TOUCH_PREFIX + (touchPlane[i] ? "あり" : "なし"));
-            this.infoLabels[i][3].setText(SAKUTEKI_PREFIX + sakuteki[i]);
+            if (formation[i] != null)
+                this.infoLabels[i][1].setText(FORM_PREFIX + formation[i]);
+            if (touchPlane != null)
+                this.infoLabels[i][2].setText(TOUCH_PREFIX + (touchPlane[i] ? "あり" : "なし"));
+            if (sakuteki != null)
+                this.infoLabels[i][3].setText(SAKUTEKI_PREFIX + sakuteki[i]);
             if (i == 0) {
                 this.infoLabels[i][4].setText("航空戦:");
                 this.infoLabels[i][5].setText((seiku != null) ? seiku : "なし");
             }
             this.infoLabels[i][6].setText("stage1");
             this.infoLabels[i][7].setText("stage2");
-            this.printPlaneCount(this.infoLabels[i], 8, air[0], i);
-            this.printPlaneCount(this.infoLabels[i], 10, air[1], i);
+            if (air != null) {
+                this.printPlaneCount(this.infoLabels[i], 8, air[0], i);
+                this.printPlaneCount(this.infoLabels[i], 10, air[1], i);
+            }
         }
 
         this.matchLabel.setText(battle.getFormationMatch());
@@ -605,31 +612,34 @@ public class BattleWindow extends BattleWindowBase {
     @Override
     protected void updateData(boolean start) {
         this.beginDraw();
-        if (this.getBattleDto().size() > 0) {
-            this.printDock();
-            this.printMap();
-            this.printBattle();
-        }
-        else if (this.getDocks() == null) {
-            // 出撃中でない
-            this.clearText();
-            this.title.setText("出撃中ではありません");
-        }
-        else if (this.getMapCellDto() == null) {
-            // 移動中
-            this.clearText();
-            if (start) {
-                this.title.setText("出撃しました");
+        try {
+            if (this.getBattleDto().size() > 0) {
+                this.printDock();
+                this.printMap();
+                this.printBattle();
+            }
+            else if (this.getDocks() == null) {
+                // 出撃中でない
+                this.clearText();
+                this.title.setText("出撃中ではありません");
+            }
+            else if (this.getMapCellDto() == null) {
+                // 移動中
+                this.clearText();
+                if (start) {
+                    this.title.setText("出撃しました");
+                }
+                else {
+                    this.title.setText("移動中...");
+                }
+                this.printDock();
             }
             else {
-                this.title.setText("移動中...");
+                // 移動中
+                this.printMap();
             }
-            this.printDock();
+        } finally {
+            this.endDraw();
         }
-        else {
-            // 移動中
-            this.printMap();
-        }
-        this.endDraw();
     }
 }

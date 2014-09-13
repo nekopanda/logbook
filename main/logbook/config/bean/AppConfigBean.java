@@ -160,6 +160,10 @@ public final class AppConfigBean {
     /** 艦これ統計データベースへ送信するときのアクセスキー */
     private String accessKey = "";
 
+    private WindowPositionBean battleWindowPos = new WindowPositionBean();
+
+    private WindowPositionBean battleShipWondowPos = new WindowPositionBean();
+
     /**
      * ポート番号を取得します。
      * @return ポート番号
@@ -954,5 +958,33 @@ public final class AppConfigBean {
      */
     public void setAccessKey(String accessKey) {
         this.accessKey = accessKey;
+    }
+
+    /**
+     * @return battleWindowPos
+     */
+    public WindowPositionBean getBattleWindowPos() {
+        return this.battleWindowPos;
+    }
+
+    /**
+     * @param battleWindowPos セットする battleWindowPos
+     */
+    public void setBattleWindowPos(WindowPositionBean battleWindowPos) {
+        this.battleWindowPos = battleWindowPos;
+    }
+
+    /**
+     * @return battleShipWondowPos
+     */
+    public WindowPositionBean getBattleShipWindowPos() {
+        return this.battleShipWondowPos;
+    }
+
+    /**
+     * @param battleShipWindowPos セットする battleShipWondowPos
+     */
+    public void setBattleShipWindowPos(WindowPositionBean battleShipWindowPos) {
+        this.battleShipWondowPos = battleShipWindowPos;
     }
 }

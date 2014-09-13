@@ -852,6 +852,9 @@ public final class GlobalContext {
 
             if (mapCellDto == null) {
                 // 出撃していない場合は出撃させる
+                for (DockDto dock : battle.getFriends()) {
+                    isSortie[Integer.parseInt(dock.getId()) - 1] = true;
+                }
                 appListener.startSortie();
             }
             appListener.updateBattle(battle);
@@ -1513,9 +1516,11 @@ public final class GlobalContext {
                 ResourceItemDto items = new ResourceItemDto();
                 items.loadMissionResult(apidata);
                 result.setItems(items);
-                material = material.clone().obtained(items);
-                material.setEvent("遠征帰還");
-                CreateReportLogic.storeMaterialReport(material);
+                if (material != null) {
+                    material = material.clone().obtained(items);
+                    material.setEvent("遠征帰還");
+                    CreateReportLogic.storeMaterialReport(material);
+                }
             }
 
             CreateReportLogic.storeCreateMissionReport(result);
@@ -1648,8 +1653,10 @@ public final class GlobalContext {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
             ResourceItemDto items = new ResourceItemDto();
             items.loadQuestClear(apidata);
-            material = material.clone().obtained(items);
-            material.setEvent("任務をクリア");
+            if (material != null) {
+                material = material.clone().obtained(items);
+                material.setEvent("任務をクリア");
+            }
 
         } catch (Exception e) {
             LOG.warn("消化した任務を除去しますに失敗しました", e);
@@ -1677,8 +1684,10 @@ public final class GlobalContext {
             JsonObject obj = data.getJsonObject().getJsonObject("api_data");
 
             mapCellDto = new MapCellDto(obj);
-            material.setEvent("出撃");
-            CreateReportLogic.storeMaterialReport(material);
+            if (material != null) {
+                material.setEvent("出撃");
+                CreateReportLogic.storeMaterialReport(material);
+            }
 
             appListener.startSortie();
             appListener.updateMapCell(mapCellDto);

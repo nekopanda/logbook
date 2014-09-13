@@ -5,6 +5,7 @@ package logbook.gui;
 
 import java.util.List;
 
+import logbook.config.bean.WindowPositionBean;
 import logbook.dto.BattleDto;
 import logbook.dto.DockDto;
 import logbook.dto.ItemDto;
@@ -19,6 +20,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -46,8 +48,8 @@ public class BattleShipWindow extends BattleWindowBase {
      * Create the dialog.
      * @param parent
      */
-    public BattleShipWindow(Shell parent) {
-        super(parent, "自軍敵軍パラメータ ");
+    public BattleShipWindow(Shell parent, MenuItem menuItem, WindowPositionBean windowPos) {
+        super(parent, menuItem, windowPos, "自軍敵軍パラメータ ");
     }
 
     private void friendUpdatetSlotitem(int newIndex) {
@@ -83,12 +85,16 @@ public class BattleShipWindow extends BattleWindowBase {
     private void friendSelectedIndexChanged(int newIndex) {
         if (this.friendCurrentIndex != newIndex) {
             this.beginDraw();
-            if (this.friendCurrentIndex != -1) {
-                this.friendLabels[this.friendCurrentIndex].setFont(this.getNormalFont());
+            try {
+                if (this.friendCurrentIndex != -1) {
+                    this.friendLabels[this.friendCurrentIndex].setFont(this.getNormalFont());
+                }
+                this.friendUpdatetSlotitem(newIndex);
+                this.endDraw();
+                this.friendCurrentIndex = newIndex;
+            } finally {
+                this.endDraw();
             }
-            this.friendUpdatetSlotitem(newIndex);
-            this.endDraw();
-            this.friendCurrentIndex = newIndex;
         }
     }
 
@@ -122,12 +128,16 @@ public class BattleShipWindow extends BattleWindowBase {
     private void enemySelectedIndexChanged(int newIndex) {
         if (this.enemyCurrentIndex != newIndex) {
             this.beginDraw();
-            if (this.enemyCurrentIndex != -1) {
-                this.enemyLabels[this.enemyCurrentIndex].setFont(this.getNormalFont());
+            try {
+                if (this.enemyCurrentIndex != -1) {
+                    this.enemyLabels[this.enemyCurrentIndex].setFont(this.getNormalFont());
+                }
+                this.enemyUpdatetSlotitem(newIndex);
+                this.endDraw();
+                this.enemyCurrentIndex = newIndex;
+            } finally {
+                this.endDraw();
             }
-            this.enemyUpdatetSlotitem(newIndex);
-            this.endDraw();
-            this.enemyCurrentIndex = newIndex;
         }
     }
 
@@ -358,25 +368,28 @@ public class BattleShipWindow extends BattleWindowBase {
     @Override
     protected void updateData(boolean start) {
         this.beginDraw();
-        if (this.getBattleDto().size() > 0) {
-            this.printDock();
-            this.printMap();
-            this.printBattle();
+        try {
+            if (this.getBattleDto().size() > 0) {
+                this.printDock();
+                this.printMap();
+                this.printBattle();
+            }
+            else if (this.getDocks() == null) {
+                // 出撃中でない
+                this.clearText();
+            }
+            else if (this.getMapCellDto() == null) {
+                // 移動中
+                this.clearText();
+                this.printDock();
+            }
+            else {
+                // 移動中
+                this.printMap();
+            }
+        } finally {
+            this.endDraw();
         }
-        else if (this.getDocks() == null) {
-            // 出撃中でない
-            this.clearText();
-        }
-        else if (this.getMapCellDto() == null) {
-            // 移動中
-            this.clearText();
-            this.printDock();
-        }
-        else {
-            // 移動中
-            this.printMap();
-        }
-        this.endDraw();
     }
 
 }
