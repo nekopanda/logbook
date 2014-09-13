@@ -555,7 +555,8 @@ public class BattleWindow extends BattleWindowBase {
         String result0 = "MVP(砲雷のみ) ";
         for (int i = 0; i < MVPList.size(); ++i) {
             ShipDto ship = MVPList.get(i);
-            result0 += String.format("%d: %s(%d)", i + 1, ship.getName(), sortArray[i][0]);
+            result0 += String.format("%d: %s(%d)", i + 1,
+                    (ship == null) ? "?" : ship.getName(), sortArray[i][0]);
             if (i != (MVPList.size() - 1))
                 result0 += ", ";
         }
