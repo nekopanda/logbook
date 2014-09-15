@@ -431,15 +431,10 @@ public class BattleExDto extends AbstractDto {
                     (double) enemyGauge / BattleExDto.this.getEnemyGaugeMax()
             };
 
-            double friendGaugeRate = this.damageRate[0];
-            double enemyGaugeRate = this.damageRate[1];
-            // 1.1
-            boolean equalOrMore = (1.095 * enemyGaugeRate) >= friendGaugeRate;
-            boolean equalOrMore1 = (1.12 * enemyGaugeRate) >= friendGaugeRate;
-            // 2.5倍以上
-            boolean superior = (enemyGaugeRate > 0.01) && (enemyGaugeRate >= (2.53 * friendGaugeRate));
-            boolean superior1 = (enemyGaugeRate > 0.01) && (enemyGaugeRate >= (2.5 * friendGaugeRate));
-            boolean superior2 = (enemyGaugeRate > 0.01) && (enemyGaugeRate >= (2.3 * friendGaugeRate));
+            double friendGaugeRate = Math.floor(this.damageRate[0] * 100);
+            double enemyGaugeRate = Math.floor(this.damageRate[1] * 100);
+            boolean equalOrMore = (enemyGaugeRate > (0.9 * friendGaugeRate));
+            boolean superior = (enemyGaugeRate > 0) && (enemyGaugeRate > (2.5 * friendGaugeRate));
 
             if (friendSunk == 0) { // 味方轟沈数ゼロ
                 if (enemyNowShips == 0) { // 敵を殲滅した
@@ -467,12 +462,6 @@ public class BattleExDto extends AbstractDto {
                     if (superior) {
                         return ResultRank.B;
                     }
-                    else if (superior1) {
-                        return ResultRank.B_OR_C;
-                    }
-                    else if (superior2) {
-                        return ResultRank.C_OR_B;
-                    }
                 }
             }
             else {
@@ -488,13 +477,8 @@ public class BattleExDto extends AbstractDto {
                 if (superior) {
                     return ResultRank.B;
                 }
-                else if (superior1) {
-                    return ResultRank.B_OR_C;
-                }
-                else if (superior2) {
-                    return ResultRank.C_OR_B;
-                }
                 // 敵旗艦を撃沈
+                // TODO: 味方の轟沈艦が２隻以上ある場合、敵旗艦を撃沈してもDになる場合がある
                 if (this.nowEnemyHp[0] == 0) {
                     return ResultRank.C;
                 }
@@ -503,9 +487,6 @@ public class BattleExDto extends AbstractDto {
             if (enemyGauge > 0) {
                 if (equalOrMore) {
                     return ResultRank.C;
-                }
-                else if (equalOrMore1) {
-                    return ResultRank.D_OR_C;
                 }
             }
             // 轟沈艦があり かつ 残った艦が１隻のみ

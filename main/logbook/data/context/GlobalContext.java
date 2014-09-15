@@ -902,10 +902,7 @@ public final class GlobalContext {
                 // ランクが合っているかチェック
                 Phase lastPhase = battle.getLastPhase();
                 if (!battle.getRank().equals(lastPhase.getEstimatedRank().rank())) {
-                    if ((lastPhase.getEstimatedRank().match(battle.getRank())))
-                        ;
-                    else
-                        LOG.info("戦闘結果判定ミス: 正解ランク:" + battle.getRank() + " " + lastPhase.getRankCalcInfo());
+                    LOG.info("戦闘結果判定ミス: 正解ランク:" + battle.getRank() + " " + lastPhase.getRankCalcInfo());
                 }
 
                 for (int i = 0; i < (battleResultList.size() - AppConstants.MAX_LOG_SIZE); i++) {

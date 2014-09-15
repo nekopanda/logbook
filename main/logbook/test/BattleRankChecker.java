@@ -112,28 +112,8 @@ public class BattleRankChecker {
                         // ランクが合っているかチェック
                         ResultRank estimatedRank = battle.getLastPhase().getEstimatedRank();
                         if (!battle.getRank().equals(estimatedRank.rank())) {
-                            if ((estimatedRank.match(battle.getRank())))
-                                ;
-                            else
-                                System.out.println("戦闘結果判定ミス: 正解ランク:" + battle.getRank() + " "
-                                        + battle.getLastPhase().getRankCalcInfo());
-                        }
-
-                        // 判定を特定できない場合の統計
-                        if (estimatedRank.match(battle.getRank())) {
-                            switch (estimatedRank) {
-                            case B_OR_C:
-                                rankCount[battle.getRank().equals("B") ? 0 : 1]++;
-                                break;
-                            case C_OR_B:
-                                rankCount[battle.getRank().equals("C") ? 2 : 3]++;
-                                break;
-                            case D_OR_C:
-                                rankCount[battle.getRank().equals("D") ? 4 : 5]++;
-                                break;
-                            default:
-                                break;
-                            }
+                            System.out.println("戦闘結果判定ミス: 正解ランク:" + battle.getRank() + " "
+                                    + battle.getLastPhase().getRankCalcInfo());
                         }
 
                         battle.toProto().writeDelimitedTo(output);

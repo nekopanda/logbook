@@ -17,25 +17,13 @@ public enum ResultRank {
     B("B", "戦術的勝利B"),
     C("C", "戦術的敗北C"),
     D("D", "敗北D"),
-    E("E", "敗北E"),
-
-    B_OR_C("B", "C", "戦術的勝利B （Cの可能性もあり）"),
-    C_OR_B("C", "B", "戦術的敗北C （Bの可能性もあり）"),
-    D_OR_C("D", "C", "敗北D （Cの可能性もあり）");
+    E("E", "敗北E");
 
     private String rank;
-    private String perhaps;
     private String description;
 
     private ResultRank(String rank, String desc) {
         this.rank = rank;
-        this.perhaps = null;
-        this.description = desc;
-    }
-
-    private ResultRank(String rank, String perhaps, String desc) {
-        this.rank = rank;
-        this.perhaps = perhaps;
         this.description = desc;
     }
 
@@ -55,12 +43,6 @@ public enum ResultRank {
             return ResultRankPb.D;
         case E:
             return ResultRankPb.E;
-        case B_OR_C:
-            return ResultRankPb.B_OR_C;
-        case C_OR_B:
-            return ResultRankPb.C_OR_B;
-        case D_OR_C:
-            return ResultRankPb.D_OR_C;
         }
         return null;
     }
@@ -81,12 +63,6 @@ public enum ResultRank {
             return D;
         case 6:
             return E;
-        case 7:
-            return B_OR_C;
-        case 8:
-            return C_OR_B;
-        case 9:
-            return D_OR_C;
         }
         return null;
     }
@@ -94,11 +70,6 @@ public enum ResultRank {
     @Override
     public String toString() {
         return this.description;
-    }
-
-    public boolean match(String rank) {
-        return (this.rank.equals(rank)) ||
-                ((this.perhaps != null) && this.perhaps.equals(rank));
     }
 
     public String rank() {
