@@ -48,6 +48,28 @@ public enum BattlePhaseKind {
         return null;
     }
 
+    public static BattlePhaseKind fromProto(BattlePhaseKindPb pb) {
+        switch (pb.getNumber()) {
+        case 0:
+            return BATTLE;
+        case 1:
+            return MIDNIGHT;
+        case 2:
+            return SP_MIDNIGHT;
+        case 3:
+            return NIGHT_TO_DAY;
+        case 4:
+            return COMBINED_BATTLE;
+        case 5:
+            return COMBINED_AIR;
+        case 6:
+            return COMBINED_MIDNIGHT;
+        case 7:
+            return COMBINED_SP_MIDNIGHT;
+        }
+        return null;
+    }
+
     /**
      * @return night
      */

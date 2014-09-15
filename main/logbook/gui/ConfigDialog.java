@@ -104,6 +104,9 @@ public final class ConfigDialog extends Dialog {
         TreeItem chart = new TreeItem(systemroot, SWT.NONE);
         chart.setText("資材チャート");
         chart.setData("chart");
+        TreeItem window = new TreeItem(systemroot, SWT.NONE);
+        window.setText("ウィンドウ");
+        window.setData("window");
         TreeItem proxy = new TreeItem(systemroot, SWT.NONE);
         proxy.setText("通信");
         proxy.setData("connection");
@@ -530,6 +533,43 @@ public final class ConfigDialog extends Dialog {
         });
         resetBauxiteColor.setText("リセット");
 
+        // ウィンドウ
+        Composite compositeWindow = new Composite(this.composite, SWT.NONE);
+        this.compositeMap.put("window", compositeWindow);
+        compositeWindow.setLayout(new GridLayout(3, false));
+
+        Label opaqueInterval = new Label(compositeWindow, SWT.NONE);
+        opaqueInterval.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        opaqueInterval.setText("マウスが離れてから元の透明度に戻るまでの時間");
+
+        new Label(compositeWindow, SWT.NONE);
+
+        final Spinner opaqueIntervalSpinner = new Spinner(compositeSystem, SWT.BORDER);
+        opaqueIntervalSpinner.setMaximum(60 * 60 * 10);
+        opaqueIntervalSpinner.setMinimum(0);
+        opaqueIntervalSpinner.setSelection(AppConfig.get().getOpaqueInterval());
+        GridData gdopaqueIntervalSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        gdopaqueIntervalSpinner.widthHint = 65;
+        opaqueIntervalSpinner.setLayoutData(gdopaqueIntervalSpinner);
+
+        Label opaqueIntervalSuffix = new Label(compositeWindow, SWT.NONE);
+        opaqueIntervalSuffix.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        opaqueIntervalSuffix.setText("x0.1秒");
+
+        Label shipTableName = new Label(compositeWindow, SWT.NONE);
+        shipTableName.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        shipTableName.setText("艦娘一覧ウィンドウの名前設定");
+
+        final Text[] shipTableNameText = new Text[4];
+        for (int i = 0; i < 4; ++i) {
+            Label shipTableLabel = new Label(compositeWindow, SWT.NONE);
+            shipTableLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+            shipTableLabel.setText(String.valueOf(i + 1) + ": ");
+            shipTableNameText[i] = new Text(compositeWindow, SWT.BORDER);
+            shipTableNameText[i].setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
+            shipTableNameText[i].setText(AppConfig.get().getShipTableNames()[i]);
+        }
+
         // プロキシ
         Composite compositeProxy = new Composite(this.composite, SWT.NONE);
         this.compositeMap.put("connection", compositeProxy);
@@ -683,6 +723,11 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setAmmoColor(ammo.getForeground().getRGB());
                 AppConfig.get().setMetalColor(metal.getForeground().getRGB());
                 AppConfig.get().setBauxiteColor(bauxite.getForeground().getRGB());
+                // ウィンドウ
+                AppConfig.get().setOpaqueInterval(opaqueIntervalSpinner.getSelection());
+                for (int i = 0; i < 4; ++i) {
+                    AppConfig.get().getShipTableNames()[i] = shipTableNameText[i].getText();
+                }
                 // connection
                 AppConfig.get().setUseProxy(useProxyButton.getSelection());
                 AppConfig.get().setProxyHost(proxyHostText.getText());

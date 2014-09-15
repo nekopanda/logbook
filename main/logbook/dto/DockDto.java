@@ -44,9 +44,11 @@ public final class DockDto extends AbstractDto {
         if (this.name != null) {
             builder.setName(this.name);
         }
-        for (ShipDto b : this.ships) {
-            if (b != null) {
-                builder.addShips(b.toProto());
+        if (this.ships != null) {
+            for (ShipDto b : this.ships) {
+                if (b != null) {
+                    builder.addShips(b.toProto());
+                }
             }
         }
         return builder.build();

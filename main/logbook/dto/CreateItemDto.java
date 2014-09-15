@@ -35,7 +35,7 @@ public final class CreateItemDto extends AbstractDto {
 
         this.createDate = Calendar.getInstance().getTime();
         this.createFlag = object.getJsonNumber("api_create_flag").longValue() != 0;
-        this.resources = resources != null ? resources : new ResourceDto("0", "0", "0", "0", null, 0);
+        this.resources = resources != null ? resources : new ResourceDto(0, 0, 0, 0, null, 0);
     }
 
     /**
@@ -83,28 +83,28 @@ public final class CreateItemDto extends AbstractDto {
     /**
      * @return 燃料
      */
-    public String getFuel() {
+    public int getFuel() {
         return this.resources.getFuel();
     }
 
     /**
      * @return 弾薬
      */
-    public String getAmmo() {
+    public int getAmmo() {
         return this.resources.getAmmo();
     }
 
     /**
      * @return 鋼材
      */
-    public String getMetal() {
+    public int getMetal() {
         return this.resources.getMetal();
     }
 
     /**
      * @return ボーキサイト
      */
-    public String getBauxite() {
+    public int getBauxite() {
         return this.resources.getBauxite();
     }
 

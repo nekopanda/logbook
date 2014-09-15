@@ -50,8 +50,10 @@ public class MapCellDto {
 
     public MapCellDtoPb toProto() {
         MapCellDtoPb.Builder builder = MapCellDtoPb.newBuilder();
-        for (int b : this.map) {
-            builder.addMap(b);
+        if (this.map != null) {
+            for (int b : this.map) {
+                builder.addMap(b);
+            }
         }
         builder.setEnemyId(this.enemyId);
         builder.setColorNo(this.colorNo);

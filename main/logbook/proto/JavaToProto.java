@@ -126,12 +126,13 @@ public class JavaToProto {
                 if (f.isRepeat()) {
                     String suffix = f.isMap() ? ".entrySet()" : "";
                     String valName = NAMES[JavaToProto.this.depth++];
+                    builder.append("if(").append(objName).append(".").append(f.getName()).append(" != null) { ");
                     builder.append("for(").append(f.getType().javaTypeName).append(" ")
                             .append(valName).append(" : ").append(objName).append(".")
                             .append(f.getName()).append(suffix).append(") {\n").append(TABS, 0, JavaToProto.this.depth);
                     f.getType().genToProto(builder, builderName + ".add" + uc, valName);
                     JavaToProto.this.depth--;
-                    builder.append("\n").append(TABS, 0, JavaToProto.this.depth).append("}");
+                    builder.append("\n").append(TABS, 0, JavaToProto.this.depth).append("}").append(" }");
                 }
                 else {
                     String getter = objName + "." + (useGetter ? ("get" + uc + "()") : f.getName());
@@ -280,12 +281,26 @@ public class JavaToProto {
 
         @Override
         public void genToProtoMethod(StringBuilder builder) {
+            // to proto
             builder.append("public ").append(this.javaName).append(" toProto() {\n\t");
             builder.append("switch(this) {\n\t");
             for (Field f : this.type.getDeclaredFields()) {
                 if (f.isEnumConstant()) {
                     builder.append("case ").append(f.getName()).append(":\n\t\treturn ").append(this.javaName)
                             .append(".").append(f.getName()).append(";\n\t");
+                }
+            }
+            builder.append("}\n");
+            builder.append("\treturn null;\n}");
+            // from proto
+            builder.append("\npublic static ").append(this.javaTypeName)
+                    .append(" fromProto(").append(this.javaName).append(" pb) {\n\t");
+            builder.append("switch(pb.getNumber()) {\n\t");
+            int number = 0;
+            for (Field f : this.type.getDeclaredFields()) {
+                if (f.isEnumConstant()) {
+                    builder.append("case ").append(number++).append(":\n\t\treturn ")
+                            .append(f.getName()).append(";\n\t");
                 }
             }
             builder.append("}\n");
@@ -308,11 +323,12 @@ public class JavaToProto {
             MessageField f = this.fields.get(0);
             builder.append(TABS, 0, JavaToProto.this.depth);
             String valName = NAMES[JavaToProto.this.depth++];
+            builder.append("if(").append(obj).append(" != null) { ");
             builder.append("for(").append(f.getType().javaTypeName).append(" ").append(valName).append(" : ")
                     .append(obj).append(") {\n").append(TABS, 0, JavaToProto.this.depth);
             f.getType().genToProto(builder, builderName + ".addData", valName);
             JavaToProto.this.depth--;
-            builder.append("\n").append(TABS, 0, JavaToProto.this.depth).append("}");
+            builder.append("\n").append(TABS, 0, JavaToProto.this.depth).append("}").append(" }");
             builder.append("\n");
 
             builder.append(TABS, 0, JavaToProto.this.depth).append(setMethod)

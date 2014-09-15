@@ -68,22 +68,30 @@ public class AirBattleDto {
 
     public AirBattleDtoPb toProto() {
         AirBattleDtoPb.Builder builder = AirBattleDtoPb.newBuilder();
-        for (BattleAtackDto b : this.atacks) {
-            if (b != null) {
-                builder.addAtacks(b.toProto());
+        if (this.atacks != null) {
+            for (BattleAtackDto b : this.atacks) {
+                if (b != null) {
+                    builder.addAtacks(b.toProto());
+                }
             }
         }
-        for (int b : this.touchPlane) {
-            builder.addTouchPlane(b);
+        if (this.touchPlane != null) {
+            for (int b : this.touchPlane) {
+                builder.addTouchPlane(b);
+            }
         }
         if (this.seiku != null) {
             builder.setSeiku(this.seiku);
         }
-        for (int b : this.stage1) {
-            builder.addStage1(b);
+        if (this.stage1 != null) {
+            for (int b : this.stage1) {
+                builder.addStage1(b);
+            }
         }
-        for (int b : this.stage2) {
-            builder.addStage2(b);
+        if (this.stage2 != null) {
+            for (int b : this.stage2) {
+                builder.addStage2(b);
+            }
         }
         return builder.build();
     }

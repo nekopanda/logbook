@@ -928,12 +928,12 @@ public final class GlobalContext {
             String kdockid = data.getField("api_kdock_id");
             // 投入資源
             ResourceDto resource = new ResourceDto(
-                    data.getField("api_large_flag"),
-                    data.getField("api_item1"),
-                    data.getField("api_item2"),
-                    data.getField("api_item3"),
-                    data.getField("api_item4"),
-                    data.getField("api_item5"),
+                    Integer.parseInt(data.getField("api_large_flag")),
+                    Integer.parseInt(data.getField("api_item1")),
+                    Integer.parseInt(data.getField("api_item2")),
+                    Integer.parseInt(data.getField("api_item3")),
+                    Integer.parseInt(data.getField("api_item4")),
+                    Integer.parseInt(data.getField("api_item5")),
                     secretary, hqLevel
                     );
             lastBuildKdock = kdockid;
@@ -975,7 +975,7 @@ public final class GlobalContext {
                         }
                     }
                     // 建造ドックの空きをセットします
-                    resource.setFreeDock(Integer.toString(freecount));
+                    resource.setFreeDock(freecount);
                     KdockConfig.store(lastBuildKdock, resource);
                 }
             }
@@ -1068,8 +1068,12 @@ public final class GlobalContext {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
 
             // 投入資源
-            ResourceDto resources = new ResourceDto(data.getField("api_item1"), data.getField("api_item2"),
-                    data.getField("api_item3"), data.getField("api_item4"), secretary, hqLevel);
+            ResourceDto resources = new ResourceDto(
+                    Integer.parseInt(data.getField("api_item1")),
+                    Integer.parseInt(data.getField("api_item2")),
+                    Integer.parseInt(data.getField("api_item3")),
+                    Integer.parseInt(data.getField("api_item4")),
+                    secretary, hqLevel);
 
             CreateItemDto createitem = new CreateItemDto(apidata, resources);
             if (createitem.isCreateFlag()) {
@@ -1512,10 +1516,10 @@ public final class GlobalContext {
 
             if (clearResult != 0) {
                 JsonArray getMaterial = apidata.getJsonArray("api_get_material");
-                result.setFuel(getMaterial.getJsonNumber(0).toString());
-                result.setAmmo(getMaterial.getJsonNumber(1).toString());
-                result.setMetal(getMaterial.getJsonNumber(2).toString());
-                result.setBauxite(getMaterial.getJsonNumber(3).toString());
+                result.setFuel(getMaterial.getInt(0));
+                result.setAmmo(getMaterial.getInt(1));
+                result.setMetal(getMaterial.getInt(2));
+                result.setBauxite(getMaterial.getInt(3));
 
                 // 資源に反映させてレポート
                 ResourceItemDto items = new ResourceItemDto();

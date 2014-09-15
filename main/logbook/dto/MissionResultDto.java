@@ -19,16 +19,16 @@ public final class MissionResultDto extends AbstractDto {
     private String questName;
 
     /** 燃料 */
-    private String fuel;
+    private int fuel;
 
     /** 弾薬 */
-    private String ammo;
+    private int ammo;
 
     /** 鋼材 */
-    private String metal;
+    private int metal;
 
     /** ボーキイト */
-    private String bauxite;
+    private int bauxite;
 
     /** アイテム */
     private ResourceItemDto items;
@@ -96,7 +96,7 @@ public final class MissionResultDto extends AbstractDto {
      * 
      * @return 燃料
      */
-    public String getFuel() {
+    public int getFuel() {
         return this.fuel;
     }
 
@@ -105,7 +105,7 @@ public final class MissionResultDto extends AbstractDto {
      * 
      * @param 燃料
      */
-    public void setFuel(String fuel) {
+    public void setFuel(int fuel) {
         this.fuel = fuel;
     }
 
@@ -114,7 +114,7 @@ public final class MissionResultDto extends AbstractDto {
      * 
      * @return 弾薬
      */
-    public String getAmmo() {
+    public int getAmmo() {
         return this.ammo;
     }
 
@@ -123,7 +123,7 @@ public final class MissionResultDto extends AbstractDto {
      * 
      * @param 弾薬
      */
-    public void setAmmo(String ammo) {
+    public void setAmmo(int ammo) {
         this.ammo = ammo;
     }
 
@@ -132,7 +132,7 @@ public final class MissionResultDto extends AbstractDto {
      * 
      * @return 鋼材
      */
-    public String getMetal() {
+    public int getMetal() {
         return this.metal;
     }
 
@@ -141,7 +141,7 @@ public final class MissionResultDto extends AbstractDto {
      * 
      * @param 鋼材
      */
-    public void setMetal(String metal) {
+    public void setMetal(int metal) {
         this.metal = metal;
     }
 
@@ -150,7 +150,7 @@ public final class MissionResultDto extends AbstractDto {
      * 
      * @return ボーキイト
      */
-    public String getBauxite() {
+    public int getBauxite() {
         return this.bauxite;
     }
 
@@ -159,7 +159,7 @@ public final class MissionResultDto extends AbstractDto {
      * 
      * @param ボーキイト
      */
-    public void setBauxite(String bauxite) {
+    public void setBauxite(int bauxite) {
         this.bauxite = bauxite;
     }
 

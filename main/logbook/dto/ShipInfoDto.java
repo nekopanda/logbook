@@ -113,11 +113,15 @@ public final class ShipInfoDto extends AbstractDto {
         }
         builder.setMaxBull(this.maxBull);
         builder.setMaxFuel(this.maxFuel);
-        for (int b : this.powup) {
-            builder.addPowup(b);
+        if (this.powup != null) {
+            for (int b : this.powup) {
+                builder.addPowup(b);
+            }
         }
-        for (int b : this.maxeq) {
-            builder.addMaxeq(b);
+        if (this.maxeq != null) {
+            for (int b : this.maxeq) {
+                builder.addMaxeq(b);
+            }
         }
         return builder.build();
     }

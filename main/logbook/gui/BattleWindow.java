@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import logbook.config.bean.WindowPositionBean;
 import logbook.constants.AppConstants;
 import logbook.dto.AirBattleDto;
 import logbook.dto.BattleAtackDto;
@@ -62,8 +61,8 @@ public class BattleWindow extends BattleWindowBase {
      * Create the dialog.
      * @param parent
      */
-    public BattleWindow(Shell parent, MenuItem menuItem, WindowPositionBean windowPos) {
-        super(parent, menuItem, windowPos, "戦況");
+    public BattleWindow(Shell parent, MenuItem menuItem) {
+        super(parent, menuItem, "戦況");
     }
 
     private void addInfoLabel(Label[] labels, int row, int width) {

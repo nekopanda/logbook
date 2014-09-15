@@ -26,8 +26,8 @@ public final class ItemTable extends AbstractTableDialog {
     /**
      * @param parent
      */
-    public ItemTable(Shell parent) {
-        super(parent);
+    public ItemTable(Shell parent, MenuItem menuItem) {
+        super(parent, menuItem);
     }
 
     @Override

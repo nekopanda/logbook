@@ -12,7 +12,6 @@ import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -75,13 +74,13 @@ public final class CreateReportLogic {
         }
 
         @Override
-        public TableItem create(Table table, String[] text, int count) {
+        public TableItem create(Table table, Comparable[] text, int count) {
             TableItem item = new TableItem(table, SWT.NONE);
             // 偶数行に背景色を付ける
             if ((count % 2) != 0) {
                 item.setBackground(SWTResourceManager.getColor(AppConstants.ROW_BACKGROUND));
             }
-            item.setText(text);
+            item.setText(toStringArray(text));
             return item;
         }
     };
@@ -112,9 +111,9 @@ public final class CreateReportLogic {
         }
 
         @Override
-        public TableItem create(Table table, String[] text, int count) {
+        public TableItem create(Table table, Comparable[] text, int count) {
             // 艦娘
-            Long ship = Long.valueOf(text[1]);
+            Long ship = (Long) text[1];
 
             TableItem item = new TableItem(table, SWT.NONE);
 
@@ -126,7 +125,7 @@ public final class CreateReportLogic {
             }
 
             // 疲労
-            int cond = Integer.parseInt(text[5]);
+            int cond = (Integer) text[5];
             if (cond <= AppConstants.COND_RED) {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
             } else if (cond <= AppConstants.COND_ORANGE) {
@@ -142,7 +141,7 @@ public final class CreateReportLogic {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.NDOCK_COLOR));
             }
 
-            item.setText(text);
+            item.setText(toStringArray(text));
             return item;
         }
     };
@@ -163,18 +162,18 @@ public final class CreateReportLogic {
      * ドロップ報告書の内容
      * @return 内容
      */
-    public static List<String[]> getBattleResultBody() {
+    public static List<Comparable[]> getBattleResultBody() {
         List<BattleResultDto> results = GlobalContext.getBattleResultList();
-        List<Object[]> body = new ArrayList<Object[]>();
+        List<Comparable[]> body = new ArrayList<Comparable[]>();
 
         for (int i = 0; i < results.size(); i++) {
             BattleResultDto item = results.get(i);
-            body.add(new Object[] { Integer.toString(i + 1),
-                    new SimpleDateFormat(AppConstants.DATE_FORMAT).format(item.getBattleDate()), item.getQuestName(),
+            body.add(new Comparable[] { Integer.toString(i + 1),
+                    new DateTimeString(item.getBattleDate()), item.getQuestName(),
                     item.getMapCellNo(), item.getRank(), item.getEnemyName(), item.getDropType(),
                     item.getDropName() });
         }
-        return toListStringArray(body);
+        return body;
     }
 
     /**
@@ -204,8 +203,8 @@ public final class CreateReportLogic {
      * 
      * @return 内容
      */
-    public static List<String[]> getBattleResultStoreBody(List<BattleExDto> results) {
-        List<Object[]> body = new ArrayList<Object[]>();
+    public static List<Comparable[]> getBattleResultStoreBody(List<BattleExDto> results) {
+        List<Comparable[]> body = new ArrayList<Comparable[]>();
 
         for (int i = 0; i < results.size(); i++) {
             BattleExDto battle = results.get(i);
@@ -244,8 +243,8 @@ public final class CreateReportLogic {
                 }
             }
 
-            body.add(new Object[] { Integer.toString(i + 1),
-                    new SimpleDateFormat(AppConstants.DATE_FORMAT).format(battle.getBattleDate()),
+            body.add(new Comparable[] { Integer.toString(i + 1),
+                    new DateTimeString(battle.getBattleDate()),
                     battle.getQuestName(),
                     battle.getMapCellDto().toString(), battle.getRank(), battle.getEnemyName(), battle.getDropType(),
                     battle.getDropName(),
@@ -253,7 +252,7 @@ public final class CreateReportLogic {
                     friend[4], friendHp[4], friend[5], friendHp[5], enemy[0], enemyHp[0], enemy[1], enemyHp[1],
                     enemy[2], enemyHp[2], enemy[3], enemyHp[3], enemy[4], enemyHp[4], enemy[5], enemyHp[5] });
         }
-        return toListStringArray(body);
+        return body;
     }
 
     /**
@@ -270,16 +269,16 @@ public final class CreateReportLogic {
      * 
      * @return 内容
      */
-    public static List<String[]> getCreateShipBody(List<GetShipDto> ships) {
-        List<Object[]> body = new ArrayList<Object[]>();
+    public static List<Comparable[]> getCreateShipBody(List<GetShipDto> ships) {
+        List<Comparable[]> body = new ArrayList<Comparable[]>();
         for (int i = 0; i < ships.size(); i++) {
             GetShipDto ship = ships.get(i);
-            body.add(new Object[] { Integer.toString(i + 1),
-                    new SimpleDateFormat(AppConstants.DATE_FORMAT).format(ship.getGetDate()), ship.getBuildType(),
+            body.add(new Comparable[] { Integer.toString(i + 1),
+                    new DateTimeString(ship.getGetDate()), ship.getBuildType(),
                     ship.getName(), ship.getType(), ship.getFuel(), ship.getAmmo(), ship.getMetal(), ship.getBauxite(),
                     ship.getResearchMaterials(), ship.getFreeDock(), ship.getSecretary(), ship.getHqLevel() });
         }
-        return toListStringArray(body);
+        return body;
     }
 
     /**
@@ -296,8 +295,8 @@ public final class CreateReportLogic {
      * 
      * @return 内容
      */
-    public static List<String[]> getCreateItemBody(List<CreateItemDto> items) {
-        List<Object[]> body = new ArrayList<Object[]>();
+    public static List<Comparable[]> getCreateItemBody(List<CreateItemDto> items) {
+        List<Comparable[]> body = new ArrayList<Comparable[]>();
 
         for (int i = 0; i < items.size(); i++) {
             CreateItemDto item = items.get(i);
@@ -307,12 +306,12 @@ public final class CreateReportLogic {
                 name = item.getName();
                 type = item.getType();
             }
-            body.add(new Object[] { Integer.toString(i + 1),
-                    new SimpleDateFormat(AppConstants.DATE_FORMAT).format(item.getCreateDate()), name, type,
+            body.add(new Comparable[] { Integer.toString(i + 1),
+                    new DateTimeString(item.getCreateDate()), name, type,
                     item.getFuel(), item.getAmmo(), item.getMetal(), item.getBauxite(), item.getSecretary(),
                     item.getHqLevel() });
         }
-        return toListStringArray(body);
+        return body;
     }
 
     /**
@@ -329,7 +328,7 @@ public final class CreateReportLogic {
      * 
      * @return 内容
      */
-    public static List<String[]> getItemListBody() {
+    public static List<Comparable[]> getItemListBody() {
         Set<Entry<Long, ItemDto>> items = GlobalContext.getItemMap().entrySet();
         Map<ItemDto, Integer> itemCountMap = new HashMap<ItemDto, Integer>();
 
@@ -352,18 +351,18 @@ public final class CreateReportLogic {
             }
         });
 
-        List<Object[]> body = new ArrayList<Object[]>();
+        List<Comparable[]> body = new ArrayList<Comparable[]>();
 
         int count = 0;
         for (Entry<ItemDto, Integer> entry : countitems) {
             ItemDto item = entry.getKey();
             count++;
-            body.add(new Object[] { count, item.getName(), item.getTypeName(), entry.getValue(), item.getHoug(),
+            body.add(new Comparable[] { count, item.getName(), item.getTypeName(), entry.getValue(), item.getHoug(),
                     item.getHoum(), item.getLeng(), item.getLuck(), item.getHouk(), item.getBaku(), item.getRaig(),
                     item.getSaku(), item.getTais(), item.getTyku(), item.getSouk()
             });
         }
-        return toListStringArray(body);
+        return body;
     }
 
     /**
@@ -372,8 +371,32 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getShipListHeader() {
-        return new String[] { "", "ID", "艦隊", "名前", "艦種", "疲労", "回復", "Lv", "Next", "経験値", "制空", "装備1", "装備2",
-                "装備3", "装備4", "HP", "火力", "雷装", "対空", "装甲", "回避", "対潜", "索敵", "運" };
+        return new String[] {
+                "",
+                "ID",
+                "艦隊",
+                "名前",
+                "艦種",
+                "疲労",
+                "回復",
+                "Lv",
+                "Next",
+                "経験値",
+                "制空",
+                "装備1",
+                "装備2",
+                "装備3",
+                "装備4",
+                "HP",
+                "火力",
+                "雷装",
+                "対空",
+                "装甲",
+                "回避",
+                "対潜",
+                "索敵",
+                "運"
+        };
     }
 
     /**
@@ -383,9 +406,9 @@ public final class CreateReportLogic {
      * @param filter 鍵付きのみ
      * @return 内容
      */
-    public static List<String[]> getShipListBody(boolean specdiff, ShipFilterDto filter) {
+    public static List<Comparable[]> getShipListBody(boolean specdiff, ShipFilterDto filter) {
         Set<Entry<Long, ShipDto>> ships = GlobalContext.getShipMap().entrySet();
-        List<Object[]> body = new ArrayList<Object[]>();
+        List<Comparable[]> body = new ArrayList<Comparable[]>();
         int count = 0;
         for (Entry<Long, ShipDto> entry : ships) {
             ShipDto ship = entry.getValue();
@@ -396,53 +419,32 @@ public final class CreateReportLogic {
 
             count++;
 
-            if (!specdiff) {
-                // 通常
-                body.add(new Object[] {
-                        count,
-                        ship.getId(),
-                        ship.getFleetid(),
-                        ship.getName(),
-                        ship.getType(),
-                        ship.getEstimatedCond(),
-                        ship.getCondClearDate(),
-                        ship.getLv(),
-                        ship.getNext(),
-                        ship.getExp(),
-                        ship.getSeiku(),
-                        ship.getSlot().get(0),
-                        ship.getSlot().get(1),
-                        ship.getSlot().get(2),
-                        ship.getSlot().get(3),
-                        ship.getMaxhp(),
-                        ship.getKaryoku(),
-                        ship.getRaisou(),
-                        ship.getTaiku(),
-                        ship.getSoukou(),
-                        ship.getKaihi(),
-                        ship.getTaisen(),
-                        ship.getSakuteki(),
-                        ship.getLucky()
-                });
-            } else {
-                // 成長の余地
-                // 火力
-                long karyoku = ship.getKaryokuMax() - ship.getKaryoku();
-                // 雷装
-                long raisou = ship.getRaisouMax() - ship.getRaisou();
-                // 対空
-                long taiku = ship.getTaikuMax() - ship.getTaiku();
-                // 装甲
-                long soukou = ship.getSoukouMax() - ship.getSoukou();
-                // 回避
-                long kaihi = ship.getKaihiMax() - ship.getKaihi();
-                // 対潜
-                long taisen = ship.getTaisenMax() - ship.getTaisen();
-                // 索敵
-                long sakuteki = ship.getSakutekiMax() - ship.getSakuteki();
-                // 運
-                long lucky = ship.getLuckyMax() - ship.getLucky();
+            // 火力
+            int karyoku;
+            // 雷装
+            int raisou;
+            // 対空
+            int taiku;
+            // 装甲
+            int soukou;
+            // 回避
+            int kaihi;
+            // 対潜
+            int taisen;
+            // 索敵
+            int sakuteki;
+            // 運
+            int lucky;
 
+            if (specdiff) {
+                karyoku = ship.getKaryokuMax() - ship.getKaryoku();
+                raisou = ship.getRaisouMax() - ship.getRaisou();
+                taiku = ship.getTaikuMax() - ship.getTaiku();
+                soukou = ship.getSoukouMax() - ship.getSoukou();
+                kaihi = ship.getKaihiMax() - ship.getKaihi();
+                taisen = ship.getTaisenMax() - ship.getTaisen();
+                sakuteki = ship.getSakutekiMax() - ship.getSakuteki();
+                lucky = ship.getLuckyMax() - ship.getLucky();
                 for (ItemDto item : ship.getItem()) {
                     if (item != null) {
                         karyoku += item.getHoug();
@@ -454,35 +456,46 @@ public final class CreateReportLogic {
                         lucky += item.getLuck();
                     }
                 }
-                body.add(new Object[] {
-                        count,
-                        ship.getId(),
-                        ship.getFleetid(),
-                        ship.getName(),
-                        ship.getType(),
-                        ship.getCond(),
-                        ship.getCondClearDate(),
-                        ship.getLv(),
-                        ship.getNext(),
-                        ship.getExp(),
-                        ship.getSeiku(),
-                        ship.getSlot().get(0),
-                        ship.getSlot().get(1),
-                        ship.getSlot().get(2),
-                        ship.getSlot().get(3),
-                        ship.getMaxhp(),
-                        karyoku,
-                        raisou,
-                        taiku,
-                        soukou,
-                        kaihi,
-                        taisen,
-                        sakuteki,
-                        lucky
-                });
             }
+            else {
+                karyoku = ship.getKaryoku();
+                raisou = ship.getRaisou();
+                taiku = ship.getTaiku();
+                soukou = ship.getSoukou();
+                kaihi = ship.getKaihi();
+                taisen = ship.getTaisen();
+                sakuteki = ship.getSakuteki();
+                lucky = ship.getLucky();
+            }
+
+            body.add(new Comparable[] {
+                    count,
+                    ship.getId(),
+                    ship.getFleetid(),
+                    ship.getName(),
+                    ship.getType(),
+                    ship.getCond(),
+                    new TimeString(ship.getCondClearTime().getTime()),
+                    ship.getLv(),
+                    ship.getNext(),
+                    ship.getExp(),
+                    ship.getSeiku(),
+                    ship.getSlot().get(0),
+                    ship.getSlot().get(1),
+                    ship.getSlot().get(2),
+                    ship.getSlot().get(3),
+                    ship.getMaxhp(),
+                    karyoku,
+                    raisou,
+                    taiku,
+                    soukou,
+                    kaihi,
+                    taisen,
+                    sakuteki,
+                    lucky
+            });
         }
-        return toListStringArray(body);
+        return body;
     }
 
     /**
@@ -499,8 +512,8 @@ public final class CreateReportLogic {
      * 
      * @return 遠征結果
      */
-    public static List<String[]> getMissionResultBody(List<MissionResultDto> resultlist) {
-        List<Object[]> body = new ArrayList<Object[]>();
+    public static List<Comparable[]> getMissionResultBody(List<MissionResultDto> resultlist) {
+        List<Comparable[]> body = new ArrayList<Comparable[]>();
 
         for (int i = 0; i < resultlist.size(); i++) {
             MissionResultDto result = resultlist.get(i);
@@ -520,9 +533,9 @@ public final class CreateReportLogic {
                 }
             }
 
-            body.add(new Object[] {
+            body.add(new Comparable[] {
                     Integer.toString(i + 1),
-                    new SimpleDateFormat(AppConstants.DATE_FORMAT).format(result.getDate()),
+                    new DateTimeString(result.getDate()),
                     result.getClearResult(),
                     result.getQuestName(),
                     result.getFuel(),
@@ -535,7 +548,7 @@ public final class CreateReportLogic {
                     itemCount[1],
             });
         }
-        return toListStringArray(body);
+        return body;
     }
 
     /**
@@ -552,8 +565,8 @@ public final class CreateReportLogic {
      * 
      * @return
      */
-    public static List<String[]> getQuestBody() {
-        List<Object[]> body = new ArrayList<Object[]>();
+    public static List<Comparable[]> getQuestBody() {
+        List<Comparable[]> body = new ArrayList<Comparable[]>();
 
         for (QuestDto quest : GlobalContext.getQuest()) {
             if (quest == null)
@@ -574,7 +587,7 @@ public final class CreateReportLogic {
                 continue;
             }
 
-            body.add(new Object[] {
+            body.add(new Comparable[] {
                     quest.getNo(),
                     "" + quest.getPage() + "-" + quest.getPos(),
                     state,
@@ -586,7 +599,7 @@ public final class CreateReportLogic {
                     quest.getBauxite()
             });
         }
-        return toListStringArray(body);
+        return body;
     }
 
     /**
@@ -604,22 +617,22 @@ public final class CreateReportLogic {
      * @param materials 資材
      * @return
      */
-    public static List<String[]> getMaterialStoreBody(List<MaterialDto> materials) {
-        List<String[]> body = new ArrayList<String[]>();
+    public static List<Comparable[]> getMaterialStoreBody(List<MaterialDto> materials) {
+        List<Comparable[]> body = new ArrayList<Comparable[]>();
 
         for (int i = 0; i < materials.size(); i++) {
             MaterialDto material = materials.get(i);
-            body.add(new String[] {
-                    Integer.toString(i + 1),
-                    new SimpleDateFormat(AppConstants.DATE_FORMAT).format(material.getTime()),
+            body.add(new Comparable[] {
+                    i + 1,
+                    new DateTimeString(material.getTime()),
                     material.getEvent(),
-                    Integer.toString(material.getFuel()),
-                    Integer.toString(material.getAmmo()),
-                    Integer.toString(material.getMetal()),
-                    Integer.toString(material.getBauxite()),
-                    Integer.toString(material.getBucket()),
-                    Integer.toString(material.getBurner()),
-                    Integer.toString(material.getResearch())
+                    material.getFuel(),
+                    material.getAmmo(),
+                    material.getMetal(),
+                    material.getBauxite(),
+                    material.getBucket(),
+                    material.getBurner(),
+                    material.getResearch()
             });
         }
 
@@ -641,16 +654,16 @@ public final class CreateReportLogic {
      * @param lostList ロストデータ
      * @return
      */
-    public static List<String[]> getLostStoreBody(List<LostEntityDto> lostList) {
-        List<String[]> body = new ArrayList<String[]>();
+    public static List<Comparable[]> getLostStoreBody(List<LostEntityDto> lostList) {
+        List<Comparable[]> body = new ArrayList<Comparable[]>();
 
         for (int i = 0; i < lostList.size(); i++) {
             LostEntityDto lost = lostList.get(i);
-            body.add(new String[] {
-                    Integer.toString(i + 1),
-                    new SimpleDateFormat(AppConstants.DATE_FORMAT).format(lost.getTime()),
+            body.add(new Comparable[] {
+                    i + 1,
+                    new DateTimeString(lost.getTime()),
                     lost.getLostEntity(),
-                    Integer.toString(lost.getEntityId()),
+                    lost.getEntityId(),
                     lost.getName(),
                     lost.getEventCaused()
             });
@@ -668,12 +681,12 @@ public final class CreateReportLogic {
      * @param applend 追記フラグ
      * @throws IOException
      */
-    public static void writeCsvStripFirstColumn(File file, String[] header, List<String[]> body, boolean applend)
+    public static void writeCsvStripFirstColumn(File file, String[] header, List<Comparable[]> body, boolean applend)
             throws IOException {
         // 報告書の項番を除く
         String[] copyheader = Arrays.copyOfRange(header, 1, header.length);
-        List<String[]> copybody = new ArrayList<String[]>();
-        for (String[] strings : body) {
+        List<Comparable[]> copybody = new ArrayList<Comparable[]>();
+        for (Comparable[] strings : body) {
             copybody.add(Arrays.copyOfRange(strings, 1, strings.length));
         }
         writeCsv(file, copyheader, copybody, applend);
@@ -688,15 +701,15 @@ public final class CreateReportLogic {
      * @param applend 追記フラグ
      * @throws IOException
      */
-    public static void writeCsv(File file, String[] header, List<String[]> body, boolean applend)
+    public static void writeCsv(File file, String[] header, List<Comparable[]> body, boolean applend)
             throws IOException {
         OutputStream stream = new BufferedOutputStream(new FileOutputStream(file, applend));
         try {
             if (!file.exists() || (FileUtils.sizeOf(file) <= 0)) {
                 IOUtils.write(StringUtils.join(header, ',') + "\r\n", stream, AppConstants.CHARSET);
             }
-            for (String[] colums : body) {
-                IOUtils.write(StringUtils.join(colums, ',') + "\r\n", stream, AppConstants.CHARSET);
+            for (Comparable[] colums : body) {
+                IOUtils.write(StringUtils.join(colums.toString(), ',') + "\r\n", stream, AppConstants.CHARSET);
             }
         } finally {
             stream.close();
@@ -709,20 +722,17 @@ public final class CreateReportLogic {
      * @param from テーブルに表示する内容
      * @return テーブルに表示する内容
      */
-    private static List<String[]> toListStringArray(List<Object[]> from) {
-        List<String[]> body = new ArrayList<String[]>();
-        for (Object[] objects : from) {
-            String[] values = new String[objects.length];
-            for (int i = 0; i < objects.length; i++) {
-                if (objects[i] != null) {
-                    values[i] = String.valueOf(objects[i]);
-                } else {
-                    values[i] = "";
-                }
+    public static String[] toStringArray(Comparable[] data) {
+        String[] ret = new String[data.length];
+        for (int i = 0; i < data.length; ++i) {
+            if (data[i] == null) {
+                ret[i] = "";
             }
-            body.add(values);
+            else {
+                ret[i] = data[i].toString();
+            }
         }
-        return body;
+        return ret;
     }
 
     /**

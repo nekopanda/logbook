@@ -9,6 +9,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -22,8 +23,8 @@ public final class DropReportTable extends AbstractTableDialog {
     /**
      * @param parent
      */
-    public DropReportTable(Shell parent) {
-        super(parent);
+    public DropReportTable(Shell parent, MenuItem menuItem) {
+        super(parent, menuItem);
     }
 
     @Override

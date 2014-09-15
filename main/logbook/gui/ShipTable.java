@@ -1,8 +1,9 @@
 package logbook.gui;
 
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
+import logbook.config.AppConfig;
 import logbook.config.ShipGroupConfig;
 import logbook.config.bean.ShipGroupBean;
 import logbook.data.context.GlobalContext;
@@ -32,6 +33,9 @@ import org.eclipse.swt.widgets.TableItem;
  */
 public final class ShipTable extends AbstractTableDialog {
 
+    /** 何番目か */
+    private final int index;
+
     /** 成長余地 */
     private boolean specdiff = false;
 
@@ -41,8 +45,9 @@ public final class ShipTable extends AbstractTableDialog {
     /**
      * @param parent
      */
-    public ShipTable(Shell parent) {
-        super(parent);
+    public ShipTable(Shell parent, MenuItem menuItem, int index) {
+        super(parent, menuItem);
+        this.index = index;
     }
 
     /**
@@ -154,7 +159,7 @@ public final class ShipTable extends AbstractTableDialog {
                 public void widgetSelected(SelectionEvent e) {
                     TableItem[] tableItems = ShipTable.this.table.getSelection();
                     for (int i = 0; i < tableItems.length; i++) {
-                        long id = Long.parseLong(tableItems[i].getText(1));
+                        int id = Integer.parseInt(tableItems[i].getText(1));
                         ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
                         bean.getShips().add(id);
                     }
@@ -186,10 +191,11 @@ public final class ShipTable extends AbstractTableDialog {
 
     @Override
     protected String getTitle() {
+        String name = AppConfig.get().getShipTableNames()[this.index];
         if ((this.filter != null) && (this.filter.group != null)) {
-            return "所有艦娘一覧 (" + this.filter.group.getName() + ")";
+            return name + " (" + this.filter.group.getName() + ")";
         }
-        return "所有艦娘一覧";
+        return name;
     }
 
     @Override
@@ -210,6 +216,11 @@ public final class ShipTable extends AbstractTableDialog {
     @Override
     protected TableItemCreator getTableItemCreator() {
         return CreateReportLogic.SHIP_LIST_TABLE_ITEM_CREATOR;
+    }
+
+    @Override
+    public String getWindowId() {
+        return this.getClass().getName() + ((this.index == 0) ? "" : String.valueOf(this.index));
     }
 
     @Override

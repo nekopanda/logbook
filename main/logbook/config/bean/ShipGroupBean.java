@@ -13,7 +13,7 @@ public final class ShipGroupBean {
     private String name;
 
     /** 艦娘リスト */
-    private Set<Long> ships = new LinkedHashSet<Long>();
+    private Set<Integer> ships = new LinkedHashSet<Integer>();
 
     /**
      * グループ名を取得します。
@@ -35,7 +35,7 @@ public final class ShipGroupBean {
      * 艦娘リストを取得します。
      * @return 艦娘リスト
      */
-    public Set<Long> getShips() {
+    public Set<Integer> getShips() {
         return this.ships;
     }
 
@@ -43,7 +43,7 @@ public final class ShipGroupBean {
      * 艦娘リストを設定します。
      * @param ships 艦娘リスト
      */
-    public void setShips(Set<Long> ships) {
+    public void setShips(Set<Integer> ships) {
         this.ships = ships;
     }
 }

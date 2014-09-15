@@ -40,20 +40,30 @@ public class BattleAtackDto {
         BattleAtackDtoPb.Builder builder = BattleAtackDtoPb.newBuilder();
         builder.setKind(this.kind.toProto());
         builder.setFriendAtack(this.friendAtack);
-        for (int b : this.origin) {
-            builder.addOrigin(b);
+        if (this.origin != null) {
+            for (int b : this.origin) {
+                builder.addOrigin(b);
+            }
         }
-        for (int b : this.ot) {
-            builder.addOt(b);
+        if (this.ot != null) {
+            for (int b : this.ot) {
+                builder.addOt(b);
+            }
         }
-        for (int b : this.ydam) {
-            builder.addYdam(b);
+        if (this.ydam != null) {
+            for (int b : this.ydam) {
+                builder.addYdam(b);
+            }
         }
-        for (int b : this.target) {
-            builder.addTarget(b);
+        if (this.target != null) {
+            for (int b : this.target) {
+                builder.addTarget(b);
+            }
         }
-        for (int b : this.damage) {
-            builder.addDamage(b);
+        if (this.damage != null) {
+            for (int b : this.damage) {
+                builder.addDamage(b);
+            }
         }
         return builder.build();
     }

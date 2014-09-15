@@ -30,6 +30,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
@@ -65,8 +66,8 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
      * @param parent
      * @param style
      */
-    public ShipFilterGroupDialog(Shell parent) {
-        super(parent);
+    public ShipFilterGroupDialog(Shell parent, MenuItem menuItem) {
+        super(parent, menuItem);
     }
 
     /**
@@ -179,19 +180,19 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
 
     @Override
     protected void updateTableBody() {
-        List<String[]> body = new ArrayList<String[]>();
+        List<Comparable[]> body = new ArrayList<Comparable[]>();
         if (this.property != null) {
             List<ShipDto> shipList = this.property.getShipList();
             for (int i = 0; i < shipList.size(); i++) {
                 ShipDto ship = shipList.get(i);
-                body.add(new String[] {
-                        Integer.toString(i + 1),
-                        Long.toString(ship.getId()),
+                body.add(new Comparable[] {
+                        i + 1,
+                        ship.getId(),
                         ship.getFleetid(),
                         ship.getName(),
                         ship.getType(),
-                        Long.toString(ship.getLv()),
-                        Long.toString(ship.getEstimatedCond())
+                        ship.getLv(),
+                        ship.getEstimatedCond()
                 });
             }
         }
@@ -526,7 +527,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
         public List<ShipDto> getShipList() {
             List<ShipDto> ships = new ArrayList<ShipDto>();
             Map<Long, ShipDto> shipMap = GlobalContext.getShipMap();
-            for (Long id : this.shipGroup.getShips()) {
+            for (Integer id : this.shipGroup.getShips()) {
                 ShipDto ship = shipMap.get(id);
                 if (ship != null) {
                     ships.add(ship);

@@ -163,8 +163,10 @@ public final class ItemDto extends AbstractDto {
     public ItemDtoPb toProto() {
         ItemDtoPb.Builder builder = ItemDtoPb.newBuilder();
         builder.setId(this.id);
-        for (int b : this.type) {
-            builder.addType(b);
+        if (this.type != null) {
+            for (int b : this.type) {
+                builder.addType(b);
+            }
         }
         builder.setAtap(this.atap);
         builder.setBakk(this.bakk);

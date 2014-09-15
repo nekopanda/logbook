@@ -7,37 +7,37 @@ package logbook.config.bean;
 public final class KdockBean {
 
     /** 種類 */
-    private String type;
+    private Integer type;
 
     /** 燃料 */
-    private String fuel;
+    private int fuel;
 
     /** 弾薬 */
-    private String ammo;
+    private int ammo;
 
     /** 鋼材 */
-    private String metal;
+    private int metal;
 
     /** ボーキサイト  */
-    private String bauxite;
+    private int bauxite;
 
     /** 開発資材 */
-    private String researchMaterials;
+    private Integer researchMaterials;
 
     /** 秘書艦 */
-    private long shipId;
+    private int shipId;
 
     /** 司令部Lv */
     private int hqLevel;
 
     /** 空きドック */
-    private String freeDock;
+    private Integer freeDock;
 
     /**
      * 種類を取得します。
      * @return 種類
      */
-    public String getType() {
+    public Integer getType() {
         return this.type;
     }
 
@@ -45,7 +45,7 @@ public final class KdockBean {
      * 種類を設定します。
      * @param type 種類
      */
-    public void setType(String type) {
+    public void setType(Integer type) {
         this.type = type;
     }
 
@@ -53,7 +53,7 @@ public final class KdockBean {
      * 燃料を取得します。
      * @return 燃料
      */
-    public String getFuel() {
+    public int getFuel() {
         return this.fuel;
     }
 
@@ -61,7 +61,7 @@ public final class KdockBean {
      * 燃料を設定します。
      * @param fuel 燃料
      */
-    public void setFuel(String fuel) {
+    public void setFuel(int fuel) {
         this.fuel = fuel;
     }
 
@@ -69,7 +69,7 @@ public final class KdockBean {
      * 弾薬を取得します。
      * @return 弾薬
      */
-    public String getAmmo() {
+    public int getAmmo() {
         return this.ammo;
     }
 
@@ -77,7 +77,7 @@ public final class KdockBean {
      * 弾薬を設定します。
      * @param ammo 弾薬
      */
-    public void setAmmo(String ammo) {
+    public void setAmmo(int ammo) {
         this.ammo = ammo;
     }
 
@@ -85,7 +85,7 @@ public final class KdockBean {
      * 鋼材を取得します。
      * @return 鋼材
      */
-    public String getMetal() {
+    public int getMetal() {
         return this.metal;
     }
 
@@ -93,7 +93,7 @@ public final class KdockBean {
      * 鋼材を設定します。
      * @param metal 鋼材
      */
-    public void setMetal(String metal) {
+    public void setMetal(int metal) {
         this.metal = metal;
     }
 
@@ -101,7 +101,7 @@ public final class KdockBean {
      * ボーキサイトを取得します。
      * @return ボーキサイト
      */
-    public String getBauxite() {
+    public int getBauxite() {
         return this.bauxite;
     }
 
@@ -109,7 +109,7 @@ public final class KdockBean {
      * ボーキサイトを設定します。
      * @param bauxite ボーキサイト
      */
-    public void setBauxite(String bauxite) {
+    public void setBauxite(int bauxite) {
         this.bauxite = bauxite;
     }
 
@@ -117,7 +117,7 @@ public final class KdockBean {
      * 開発資材を取得します。
      * @return 開発資材
      */
-    public String getResearchMaterials() {
+    public Integer getResearchMaterials() {
         return this.researchMaterials;
     }
 
@@ -125,7 +125,7 @@ public final class KdockBean {
      * 開発資材を設定します。
      * @param researchMaterials 開発資材
      */
-    public void setResearchMaterials(String researchMaterials) {
+    public void setResearchMaterials(Integer researchMaterials) {
         this.researchMaterials = researchMaterials;
     }
 
@@ -133,7 +133,7 @@ public final class KdockBean {
      * 秘書艦を取得します。
      * @return 秘書艦
      */
-    public long getShipId() {
+    public int getShipId() {
         return this.shipId;
     }
 
@@ -141,7 +141,7 @@ public final class KdockBean {
      * 秘書艦を設定します。
      * @param shipId 秘書艦
      */
-    public void setShipId(long shipId) {
+    public void setShipId(int shipId) {
         this.shipId = shipId;
     }
 
@@ -165,7 +165,7 @@ public final class KdockBean {
      * 空きドックを取得します。
      * @return 空きドック
      */
-    public String getFreeDock() {
+    public Integer getFreeDock() {
         return this.freeDock;
     }
 
@@ -173,7 +173,7 @@ public final class KdockBean {
      * 空きドックを設定します。
      * @param freeDock 空きドック
      */
-    public void setFreeDock(String freeDock) {
+    public void setFreeDock(Integer freeDock) {
         this.freeDock = freeDock;
     }
 

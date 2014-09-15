@@ -29,9 +29,8 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Dialog;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
@@ -40,7 +39,7 @@ import org.eclipse.swt.widgets.Text;
  * 経験値計算機
  *
  */
-public final class CalcExpDialog extends Dialog {
+public final class CalcExpDialog extends WindowBase {
 
     /** 旗艦 */
     private static boolean flag = true;
@@ -67,32 +66,37 @@ public final class CalcExpDialog extends Dialog {
      * Create the dialog.
      * @param parent
      */
-    public CalcExpDialog(Shell parent) {
-        super(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE);
-        this.setText("経験値計算機");
+    public CalcExpDialog(Shell parent, MenuItem menuItem) {
+        super(menuItem);
+        super.createContents(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
     }
 
     /**
      * Open the dialog.
      */
+    @Override
     public void open() {
-        this.createContents();
-        this.shell.open();
-        this.shell.layout();
-        Display display = this.getParent().getDisplay();
-        while (!this.shell.isDisposed()) {
-            if (!display.readAndDispatch()) {
-                display.sleep();
-            }
+        // 初期化済みの場合
+        if (this.isWindowInitialized()) {
+            this.setShipComboData();
+            this.preset();
+            this.calc();
+            this.setVisible(true);
+            return;
         }
+        this.createContents();
+        this.registerEvents();
+        this.setWindowInitialized(true);
+        this.setVisible(true);
     }
 
     /**
      * Create contents of the dialog.
      */
     private void createContents() {
-        this.shell = new Shell(this.getParent(), this.getStyle());
-        this.shell.setText(this.getText());
+        // シェルを作成
+        this.shell = this.getShell();
+        this.shell.setText("経験値計算機");
         this.shell.setLayout(new GridLayout(1, false));
 
         Composite select = new Composite(this.shell, SWT.NONE);

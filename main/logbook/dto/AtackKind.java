@@ -28,4 +28,18 @@ public enum AtackKind {
         }
         return null;
     }
+
+    public static AtackKind fromProto(AtackKindPb pb) {
+        switch (pb.getNumber()) {
+        case 0:
+            return AIR;
+        case 1:
+            return SUPPORT;
+        case 2:
+            return HOUGEKI;
+        case 3:
+            return RAIGEKI;
+        }
+        return null;
+    }
 }

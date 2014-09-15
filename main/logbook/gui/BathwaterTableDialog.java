@@ -12,6 +12,8 @@ import logbook.data.context.GlobalContext;
 import logbook.dto.DeckMissionDto;
 import logbook.dto.NdockDto;
 import logbook.dto.ShipDto;
+import logbook.gui.logic.CreateReportLogic;
+import logbook.gui.logic.HpString;
 import logbook.gui.logic.TableItemCreator;
 import logbook.gui.logic.TimeLogic;
 
@@ -45,8 +47,8 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
      * @param parent
      * @param style
      */
-    public BathwaterTableDialog(Shell parent) {
-        super(parent);
+    public BathwaterTableDialog(Shell parent, MenuItem menuItem) {
+        super(parent, menuItem);
     }
 
     @Override
@@ -103,7 +105,7 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
             }
         });
 
-        List<String[]> body = new ArrayList<String[]>();
+        List<Comparable[]> body = new ArrayList<Comparable[]>();
         for (int i = 0; i < ships.size(); i++) {
             ShipDto ship = ships.get(i);
             // 状態
@@ -124,15 +126,22 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
                 status = "遠征";
             }
             // HP1あたりの時間
-            String time = TimeLogic.toDateRestString((long) (ship.getDocktime()
+            long unitSeconds = ((long) (ship.getDocktime()
                     / (float) (ship.getMaxhp() - ship.getNowhp()) / 1000));
             // 整形
-            body.add(new String[] {
-                    Integer.toString(i + 1), Long.toString(ship.getId()), ship.getFleetid(),
-                    Long.toString(ship.getCond()), ship.getName(), Long.toString(ship.getLv()),
-                    Long.toString(ship.getNowhp()) + "/" + Long.toString(ship.getMaxhp()),
-                    TimeLogic.toDateRestString(ship.getDocktime() / 1000), Long.toString(ship.getDockfuel()),
-                    Long.toString(ship.getDockmetal()), status, time
+            body.add(new Comparable[] {
+                    i + 1,
+                    ship.getId(),
+                    ship.getFleetid(),
+                    ship.getCond(),
+                    ship.getName(),
+                    ship.getLv(),
+                    new HpString(ship.getNowhp(), ship.getMaxhp()),
+                    new TimeLogic(ship.getDocktime()),
+                    ship.getDockfuel(),
+                    ship.getDockmetal(),
+                    status,
+                    TimeLogic.fromSeconds(unitSeconds)
             });
         }
         this.body = body;
@@ -147,13 +156,13 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
             }
 
             @Override
-            public TableItem create(Table table, String[] text, int count) {
+            public TableItem create(Table table, Comparable[] text, int count) {
                 TableItem item = new TableItem(table, SWT.NONE);
                 // 偶数行に背景色を付ける
                 if ((count % 2) != 0) {
                     item.setBackground(SWTResourceManager.getColor(AppConstants.ROW_BACKGROUND));
                 }
-                item.setText(text);
+                item.setText(CreateReportLogic.toStringArray(text));
                 if (text[10].equals("遠征")) {
                     item.setForeground(SWTResourceManager.getColor(AppConstants.MISSION_COLOR));
                 }

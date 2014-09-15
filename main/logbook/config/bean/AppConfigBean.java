@@ -25,12 +25,6 @@ public final class AppConfigBean {
     /** プロキシポート */
     private int proxyPort = 8080;
 
-    /** ウインドウサイズ(width) */
-    private int width = 280;
-
-    /** ウインドウサイズ(height) */
-    private int height = 420;
-
     /** 最前面に表示 */
     private boolean onTop = true;
 
@@ -87,12 +81,6 @@ public final class AppConfigBean {
 
     /** 画面キャプチャ-日付のフォルダを作成 */
     private boolean createDateFolder = true;
-
-    /** ウインドウ位置X */
-    private int locationX = -1;
-
-    /** ウインドウ位置Y */
-    private int locationY = -1;
 
     /** 補給不足で警告アイコン */
     private boolean warnByNeedSupply = true;
@@ -152,7 +140,7 @@ public final class AppConfigBean {
     private String storeJsonPath = FilenameUtils.concat(new File("").getAbsolutePath(), "json");
 
     /** テーブル列を表示する設定(キー:java.lang.Class.getName()) */
-    private Map<String, boolean[]> visibleColumnMap = new HashMap<String, boolean[]>();
+    private Map<String, TableConfigBean> tableConfigMap = new HashMap<String, TableConfigBean>();
 
     /** 艦これ統計データベースへのデータ送信 */
     private boolean sendDatabase = false;
@@ -160,9 +148,19 @@ public final class AppConfigBean {
     /** 艦これ統計データベースへ送信するときのアクセスキー */
     private String accessKey = "";
 
-    private WindowPositionBean battleWindowPos = new WindowPositionBean();
+    /** ウィンドウの表示状態 */
+    private Map<String, WindowConfigBean> windowConfigMap = new HashMap<String, WindowConfigBean>();
 
-    private WindowPositionBean battleShipWondowPos = new WindowPositionBean();
+    /** マウスが離れてから元の透明度に戻るまでの時間（0.1秒単位） */
+    private int opaqueInterval = 6;
+
+    /** 艦娘一覧ウィンドウの名前 */
+    private String[] shipTableNames = new String[] {
+            "所有艦娘一覧",
+            "お風呂に入りたい艦娘",
+            "所有艦娘一覧 3",
+            "所有艦娘一覧 4"
+    };
 
     /**
      * ポート番号を取得します。
@@ -226,38 +224,6 @@ public final class AppConfigBean {
      */
     public void setProxyPort(int proxyPort) {
         this.proxyPort = proxyPort;
-    }
-
-    /**
-     * ウインドウサイズ(width)を取得します。
-     * @return ウインドウサイズ(width)
-     */
-    public int getWidth() {
-        return this.width;
-    }
-
-    /**
-     * ウインドウサイズ(width)を設定します。
-     * @param width ウインドウサイズ(width)
-     */
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    /**
-     * ウインドウサイズ(height)を取得します。
-     * @return ウインドウサイズ(height)
-     */
-    public int getHeight() {
-        return this.height;
-    }
-
-    /**
-     * ウインドウサイズ(height)を設定します。
-     * @param height ウインドウサイズ(height)
-     */
-    public void setHeight(int height) {
-        this.height = height;
     }
 
     /**
@@ -562,38 +528,6 @@ public final class AppConfigBean {
      */
     public void setCreateDateFolder(boolean createDateFolder) {
         this.createDateFolder = createDateFolder;
-    }
-
-    /**
-     * ウインドウ位置Xを取得します。
-     * @return ウインドウ位置X
-     */
-    public int getLocationX() {
-        return this.locationX;
-    }
-
-    /**
-     * ウインドウ位置Xを設定します。
-     * @param locationX ウインドウ位置X
-     */
-    public void setLocationX(int locationX) {
-        this.locationX = locationX;
-    }
-
-    /**
-     * ウインドウ位置Yを取得します。
-     * @return ウインドウ位置Y
-     */
-    public int getLocationY() {
-        return this.locationY;
-    }
-
-    /**
-     * ウインドウ位置Yを設定します。
-     * @param locationY ウインドウ位置Y
-     */
-    public void setLocationY(int locationY) {
-        this.locationY = locationY;
     }
 
     /**
@@ -920,16 +854,16 @@ public final class AppConfigBean {
      * テーブル列を表示する設定(キー:java.lang.Class.getName())を取得します。
      * @return テーブル列を表示する設定(キー:java.lang.Class.getName())
      */
-    public Map<String, boolean[]> getVisibleColumnMap() {
-        return this.visibleColumnMap;
+    public Map<String, TableConfigBean> getTableConfigMap() {
+        return this.tableConfigMap;
     }
 
     /**
      * テーブル列を表示する設定(キー:java.lang.Class.getName())を設定します。
      * @param visibleColumnMap テーブル列を表示する設定(キー:java.lang.Class.getName())
      */
-    public void setVisibleColumnMap(Map<String, boolean[]> visibleColumnMap) {
-        this.visibleColumnMap = visibleColumnMap;
+    public void setTableConfigMap(Map<String, TableConfigBean> tableConfigMap) {
+        this.tableConfigMap = tableConfigMap;
     }
 
     /**
@@ -961,30 +895,44 @@ public final class AppConfigBean {
     }
 
     /**
-     * @return battleWindowPos
+     * @return windowConfigMap
      */
-    public WindowPositionBean getBattleWindowPos() {
-        return this.battleWindowPos;
+    public Map<String, WindowConfigBean> getWindowConfigMap() {
+        return this.windowConfigMap;
     }
 
     /**
-     * @param battleWindowPos セットする battleWindowPos
+     * @param windowConfigMap セットする windowConfigMap
      */
-    public void setBattleWindowPos(WindowPositionBean battleWindowPos) {
-        this.battleWindowPos = battleWindowPos;
+    public void setWindowConfigMap(Map<String, WindowConfigBean> windowConfigMap) {
+        this.windowConfigMap = windowConfigMap;
     }
 
     /**
-     * @return battleShipWondowPos
+     * @return opaqueInterval
      */
-    public WindowPositionBean getBattleShipWindowPos() {
-        return this.battleShipWondowPos;
+    public int getOpaqueInterval() {
+        return this.opaqueInterval;
     }
 
     /**
-     * @param battleShipWindowPos セットする battleShipWondowPos
+     * @param opaqueInterval セットする opaqueInterval
      */
-    public void setBattleShipWindowPos(WindowPositionBean battleShipWindowPos) {
-        this.battleShipWondowPos = battleShipWindowPos;
+    public void setOpaqueInterval(int opaqueInterval) {
+        this.opaqueInterval = opaqueInterval;
+    }
+
+    /**
+     * @return shipTableNames
+     */
+    public String[] getShipTableNames() {
+        return this.shipTableNames;
+    }
+
+    /**
+     * @param shipTableNames セットする shipTableNames
+     */
+    public void setShipTableNames(String[] shipTableNames) {
+        this.shipTableNames = shipTableNames;
     }
 }

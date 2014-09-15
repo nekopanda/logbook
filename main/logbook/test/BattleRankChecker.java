@@ -4,6 +4,7 @@
 package logbook.test;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.Charset;
@@ -42,6 +43,7 @@ public class BattleRankChecker {
         int resultCount = 0;
         int[] rankCount = new int[10];
         try {
+            FileOutputStream output = new FileOutputStream("dump-data.dat");
             BattleExDto battle = null;
             for (int i = 0; i < fileNameList.length; ++i) {
                 String fileName = fileNameList[i];
@@ -134,12 +136,15 @@ public class BattleRankChecker {
                             }
                         }
 
+                        battle.toProto().writeDelimitedTo(output);
+
                         battle = null;
                         ++resultCount;
                     }
                     jsonreader.close();
                 }
             }
+            output.close();
             System.out.println(resultCount + "件の戦闘結果を処理");
             System.out.println(Arrays.toString(rankCount));
         } catch (IOException e) {

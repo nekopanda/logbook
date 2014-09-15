@@ -1,9 +1,5 @@
 package logbook.gui;
 
-import java.util.Arrays;
-
-import logbook.config.AppConfig;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
@@ -63,12 +59,7 @@ public final class SelectVisibleColumnDialog extends Dialog {
         // ヘッダー
         String[] header = this.dialog.getTableHeader();
         // カラム設定を取得
-        boolean[] visibles = AppConfig.get().getVisibleColumnMap().get(this.dialog.getClass().getName());
-        if ((visibles == null) || (visibles.length != header.length)) {
-            visibles = new boolean[header.length];
-            Arrays.fill(visibles, true);
-            AppConfig.get().getVisibleColumnMap().put(this.dialog.getClass().getName(), visibles);
-        }
+        boolean[] visibles = this.dialog.getConfig().getVisibleColumn();
 
         Tree tree = new Tree(this.shell, SWT.BORDER | SWT.CHECK);
 
@@ -78,7 +69,7 @@ public final class SelectVisibleColumnDialog extends Dialog {
             column.setChecked(visibles[i]);
             column.setExpanded(true);
         }
-        this.shell.addShellListener(new TreeShellAdapter(tree, visibles, this.dialog));
+        this.shell.addShellListener(new TreeShellAdapter(tree, this.dialog));
     }
 
     /**
@@ -88,20 +79,19 @@ public final class SelectVisibleColumnDialog extends Dialog {
     private static final class TreeShellAdapter extends ShellAdapter {
 
         private final Tree tree;
-        private final boolean[] visibles;
         private final AbstractTableDialog dialog;
 
-        public TreeShellAdapter(Tree tree, boolean[] visibles, AbstractTableDialog dialog) {
+        public TreeShellAdapter(Tree tree, AbstractTableDialog dialog) {
             this.tree = tree;
-            this.visibles = visibles;
             this.dialog = dialog;
         }
 
         @Override
         public void shellClosed(ShellEvent e) {
             TreeItem[] items = this.tree.getItems();
+            boolean[] visibles = this.dialog.getConfig().getVisibleColumn();
             for (int i = 0; i < items.length; i++) {
-                this.visibles[i + 1] = items[i].getChecked();
+                visibles[i + 1] = items[i].getChecked();
             }
             this.dialog.reloadTable();
         }

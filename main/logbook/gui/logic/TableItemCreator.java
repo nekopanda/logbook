@@ -11,5 +11,5 @@ public interface TableItemCreator {
 
     void init();
 
-    TableItem create(Table table, String[] text, int count);
+    TableItem create(Table table, Comparable[] text, int count);
 }

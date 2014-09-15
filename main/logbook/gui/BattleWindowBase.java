@@ -6,7 +6,6 @@ package logbook.gui;
 import java.util.ArrayList;
 import java.util.List;
 
-import logbook.config.bean.WindowPositionBean;
 import logbook.dto.BattleExDto;
 import logbook.dto.DockDto;
 import logbook.dto.MapCellDto;
@@ -15,13 +14,8 @@ import logbook.dto.ShipInfoDto;
 import logbook.gui.logic.LayoutLogic;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.ShellAdapter;
-import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MenuItem;
@@ -32,18 +26,10 @@ import org.eclipse.wb.swt.SWTResourceManager;
  * @author Nekopanda
  *
  */
-public class BattleWindowBase {
-
-    private final Shell shell;
-
-    private final MenuItem menuItem;
-
-    private final WindowPositionBean windowPos;
+public class BattleWindowBase extends WindowBase {
 
     private final Font normalFont;
     private final Font boldFont;
-
-    private boolean windowCreated = false;
 
     // タイトル
     private final String windowText;
@@ -62,89 +48,50 @@ public class BattleWindowBase {
      * Create the dialog.
      * @param parent
      */
-    public BattleWindowBase(Shell parent, MenuItem menuItem, WindowPositionBean windowPos, String windowText) {
-        this.shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE);
-        this.menuItem = menuItem;
-        this.windowPos = windowPos;
+    public BattleWindowBase(Shell parent, MenuItem menuItem, String windowText) {
+        super(menuItem);
+        super.createContents(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
         this.windowText = windowText;
         this.normalFont = this.getShell().getFont();
         FontData fontData = this.normalFont.getFontData()[0];
         String fontName = fontData.getName();
         int size = fontData.getHeight();
         this.boldFont = SWTResourceManager.getFont(fontName, size, SWT.BOLD);
-
-        this.menuItem.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                boolean open = BattleWindowBase.this.menuItem.getSelection();
-                if (open) {
-                    BattleWindowBase.this.open();
-                }
-                else {
-                    BattleWindowBase.this.close();
-                }
-            }
-        });
-        this.shell.addShellListener(new ShellAdapter() {
-            @Override
-            public void shellClosed(ShellEvent e) {
-                e.doit = false;
-                BattleWindowBase.this.menuItem.setSelection(false);
-                BattleWindowBase.this.close();
-            }
-        });
-
-        int locationX = windowPos.getLocationX();
-        int locationY = windowPos.getLocationY();
-        if ((locationX != -1) && (locationY != -1)) {
-            this.shell.setLocation(new Point(locationX, locationY));
-        }
+        this.getShell().setText(this.windowText);
     }
 
+    @Override
     public void open() {
-        if (!this.shell.getVisible()) {
-            if (this.windowCreated == false) {
-                this.shell.setText(this.windowText);
-                this.createContents();
-                this.windowCreated = true;
-                this.combinedMode = true;
-                this.setCombinedMode(false);
-                this.getShell().pack();
+        if (!this.isWindowInitialized()) {
+            this.createContents();
+            super.registerEvents();
+            this.combinedMode = true;
+            this.setCombinedMode(false);
+            this.getShell().pack();
+            this.setWindowInitialized(true);
+        }
+        this.setVisible(true);
+    }
+
+    @Override
+    public void setVisible(boolean visible) {
+        if (this.getShell().getVisible() != visible) {
+            if (visible) {
+                this.updateData(false);
             }
-            this.menuItem.setSelection(true);
-            this.shell.open();
-            this.updateData(false);
-            this.shell.layout();
+            super.setVisible(visible);
         }
-    }
-
-    public void close() {
-        if (this.shell.getVisible()) {
-            this.menuItem.setSelection(false);
-            this.shell.setVisible(false);
-        }
-    }
-
-    public WindowPositionBean getWindowPos() {
-        boolean opened = this.shell.getVisible();
-        this.windowPos.setOpened(opened);
-        if (opened) {
-            Point location = this.shell.getLocation();
-            this.windowPos.setLocationX(location.x);
-            this.windowPos.setLocationY(location.y);
-        }
-        return this.windowPos;
     }
 
     protected void beginDraw() {
-        this.shell.setRedraw(false);
+        this.getShell().setRedraw(false);
     }
 
     protected void endDraw() {
-        this.shell.layout();
-        this.shell.setRedraw(true);
-        //this.shell.redraw();
-        //this.shell.update();
+        this.getShell().layout();
+        this.getShell().setRedraw(true);
+        //this.getShell().redraw();
+        //this.getShell().update();
     }
 
     protected void beginCombined() {
@@ -156,7 +103,7 @@ public class BattleWindowBase {
     }
 
     protected Label addLabel(String text, int width, int align, int horizontalSpan, int verticalSpan) {
-        Label label = new Label(this.shell, SWT.NONE);
+        Label label = new Label(this.getShell(), SWT.NONE);
         if (this.combinedMode) {
             this.labelsForCombined.add(label);
         }
@@ -185,7 +132,7 @@ public class BattleWindowBase {
     }
 
     protected void addHorizontalSeparator(int span) {
-        Label label = new Label(this.shell, SWT.SEPARATOR | SWT.HORIZONTAL);
+        Label label = new Label(this.getShell(), SWT.SEPARATOR | SWT.HORIZONTAL);
         label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, span, 1));
         if (this.combinedMode) {
             this.labelsForCombined.add(label);
@@ -193,9 +140,9 @@ public class BattleWindowBase {
     }
 
     protected void addVerticalSeparator(int span) {
-        //Label lblsp1 = new Label(this.shell, SWT.SEPARATOR | SWT.VERTICAL);
+        //Label lblsp1 = new Label(this.getShell(), SWT.SEPARATOR | SWT.VERTICAL);
         //lblsp1.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, false, false, 1, span));
-        Label label = new Label(this.shell, SWT.SEPARATOR | SWT.VERTICAL);
+        Label label = new Label(this.getShell(), SWT.SEPARATOR | SWT.VERTICAL);
         GridData gd = new GridData(SWT.CENTER, SWT.FILL, false, false, 1, span);
         gd.widthHint = 10;
         label.setLayoutData(gd);
@@ -205,7 +152,7 @@ public class BattleWindowBase {
     }
 
     protected void skipSlot() {
-        Label label = new Label(this.shell, SWT.NONE);
+        Label label = new Label(this.getShell(), SWT.NONE);
         label.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
         if (this.combinedMode) {
             this.labelsForCombined.add(label);
@@ -222,7 +169,7 @@ public class BattleWindowBase {
         for (int i = 0; i < this.enemyShips.length; ++i) {
             this.enemyShips[i] = null;
         }
-        if (this.shell.getVisible()) {
+        if (this.getShell().getVisible()) {
             this.updateData(false);
         }
     }
@@ -239,14 +186,14 @@ public class BattleWindowBase {
                 this.friendShips[(i * 6) + c] = dockShips.get(c);
             }
         }
-        if (this.shell.getVisible()) {
+        if (this.getShell().getVisible()) {
             this.updateData(start);
         }
     }
 
     public void updateMapCell(MapCellDto data) {
         this.mapCellDto = data;
-        if (this.shell.getVisible()) {
+        if (this.getShell().getVisible()) {
             this.updateData(false);
         }
     }
@@ -257,7 +204,7 @@ public class BattleWindowBase {
         for (int i = 0; i < enemyShips.size(); ++i) {
             this.enemyShips[i] = enemyShips.get(i);
         }
-        if (this.shell.getVisible()) {
+        if (this.getShell().getVisible()) {
             this.updateData(false);
         }
     }
@@ -297,13 +244,6 @@ public class BattleWindowBase {
      */
     protected BattleExDto getBattle() {
         return this.battle;
-    }
-
-    /**
-     * @return shell
-     */
-    public Shell getShell() {
-        return this.shell;
     }
 
     /**

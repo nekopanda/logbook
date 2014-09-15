@@ -28,7 +28,7 @@ public final class GetShipDto extends AbstractDto {
 
         this.getDate = Calendar.getInstance().getTime();
         this.ship = ship;
-        this.resources = resources != null ? resources : new ResourceDto("0", "0", "0", "0", null, 0);
+        this.resources = resources != null ? resources : new ResourceDto(0, 0, 0, 0, null, 0);
     }
 
     /**
@@ -154,8 +154,8 @@ public final class GetShipDto extends AbstractDto {
      * @return 建造種類
      */
     public String getBuildType() {
-        String type = this.resources.getType();
-        if ("1".equals(type)) {
+        Integer type = this.resources.getType();
+        if (type == 1) {
             return "大型艦建造";
         }
         return "通常艦建造";
@@ -164,42 +164,42 @@ public final class GetShipDto extends AbstractDto {
     /**
      * @return 燃料
      */
-    public String getFuel() {
+    public int getFuel() {
         return this.resources.getFuel();
     }
 
     /**
      * @return 弾薬
      */
-    public String getAmmo() {
+    public int getAmmo() {
         return this.resources.getAmmo();
     }
 
     /**
      * @return 鋼材
      */
-    public String getMetal() {
+    public int getMetal() {
         return this.resources.getMetal();
     }
 
     /**
      * @return ボーキサイト
      */
-    public String getBauxite() {
+    public int getBauxite() {
         return this.resources.getBauxite();
     }
 
     /**
      * @return 開発資材
      */
-    public String getResearchMaterials() {
+    public Integer getResearchMaterials() {
         return this.resources.getResearchMaterials();
     }
 
     /**
      * @return 空きドック
      */
-    public String getFreeDock() {
+    public int getFreeDock() {
         return this.resources.getFreeDock();
     }
 

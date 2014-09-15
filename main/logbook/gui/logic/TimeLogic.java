@@ -4,11 +4,38 @@ package logbook.gui.logic;
  * 時間を計算する
  *
  */
-public class TimeLogic {
+public class TimeLogic implements Comparable<TimeLogic> {
 
     private static final int ONE_MINUTES = 60;
     private static final int ONE_HOUR = 60 * 60;
     private static final int ONE_DAY = 60 * 60 * 24;
+
+    private final Long milliseconds;
+
+    public TimeLogic(Long milliseconds) {
+        this.milliseconds = milliseconds;
+    }
+
+    public static TimeLogic fromSeconds(Long seconds) {
+        if (seconds == null)
+            return new TimeLogic(null);
+        return new TimeLogic(seconds * 1000);
+    }
+
+    @Override
+    public String toString() {
+        return toDateRestString(this.milliseconds / 1000);
+    }
+
+    /* (非 Javadoc)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    @Override
+    public int compareTo(TimeLogic arg0) {
+        long o1 = (this.milliseconds == null) ? 0 : this.milliseconds;
+        long o2 = (arg0.milliseconds == null) ? 0 : arg0.milliseconds;
+        return Long.compare(o1, o2);
+    }
 
     /**
      * 残り時間を見やすい形式に整形する

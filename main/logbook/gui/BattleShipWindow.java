@@ -5,7 +5,6 @@ package logbook.gui;
 
 import java.util.List;
 
-import logbook.config.bean.WindowPositionBean;
 import logbook.dto.BattleExDto;
 import logbook.dto.DockDto;
 import logbook.dto.ItemDto;
@@ -48,8 +47,8 @@ public class BattleShipWindow extends BattleWindowBase {
      * Create the dialog.
      * @param parent
      */
-    public BattleShipWindow(Shell parent, MenuItem menuItem, WindowPositionBean windowPos) {
-        super(parent, menuItem, windowPos, "自軍敵軍パラメータ ");
+    public BattleShipWindow(Shell parent, MenuItem menuItem) {
+        super(parent, menuItem, "自軍敵軍パラメータ ");
     }
 
     private void friendUpdatetSlotitem(int newIndex) {

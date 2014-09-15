@@ -15,6 +15,7 @@ import logbook.dto.ItemDto;
 import logbook.dto.ShipDto;
 import logbook.gui.ApplicationMain;
 import logbook.gui.logic.Sound;
+import logbook.gui.logic.TimeString;
 import logbook.internal.EvaluateExp;
 import logbook.internal.SeaExp;
 import logbook.util.CalcExpUtils;
@@ -318,7 +319,7 @@ public class FleetComposite extends Composite {
             // 疲労している艦娘がいる場合メッセージを表示
             if (this.cond > cond) {
                 this.cond = cond;
-                this.clearDate = ship.getCondClearDate();
+                this.clearDate = new TimeString(ship.getCondClearTime().getTime()).toString();
             }
 
             // 体力メッセージ
@@ -688,7 +689,7 @@ public class FleetComposite extends Composite {
     @CheckForNull
     private Integer getNextCount(ShipDto ship, boolean isFlagship) {
         // 次のレベルに必要な経験値
-        Long nextexp = CalcExpUtils.getNextLvExp((int) ship.getLv());
+        Long nextexp = CalcExpUtils.getNextLvExp(ship.getLv());
         if (nextexp != null) {
             // 必要経験値
             long needexp = nextexp - ship.getExp();

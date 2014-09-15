@@ -7,22 +7,22 @@ package logbook.dto;
 public final class ResourceDto extends AbstractDto {
 
     /** 種類(大型艦建造:1, 通常艦建造:0) */
-    private final String type;
+    private final Integer type;
 
     /** 燃料 */
-    private final String fuel;
+    private final int fuel;
 
     /** 弾薬 */
-    private final String ammo;
+    private final int ammo;
 
     /** 鋼材 */
-    private final String metal;
+    private final int metal;
 
     /** ボーキサイト */
-    private final String bauxite;
+    private final int bauxite;
 
     /** 開発資材 */
-    private final String researchMaterials;
+    private final Integer researchMaterials;
 
     /** 秘書艦 */
     private final ShipDto ship;
@@ -31,7 +31,7 @@ public final class ResourceDto extends AbstractDto {
     private final int hqLevel;
 
     /** 空きドック */
-    private String freeDock;
+    private Integer freeDock;
 
     /**
      * コンストラクター(建造)
@@ -44,7 +44,7 @@ public final class ResourceDto extends AbstractDto {
      * @param researchMaterials 開発資材
      * @param ship 秘書艦
      */
-    public ResourceDto(String type, String fuel, String ammo, String metal, String bauxite, String researchMaterials,
+    public ResourceDto(int type, int fuel, int ammo, int metal, int bauxite, int researchMaterials,
             ShipDto ship, int hqLevel) {
 
         this.type = type;
@@ -66,7 +66,7 @@ public final class ResourceDto extends AbstractDto {
      * @param bauxite ボーキサイト
      * @param ship 秘書艦
      */
-    public ResourceDto(String fuel, String ammo, String metal, String bauxite, ShipDto ship, int hqLevel) {
+    public ResourceDto(int fuel, int ammo, int metal, int bauxite, ShipDto ship, int hqLevel) {
 
         this.type = null;
         this.fuel = fuel;
@@ -81,42 +81,42 @@ public final class ResourceDto extends AbstractDto {
     /**
      * @return 種類
      */
-    public String getType() {
+    public Integer getType() {
         return this.type;
     }
 
     /**
      * @return 燃料
      */
-    public String getFuel() {
+    public int getFuel() {
         return this.fuel;
     }
 
     /**
      * @return 弾薬
      */
-    public String getAmmo() {
+    public int getAmmo() {
         return this.ammo;
     }
 
     /**
      * @return 鋼材
      */
-    public String getMetal() {
+    public int getMetal() {
         return this.metal;
     }
 
     /**
      * @return ボーキサイト
      */
-    public String getBauxite() {
+    public int getBauxite() {
         return this.bauxite;
     }
 
     /**
      * @return 開発資材
      */
-    public String getResearchMaterials() {
+    public Integer getResearchMaterials() {
         return this.researchMaterials;
     }
 
@@ -137,14 +137,14 @@ public final class ResourceDto extends AbstractDto {
     /**
      * @return 空きドック
      */
-    public String getFreeDock() {
-        return this.freeDock != null ? this.freeDock : "0";
+    public int getFreeDock() {
+        return this.freeDock != null ? this.freeDock : 0;
     }
 
     /**
      * @return 空きドックをセットする
      */
-    public void setFreeDock(String freeDock) {
+    public void setFreeDock(Integer freeDock) {
         if (this.freeDock == null) {
             this.freeDock = freeDock;
         }

@@ -6,22 +6,15 @@ import logbook.config.ItemMasterConfig;
 import logbook.config.MasterDataConfig;
 import logbook.config.ShipConfig;
 import logbook.config.ShipGroupConfig;
+import logbook.config.bean.WindowConfigBean;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.gui.background.AsyncExecApplicationMain;
 import logbook.gui.background.AsyncExecUpdateCheck;
-import logbook.gui.listener.BathwaterTableAdapter;
-import logbook.gui.listener.CalcExpAdapter;
 import logbook.gui.listener.CaptureDialogAdapter;
 import logbook.gui.listener.ConfigDialogAdapter;
-import logbook.gui.listener.CreateItemReportAdapter;
-import logbook.gui.listener.CreateShipReportAdapter;
-import logbook.gui.listener.DropReportAdapter;
 import logbook.gui.listener.HelpEventListener;
-import logbook.gui.listener.ItemListReportAdapter;
 import logbook.gui.listener.MainShellAdapter;
-import logbook.gui.listener.MissionResultReportAdapter;
-import logbook.gui.listener.ShipListReportAdapter;
 import logbook.gui.listener.TraySelectionListener;
 import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.MainAppListener;
@@ -68,7 +61,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
  * メイン画面
  *
  */
-public final class ApplicationMain {
+public final class ApplicationMain extends WindowBase {
 
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(ApplicationMain.class);
@@ -107,14 +100,42 @@ public final class ApplicationMain {
         }
     }
 
-    /** シェル */
+    /** ベースクラスの持っているshellと同じ */
     private Shell shell;
 
     /** トレイ */
     private TrayItem trayItem;
 
+    /** ウィンドウたち */
+    /** ドロップ報告書 */
+    private DropReportTable dropReportWindow;
+    /** 建造報告書 */
+    private CreateShipReportTable createShipReportWindow;
+    /** 開発報告書 */
+    private CreateItemReportTable createItemReportWindow;
+    /** 遠征報告書 */
+    private MissionResultTable missionResultWindow;
+    /** 所有装備一覧 */
+    private ItemTable itemTableWindow;
+    /** 艦娘一覧1-4 */
+    private final ShipTable[] shipTableWindows = new ShipTable[4];
+    /** お風呂に入りたい艦娘 */
+    private BathwaterTableDialog bathwaterTablwWindow;
+    /** 任務一覧 */
+    private QuestTable questTableWindow;
+    /** 戦況 */
+    private BattleWindow battleWindow;
+    /** 自軍敵軍パラメータ */
+    private BattleShipWindow battleShipWindow;
+    /** 経験値計算 */
+    private CalcExpDialog calcExpWindow;
+    /** グループエディター */
+    private ShipFilterGroupDialog shipFilterGroupWindow;
+
     /** コマンドボタン */
     private Composite commandComposite;
+    /** 縮小表示メニューアイテム */
+    private MenuItem dispsize;
     /** 所有装備 */
     private Button itemList;
     /** 所有艦娘 */
@@ -164,13 +185,6 @@ public final class ApplicationMain {
     /** コンソール **/
     private List console;
 
-    /** 戦況 */
-    private MenuItem battleWinMenu;
-    private BattleWindow battleWindow;
-    /** 自軍敵軍パラメータ */
-    private MenuItem battleShipWinMenu;
-    private BattleShipWindow battleShipWindow;
-
     /**
      * Launch the application.
      * @param args
@@ -189,7 +203,7 @@ public final class ApplicationMain {
             Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHookThread()));
             // アプリケーション開始
             ApplicationMain window = new ApplicationMain();
-            window.open();
+            window.restore();
         } catch (Error e) {
             LOG.fatal("メインスレッドが異常終了しました", e);
         } catch (Exception e) {
@@ -202,12 +216,12 @@ public final class ApplicationMain {
     /**
      * Open the window.
      */
+    @Override
     public void open() {
         Display display = Display.getDefault();
         this.createContents();
-        this.shell.open();
-        this.shell.layout();
-        this.createChildWindow();
+        this.registerEvents();
+        this.restoreWindows();
         while (!this.shell.isDisposed()) {
             if (!display.readAndDispatch()) {
                 display.sleep();
@@ -225,7 +239,8 @@ public final class ApplicationMain {
         if (AppConfig.get().isOnTop()) {
             shellStyle |= SWT.ON_TOP;
         }
-        this.shell = new Shell(shellStyle);
+        super.createContents(display, shellStyle, false);
+        this.shell = this.getShell();
         this.shell.setText(AppConstants.TITLEBAR_TEXT);
         this.shell.setAlpha(AppConfig.get().getAlpha());
         GridLayout glShell = new GridLayout(1, false);
@@ -240,16 +255,7 @@ public final class ApplicationMain {
             @Override
             public void shellClosed(ShellEvent e) {
                 // 終了の確認でウインドウ位置を記憶
-                Point location = ApplicationMain.this.shell.getLocation();
-                AppConfig.get().setLocationX(location.x);
-                AppConfig.get().setLocationY(location.y);
-                if (!AppConfig.get().isMinimumLayout()) {
-                    AppConfig.get().setWidth(ApplicationMain.this.shell.getSize().x);
-                    AppConfig.get().setHeight(ApplicationMain.this.shell.getSize().y);
-                }
-
-                AppConfig.get().setBattleShipWindowPos(ApplicationMain.this.battleShipWindow.getWindowPos());
-                AppConfig.get().setBattleWindowPos(ApplicationMain.this.battleWindow.getWindowPos());
+                ApplicationMain.this.saveWindows();
 
                 if (AppConfig.get().isCheckDoit()) {
                     MessageBox box = new MessageBox(ApplicationMain.this.shell, SWT.YES | SWT.NO
@@ -289,74 +295,77 @@ public final class ApplicationMain {
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // コマンド-ドロップ報告書
-        MenuItem cmddrop = new MenuItem(cmdmenu, SWT.NONE);
+        MenuItem cmddrop = new MenuItem(cmdmenu, SWT.CHECK);
         cmddrop.setText("ドロップ報告書(&D)\tCtrl+D");
         cmddrop.setAccelerator(SWT.CTRL + 'D');
-        cmddrop.addSelectionListener(new DropReportAdapter(this.shell));
+        this.dropReportWindow = new DropReportTable(this.shell, cmddrop);
         // コマンド-建造報告書
-        MenuItem cmdcreateship = new MenuItem(cmdmenu, SWT.NONE);
+        MenuItem cmdcreateship = new MenuItem(cmdmenu, SWT.CHECK);
         cmdcreateship.setText("建造報告書(&B)\tCtrl+B");
         cmdcreateship.setAccelerator(SWT.CTRL + 'B');
-        cmdcreateship.addSelectionListener(new CreateShipReportAdapter(this.shell));
+        this.createShipReportWindow = new CreateShipReportTable(this.shell, cmdcreateship);
         // コマンド-開発報告書
-        MenuItem cmdcreateitem = new MenuItem(cmdmenu, SWT.NONE);
+        MenuItem cmdcreateitem = new MenuItem(cmdmenu, SWT.CHECK);
         cmdcreateitem.setText("開発報告書(&E)\tCtrl+E");
         cmdcreateitem.setAccelerator(SWT.CTRL + 'E');
-        cmdcreateitem.addSelectionListener(new CreateItemReportAdapter(this.shell));
+        this.createItemReportWindow = new CreateItemReportTable(this.shell, cmdcreateitem);
         // コマンド-遠征報告書
-        MenuItem cmdmissionresult = new MenuItem(cmdmenu, SWT.NONE);
+        MenuItem cmdmissionresult = new MenuItem(cmdmenu, SWT.CHECK);
         cmdmissionresult.setText("遠征報告書(&T)\tCtrl+T");
         cmdmissionresult.setAccelerator(SWT.CTRL + 'T');
-        cmdmissionresult.addSelectionListener(new MissionResultReportAdapter(this.shell));
+        this.missionResultWindow = new MissionResultTable(this.shell, cmdmissionresult);
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // コマンド-所有装備一覧
-        MenuItem cmditemlist = new MenuItem(cmdmenu, SWT.NONE);
+        MenuItem cmditemlist = new MenuItem(cmdmenu, SWT.CHECK);
         cmditemlist.setText("所有装備一覧(&I)\tCtrl+I");
         cmditemlist.setAccelerator(SWT.CTRL + 'I');
-        cmditemlist.addSelectionListener(new ItemListReportAdapter(this.shell));
+        this.itemTableWindow = new ItemTable(this.shell, cmditemlist);
         // コマンド-所有艦娘一覧
-        MenuItem cmdshiplist = new MenuItem(cmdmenu, SWT.NONE);
-        cmdshiplist.setText("所有艦娘一覧(&S)\tCtrl+S");
-        cmdshiplist.setAccelerator(SWT.CTRL + 'S');
-        cmdshiplist.addSelectionListener(new ShipListReportAdapter(this.shell));
+        for (int i = 0; i < 4; ++i) {
+            MenuItem cmdshiplist = new MenuItem(cmdmenu, SWT.CHECK);
+            final int index = i;
+            int number = i + 1;
+            cmdshiplist.setText("所有艦娘一覧(&" + number + ")\tCtrl+" + number);
+            cmdshiplist.setAccelerator(SWT.CTRL + ('1' + i));
+            this.shipTableWindows[i] = new ShipTable(this.shell, cmdshiplist, index);
+        }
 
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // コマンド-お風呂に入りたい艦娘
-        MenuItem cmdbathwaterlist = new MenuItem(cmdmenu, SWT.NONE);
+        MenuItem cmdbathwaterlist = new MenuItem(cmdmenu, SWT.CHECK);
         cmdbathwaterlist.setText("お風呂に入りたい艦娘(&N)\tCtrl+N");
         cmdbathwaterlist.setAccelerator(SWT.CTRL + 'N');
-        cmdbathwaterlist.addSelectionListener(new BathwaterTableAdapter(this.shell));
+        this.bathwaterTablwWindow = new BathwaterTableDialog(this.shell, cmdbathwaterlist);
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // コマンド-任務一覧
-        MenuItem questlist = new MenuItem(cmdmenu, SWT.NONE);
+        MenuItem questlist = new MenuItem(cmdmenu, SWT.CHECK);
         questlist.setText("任務一覧(&Q)\tCtrl+Q");
         questlist.setAccelerator(SWT.CTRL + 'Q');
-        questlist.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                new QuestTable(ApplicationMain.this.shell).open();
-            }
-        });
+        this.questTableWindow = new QuestTable(this.shell, questlist);
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
 
         // 表示-戦況ウィンドウ 
-        this.battleWinMenu = new MenuItem(cmdmenu, SWT.CHECK);
-        this.battleWinMenu.setText("戦況(&W)\tCtrl+W");
-        this.battleWinMenu.setAccelerator(SWT.CTRL + 'W');
+        MenuItem battleWinMenu = new MenuItem(cmdmenu, SWT.CHECK);
+        battleWinMenu.setText("戦況(&W)\tCtrl+W");
+        battleWinMenu.setAccelerator(SWT.CTRL + 'W');
+        this.battleWindow = new BattleWindow(this.shell, battleWinMenu);
 
         // 表示-敵味方パラメータ
-        this.battleShipWinMenu = new MenuItem(cmdmenu, SWT.CHECK);
-        this.battleShipWinMenu.setText("自軍敵軍パラメータ(&P)\tCtrl+P");
-        this.battleShipWinMenu.setAccelerator(SWT.CTRL + 'P');
+        MenuItem battleShipWinMenu = new MenuItem(cmdmenu, SWT.CHECK);
+        battleShipWinMenu.setText("自軍敵軍パラメータ(&P)\tCtrl+P");
+        battleShipWinMenu.setAccelerator(SWT.CTRL + 'P');
+        this.battleShipWindow = new BattleShipWindow(this.shell, battleShipWinMenu);
 
         // 表示-縮小表示
-        final MenuItem dispsize = new MenuItem(cmdmenu, SWT.CHECK);
-        dispsize.setText("縮小表示(&M)\tCtrl+M");
-        dispsize.setAccelerator(SWT.CTRL + 'M');
+        // ウィンドウの右クリックメニューに追加
+        new MenuItem(this.getMenu(), SWT.SEPARATOR);
+        this.dispsize = new MenuItem(this.getMenu(), SWT.CHECK);
+        this.dispsize.setText("縮小表示(&M)\tCtrl+M");
+        this.dispsize.setAccelerator(SWT.CTRL + 'M');
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // 終了
@@ -370,20 +379,15 @@ public final class ApplicationMain {
         });
 
         // 計算機-経験値計算
-        MenuItem calcexp = new MenuItem(calcmenu, SWT.NONE);
+        MenuItem calcexp = new MenuItem(calcmenu, SWT.CHECK);
         calcexp.setText("経験値計算機(&C)\tCtrl+C");
         calcexp.setAccelerator(SWT.CTRL + 'C');
-        calcexp.addSelectionListener(new CalcExpAdapter(this.shell));
+        this.calcExpWindow = new CalcExpDialog(this.shell, calcexp);
 
         // その他-グループエディター
-        MenuItem shipgroup = new MenuItem(etcmenu, SWT.NONE);
+        MenuItem shipgroup = new MenuItem(etcmenu, SWT.CHECK);
         shipgroup.setText("グループエディター(&G)");
-        shipgroup.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                new ShipFilterGroupDialog(ApplicationMain.this.shell).open();
-            }
-        });
+        this.shipFilterGroupWindow = new ShipFilterGroupDialog(this.shell, shipgroup);
         // その他-資材チャート
         MenuItem resourceChart = new MenuItem(etcmenu, SWT.NONE);
         resourceChart.setText("資材チャート(&R)");
@@ -400,6 +404,17 @@ public final class ApplicationMain {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 new CreatePacFileDialog(ApplicationMain.this.shell).open();
+            }
+        });
+        // セパレータ
+        new MenuItem(etcmenu, SWT.SEPARATOR);
+        // その他-ウィンドウをディスプレイ内に移動
+        MenuItem movewindows = new MenuItem(etcmenu, SWT.NONE);
+        movewindows.setText("ウィンドウを呼び戻す");
+        movewindows.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                ApplicationMain.this.moveWindowsIntoDisplay();
             }
         });
         // セパレータ
@@ -427,10 +442,22 @@ public final class ApplicationMain {
 
         this.itemList = new Button(this.commandComposite, SWT.PUSH);
         this.itemList.setText("所有装備(0/0)");
-        this.itemList.addSelectionListener(new ItemListReportAdapter(this.shell));
+        this.itemList.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                ApplicationMain.this.itemTableWindow.open();
+                ApplicationMain.this.itemTableWindow.getShell().setActive();
+            }
+        });
         this.shipList = new Button(this.commandComposite, SWT.PUSH);
         this.shipList.setText("所有艦娘(0/0)");
-        this.shipList.addSelectionListener(new ShipListReportAdapter(this.shell));
+        this.shipList.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                ApplicationMain.this.shipTableWindows[0].open();
+                ApplicationMain.this.shipTableWindows[0].getShell().setActive();
+            }
+        });
 
         // タブフォルダー
         this.tabFolder = new CTabFolder(this.shell, SWT.NONE);
@@ -599,20 +626,18 @@ public final class ApplicationMain {
             ApplicationMain.this.hide(true, this.commandComposite, this.deckNotice, this.deck1name, this.deck2name,
                     this.deck3name, this.ndockNotice, this.ndock1name, this.ndock2name, this.ndock3name,
                     this.ndock4name, this.consoleComposite);
-            dispsize.setSelection(true);
+            this.dispsize.setSelection(true);
             this.shell.pack();
             this.shell.setRedraw(true);
-        } else {
-            this.shell.setSize(AppConfig.get().getWidth(), AppConfig.get().getHeight());
         }
 
         // 縮小表示チェック時の動作
-        dispsize.addSelectionListener(new SelectionAdapter() {
+        this.dispsize.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 Shell shell = ApplicationMain.this.shell;
                 shell.setRedraw(false);
-                boolean minimum = dispsize.getSelection();
+                boolean minimum = ApplicationMain.this.dispsize.getSelection();
                 // コントロールを隠す
                 ApplicationMain.this.hide(minimum, ApplicationMain.this.commandComposite,
                         ApplicationMain.this.deckNotice, ApplicationMain.this.deck1name,
@@ -646,33 +671,64 @@ public final class ApplicationMain {
                         }
                     }
                 } else {
-                    shell.setSize(AppConfig.get().getWidth(), AppConfig.get().getHeight());
+                    WindowConfigBean config = ApplicationMain.this.getWindowConfig();
+                    shell.setSize(config.getWidth(), config.getHeight());
                 }
                 // 設定を保存
                 AppConfig.get().setMinimumLayout(minimum);
             }
         });
-        // 前回のウインドウ位置を取得する
-        int locationX = AppConfig.get().getLocationX();
-        int locationY = AppConfig.get().getLocationY();
-        if ((locationX != -1) && (locationY != -1)) {
-            this.shell.setLocation(new Point(locationX, locationY));
-        }
 
         this.startThread();
     }
 
-    /** 子ウィンドウを作ります */
-    private void createChildWindow() {
-        this.battleWindow = new BattleWindow(this.shell, this.battleWinMenu,
-                AppConfig.get().getBattleWindowPos());
-        if (AppConfig.get().getBattleWindowPos().isOpened())
-            this.battleWindow.open();
+    @Override
+    public void restore() {
+        // メインウィンドウは常に開く
+        this.getWindowConfig().setOpened(true);
+        super.restore();
+    }
 
-        this.battleShipWindow = new BattleShipWindow(this.shell, this.battleShipWinMenu,
-                AppConfig.get().getBattleShipWindowPos());
-        if (AppConfig.get().getBattleShipWindowPos().isOpened())
-            this.battleShipWindow.open();
+    /** ウィンドウ配置を復元 */
+    private void restoreWindows() {
+        // まずはメインウィンドウを表示する
+        this.setVisible(true);
+        for (WindowBase window : this.getWindowList()) {
+            window.restore();
+        }
+    }
+
+    private void saveWindows() {
+        this.save();
+        for (WindowBase window : this.getWindowList()) {
+            window.save();
+        }
+    }
+
+    private void moveWindowsIntoDisplay() {
+        for (WindowBase window : this.getWindowList()) {
+            window.moveIntoDisplay();
+        }
+    }
+
+    private WindowBase[] getWindowList() {
+        return new WindowBase[] {
+                this.dropReportWindow,
+                this.createShipReportWindow,
+                this.createItemReportWindow,
+                this.missionResultWindow,
+                this.itemTableWindow,
+                this.shipTableWindows[0],
+                this.shipTableWindows[1],
+                this.shipTableWindows[2],
+                this.shipTableWindows[3],
+                this.bathwaterTablwWindow,
+                this.questTableWindow,
+                this.battleWindow,
+                this.battleShipWindow,
+                this.calcExpWindow,
+                this.shipFilterGroupWindow,
+        };
     }
 
     /**
@@ -732,11 +788,14 @@ public final class ApplicationMain {
         }
     }
 
-    /**
-     * @return shell
-     */
-    public Shell getShell() {
-        return this.shell;
+    @Override
+    protected boolean shouldSaveWindowSize() {
+        return !AppConfig.get().isMinimumLayout();
+    }
+
+    @Override
+    protected Point getDefaultSize() {
+        return new Point(280, 420);
     }
 
     /**

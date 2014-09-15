@@ -51,9 +51,11 @@ public class EnemyData {
         if (this.enemyName != null) {
             builder.setEnemyName(this.enemyName);
         }
-        for (String b : this.enemyShips) {
-            if (b != null) {
-                builder.addEnemyShips(b);
+        if (this.enemyShips != null) {
+            for (String b : this.enemyShips) {
+                if (b != null) {
+                    builder.addEnemyShips(b);
+                }
             }
         }
         if (this.formation != null) {

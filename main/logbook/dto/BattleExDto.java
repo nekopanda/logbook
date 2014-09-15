@@ -297,28 +297,38 @@ public class BattleExDto extends AbstractDto {
         public PhasePb toProto() {
             PhasePb.Builder builder = PhasePb.newBuilder();
             builder.setKind(this.kind.toProto());
-            for (int b : this.nowFriendHp) {
-                builder.addNowFriendHp(b);
+            if (this.nowFriendHp != null) {
+                for (int b : this.nowFriendHp) {
+                    builder.addNowFriendHp(b);
+                }
             }
-            for (int b : this.nowFriendHpCombined) {
-                builder.addNowFriendHpCombined(b);
+            if (this.nowFriendHpCombined != null) {
+                for (int b : this.nowFriendHpCombined) {
+                    builder.addNowFriendHpCombined(b);
+                }
             }
-            for (int b : this.nowEnemyHp) {
-                builder.addNowEnemyHp(b);
+            if (this.nowEnemyHp != null) {
+                for (int b : this.nowEnemyHp) {
+                    builder.addNowEnemyHp(b);
+                }
             }
             builder.setEstimatedRank(this.estimatedRank.toProto());
             builder.setIsNight(this.isNight);
             if (this.supportType != null) {
                 builder.setSupportType(this.supportType);
             }
-            for (int b : this.touchPlane) {
-                builder.addTouchPlane(b);
+            if (this.touchPlane != null) {
+                for (int b : this.touchPlane) {
+                    builder.addTouchPlane(b);
+                }
             }
             if (this.seiku != null) {
                 builder.setSeiku(this.seiku);
             }
-            for (double b : this.damageRate) {
-                builder.addDamageRate(b);
+            if (this.damageRate != null) {
+                for (double b : this.damageRate) {
+                    builder.addDamageRate(b);
+                }
             }
             if (this.air != null) {
                 builder.setAir(this.air.toProto());
@@ -326,39 +336,53 @@ public class BattleExDto extends AbstractDto {
             if (this.air2 != null) {
                 builder.setAir2(this.air2.toProto());
             }
-            for (BattleAtackDto b : this.support) {
-                if (b != null) {
-                    builder.addSupport(b.toProto());
+            if (this.support != null) {
+                for (BattleAtackDto b : this.support) {
+                    if (b != null) {
+                        builder.addSupport(b.toProto());
+                    }
                 }
             }
-            for (BattleAtackDto b : this.opening) {
-                if (b != null) {
-                    builder.addOpening(b.toProto());
+            if (this.opening != null) {
+                for (BattleAtackDto b : this.opening) {
+                    if (b != null) {
+                        builder.addOpening(b.toProto());
+                    }
                 }
             }
-            for (BattleAtackDto b : this.raigeki) {
-                if (b != null) {
-                    builder.addRaigeki(b.toProto());
+            if (this.raigeki != null) {
+                for (BattleAtackDto b : this.raigeki) {
+                    if (b != null) {
+                        builder.addRaigeki(b.toProto());
+                    }
                 }
             }
-            for (BattleAtackDto b : this.hougeki) {
-                if (b != null) {
-                    builder.addHougeki(b.toProto());
+            if (this.hougeki != null) {
+                for (BattleAtackDto b : this.hougeki) {
+                    if (b != null) {
+                        builder.addHougeki(b.toProto());
+                    }
                 }
             }
-            for (BattleAtackDto b : this.hougeki1) {
-                if (b != null) {
-                    builder.addHougeki1(b.toProto());
+            if (this.hougeki1 != null) {
+                for (BattleAtackDto b : this.hougeki1) {
+                    if (b != null) {
+                        builder.addHougeki1(b.toProto());
+                    }
                 }
             }
-            for (BattleAtackDto b : this.hougeki2) {
-                if (b != null) {
-                    builder.addHougeki2(b.toProto());
+            if (this.hougeki2 != null) {
+                for (BattleAtackDto b : this.hougeki2) {
+                    if (b != null) {
+                        builder.addHougeki2(b.toProto());
+                    }
                 }
             }
-            for (BattleAtackDto b : this.hougeki3) {
-                if (b != null) {
-                    builder.addHougeki3(b.toProto());
+            if (this.hougeki3 != null) {
+                for (BattleAtackDto b : this.hougeki3) {
+                    if (b != null) {
+                        builder.addHougeki3(b.toProto());
+                    }
                 }
             }
             return builder.build();
@@ -735,63 +759,91 @@ public class BattleExDto extends AbstractDto {
         if (this.battleDate != null) {
             builder.setBattleDate(this.battleDate.getTime());
         }
-        for (DockDto b : this.friends) {
-            if (b != null) {
-                builder.addFriends(b.toProto());
-            }
-        }
-        for (ShipInfoDto b : this.enemy) {
-            if (b != null) {
-                builder.addEnemy(b.toProto());
-            }
-        }
-        for (ItemDto[] b : this.enemySlot) {
-            ItemDtoListPb.Builder builder1 = ItemDtoListPb.newBuilder();
-            for (ItemDto c : b) {
-                if (c != null) {
-                    builder1.addData(c.toProto());
+        if (this.friends != null) {
+            for (DockDto b : this.friends) {
+                if (b != null) {
+                    builder.addFriends(b.toProto());
                 }
             }
-            builder.addEnemySlot(builder1.build());
         }
-        for (int[] b : this.enemyParam) {
-            intListPb.Builder builder2 = intListPb.newBuilder();
-            for (int c : b) {
-                builder2.addData(c);
+        if (this.enemy != null) {
+            for (ShipInfoDto b : this.enemy) {
+                if (b != null) {
+                    builder.addEnemy(b.toProto());
+                }
             }
-            builder.addEnemyParam(builder2.build());
         }
-        for (int b : this.maxFriendHp) {
-            builder.addMaxFriendHp(b);
+        if (this.enemySlot != null) {
+            for (ItemDto[] b : this.enemySlot) {
+                ItemDtoListPb.Builder builder1 = ItemDtoListPb.newBuilder();
+                if (b != null) {
+                    for (ItemDto c : b) {
+                        if (c != null) {
+                            builder1.addData(c.toProto());
+                        }
+                    }
+                }
+                builder.addEnemySlot(builder1.build());
+            }
         }
-        for (int b : this.maxFriendHpCombined) {
-            builder.addMaxFriendHpCombined(b);
+        if (this.enemyParam != null) {
+            for (int[] b : this.enemyParam) {
+                intListPb.Builder builder2 = intListPb.newBuilder();
+                if (b != null) {
+                    for (int c : b) {
+                        builder2.addData(c);
+                    }
+                }
+                builder.addEnemyParam(builder2.build());
+            }
         }
-        for (int b : this.maxEnemyHp) {
-            builder.addMaxEnemyHp(b);
+        if (this.maxFriendHp != null) {
+            for (int b : this.maxFriendHp) {
+                builder.addMaxFriendHp(b);
+            }
         }
-        for (int b : this.startFriendHp) {
-            builder.addStartFriendHp(b);
+        if (this.maxFriendHpCombined != null) {
+            for (int b : this.maxFriendHpCombined) {
+                builder.addMaxFriendHpCombined(b);
+            }
         }
-        for (int b : this.startFriendHpCombined) {
-            builder.addStartFriendHpCombined(b);
+        if (this.maxEnemyHp != null) {
+            for (int b : this.maxEnemyHp) {
+                builder.addMaxEnemyHp(b);
+            }
         }
-        for (int b : this.startEnemyHp) {
-            builder.addStartEnemyHp(b);
+        if (this.startFriendHp != null) {
+            for (int b : this.startFriendHp) {
+                builder.addStartFriendHp(b);
+            }
+        }
+        if (this.startFriendHpCombined != null) {
+            for (int b : this.startFriendHpCombined) {
+                builder.addStartFriendHpCombined(b);
+            }
+        }
+        if (this.startEnemyHp != null) {
+            for (int b : this.startEnemyHp) {
+                builder.addStartEnemyHp(b);
+            }
         }
         builder.setFriendGaugeMax(this.friendGaugeMax);
         builder.setEnemyGaugeMax(this.enemyGaugeMax);
-        for (String b : this.formation) {
-            if (b != null) {
-                builder.addFormation(b);
+        if (this.formation != null) {
+            for (String b : this.formation) {
+                if (b != null) {
+                    builder.addFormation(b);
+                }
             }
         }
         if (this.formationMatch != null) {
             builder.setFormationMatch(this.formationMatch);
         }
-        for (String b : this.sakuteki) {
-            if (b != null) {
-                builder.addSakuteki(b);
+        if (this.sakuteki != null) {
+            for (String b : this.sakuteki) {
+                if (b != null) {
+                    builder.addSakuteki(b);
+                }
             }
         }
         if (this.questName != null) {
@@ -813,9 +865,11 @@ public class BattleExDto extends AbstractDto {
         if (this.dropName != null) {
             builder.setDropName(this.dropName);
         }
-        for (Phase b : this.phaseList) {
-            if (b != null) {
-                builder.addPhaseList(b.toProto());
+        if (this.phaseList != null) {
+            for (Phase b : this.phaseList) {
+                if (b != null) {
+                    builder.addPhaseList(b.toProto());
+                }
             }
         }
         return builder.build();

@@ -65,6 +65,32 @@ public enum ResultRank {
         return null;
     }
 
+    public static ResultRank fromProto(ResultRankPb pb) {
+        switch (pb.getNumber()) {
+        case 0:
+            return PERFECT;
+        case 1:
+            return S;
+        case 2:
+            return A;
+        case 3:
+            return B;
+        case 4:
+            return C;
+        case 5:
+            return D;
+        case 6:
+            return E;
+        case 7:
+            return B_OR_C;
+        case 8:
+            return C_OR_B;
+        case 9:
+            return D_OR_C;
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         return this.description;

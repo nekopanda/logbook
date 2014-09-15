@@ -1,5 +1,6 @@
 package logbook.gui;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -8,21 +9,23 @@ import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import logbook.config.AppConfig;
+import logbook.config.bean.TableConfigBean;
 import logbook.gui.listener.TableKeyShortcutAdapter;
 import logbook.gui.listener.TableToClipboardAdapter;
 import logbook.gui.listener.TableToCsvSaveAdapter;
 import logbook.gui.logic.TableItemCreator;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -34,7 +37,7 @@ import org.eclipse.swt.widgets.TableItem;
  * テーブルで構成されるダイアログの基底クラス
  *
  */
-public abstract class AbstractTableDialog extends Dialog {
+public abstract class AbstractTableDialog extends WindowBase {
 
     /** タイマー */
     protected Timer timer;
@@ -43,7 +46,7 @@ public abstract class AbstractTableDialog extends Dialog {
     protected String[] header = this.getTableHeader();
 
     /** テーブルに表示しているボディー */
-    protected List<String[]> body;
+    protected List<Comparable[]> body;
 
     /** ソート順序 */
     protected final boolean[] orderflgs = new boolean[this.header.length];
@@ -66,6 +69,9 @@ public abstract class AbstractTableDialog extends Dialog {
     /** テーブルのメニュー */
     protected Menu tablemenu;
 
+    /** ヘッダーのメニュー */
+    protected Menu headermenu;
+
     /** テーブルソート */
     protected final TableComparator comparator = new TableComparator();
 
@@ -74,17 +80,26 @@ public abstract class AbstractTableDialog extends Dialog {
     /**
      * コンストラクター
      */
-    public AbstractTableDialog(Shell parent) {
-        super(parent, SWT.SHELL_TRIM | SWT.MODELESS);
+    public AbstractTableDialog(Shell parent, MenuItem menuItem) {
+        super(menuItem);
+        super.createContents(parent, SWT.SHELL_TRIM | SWT.MODELESS, true);
     }
 
     /**
      * Open the dialog.
      */
+    @Override
     public void open() {
+        // 初期化済みの場合
+        if (this.isWindowInitialized()) {
+            // リロードして表示
+            this.reloadTable();
+            this.setVisible(true);
+            return;
+        }
+
         // シェルを作成
-        this.shell = new Shell(this.getParent(), this.getStyle());
-        this.shell.setSize(this.getSize());
+        this.shell = this.getShell();
         this.shell.setText(this.getTitle());
         this.shell.setLayout(new FillLayout());
         // メニューバー
@@ -128,11 +143,15 @@ public abstract class AbstractTableDialog extends Dialog {
         selectVisible.setText("列の表示・非表示(&V)");
         selectVisible.addSelectionListener(new SelectVisibleColumnAdapter());
 
+        // ウィンドウの基本メニューを設定
+        super.registerEvents();
+
         new MenuItem(this.opemenu, SWT.SEPARATOR);
 
         // テーブル右クリックメニュー
-        this.tablemenu = new Menu(this.table);
+        this.tablemenu = this.getMenu();
         this.table.setMenu(this.tablemenu);
+        new MenuItem(this.tablemenu, SWT.SEPARATOR);
         MenuItem sendclipbord = new MenuItem(this.tablemenu, SWT.NONE);
         sendclipbord.addSelectionListener(new TableToClipboardAdapter(this.header, this.table));
         sendclipbord.setText("クリップボードにコピー(&C)");
@@ -147,19 +166,56 @@ public abstract class AbstractTableDialog extends Dialog {
         // 列幅を整える
         this.packTableHeader();
 
-        this.createContents();
-        this.shell.open();
-        this.shell.layout();
-        this.display = this.getParent().getDisplay();
-        while (!this.shell.isDisposed()) {
-            if (!this.display.readAndDispatch()) {
-                this.display.sleep();
+        // ヘッダの右クリックメニュー
+        this.headermenu = new Menu(this.table);
+        boolean[] visibles = this.getConfig().getVisibleColumn();
+        for (int i = 0; i < this.header.length; ++i) {
+            final MenuItem item = new MenuItem(this.headermenu, SWT.CHECK);
+            final int column_index = i;
+            item.setText(this.header[i]);
+            item.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    boolean selected = item.getSelection();
+                    boolean[] visibles = AbstractTableDialog.this.getConfig().getVisibleColumn();
+                    visibles[column_index] = selected;
+                    AbstractTableDialog.this.setColumnVisible(column_index, selected);
+                }
+            });
+            item.setSelection(visibles[i]);
+        }
+
+        // クリック位置によってメニュー切り替え
+        this.table.addListener(SWT.MenuDetect, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                Point pt = AbstractTableDialog.this.display.map(null, AbstractTableDialog.this.table, new Point(
+                        event.x, event.y));
+                Rectangle clientArea = AbstractTableDialog.this.table.getClientArea();
+                boolean header = (clientArea.y <= pt.y)
+                        && (pt.y < (clientArea.y + AbstractTableDialog.this.table.getHeaderHeight()));
+                AbstractTableDialog.this.table.setMenu(
+                        header ? AbstractTableDialog.this.headermenu : AbstractTableDialog.this.tablemenu);
             }
-        }
-        // タイマーの終了
-        if (this.timer != null) {
-            this.timer.cancel();
-        }
+        });
+
+        this.table.addListener(SWT.Dispose, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                // setMenuされたメニューしかdisposeされないので
+                AbstractTableDialog.this.headermenu.dispose();
+                AbstractTableDialog.this.tablemenu.dispose();
+                // タイマーの終了
+                if (AbstractTableDialog.this.timer != null) {
+                    AbstractTableDialog.this.timer.cancel();
+                }
+            }
+        });
+
+        this.display = this.shell.getDisplay();
+        this.createContents();
+        this.setWindowInitialized(true);
+        this.setVisible(true);
     }
 
     /**
@@ -173,9 +229,7 @@ public abstract class AbstractTableDialog extends Dialog {
         this.table.setSortColumn(null);
         this.disposeTableBody();
         this.updateTableBody();
-        if (this.comparator.getHasSetConfig()) {
-            Collections.sort(this.body, this.comparator);
-        }
+        this.sortBody();
         this.setTableBody();
         this.packTableHeader();
         this.table.setSortColumn(sortColumn);
@@ -204,7 +258,7 @@ public abstract class AbstractTableDialog extends Dialog {
         TableItemCreator creator = this.getTableItemCreator();
         creator.init();
         for (int i = 0; i < this.body.size(); i++) {
-            String[] line = this.body.get(i);
+            Comparable[] line = this.body.get(i);
             creator.create(this.table, line, i);
         }
     }
@@ -223,25 +277,65 @@ public abstract class AbstractTableDialog extends Dialog {
      * テーブルヘッダーの幅を調節する
      */
     protected void packTableHeader() {
-        boolean[] visibles = AppConfig.get().getVisibleColumnMap().get(this.getClass().getName());
+        boolean[] visibles = this.getConfig().getVisibleColumn();
 
         TableColumn[] columns = this.table.getColumns();
 
-        // 列の表示・非表示設定のサイズがカラム数と異なっている場合は破棄する
-        if (visibles != null) {
-            if (visibles.length != columns.length) {
-                AppConfig.get().getVisibleColumnMap().remove(this.getClass().getName());
-                visibles = null;
-            }
-        }
-
         for (int i = 0; i < columns.length; i++) {
-            if ((visibles == null) || visibles[i]) {
+            if (visibles[i]) {
                 columns[i].pack();
             } else {
                 columns[i].setWidth(0);
             }
         }
+    }
+
+    protected void setColumnVisible(int index, boolean visible) {
+        TableColumn[] columns = this.table.getColumns();
+        if (visible) {
+            columns[index].pack();
+        }
+        else {
+            columns[index].setWidth(0);
+        }
+    }
+
+    protected TableConfigBean getConfig() {
+        TableConfigBean config = AppConfig.get().getTableConfigMap().get(this.getWindowId());
+
+        // 列の表示・非表示設定のサイズがカラム数と異なっている場合は破棄する
+        if (config != null) {
+            if (config.getVisibleColumn() == null) {
+                config = null;
+            }
+            else if (config.getVisibleColumn().length != this.header.length) {
+                config = null;
+            }
+        }
+
+        if (config == null) {
+            config = this.getDefaultTableConfig();
+        }
+
+        return config;
+    }
+
+    /**
+     * ウィンドウサイズを保存・リストアするべきか？
+     * @return
+     */
+    @Override
+    protected boolean shouldSaveWindowSize() {
+        return true;
+    }
+
+    /**
+     * ウィンドウのデフォルトサイズを取得
+     * @return
+     */
+    @Override
+    protected Point getDefaultSize() {
+        return this.getSize();
     }
 
     /**
@@ -300,6 +394,20 @@ public abstract class AbstractTableDialog extends Dialog {
     protected abstract SelectionListener getHeaderSelectionListener();
 
     /**
+     * テーブルの初期状態
+     * @return
+     */
+    protected TableConfigBean getDefaultTableConfig() {
+        TableConfigBean config = new TableConfigBean();
+        boolean[] visibles = new boolean[this.header.length];
+        Arrays.fill(visibles, true);
+        config.setVisibleColumn(visibles);
+        TableConfigBean.SortKey[] sortKeys = new TableConfigBean.SortKey[3];
+        config.setSortKeys(sortKeys);
+        return config;
+    }
+
+    /**
      * テーブルをソートします
      * 
      * @param headerColumn ソートするカラム
@@ -322,10 +430,24 @@ public abstract class AbstractTableDialog extends Dialog {
      * @param headerColumn ソートするカラム
      */
     protected void sortTableItems(int index, TableColumn headerColumn) {
+        final boolean orderflg = !this.orderflgs[index];
+
+        // ソートキーに追加
+        TableConfigBean config = this.getConfig();
+        TableConfigBean.SortKey[] sortKeys = config.getSortKeys();
+        TableConfigBean.SortKey[] newKeys = new TableConfigBean.SortKey[3];
+        newKeys[0] = new TableConfigBean.SortKey(index, orderflg);
+        for (int i = 1, j = 0; (i < newKeys.length) && (j < sortKeys.length); ++j) {
+            // キーは重複させない
+            if ((sortKeys[j] != null) && (newKeys[0].index != sortKeys[j].index)) {
+                newKeys[i++] = sortKeys[j];
+            }
+        }
+        config.setSortKeys(newKeys);
+
         this.shell.setRedraw(false);
         this.disposeTableBody();
 
-        final boolean orderflg = !this.orderflgs[index];
         for (int i = 0; i < this.orderflgs.length; i++) {
             this.orderflgs[i] = false;
         }
@@ -339,19 +461,29 @@ public abstract class AbstractTableDialog extends Dialog {
             this.table.setSortDirection(SWT.DOWN);
         }
 
-        this.comparator.setIndex(index);
-        this.comparator.setOrder(orderflg);
-        Collections.sort(this.body, this.comparator);
+        this.sortBody();
         this.setTableBody();
 
         this.shell.setRedraw(true);
+    }
 
+    private void sortBody() {
+        TableConfigBean.SortKey[] sortKeys = this.getConfig().getSortKeys();
+        if (sortKeys != null) {
+            for (int i = sortKeys.length; i <= 0; --i) {
+                if (sortKeys[i] != null) {
+                    this.comparator.setIndex(sortKeys[i].index);
+                    this.comparator.setOrder(sortKeys[i].order);
+                    Collections.sort(this.body, this.comparator);
+                }
+            }
+        }
     }
 
     /**
      * テーブルをソートする{@link java.util.Comparator}です。
      */
-    protected class TableComparator implements Comparator<String[]> {
+    protected class TableComparator implements Comparator<Comparable[]> {
 
         /** ソート設定済みフラグ */
         private boolean confflg = false;
@@ -361,24 +493,25 @@ public abstract class AbstractTableDialog extends Dialog {
         private boolean order;
 
         @Override
-        public final int compare(String[] o1, String[] o2) {
-            int length = Math.max(o1[this.index].length(), o2[this.index].length());
-            String o1str = StringUtils.leftPad(o1[this.index], length, '0');
-            String o2str = StringUtils.leftPad(o2[this.index], length, '0');
-            if (StringUtils.isEmpty(o1[this.index]) && StringUtils.isEmpty(o2[this.index])) {
-                return 0;
+        public final int compare(Comparable[] o1, Comparable[] o2) {
+            int ret;
+            Comparable o1c = o1[this.index];
+            Comparable o2c = o2[this.index];
+            if (o1c == null) {
+                if (o2c == null) {
+                    ret = 0;
+                }
+                else {
+                    ret = -1;
+                }
             }
-            if (StringUtils.isEmpty(o1[this.index])) {
-                return 1;
+            else if (o2c == null) {
+                ret = 1;
             }
-            if (StringUtils.isEmpty(o2[this.index])) {
-                return -1;
+            else {
+                ret = o1[this.index].compareTo(o2[this.index]);
             }
-            if (!this.order) {
-                return o2str.compareTo(o1str);
-            } else {
-                return o1str.compareTo(o2str);
-            }
+            return this.order ? ret : -ret;
         }
 
         /**

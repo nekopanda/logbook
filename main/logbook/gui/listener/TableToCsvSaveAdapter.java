@@ -65,7 +65,7 @@ public final class TableToCsvSaveAdapter extends SelectionAdapter {
                 }
             }
             try {
-                List<String[]> body = new ArrayList<String[]>();
+                List<Comparable[]> body = new ArrayList<Comparable[]>();
                 TableItem[] items = this.table.getItems();
                 for (TableItem item : items) {
                     String[] colums = new String[this.header.length];

@@ -8,6 +8,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 
@@ -20,8 +21,8 @@ public final class CreateShipReportTable extends AbstractTableDialog {
     /**
      * @param parent
      */
-    public CreateShipReportTable(Shell parent) {
-        super(parent);
+    public CreateShipReportTable(Shell parent, MenuItem menuItem) {
+        super(parent, menuItem);
     }
 
     @Override
