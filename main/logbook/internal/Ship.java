@@ -603,11 +603,11 @@ public class Ship {
             this.put("584", new ShipInfoDto("中間棲姫", "航空戦艦", "", 0, 0, 0));
             this.put("585", new ShipInfoDto("空母棲鬼", "正規空母", "", 0, 0, 0));
             this.put("586", new ShipInfoDto("空母棲姫", "正規空母", "", 0, 0, 0));
-            this.put("587", new ShipInfoDto("ナガラ級*", "軽巡洋艦", "mist*", 0, 0, 0));
-            this.put("588", new ShipInfoDto("タカオ*", "重巡洋艦", "mist*", 0, 0, 0));
-            this.put("589", new ShipInfoDto("マヤ*", "重巡洋艦", "mist*", 0, 0, 0));
-            this.put("590", new ShipInfoDto("ハルナ*", "戦艦", "mist*", 0, 0, 0));
-            this.put("591", new ShipInfoDto("キリシマ*", "戦艦", "mist*", 0, 0, 0));
+            this.put("587", new ShipInfoDto("北方棲姫", "航空戦艦", "", 0, 0, 0));
+            this.put("588", new ShipInfoDto("北方棲姫", "航空戦艦", "", 0, 0, 0));
+            this.put("589", new ShipInfoDto("北方棲姫", "航空戦艦", "", 0, 0, 0));
+            this.put("590", new ShipInfoDto("北方棲姫", "航空戦艦", "", 0, 0, 0));
+            this.put("591", new ShipInfoDto("軽巡ツ級", "軽巡洋艦", "", 0, 0, 0));
             this.put("592", new ShipInfoDto("コンゴウ*", "戦艦", "mist*", 0, 0, 0));
             this.put("593", ShipInfoDto.EMPTY);
             this.put("594", ShipInfoDto.EMPTY);
