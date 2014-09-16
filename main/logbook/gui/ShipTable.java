@@ -1,13 +1,17 @@
 package logbook.gui;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import logbook.config.ShipGroupConfig;
 import logbook.config.bean.ShipGroupBean;
+import logbook.data.context.GlobalContext;
+import logbook.dto.ShipDto;
 import logbook.dto.ShipFilterDto;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.TableItemCreator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -15,6 +19,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -119,10 +124,25 @@ public final class ShipTable extends AbstractTableDialog {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     TableItem[] tableItems = ShipTable.this.table.getSelection();
-                    for (int i = 0; i < tableItems.length; i++) {
-                        long id = Long.parseLong(tableItems[i].getText(1));
-                        ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
-                        bean.getShips().add(id);
+                    if (tableItems.length > 0) {
+                        List<String> name = new ArrayList<>();
+                        for (int i = 0; i < tableItems.length; i++) {
+                            long id = Long.parseLong(tableItems[i].getText(1));
+                            ShipDto ship = GlobalContext.getShipMap().get(id);
+                            name.add(ship.getName());
+                        }
+                        MessageBox box = new MessageBox(ShipTable.this.shell, SWT.YES | SWT.NO
+                                | SWT.ICON_QUESTION);
+                        box.setText("選択した艦娘をグループに追加");
+                        box.setMessage("「" + StringUtils.join(name, ",") + "」をグループに追加しますか？");
+
+                        if (box.open() == SWT.YES) {
+                            for (int i = 0; i < tableItems.length; i++) {
+                                long id = Long.parseLong(tableItems[i].getText(1));
+                                ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
+                                bean.getShips().add(id);
+                            }
+                        }
                     }
                 }
             });
@@ -140,10 +160,25 @@ public final class ShipTable extends AbstractTableDialog {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     TableItem[] tableItems = ShipTable.this.table.getSelection();
-                    for (int i = 0; i < tableItems.length; i++) {
-                        long id = Long.parseLong(tableItems[i].getText(1));
-                        ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
-                        bean.getShips().remove(id);
+                    if (tableItems.length > 0) {
+                        List<String> name = new ArrayList<>();
+                        for (int i = 0; i < tableItems.length; i++) {
+                            long id = Long.parseLong(tableItems[i].getText(1));
+                            ShipDto ship = GlobalContext.getShipMap().get(id);
+                            name.add(ship.getName());
+                        }
+                        MessageBox box = new MessageBox(ShipTable.this.shell, SWT.YES | SWT.NO
+                                | SWT.ICON_QUESTION);
+                        box.setText("選択した艦娘をグループから除去");
+                        box.setMessage("「" + StringUtils.join(name, ",") + "」をグループから除去しますか？");
+
+                        if (box.open() == SWT.YES) {
+                            for (int i = 0; i < tableItems.length; i++) {
+                                long id = Long.parseLong(tableItems[i].getText(1));
+                                ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
+                                bean.getShips().remove(id);
+                            }
+                        }
                     }
                 }
             });
