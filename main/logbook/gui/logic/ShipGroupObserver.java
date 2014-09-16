@@ -30,9 +30,15 @@ public class ShipGroupObserver {
         }
     }
 
-    public static void groupChanged(ShipGroupBean group) {
+    public static void groupNameChanged(ShipGroupBean group) {
         for (ShipGroupListener listener : listeners) {
-            listener.groupChanged(group);
+            listener.groupNameChanged(group);
+        }
+    }
+
+    public static void groupShipChanged(ShipGroupBean group) {
+        for (ShipGroupListener listener : listeners) {
+            listener.groupShipChanged(group);
         }
     }
 }

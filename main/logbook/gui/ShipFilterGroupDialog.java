@@ -130,7 +130,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
         this.treeItem.setExpanded(true);
 
         this.mainComposite = new Composite(this.sashForm, SWT.NONE);
-        GridLayout mainLayout = new GridLayout(3, false);
+        GridLayout mainLayout = new GridLayout(4, false);
         mainLayout.verticalSpacing = 1;
         mainLayout.marginWidth = 1;
         mainLayout.marginHeight = 1;
@@ -140,7 +140,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
 
         this.text = new Text(this.mainComposite, SWT.BORDER);
         this.text.addModifyListener(new ModifyNameAdapter(this));
-        this.text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+        this.text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
         this.text.setEnabled(false);
     }
 
@@ -163,7 +163,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
         this.btnRemoveShip.addSelectionListener(new RemoveShipAdapter(this));
         this.btnRemoveShip.setEnabled(false);
         Button updateShip = new Button(this.mainComposite, SWT.NONE);
-        updateShip.setText("追加");
+        updateShip.setText("更新");
         updateShip.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -294,7 +294,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
         }
         // コントロールを再配置
         this.shipcombo.pack();
-        this.shipcombo.getParent().pack();
+        this.shipcombo.getParent().layout();
     }
 
     /**
@@ -420,11 +420,14 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
         @Override
         public void modifyText(ModifyEvent e) {
             if (this.dialog.property != null) {
-                String text = this.dialog.text.getText();
-                this.dialog.property.getTreeItem().setText(text);
                 ShipGroupBean group = this.dialog.property.getShipGroupBean();
-                group.setName(text);
-                ShipGroupObserver.groupChanged(group);
+                String text = this.dialog.text.getText();
+                String groupName = group.getName();
+                if (!text.equals(groupName)) { // 変わった時だけ
+                    this.dialog.property.getTreeItem().setText(text);
+                    group.setName(text);
+                    ShipGroupObserver.groupNameChanged(group);
+                }
             }
         }
     }
@@ -483,7 +486,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
                     ShipDto ship = this.dialog.shipmap.get(this.dialog.shipcombo.getItem(this.dialog.shipcombo
                             .getSelectionIndex()));
                     target.getShips().add(ship.getId());
-                    ShipGroupObserver.groupChanged(target);
+                    ShipGroupObserver.groupShipChanged(target);
                 }
             }
         }
@@ -517,7 +520,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
                         target.getShips().remove(id);
                     }
                 }
-                ShipGroupObserver.groupChanged(target);
+                ShipGroupObserver.groupShipChanged(target);
             }
         }
     }
@@ -586,7 +589,12 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
     }
 
     @Override
-    public void groupChanged(ShipGroupBean group) {
+    public void groupNameChanged(ShipGroupBean group) {
+        // 自分で変更しているので何もしない
+    }
+
+    @Override
+    public void groupShipChanged(ShipGroupBean group) {
         if (this.property.getShipGroupBean() == group) {
             this.reloadTable();
         }

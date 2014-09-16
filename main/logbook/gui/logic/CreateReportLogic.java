@@ -362,7 +362,10 @@ public final class CreateReportLogic {
                 "ID",
                 "鍵",//
                 "艦隊",
-                "位置", //
+                "Lv順", //
+                "艦種順", //
+                "NEW順", //
+                "修理順", //
                 "名前",
                 "艦種",
                 "艦ID",//
@@ -412,12 +415,11 @@ public final class CreateReportLogic {
      * @return 内容
      */
     public static List<Comparable[]> getShipListBody(boolean specdiff, ShipFilterDto filter) {
-        Set<Entry<Integer, ShipDto>> ships = GlobalContext.getShipMap().entrySet();
         Set<Integer> missionSet = GlobalContext.getMissionShipSet();
         List<Comparable[]> body = new ArrayList<Comparable[]>();
         int count = 0;
-        for (Entry<Integer, ShipDto> entry : ships) {
-            ShipDto ship = entry.getValue();
+        for (ShipWithSortNumber shipObj : getShipWithSortNumber()) {
+            ShipDto ship = shipObj.ship;
 
             if ((filter != null) && !shipFilter(ship, filter)) {
                 continue;
@@ -426,6 +428,11 @@ public final class CreateReportLogic {
             ShipInfoDto shipInfo = Ship.get(String.valueOf(ship.getShipId()));
 
             count++;
+
+            String fleet = null;
+            if (ship.isFleetMember()) {
+                fleet = String.valueOf(ship.getFleetid()) + "-" + String.valueOf(ship.getFleetpos() + 1);
+            }
 
             String now = "";
             if (missionSet.contains(ship.getId())) {
@@ -500,14 +507,17 @@ public final class CreateReportLogic {
 
             // 艦載機数
             List<String> slotString = ship.getSlot();
-            List<ItemDto> slotItem = ship.getItem();
-            List<Integer> onSlot = ship.getOnSlot();
-            int[] maxEq = shipInfo.getMaxeq();
             HpString[] onSlotString = new HpString[4];
-            for (int i = 0; i < onSlotString.length; ++i) {
-                ItemDto item = slotItem.get(i);
-                if ((item != null) && item.isPlane()) {
-                    onSlotString[i] = new HpString(onSlot.get(i), maxEq != null ? maxEq[i] : 0);
+            if (ship.canEquipPlane()) { // 飛行機を装備できる場合だけ
+                List<ItemDto> slotItem = ship.getItem();
+                List<Integer> onSlot = ship.getOnSlot();
+                int[] maxEq = shipInfo.getMaxeq();
+                int slotNum = ship.getSlotNum();
+                for (int i = 0; i < slotNum; ++i) {
+                    ItemDto item = slotItem.get(i);
+                    int cur = ((item != null) && item.isPlane()) ? onSlot.get(i) : 0;
+                    int max = maxEq != null ? maxEq[i] : 0;
+                    onSlotString[i] = new HpString(cur, max);
                 }
             }
 
@@ -515,8 +525,11 @@ public final class CreateReportLogic {
                     new TableRowHeader(count, ship),
                     ship.getId(),
                     ship.getLocked() ? "♥" : "",
-                    ship.getFleetid(),
-                    ship.isFleetMember() ? ship.getFleetpos() : null,
+                    fleet,
+                    getPageNumber(shipObj.sortNumber[0]),
+                    getPageNumber(shipObj.sortNumber[1]),
+                    getPageNumber(shipObj.sortNumber[2]),
+                    getPageNumber(shipObj.sortNumber[3]),
                     ship.getName(),
                     ship.getType(),
                     ship.getCharId(),
@@ -558,6 +571,103 @@ public final class CreateReportLogic {
             });
         }
         return body;
+    }
+
+    private static IntegerPair getPageNumber(int index) {
+        return new IntegerPair((index / 10) + 1, (index % 10) + 1, "-");
+    }
+
+    private static class ShipWithSortNumber {
+        public ShipDto ship;
+        /** Lv順, 艦種順, NEW順, 修理順 (ゼロ始まり) */
+        public int[] sortNumber = new int[4];
+
+        public ShipWithSortNumber(ShipDto ship) {
+            this.ship = ship;
+        }
+    }
+
+    private static class ShipComparatorBase implements Comparator<ShipWithSortNumber> {
+        @Override
+        public int compare(ShipWithSortNumber o1, ShipWithSortNumber o2) {
+            int ret = Integer.compare(o1.ship.getSortno(), o2.ship.getSortno());
+            if (ret == 0) {
+                ret = Integer.compare(o1.ship.getId(), o2.ship.getId());
+            }
+            return ret;
+        }
+    }
+
+    private static void genSortNumber(List<ShipWithSortNumber> list, int index, Comparator<ShipWithSortNumber> comp) {
+        Collections.sort(list, comp);
+        for (int i = 0; i < list.size(); ++i) {
+            list.get(i).sortNumber[index] = i;
+        }
+    }
+
+    private static List<ShipWithSortNumber> getShipWithSortNumber() {
+        List<ShipWithSortNumber> ships = new ArrayList<ShipWithSortNumber>();
+        for (ShipDto ship : GlobalContext.getShipMap().values()) {
+            ships.add(new ShipWithSortNumber(ship));
+        }
+        // Lv順
+        genSortNumber(ships, 0, new ShipComparatorBase() {
+            @Override
+            public int compare(ShipWithSortNumber o1, ShipWithSortNumber o2) {
+                int ret = -Integer.compare(o1.ship.getLv(), o2.ship.getLv());
+                if (ret == 0) {
+                    return super.compare(o1, o2);
+                }
+                return ret;
+            }
+        });
+        // 艦種順
+        genSortNumber(ships, 1, new Comparator<ShipWithSortNumber>() {
+            @Override
+            public int compare(ShipWithSortNumber o1, ShipWithSortNumber o2) {
+                int ret = -Integer.compare(o1.ship.getShipInfo().getStype(), o2.ship.getShipInfo().getStype());
+                if (ret == 0) {
+                    ret = Integer.compare(o1.ship.getSortno(), o2.ship.getSortno());
+                    /*// Lv順の後に安定ソートするので
+                    if (ret == 0) {
+                        ret = -Integer.compare(o1.ship.getLv(), o2.ship.getLv());
+                        if (ret == 0) {
+                            ret = Integer.compare(o1.ship.getId(), o2.ship.getId());
+                        }
+                    }
+                    */
+                }
+                return ret;
+            }
+        });
+        // NEW
+        genSortNumber(ships, 2, new ShipComparatorBase() {
+            @Override
+            public int compare(ShipWithSortNumber o1, ShipWithSortNumber o2) {
+                return -Integer.compare(o1.ship.getId(), o2.ship.getId());
+            }
+        });
+        // 修理順
+        genSortNumber(ships, 3, new ShipComparatorBase() {
+            @Override
+            public int compare(ShipWithSortNumber o1, ShipWithSortNumber o2) {
+                double o1rate = (double) o1.ship.getNowhp() / (double) o1.ship.getMaxhp();
+                double o2rate = (double) o2.ship.getNowhp() / (double) o2.ship.getMaxhp();
+                int ret = Double.compare(o1rate, o2rate);
+                if (ret == 0) {
+                    return super.compare(o1, o2);
+                }
+                return ret;
+            }
+        });
+        // 最後にID順にしておく
+        Collections.sort(ships, new Comparator<ShipWithSortNumber>() {
+            @Override
+            public int compare(ShipWithSortNumber o1, ShipWithSortNumber o2) {
+                return Integer.compare(o1.ship.getId(), o2.ship.getId());
+            }
+        });
+        return ships;
     }
 
     /**

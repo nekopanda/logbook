@@ -3,6 +3,7 @@ package logbook.dto;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 
+import logbook.constants.AppConstants;
 import logbook.internal.ItemType;
 import logbook.proto.LogbookEx.ItemDtoPb;
 import logbook.proto.Tag;
@@ -194,15 +195,12 @@ public final class ItemDto extends AbstractDto {
     }
 
     public boolean isPlane() {
-        switch (this.type[1]) {
-        case 5: // 攻撃爆撃機
-        case 7: // 戦闘機
-        case 15: // ヘリ
-        case 16: // 連絡機
-            return true;
-        default:
-            return false;
+        for (int i = 0; i < AppConstants.PLANE_ITEM_TYPES.length; ++i) {
+            if (this.type[2] == AppConstants.PLANE_ITEM_TYPES[i]) {
+                return true;
+            }
         }
+        return false;
     }
 
     /**

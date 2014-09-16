@@ -13,5 +13,7 @@ public interface ShipGroupListener {
 
     void listChanged();
 
-    void groupChanged(ShipGroupBean group);
+    void groupNameChanged(ShipGroupBean group);
+
+    void groupShipChanged(ShipGroupBean group);
 }

@@ -20,8 +20,11 @@ import logbook.util.CalcExpUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -217,8 +220,12 @@ public final class CalcExpDialog extends WindowBase {
 
         this.shipcombo.addSelectionListener(new PresetListener());
         reload.addSelectionListener(new ReloadListener());
-        this.beforelv.addSelectionListener(new BeforeLvListener(this.beforexp, this.beforelv));
-        this.afterlv.addSelectionListener(new AfterLvListener(this.afterexp, this.afterlv));
+        SelectionListener beforeLvListener = new BeforeLvListener(this.beforexp, this.beforelv);
+        this.beforelv.addSelectionListener(beforeLvListener);
+        this.beforelv.addMouseWheelListener(new WheelListener(this.beforelv, beforeLvListener));
+        SelectionListener afterLvListener = new BeforeLvListener(this.afterexp, this.afterlv);
+        this.afterlv.addSelectionListener(afterLvListener);
+        this.afterlv.addMouseWheelListener(new WheelListener(this.afterlv, afterLvListener));
 
         this.seacombo.addSelectionListener(new UpdateListener());
         this.evalcombo.addSelectionListener(new UpdateListener());
@@ -443,5 +450,38 @@ public final class CalcExpDialog extends WindowBase {
             this.afterexp.setText(afterexpstr);
             CalcExpDialog.this.calc();
         }
+    }
+
+    /**
+     * ホイールでレベルを動かす
+     */
+    private final class WheelListener implements MouseWheelListener {
+
+        private final Spinner spinner;
+        private final SelectionListener listener;
+
+        public WheelListener(Spinner spinner, SelectionListener listener) {
+            this.spinner = spinner;
+            this.listener = listener;
+        }
+
+        @Override
+        public void mouseScrolled(MouseEvent e) {
+            if (e.count > 0) {
+                int cur = this.spinner.getSelection();
+                if (cur < this.spinner.getMaximum()) {
+                    this.spinner.setSelection(cur + 1);
+                    this.listener.widgetSelected(null);
+                }
+            }
+            else if (e.count < 0) {
+                int cur = this.spinner.getSelection();
+                if (cur > this.spinner.getMinimum()) {
+                    this.spinner.setSelection(cur - 1);
+                    this.listener.widgetSelected(null);
+                }
+            }
+        }
+
     }
 }

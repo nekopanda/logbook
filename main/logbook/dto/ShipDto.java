@@ -12,9 +12,11 @@ import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
+import logbook.config.MasterDataConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.internal.ExpTable;
+import logbook.internal.MasterData;
 import logbook.internal.Ship;
 import logbook.proto.LogbookEx.ShipDtoPb;
 import logbook.proto.Tag;
@@ -38,6 +40,8 @@ public final class ShipDto extends AbstractDto {
     /** キャラクタ識別ID（その艦の最終形の艦ID） */
     @Tag(2)
     private final int charId;
+
+    private final int sortno;
 
     /** 鍵付き */
     @Tag(3)
@@ -211,6 +215,7 @@ public final class ShipDto extends AbstractDto {
             afterShipId = Ship.get(String.valueOf(afterShipId)).getAftershipid();
         }
         this.charId = charId;
+        this.sortno = object.getInt("api_sortno");
 
         this.lv = object.getJsonNumber("api_lv").intValue();
         this.cond = object.getJsonNumber("api_cond").intValue();
@@ -345,6 +350,13 @@ public final class ShipDto extends AbstractDto {
      */
     public int getCharId() {
         return this.charId;
+    }
+
+    /**
+     * @return sortno
+     */
+    public int getSortno() {
+        return this.sortno;
     }
 
     /**
@@ -576,6 +588,28 @@ public final class ShipDto extends AbstractDto {
      */
     public List<Integer> getItemId() {
         return Collections.unmodifiableList(this.slot);
+    }
+
+    /**
+     * @return 飛行機を装備できるか？
+     */
+    public boolean canEquipPlane() {
+        if (this.shipInfo == null) // データを取得していない
+            return false;
+        int stype = this.shipInfo.getStype();
+        List<MasterData.ShipTypeDto> info = MasterDataConfig.get().getStype();
+        if (info.size() < stype) // データを取得していない
+            return false;
+        MasterData.ShipTypeDto shipType = info.get(stype - 1);
+        if (shipType == null) // データを取得していない
+            return false;
+        List<Boolean> equipType = shipType.getEquipType();
+        for (int i = 0; i < AppConstants.PLANE_ITEM_TYPES.length; ++i) {
+            if (equipType.get(AppConstants.PLANE_ITEM_TYPES[i] - 1)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

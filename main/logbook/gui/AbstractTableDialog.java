@@ -232,7 +232,6 @@ public abstract class AbstractTableDialog extends WindowBase {
      * テーブルをリロードする
      */
     protected void reloadTable() {
-        System.out.println("start reloading ...");
         this.table.setRedraw(false);
         TableColumn sortColumn = this.table.getSortColumn();
         int topindex = this.table.getTopIndex();
@@ -250,6 +249,7 @@ public abstract class AbstractTableDialog extends WindowBase {
         this.table.setSelection(selection);
         this.table.setTopIndex(topindex);
         this.table.setRedraw(true);
+        this.table.setTopIndex(topindex);
     }
 
     /**

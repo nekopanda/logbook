@@ -100,6 +100,8 @@ public final class ApplicationMain extends WindowBase {
 
     /** ベースクラスの持っているshellと同じ */
     private Shell shell;
+    /** 表示しない親ウィンドウ */
+    private Shell dummyHolder;
 
     /** トレイ */
     private TrayItem trayItem;
@@ -226,6 +228,7 @@ public final class ApplicationMain extends WindowBase {
                 display.sleep();
             }
         }
+        this.dummyHolder.dispose();
         this.trayItem.dispose();
     }
 
@@ -234,11 +237,12 @@ public final class ApplicationMain extends WindowBase {
      */
     public void createContents() {
         final Display display = Display.getDefault();
-        int shellStyle = SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE;
+        int shellStyle = 0;
         if (AppConfig.get().isOnTop()) {
             shellStyle |= SWT.ON_TOP;
         }
-        super.createContents(display, shellStyle, false);
+        this.dummyHolder = new Shell(display, shellStyle | SWT.TOOL);
+        super.createContents(display, shellStyle | SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
         this.shell = this.getShell();
         this.shell.setText(AppConstants.TITLEBAR_TEXT);
         this.shell.setAlpha(AppConfig.get().getAlpha());
@@ -290,41 +294,41 @@ public final class ApplicationMain extends WindowBase {
         // コマンド-キャプチャ
         MenuItem capture = new MenuItem(cmdmenu, SWT.CHECK);
         capture.setText("キャプチャ(&C)");
-        this.captureWindow = new CaptureDialog(this.shell, capture);
+        this.captureWindow = new CaptureDialog(this.dummyHolder, capture);
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // コマンド-ドロップ報告書
         MenuItem cmddrop = new MenuItem(cmdmenu, SWT.CHECK);
         cmddrop.setText("ドロップ報告書(&D)\tCtrl+D");
         cmddrop.setAccelerator(SWT.CTRL + 'D');
-        this.dropReportWindow = new DropReportTable(this.shell, cmddrop);
+        this.dropReportWindow = new DropReportTable(this.dummyHolder, cmddrop);
         // コマンド-建造報告書
         MenuItem cmdcreateship = new MenuItem(cmdmenu, SWT.CHECK);
         cmdcreateship.setText("建造報告書(&B)\tCtrl+B");
         cmdcreateship.setAccelerator(SWT.CTRL + 'B');
-        this.createShipReportWindow = new CreateShipReportTable(this.shell, cmdcreateship);
+        this.createShipReportWindow = new CreateShipReportTable(this.dummyHolder, cmdcreateship);
         // コマンド-開発報告書
         MenuItem cmdcreateitem = new MenuItem(cmdmenu, SWT.CHECK);
         cmdcreateitem.setText("開発報告書(&E)\tCtrl+E");
         cmdcreateitem.setAccelerator(SWT.CTRL + 'E');
-        this.createItemReportWindow = new CreateItemReportTable(this.shell, cmdcreateitem);
+        this.createItemReportWindow = new CreateItemReportTable(this.dummyHolder, cmdcreateitem);
         // コマンド-遠征報告書
         MenuItem cmdmissionresult = new MenuItem(cmdmenu, SWT.CHECK);
         cmdmissionresult.setText("遠征報告書(&T)\tCtrl+T");
         cmdmissionresult.setAccelerator(SWT.CTRL + 'T');
-        this.missionResultWindow = new MissionResultTable(this.shell, cmdmissionresult);
+        this.missionResultWindow = new MissionResultTable(this.dummyHolder, cmdmissionresult);
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // コマンド-所有装備一覧
         MenuItem cmditemlist = new MenuItem(cmdmenu, SWT.CHECK);
         cmditemlist.setText("所有装備一覧(&I)\tCtrl+I");
         cmditemlist.setAccelerator(SWT.CTRL + 'I');
-        this.itemTableWindow = new ItemTable(this.shell, cmditemlist);
+        this.itemTableWindow = new ItemTable(this.dummyHolder, cmditemlist);
         // コマンド-所有艦娘一覧
         for (int i = 0; i < 4; ++i) {
             MenuItem cmdshiplist = new MenuItem(cmdmenu, SWT.CHECK);
             cmdshiplist.setAccelerator(SWT.CTRL + ('1' + i));
-            this.shipTableWindows[i] = new ShipTable(this.shell, cmdshiplist, i);
+            this.shipTableWindows[i] = new ShipTable(this.dummyHolder, cmdshiplist, i);
         }
 
         // セパレータ
@@ -333,14 +337,14 @@ public final class ApplicationMain extends WindowBase {
         MenuItem cmdbathwaterlist = new MenuItem(cmdmenu, SWT.CHECK);
         cmdbathwaterlist.setText("お風呂に入りたい艦娘(&N)\tCtrl+N");
         cmdbathwaterlist.setAccelerator(SWT.CTRL + 'N');
-        this.bathwaterTablwWindow = new BathwaterTableDialog(this.shell, cmdbathwaterlist);
+        this.bathwaterTablwWindow = new BathwaterTableDialog(this.dummyHolder, cmdbathwaterlist);
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // コマンド-任務一覧
         MenuItem questlist = new MenuItem(cmdmenu, SWT.CHECK);
         questlist.setText("任務一覧(&Q)\tCtrl+Q");
         questlist.setAccelerator(SWT.CTRL + 'Q');
-        this.questTableWindow = new QuestTable(this.shell, questlist);
+        this.questTableWindow = new QuestTable(this.dummyHolder, questlist);
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
 
@@ -348,13 +352,13 @@ public final class ApplicationMain extends WindowBase {
         MenuItem battleWinMenu = new MenuItem(cmdmenu, SWT.CHECK);
         battleWinMenu.setText("戦況(&W)\tCtrl+W");
         battleWinMenu.setAccelerator(SWT.CTRL + 'W');
-        this.battleWindow = new BattleWindow(this.shell, battleWinMenu);
+        this.battleWindow = new BattleWindow(this.dummyHolder, battleWinMenu);
 
         // 表示-敵味方パラメータ
         MenuItem battleShipWinMenu = new MenuItem(cmdmenu, SWT.CHECK);
         battleShipWinMenu.setText("自軍敵軍パラメータ(&P)\tCtrl+P");
         battleShipWinMenu.setAccelerator(SWT.CTRL + 'P');
-        this.battleShipWindow = new BattleShipWindow(this.shell, battleShipWinMenu);
+        this.battleShipWindow = new BattleShipWindow(this.dummyHolder, battleShipWinMenu);
 
         // 表示-縮小表示
         // ウィンドウの右クリックメニューに追加
@@ -378,19 +382,19 @@ public final class ApplicationMain extends WindowBase {
         MenuItem calcexp = new MenuItem(calcmenu, SWT.CHECK);
         calcexp.setText("経験値計算機(&C)\tCtrl+C");
         calcexp.setAccelerator(SWT.CTRL + 'C');
-        this.calcExpWindow = new CalcExpDialog(this.shell, calcexp);
+        this.calcExpWindow = new CalcExpDialog(this.dummyHolder, calcexp);
 
         // その他-グループエディター
         MenuItem shipgroup = new MenuItem(etcmenu, SWT.CHECK);
         shipgroup.setText("グループエディター(&G)");
-        this.shipFilterGroupWindow = new ShipFilterGroupDialog(this.shell, shipgroup);
+        this.shipFilterGroupWindow = new ShipFilterGroupDialog(this.dummyHolder, shipgroup);
         // その他-資材チャート
         MenuItem resourceChart = new MenuItem(etcmenu, SWT.NONE);
         resourceChart.setText("資材チャート(&R)");
         resourceChart.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                new ResourceChartDialog(ApplicationMain.this.shell).open();
+                new ResourceChartDialog(ApplicationMain.this.dummyHolder).open();
             }
         });
         // その他-自動プロキシ構成スクリプトファイル生成
@@ -399,7 +403,7 @@ public final class ApplicationMain extends WindowBase {
         pack.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                new CreatePacFileDialog(ApplicationMain.this.shell).open();
+                new CreatePacFileDialog(ApplicationMain.this.dummyHolder).open();
             }
         });
         // セパレータ

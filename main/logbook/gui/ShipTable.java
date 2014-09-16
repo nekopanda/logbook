@@ -1,5 +1,6 @@
 package logbook.gui;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +50,7 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
     private MenuItem groupFilterCascade;
     private MenuItem addGroupCascade;
     private MenuItem removeGroupCascade;
+    private final List<MenuItem> currentGroupItems = new ArrayList<MenuItem>();
 
     /**
      * @param parent
@@ -140,7 +142,6 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
         this.addGroupCascade.setText("選択した艦娘をグループに追加(&A)");
         this.removeGroupCascade = new MenuItem(this.tablemenu, SWT.CASCADE);
         this.removeGroupCascade.setText("選択した艦娘をグループから除去(&D)");
-        this.listChanged();
 
         // フィルタを復元
         ShipFilterDto[] shipFilters = AppConfig.get().getShipFilters();
@@ -158,6 +159,7 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
                 }
             }
         }
+        this.listChanged();
 
         ShipGroupObserver.addListener(this);
         this.table.addListener(SWT.Dispose, new Listener() {
@@ -232,29 +234,48 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
         return menu;
     }
 
+    private void groupWidgetSelected(SelectionEvent e) {
+        MenuItem selectedItem = (MenuItem) e.widget;
+        boolean selection = selectedItem.getSelection();
+        if (selection) {
+            ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
+            ShipFilterDto filter = this.getFilter();
+            filter.group = bean;
+            filter.groupId = bean.getId();
+            // これだけ残してあとはオフる
+            for (MenuItem item : this.currentGroupItems) {
+                if (selectedItem != item) {
+                    item.setSelection(false);
+                }
+            }
+        }
+        else {
+            this.filter.group = null;
+            this.filter.groupId = 0;
+        }
+        ShipTable.this.updateFilter(this.filter);
+    }
+
     @Override
     public void listChanged() {
-        if (this.getShell().isDisposed()) {
-            return;
-        }
-
         List<ShipGroupBean> groups = ShipGroupConfig.get().getGroup();
 
         Menu groupFilterMenu = recreateCascadeMenu(this.groupFilterCascade);
+        this.currentGroupItems.clear();
         for (ShipGroupBean groupBean : groups) {
-            final MenuItem groupItem = new MenuItem(groupFilterMenu, SWT.NONE);
+            final MenuItem groupItem = new MenuItem(groupFilterMenu, SWT.CHECK);
             groupItem.setText(groupBean.getName());
             groupItem.setData(groupBean);
             groupItem.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
-                    ShipFilterDto filter = ShipTable.this.getFilter();
-                    filter.group = bean;
-                    filter.groupId = bean.getId();
-                    ShipTable.this.updateFilter(filter);
+                    ShipTable.this.groupWidgetSelected(e);
                 }
             });
+            if (this.filter.group == groupBean) {
+                groupItem.setSelection(true);
+            }
+            this.currentGroupItems.add(groupItem);
         }
 
         Menu addGroupMenu = recreateCascadeMenu(this.addGroupCascade);
@@ -271,7 +292,7 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
                         int id = Integer.parseInt(tableItems[i].getText(1));
                         bean.getShips().add(id);
                     }
-                    ShipGroupObserver.groupChanged(bean);
+                    ShipGroupObserver.groupShipChanged(bean);
                 }
             });
         }
@@ -290,21 +311,37 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
                         int id = Integer.parseInt(tableItems[i].getText(1));
                         bean.getShips().remove(id);
                     }
-                    ShipGroupObserver.groupChanged(bean);
+                    ShipGroupObserver.groupShipChanged(bean);
                 }
             });
         }
     }
 
     @Override
-    public void groupChanged(ShipGroupBean group) {
-        if (this.getShell().isDisposed()) {
-            return;
+    public void save() {
+        if (this.filter != null) {
+            ShipFilterDto[] shipFilters = AppConfig.get().getShipFilters();
+            if ((shipFilters == null) || (shipFilters.length != 4)) {
+                shipFilters = new ShipFilterDto[4];
+            }
+            shipFilters[this.index] = this.filter;
+            AppConfig.get().setShipFilters(shipFilters);
         }
+        super.save();
+    }
 
+    @Override
+    public void groupNameChanged(ShipGroupBean group) {
         if (this.filter.group == group) {
-            this.reloadTable();
             this.shell.setText(this.getTitle());
         }
+    }
+
+    @Override
+    public void groupShipChanged(ShipGroupBean group) {
+        if (this.filter.group == group) {
+            this.reloadTable();
+        }
+
     }
 }
