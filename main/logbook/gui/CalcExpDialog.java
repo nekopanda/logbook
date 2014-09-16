@@ -239,7 +239,7 @@ public final class CalcExpDialog extends WindowBase {
             ShipDto ship = CalcExpDialog.this.shipmap
                     .get(this.shipcombo.getItem(this.shipcombo.getSelectionIndex()));
             if (ship != null) {
-                int before = (int) ship.getLv();
+                int before = ship.getLv();
                 int after = this.afterlv.getSelection();
                 // 改造Lv
                 int afterlv = ship.getShipInfo().getAfterlv();
@@ -252,8 +252,8 @@ public final class CalcExpDialog extends WindowBase {
                 // 目標レベルが150を超える場合は150に設定
                 after = Math.min(after, 150);
 
-                String beforeexpstr = Long.toString(ship.getExp());
-                String afterexpstr = Long.toString(ExpTable.get().get(after));
+                String beforeexpstr = String.valueOf(ship.getExp());
+                String afterexpstr = String.valueOf(ExpTable.get().get(after));
 
                 this.beforelv.setSelection(before);
                 this.afterlv.setSelection(after);
@@ -278,11 +278,11 @@ public final class CalcExpDialog extends WindowBase {
         // 評価
         double eval = EvaluateExp.get().get(this.evalcombo.getItem(this.evalcombo.getSelectionIndex()));
         // 得られる経験値
-        long getexp = CalcExpUtils.getExp(baseexp, eval, this.flagbtn.getSelection(), this.mvpbtn.getSelection());
+        int getexp = CalcExpUtils.getExp(baseexp, eval, this.flagbtn.getSelection(), this.mvpbtn.getSelection());
         // 戦闘回数
         int count = BigDecimal.valueOf(needexpint).divide(BigDecimal.valueOf(getexp), RoundingMode.CEILING).intValue();
         // 1回の戦闘
-        this.getexp.setText(Long.toString(getexp));
+        this.getexp.setText(String.valueOf(getexp));
         // 必要経験値
         this.needexp.setText(Integer.toString(needexpint));
         // 戦闘回数
@@ -300,7 +300,7 @@ public final class CalcExpDialog extends WindowBase {
      */
     private void setShipComboData() {
         // 選択していた艦娘を取得
-        long select = 0;
+        int select = 0;
         if (this.shipcombo.getSelectionIndex() >= 0) {
             ShipDto ship = this.shipmap.get(this.shipcombo.getItem(this.shipcombo.getSelectionIndex()));
             select = ship.getId();
@@ -316,11 +316,11 @@ public final class CalcExpDialog extends WindowBase {
         // 表示用文字列と艦娘の紐付けを削除
         this.shipmap.clear();
         // 艦娘IDの最大を取得してゼロ埋め長さを算出
-        long maxshipid = 0;
+        int maxshipid = 0;
         for (ShipDto ship : GlobalContext.getShipMap().values()) {
             maxshipid = Math.max(ship.getId(), maxshipid);
         }
-        int padlength = Long.toString(maxshipid).length();
+        int padlength = String.valueOf(maxshipid).length();
         // 表示用文字列と艦娘の紐付けを追加
         for (ShipDto ship : GlobalContext.getShipMap().values()) {
             this.shipmap.put(this.getShipLabel(ship, padlength), ship);
@@ -330,7 +330,7 @@ public final class CalcExpDialog extends WindowBase {
         Collections.sort(ships, new Comparator<ShipDto>() {
             @Override
             public int compare(ShipDto o1, ShipDto o2) {
-                return Long.compare(o2.getExp(), o1.getExp());
+                return Integer.compare(o2.getExp(), o1.getExp());
             }
         });
         // コンボボックスに追加
@@ -354,7 +354,7 @@ public final class CalcExpDialog extends WindowBase {
      * @return
      */
     private String getShipLabel(ShipDto ship, int padlength) {
-        return new StringBuilder().append(StringUtils.leftPad(Long.toString(ship.getId()), padlength, '0'))
+        return new StringBuilder().append(StringUtils.leftPad(String.valueOf(ship.getId()), padlength, '0'))
                 .append(": ").append(ship.getName()).append(" (Lv").append(ship.getLv() + ")").toString();
     }
 
@@ -414,7 +414,7 @@ public final class CalcExpDialog extends WindowBase {
 
         @Override
         public void widgetSelected(SelectionEvent e) {
-            String beforeexpstr = Long.toString(ExpTable.get().get(this.beforelv.getSelection()));
+            String beforeexpstr = String.valueOf(ExpTable.get().get(this.beforelv.getSelection()));
             this.beforexp.setText(beforeexpstr);
             CalcExpDialog.this.calc();
         }
@@ -439,7 +439,7 @@ public final class CalcExpDialog extends WindowBase {
 
         @Override
         public void widgetSelected(SelectionEvent e) {
-            String afterexpstr = Long.toString(ExpTable.get().get(this.afterlv.getSelection()));
+            String afterexpstr = String.valueOf(ExpTable.get().get(this.afterlv.getSelection()));
             this.afterexp.setText(afterexpstr);
             CalcExpDialog.this.calc();
         }

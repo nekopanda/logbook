@@ -172,11 +172,11 @@ public final class BattleDialog extends Dialog {
 
                 Label lblCond = new Label(fComposite, SWT.NONE);
                 lblCond.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-                lblCond.setText(Long.toString(ship.getCond()));
+                lblCond.setText(String.valueOf(ship.getCond()));
 
                 Label lblSeiku = new Label(fComposite, SWT.NONE);
                 lblSeiku.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-                lblSeiku.setText(Long.toString(ship.getSeiku()));
+                lblSeiku.setText(String.valueOf(ship.getSeiku()));
 
                 List<String> slots = ship.getSlot();
 
@@ -338,8 +338,8 @@ public final class BattleDialog extends Dialog {
                 sb.append("             <td>" + ship.getName() + "(Lv" + ship.getLv() + ")" + "</td>").append(
                         "\r\n");
                 sb.append("             <td>" + ship.getNowhp() + "/" + ship.getMaxhp() + "</td>").append("\r\n");
-                sb.append("             <td>" + Long.toString(ship.getCond()) + "</td>").append("\r\n");
-                sb.append("             <td>" + Long.toString(ship.getSeiku()) + "</td>").append("\r\n");
+                sb.append("             <td>" + String.valueOf(ship.getCond()) + "</td>").append("\r\n");
+                sb.append("             <td>" + String.valueOf(ship.getSeiku()) + "</td>").append("\r\n");
 
                 List<String> slots = ship.getSlot();
                 for (String name : slots) {

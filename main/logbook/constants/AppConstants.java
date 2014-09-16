@@ -152,6 +152,9 @@ public class AppConstants {
     /** /resources/icon/star.png */
     public static final String R_ICON_STAR = "/resources/icon/star.png";
 
+    /** /resources/icon/heart.png */
+    public static final String R_ICON_LOCKED = "/resources/icon/heart.png";
+
     /** /resources/hpgauge/0.png */
     public static final String R_HPGAUGE_0 = "/resources/hpgauge/0.png";
 

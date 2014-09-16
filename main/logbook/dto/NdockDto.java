@@ -11,7 +11,7 @@ public final class NdockDto extends AbstractDto {
     public static final NdockDto EMPTY = new NdockDto(0, null);
 
     /** 艦娘ID */
-    private final long ndockid;
+    private final int ndockid;
 
     /** お風呂から上がる時間 */
     private final Date ndocktime;
@@ -19,7 +19,7 @@ public final class NdockDto extends AbstractDto {
     /**
      * コンストラクター
      */
-    public NdockDto(long ndockid, Date ndocktime) {
+    public NdockDto(int ndockid, Date ndocktime) {
         this.ndockid = ndockid;
         this.ndocktime = ndocktime;
     }
@@ -27,7 +27,7 @@ public final class NdockDto extends AbstractDto {
     /**
      * @return 艦娘ID
      */
-    public long getNdockid() {
+    public int getNdockid() {
         return this.ndockid;
     }
 

@@ -21,6 +21,8 @@ public class TimeString implements Comparable<TimeString> {
 
     @Override
     public String toString() {
+        if (this.date == null)
+            return "";
         return format.format(this.date);
     }
 

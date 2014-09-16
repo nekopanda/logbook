@@ -193,6 +193,18 @@ public final class ItemDto extends AbstractDto {
         return builder.build();
     }
 
+    public boolean isPlane() {
+        switch (this.type[1]) {
+        case 5: // 攻撃爆撃機
+        case 7: // 戦闘機
+        case 15: // ヘリ
+        case 16: // 連絡機
+            return true;
+        default:
+            return false;
+        }
+    }
+
     /**
      * @return 表示分類名
      */

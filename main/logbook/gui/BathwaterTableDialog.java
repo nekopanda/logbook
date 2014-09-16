@@ -3,14 +3,11 @@ package logbook.gui;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
-import logbook.dto.DeckMissionDto;
-import logbook.dto.NdockDto;
 import logbook.dto.ShipDto;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.HpString;
@@ -38,9 +35,9 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
     /** 遠征中の艦娘を外すフラグ */
     private static boolean removeflg;
     /** 遠征中の艦娘 */
-    private Set<Long> deckMissionShips;
+    private Set<Integer> deckMissionShips;
     /** 入渠中の艦娘 */
-    private Set<Long> nDockShips;
+    private Set<Integer> nDockShips;
 
     /**
      * Create the dialog.
@@ -83,8 +80,8 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
 
     @Override
     protected void updateTableBody() {
-        this.deckMissionShips = this.getDeckMissionShips();
-        this.nDockShips = this.getNDockShips();
+        this.deckMissionShips = GlobalContext.getMissionShipSet();
+        this.nDockShips = GlobalContext.getNDockShipSet();
 
         List<ShipDto> ships = new ArrayList<ShipDto>();
         for (ShipDto ship : GlobalContext.getShipMap().values()) {
@@ -187,37 +184,5 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
                 }
             }
         };
-    }
-
-    /**
-     * 遠征中の艦娘を取得します
-     * 
-     * @return
-     */
-    private Set<Long> getDeckMissionShips() {
-        // 遠征
-        Set<Long> deckmissions = new HashSet<Long>();
-        for (DeckMissionDto deckMission : GlobalContext.getDeckMissions()) {
-            if ((deckMission.getMission() != null) && (deckMission.getShips() != null)) {
-                deckmissions.addAll(deckMission.getShips());
-            }
-        }
-        return deckmissions;
-    }
-
-    /**
-     * 入渠中の艦娘を取得します
-     * 
-     * @return
-     */
-    private Set<Long> getNDockShips() {
-        // 入渠
-        Set<Long> docks = new HashSet<Long>();
-        for (NdockDto ndock : GlobalContext.getNdocks()) {
-            if (ndock.getNdockid() != 0) {
-                docks.add(ndock.getNdockid());
-            }
-        }
-        return docks;
     }
 }

@@ -3,7 +3,6 @@
  */
 package logbook.config.bean;
 
-
 /**
  * @author Nekopanda
  *
@@ -24,6 +23,8 @@ public class TableConfigBean {
     }
 
     private boolean[] visibleColumn;
+
+    private int[] columnOrder;
 
     private SortKey[] sortKeys;
 
@@ -53,5 +54,19 @@ public class TableConfigBean {
      */
     public void setSortKeys(SortKey[] sortKeys) {
         this.sortKeys = sortKeys;
+    }
+
+    /**
+     * @return columnOrder
+     */
+    public int[] getColumnOrder() {
+        return this.columnOrder;
+    }
+
+    /**
+     * @param columnOrder セットする columnOrder
+     */
+    public void setColumnOrder(int[] columnOrder) {
+        this.columnOrder = columnOrder;
     }
 }

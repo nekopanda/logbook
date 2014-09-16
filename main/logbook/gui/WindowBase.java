@@ -463,6 +463,7 @@ public class WindowBase {
      * 状態を保存
      */
     public void save() {
+        this.getWindowConfig();
         boolean opened = this.shell.getVisible();
         this.config.setOpened(opened);
         if (opened && !this.shell.getMaximized()) { // 最大化されているときは記憶しない

@@ -26,10 +26,10 @@ public final class DeckMissionDto extends AbstractDto {
     private final Date time;
 
     /** 艦隊 */
-    private final long fleetid;
+    private final int fleetid;
 
     /** 艦娘 */
-    private final Set<Long> ships;
+    private final Set<Integer> ships;
 
     /**
      * コンストラクター
@@ -46,7 +46,7 @@ public final class DeckMissionDto extends AbstractDto {
     /**
      * コンストラクター
      */
-    public DeckMissionDto(String name, int missionId, Date time, long fleetid, Set<Long> ships) {
+    public DeckMissionDto(String name, int missionId, Date time, int fleetid, Set<Integer> ships) {
         this.name = name;
         this.missionId = missionId;
         this.mission = Deck.get(missionId);
@@ -86,14 +86,14 @@ public final class DeckMissionDto extends AbstractDto {
     /**
      * @return 艦隊
      */
-    public long getFleetid() {
+    public int getFleetid() {
         return this.fleetid;
     }
 
     /**
      * @return 艦娘
      */
-    public Set<Long> getShips() {
+    public Set<Integer> getShips() {
         return this.ships;
     }
 }

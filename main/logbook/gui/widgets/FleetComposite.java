@@ -14,6 +14,7 @@ import logbook.dto.DockDto;
 import logbook.dto.ItemDto;
 import logbook.dto.ShipDto;
 import logbook.gui.ApplicationMain;
+import logbook.gui.logic.SakutekiString;
 import logbook.gui.logic.Sound;
 import logbook.gui.logic.TimeString;
 import logbook.internal.EvaluateExp;
@@ -66,7 +67,7 @@ public class FleetComposite extends Composite {
     /** タブアイコン表示 */
     private final BitSet state = new BitSet();
     /** コンディション最小値(メッセージ表示用) */
-    private long cond;
+    private int cond;
     /** 疲労回復時間(メッセージ表示用) */
     private String clearDate;
     /** 大破している */
@@ -292,13 +293,13 @@ public class FleetComposite extends Composite {
             // 艦娘のステータス
             BitSet shipstatus = new BitSet();
             // HP
-            long nowhp = ship.getNowhp();
+            int nowhp = ship.getNowhp();
             // MaxHP
-            long maxhp = ship.getMaxhp();
+            int maxhp = ship.getMaxhp();
             // HP割合
             float hpratio = (float) nowhp / (float) maxhp;
             // 疲労
-            long cond = ship.getCond();
+            int cond = ship.getCond();
             // 弾
             int bull = ship.getBull();
             // 弾Max
@@ -572,11 +573,11 @@ public class FleetComposite extends Composite {
         if (this.clearDate != null) {
             this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_COND, this.clearDate), null);
         }
-        FleetStatus fleetStatus = new FleetStatus(ships);
+        SakutekiString fleetStatus = new SakutekiString(ships);
         // 制空
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_SEIKU, seiku), null);
         this.addStyledText(this.message,
-                MessageFormat.format(AppConstants.MESSAGE_SAKUTEKI, fleetStatus.getSakuteki()), null);
+                MessageFormat.format(AppConstants.MESSAGE_SAKUTEKI, fleetStatus.toString()), null);
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_TOTAL_LV, totallv), null);
 
         this.updateTabIcon();
@@ -689,17 +690,17 @@ public class FleetComposite extends Composite {
     @CheckForNull
     private Integer getNextCount(ShipDto ship, boolean isFlagship) {
         // 次のレベルに必要な経験値
-        Long nextexp = CalcExpUtils.getNextLvExp(ship.getLv());
+        Integer nextexp = CalcExpUtils.getNextLvExp(ship.getLv());
         if (nextexp != null) {
             // 必要経験値
-            long needexp = nextexp - ship.getExp();
+            int needexp = nextexp - ship.getExp();
             // 海域Exp
             Integer baseexp = SeaExp.get().get(AppConfig.get().getDefaultSea());
             // 評価倍率
             Double eval = EvaluateExp.get().get(AppConfig.get().getDefaultEvaluate());
             if ((baseexp != null) && (eval != null)) {
                 // 得られる経験値
-                long getexpd = CalcExpUtils.getExp(baseexp, eval, isFlagship, false);
+                int getexpd = CalcExpUtils.getExp(baseexp, eval, isFlagship, false);
                 // 戦闘回数
                 int count = CalcExpUtils.getCount(needexp, getexpd);
                 return Integer.valueOf(count);

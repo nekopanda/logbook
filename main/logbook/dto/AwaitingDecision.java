@@ -6,11 +6,11 @@ package logbook.dto;
  */
 public final class AwaitingDecision extends AbstractDto {
 
-    private final long shipid;
+    private final int shipid;
 
     private final String dock;
 
-    public AwaitingDecision(long shipid, String dock) {
+    public AwaitingDecision(int shipid, String dock) {
 
         this.shipid = shipid;
         this.dock = dock;
@@ -19,7 +19,7 @@ public final class AwaitingDecision extends AbstractDto {
     /**
      * @return shipid
      */
-    public long getShipid() {
+    public int getShipid() {
         return this.shipid;
     }
 

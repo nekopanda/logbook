@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 import logbook.config.ShipGroupConfig;
 import logbook.config.bean.ShipGroupBean;
@@ -14,6 +17,8 @@ import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.dto.ShipDto;
 import logbook.gui.logic.CreateReportLogic;
+import logbook.gui.logic.ShipGroupListener;
+import logbook.gui.logic.ShipGroupObserver;
 import logbook.gui.logic.TableItemCreator;
 
 import org.apache.commons.lang3.StringUtils;
@@ -30,6 +35,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
@@ -44,7 +51,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
  * グループエディター
  *
  */
-public final class ShipFilterGroupDialog extends AbstractTableDialog {
+public final class ShipFilterGroupDialog extends AbstractTableDialog implements ShipGroupListener {
 
     private Text text;
     private SashForm sashForm;
@@ -142,7 +149,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
      */
     @Override
     protected void createContents() {
-        this.table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
+        this.table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1));
         this.shipcombo = new Combo(this.mainComposite, SWT.READ_ONLY);
         this.setShipComboData();
         this.shipcombo.setEnabled(false);
@@ -155,7 +162,23 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
         this.btnRemoveShip.setText("除去");
         this.btnRemoveShip.addSelectionListener(new RemoveShipAdapter(this));
         this.btnRemoveShip.setEnabled(false);
+        Button updateShip = new Button(this.mainComposite, SWT.NONE);
+        updateShip.setText("追加");
+        updateShip.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                ShipFilterGroupDialog.this.setShipComboData();
+            }
+        });
         this.sashForm.setWeights(new int[] { 2, 5 });
+
+        ShipGroupObserver.addListener(this);
+        this.table.addListener(SWT.Dispose, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                ShipGroupObserver.removeListener(ShipFilterGroupDialog.this);
+            }
+        });
     }
 
     @Override
@@ -247,11 +270,11 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
         // 表示用文字列と艦娘の紐付けを削除
         this.shipmap.clear();
         // 艦娘IDの最大を取得してゼロ埋め長さを算出
-        long maxshipid = 0;
+        int maxshipid = 0;
         for (ShipDto ship : GlobalContext.getShipMap().values()) {
             maxshipid = Math.max(ship.getId(), maxshipid);
         }
-        int padlength = Long.toString(maxshipid).length();
+        int padlength = String.valueOf(maxshipid).length();
         // 表示用文字列と艦娘の紐付けを追加
         for (ShipDto ship : GlobalContext.getShipMap().values()) {
             this.shipmap.put(this.getShipLabel(ship, padlength), ship);
@@ -261,7 +284,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
         Collections.sort(ships, new Comparator<ShipDto>() {
             @Override
             public int compare(ShipDto o1, ShipDto o2) {
-                return Long.compare(o2.getExp(), o1.getExp());
+                return Integer.compare(o2.getExp(), o1.getExp());
             }
         });
         // コンボボックスに追加
@@ -282,7 +305,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
      * @return
      */
     private String getShipLabel(ShipDto ship, int padlength) {
-        return new StringBuilder().append(StringUtils.leftPad(Long.toString(ship.getId()), padlength, '0'))
+        return new StringBuilder().append(StringUtils.leftPad(String.valueOf(ship.getId()), padlength, '0'))
                 .append(": ").append(ship.getName()).append(" (Lv").append(ship.getLv() + ")").toString();
     }
 
@@ -302,19 +325,36 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
             this.dialog = dialog;
         }
 
+        private ShipGroupBean createNewGroup(List<ShipGroupBean> list) {
+            Set<Integer> idSet = new HashSet<Integer>();
+            for (ShipGroupBean shipGroup : list) {
+                idSet.add(shipGroup.getId());
+            }
+            Random rnd = new Random(System.currentTimeMillis());
+            // 一意のIDを生成する
+            int newId = rnd.nextInt();
+            while (idSet.contains(newId) || (newId == 0))
+                newId = rnd.nextInt();
+            ShipGroupBean bean = new ShipGroupBean();
+            bean.setId(newId);
+            bean.setName("新規グループ");
+            list.add(bean);
+            return bean;
+        }
+
         @Override
         public void widgetSelected(SelectionEvent e) {
             List<ShipGroupBean> shipGroupList = ShipGroupConfig.get().getGroup();
 
-            ShipGroupBean bean = new ShipGroupBean();
-            bean.setName("新規グループ");
-            shipGroupList.add(bean);
+            ShipGroupBean bean = this.createNewGroup(shipGroupList);
 
             TreeItem item = new TreeItem(this.dialog.treeItem, SWT.NONE);
             item.setImage(SWTResourceManager.getImage(ShipFilterGroupDialog.class, AppConstants.R_ICON_FOLDER_STAR));
             item.setText(bean.getName());
             item.setData(new GroupProperty(bean, item));
             this.dialog.treeItem.setExpanded(true);
+
+            ShipGroupObserver.listChanged();
         }
     }
 
@@ -354,6 +394,8 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
                     this.dialog.text.setText("");
                     this.dialog.property.getTreeItem().dispose();
                     this.dialog.property = null;
+
+                    ShipGroupObserver.listChanged();
                 }
             }
         }
@@ -382,6 +424,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
                 this.dialog.property.getTreeItem().setText(text);
                 ShipGroupBean group = this.dialog.property.getShipGroupBean();
                 group.setName(text);
+                ShipGroupObserver.groupChanged(group);
             }
         }
     }
@@ -440,7 +483,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
                     ShipDto ship = this.dialog.shipmap.get(this.dialog.shipcombo.getItem(this.dialog.shipcombo
                             .getSelectionIndex()));
                     target.getShips().add(ship.getId());
-                    this.dialog.reloadTable();
+                    ShipGroupObserver.groupChanged(target);
                 }
             }
         }
@@ -470,11 +513,11 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
                 for (TableItem tableItem : items) {
                     String text = tableItem.getText(1);
                     if (StringUtils.isNumeric(text)) {
-                        Long id = Long.valueOf(text);
+                        int id = Integer.valueOf(text);
                         target.getShips().remove(id);
                     }
                 }
-                this.dialog.reloadTable();
+                ShipGroupObserver.groupChanged(target);
             }
         }
     }
@@ -526,7 +569,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
          */
         public List<ShipDto> getShipList() {
             List<ShipDto> ships = new ArrayList<ShipDto>();
-            Map<Long, ShipDto> shipMap = GlobalContext.getShipMap();
+            Map<Integer, ShipDto> shipMap = GlobalContext.getShipMap();
             for (Integer id : this.shipGroup.getShips()) {
                 ShipDto ship = shipMap.get(id);
                 if (ship != null) {
@@ -534,6 +577,18 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog {
                 }
             }
             return ships;
+        }
+    }
+
+    @Override
+    public void listChanged() {
+        // 自分で変更しているので何もしない
+    }
+
+    @Override
+    public void groupChanged(ShipGroupBean group) {
+        if (this.property.getShipGroupBean() == group) {
+            this.reloadTable();
         }
     }
 }

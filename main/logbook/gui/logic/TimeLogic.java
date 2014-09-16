@@ -10,15 +10,13 @@ public class TimeLogic implements Comparable<TimeLogic> {
     private static final int ONE_HOUR = 60 * 60;
     private static final int ONE_DAY = 60 * 60 * 24;
 
-    private final Long milliseconds;
+    private final long milliseconds;
 
-    public TimeLogic(Long milliseconds) {
+    public TimeLogic(long milliseconds) {
         this.milliseconds = milliseconds;
     }
 
-    public static TimeLogic fromSeconds(Long seconds) {
-        if (seconds == null)
-            return new TimeLogic(null);
+    public static TimeLogic fromSeconds(long seconds) {
         return new TimeLogic(seconds * 1000);
     }
 
@@ -32,9 +30,7 @@ public class TimeLogic implements Comparable<TimeLogic> {
      */
     @Override
     public int compareTo(TimeLogic arg0) {
-        long o1 = (this.milliseconds == null) ? 0 : this.milliseconds;
-        long o2 = (arg0.milliseconds == null) ? 0 : arg0.milliseconds;
-        return Long.compare(o1, o2);
+        return Long.compare(this.milliseconds, arg0.milliseconds);
     }
 
     /**

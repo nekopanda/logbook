@@ -34,9 +34,11 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
@@ -45,7 +47,7 @@ import org.eclipse.swt.widgets.Text;
  * キャプチャダイアログ
  *
  */
-public final class CaptureDialog extends Dialog {
+public final class CaptureDialog extends WindowBase {
 
     private Shell shell;
 
@@ -65,36 +67,30 @@ public final class CaptureDialog extends Dialog {
      * Create the dialog.
      * @param parent
      */
-    public CaptureDialog(Shell parent) {
-        super(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE);
-        this.setText("キャプチャ");
+    public CaptureDialog(Shell parent, MenuItem menuItem) {
+        super(menuItem);
+        //super.createContents(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
+        super.createContents(Display.getDefault(), SWT.CLOSE | SWT.ON_TOP | SWT.TITLE | SWT.RESIZE | SWT.TOOL, false);
+        this.getShell().setText("キャプチャ");
     }
 
     /**
      * Open the dialog.
      * @return the result
      */
+    @Override
     public void open() {
-        try {
-            this.createContents();
-            this.shell.open();
-            this.shell.layout();
-            Display display = this.getParent().getDisplay();
-            while (!this.shell.isDisposed()) {
-                if (!display.readAndDispatch()) {
-                    display.sleep();
-                }
-            }
-        } finally {
-            // タイマーを停止させる
-            if (this.timer != null) {
-                this.timer.cancel();
-            }
-            // フォントを開放
-            if (this.font != null) {
-                this.font.dispose();
-            }
+        // 初期化済みの場合
+        if (this.isWindowInitialized()) {
+            // リロードして表示
+            this.setVisible(true);
+            return;
         }
+
+        this.createContents();
+        this.registerEvents();
+        this.setWindowInitialized(true);
+        this.setVisible(true);
     }
 
     /**
@@ -102,8 +98,7 @@ public final class CaptureDialog extends Dialog {
      */
     private void createContents() {
         // シェル
-        this.shell = new Shell(this.getParent(), this.getStyle());
-        this.shell.setText(this.getText());
+        this.shell = this.getShell();
         // レイアウト
         GridLayout glShell = new GridLayout(1, false);
         glShell.horizontalSpacing = 1;
@@ -167,6 +162,20 @@ public final class CaptureDialog extends Dialog {
         this.capture.setEnabled(false);
         this.capture.setText(getCaptureButtonText(false, this.interval.getSelection()));
         this.capture.addSelectionListener(new CaptureStartAdapter());
+
+        this.shell.addListener(SWT.Dispose, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                // タイマーを停止させる
+                if (CaptureDialog.this.timer != null) {
+                    CaptureDialog.this.timer.cancel();
+                }
+                // フォントを開放
+                if (CaptureDialog.this.font != null) {
+                    CaptureDialog.this.font.dispose();
+                }
+            }
+        });
 
         this.shell.pack();
     }

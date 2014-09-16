@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -69,10 +70,10 @@ public final class GlobalContext {
     private static final Logger LOG = LogManager.getLogger(GlobalContext.class);
 
     /** 装備Map */
-    private static Map<Long, ItemDto> itemMap = new TreeMap<Long, ItemDto>();
+    private static Map<Integer, ItemDto> itemMap = new TreeMap<Integer, ItemDto>();
 
     /** 艦娘Map */
-    private static Map<Long, ShipDto> shipMap = new TreeMap<Long, ShipDto>();
+    private static Map<Integer, ShipDto> shipMap = new TreeMap<Integer, ShipDto>();
 
     /** 秘書艦 */
     private static ShipDto secretary;
@@ -160,7 +161,7 @@ public final class GlobalContext {
     /**
      * @return 装備Map
      */
-    public static Map<Long, ItemDto> getItemMap() {
+    public static Map<Integer, ItemDto> getItemMap() {
         return itemMap;
     }
 
@@ -168,16 +169,9 @@ public final class GlobalContext {
      * 装備を復元する
      * @param map
      */
-    public static void setItemMap(Map<Long, Integer> map) {
-        for (Entry<Long, Integer> entry : map.entrySet()) {
-            Object obj = entry.getValue();
-            Integer id;
-            if (obj instanceof Integer) {
-                id = (Integer) obj;
-            } else {
-                // 旧設定ファイル用
-                id = Integer.parseInt(obj.toString());
-            }
+    public static void setItemMap(Map<Integer, Integer> map) {
+        for (Entry<Integer, Integer> entry : map.entrySet()) {
+            Integer id = entry.getValue();
             ItemDto item = Item.get(id);
             if (item != null) {
                 itemMap.put(entry.getKey(), item);
@@ -188,7 +182,7 @@ public final class GlobalContext {
     /**
      * @return 艦娘Map
      */
-    public static Map<Long, ShipDto> getShipMap() {
+    public static Map<Integer, ShipDto> getShipMap() {
         return shipMap;
     }
 
@@ -277,6 +271,32 @@ public final class GlobalContext {
     }
 
     /**
+     * @return 遠征中の艦セット
+     */
+    public static Set<Integer> getMissionShipSet() {
+        Set<Integer> set = new HashSet<Integer>();
+        for (DeckMissionDto deckMission : deckMissions) {
+            if ((deckMission.getMission() != null) && (deckMission.getShips() != null)) {
+                set.addAll(deckMission.getShips());
+            }
+        }
+        return set;
+    }
+
+    /**
+     * @return 入渠中の艦セット
+     */
+    public static Set<Integer> getNDockShipSet() {
+        Set<Integer> set = new HashSet<Integer>();
+        for (NdockDto ndock : ndocks) {
+            if (ndock.getNdockid() != 0) {
+                set.add(ndock.getNdockid());
+            }
+        }
+        return set;
+    }
+
+    /**
      * 艦娘が入渠しているかを調べます
      * 
      * @param ship 艦娘
@@ -291,7 +311,7 @@ public final class GlobalContext {
      * @param ship 艦娘ID
      * @return 入渠している場合true
      */
-    public static boolean isNdock(long ship) {
+    public static boolean isNdock(int ship) {
         for (NdockDto ndock : ndocks) {
             if (ship == ndock.getNdockid()) {
                 return true;
@@ -602,9 +622,9 @@ public final class GlobalContext {
                 for (JsonValue shipval : ships) {
                     JsonObject shipobj = (JsonObject) shipval;
 
-                    Long shipid = shipobj.getJsonNumber("api_id").longValue();
-                    int fuel = shipobj.getJsonNumber("api_fuel").intValue();
-                    int bull = shipobj.getJsonNumber("api_bull").intValue();
+                    int shipid = shipobj.getInt("api_id");
+                    int fuel = shipobj.getInt("api_fuel");
+                    int bull = shipobj.getInt("api_bull");
 
                     ShipDto ship = shipMap.get(shipid);
                     if (ship != null) {
@@ -635,8 +655,8 @@ public final class GlobalContext {
     private static void doChange(Data data) {
         try {
             String fleetid = data.getField("api_id");
-            long shipid = Long.parseLong(data.getField("api_ship_id"));
-            int shipidx = Integer.parseInt(data.getField("api_ship_idx"));
+            int shipid = Integer.valueOf(data.getField("api_ship_id"));
+            int shipidx = Integer.valueOf(data.getField("api_ship_idx"));
 
             DockDto dockdto = dock.get(fleetid);
 
@@ -647,7 +667,7 @@ public final class GlobalContext {
                 if (shipidx == -1) {
                     for (int i = 1; i < ships.size(); i++) {
                         // 艦隊IDを外す
-                        ships.get(i).setFleetid(null);
+                        ships.get(i).setFleetid("");
                     }
                     // 旗艦以外解除
                     newdock.addShip(ships.get(0));
@@ -659,7 +679,7 @@ public final class GlobalContext {
 
                     for (int i = 0; i < ships.size(); i++) {
                         // 艦隊IDを一旦全部外す
-                        ships.get(i).setFleetid(null);
+                        ships.get(i).setFleetid("");
                         shiparray[i] = ships.get(i);
                     }
                     for (int i = 0; i < ships.size(); i++) {
@@ -668,9 +688,11 @@ public final class GlobalContext {
                         }
                     }
                     shiparray[shipidx] = rship;
-                    for (ShipDto shipdto : shiparray) {
+                    for (int i = 0; i < shiparray.length; ++i) {
+                        ShipDto shipdto = shiparray[i];
                         if (shipdto != null) {
                             shipdto.setFleetid(fleetid);
+                            shipdto.setFleetpos(i);
                             newdock.addShip(shipdto);
                         }
                     }
@@ -748,7 +770,7 @@ public final class GlobalContext {
                 JsonArray apiShip = apidata.getJsonArray("api_ship");
                 for (int i = 0; i < apiShip.size(); i++) {
                     ShipDto ship = new ShipDto((JsonObject) apiShip.get(i));
-                    shipMap.put(Long.valueOf(ship.getId()), ship);
+                    shipMap.put(Integer.valueOf(ship.getId()), ship);
                 }
                 JsonArray apiDeckPort = apidata.getJsonArray("api_deck_port");
                 doDeck(apiDeckPort);
@@ -768,12 +790,12 @@ public final class GlobalContext {
 
                     int section = ((JsonNumber) jmission.get(1)).intValue();
                     long milis = ((JsonNumber) jmission.get(2)).longValue();
-                    long fleetid = object.getJsonNumber("api_id").longValue();
+                    int fleetid = object.getInt("api_id");
 
-                    Set<Long> ships = new LinkedHashSet<Long>();
+                    Set<Integer> ships = new LinkedHashSet<Integer>();
                     JsonArray shiparray = object.getJsonArray("api_ship");
                     for (JsonValue jsonValue : shiparray) {
-                        long shipid = ((JsonNumber) jsonValue).longValue();
+                        int shipid = ((JsonNumber) jsonValue).intValue();
                         if (shipid != -1) {
                             ships.add(shipid);
                         }
@@ -1022,7 +1044,7 @@ public final class GlobalContext {
                 for (int i = 0; i < slotitemArray.size(); i++) {
                     JsonObject object = (JsonObject) slotitemArray.get(i);
                     int typeid = object.getInt("api_slotitem_id");
-                    Long id = object.getJsonNumber("api_id").longValue();
+                    int id = object.getJsonNumber("api_id").intValue();
                     ItemDto item = Item.get(typeid);
                     if (item != null) {
                         itemMap.put(id, item);
@@ -1032,7 +1054,7 @@ public final class GlobalContext {
             // 艦娘を追加します
             JsonObject apiShip = apidata.getJsonObject("api_ship");
             ShipDto ship = new ShipDto(apiShip);
-            shipMap.put(Long.valueOf(ship.getId()), ship);
+            shipMap.put(Integer.valueOf(ship.getId()), ship);
             // 投入資源を取得する
             ResourceDto resource = getShipResource.get(dock);
             if (resource == null) {
@@ -1076,7 +1098,7 @@ public final class GlobalContext {
             if (createitem.isCreateFlag()) {
                 JsonObject object = apidata.getJsonObject("api_slot_item");
                 int typeid = object.getJsonNumber("api_slotitem_id").intValue();
-                Long id = object.getJsonNumber("api_id").longValue();
+                int id = object.getInt("api_id");
                 ItemDto item = Item.get(typeid);
                 if (item != null) {
                     itemMap.put(id, item);
@@ -1118,7 +1140,7 @@ public final class GlobalContext {
             for (int i = 0; i < apidata.size(); i++) {
                 JsonObject object = (JsonObject) apidata.get(i);
                 int typeid = object.getJsonNumber("api_slotitem_id").intValue();
-                Long id = object.getJsonNumber("api_id").longValue();
+                int id = object.getInt("api_id");
                 ItemDto item = Item.get(typeid);
                 if (item != null) {
                     itemMap.put(id, item);
@@ -1146,7 +1168,7 @@ public final class GlobalContext {
 
             if (shipidstr != null) {
                 // 艦娘の指定がある場合は艦娘を差し替える
-                Long shipid = Long.parseLong(shipidstr);
+                int shipid = Integer.parseInt(shipidstr);
                 for (int i = 0; i < shipdata.size(); i++) {
                     ShipDto ship = new ShipDto((JsonObject) shipdata.get(i));
                     shipMap.put(shipid, ship);
@@ -1156,7 +1178,7 @@ public final class GlobalContext {
                 shipMap.clear();
                 for (int i = 0; i < shipdata.size(); i++) {
                     ShipDto ship = new ShipDto((JsonObject) shipdata.get(i));
-                    shipMap.put(Long.valueOf(ship.getId()), ship);
+                    shipMap.put(ship.getId(), ship);
                 }
             }
             // 艦隊を設定
@@ -1181,7 +1203,7 @@ public final class GlobalContext {
             shipMap.clear();
             for (int i = 0; i < apidata.size(); i++) {
                 ShipDto ship = new ShipDto((JsonObject) apidata.get(i));
-                shipMap.put(Long.valueOf(ship.getId()), ship);
+                shipMap.put(ship.getId(), ship);
             }
 
             // 戦闘結果がある場合、ダメージ計算があっているか検証します
@@ -1239,7 +1261,7 @@ public final class GlobalContext {
         dock.clear();
         for (int i = 0; i < apidata.size(); i++) {
             JsonObject jsonObject = (JsonObject) apidata.get(i);
-            String fleetid = Long.toString(jsonObject.getJsonNumber("api_id").longValue());
+            String fleetid = String.valueOf(jsonObject.getInt("api_id"));
             String name = jsonObject.getString("api_name");
             JsonArray apiship = jsonObject.getJsonArray("api_ship");
 
@@ -1247,8 +1269,7 @@ public final class GlobalContext {
             dock.put(fleetid, dockdto);
 
             for (int j = 0; j < apiship.size(); j++) {
-                Long shipid = Long.valueOf(((JsonNumber) apiship.get(j)).longValue());
-                ShipDto ship = shipMap.get(shipid);
+                ShipDto ship = shipMap.get(apiship.getInt(j));
 
                 if (ship != null) {
                     dockdto.addShip(ship);
@@ -1258,6 +1279,7 @@ public final class GlobalContext {
                     }
                     // 艦隊IDを設定
                     ship.setFleetid(fleetid);
+                    ship.setFleetpos(j);
                 }
             }
         }
@@ -1282,15 +1304,14 @@ public final class GlobalContext {
      */
     private static void doDestroyShip(Data data) {
         try {
-            Long shipid = Long.parseLong(data.getField("api_ship_id"));
+            int shipid = Integer.valueOf(data.getField("api_ship_id"));
             ShipDto ship = shipMap.get(shipid);
             if (ship != null) {
                 // レポート
                 CreateReportLogic.storeLostReport(LostEntityDto.make(ship, "艦娘の解体"));
 
                 // 持っている装備を廃棄する
-                List<Long> items = ship.getItemId();
-                for (Long item : items) {
+                for (int item : ship.getItemId()) {
                     itemMap.remove(item);
                 }
                 // 艦娘を外す
@@ -1322,7 +1343,7 @@ public final class GlobalContext {
             String itemids = data.getField("api_slotitem_ids");
             List<LostEntityDto> dtoList = new ArrayList<LostEntityDto>();
             for (String itemid : itemids.split(",")) {
-                Long item = Long.parseLong(itemid);
+                int item = Integer.valueOf(itemid);
                 ItemDto itemDto = itemMap.get(item);
                 if (itemDto != null) {
                     dtoList.add(LostEntityDto.make(item, itemDto));
@@ -1347,13 +1368,12 @@ public final class GlobalContext {
             // 近代化改修に使った艦を取り除く
             String shipids = data.getField("api_id_items");
             for (String shipid : shipids.split(",")) {
-                ShipDto ship = shipMap.get(Long.parseLong(shipid));
+                ShipDto ship = shipMap.get(Integer.valueOf(shipid));
                 if (ship != null) {
                     // 記録する
                     CreateReportLogic.storeLostReport(LostEntityDto.make(ship, "近代化改修"));
                     // 持っている装備を廃棄する
-                    List<Long> items = ship.getItemId();
-                    for (Long item : items) {
+                    for (int item : ship.getItemId()) {
                         itemMap.remove(item);
                     }
                     // 艦娘を外す
@@ -1373,7 +1393,7 @@ public final class GlobalContext {
             // 近代化改修された艦を更新する
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
             ShipDto ship = new ShipDto(apidata.getJsonObject("api_ship"));
-            Long id = Long.valueOf(ship.getId());
+            int id = ship.getId();
             // 艦隊情報を引き継ぐ
             ShipDto oldShip = shipMap.get(id);
             String fleetid = oldShip.getFleetid();
@@ -1382,6 +1402,7 @@ public final class GlobalContext {
                 if (dockdto != null) {
                     dockdto.replaceShip(oldShip, ship);
                     ship.setFleetid(fleetid);
+                    ship.setFleetpos(oldShip.getFleetpos());
                 }
             }
             shipMap.put(id, ship);
@@ -1565,7 +1586,7 @@ public final class GlobalContext {
 
         for (int i = 0; i < apidata.size(); i++) {
             JsonObject object = (JsonObject) apidata.get(i);
-            long id = object.getJsonNumber("api_ship_id").longValue();
+            int id = object.getJsonNumber("api_ship_id").intValue();
             long milis = object.getJsonNumber("api_complete_time").longValue();
 
             Date time = null;

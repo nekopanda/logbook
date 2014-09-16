@@ -72,7 +72,7 @@ public class KdockConfig {
                     return null;
                 }
 
-                Map<Long, ShipDto> ships = GlobalContext.getShipMap();
+                Map<Integer, ShipDto> ships = GlobalContext.getShipMap();
                 if (!ships.isEmpty() && ships.containsKey(kdock.getShipId())) {
                     ResourceDto resource = new ResourceDto(kdock.getType(), kdock.getFuel(), kdock.getAmmo(),
                             kdock.getMetal(),

@@ -66,8 +66,7 @@ public class BattleShipWindow extends BattleWindowBase {
                         String itemName = "";
                         ItemDto item = slots.get(i);
                         if (item != null) {
-                            int type1 = item.getType1();
-                            if ((type1 == 5) || (type1 == 7)) { // 艦載機搭載中
+                            if (item.isPlane()) {
                                 String max = (maxeq == null) ? "?" : String.valueOf(maxeq[i]);
                                 onSlot = String.valueOf(onSlots.get(i)) + "/" + max;
                             }

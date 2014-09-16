@@ -47,6 +47,8 @@ public final class ShipDto extends AbstractDto {
     @Tag(4)
     private String fleetid = "";
 
+    private int fleetpos;
+
     /** 名前 */
     @Tag(5)
     private final String name;
@@ -109,7 +111,7 @@ public final class ShipDto extends AbstractDto {
 
     /** 装備 */
     @Tag(20)
-    private final List<Long> slot;
+    private final List<Integer> slot;
 
     /** 艦載機の搭載数 */
     @Tag(21)
@@ -226,11 +228,11 @@ public final class ShipDto extends AbstractDto {
         this.nowhp = object.getJsonNumber("api_nowhp").intValue();
         this.maxhp = object.getJsonNumber("api_maxhp").intValue();
         this.slotnum = object.getJsonNumber("api_slotnum").intValue();
-        this.slot = new ArrayList<Long>();
+        this.slot = new ArrayList<Integer>();
         JsonArray slot = object.getJsonArray("api_slot");
         for (JsonValue jsonValue : slot) {
             JsonNumber itemid = (JsonNumber) jsonValue;
-            this.slot.add(Long.valueOf(itemid.intValue()));
+            this.slot.add(itemid.intValue());
         }
         this.onslot = new ArrayList<Integer>();
         JsonArray onslot = object.getJsonArray("api_onslot");
@@ -289,7 +291,7 @@ public final class ShipDto extends AbstractDto {
         builder.setMaxhp(this.maxhp);
         builder.setSlotnum(this.slotnum);
         if (this.slot != null) {
-            for (Long b : this.slot) {
+            for (Integer b : this.slot) {
                 if (b != null) {
                     builder.addSlot(b);
                 }
@@ -366,6 +368,24 @@ public final class ShipDto extends AbstractDto {
      */
     public void setFleetid(String fleetid) {
         this.fleetid = fleetid;
+    }
+
+    public boolean isFleetMember() {
+        return (this.fleetid != null) && (this.fleetid.length() > 0);
+    }
+
+    /**
+     * @return fleetpos
+     */
+    public int getFleetpos() {
+        return this.fleetpos;
+    }
+
+    /**
+     * @param fleetpos セットする fleetpos
+     */
+    public void setFleetpos(int fleetpos) {
+        this.fleetpos = fleetpos;
     }
 
     /**
@@ -497,7 +517,7 @@ public final class ShipDto extends AbstractDto {
         return this.maxhp;
     }
 
-    public List<Long> getRawSlot() {
+    public List<Integer> getRawSlot() {
         return this.slot;
     }
 
@@ -514,8 +534,8 @@ public final class ShipDto extends AbstractDto {
      */
     public List<String> getSlot() {
         List<String> itemNames = new ArrayList<String>();
-        Map<Long, ItemDto> itemMap = GlobalContext.getItemMap();
-        for (Long itemid : this.slot) {
+        Map<Integer, ItemDto> itemMap = GlobalContext.getItemMap();
+        for (int itemid : this.slot) {
             if (-1 != itemid) {
                 ItemDto name = itemMap.get(itemid);
                 if (name != null) {
@@ -535,8 +555,8 @@ public final class ShipDto extends AbstractDto {
      */
     public List<ItemDto> getItem() {
         List<ItemDto> items = new ArrayList<ItemDto>();
-        Map<Long, ItemDto> itemMap = GlobalContext.getItemMap();
-        for (Long itemid : this.slot) {
+        Map<Integer, ItemDto> itemMap = GlobalContext.getItemMap();
+        for (int itemid : this.slot) {
             if (-1 != itemid) {
                 ItemDto item = itemMap.get(itemid);
                 if (item != null) {
@@ -554,7 +574,7 @@ public final class ShipDto extends AbstractDto {
     /**
      * @return 装備ID
      */
-    public List<Long> getItemId() {
+    public List<Integer> getItemId() {
         return Collections.unmodifiableList(this.slot);
     }
 
@@ -719,9 +739,9 @@ public final class ShipDto extends AbstractDto {
      */
     public String getNext() {
         String next = "";
-        Long nextLvExp = ExpTable.get().get(this.lv + 1);
+        Integer nextLvExp = ExpTable.get().get(this.lv + 1);
         if (nextLvExp != null) {
-            next = Long.toString(nextLvExp - this.exp);
+            next = String.valueOf(nextLvExp - this.exp);
         }
         return next;
     }

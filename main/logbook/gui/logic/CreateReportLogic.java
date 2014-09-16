@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,14 +32,12 @@ import logbook.data.context.GlobalContext;
 import logbook.dto.BattleExDto;
 import logbook.dto.BattleResultDto;
 import logbook.dto.CreateItemDto;
-import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
 import logbook.dto.LostEntityDto;
 import logbook.dto.MaterialDto;
 import logbook.dto.MissionResultDto;
-import logbook.dto.NdockDto;
 import logbook.dto.QuestDto;
 import logbook.dto.ResourceItemDto;
 import logbook.dto.ShipDto;
@@ -48,6 +45,7 @@ import logbook.dto.ShipFilterDto;
 import logbook.dto.ShipInfoDto;
 import logbook.dto.UseItemDto;
 import logbook.internal.MasterData;
+import logbook.internal.Ship;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -88,32 +86,20 @@ public final class CreateReportLogic {
     /** テーブルアイテム作成(所有艦娘一覧) */
     public static final TableItemCreator SHIP_LIST_TABLE_ITEM_CREATOR = new TableItemCreator() {
 
-        private Set<Long> deckmissions;
+        private Set<Integer> deckmissions;
 
-        private Set<Long> docks;
+        private Set<Integer> docks;
 
         @Override
         public void init() {
-            // 遠征
-            this.deckmissions = new HashSet<Long>();
-            for (DeckMissionDto deckMission : GlobalContext.getDeckMissions()) {
-                if ((deckMission.getMission() != null) && (deckMission.getShips() != null)) {
-                    this.deckmissions.addAll(deckMission.getShips());
-                }
-            }
-            // 入渠
-            this.docks = new HashSet<Long>();
-            for (NdockDto ndock : GlobalContext.getNdocks()) {
-                if (ndock.getNdockid() != 0) {
-                    this.docks.add(ndock.getNdockid());
-                }
-            }
+            this.deckmissions = GlobalContext.getMissionShipSet();
+            this.docks = GlobalContext.getNDockShipSet();
         }
 
         @Override
         public TableItem create(Table table, Comparable[] text, int count) {
             // 艦娘
-            Long ship = (Long) text[1];
+            ShipDto ship = (ShipDto) ((TableRowHeader) text[0]).get();
 
             TableItem item = new TableItem(table, SWT.NONE);
 
@@ -125,7 +111,7 @@ public final class CreateReportLogic {
             }
 
             // 疲労
-            int cond = (Integer) text[5];
+            int cond = ship.getCond();
             if (cond <= AppConstants.COND_RED) {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
             } else if (cond <= AppConstants.COND_ORANGE) {
@@ -133,11 +119,11 @@ public final class CreateReportLogic {
             }
 
             // 遠征
-            if (this.deckmissions.contains(ship)) {
+            if (this.deckmissions.contains(ship.getId())) {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.MISSION_COLOR));
             }
             // 入渠
-            if (this.docks.contains(ship)) {
+            if (this.docks.contains(ship.getId())) {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.NDOCK_COLOR));
             }
 
@@ -329,10 +315,10 @@ public final class CreateReportLogic {
      * @return 内容
      */
     public static List<Comparable[]> getItemListBody() {
-        Set<Entry<Long, ItemDto>> items = GlobalContext.getItemMap().entrySet();
+        Set<Entry<Integer, ItemDto>> items = GlobalContext.getItemMap().entrySet();
         Map<ItemDto, Integer> itemCountMap = new HashMap<ItemDto, Integer>();
 
-        for (Entry<Long, ItemDto> entry : items) {
+        for (Entry<Integer, ItemDto> entry : items) {
             ItemDto item = entry.getValue();
             Integer count = itemCountMap.get(item);
             if (count == null) {
@@ -374,20 +360,39 @@ public final class CreateReportLogic {
         return new String[] {
                 "",
                 "ID",
+                "鍵",//
                 "艦隊",
+                "位置", //
                 "名前",
                 "艦種",
+                "艦ID",//
+                "現在",//
                 "疲労",
                 "回復",
+                "HP", //
+                "燃料",//
+                "弾薬",//
+                "修理時間",//
+                "燃料",//
+                "鋼材",//
+                "損傷",//
+                "HP1あたり", //
                 "Lv",
                 "Next",
                 "経験値",
                 "制空",
+                "索敵", //
                 "装備1",
+                "艦載機1", //
                 "装備2",
+                "艦載機2", //
                 "装備3",
+                "艦載機3", //
                 "装備4",
-                "HP",
+                "艦載機4", //
+                "耐久",
+                "燃料",//
+                "弾薬",//
                 "火力",
                 "雷装",
                 "対空",
@@ -407,17 +412,28 @@ public final class CreateReportLogic {
      * @return 内容
      */
     public static List<Comparable[]> getShipListBody(boolean specdiff, ShipFilterDto filter) {
-        Set<Entry<Long, ShipDto>> ships = GlobalContext.getShipMap().entrySet();
+        Set<Entry<Integer, ShipDto>> ships = GlobalContext.getShipMap().entrySet();
+        Set<Integer> missionSet = GlobalContext.getMissionShipSet();
         List<Comparable[]> body = new ArrayList<Comparable[]>();
         int count = 0;
-        for (Entry<Long, ShipDto> entry : ships) {
+        for (Entry<Integer, ShipDto> entry : ships) {
             ShipDto ship = entry.getValue();
 
             if ((filter != null) && !shipFilter(ship, filter)) {
                 continue;
             }
 
+            ShipInfoDto shipInfo = Ship.get(String.valueOf(ship.getShipId()));
+
             count++;
+
+            String now = "";
+            if (missionSet.contains(ship.getId())) {
+                now = "遠征中";
+            }
+            else if (GlobalContext.isNdock(ship.getId())) {
+                now = "入渠中";
+            }
 
             // 火力
             int karyoku;
@@ -468,23 +484,69 @@ public final class CreateReportLogic {
                 lucky = ship.getLucky();
             }
 
+            // HP1あたりの時間
+            long dockTime = ship.getDocktime();
+            long unitSeconds = ((long) (dockTime
+                    / (float) (ship.getMaxhp() - ship.getNowhp()) / 1000));
+            // 損傷
+            String damage = "";
+            if (ship.isBadlyDamage()) {
+                damage = "大破";
+            } else if (ship.isHalfDamage()) {
+                damage = "中破";
+            } else if (ship.isSlightDamage()) {
+                damage = "小破";
+            }
+
+            // 艦載機数
+            List<String> slotString = ship.getSlot();
+            List<ItemDto> slotItem = ship.getItem();
+            List<Integer> onSlot = ship.getOnSlot();
+            int[] maxEq = shipInfo.getMaxeq();
+            HpString[] onSlotString = new HpString[4];
+            for (int i = 0; i < onSlotString.length; ++i) {
+                ItemDto item = slotItem.get(i);
+                if ((item != null) && item.isPlane()) {
+                    onSlotString[i] = new HpString(onSlot.get(i), maxEq != null ? maxEq[i] : 0);
+                }
+            }
+
             body.add(new Comparable[] {
-                    count,
+                    new TableRowHeader(count, ship),
                     ship.getId(),
+                    ship.getLocked() ? "♥" : "",
                     ship.getFleetid(),
+                    ship.isFleetMember() ? ship.getFleetpos() : null,
                     ship.getName(),
                     ship.getType(),
+                    ship.getCharId(),
+                    now,
                     ship.getCond(),
-                    new TimeString(ship.getCondClearTime().getTime()),
+                    (ship.getCond() < 49) ? new TimeString(ship.getCondClearTime().getTime()) : null,
+                    new HpString(ship.getNowhp(), ship.getMaxhp()),
+                    new HpString(ship.getFuel(), ship.getFuelMax()),
+                    new HpString(ship.getBull(), ship.getBullMax()),
+                    dockTime > 0 ? new TimeLogic(ship.getDocktime()) : null,
+                    dockTime > 0 ? ship.getDockfuel() : null,
+                    dockTime > 0 ? ship.getDockmetal() : null,
+                    damage,
+                    dockTime > 0 ? TimeLogic.fromSeconds(unitSeconds) : null,
                     ship.getLv(),
                     ship.getNext(),
                     ship.getExp(),
                     ship.getSeiku(),
-                    ship.getSlot().get(0),
-                    ship.getSlot().get(1),
-                    ship.getSlot().get(2),
-                    ship.getSlot().get(3),
+                    new SakutekiString(ship),
+                    slotString.get(0),
+                    onSlotString[0],
+                    slotString.get(1),
+                    onSlotString[1],
+                    slotString.get(2),
+                    onSlotString[2],
+                    slotString.get(3),
+                    onSlotString[3],
                     ship.getMaxhp(),
+                    ship.getFuelMax(),
+                    ship.getBullMax(),
                     karyoku,
                     raisou,
                     taiku,

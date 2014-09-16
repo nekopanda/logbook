@@ -25,8 +25,8 @@ public class ItemConfig {
      * 設定ファイルに書き込みます
      */
     public static void store() throws IOException {
-        Map<Long, Integer> map = new HashMap<Long, Integer>();
-        for (Entry<Long, ItemDto> entry : GlobalContext.getItemMap().entrySet()) {
+        Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+        for (Entry<Integer, ItemDto> entry : GlobalContext.getItemMap().entrySet()) {
             map.put(entry.getKey(), entry.getValue().getId());
         }
         BeanUtils.writeObject(AppConstants.ITEM_CONFIG_FILE, map);
@@ -40,7 +40,7 @@ public class ItemConfig {
      */
     public static void load() {
         try {
-            Map<Long, Integer> map = BeanUtils.readObject(AppConstants.ITEM_CONFIG_FILE, Map.class);
+            Map<Integer, Integer> map = BeanUtils.readObject(AppConstants.ITEM_CONFIG_FILE, Map.class);
             if (map != null) {
                 GlobalContext.setItemMap(map);
             }

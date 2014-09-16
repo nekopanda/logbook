@@ -12,6 +12,9 @@ public final class ShipGroupBean {
     /** グループ名 */
     private String name;
 
+    /** グループのID */
+    private int id;
+
     /** 艦娘リスト */
     private Set<Integer> ships = new LinkedHashSet<Integer>();
 
@@ -45,5 +48,19 @@ public final class ShipGroupBean {
      */
     public void setShips(Set<Integer> ships) {
         this.ships = ships;
+    }
+
+    /**
+     * @return id
+     */
+    public int getId() {
+        return this.id;
+    }
+
+    /**
+     * @param id セットする id
+     */
+    public void setId(int id) {
+        this.id = id;
     }
 }

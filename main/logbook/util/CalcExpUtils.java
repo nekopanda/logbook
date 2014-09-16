@@ -20,7 +20,7 @@ public class CalcExpUtils {
      * @return 次のレベルまでに必要な経験値
      */
     @CheckForNull
-    public static Long getNextLvExp(int nowlv) {
+    public static Integer getNextLvExp(int nowlv) {
         return ExpTable.get().get(nowlv + 1);
     }
 
@@ -33,7 +33,7 @@ public class CalcExpUtils {
      * @param isMvp MVP
      * @return 得られる経験値
      */
-    public static long getExp(int baseexp, double eval, boolean isFlagship, boolean isMvp) {
+    public static int getExp(int baseexp, double eval, boolean isFlagship, boolean isMvp) {
         // 得られる経験値
         double getexpd = baseexp * eval;
         if (isFlagship) {
@@ -45,7 +45,7 @@ public class CalcExpUtils {
         // 最大累積 3.6倍
         getexpd = Math.min(getexpd, baseexp * 3.6);
 
-        return Math.round(getexpd);
+        return (int) Math.round(getexpd);
     }
 
     /**
@@ -55,7 +55,7 @@ public class CalcExpUtils {
      * @param exp 1回あたりの経験値
      * @return 
      */
-    public static int getCount(long needexp, long exp) {
+    public static int getCount(int needexp, int exp) {
         return BigDecimal.valueOf(needexp).divide(BigDecimal.valueOf(exp), RoundingMode.CEILING)
                 .intValue();
     }

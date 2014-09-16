@@ -18,6 +18,9 @@ public class DateTimeString implements Comparable<DateTimeString> {
     private final Date date;
 
     public DateTimeString(Date date) {
+        if (date == null) {
+            throw new NullPointerException();
+        }
         this.date = date;
     }
 
@@ -28,8 +31,6 @@ public class DateTimeString implements Comparable<DateTimeString> {
 
     @Override
     public int compareTo(DateTimeString o) {
-        long o1 = (this.date == null) ? 0 : this.date.getTime();
-        long o2 = (o.date == null) ? 0 : o.date.getTime();
-        return Long.compare(o1, o2);
+        return Long.compare(this.date.getTime(), o.date.getTime());
     }
 }

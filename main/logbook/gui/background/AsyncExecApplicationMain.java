@@ -166,7 +166,7 @@ public final class AsyncExecApplicationMain extends Thread {
                     int max = GlobalContext.maxChara();
                     int size = GlobalContext.getShipMap().size();
                     int locked = 0;
-                    for (Entry<Long, ShipDto> entry : GlobalContext.getShipMap().entrySet()) {
+                    for (Entry<Integer, ShipDto> entry : GlobalContext.getShipMap().entrySet()) {
                         if (entry.getValue().getLocked()) {
                             locked++;
                         }
@@ -333,7 +333,7 @@ public final class AsyncExecApplicationMain extends Thread {
         private boolean updateNdock(Date now, List<String> notice) {
             boolean noticeflg = false;
 
-            Map<Long, ShipDto> shipMap = GlobalContext.getShipMap();
+            Map<Integer, ShipDto> shipMap = GlobalContext.getShipMap();
 
             Label[] ndockNameLabels = { this.main.getNdock1name(), this.main.getNdock2name(),
                     this.main.getNdock3name(), this.main.getNdock4name() };
@@ -347,7 +347,7 @@ public final class AsyncExecApplicationMain extends Thread {
                 String time = "";
 
                 if (ndocks[i].getNdockid() != 0) {
-                    ShipDto ship = shipMap.get(Long.valueOf(ndocks[i].getNdockid()));
+                    ShipDto ship = shipMap.get(ndocks[i].getNdockid());
                     if (ship != null) {
                         name = ship.getName() + " (Lv" + ship.getLv() + ")";
                         long rest = getRest(now, ndocks[i].getNdocktime());

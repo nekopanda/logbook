@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import logbook.dto.ShipFilterDto;
+
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.swt.graphics.RGB;
 
@@ -160,6 +162,11 @@ public final class AppConfigBean {
             "お風呂に入りたい艦娘",
             "所有艦娘一覧 3",
             "所有艦娘一覧 4"
+    };
+
+    /** 艦娘ウィンドウのフィルタ */
+    private ShipFilterDto[] shipFilters = new ShipFilterDto[] {
+            null, null, null, null
     };
 
     /**
@@ -934,5 +941,19 @@ public final class AppConfigBean {
      */
     public void setShipTableNames(String[] shipTableNames) {
         this.shipTableNames = shipTableNames;
+    }
+
+    /**
+     * @return shipFilters
+     */
+    public ShipFilterDto[] getShipFilters() {
+        return this.shipFilters;
+    }
+
+    /**
+     * @param shipFilters セットする shipFilters
+     */
+    public void setShipFilters(ShipFilterDto[] shipFilters) {
+        this.shipFilters = shipFilters;
     }
 }

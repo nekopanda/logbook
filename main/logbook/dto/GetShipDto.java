@@ -41,7 +41,7 @@ public final class GetShipDto extends AbstractDto {
     /**
      * @return 艦娘個人を識別するID
      */
-    public long getId() {
+    public int getId() {
         return this.ship.getId();
     }
 
@@ -62,28 +62,28 @@ public final class GetShipDto extends AbstractDto {
     /**
      * @return Lv
      */
-    public long getLv() {
+    public int getLv() {
         return this.ship.getLv();
     }
 
     /**
      * @return 経験値
      */
-    public long getExp() {
+    public int getExp() {
         return this.ship.getExp();
     }
 
     /**
      * @return HP
      */
-    public long getNowhp() {
+    public int getNowhp() {
         return this.ship.getNowhp();
     }
 
     /**
      * @return MaxHP
      */
-    public long getMaxhp() {
+    public int getMaxhp() {
         return this.ship.getMaxhp();
     }
 
@@ -97,56 +97,56 @@ public final class GetShipDto extends AbstractDto {
     /**
      * @return 火力
      */
-    public long getKaryoku() {
+    public int getKaryoku() {
         return this.ship.getKaryoku();
     }
 
     /**
      * @return 雷装
      */
-    public long getRaisou() {
+    public int getRaisou() {
         return this.ship.getRaisou();
     }
 
     /**
      * @return 対空
      */
-    public long getTaiku() {
+    public int getTaiku() {
         return this.ship.getTaiku();
     }
 
     /**
      * @return 装甲
      */
-    public long getSoukou() {
+    public int getSoukou() {
         return this.ship.getSoukou();
     }
 
     /**
      * @return 回避
      */
-    public long getKaihi() {
+    public int getKaihi() {
         return this.ship.getKaihi();
     }
 
     /**
      * @return 対潜
      */
-    public long getTaisen() {
+    public int getTaisen() {
         return this.ship.getTaisen();
     }
 
     /**
      * @return 索敵
      */
-    public long getSakuteki() {
+    public int getSakuteki() {
         return this.ship.getSakuteki();
     }
 
     /**
      * @return 運
      */
-    public long getLucky() {
+    public int getLucky() {
         return this.ship.getLucky();
     }
 

@@ -45,6 +45,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
  */
 public final class ConfigDialog extends Dialog {
 
+    private final ApplicationMain main;
     private final Map<String, Composite> compositeMap = new HashMap<String, Composite>();
     private Shell shell;
     private Composite composite;
@@ -54,8 +55,9 @@ public final class ConfigDialog extends Dialog {
      * Create the dialog.
      * @param parent
      */
-    public ConfigDialog(Shell parent) {
-        super(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE);
+    public ConfigDialog(ApplicationMain main) {
+        super(main.getShell(), SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE);
+        this.main = main;
         this.setText("設定");
     }
 
@@ -544,7 +546,7 @@ public final class ConfigDialog extends Dialog {
 
         new Label(compositeWindow, SWT.NONE);
 
-        final Spinner opaqueIntervalSpinner = new Spinner(compositeSystem, SWT.BORDER);
+        final Spinner opaqueIntervalSpinner = new Spinner(compositeWindow, SWT.BORDER);
         opaqueIntervalSpinner.setMaximum(60 * 60 * 10);
         opaqueIntervalSpinner.setMinimum(0);
         opaqueIntervalSpinner.setSelection(AppConfig.get().getOpaqueInterval());
@@ -744,6 +746,7 @@ public final class ConfigDialog extends Dialog {
                     ex.printStackTrace();
                 }
                 ConfigDialog.this.shell.close();
+                ConfigDialog.this.main.configUpdated();
             }
         });
 

@@ -204,19 +204,19 @@ public class QueryHandler extends HttpServlet {
     private static JsonObjectBuilder shipToJson(ShipDto ship) {
         JsonArrayBuilder slot_array = Json.createArrayBuilder();
         JsonArrayBuilder onSlot_array = Json.createArrayBuilder();
-        for (Long item_number : ship.getRawSlot()) {
+        for (int item_number : ship.getRawSlot()) {
             slot_array.add(item_number);
         }
-        for (Integer item_number : ship.getOnSlot()) {
+        for (int item_number : ship.getOnSlot()) {
             onSlot_array.add(item_number);
         }
 
         // 成長の余地
-        long karyoku = ship.getKaryokuMax() - ship.getKaryoku();
-        long raisou = ship.getRaisouMax() - ship.getRaisou();
-        long taiku = ship.getTaikuMax() - ship.getTaiku();
-        long souko = ship.getSoukouMax() - ship.getSoukou();
-        long lucky = ship.getLuckyMax() - ship.getLucky();
+        int karyoku = ship.getKaryokuMax() - ship.getKaryoku();
+        int raisou = ship.getRaisouMax() - ship.getRaisou();
+        int taiku = ship.getTaikuMax() - ship.getTaiku();
+        int souko = ship.getSoukouMax() - ship.getSoukou();
+        int lucky = ship.getLuckyMax() - ship.getLucky();
         for (ItemDto item : ship.getItem()) {
             if (item != null) {
                 karyoku += item.getHoug();
@@ -371,9 +371,9 @@ public class QueryHandler extends HttpServlet {
 
                 { // 装備
                     JsonArrayBuilder item_array = Json.createArrayBuilder();
-                    Map<Long, ItemDto> itemMap = GlobalContext.getItemMap();
-                    for (Long id : itemMap.keySet()) {
-                        item_array.add(itemToJson(id.intValue(), itemMap.get(id)));
+                    Map<Integer, ItemDto> itemMap = GlobalContext.getItemMap();
+                    for (int id : itemMap.keySet()) {
+                        item_array.add(itemToJson(id, itemMap.get(id)));
                     }
                     jb.add("items", item_array);
                 }

@@ -10,6 +10,8 @@ import logbook.data.context.GlobalContext;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipFilterDto;
 import logbook.gui.logic.CreateReportLogic;
+import logbook.gui.logic.ShipGroupListener;
+import logbook.gui.logic.ShipGroupObserver;
 import logbook.gui.logic.TableItemCreator;
 
 import org.eclipse.swt.SWT;
@@ -21,6 +23,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -31,7 +35,7 @@ import org.eclipse.swt.widgets.TableItem;
  * 所有艦娘一覧テーブル
  *
  */
-public final class ShipTable extends AbstractTableDialog {
+public final class ShipTable extends AbstractTableDialog implements ShipGroupListener {
 
     /** 何番目か */
     private final int index;
@@ -40,7 +44,11 @@ public final class ShipTable extends AbstractTableDialog {
     private boolean specdiff = false;
 
     /** フィルター */
-    private ShipFilterDto filter = new ShipFilterDto();
+    private ShipFilterDto filter = null;
+
+    private MenuItem groupFilterCascade;
+    private MenuItem addGroupCascade;
+    private MenuItem removeGroupCascade;
 
     /**
      * @param parent
@@ -115,7 +123,7 @@ public final class ShipTable extends AbstractTableDialog {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 StringBuilder sb = new StringBuilder();
-                Map<Long, ShipDto> shipMap = GlobalContext.getShipMap();
+                Map<Integer, ShipDto> shipMap = GlobalContext.getShipMap();
                 for (TableItem item : ShipTable.this.table.getSelection()) {
                     sb.append("\"").append(shipMap.get(item.getData()).getName()).append("\", ");
                 }
@@ -125,68 +133,39 @@ public final class ShipTable extends AbstractTableDialog {
         });
         shipCopy.setText("艦娘の名前をコピー(&2)");
 
-        List<ShipGroupBean> groups = ShipGroupConfig.get().getGroup();
+        // グループメニュー作成
+        this.groupFilterCascade = new MenuItem(this.tablemenu, SWT.CASCADE);
+        this.groupFilterCascade.setText("グループフィルター(&G)");
+        this.addGroupCascade = new MenuItem(this.tablemenu, SWT.CASCADE);
+        this.addGroupCascade.setText("選択した艦娘をグループに追加(&A)");
+        this.removeGroupCascade = new MenuItem(this.tablemenu, SWT.CASCADE);
+        this.removeGroupCascade.setText("選択した艦娘をグループから除去(&D)");
+        this.listChanged();
 
-        MenuItem groupFilterCascade = new MenuItem(this.tablemenu, SWT.CASCADE);
-        groupFilterCascade.setText("グループフィルター(&G)");
-        Menu groupFilterMenu = new Menu(groupFilterCascade);
-        groupFilterCascade.setMenu(groupFilterMenu);
-        for (ShipGroupBean groupBean : groups) {
-            final MenuItem groupItem = new MenuItem(groupFilterMenu, SWT.NONE);
-            groupItem.setText(groupBean.getName());
-            groupItem.setData(groupBean);
-            groupItem.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
-                    ShipFilterDto filter = ShipTable.this.getFilter();
-                    filter.group = bean;
-                    ShipTable.this.updateFilter(filter);
+        // フィルタを復元
+        ShipFilterDto[] shipFilters = AppConfig.get().getShipFilters();
+        if ((shipFilters != null) && (shipFilters.length > this.index)) {
+            this.filter = shipFilters[this.index];
+        }
+        if (this.filter == null) {
+            this.filter = new ShipFilterDto();
+        }
+        if ((this.filter.group == null) && (this.filter.groupId != 0)) {
+            for (ShipGroupBean group : ShipGroupConfig.get().getGroup()) {
+                if (group.getId() == this.filter.groupId) {
+                    this.filter.group = group;
+                    break;
                 }
-            });
+            }
         }
 
-        MenuItem addGroupCascade = new MenuItem(this.tablemenu, SWT.CASCADE);
-        addGroupCascade.setText("選択した艦娘をグループに追加(&A)");
-        Menu addGroupMenu = new Menu(addGroupCascade);
-        addGroupCascade.setMenu(addGroupMenu);
-        for (ShipGroupBean groupBean : groups) {
-            final MenuItem groupItem = new MenuItem(addGroupMenu, SWT.NONE);
-            groupItem.setText(groupBean.getName());
-            groupItem.setData(groupBean);
-            groupItem.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    TableItem[] tableItems = ShipTable.this.table.getSelection();
-                    for (int i = 0; i < tableItems.length; i++) {
-                        int id = Integer.parseInt(tableItems[i].getText(1));
-                        ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
-                        bean.getShips().add(id);
-                    }
-                }
-            });
-        }
-
-        MenuItem removeGroupCascade = new MenuItem(this.tablemenu, SWT.CASCADE);
-        removeGroupCascade.setText("選択した艦娘をグループから除去(&D)");
-        Menu removeGroupMenu = new Menu(removeGroupCascade);
-        removeGroupCascade.setMenu(removeGroupMenu);
-        for (ShipGroupBean groupBean : groups) {
-            final MenuItem groupItem = new MenuItem(removeGroupMenu, SWT.NONE);
-            groupItem.setText(groupBean.getName());
-            groupItem.setData(groupBean);
-            groupItem.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    TableItem[] tableItems = ShipTable.this.table.getSelection();
-                    for (int i = 0; i < tableItems.length; i++) {
-                        long id = Long.parseLong(tableItems[i].getText(1));
-                        ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
-                        bean.getShips().remove(id);
-                    }
-                }
-            });
-        }
+        ShipGroupObserver.addListener(this);
+        this.table.addListener(SWT.Dispose, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                ShipGroupObserver.removeListener(ShipTable.this);
+            }
+        });
     }
 
     @Override
@@ -241,5 +220,91 @@ public final class ShipTable extends AbstractTableDialog {
      */
     public ShipFilterDto getFilter() {
         return this.filter;
+    }
+
+    private static Menu recreateCascadeMenu(MenuItem menuItem) {
+        Menu menu = menuItem.getMenu();
+        if (menu != null) {
+            menu.dispose();
+        }
+        menu = new Menu(menuItem);
+        menuItem.setMenu(menu);
+        return menu;
+    }
+
+    @Override
+    public void listChanged() {
+        if (this.getShell().isDisposed()) {
+            return;
+        }
+
+        List<ShipGroupBean> groups = ShipGroupConfig.get().getGroup();
+
+        Menu groupFilterMenu = recreateCascadeMenu(this.groupFilterCascade);
+        for (ShipGroupBean groupBean : groups) {
+            final MenuItem groupItem = new MenuItem(groupFilterMenu, SWT.NONE);
+            groupItem.setText(groupBean.getName());
+            groupItem.setData(groupBean);
+            groupItem.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
+                    ShipFilterDto filter = ShipTable.this.getFilter();
+                    filter.group = bean;
+                    filter.groupId = bean.getId();
+                    ShipTable.this.updateFilter(filter);
+                }
+            });
+        }
+
+        Menu addGroupMenu = recreateCascadeMenu(this.addGroupCascade);
+        for (ShipGroupBean groupBean : groups) {
+            final MenuItem groupItem = new MenuItem(addGroupMenu, SWT.NONE);
+            groupItem.setText(groupBean.getName());
+            groupItem.setData(groupBean);
+            groupItem.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    TableItem[] tableItems = ShipTable.this.table.getSelection();
+                    ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
+                    for (int i = 0; i < tableItems.length; i++) {
+                        int id = Integer.parseInt(tableItems[i].getText(1));
+                        bean.getShips().add(id);
+                    }
+                    ShipGroupObserver.groupChanged(bean);
+                }
+            });
+        }
+
+        Menu removeGroupMenu = recreateCascadeMenu(this.removeGroupCascade);
+        for (ShipGroupBean groupBean : groups) {
+            final MenuItem groupItem = new MenuItem(removeGroupMenu, SWT.NONE);
+            groupItem.setText(groupBean.getName());
+            groupItem.setData(groupBean);
+            groupItem.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    TableItem[] tableItems = ShipTable.this.table.getSelection();
+                    ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
+                    for (int i = 0; i < tableItems.length; i++) {
+                        int id = Integer.parseInt(tableItems[i].getText(1));
+                        bean.getShips().remove(id);
+                    }
+                    ShipGroupObserver.groupChanged(bean);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void groupChanged(ShipGroupBean group) {
+        if (this.getShell().isDisposed()) {
+            return;
+        }
+
+        if (this.filter.group == group) {
+            this.reloadTable();
+            this.shell.setText(this.getTitle());
+        }
     }
 }

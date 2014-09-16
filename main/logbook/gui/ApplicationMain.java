@@ -11,8 +11,6 @@ import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.gui.background.AsyncExecApplicationMain;
 import logbook.gui.background.AsyncExecUpdateCheck;
-import logbook.gui.listener.CaptureDialogAdapter;
-import logbook.gui.listener.ConfigDialogAdapter;
 import logbook.gui.listener.HelpEventListener;
 import logbook.gui.listener.MainShellAdapter;
 import logbook.gui.listener.TraySelectionListener;
@@ -107,6 +105,7 @@ public final class ApplicationMain extends WindowBase {
     private TrayItem trayItem;
 
     /** ウィンドウたち */
+    private CaptureDialog captureWindow;
     /** ドロップ報告書 */
     private DropReportTable dropReportWindow;
     /** 建造報告書 */
@@ -289,9 +288,9 @@ public final class ApplicationMain extends WindowBase {
 
         // メニュー
         // コマンド-キャプチャ
-        MenuItem capture = new MenuItem(cmdmenu, SWT.NONE);
+        MenuItem capture = new MenuItem(cmdmenu, SWT.CHECK);
         capture.setText("キャプチャ(&C)");
-        capture.addSelectionListener(new CaptureDialogAdapter(this.shell));
+        this.captureWindow = new CaptureDialog(this.shell, capture);
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // コマンド-ドロップ報告書
@@ -324,11 +323,8 @@ public final class ApplicationMain extends WindowBase {
         // コマンド-所有艦娘一覧
         for (int i = 0; i < 4; ++i) {
             MenuItem cmdshiplist = new MenuItem(cmdmenu, SWT.CHECK);
-            final int index = i;
-            int number = i + 1;
-            cmdshiplist.setText("所有艦娘一覧(&" + number + ")\tCtrl+" + number);
             cmdshiplist.setAccelerator(SWT.CTRL + ('1' + i));
-            this.shipTableWindows[i] = new ShipTable(this.shell, cmdshiplist, index);
+            this.shipTableWindows[i] = new ShipTable(this.shell, cmdshiplist, i);
         }
 
         // セパレータ
@@ -422,7 +418,12 @@ public final class ApplicationMain extends WindowBase {
         // その他-設定
         MenuItem config = new MenuItem(etcmenu, SWT.NONE);
         config.setText("設定(&P)");
-        config.addSelectionListener(new ConfigDialogAdapter(this.shell));
+        config.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                new ConfigDialog(ApplicationMain.this).open();
+            }
+        });
         // その他-バージョン情報
         MenuItem version = new MenuItem(etcmenu, SWT.NONE);
         version.setText("バージョン情報(&A)");
@@ -679,6 +680,8 @@ public final class ApplicationMain extends WindowBase {
             }
         });
 
+        this.configUpdated();
+
         this.startThread();
     }
 
@@ -796,6 +799,21 @@ public final class ApplicationMain extends WindowBase {
     @Override
     protected Point getDefaultSize() {
         return new Point(280, 420);
+    }
+
+    /**
+     * 設定が更新された
+     */
+    public void configUpdated() {
+        String[] shipNames = AppConfig.get().getShipTableNames();
+        for (int i = 0; i < shipNames.length; ++i) {
+            int number = i + 1;
+            if ((shipNames[i] == null) || (shipNames[i].length() == 0)) {
+                shipNames[i] = "艦娘一覧 " + number;
+            }
+            this.shipTableWindows[i].getMenuItem().setText(shipNames[i] + "(&" + number + ")\tCtrl+" + number);
+            this.shipTableWindows[i].getShell().setText(this.shipTableWindows[i].getTitle());
+        }
     }
 
     /**
