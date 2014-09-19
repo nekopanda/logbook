@@ -65,12 +65,19 @@ public class BattleWindowBase extends WindowBase {
         if (!this.isWindowInitialized()) {
             this.createContents();
             super.registerEvents();
+            this.createContentsAfter();
             this.combinedMode = true;
             this.setCombinedMode(false);
             this.getShell().pack();
             this.setWindowInitialized(true);
         }
         this.setVisible(true);
+    }
+
+    /**
+     * 
+     */
+    protected void createContentsAfter() {
     }
 
     @Override

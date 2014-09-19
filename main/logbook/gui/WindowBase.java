@@ -35,8 +35,10 @@ public class WindowBase {
     private static int[] ALPHA_VALUES = new int[] { 255, 230, 205, 154, 102, 26 };
     private static String[] ALPHA_TEXT = new String[] { "不透明化", "90%", "80%", "60%", "40%", "10%" };
 
-    private static GlobalOpacitySettingOvserver globalObserver = new GlobalOpacitySettingOvserver();
+    private static WindowTreeNode globalRootNode = new WindowTreeNode(true);
 
+    private final WindowTreeNode treeNode = new WindowTreeNode(this);
+    private WindowBase parent;
     private Shell shell;
     private Menu alphamenu;
     private MenuItem menuItem;
@@ -48,111 +50,177 @@ public class WindowBase {
     private MenuItem shareOpacityItem;
     private MenuItem[] opacity;
 
-    private OpacitySettingObserver settingObserver = new OpacitySettingObserver();
-
     // 設定
     private WindowConfigBean config;
     private boolean shareOpacitySetting = false;
     private int opacityIndex = 0;
 
-    // アニメーション
-    private OpacityAnimation opacityAnimation;
+    private static class WindowTreeNode implements OpacityAnimationClient {
+        private WindowTreeNode parent;
+        private final List<WindowTreeNode> childs = new ArrayList<WindowTreeNode>();
+        private OpacityAnimation animation;
+        public WindowBase window;
+        private boolean enabled;
 
-    // 設定を共有していない場合のダミーオブザーバ
-    private static class OpacitySettingObserver {
-
-        public void opaqueChanged(WindowBase source) {
-            source.opaqueChanged(source.opaqueItem.getSelection());
+        public WindowTreeNode(WindowBase window) {
+            this.window = window;
         }
 
-        public void opacityChanged(WindowBase source, int index) {
-            source.opacityChanged(index);
+        public WindowTreeNode(boolean enabled) {
+            this.enabled = enabled;
         }
-    }
 
-    // 設定を登録されたウィンドウすべてに通知するオブサーバ
-    private static class GlobalOpacitySettingOvserver extends OpacitySettingObserver {
-        private final OpacitySettingObserver dummyObserver = new OpacitySettingObserver();
-        private OpacityAnimation animationServer = null;
-        private final List<WindowBase> shareWindows = new ArrayList<WindowBase>();
+        public void setEnabled(boolean enabled) {
+            if (this.enabled != enabled) {
+                this.enabled = enabled;
+                if (enabled) {
+                    this.enable();
+                }
+                else {
+                    if (this.animation != null) {
+                        this.animation.setEnabled(false);
+                    }
+                }
+            }
+        }
 
-        public void register(WindowBase window) {
-            if (this.shareWindows.size() > 0) {
-                // 既に登録されたウィンドウがある場合は設定を取ってくる
-                WindowBase master = this.shareWindows.get(0);
-                window.opaqueChanged(master.opaqueItem.getSelection());
-                window.opacityChanged(master.opacityIndex);
-                window.shell.setAlpha(ALPHA_VALUES[window.opacityIndex]);
-                this.shareWindows.add(window);
+        public void addChild(WindowTreeNode node) {
+            this.childs.add(node);
+            node.parent = this;
+            if (this.enabled) {
+                this.enable();
+            }
+        }
+
+        public void removeChild(WindowTreeNode node) {
+            this.childs.remove(node);
+            node.parent = null;
+            if (node.enabled) {
+                node.enable();
+            }
+        }
+
+        private void enable() {
+            if (this.parent != null) {
+                this.transferMasterSetting();
             }
             else {
-                // １つ目を登録する場合
-                this.animationServer = new OpacityAnimation(new OpacityAnimationClient() {
-                    @Override
-                    public boolean isMouseHovering() {
-                        for (WindowBase window : GlobalOpacitySettingOvserver.this.shareWindows) {
-                            if (window.isMouseHovering()) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    }
-
-                    @Override
-                    public void setAlpha(int newAlpha) {
-                        for (WindowBase window : GlobalOpacitySettingOvserver.this.shareWindows) {
-                            window.shell.setAlpha(newAlpha);
-                        }
-                    }
-                });
-                this.shareWindows.add(window); // 下のsetAlphaで反映されるように追加しておく
-                this.animationServer.setInitialAlpha(
-                        ALPHA_VALUES[window.opacityIndex], window.opaqueItem.getSelection());
-            }
-            window.settingObserver = this;
-            if (window.opacityAnimation != null) {
-                window.opacityAnimation.dispoase();
-                window.opacityAnimation = null;
+                // ルートなのでアニメーションを有効化
+                if (this.animation == null) {
+                    this.animation = new OpacityAnimation(this);
+                }
+                WindowBase from = this.getFirstWindow();
+                boolean hoverAware = from.opaqueItem.getSelection();
+                int alhpa = ALPHA_VALUES[from.opacityIndex];
+                this.animation.setInitialAlpha(alhpa, hoverAware);
+                this.animation.setEnabled(true);
             }
         }
 
-        public void deregister(WindowBase window, boolean disposing) {
-            if (this.shareWindows.remove(window)) {
-                window.settingObserver = this.dummyObserver;
-                if (!disposing) {
-                    window.initAnimation();
+        private WindowBase getFirstWindow() {
+            if (this.window != null) {
+                return this.window;
+            }
+            for (WindowTreeNode node : this.childs) {
+                if (node.window != null) {
+                    return node.window;
                 }
-                if (this.shareWindows.size() == 0) {
-                    // なくなった
-                    this.animationServer.dispoase();
-                    this.animationServer = null;
+            }
+            return null;
+        }
+
+        private WindowTreeNode getRoot() {
+            // 一番上を取得
+            WindowTreeNode node = this;
+            while (node.parent != null)
+                node = node.parent;
+            return node;
+        }
+
+        private void transferMasterSetting() {
+            WindowBase from = this.getRoot().getFirstWindow();
+            if ((from != null) && (this.window != null) && (from != this.window)) {
+                boolean hoverAware = from.opaqueItem.getSelection();
+                int alhpa = ALPHA_VALUES[from.opacityIndex];
+                this.window.opaqueChanged(hoverAware);
+                this.window.opacityChanged(from.opacityIndex);
+                this.window.shell.setAlpha(alhpa);
+                if (this.animation != null) {
+                    this.animation.setHoverAware(hoverAware);
+                    this.animation.setAlpha(alhpa);
                 }
             }
         }
 
         public boolean getMouseHoverAware() {
-            return this.animationServer.getHoverAware();
+            return this.getRoot().animation.getHoverAware();
+        }
+
+        public int getAlpha() {
+            return this.getRoot().animation.getAlpha();
         }
 
         @Override
+        public boolean isMouseHovering() {
+            if ((this.window != null) && this.window.isMouseHovering()) {
+                return true;
+            }
+            for (WindowTreeNode child : this.childs) {
+                if (child.isMouseHovering()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public void setAlpha(int newAlpha) {
+            if (this.window != null) {
+                this.window.shell.setAlpha(newAlpha);
+            }
+            for (WindowTreeNode child : this.childs) {
+                child.setAlpha(newAlpha);
+            }
+        }
+
+        private static interface EventProc {
+            void proc(WindowBase window);
+        }
+
+        private void routeEvent(EventProc proc) {
+            if (this.window != null)
+                proc.proc(this.window);
+
+            for (WindowTreeNode node : this.childs) {
+                node.routeEvent(proc);
+            }
+        }
+
         public void opaqueChanged(WindowBase source) {
-            boolean newValue = source.opaqueItem.getSelection();
-            for (WindowBase window : this.shareWindows) {
-                window.opaqueChanged(newValue);
+            final boolean newValue = source.opaqueItem.getSelection();
+            WindowTreeNode node = this.getRoot();
+            if (node.animation != null) {
+                node.animation.setHoverAware(newValue);
             }
-            if (this.animationServer != null) {
-                this.animationServer.setHoverAware(newValue);
-            }
+            node.routeEvent(new EventProc() {
+                @Override
+                public void proc(WindowBase window) {
+                    window.opaqueChanged(newValue);
+                }
+            });
         }
 
-        @Override
-        public void opacityChanged(WindowBase source, int index) {
-            for (WindowBase window : this.shareWindows) {
-                window.opacityChanged(index);
+        public void opacityChanged(WindowBase source, final int index) {
+            WindowTreeNode node = this.getRoot();
+            if (node.animation != null) {
+                node.animation.setAlpha(ALPHA_VALUES[index]);
             }
-            if (this.animationServer != null) {
-                this.animationServer.setAlpha(ALPHA_VALUES[index]);
-            }
+            node.routeEvent(new EventProc() {
+                @Override
+                public void proc(WindowBase window) {
+                    window.opacityChanged(index);
+                }
+            });
         }
     }
 
@@ -201,9 +269,10 @@ public class WindowBase {
      * @param display shellの引数
      * @param style shellの引数
      */
-    protected void createContents(Shell parent, int style, boolean menuCascade) {
+    protected void createContents(WindowBase parent, int style, boolean menuCascade) {
         if (this.shell == null) {
-            this.shell = new Shell(parent, style);
+            this.parent = parent;
+            this.shell = new Shell(parent.shell, style);
             this.createContents(menuCascade);
         }
     }
@@ -219,13 +288,6 @@ public class WindowBase {
             public void handleEvent(Event event) {
                 // setMenuされたメニューしかdisposeされないので
                 WindowBase.this.alphamenu.dispose();
-                // アニメーションを破棄
-                if (WindowBase.this.opacityAnimation != null) {
-                    WindowBase.this.opacityAnimation.dispoase();
-                }
-                else {
-                    globalObserver.deregister(WindowBase.this, true);
-                }
             }
         });
         if (this.menuItem != null) {
@@ -252,24 +314,6 @@ public class WindowBase {
         }
     }
 
-    private void initAnimation() {
-        if (this.opacityAnimation == null) {
-            this.opacityAnimation = new OpacityAnimation(new OpacityAnimationClient() {
-                @Override
-                public boolean isMouseHovering() {
-                    return WindowBase.this.isMouseHovering();
-                }
-
-                @Override
-                public void setAlpha(int newAlpha) {
-                    WindowBase.this.shell.setAlpha(newAlpha);
-                }
-            });
-            this.opacityAnimation.setInitialAlpha(
-                    ALPHA_VALUES[this.opacityIndex], this.opaqueItem.getSelection());
-        }
-    }
-
     private boolean isMouseHovering() {
         if (this.shell.getVisible() == false)
             return false;
@@ -282,9 +326,6 @@ public class WindowBase {
 
     private void opaqueChanged(boolean newValue) {
         this.opaqueItem.setSelection(newValue);
-        if (this.opacityAnimation != null) {
-            this.opacityAnimation.setHoverAware(newValue);
-        }
     }
 
     private void opacityChanged(int newValue) {
@@ -295,9 +336,6 @@ public class WindowBase {
         }
         this.opacity[newValue].setSelection(true);
         this.opacityIndex = newValue;
-        if (this.opacityAnimation != null) {
-            this.opacityAnimation.setAlpha(ALPHA_VALUES[newValue]);
-        }
     }
 
     private void createContents(boolean cascade) {
@@ -317,12 +355,17 @@ public class WindowBase {
         this.opaqueItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent paramSelectionEvent) {
-                WindowBase.this.settingObserver.opaqueChanged(WindowBase.this);
+                WindowBase.this.treeNode.opaqueChanged(WindowBase.this);
             }
         });
         // 他のウィンドウと設定共有
         this.shareOpacityItem = new MenuItem(rootMenu, SWT.CHECK);
-        this.shareOpacityItem.setText("他のウィンドウと設定共有");
+        if (this.parent == null) {
+            this.shareOpacityItem.setText("他のウィンドウと設定共有");
+        }
+        else {
+            this.shareOpacityItem.setText("親ウィンドウと設定共有");
+        }
         this.shareOpacityItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent paramSelectionEvent) {
@@ -330,10 +373,20 @@ public class WindowBase {
                 if (WindowBase.this.shareOpacitySetting != newValue) {
                     WindowBase.this.shareOpacitySetting = newValue;
                     if (newValue) {
-                        globalObserver.register(WindowBase.this);
+                        if (WindowBase.this.parent == null) {
+                            globalRootNode.addChild(WindowBase.this.treeNode);
+                        }
+                        else {
+                            WindowBase.this.parent.treeNode.addChild(WindowBase.this.treeNode);
+                        }
                     }
                     else {
-                        globalObserver.deregister(WindowBase.this, false);
+                        if (WindowBase.this.parent == null) {
+                            globalRootNode.removeChild(WindowBase.this.treeNode);
+                        }
+                        else {
+                            WindowBase.this.parent.treeNode.removeChild(WindowBase.this.treeNode);
+                        }
                     }
                 }
             }
@@ -347,7 +400,7 @@ public class WindowBase {
             this.opacity[i].addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent paramSelectionEvent) {
-                    WindowBase.this.settingObserver.opacityChanged(WindowBase.this, index);
+                    WindowBase.this.treeNode.opacityChanged(WindowBase.this, index);
                 }
             });
         }
@@ -356,6 +409,7 @@ public class WindowBase {
         if (this.config != null) {
             this.restoreSetting();
         }
+        // TODO:
         this.opacity[this.opacityIndex].setSelection(true);
         this.shareOpacityItem.setSelection(this.shareOpacitySetting);
 

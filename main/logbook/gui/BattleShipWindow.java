@@ -303,6 +303,19 @@ public class BattleShipWindow extends BattleWindowBase {
         this.clearText();
     }
 
+    /**
+     * 艦名は選択解除があるのでウィンドウメニューを外しておく
+     */
+    @Override
+    protected void createContentsAfter() {
+        for (int i = 0; i < 12; ++i) {
+            this.friendLabels[i].setMenu(null);
+        }
+        for (int i = 0; i < 6; ++i) {
+            this.enemyLabels[i].setMenu(null);
+        }
+    }
+
     private void printDock(DockDto dock, int base) {
         List<ShipDto> ships = dock.getShips();
         for (int i = 0; i < ships.size(); ++i) {

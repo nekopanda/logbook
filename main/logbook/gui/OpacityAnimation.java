@@ -29,6 +29,7 @@ public class OpacityAnimation {
 
     private int baseAlpha; // 設定されたアルファ値
     private boolean mouseHoverAware = false; // マウスホバーに反応する？
+    private boolean enabled = false;
 
     private boolean mouseLeaved = false;
     private boolean activated = false;
@@ -109,11 +110,18 @@ public class OpacityAnimation {
 
     public OpacityAnimation(OpacityAnimationClient client) {
         this.client = client;
-        server.register(this);
     }
 
-    public void dispoase() {
-        server.deregister(this);
+    public void setEnabled(boolean enabled) {
+        if (this.enabled != enabled) {
+            this.enabled = enabled;
+            if (enabled) {
+                server.register(this);
+            }
+            else {
+                server.deregister(this);
+            }
+        }
     }
 
     /** 初期アルファ値設定(client.setAlpha()も呼び出す） */
