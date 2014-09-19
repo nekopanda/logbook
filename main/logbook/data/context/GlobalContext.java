@@ -1578,15 +1578,16 @@ public final class GlobalContext {
     private static void doQuest(Data data) {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
-            if (apidata.isNull("api_list")) {
-                LOG.info("任務が空でした");
+            int items_per_page = 5;
+            int disp_page = apidata.getJsonNumber("api_disp_page").intValue();
+            int page_count = apidata.getJsonNumber("api_page_count").intValue();
+            if (page_count == 0) { // 任務が１つもない時
                 questList.clear();
             }
+            else if ((disp_page > page_count) || apidata.isNull("api_list")) {
+                // 表示ページが全体ページ数より後ろの場合は任務情報が何も送られてこない
+            }
             else {
-                JsonArray apilist = apidata.getJsonArray("api_list");
-                int items_per_page = 5;
-                int disp_page = apidata.getJsonNumber("api_disp_page").intValue();
-                int page_count = apidata.getJsonNumber("api_page_count").intValue();
                 // 足りない要素を足す
                 for (int i = questList.size(); i < (page_count * items_per_page); ++i) {
                     questList.add(null);
@@ -1596,7 +1597,7 @@ public final class GlobalContext {
                     questList.remove(i);
                 }
                 int pos = 1;
-                for (JsonValue value : apilist) {
+                for (JsonValue value : apidata.getJsonArray("api_list")) {
                     if (value instanceof JsonObject) {
                         JsonObject questobject = (JsonObject) value;
                         // 任務を作成
