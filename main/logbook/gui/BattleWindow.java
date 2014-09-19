@@ -54,7 +54,7 @@ public class BattleWindow extends BattleWindowBase {
     private static String AFTER_DAY = "昼戦後";
     private static String AFTER_NIGHT = "夜戦後";
     private static String FORM_PREFIX = "陣形:";
-    private static String TOUCH_PREFIX = "接触:";
+    private static String TOUCH_PREFIX = "触接:";
     private static String SAKUTEKI_PREFIX = "索敵:";
 
     /**
@@ -72,7 +72,7 @@ public class BattleWindow extends BattleWindowBase {
             break;
         case 1:
             labels[1] = this.addLabelWithSize("陣形", width / 2);
-            labels[2] = this.addLabelWithSize("接触", width / 2);
+            labels[2] = this.addLabelWithSize("触接", width / 2);
             break;
         case 2:
             labels[3] = this.addLabel("索敵", width, SWT.CENTER, 2, 1);
@@ -107,7 +107,7 @@ public class BattleWindow extends BattleWindowBase {
             break;
         case 1:
             labels[1] = this.addLabelWithSize("陣形", width / 2);
-            labels[2] = this.addLabelWithSize("接触", width / 2);
+            labels[2] = this.addLabelWithSize("触接", width / 2);
             break;
         case 2:
             labels[3] = this.addLabel("索敵", width, SWT.CENTER, 2, 1);
@@ -360,7 +360,7 @@ public class BattleWindow extends BattleWindowBase {
             ShipDto ship = ships.get(i);
             this.friendLabels[base + i].setText(String.valueOf(i + 1) + "." +
                     ship.getName() + "(Lv." + ship.getLv() + ")");
-            printFriendHp(this.friendHpLabels, base + i, (int) ship.getNowhp(), (int) ship.getMaxhp());
+            printFriendHp(this.friendHpLabels, base + i, ship.getNowhp(), ship.getMaxhp());
         }
     }
 

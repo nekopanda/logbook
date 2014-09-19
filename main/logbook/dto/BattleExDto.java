@@ -150,7 +150,7 @@ public class BattleExDto extends AbstractDto {
         @Tag(7)
         private String supportType;
 
-        /** 接触機（味方・敵） -1の場合は「接触なし」 */
+        /** 触接機（味方・敵） -1の場合は「触接なし」 */
         @Tag(8)
         private int[] touchPlane;
 
@@ -201,7 +201,7 @@ public class BattleExDto extends AbstractDto {
                 this.nowFriendHpCombined = null;
             }
 
-            // 接触
+            // 触接
             JsonArray jsonTouchPlane = object.getJsonArray("api_touch_plane");
             if (jsonTouchPlane != null) {
                 this.touchPlane = new int[] {
@@ -216,7 +216,7 @@ public class BattleExDto extends AbstractDto {
             JsonObject kouku = object.getJsonObject("api_kouku");
             if (kouku != null) {
                 this.air = new AirBattleDto(kouku, isCombined);
-                // 昼戦の接触はここ
+                // 昼戦の触接はここ
                 this.touchPlane = this.air.touchPlane;
                 // 制空はここから取る
                 this.seiku = this.air.seiku;

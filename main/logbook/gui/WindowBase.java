@@ -338,6 +338,25 @@ public class WindowBase {
         this.opacityIndex = newValue;
     }
 
+    private void updateTreeNodeState() {
+        if (this.shareOpacitySetting) {
+            if (this.parent == null) {
+                globalRootNode.addChild(this.treeNode);
+            }
+            else {
+                this.parent.treeNode.addChild(this.treeNode);
+            }
+        }
+        else {
+            if (this.parent == null) {
+                globalRootNode.removeChild(this.treeNode);
+            }
+            else {
+                this.parent.treeNode.removeChild(this.treeNode);
+            }
+        }
+    }
+
     private void createContents(boolean cascade) {
         // ウィンドウ基本メニュー
         this.alphamenu = new Menu(this.shell);
@@ -372,22 +391,7 @@ public class WindowBase {
                 boolean newValue = WindowBase.this.shareOpacityItem.getSelection();
                 if (WindowBase.this.shareOpacitySetting != newValue) {
                     WindowBase.this.shareOpacitySetting = newValue;
-                    if (newValue) {
-                        if (WindowBase.this.parent == null) {
-                            globalRootNode.addChild(WindowBase.this.treeNode);
-                        }
-                        else {
-                            WindowBase.this.parent.treeNode.addChild(WindowBase.this.treeNode);
-                        }
-                    }
-                    else {
-                        if (WindowBase.this.parent == null) {
-                            globalRootNode.removeChild(WindowBase.this.treeNode);
-                        }
-                        else {
-                            WindowBase.this.parent.treeNode.removeChild(WindowBase.this.treeNode);
-                        }
-                    }
+                    WindowBase.this.updateTreeNodeState();
                 }
             }
         });
@@ -409,17 +413,11 @@ public class WindowBase {
         if (this.config != null) {
             this.restoreSetting();
         }
-        // TODO:
         this.opacity[this.opacityIndex].setSelection(true);
         this.shareOpacityItem.setSelection(this.shareOpacitySetting);
 
-        // アニメーション初期化
-        if (this.shareOpacitySetting) {
-            globalObserver.register(this);
-        }
-        else {
-            this.initAnimation();
-        }
+        this.updateTreeNodeState();
+        this.treeNode.setEnabled(true);
     }
 
     private boolean restoreSetting() {
@@ -456,17 +454,7 @@ public class WindowBase {
     public void restore() {
         this.getWindowConfig();
         if (this.restoreSetting()) {
-            // アニメーションに反映
-            // 設定を共有していた場合は解除
-            if (this.opacityAnimation == null) {
-                globalObserver.deregister(this, false);
-            }
-            if (this.shareOpacitySetting) {
-                globalObserver.register(this);
-            }
-            else {
-                this.initAnimation();
-            }
+            this.updateTreeNodeState();
         }
         if (this.config.isOpened()) {
             this.open();
@@ -524,12 +512,7 @@ public class WindowBase {
             Point location = this.shell.getLocation();
             this.config.setLocationX(location.x);
             this.config.setLocationY(location.y);
-            if (this.opacityAnimation != null) {
-                this.config.setMouseHoveringAware(this.opacityAnimation.getHoverAware());
-            }
-            else {
-                this.config.setMouseHoveringAware(globalObserver.getMouseHoverAware());
-            }
+            this.config.setMouseHoveringAware(this.treeNode.getMouseHoverAware());
             this.config.setShareOpacitySetting(this.shareOpacitySetting);
             this.config.setOpacityIndex(this.opacityIndex);
             if (this.shouldSaveWindowSize()) {
@@ -582,6 +565,9 @@ public class WindowBase {
             this.config = AppConfig.get().getWindowConfigMap().get(this.getWindowId());
             if (this.config == null) {
                 this.config = new WindowConfigBean();
+                if (this.parent != null) {
+                    this.config.setShareOpacitySetting(true);
+                }
             }
         }
         return this.config;

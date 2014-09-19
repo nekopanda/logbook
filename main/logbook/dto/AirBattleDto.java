@@ -20,7 +20,7 @@ public class AirBattleDto {
 
     @Tag(1)
     public List<BattleAtackDto> atacks;
-    /** 接触（味方・敵） */
+    /** 触接（味方・敵） */
     @Tag(2)
     public int[] touchPlane;
     /** 制空 */
