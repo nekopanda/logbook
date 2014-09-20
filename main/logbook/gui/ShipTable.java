@@ -80,7 +80,7 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
         filter.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                new ShipFilterDialog(ShipTable.this.shell, ShipTable.this, ShipTable.this.filter).open();
+                new ShipFilterDialog(ShipTable.this, ShipTable.this.filter).open();
             }
         });
         // セパレータ
@@ -104,7 +104,7 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
         filtertable.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                new ShipFilterDialog(ShipTable.this.shell, ShipTable.this, ShipTable.this.filter).open();
+                new ShipFilterDialog(ShipTable.this, ShipTable.this.filter).open();
             }
         });
         MenuItem idCopy = new MenuItem(this.tablemenu, SWT.NONE);

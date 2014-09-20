@@ -24,7 +24,6 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -35,7 +34,7 @@ import org.eclipse.swt.widgets.Text;
  * 所有艦娘一覧で使用するフィルターダイアログ
  * 
  */
-public final class ShipFilterDialog extends Dialog {
+public final class ShipFilterDialog extends WindowBase {
 
     private Shell shell;
 
@@ -109,8 +108,8 @@ public final class ShipFilterDialog extends Dialog {
      * @param shipTable 呼び出し元
      * @param filter 初期値
      */
-    public ShipFilterDialog(Shell parent, ShipTable shipTable, ShipFilterDto filter) {
-        super(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE);
+    public ShipFilterDialog(ShipTable shipTable, ShipFilterDto filter) {
+        super.createContents(shipTable, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
         this.shipTable = shipTable;
         this.filter = filter;
     }
@@ -119,11 +118,13 @@ public final class ShipFilterDialog extends Dialog {
      * Open the dialog.
      * @return the result
      */
+    @Override
     public void open() {
         this.createContents();
+        this.registerEvents();
         this.shell.open();
         this.shell.layout();
-        Display display = this.getParent().getDisplay();
+        Display display = this.shell.getDisplay();
         while (!this.shell.isDisposed()) {
             if (!display.readAndDispatch()) {
                 display.sleep();
@@ -135,7 +136,7 @@ public final class ShipFilterDialog extends Dialog {
      * Create contents of the dialog.
      */
     private void createContents() {
-        this.shell = new Shell(this.getParent(), this.getStyle());
+        this.shell = this.getShell();
         this.shell.setText("フィルター");
         GridLayout glShell = new GridLayout(1, false);
         glShell.verticalSpacing = 2;

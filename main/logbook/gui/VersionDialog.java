@@ -15,7 +15,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -26,7 +25,7 @@ import org.eclipse.swt.widgets.Shell;
  * バージョン情報
  *
  */
-public final class VersionDialog extends Dialog {
+public final class VersionDialog extends WindowBase {
 
     private static final Logger LOG = LogManager.getLogger(VersionDialog.class);
 
@@ -36,19 +35,21 @@ public final class VersionDialog extends Dialog {
      * Create the dialog.
      * @param parent
      */
-    public VersionDialog(Shell parent) {
-        super(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE);
-        this.setText("バージョン情報");
+    public VersionDialog(WindowBase parent) {
+        this.createContents(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
+        this.getShell().setText("バージョン情報");
     }
 
     /**
      * Open the dialog.
      */
+    @Override
     public void open() {
         this.createContents();
+        this.registerEvents();
         this.shell.open();
         this.shell.layout();
-        Display display = this.getParent().getDisplay();
+        Display display = this.shell.getDisplay();
         while (!this.shell.isDisposed()) {
             if (!display.readAndDispatch()) {
                 display.sleep();
@@ -60,8 +61,7 @@ public final class VersionDialog extends Dialog {
      * Create contents of the dialog.
      */
     private void createContents() {
-        this.shell = new Shell(this.getParent(), this.getStyle());
-        this.shell.setText(this.getText());
+        this.shell = this.getShell();
         this.shell.setLayout(new GridLayout(1, false));
 
         // バージョン

@@ -29,7 +29,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
@@ -42,7 +41,7 @@ import org.eclipse.swt.widgets.Shell;
  * 資材チャートのダイアログ
  *
  */
-public final class ResourceChartDialog extends Dialog {
+public final class ResourceChartDialog extends WindowBase {
 
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(ResourceChartDialog.class);
@@ -70,19 +69,21 @@ public final class ResourceChartDialog extends Dialog {
      * @param parent
      */
     public ResourceChartDialog(Shell parent) {
-        super(parent, SWT.SHELL_TRIM);
-        this.setText("資材チャート");
+        super.createContents(parent, SWT.SHELL_TRIM, true);
+        this.getShell().setText("資材チャート");
     }
 
     /**
      * Open the dialog.
      * @return the result
      */
+    @Override
     public void open() {
         this.createContents();
+        this.registerEvents();
         this.shell.open();
         this.shell.layout();
-        Display display = this.getParent().getDisplay();
+        Display display = this.shell.getDisplay();
         while (!this.shell.isDisposed()) {
             if (!display.readAndDispatch()) {
                 display.sleep();
@@ -94,10 +95,9 @@ public final class ResourceChartDialog extends Dialog {
      * Create contents of the dialog.
      */
     private void createContents() {
-        this.shell = new Shell(this.getParent(), this.getStyle());
+        this.shell = this.getShell();
         this.shell.setMinimumSize(450, 300);
         this.shell.setSize(800, 500);
-        this.shell.setText(this.getText());
         GridLayout glShell = new GridLayout(2, false);
         glShell.verticalSpacing = 2;
         glShell.marginWidth = 2;

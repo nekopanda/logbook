@@ -8,6 +8,8 @@ import java.util.List;
 
 import logbook.config.AppConfig;
 import logbook.config.bean.WindowConfigBean;
+import logbook.gui.logic.OpacityAnimation;
+import logbook.gui.logic.OpacityAnimationClient;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -55,12 +57,17 @@ public class WindowBase {
     private boolean shareOpacitySetting = false;
     private int opacityIndex = 0;
 
+    private static interface EventProc {
+        void proc(WindowBase window);
+    }
+
     private static class WindowTreeNode implements OpacityAnimationClient {
         private WindowTreeNode parent;
         private final List<WindowTreeNode> childs = new ArrayList<WindowTreeNode>();
         private OpacityAnimation animation;
         public WindowBase window;
         private boolean enabled;
+        private boolean hasWindow;
 
         public WindowTreeNode(WindowBase window) {
             this.window = window;
@@ -74,29 +81,47 @@ public class WindowBase {
             if (this.enabled != enabled) {
                 this.enabled = enabled;
                 if (enabled) {
+                    if (this.parent != null) {
+                        this.parent.enable();
+                    }
                     this.enable();
                 }
                 else {
                     if (this.animation != null) {
+                        this.dbgprint("this.animation.setEnabled(false);");
                         this.animation.setEnabled(false);
                     }
+                    this.hasWindow = false;
                 }
             }
         }
 
         public void addChild(WindowTreeNode node) {
+            node.dbgprint("addChild");
             this.childs.add(node);
             node.parent = this;
-            if (this.enabled) {
+            node.hasWindow = false;
+            if (node.enabled) {
+                node.transferMasterSetting();
                 this.enable();
             }
         }
 
         public void removeChild(WindowTreeNode node) {
+            node.dbgprint("removeChild");
             this.childs.remove(node);
             node.parent = null;
             if (node.enabled) {
                 node.enable();
+            }
+        }
+
+        public void routeEvent(EventProc proc) {
+            if (this.window != null)
+                proc.proc(this.window);
+
+            for (WindowTreeNode node : this.childs) {
+                node.routeEvent(proc);
             }
         }
 
@@ -107,12 +132,23 @@ public class WindowBase {
             else {
                 // ルートなのでアニメーションを有効化
                 if (this.animation == null) {
+                    this.dbgprint("new OpacityAnimation(this);");
                     this.animation = new OpacityAnimation(this);
                 }
                 WindowBase from = this.getFirstWindow();
-                boolean hoverAware = from.opaqueItem.getSelection();
-                int alhpa = ALPHA_VALUES[from.opacityIndex];
-                this.animation.setInitialAlpha(alhpa, hoverAware);
+                if (from == null) {
+                    this.dbgprint("this.hasWindow = false");
+                    this.hasWindow = false;
+                }
+                else {
+                    boolean hoverAware = from.opaqueItem.getSelection();
+                    int alhpa = ALPHA_VALUES[from.opacityIndex];
+                    if (this.hasWindow == false) {
+                        this.dbgprint("this.animation.setInitialAlpha(" + alhpa + ", " + hoverAware + ");");
+                        this.animation.setInitialAlpha(alhpa, hoverAware);
+                        this.hasWindow = true;
+                    }
+                }
                 this.animation.setEnabled(true);
             }
         }
@@ -138,16 +174,25 @@ public class WindowBase {
         }
 
         private void transferMasterSetting() {
-            WindowBase from = this.getRoot().getFirstWindow();
-            if ((from != null) && (this.window != null) && (from != this.window)) {
-                boolean hoverAware = from.opaqueItem.getSelection();
-                int alhpa = ALPHA_VALUES[from.opacityIndex];
-                this.window.opaqueChanged(hoverAware);
-                this.window.opacityChanged(from.opacityIndex);
-                this.window.shell.setAlpha(alhpa);
-                if (this.animation != null) {
-                    this.animation.setHoverAware(hoverAware);
-                    this.animation.setAlpha(alhpa);
+            this.dbgprint("transferMasterSetting()");
+            if (this.window != null) {
+                WindowTreeNode root = this.getRoot();
+                WindowBase from = root.getFirstWindow();
+                if ((from != null) && (from != this.window)) {
+                    boolean hoverAware = from.opaqueItem.getSelection();
+                    this.window.opaqueChanged(hoverAware);
+                    this.window.opacityChanged(from.opacityIndex);
+                    this.dbgprint("this.window.shell.setAlpha(alhpa);");
+                    if (root.animation != null) {
+                        this.window.shell.setAlpha(root.animation.getCurrentAlpha());
+                    }
+                    else {
+                        int alhpa = ALPHA_VALUES[from.opacityIndex];
+                        this.window.shell.setAlpha(alhpa);
+                    }
+                    if (this.animation != null) {
+                        this.animation.setEnabled(false);
+                    }
                 }
             }
         }
@@ -175,24 +220,12 @@ public class WindowBase {
 
         @Override
         public void setAlpha(int newAlpha) {
+            this.dbgprint("setAlpha(" + newAlpha + ")");
             if (this.window != null) {
                 this.window.shell.setAlpha(newAlpha);
             }
             for (WindowTreeNode child : this.childs) {
                 child.setAlpha(newAlpha);
-            }
-        }
-
-        private static interface EventProc {
-            void proc(WindowBase window);
-        }
-
-        private void routeEvent(EventProc proc) {
-            if (this.window != null)
-                proc.proc(this.window);
-
-            for (WindowTreeNode node : this.childs) {
-                node.routeEvent(proc);
             }
         }
 
@@ -221,6 +254,11 @@ public class WindowBase {
                     window.opacityChanged(index);
                 }
             });
+        }
+
+        private void dbgprint(String text) {
+            //String wid = (this.window != null) ? this.window.getWindowId() : "null";
+            //System.out.println("[" + wid + "] " + text);
         }
     }
 
@@ -269,6 +307,18 @@ public class WindowBase {
      * @param display shellの引数
      * @param style shellの引数
      */
+    protected void createContents(Shell shell, int style, boolean menuCascade) {
+        if (this.shell == null) {
+            this.shell = new Shell(shell, style);
+            this.createContents(menuCascade);
+        }
+    }
+
+    /**
+     *　shellを作成。open()などから呼び出す
+     * @param display shellの引数
+     * @param style shellの引数
+     */
     protected void createContents(WindowBase parent, int style, boolean menuCascade) {
         if (this.shell == null) {
             this.parent = parent;
@@ -288,6 +338,11 @@ public class WindowBase {
             public void handleEvent(Event event) {
                 // setMenuされたメニューしかdisposeされないので
                 WindowBase.this.alphamenu.dispose();
+                // アニメーションをオフ
+                WindowBase.this.treeNode.setEnabled(false);
+                // ツリーから切り離す
+                WindowBase.this.shareOpacitySetting = false;
+                WindowBase.this.updateTreeNodeState();
             }
         });
         if (this.menuItem != null) {
@@ -410,14 +465,20 @@ public class WindowBase {
         }
 
         // 初期状態を設定
+        if (this.parent != null) {
+            this.shareOpacitySetting = true;
+        }
         if (this.config != null) {
             this.restoreSetting();
         }
         this.opacity[this.opacityIndex].setSelection(true);
         this.shareOpacityItem.setSelection(this.shareOpacitySetting);
 
+        this.dbgprint("before setEnabled(true) alpha=" + this.shell.getAlpha());
+        this.dbgprint("after setEnabled(true) alpha=" + this.shell.getAlpha());
         this.updateTreeNodeState();
         this.treeNode.setEnabled(true);
+        this.dbgprint("after updateTreeNodeState() alpha=" + this.shell.getAlpha());
     }
 
     private boolean restoreSetting() {
@@ -453,8 +514,14 @@ public class WindowBase {
      */
     public void restore() {
         this.getWindowConfig();
-        if (this.restoreSetting()) {
-            this.updateTreeNodeState();
+        if (this.shell != null) {
+            this.dbgprint("disable");
+            this.treeNode.setEnabled(false);
+            if (this.restoreSetting()) {
+                this.updateTreeNodeState();
+            }
+            this.dbgprint("enable");
+            this.treeNode.setEnabled(true);
         }
         if (this.config.isOpened()) {
             this.open();
@@ -482,6 +549,7 @@ public class WindowBase {
             if (this.menuItem != null) {
                 this.menuItem.setSelection(visible);
             }
+            this.dbgprint("setVisible alpha=" + this.shell.getAlpha());
             this.shell.setVisible(visible);
         }
     }
@@ -526,38 +594,44 @@ public class WindowBase {
 
     /**
      * 画面からはみ出している場合画面内に戻す
+     * 子ウィンドウがある場合は子も戻す
      */
     public void moveIntoDisplay() {
-        if (this.shell.getVisible()) {
-            Rectangle displayRect = this.shell.getDisplay().getClientArea();
-            // ディスプレイサイズより大きい時は小さくする
-            Rectangle windowRect = this.shell.getBounds();
-            if (displayRect.width < windowRect.width) {
-                windowRect.width = displayRect.width;
+        this.treeNode.routeEvent(new EventProc() {
+            @Override
+            public void proc(WindowBase window) {
+                if (window.shell.getVisible()) {
+                    Rectangle displayRect = window.shell.getDisplay().getClientArea();
+                    // ディスプレイサイズより大きい時は小さくする
+                    Rectangle windowRect = window.shell.getBounds();
+                    if (displayRect.width < windowRect.width) {
+                        windowRect.width = displayRect.width;
+                    }
+                    if (displayRect.height < windowRect.height) {
+                        windowRect.height = displayRect.height;
+                    }
+                    // 左から出ている？
+                    if (windowRect.x < displayRect.x) {
+                        windowRect.x = displayRect.x;
+                    }
+                    // 上から出ている？
+                    if (windowRect.y < displayRect.y) {
+                        windowRect.y = displayRect.y;
+                    }
+                    // 右から出ている？
+                    if ((windowRect.x + windowRect.width) > (displayRect.width + displayRect.x)) {
+                        windowRect.x = (displayRect.width + displayRect.x) - windowRect.width;
+                    }
+                    // 下から出ている？
+                    if ((windowRect.y + windowRect.height) > (displayRect.height + displayRect.y)) {
+                        windowRect.y = (displayRect.height + displayRect.y) - windowRect.height;
+                    }
+                    if (!windowRect.equals(window.shell.getBounds())) {
+                        window.shell.setBounds(windowRect);
+                    }
+                }
             }
-            if (displayRect.height < windowRect.height) {
-                windowRect.height = displayRect.height;
-            }
-            // 左から出ている？
-            if (windowRect.x < displayRect.x) {
-                windowRect.x = displayRect.x;
-            }
-            // 上から出ている？
-            if (windowRect.y < displayRect.y) {
-                windowRect.y = displayRect.y;
-            }
-            // 右から出ている？
-            if ((windowRect.x + windowRect.width) > (displayRect.width + displayRect.x)) {
-                windowRect.x = (displayRect.width + displayRect.x) - windowRect.width;
-            }
-            // 下から出ている？
-            if ((windowRect.y + windowRect.height) > (displayRect.height + displayRect.y)) {
-                windowRect.y = (displayRect.height + displayRect.y) - windowRect.height;
-            }
-            if (!windowRect.equals(this.shell.getBounds())) {
-                this.shell.setBounds(windowRect);
-            }
-        }
+        });
     }
 
     public WindowConfigBean getWindowConfig() {
@@ -567,6 +641,7 @@ public class WindowBase {
                 this.config = new WindowConfigBean();
                 if (this.parent != null) {
                     this.config.setShareOpacitySetting(true);
+                    this.dbgprint("this.config.setShareOpacitySetting(true);");
                 }
             }
         }
@@ -609,5 +684,9 @@ public class WindowBase {
      */
     protected void setWindowInitialized(boolean windowInitialized) {
         this.windowInitialized = windowInitialized;
+    }
+
+    private void dbgprint(String text) {
+        //System.out.println("[" + this.getWindowId() + "] " + text);
     }
 }

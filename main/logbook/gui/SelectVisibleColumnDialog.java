@@ -4,7 +4,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
@@ -14,7 +13,7 @@ import org.eclipse.swt.widgets.TreeItem;
  * テーブルの列を表示・非表示選択するダイアログ
  *
  */
-public final class SelectVisibleColumnDialog extends Dialog {
+public final class SelectVisibleColumnDialog extends WindowBase {
 
     /** 親ダイアログ */
     private final AbstractTableDialog dialog;
@@ -27,19 +26,21 @@ public final class SelectVisibleColumnDialog extends Dialog {
      * @param parent 親シェル
      * @param dialog 親ダイアログ
      */
-    public SelectVisibleColumnDialog(Shell parent, AbstractTableDialog dialog) {
-        super(parent, SWT.NONE);
+    public SelectVisibleColumnDialog(AbstractTableDialog dialog) {
+        super.createContents(dialog, SWT.SHELL_TRIM | SWT.PRIMARY_MODAL, false);
         this.dialog = dialog;
     }
 
     /**
      * Open the dialog.
      */
+    @Override
     public void open() {
         this.createContents();
+        this.registerEvents();
         this.shell.open();
         this.shell.layout();
-        Display display = this.getParent().getDisplay();
+        Display display = this.shell.getDisplay();
         while (!this.shell.isDisposed()) {
             if (!display.readAndDispatch()) {
                 display.sleep();
@@ -51,7 +52,7 @@ public final class SelectVisibleColumnDialog extends Dialog {
      * Create contents of the dialog.
      */
     private void createContents() {
-        this.shell = new Shell(this.getParent(), SWT.SHELL_TRIM | SWT.PRIMARY_MODAL);
+        this.shell = this.getShell();
         this.shell.setSize(300, 275);
         this.shell.setText("列の表示非表示");
         this.shell.setLayout(new FillLayout(SWT.HORIZONTAL));

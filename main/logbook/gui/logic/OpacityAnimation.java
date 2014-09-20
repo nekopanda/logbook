@@ -1,7 +1,7 @@
 /**
  * 
  */
-package logbook.gui;
+package logbook.gui.logic;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -135,8 +135,10 @@ public class OpacityAnimation {
     public void setAlpha(int newAlpah) {
         if (this.baseAlpha != newAlpah) {
             this.baseAlpha = newAlpah;
-            this.nowAnimating = true;
-            server.startAnimation();
+            if (this.enabled) {
+                this.nowAnimating = true;
+                server.startAnimation();
+            }
         }
     }
 
@@ -144,13 +146,19 @@ public class OpacityAnimation {
         return this.baseAlpha;
     }
 
+    public int getCurrentAlpha() {
+        return this.currentAlpha;
+    }
+
     /** マウスに対応するかを設定する */
     public void setHoverAware(boolean aware) {
         if (this.mouseHoverAware != aware) {
             this.mouseHoverAware = aware;
-            this.nowAnimating = true;
-            //System.out.println("mouse hover -> " + aware);
-            server.startAnimation();
+            if (this.enabled) {
+                this.nowAnimating = true;
+                //System.out.println("mouse hover -> " + aware);
+                server.startAnimation();
+            }
         }
     }
 
@@ -216,6 +224,9 @@ public class OpacityAnimation {
             }
             //System.out.println("Alpha=" + this.currentAlpha);
             this.client.setAlpha(this.currentAlpha);
+        }
+        if (continueAnimation == false) {
+            this.activated = false;
         }
         this.nowAnimating = continueAnimation;
     }

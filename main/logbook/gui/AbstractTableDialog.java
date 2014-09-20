@@ -606,7 +606,7 @@ public abstract class AbstractTableDialog extends WindowBase {
     protected class SelectVisibleColumnAdapter extends SelectionAdapter {
         @Override
         public void widgetSelected(SelectionEvent e) {
-            new SelectVisibleColumnDialog(AbstractTableDialog.this.shell, AbstractTableDialog.this).open();
+            new SelectVisibleColumnDialog(AbstractTableDialog.this).open();
         }
     }
 

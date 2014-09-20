@@ -1,7 +1,7 @@
 /**
  * 
  */
-package logbook.gui;
+package logbook.gui.logic;
 
 /**
  * @author Nekopanda

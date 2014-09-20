@@ -245,7 +245,6 @@ public final class ApplicationMain extends WindowBase {
         super.createContents(display, shellStyle | SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
         this.shell = this.getShell();
         this.shell.setText(AppConstants.TITLEBAR_TEXT);
-        this.shell.setAlpha(AppConfig.get().getAlpha());
         GridLayout glShell = new GridLayout(1, false);
         glShell.horizontalSpacing = 1;
         glShell.marginTop = 0;
@@ -431,12 +430,12 @@ public final class ApplicationMain extends WindowBase {
         // その他-バージョン情報
         MenuItem version = new MenuItem(etcmenu, SWT.NONE);
         version.setText("バージョン情報(&A)");
-        version.addSelectionListener(new HelpEventListener(this.shell));
+        version.addSelectionListener(new HelpEventListener(this));
 
         // シェルイベント
         this.shell.addShellListener(new MainShellAdapter());
         // キーが押された時に呼ばれるリスナーを追加します
-        this.shell.addHelpListener(new HelpEventListener(this.shell));
+        this.shell.addHelpListener(new HelpEventListener(this));
 
         this.trayItem = this.addTrayItem(display);
 
@@ -720,6 +719,7 @@ public final class ApplicationMain extends WindowBase {
 
     private WindowBase[] getWindowList() {
         return new WindowBase[] {
+                this.captureWindow,
                 this.dropReportWindow,
                 this.createShipReportWindow,
                 this.createItemReportWindow,
