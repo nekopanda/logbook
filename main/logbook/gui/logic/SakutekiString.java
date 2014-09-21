@@ -49,15 +49,15 @@ public class SakutekiString implements Comparable<SakutekiString> {
             ItemDto item = items.get(i);
             if (item != null) {
                 // 装備の索敵値
-                this.slotSakuteki += item.getSaku();
+                this.slotSakuteki += item.getParam().getSaku();
                 if (item.getType1() == 0) { // 取得できていない
                     this.sakutekiFailed = true;
                 }
                 if ((item.getType1() == 7) && (onslot[i] > 0)) { // 7: 偵察機 (搭載数>0の場合のみ)
-                    this.teisatsuSakuteki += item.getSaku();
+                    this.teisatsuSakuteki += item.getParam().getSaku();
                 }
                 if (item.getType1() == 8) { // 8: 電探
-                    this.dentanSakuteki += item.getSaku();
+                    this.dentanSakuteki += item.getParam().getSaku();
                 }
             }
         }

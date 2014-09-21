@@ -3,7 +3,6 @@
  */
 package logbook.dto;
 
-import logbook.internal.Ship;
 import logbook.proto.Tag;
 
 /**
@@ -11,10 +10,6 @@ import logbook.proto.Tag;
  *
  */
 public class EnemyShipDto extends ShipBaseDto {
-
-    /** 装備 */
-    @Tag(20)
-    private final int[] slot;
 
     /** 火力 */
     @Tag(22)
@@ -32,24 +27,44 @@ public class EnemyShipDto extends ShipBaseDto {
     @Tag(28)
     private final int soukou;
 
-    //
-
     public EnemyShipDto(int shipId, int[] slot, int[] param) {
-        super(Ship.get(String.valueOf(shipId)));
-        this.slot = slot;
+        super(shipId, slot);
         this.karyoku = param[0];
         this.raisou = param[0];
         this.taiku = param[0];
         this.soukou = param[0];
-
-        // 上記４つ以外のパラメータはマスターデータと装備から計算
     }
 
     /**
-     * @return 装備ID
+     * @return 火力
      */
     @Override
-    public int[] getItemId() {
-        return this.slot;
+    public int getKaryoku() {
+        return this.karyoku;
     }
+
+    /**
+     * @return 雷装
+     */
+    @Override
+    public int getRaisou() {
+        return this.raisou;
+    }
+
+    /**
+     * @return 対空
+     */
+    @Override
+    public int getTaiku() {
+        return this.taiku;
+    }
+
+    /**
+     * @return 装甲
+     */
+    @Override
+    public int getSoukou() {
+        return this.soukou;
+    }
+
 }

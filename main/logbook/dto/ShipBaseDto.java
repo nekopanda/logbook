@@ -15,6 +15,7 @@ import logbook.data.context.GlobalContext;
 import logbook.internal.MasterData;
 import logbook.internal.Ship;
 import logbook.proto.Tag;
+import logbook.util.JsonUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -24,8 +25,20 @@ import org.apache.commons.lang3.StringUtils;
  */
 public abstract class ShipBaseDto extends AbstractDto {
 
-    @Tag(40)
+    @Tag(1)
     private final ShipInfoDto shipInfo;
+
+    /** 装備 */
+    @Tag(2)
+    private final int[] slot;
+
+    /** 装備込のパラメータ */
+    @Tag(3)
+    private final ShipParameters param;
+
+    /** 装備による上昇分 */
+    @Tag(4)
+    private final ShipParameters slotParam;
 
     /**
      * コンストラクター
@@ -36,10 +49,19 @@ public abstract class ShipBaseDto extends AbstractDto {
         int shipId = object.getJsonNumber("api_ship_id").intValue();
         ShipInfoDto shipinfo = Ship.get(String.valueOf(shipId));
         this.shipInfo = shipinfo;
+        this.slot = JsonUtils.getIntArray(object, "api_slot");
+        ShipParameters[] params = ShipParameters.fromShip(object);
+        this.param = params[0];
+        this.slotParam = params[1];
     }
 
-    public ShipBaseDto(ShipInfoDto shipInfo) {
-        this.shipInfo = shipInfo;
+    public ShipBaseDto(int shipId, int[] slot) {
+        this.shipInfo = Ship.get(String.valueOf(shipId));
+        this.slot = slot;
+        ShipParameters[] params = ShipParameters.fromBaseAndSlotItem(
+                this.shipInfo.getParam(), this.getItem());
+        this.param = params[0];
+        this.slotParam = params[1];
     }
 
     /**
@@ -111,7 +133,17 @@ public abstract class ShipBaseDto extends AbstractDto {
         return this.shipInfo.getMaxFuel();
     }
 
+    /**
+     * @return 現在の艦載機搭載数
+     */
     public int[] getOnSlot() {
+        return this.shipInfo.getMaxeq();
+    }
+
+    /**
+     * @return 艦載機最大搭載数
+     */
+    public int[] getMaxeq() {
         return this.shipInfo.getMaxeq();
     }
 
@@ -137,6 +169,13 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * @return 装備ID
+     */
+    public int[] getItemId() {
+        return this.slot;
+    }
+
+    /**
      * @return 装備
      */
     public List<ItemDto> getItem() {
@@ -157,8 +196,6 @@ public abstract class ShipBaseDto extends AbstractDto {
         return items;
     }
 
-    public abstract int[] getItemId();
-
     /**
      * @return 制空値
      */
@@ -173,7 +210,7 @@ public abstract class ShipBaseDto extends AbstractDto {
                         || (item.getType3() == 8)
                         || ((item.getType3() == 10) && (item.getType2() == 11))) {
                     //6:艦上戦闘機,7:艦上爆撃機,8:艦上攻撃機,10:水上偵察機(ただし瑞雲のみ)の場合は制空値を計算する
-                    seiku += (int) Math.floor(item.getTyku() * Math.sqrt(this.getOnSlot()[i]));
+                    seiku += (int) Math.floor(item.getParam().getTyku() * Math.sqrt(this.getOnSlot()[i]));
                 }
             }
         }
@@ -190,7 +227,7 @@ public abstract class ShipBaseDto extends AbstractDto {
         for (int i = 0; i < 4; i++) {
             ItemDto item = items.get(i);
             if (item != null) {
-                sakuteki += item.getSaku();
+                sakuteki += item.getParam().getSaku();
             }
         }
         return sakuteki;
@@ -222,111 +259,132 @@ public abstract class ShipBaseDto extends AbstractDto {
      * @return 火力
      */
     public int getKaryoku() {
-        return this.shipInfo.getHoug();
+        return this.getParam().getHoug();
     }
 
     /**
      * @return 火力(最大)
      */
     public int getKaryokuMax() {
-        return this.shipInfo.getHougMax();
+        return this.getMax().getHoug();
     }
 
     /**
      * @return 雷装
      */
     public int getRaisou() {
-        return this.shipInfo.getRaig();
+        return this.getParam().getRaig();
     }
 
     /**
      * @return 雷装(最大)
      */
     public int getRaisouMax() {
-        return this.shipInfo.getRaigMax();
+        return this.getMax().getRaig();
     }
 
     /**
      * @return 対空
      */
     public int getTaiku() {
-        return this.shipInfo.getTyku();
+        return this.getParam().getTyku();
     }
 
     /**
      * @return 対空(最大)
      */
     public int getTaikuMax() {
-        return this.shipInfo.getTykuMax();
+        return this.getMax().getTyku();
     }
 
     /**
      * @return 装甲
      */
     public int getSoukou() {
-        return this.shipInfo.getSouk();
+        return this.getParam().getSouk();
     }
 
     /**
      * @return 装甲(最大)
      */
     public int getSoukouMax() {
-        return this.shipInfo.getSoukMax();
+        return this.getMax().getSouk();
     }
 
     /**
      * @return 回避
      */
     public int getKaihi() {
-        return this.shipInfo.getKaih();
+        return this.getParam().getKaih();
     }
 
     /**
      * @return 回避(最大)
      */
     public int getKaihiMax() {
-        return this.shipInfo.getKaihMax();
+        return this.getMax().getKaih();
     }
 
     /**
      * @return 対潜
      */
     public int getTaisen() {
-        return this.shipInfo.getTais();
+        return this.getParam().getTais();
     }
 
     /**
      * @return 対潜(最大)
      */
     public int getTaisenMax() {
-        return this.shipInfo.getTaisMax();
+        return this.getMax().getTais();
     }
 
     /**
      * @return 索敵
      */
     public int getSakuteki() {
-        return this.shipInfo.getSaku();
+        return this.getParam().getSaku();
     }
 
     /**
      * @return 索敵(最大)
      */
     public int getSakutekiMax() {
-        return this.shipInfo.getSakuMax();
+        return this.getMax().getSaku();
     }
 
     /**
      * @return 運
      */
     public int getLucky() {
-        return this.shipInfo.getLuck();
+        return this.getParam().getLuck();
     }
 
     /**
      * @return 運(最大)
      */
     public int getLuckyMax() {
-        return this.shipInfo.getLuckMax();
+        return this.getMax().getLuck();
+    }
+
+    /**
+     * @return 装備込のパラメータ
+     */
+    public ShipParameters getParam() {
+        return this.param;
+    }
+
+    /**
+     * @return 装備による上昇分
+     */
+    public ShipParameters getSlotParam() {
+        return this.slotParam;
+    }
+
+    /**
+     * @return この艦の最大パラメータ（装備なしで）
+     */
+    public ShipParameters getMax() {
+        return this.shipInfo.getMax();
     }
 }

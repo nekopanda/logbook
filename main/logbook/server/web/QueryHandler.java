@@ -34,6 +34,7 @@ import logbook.dto.PracticeUserDto;
 import logbook.dto.QuestDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
+import logbook.dto.ShipParameters;
 import logbook.internal.Item;
 import logbook.internal.MasterData;
 import logbook.internal.MasterData.MapAreaDto;
@@ -205,27 +206,18 @@ public class QueryHandler extends HttpServlet {
     private static JsonObjectBuilder shipToJson(ShipDto ship) {
         JsonArrayBuilder slot_array = Json.createArrayBuilder();
         JsonArrayBuilder onSlot_array = Json.createArrayBuilder();
-        for (int item_number : ship.getRawSlot()) {
+        for (int item_number : ship.getItemId()) {
             slot_array.add(item_number);
         }
         for (int item_number : ship.getOnSlot()) {
             onSlot_array.add(item_number);
         }
 
-        // 成長の余地
-        int karyoku = ship.getKaryokuMax() - ship.getKaryoku();
-        int raisou = ship.getRaisouMax() - ship.getRaisou();
-        int taiku = ship.getTaikuMax() - ship.getTaiku();
-        int souko = ship.getSoukouMax() - ship.getSoukou();
-        int lucky = ship.getLuckyMax() - ship.getLucky();
-        for (ItemDto item : ship.getItem()) {
-            if (item != null) {
-                karyoku += item.getHoug();
-                raisou += item.getRaig();
-                taiku += item.getTyku();
-                lucky += item.getLuck();
-            }
-        }
+        // 成長の余地 = (装備なしのMAX) + (装備による上昇分) - (装備込の現在値)
+        ShipParameters space = new ShipParameters();
+        space.add(ship.getMax());
+        space.add(ship.getSlotParam());
+        space.subtract(ship.getParam());
 
         JsonArrayBuilder status_array = Json.createArrayBuilder();
         JsonArrayBuilder statusSpace_array = Json.createArrayBuilder();
@@ -233,12 +225,12 @@ public class QueryHandler extends HttpServlet {
         status_array.add(ship.getRaisou()); // 雷装
         status_array.add(ship.getTaiku()); // 対空
         status_array.add(ship.getSoukou()); // 装甲
-        status_array.add(ship.getLucky()); // 運
-        statusSpace_array.add(karyoku); // 火力
-        statusSpace_array.add(raisou); // 雷装
-        statusSpace_array.add(taiku); // 対空
-        statusSpace_array.add(souko); // 装甲
-        statusSpace_array.add(lucky); // 運
+        status_array.add(ship.getLucky()); // 運;
+        statusSpace_array.add(space.getKaryoku()); // 火力
+        statusSpace_array.add(space.getRaisou()); // 雷装
+        statusSpace_array.add(space.getTaiku()); // 対空
+        statusSpace_array.add(space.getSoukou()); // 装甲
+        statusSpace_array.add(space.getLucky()); // 運
 
         return Json.createObjectBuilder()
                 .add("id", ship.getId())

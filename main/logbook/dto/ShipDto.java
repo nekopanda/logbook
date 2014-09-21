@@ -3,7 +3,6 @@ package logbook.dto;
 import java.util.Calendar;
 import java.util.Date;
 
-import javax.json.JsonNumber;
 import javax.json.JsonObject;
 
 import logbook.constants.AppConstants;
@@ -26,140 +25,74 @@ public final class ShipDto extends ShipBaseDto {
     private final Calendar condClearTime = Calendar.getInstance();
 
     /** 艦娘個人を識別するID */
-    @Tag(1)
+    @Tag(10)
     private final int id;
 
     /** キャラクタ識別ID（その艦の最終形の艦ID） */
-    @Tag(2)
+    @Tag(11)
     private final int charId;
 
+    @Tag(12)
     private final int sortno;
 
     /** 鍵付き */
-    @Tag(3)
+    @Tag(13)
     private final boolean locked;
 
     /** 艦隊ID */
-    @Tag(4)
+    @Tag(14)
     private String fleetid = "";
 
+    @Tag(15)
     private int fleetpos;
 
     /** Lv */
-    @Tag(7)
+    @Tag(16)
     private final int lv;
 
     /** 疲労 */
-    @Tag(8)
+    @Tag(17)
     private final int cond;
 
     /** 入渠時間 */
-    @Tag(9)
+    @Tag(18)
     private final long docktime;
 
     /** 修復資材 燃料 */
-    @Tag(10)
+    @Tag(19)
     private final int dockfuel;
 
     /** 修復資材 鋼材 */
-    @Tag(11)
+    @Tag(20)
     private final int dockmetal;
 
     /** 残弾 */
-    @Tag(12)
+    @Tag(21)
     private int bull;
 
     /** 残燃料 */
-    @Tag(14)
+    @Tag(22)
     private int fuel;
 
     /** 経験値 */
-    @Tag(16)
+    @Tag(23)
     private final int exp;
 
     /** HP */
-    @Tag(17)
+    @Tag(24)
     private int nowhp;
 
     /** MaxHP */
-    @Tag(18)
+    @Tag(25)
     private final int maxhp;
 
     /** 搭載可能装備数 */
-    @Tag(19)
+    @Tag(26)
     private final int slotnum;
 
-    /** 装備 */
-    @Tag(20)
-    private final int[] slot;
-
     /** 艦載機の搭載数 */
-    @Tag(21)
-    private final int[] onslot;
-
-    /** 火力 */
-    @Tag(22)
-    private final int karyoku;
-
-    /** 火力(最大) */
-    @Tag(23)
-    private final int karyokuMax;
-
-    /** 雷装 */
-    @Tag(24)
-    private final int raisou;
-
-    /** 雷装(最大) */
-    @Tag(25)
-    private final int raisouMax;
-
-    /** 対空 */
-    @Tag(26)
-    private final int taiku;
-
-    /** 対空(最大) */
     @Tag(27)
-    private final int taikuMax;
-
-    /** 装甲 */
-    @Tag(28)
-    private final int soukou;
-
-    /** 装甲(最大) */
-    @Tag(29)
-    private final int soukouMax;
-
-    /** 回避 */
-    @Tag(30)
-    private final int kaihi;
-
-    /** 回避(最大) */
-    @Tag(31)
-    private final int kaihiMax;
-
-    /** 対潜 */
-    @Tag(32)
-    private final int taisen;
-
-    /** 対潜(最大) */
-    @Tag(33)
-    private final int taisenMax;
-
-    /** 索敵 */
-    @Tag(34)
-    private final int sakuteki;
-
-    /** 索敵(最大) */
-    @Tag(35)
-    private final int sakutekiMax;
-
-    /** 運 */
-    @Tag(36)
-    private final int lucky;
-
-    /** 運(最大) */
-    @Tag(37)
-    private final int luckyMax;
+    private final int[] onslot;
 
     /** */
     private final int lockedEquip;
@@ -195,27 +128,10 @@ public final class ShipDto extends ShipBaseDto {
         this.fuel = object.getJsonNumber("api_fuel").intValue();
 
         this.exp = object.getJsonArray("api_exp").getJsonNumber(0).intValue();
-        this.nowhp = object.getJsonNumber("api_nowhp").intValue();
-        this.maxhp = object.getJsonNumber("api_maxhp").intValue();
+        this.nowhp = this.getParam().getHP();
+        this.maxhp = this.getMax().getHP();
         this.slotnum = object.getJsonNumber("api_slotnum").intValue();
-        this.slot = JsonUtils.getIntArray(object, "api_slot");
         this.onslot = JsonUtils.getIntArray(object, "api_onslot");
-        this.karyoku = ((JsonNumber) object.getJsonArray("api_karyoku").get(0)).intValue();
-        this.karyokuMax = ((JsonNumber) object.getJsonArray("api_karyoku").get(1)).intValue();
-        this.raisou = ((JsonNumber) object.getJsonArray("api_raisou").get(0)).intValue();
-        this.raisouMax = ((JsonNumber) object.getJsonArray("api_raisou").get(1)).intValue();
-        this.taiku = ((JsonNumber) object.getJsonArray("api_taiku").get(0)).intValue();
-        this.taikuMax = ((JsonNumber) object.getJsonArray("api_taiku").get(1)).intValue();
-        this.soukou = ((JsonNumber) object.getJsonArray("api_soukou").get(0)).intValue();
-        this.soukouMax = ((JsonNumber) object.getJsonArray("api_soukou").get(1)).intValue();
-        this.kaihi = ((JsonNumber) object.getJsonArray("api_kaihi").get(0)).intValue();
-        this.kaihiMax = ((JsonNumber) object.getJsonArray("api_kaihi").get(1)).intValue();
-        this.taisen = ((JsonNumber) object.getJsonArray("api_taisen").get(0)).intValue();
-        this.taisenMax = ((JsonNumber) object.getJsonArray("api_taisen").get(1)).intValue();
-        this.sakuteki = ((JsonNumber) object.getJsonArray("api_sakuteki").get(0)).intValue();
-        this.sakutekiMax = ((JsonNumber) object.getJsonArray("api_sakuteki").get(1)).intValue();
-        this.lucky = ((JsonNumber) object.getJsonArray("api_lucky").get(0)).intValue();
-        this.luckyMax = ((JsonNumber) object.getJsonArray("api_lucky").get(1)).intValue();
         this.lockedEquip = object.getJsonNumber("api_locked_equip").intValue();
         // 疲労が抜ける時間を計算する
         if (this.cond < 49) {
@@ -242,13 +158,6 @@ public final class ShipDto extends ShipBaseDto {
         builder.setNowhp(this.nowhp);
         builder.setMaxhp(this.maxhp);
         builder.setSlotnum(this.slotnum);
-        if (this.slot != null) {
-            for (Integer b : this.slot) {
-                if (b != null) {
-                    builder.addSlot(b);
-                }
-            }
-        }
         if (this.onslot != null) {
             for (Integer b : this.onslot) {
                 if (b != null) {
@@ -256,22 +165,6 @@ public final class ShipDto extends ShipBaseDto {
                 }
             }
         }
-        builder.setKaryoku(this.karyoku);
-        builder.setKaryokuMax(this.karyokuMax);
-        builder.setRaisou(this.raisou);
-        builder.setRaisouMax(this.raisouMax);
-        builder.setTaiku(this.taiku);
-        builder.setTaikuMax(this.taikuMax);
-        builder.setSoukou(this.soukou);
-        builder.setSoukouMax(this.soukouMax);
-        builder.setKaihi(this.kaihi);
-        builder.setKaihiMax(this.kaihiMax);
-        builder.setTaisen(this.taisen);
-        builder.setTaisenMax(this.taisenMax);
-        builder.setSakuteki(this.sakuteki);
-        builder.setSakutekiMax(this.sakutekiMax);
-        builder.setLucky(this.lucky);
-        builder.setLuckyMax(this.luckyMax);
         if (this.getShipInfo() != null) {
             builder.setShipInfo(this.getShipInfo().toProto());
         }
@@ -343,6 +236,7 @@ public final class ShipDto extends ShipBaseDto {
     /**
      * @return Lv
      */
+    @Override
     public int getLv() {
         return this.lv;
     }
@@ -441,153 +335,16 @@ public final class ShipDto extends ShipBaseDto {
         return this.maxhp;
     }
 
-    public int[] getRawSlot() {
-        return this.slot;
-    }
-
     public int getSlotNum() {
         return this.slotnum;
     }
 
+    /**
+     * @return 現在の艦載機搭載数
+     */
     @Override
     public int[] getOnSlot() {
         return this.onslot;
-    }
-
-    /**
-     * @return 装備ID
-     */
-    @Override
-    public int[] getItemId() {
-        return this.slot;
-    }
-
-    /**
-     * @return 火力
-     */
-    @Override
-    public int getKaryoku() {
-        return this.karyoku;
-    }
-
-    /**
-     * @return 火力(最大)
-     */
-    @Override
-    public int getKaryokuMax() {
-        return this.karyokuMax;
-    }
-
-    /**
-     * @return 雷装
-     */
-    @Override
-    public int getRaisou() {
-        return this.raisou;
-    }
-
-    /**
-     * @return 雷装(最大)
-     */
-    @Override
-    public int getRaisouMax() {
-        return this.raisouMax;
-    }
-
-    /**
-     * @return 対空
-     */
-    @Override
-    public int getTaiku() {
-        return this.taiku;
-    }
-
-    /**
-     * @return 対空(最大)
-     */
-    @Override
-    public int getTaikuMax() {
-        return this.taikuMax;
-    }
-
-    /**
-     * @return 装甲
-     */
-    @Override
-    public int getSoukou() {
-        return this.soukou;
-    }
-
-    /**
-     * @return 装甲(最大)
-     */
-    @Override
-    public int getSoukouMax() {
-        return this.soukouMax;
-    }
-
-    /**
-     * @return 回避
-     */
-    @Override
-    public int getKaihi() {
-        return this.kaihi;
-    }
-
-    /**
-     * @return 回避(最大)
-     */
-    @Override
-    public int getKaihiMax() {
-        return this.kaihiMax;
-    }
-
-    /**
-     * @return 対潜
-     */
-    @Override
-    public int getTaisen() {
-        return this.taisen;
-    }
-
-    /**
-     * @return 対潜(最大)
-     */
-    @Override
-    public int getTaisenMax() {
-        return this.taisenMax;
-    }
-
-    /**
-     * @return 索敵
-     */
-    @Override
-    public int getSakuteki() {
-        return this.sakuteki;
-    }
-
-    /**
-     * @return 索敵(最大)
-     */
-    @Override
-    public int getSakutekiMax() {
-        return this.sakutekiMax;
-    }
-
-    /**
-     * @return 運
-     */
-    @Override
-    public int getLucky() {
-        return this.lucky;
-    }
-
-    /**
-     * @return 運(最大)
-     */
-    @Override
-    public int getLuckyMax() {
-        return this.luckyMax;
     }
 
     /**

@@ -40,6 +40,7 @@ import logbook.dto.ResourceItemDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipFilterDto;
 import logbook.dto.ShipInfoDto;
+import logbook.dto.ShipParameters;
 import logbook.dto.UseItemDto;
 import logbook.internal.BattleResultFilter;
 import logbook.internal.BattleResultServer;
@@ -339,10 +340,11 @@ public final class CreateReportLogic {
         int count = 0;
         for (Entry<ItemDto, Integer> entry : countitems) {
             ItemDto item = entry.getKey();
+            ShipParameters param = item.getParam();
             count++;
-            body.add(new Comparable[] { count, item.getName(), item.getTypeName(), entry.getValue(), item.getHoug(),
-                    item.getHoum(), item.getLeng(), item.getLuck(), item.getHouk(), item.getBaku(), item.getRaig(),
-                    item.getSaku(), item.getTais(), item.getTyku(), item.getSouk()
+            body.add(new Comparable[] { count, item.getName(), item.getTypeName(), entry.getValue(), param.getHoug(),
+                    param.getHoum(), param.getLeng(), param.getLuck(), param.getHouk(), param.getBaku(),
+                    param.getRaig(), param.getSaku(), param.getTais(), param.getTyku(), param.getSouk()
             });
         }
         return body;
@@ -439,53 +441,15 @@ public final class CreateReportLogic {
                 now = "入渠中";
             }
 
-            // 火力
-            int karyoku;
-            // 雷装
-            int raisou;
-            // 対空
-            int taiku;
-            // 装甲
-            int soukou;
-            // 回避
-            int kaihi;
-            // 対潜
-            int taisen;
-            // 索敵
-            int sakuteki;
-            // 運
-            int lucky;
-
+            ShipParameters param = new ShipParameters();
             if (specdiff) {
-                karyoku = ship.getKaryokuMax() - ship.getKaryoku();
-                raisou = ship.getRaisouMax() - ship.getRaisou();
-                taiku = ship.getTaikuMax() - ship.getTaiku();
-                soukou = ship.getSoukouMax() - ship.getSoukou();
-                kaihi = ship.getKaihiMax() - ship.getKaihi();
-                taisen = ship.getTaisenMax() - ship.getTaisen();
-                sakuteki = ship.getSakutekiMax() - ship.getSakuteki();
-                lucky = ship.getLuckyMax() - ship.getLucky();
-                for (ItemDto item : ship.getItem()) {
-                    if (item != null) {
-                        karyoku += item.getHoug();
-                        raisou += item.getRaig();
-                        taiku += item.getTyku();
-                        soukou += item.getSouk();
-                        taisen += item.getTais();
-                        sakuteki += item.getSaku();
-                        lucky += item.getLuck();
-                    }
-                }
+                // 成長の余地 = (装備なしのMAX) + (装備による上昇分) - (装備込の現在値)
+                param.add(ship.getMax());
+                param.add(ship.getSlotParam());
+                param.subtract(ship.getParam());
             }
             else {
-                karyoku = ship.getKaryoku();
-                raisou = ship.getRaisou();
-                taiku = ship.getTaiku();
-                soukou = ship.getSoukou();
-                kaihi = ship.getKaihi();
-                taisen = ship.getTaisen();
-                sakuteki = ship.getSakuteki();
-                lucky = ship.getLucky();
+                param.add(ship.getParam());
             }
 
             // HP1あたりの時間
@@ -557,14 +521,14 @@ public final class CreateReportLogic {
                     ship.getMaxhp(),
                     ship.getFuelMax(),
                     ship.getBullMax(),
-                    karyoku,
-                    raisou,
-                    taiku,
-                    soukou,
-                    kaihi,
-                    taisen,
-                    sakuteki,
-                    lucky
+                    param.getKaryoku(),
+                    param.getRaisou(),
+                    param.getTaiku(),
+                    param.getSoukou(),
+                    param.getKaihi(),
+                    param.getTaisen(),
+                    param.getSakuteki(),
+                    param.getLucky()
             });
         }
         return body;

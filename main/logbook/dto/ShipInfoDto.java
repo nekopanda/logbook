@@ -59,69 +59,13 @@ public final class ShipInfoDto extends AbstractDto {
     @Tag(11)
     private int[] maxeq = new int[5];
 
-    /** 火力 */
+    /** パラメータ */
     @Tag(12)
-    private int houg;
+    private ShipParameters param;
 
-    /** 火力(最大) */
+    /** パラメータMAX */
     @Tag(13)
-    private int hougMax;
-
-    /** 雷装 */
-    @Tag(14)
-    private int raig;
-
-    /** 雷装(最大) */
-    @Tag(15)
-    private int raigMax;
-
-    /** 対空 */
-    @Tag(16)
-    private int tyku;
-
-    /** 対空(最大) */
-    @Tag(17)
-    private int tykuMax;
-
-    /** 装甲 */
-    @Tag(18)
-    private int souk;
-
-    /** 装甲(最大) */
-    @Tag(19)
-    private int soukMax;
-
-    /** 回避 */
-    @Tag(20)
-    private int kaih;
-
-    /** 回避(最大) */
-    @Tag(21)
-    private int kaihMax;
-
-    /** 対潜 */
-    @Tag(22)
-    private int tais;
-
-    /** 対潜(最大) */
-    @Tag(23)
-    private int taisMax;
-
-    /** 索敵 */
-    @Tag(24)
-    private int saku;
-
-    /** 索敵(最大) */
-    @Tag(25)
-    private int sakuMax;
-
-    /** 運 */
-    @Tag(26)
-    private int luck;
-
-    /** 運(最大) */
-    @Tag(27)
-    private int luckMax;
+    private ShipParameters max;
 
     /**
      * コンストラクター
@@ -164,22 +108,10 @@ public final class ShipInfoDto extends AbstractDto {
         }
         this.powup = JsonUtils.getIntArray(object, "api_powup");
         this.maxeq = JsonUtils.getIntArray(object, "api_maxeq");
-        this.houg = object.getJsonArray("api_houg").getInt(0);
-        this.hougMax = object.getJsonArray("api_houg").getInt(1);
-        this.raig = object.getJsonArray("api_raig").getInt(0);
-        this.raigMax = object.getJsonArray("api_raig").getInt(1);
-        this.tyku = object.getJsonArray("api_tyku").getInt(0);
-        this.tykuMax = object.getJsonArray("api_tyku").getInt(1);
-        this.souk = object.getJsonArray("api_souk").getInt(0);
-        this.soukMax = object.getJsonArray("api_souk").getInt(1);
-        this.kaih = object.getJsonArray("api_kaih").getInt(0);
-        this.kaihMax = object.getJsonArray("api_kaih").getInt(1);
-        this.tais = object.getJsonArray("api_tais").getInt(0);
-        this.taisMax = object.getJsonArray("api_tais").getInt(1);
-        this.saku = object.getJsonArray("api_saku").getInt(0);
-        this.sakuMax = object.getJsonArray("api_saku").getInt(1);
-        this.luck = object.getJsonArray("api_luck").getInt(0);
-        this.luckMax = object.getJsonArray("api_luck").getInt(1);
+
+        ShipParameters[] params = ShipParameters.fromMasterShip(object);
+        this.param = params[0];
+        this.max = params[1];
     }
 
     public ShipInfoDtoPb toProto() {
@@ -385,226 +317,30 @@ public final class ShipInfoDto extends AbstractDto {
     }
 
     /**
-     * @return houg
+     * @return param
      */
-    public int getHoug() {
-        return this.houg;
+    public ShipParameters getParam() {
+        return this.param;
     }
 
     /**
-     * @param houg セットする houg
+     * @param param セットする param
      */
-    public void setHoug(int houg) {
-        this.houg = houg;
+    public void setParam(ShipParameters param) {
+        this.param = param;
     }
 
     /**
-     * @return hougMax
+     * @return max
      */
-    public int getHougMax() {
-        return this.hougMax;
+    public ShipParameters getMax() {
+        return this.max;
     }
 
     /**
-     * @param hougMax セットする hougMax
+     * @param max セットする max
      */
-    public void setHougMax(int hougMax) {
-        this.hougMax = hougMax;
-    }
-
-    /**
-     * @return raig
-     */
-    public int getRaig() {
-        return this.raig;
-    }
-
-    /**
-     * @param raig セットする raig
-     */
-    public void setRaig(int raig) {
-        this.raig = raig;
-    }
-
-    /**
-     * @return raigMax
-     */
-    public int getRaigMax() {
-        return this.raigMax;
-    }
-
-    /**
-     * @param raigMax セットする raigMax
-     */
-    public void setRaigMax(int raigMax) {
-        this.raigMax = raigMax;
-    }
-
-    /**
-     * @return tyku
-     */
-    public int getTyku() {
-        return this.tyku;
-    }
-
-    /**
-     * @param tyku セットする tyku
-     */
-    public void setTyku(int tyku) {
-        this.tyku = tyku;
-    }
-
-    /**
-     * @return tykuMax
-     */
-    public int getTykuMax() {
-        return this.tykuMax;
-    }
-
-    /**
-     * @param tykuMax セットする tykuMax
-     */
-    public void setTykuMax(int tykuMax) {
-        this.tykuMax = tykuMax;
-    }
-
-    /**
-     * @return souk
-     */
-    public int getSouk() {
-        return this.souk;
-    }
-
-    /**
-     * @param souk セットする souk
-     */
-    public void setSouk(int souk) {
-        this.souk = souk;
-    }
-
-    /**
-     * @return soukMax
-     */
-    public int getSoukMax() {
-        return this.soukMax;
-    }
-
-    /**
-     * @param soukMax セットする soukMax
-     */
-    public void setSoukMax(int soukMax) {
-        this.soukMax = soukMax;
-    }
-
-    /**
-     * @return kaih
-     */
-    public int getKaih() {
-        return this.kaih;
-    }
-
-    /**
-     * @param kaih セットする kaih
-     */
-    public void setKaih(int kaih) {
-        this.kaih = kaih;
-    }
-
-    /**
-     * @return kaihMax
-     */
-    public int getKaihMax() {
-        return this.kaihMax;
-    }
-
-    /**
-     * @param kaihMax セットする kaihMax
-     */
-    public void setKaihMax(int kaihMax) {
-        this.kaihMax = kaihMax;
-    }
-
-    /**
-     * @return tais
-     */
-    public int getTais() {
-        return this.tais;
-    }
-
-    /**
-     * @param tais セットする tais
-     */
-    public void setTais(int tais) {
-        this.tais = tais;
-    }
-
-    /**
-     * @return taisMax
-     */
-    public int getTaisMax() {
-        return this.taisMax;
-    }
-
-    /**
-     * @param taisMax セットする taisMax
-     */
-    public void setTaisMax(int taisMax) {
-        this.taisMax = taisMax;
-    }
-
-    /**
-     * @return saku
-     */
-    public int getSaku() {
-        return this.saku;
-    }
-
-    /**
-     * @param saku セットする saku
-     */
-    public void setSaku(int saku) {
-        this.saku = saku;
-    }
-
-    /**
-     * @return sakuMax
-     */
-    public int getSakuMax() {
-        return this.sakuMax;
-    }
-
-    /**
-     * @param sakuMax セットする sakuMax
-     */
-    public void setSakuMax(int sakuMax) {
-        this.sakuMax = sakuMax;
-    }
-
-    /**
-     * @return luck
-     */
-    public int getLuck() {
-        return this.luck;
-    }
-
-    /**
-     * @param luck セットする luck
-     */
-    public void setLuck(int luck) {
-        this.luck = luck;
-    }
-
-    /**
-     * @return luckMax
-     */
-    public int getLuckMax() {
-        return this.luckMax;
-    }
-
-    /**
-     * @param luckMax セットする luckMax
-     */
-    public void setLuckMax(int luckMax) {
-        this.luckMax = luckMax;
+    public void setMax(ShipParameters max) {
+        this.max = max;
     }
 }

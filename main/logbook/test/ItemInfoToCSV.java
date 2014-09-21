@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 
 import logbook.config.ItemMasterConfig;
 import logbook.dto.ItemDto;
+import logbook.dto.ShipParameters;
 import logbook.internal.Item;
 
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +35,7 @@ public class ItemInfoToCSV {
 
         for (Integer key : Item.keySet()) {
             ItemDto dto = Item.get(key);
+            ShipParameters param = dto.getParam();
             if (dto.getName().length() > 0) {
                 fw.write(StringUtils.join(new String[] {
                         dto.getName(), // 名前
@@ -42,16 +44,16 @@ public class ItemInfoToCSV {
                         Integer.toString(dto.getType1()),
                         Integer.toString(dto.getType2()),
                         Integer.toString(dto.getType3()),
-                        Integer.toString(dto.getHoug()),
-                        Integer.toString(dto.getRaig()),
-                        Integer.toString(dto.getBaku()),
-                        Integer.toString(dto.getTyku()),
-                        Integer.toString(dto.getTais()),
-                        Integer.toString(dto.getSaku()),
-                        Integer.toString(dto.getHoum()),
-                        Integer.toString(dto.getLeng()),
-                        Integer.toString(dto.getLuck()),
-                        Integer.toString(dto.getRaim()) }, ','));
+                        Integer.toString(param.getHoug()),
+                        Integer.toString(param.getRaig()),
+                        Integer.toString(param.getBaku()),
+                        Integer.toString(param.getTyku()),
+                        Integer.toString(param.getTais()),
+                        Integer.toString(param.getSaku()),
+                        Integer.toString(param.getHoum()),
+                        Integer.toString(param.getLeng()),
+                        Integer.toString(param.getLuck()),
+                        Integer.toString(param.getSouk()) }, ','));
                 fw.write("\n");
             }
         }
