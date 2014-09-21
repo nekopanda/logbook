@@ -13,8 +13,8 @@ import logbook.dto.AirBattleDto;
 import logbook.dto.BattleAtackDto;
 import logbook.dto.BattleExDto;
 import logbook.dto.DockDto;
+import logbook.dto.EnemyShipDto;
 import logbook.dto.ShipDto;
-import logbook.dto.ShipInfoDto;
 import logbook.internal.EnemyData;
 
 import org.eclipse.swt.SWT;
@@ -581,11 +581,11 @@ public class BattleWindow extends BattleWindowBase {
         }
 
         // 敵
-        List<ShipInfoDto> enemyShips = battle.getEnemy();
+        List<EnemyShipDto> enemyShips = battle.getEnemy();
         int[] maxEnemyHp = battle.getMaxEnemyHp();
         for (int i = 0; i < enemyShips.size(); ++i) {
-            ShipInfoDto ship = enemyShips.get(i);
-            this.enemyLabels[i].setText(String.valueOf(i + 1) + "." + ship.getEnemyShipName());
+            EnemyShipDto ship = enemyShips.get(i);
+            this.enemyLabels[i].setText(String.valueOf(i + 1) + "." + ship.getFriendlyName());
             this.enemyHpLabels[0][i].setText(String.valueOf(maxEnemyHp[i]) + "/" + maxEnemyHp[i]);
         }
 

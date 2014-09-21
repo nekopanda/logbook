@@ -15,7 +15,7 @@ import logbook.proto.Tag;
  * @author Nekopanda
  *
  */
-public class MapCellDto {
+public class MapCellDto implements Comparable<MapCellDto> {
 
     /** マップ */
     @Tag(1)
@@ -46,6 +46,16 @@ public class MapCellDto {
         this.colorNo = object.getInt("api_color_no");
         this.bosscellNo = object.getInt("api_bosscell_no");
         this.enemyData = EnemyData.get(this.enemyId);
+    }
+
+    public MapCellDto(MapCellDtoPb pb) {
+        for (int i = 0; i < 3; ++i) {
+            this.map[i] = pb.getMap(i);
+        }
+        this.enemyId = pb.getEnemyId();
+        this.colorNo = pb.getColorNo();
+        this.bosscellNo = pb.getBosscellNo();
+        this.enemyData = null;
     }
 
     public MapCellDtoPb toProto() {
@@ -90,6 +100,15 @@ public class MapCellDto {
 
     public String detailedString() {
         return this.toString(true);
+    }
+
+    @Override
+    public int compareTo(MapCellDto arg0) {
+        int ret = 0;
+        for (int i = 0; (i < 3) && (ret == 0); ++i) {
+            ret = Integer.compare(this.map[i], this.map[i]);
+        }
+        return ret;
     }
 
     /**

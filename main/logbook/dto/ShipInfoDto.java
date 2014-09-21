@@ -1,10 +1,10 @@
 package logbook.dto;
 
-import logbook.internal.ShipStyle;
+import javax.json.JsonObject;
+
 import logbook.proto.LogbookEx.ShipInfoDtoPb;
 import logbook.proto.Tag;
-
-import org.apache.commons.lang3.StringUtils;
+import logbook.util.JsonUtils;
 
 /**
  * 艦娘の名前と種別を表します
@@ -59,6 +59,70 @@ public final class ShipInfoDto extends AbstractDto {
     @Tag(11)
     private int[] maxeq = new int[5];
 
+    /** 火力 */
+    @Tag(12)
+    private int houg;
+
+    /** 火力(最大) */
+    @Tag(13)
+    private int hougMax;
+
+    /** 雷装 */
+    @Tag(14)
+    private int raig;
+
+    /** 雷装(最大) */
+    @Tag(15)
+    private int raigMax;
+
+    /** 対空 */
+    @Tag(16)
+    private int tyku;
+
+    /** 対空(最大) */
+    @Tag(17)
+    private int tykuMax;
+
+    /** 装甲 */
+    @Tag(18)
+    private int souk;
+
+    /** 装甲(最大) */
+    @Tag(19)
+    private int soukMax;
+
+    /** 回避 */
+    @Tag(20)
+    private int kaih;
+
+    /** 回避(最大) */
+    @Tag(21)
+    private int kaihMax;
+
+    /** 対潜 */
+    @Tag(22)
+    private int tais;
+
+    /** 対潜(最大) */
+    @Tag(23)
+    private int taisMax;
+
+    /** 索敵 */
+    @Tag(24)
+    private int saku;
+
+    /** 索敵(最大) */
+    @Tag(25)
+    private int sakuMax;
+
+    /** 運 */
+    @Tag(26)
+    private int luck;
+
+    /** 運(最大) */
+    @Tag(27)
+    private int luckMax;
+
     /**
      * コンストラクター
      */
@@ -81,19 +145,41 @@ public final class ShipInfoDto extends AbstractDto {
     /**
      * コンストラクター
      */
-    public ShipInfoDto(int shipId, String name, int stype, String flagship, int afterlv, int aftershipid, int maxBull,
-            int maxFuel, int[] powup, int[] maxeq) {
-        this.name = name;
-        this.shipId = shipId;
-        this.stype = stype;
-        this.type = ShipStyle.get(String.valueOf(stype));
-        this.afterlv = afterlv;
-        this.aftershipid = aftershipid;
-        this.flagship = flagship;
-        this.maxBull = maxBull;
-        this.maxFuel = maxFuel;
-        this.powup = powup;
-        this.maxeq = maxeq;
+    public ShipInfoDto(JsonObject object) {
+        this.shipId = object.getJsonNumber("api_id").intValue();
+        this.stype = object.getJsonNumber("api_stype").intValue();
+        this.flagship = object.getString("api_yomi");
+        if ("-".equals(this.flagship)) {
+            this.flagship = "";
+        }
+        this.afterlv = object.getJsonNumber("api_afterlv").intValue();
+        this.aftershipid = Integer.parseInt(object.getString("api_aftershipid"));
+        this.maxBull = 0;
+        if (object.containsKey("api_bull_max")) {
+            this.maxBull = object.getJsonNumber("api_bull_max").intValue();
+        }
+        this.maxFuel = 0;
+        if (object.containsKey("api_fuel_max")) {
+            this.maxFuel = object.getJsonNumber("api_fuel_max").intValue();
+        }
+        this.powup = JsonUtils.getIntArray(object, "api_powup");
+        this.maxeq = JsonUtils.getIntArray(object, "api_maxeq");
+        this.houg = object.getJsonArray("api_houg").getInt(0);
+        this.hougMax = object.getJsonArray("api_houg").getInt(1);
+        this.raig = object.getJsonArray("api_raig").getInt(0);
+        this.raigMax = object.getJsonArray("api_raig").getInt(1);
+        this.tyku = object.getJsonArray("api_tyku").getInt(0);
+        this.tykuMax = object.getJsonArray("api_tyku").getInt(1);
+        this.souk = object.getJsonArray("api_souk").getInt(0);
+        this.soukMax = object.getJsonArray("api_souk").getInt(1);
+        this.kaih = object.getJsonArray("api_kaih").getInt(0);
+        this.kaihMax = object.getJsonArray("api_kaih").getInt(1);
+        this.tais = object.getJsonArray("api_tais").getInt(0);
+        this.taisMax = object.getJsonArray("api_tais").getInt(1);
+        this.saku = object.getJsonArray("api_saku").getInt(0);
+        this.sakuMax = object.getJsonArray("api_saku").getInt(1);
+        this.luck = object.getJsonArray("api_luck").getInt(0);
+        this.luckMax = object.getJsonArray("api_luck").getInt(1);
     }
 
     public ShipInfoDtoPb toProto() {
@@ -298,11 +384,227 @@ public final class ShipInfoDto extends AbstractDto {
         this.maxeq = maxeq;
     }
 
-    public String getEnemyShipName() {
-        String name = this.name;
-        if (!StringUtils.isEmpty(this.flagship)) {
-            name += " " + this.flagship;
-        }
-        return name;
+    /**
+     * @return houg
+     */
+    public int getHoug() {
+        return this.houg;
+    }
+
+    /**
+     * @param houg セットする houg
+     */
+    public void setHoug(int houg) {
+        this.houg = houg;
+    }
+
+    /**
+     * @return hougMax
+     */
+    public int getHougMax() {
+        return this.hougMax;
+    }
+
+    /**
+     * @param hougMax セットする hougMax
+     */
+    public void setHougMax(int hougMax) {
+        this.hougMax = hougMax;
+    }
+
+    /**
+     * @return raig
+     */
+    public int getRaig() {
+        return this.raig;
+    }
+
+    /**
+     * @param raig セットする raig
+     */
+    public void setRaig(int raig) {
+        this.raig = raig;
+    }
+
+    /**
+     * @return raigMax
+     */
+    public int getRaigMax() {
+        return this.raigMax;
+    }
+
+    /**
+     * @param raigMax セットする raigMax
+     */
+    public void setRaigMax(int raigMax) {
+        this.raigMax = raigMax;
+    }
+
+    /**
+     * @return tyku
+     */
+    public int getTyku() {
+        return this.tyku;
+    }
+
+    /**
+     * @param tyku セットする tyku
+     */
+    public void setTyku(int tyku) {
+        this.tyku = tyku;
+    }
+
+    /**
+     * @return tykuMax
+     */
+    public int getTykuMax() {
+        return this.tykuMax;
+    }
+
+    /**
+     * @param tykuMax セットする tykuMax
+     */
+    public void setTykuMax(int tykuMax) {
+        this.tykuMax = tykuMax;
+    }
+
+    /**
+     * @return souk
+     */
+    public int getSouk() {
+        return this.souk;
+    }
+
+    /**
+     * @param souk セットする souk
+     */
+    public void setSouk(int souk) {
+        this.souk = souk;
+    }
+
+    /**
+     * @return soukMax
+     */
+    public int getSoukMax() {
+        return this.soukMax;
+    }
+
+    /**
+     * @param soukMax セットする soukMax
+     */
+    public void setSoukMax(int soukMax) {
+        this.soukMax = soukMax;
+    }
+
+    /**
+     * @return kaih
+     */
+    public int getKaih() {
+        return this.kaih;
+    }
+
+    /**
+     * @param kaih セットする kaih
+     */
+    public void setKaih(int kaih) {
+        this.kaih = kaih;
+    }
+
+    /**
+     * @return kaihMax
+     */
+    public int getKaihMax() {
+        return this.kaihMax;
+    }
+
+    /**
+     * @param kaihMax セットする kaihMax
+     */
+    public void setKaihMax(int kaihMax) {
+        this.kaihMax = kaihMax;
+    }
+
+    /**
+     * @return tais
+     */
+    public int getTais() {
+        return this.tais;
+    }
+
+    /**
+     * @param tais セットする tais
+     */
+    public void setTais(int tais) {
+        this.tais = tais;
+    }
+
+    /**
+     * @return taisMax
+     */
+    public int getTaisMax() {
+        return this.taisMax;
+    }
+
+    /**
+     * @param taisMax セットする taisMax
+     */
+    public void setTaisMax(int taisMax) {
+        this.taisMax = taisMax;
+    }
+
+    /**
+     * @return saku
+     */
+    public int getSaku() {
+        return this.saku;
+    }
+
+    /**
+     * @param saku セットする saku
+     */
+    public void setSaku(int saku) {
+        this.saku = saku;
+    }
+
+    /**
+     * @return sakuMax
+     */
+    public int getSakuMax() {
+        return this.sakuMax;
+    }
+
+    /**
+     * @param sakuMax セットする sakuMax
+     */
+    public void setSakuMax(int sakuMax) {
+        this.sakuMax = sakuMax;
+    }
+
+    /**
+     * @return luck
+     */
+    public int getLuck() {
+        return this.luck;
+    }
+
+    /**
+     * @param luck セットする luck
+     */
+    public void setLuck(int luck) {
+        this.luck = luck;
+    }
+
+    /**
+     * @return luckMax
+     */
+    public int getLuckMax() {
+        return this.luckMax;
+    }
+
+    /**
+     * @param luckMax セットする luckMax
+     */
+    public void setLuckMax(int luckMax) {
+        this.luckMax = luckMax;
     }
 }

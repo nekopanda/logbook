@@ -4,14 +4,10 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,6 +29,7 @@ import logbook.dto.BattleExDto;
 import logbook.dto.BattleResultDto;
 import logbook.dto.CreateItemDto;
 import logbook.dto.DockDto;
+import logbook.dto.EnemyShipDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
 import logbook.dto.LostEntityDto;
@@ -44,8 +41,11 @@ import logbook.dto.ShipDto;
 import logbook.dto.ShipFilterDto;
 import logbook.dto.ShipInfoDto;
 import logbook.dto.UseItemDto;
+import logbook.internal.BattleResultFilter;
+import logbook.internal.BattleResultServer;
 import logbook.internal.MasterData;
 import logbook.internal.Ship;
+import logbook.util.ReportUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -148,15 +148,16 @@ public final class CreateReportLogic {
      * ドロップ報告書の内容
      * @return 内容
      */
-    public static List<Comparable[]> getBattleResultBody() {
-        List<BattleResultDto> results = GlobalContext.getBattleResultList();
+    public static List<Comparable[]> getBattleResultBody(BattleResultFilter filter) {
+        List<BattleResultDto> results = BattleResultServer.get().getFilteredList(filter);
         List<Comparable[]> body = new ArrayList<Comparable[]>();
 
         for (int i = 0; i < results.size(); i++) {
             BattleResultDto item = results.get(i);
-            body.add(new Comparable[] { Integer.toString(i + 1),
+            body.add(new Comparable[] {
+                    new TableRowHeader(i + 1, item),
                     new DateTimeString(item.getBattleDate()), item.getQuestName(),
-                    item.getMapCellNo(), item.getRank(), item.getEnemyName(), item.getDropType(),
+                    item.getMapCell(), item.getRank(), item.getEnemyName(), item.getDropType(),
                     item.getDropName() });
         }
         return body;
@@ -215,16 +216,12 @@ public final class CreateReportLogic {
                     friend[j] = ship.getName() + "(Lv" + ship.getLv() + ")";
                     friendHp[j] = fnowhps[j] + "/" + fmaxhps[j];
                 }
-                List<ShipInfoDto> enemyships = battle.getEnemy();
+                List<EnemyShipDto> enemyships = battle.getEnemy();
                 int[] enowhps = battle.getNowEnemyHp();
                 int[] emaxhps = battle.getMaxEnemyHp();
                 for (int j = 0; j < enemyships.size(); j++) {
-                    ShipInfoDto ship = enemyships.get(j);
-                    if (!StringUtils.isEmpty(ship.getFlagship())) {
-                        enemy[j] = ship.getName() + "(" + ship.getFlagship() + ")";
-                    } else {
-                        enemy[j] = ship.getName();
-                    }
+                    EnemyShipDto ship = enemyships.get(j);
+                    enemy[j] = ship.getFriendlyName();
                     enemyHp[j] = enowhps[j] + "/" + emaxhps[j];
                 }
             }
@@ -510,12 +507,12 @@ public final class CreateReportLogic {
             HpString[] onSlotString = new HpString[4];
             if (ship.canEquipPlane()) { // 飛行機を装備できる場合だけ
                 List<ItemDto> slotItem = ship.getItem();
-                List<Integer> onSlot = ship.getOnSlot();
+                int[] onSlot = ship.getOnSlot();
                 int[] maxEq = shipInfo.getMaxeq();
                 int slotNum = ship.getSlotNum();
                 for (int i = 0; i < slotNum; ++i) {
                     ItemDto item = slotItem.get(i);
-                    int cur = ((item != null) && item.isPlane()) ? onSlot.get(i) : 0;
+                    int cur = ((item != null) && item.isPlane()) ? onSlot[i] : 0;
                     int max = maxEq != null ? maxEq[i] : 0;
                     onSlotString[i] = new HpString(cur, max);
                 }
@@ -1199,46 +1196,17 @@ public final class CreateReportLogic {
             // 報告書の保存先ディレクトリが無く、ディレクトリの作成に失敗した場合はカレントフォルダにファイルを保存
             report = new File(name);
         }
-        if (isLocked(report)) {
+        if (ReportUtils.isLocked(report)) {
             // ロックされている場合は代替ファイルに書き込みます
             report = new File(FilenameUtils.concat(report.getParent(), altername));
         }
         else {
             File alt_report = new File(FilenameUtils.concat(report.getParent(), altername));
-            if (alt_report.exists() && !isLocked(alt_report) && (FileUtils.sizeOf(alt_report) > 0)) {
+            if (alt_report.exists() && !ReportUtils.isLocked(alt_report) && (FileUtils.sizeOf(alt_report) > 0)) {
                 mergeAltFile(report, alt_report);
             }
         }
         return report;
-    }
-
-    /**
-     * ファイルがロックされているかを確認します
-     * 
-     * @param file ファイル
-     * @return
-     * @throws IOException
-     */
-    private static boolean isLocked(File file) throws IOException {
-        if (!file.isFile()) {
-            return false;
-        }
-        try {
-            RandomAccessFile raf = new RandomAccessFile(file, "rw");
-            try {
-                FileChannel channel = raf.getChannel();
-                FileLock lock = channel.tryLock();
-                if (lock == null) {
-                    return true;
-                }
-                lock.release();
-                return false;
-            } finally {
-                raf.close();
-            }
-        } catch (FileNotFoundException e) {
-            return true;
-        }
     }
 
     /**

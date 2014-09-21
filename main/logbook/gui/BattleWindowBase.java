@@ -8,9 +8,9 @@ import java.util.List;
 
 import logbook.dto.BattleExDto;
 import logbook.dto.DockDto;
+import logbook.dto.EnemyShipDto;
 import logbook.dto.MapCellDto;
 import logbook.dto.ShipDto;
-import logbook.dto.ShipInfoDto;
 import logbook.gui.logic.LayoutLogic;
 
 import org.eclipse.swt.SWT;
@@ -38,7 +38,7 @@ public class BattleWindowBase extends WindowBase {
     private boolean combinedMode = false;
 
     private final ShipDto[] friendShips = new ShipDto[12];
-    private final ShipInfoDto[] enemyShips = new ShipInfoDto[6];
+    private final EnemyShipDto[] enemyShips = new EnemyShipDto[6];
 
     private List<DockDto> docks;
     private MapCellDto mapCellDto;
@@ -207,7 +207,7 @@ public class BattleWindowBase extends WindowBase {
 
     public void updateBattle(BattleExDto data) {
         this.battle = data;
-        List<ShipInfoDto> enemyShips = data.getEnemy();
+        List<EnemyShipDto> enemyShips = data.getEnemy();
         for (int i = 0; i < enemyShips.size(); ++i) {
             this.enemyShips[i] = enemyShips.get(i);
         }
@@ -277,7 +277,7 @@ public class BattleWindowBase extends WindowBase {
     /**
      * @return enemyShips
      */
-    protected ShipInfoDto[] getEnemyShips() {
+    protected EnemyShipDto[] getEnemyShips() {
         return this.enemyShips;
     }
 }

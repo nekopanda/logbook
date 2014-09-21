@@ -28,6 +28,9 @@ public class AppConstants {
     /** 日付書式 */
     public static final String DATE_SHORT_FORMAT = "HH:mm:ss";
 
+    /** 戦闘ログファイルの名前 */
+    public static final String BATTLE_LOGFILE_DATE_FORMAT = "yyyy-MM";
+
     /** 疲労赤色 */
     public static final int COND_RED = 19;
 
@@ -108,6 +111,9 @@ public class AppConstants {
 
     /** 敵データファイル  */
     public static final File ENEMY_DATA_FILE = new File("./config/KCRDB-enemyid.csv");
+
+    /** 出撃ログ表示用CSSファイル */
+    public static final File BATTLE_LOG_CSS_FILE = new File("./config/battle-log.css");
 
     /** 保有資材:燃料 */
     public static final int MATERIAL_FUEL = 1;

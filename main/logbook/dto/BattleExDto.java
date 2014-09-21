@@ -14,13 +14,10 @@ import javax.json.JsonObject;
 
 import logbook.data.context.GlobalContext;
 import logbook.internal.EnemyData;
-import logbook.internal.Item;
-import logbook.internal.Ship;
 import logbook.proto.LogbookEx.BattleExDtoPb;
-import logbook.proto.LogbookEx.ItemDtoListPb;
 import logbook.proto.LogbookEx.PhasePb;
-import logbook.proto.LogbookEx.intListPb;
 import logbook.proto.Tag;
+import logbook.util.JsonUtils;
 
 /**
  * @author Nekopanda
@@ -38,15 +35,7 @@ public class BattleExDto extends AbstractDto {
 
     /** 敵艦隊 */
     @Tag(3)
-    private final List<ShipInfoDto> enemy = new ArrayList<>();
-
-    /** 敵装備 */
-    @Tag(4)
-    private final List<ItemDto[]> enemySlot = new ArrayList<>();
-
-    /** 敵パラメータ */
-    @Tag(5)
-    private final List<int[]> enemyParam = new ArrayList<>();
+    private final List<EnemyShipDto> enemy = new ArrayList<>();
 
     /** 味方MaxHP */
     @Tag(6)
@@ -747,37 +736,6 @@ public class BattleExDto extends AbstractDto {
                 }
             }
         }
-        if (this.enemy != null) {
-            for (ShipInfoDto b : this.enemy) {
-                if (b != null) {
-                    builder.addEnemy(b.toProto());
-                }
-            }
-        }
-        if (this.enemySlot != null) {
-            for (ItemDto[] b : this.enemySlot) {
-                ItemDtoListPb.Builder builder1 = ItemDtoListPb.newBuilder();
-                if (b != null) {
-                    for (ItemDto c : b) {
-                        if (c != null) {
-                            builder1.addData(c.toProto());
-                        }
-                    }
-                }
-                builder.addEnemySlot(builder1.build());
-            }
-        }
-        if (this.enemyParam != null) {
-            for (int[] b : this.enemyParam) {
-                intListPb.Builder builder2 = intListPb.newBuilder();
-                if (b != null) {
-                    for (int c : b) {
-                        builder2.addData(c);
-                    }
-                }
-                builder.addEnemyParam(builder2.build());
-            }
-        }
         if (this.maxFriendHp != null) {
             for (int b : this.maxFriendHp) {
                 builder.addMaxFriendHp(b);
@@ -895,30 +853,14 @@ public class BattleExDto extends AbstractDto {
             }
 
             JsonArray shipKe = object.getJsonArray("api_ship_ke");
-            for (int i = 1; i < shipKe.size(); i++) {
-                int id = shipKe.getInt(i);
-                ShipInfoDto dto = Ship.get(String.valueOf(id));
-                if (dto != null) {
-                    this.enemy.add(dto);
-                }
-            }
-            int numEships = this.enemy.size();
-
             JsonArray eSlots = object.getJsonArray("api_eSlot");
             JsonArray eParams = object.getJsonArray("api_eParam");
-            for (int i = 0; i < this.enemy.size(); i++) {
-                JsonArray eSlot = eSlots.getJsonArray(i);
-                ItemDto[] slot = new ItemDto[5];
-                for (int j = 0; j < eSlot.size(); j++) {
-                    slot[j] = Item.get(eSlot.getInt(j));
-                }
-                this.enemySlot.add(slot);
-                JsonArray eParam = eParams.getJsonArray(i);
-                int[] param = new int[4];
-                for (int j = 0; j < eParam.size(); j++) {
-                    param[j] = eParam.getInt(j);
-                }
-                this.enemyParam.add(param);
+            int numEships = shipKe.size();
+            for (int i = 0; i < numEships; i++) {
+                int id = shipKe.getInt(i);
+                int[] slot = JsonUtils.toIntArray(eSlots.getJsonArray(i));
+                int[] param = JsonUtils.toIntArray(eParams.getJsonArray(i));
+                this.enemy.add(new EnemyShipDto(id, slot, param));
             }
 
             this.startFriendHp = new int[numFships];
@@ -1106,7 +1048,7 @@ public class BattleExDto extends AbstractDto {
     public EnemyData getEnemyData(int enemyId, String enemyName) {
         String[] enemyShips = new String[] { "", "", "", "", "", "" };
         for (int i = 0; i < this.enemy.size(); ++i) {
-            enemyShips[i] = this.enemy.get(i).getEnemyShipName();
+            enemyShips[i] = this.enemy.get(i).getFriendlyName();
         }
         return new EnemyData(enemyId, enemyName, enemyShips, this.formation[1]);
     }
@@ -1190,22 +1132,8 @@ public class BattleExDto extends AbstractDto {
     /**
      * @return enemy
      */
-    public List<ShipInfoDto> getEnemy() {
+    public List<EnemyShipDto> getEnemy() {
         return this.enemy;
-    }
-
-    /**
-     * @return enemySlot
-     */
-    public List<ItemDto[]> getEnemySlot() {
-        return this.enemySlot;
-    }
-
-    /**
-     * @return enemyParam
-     */
-    public List<int[]> getEnemyParam() {
-        return this.enemyParam;
     }
 
     /**

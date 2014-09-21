@@ -79,16 +79,17 @@ public final class ResourceChartDialog extends WindowBase {
      */
     @Override
     public void open() {
+        // 初期化済みの場合
+        if (this.isWindowInitialized()) {
+            // リロードして表示
+            this.setVisible(true);
+            return;
+        }
+
         this.createContents();
         this.registerEvents();
-        this.shell.open();
-        this.shell.layout();
-        Display display = this.shell.getDisplay();
-        while (!this.shell.isDisposed()) {
-            if (!display.readAndDispatch()) {
-                display.sleep();
-            }
-        }
+        this.setWindowInitialized(true);
+        this.setVisible(true);
     }
 
     /**

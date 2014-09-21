@@ -5,10 +5,12 @@ import java.util.Date;
 
 import javax.json.JsonObject;
 
+import logbook.proto.LogbookEx.BattleExDtoPb;
+
 /**
  * 海戦とドロップした艦娘を表します
  */
-public final class BattleResultDto extends AbstractDto {
+public class BattleResultDto extends AbstractDto {
 
     /** 日付 */
     private final Date battleDate;
@@ -20,7 +22,7 @@ public final class BattleResultDto extends AbstractDto {
     private final String rank;
 
     /** マス */
-    private final int mapCellNo;
+    private final MapCellDto mapCell;
 
     /** 敵艦隊名 */
     private final String enemyName;
@@ -44,12 +46,12 @@ public final class BattleResultDto extends AbstractDto {
      * @param cell マップ上のマス
      * @param battle 戦闘詳細
      */
-    public BattleResultDto(JsonObject object, int mapCellNo, BattleDto battle) {
+    public BattleResultDto(JsonObject object, MapCellDto mapCell, BattleDto battle) {
 
         this.battleDate = Calendar.getInstance().getTime();
-            this.questName = object.getString("api_quest_name");
+        this.questName = object.getString("api_quest_name");
         this.rank = object.getString("api_win_rank");
-        this.mapCellNo = mapCellNo;
+        this.mapCell = mapCell;
         this.enemyName = object.getJsonObject("api_enemy_info").getString("api_deck_name");
         this.dropFlag = object.containsKey("api_get_ship");
         if (this.dropFlag) {
@@ -61,6 +63,18 @@ public final class BattleResultDto extends AbstractDto {
         }
 
         this.battle = battle;
+    }
+
+    public BattleResultDto(BattleExDtoPb dto) {
+        this.battleDate = new Date(dto.getBattleDate());
+        this.questName = dto.getQuestName();
+        this.rank = dto.getRank();
+        this.mapCell = new MapCellDto(dto.getMapCellDto());
+        this.enemyName = dto.getEnemyName();
+        this.dropFlag = dto.getDropFlag();
+        this.dropType = dto.getDropType();
+        this.dropName = dto.getDropName();
+        this.battle = null;
     }
 
     /**
@@ -91,8 +105,8 @@ public final class BattleResultDto extends AbstractDto {
      * マスを取得します。
      * @return マス
      */
-    public int getMapCellNo() {
-        return this.mapCellNo;
+    public MapCellDto getMapCell() {
+        return this.mapCell;
     }
 
     /**

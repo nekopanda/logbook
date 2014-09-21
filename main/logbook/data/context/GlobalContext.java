@@ -1870,33 +1870,7 @@ public final class GlobalContext {
             return ShipInfoDto.EMPTY;
         }
 
-        int shipId = object.getJsonNumber("api_id").intValue();
-        int stype = object.getJsonNumber("api_stype").intValue();
-        String flagship = object.getString("api_yomi");
-        if ("-".equals(flagship)) {
-            flagship = "";
-        }
-        int afterlv = object.getJsonNumber("api_afterlv").intValue();
-        int aftershipid = Integer.parseInt(object.getString("api_aftershipid"));
-        int maxBull = 0;
-        if (object.containsKey("api_bull_max")) {
-            maxBull = object.getJsonNumber("api_bull_max").intValue();
-        }
-        int maxFuel = 0;
-        if (object.containsKey("api_fuel_max")) {
-            maxFuel = object.getJsonNumber("api_fuel_max").intValue();
-        }
-        JsonArray apiPowup = object.getJsonArray("api_powup");
-        int[] powup = new int[apiPowup.size()];
-        for (int i = 0; i < apiPowup.size(); i++) {
-            powup[i] = ((JsonNumber) apiPowup.get(i)).intValue();
-        }
-        JsonArray apiMaxeq = object.getJsonArray("api_maxeq");
-        int[] maxeq = new int[apiMaxeq.size()];
-        for (int i = 0; i < apiMaxeq.size(); i++) {
-            maxeq[i] = ((JsonNumber) apiMaxeq.get(i)).intValue();
-        }
-        return new ShipInfoDto(shipId, name, stype, flagship, afterlv, aftershipid, maxBull, maxFuel, powup, maxeq);
+        return new ShipInfoDto(object);
     }
 
     private static void addConsole(Object message) {

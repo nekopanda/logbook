@@ -627,7 +627,10 @@ public class Ship {
      * @return 艦娘
      */
     public static ShipInfoDto get(String id) {
-        return SHIP.get(id);
+        ShipInfoDto dto = SHIP.get(id);
+        if (dto == null)
+            return ShipInfoDto.EMPTY;
+        return dto;
     }
 
     /**

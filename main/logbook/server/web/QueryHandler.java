@@ -24,6 +24,7 @@ import logbook.dto.BasicInfoDto;
 import logbook.dto.BattleExDto;
 import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
+import logbook.dto.EnemyShipDto;
 import logbook.dto.ItemDto;
 import logbook.dto.KdockDto;
 import logbook.dto.MapCellDto;
@@ -470,12 +471,12 @@ public class QueryHandler extends HttpServlet {
                         fship_array.add(shipToJson(ship));
                     }
 
-                    List<ShipInfoDto> eships = battleDto.getEnemy();
+                    List<EnemyShipDto> eships = battleDto.getEnemy();
                     int[] enowhp = battleDto.getNowEnemyHp();
                     int[] emaxhp = battleDto.getMaxEnemyHp();
                     for (int i = 0; i < eships.size(); ++i) {
-                        ShipInfoDto ship = eships.get(i);
-                        String flagship = ship.getFlagship();
+                        EnemyShipDto ship = eships.get(i);
+                        String flagship = ship.getShipInfo().getFlagship();
                         int level = (flagship.equals("flagship") ? 2
                                 : flagship.equals("elite") ? 1
                                         : 0);

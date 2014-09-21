@@ -1,8 +1,14 @@
 package logbook.gui;
 
+import logbook.dto.BattleResultDto;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.TableItemCreator;
+import logbook.gui.logic.TableRowHeader;
+import logbook.internal.BattleResultFilter;
+import logbook.internal.BattleResultServer;
+import logbook.proto.LogbookEx.BattleExDtoPb;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -20,11 +26,21 @@ import org.eclipse.swt.widgets.TableItem;
  */
 public final class DropReportTable extends AbstractTableDialog {
 
+    private BattleResultFilter filter = new BattleResultFilter();
+
+    private final BattleDetailDialog detailDialog;
+
     /**
      * @param parent
      */
     public DropReportTable(Shell parent, MenuItem menuItem) {
         super(parent, menuItem);
+        this.detailDialog = new BattleDetailDialog(this);
+    }
+
+    public void updateFilter(BattleResultFilter filter) {
+        this.filter = filter;
+        this.reloadTable();
     }
 
     @Override
@@ -33,11 +49,41 @@ public final class DropReportTable extends AbstractTableDialog {
             @Override
             public void mouseDoubleClick(MouseEvent e) {
                 TableItem[] items = DropReportTable.this.table.getSelection();
-                for (TableItem tableItem : items) {
-                    new BattleDialog(DropReportTable.this.shell, tableItem.getText(0)).open();
+                int selected = DropReportTable.this.table.getSelectionIndex();
+                if (selected != -1) {
+                    TableRowHeader rowHeader = (TableRowHeader) DropReportTable.this.body.get(selected)[0];
+                    BattleResultDto result = (BattleResultDto) rowHeader.get();
+                    BattleExDtoPb detail = BattleResultServer.get().getBattleDetail(result);
+                    DropReportTable.this.detailDialog.setBattle(result, detail);
+                    DropReportTable.this.detailDialog.open();
                 }
             }
         });
+        // フィルターメニュー
+        final MenuItem filter = new MenuItem(this.opemenu, SWT.PUSH);
+        filter.setText("フィルター(&F)\tCtrl+F");
+        filter.setAccelerator(SWT.CTRL + 'F');
+        filter.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                new BattleFilterDialog(DropReportTable.this).open();
+            }
+        });
+        // セパレータ
+        new MenuItem(this.tablemenu, SWT.SEPARATOR);
+        // 右クリックメニューに追加する
+        final MenuItem filtertable = new MenuItem(this.tablemenu, SWT.NONE);
+        filtertable.setText("フィルター(&F)");
+        filtertable.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                new BattleFilterDialog(DropReportTable.this).open();
+            }
+        });
+    }
+
+    public BattleResultFilter getFilter() {
+        return this.filter;
     }
 
     @Override
@@ -57,7 +103,7 @@ public final class DropReportTable extends AbstractTableDialog {
 
     @Override
     protected void updateTableBody() {
-        this.body = CreateReportLogic.getBattleResultBody();
+        this.body = CreateReportLogic.getBattleResultBody(this.filter);
     }
 
     @Override

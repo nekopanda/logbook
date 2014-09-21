@@ -7,6 +7,7 @@ import java.util.List;
 
 import logbook.config.AppConfig;
 import logbook.dto.ItemDto;
+import logbook.dto.ShipBaseDto;
 import logbook.dto.ShipDto;
 
 /**
@@ -39,9 +40,9 @@ public class SakutekiString implements Comparable<SakutekiString> {
         this.calc();
     }
 
-    private void add(ShipDto ship) {
+    private void add(ShipBaseDto ship) {
         List<ItemDto> items = ship.getItem();
-        List<Integer> onslot = ship.getOnSlot();
+        int[] onslot = ship.getOnSlot();
         // 装備込の索敵値計
         this.totalSakuteki += ship.getSakuteki();
         for (int i = 0; i < 4; i++) {
@@ -52,7 +53,7 @@ public class SakutekiString implements Comparable<SakutekiString> {
                 if (item.getType1() == 0) { // 取得できていない
                     this.sakutekiFailed = true;
                 }
-                if ((item.getType1() == 7) && (onslot.get(i) > 0)) { // 7: 偵察機 (搭載数>0の場合のみ)
+                if ((item.getType1() == 7) && (onslot[i] > 0)) { // 7: 偵察機 (搭載数>0の場合のみ)
                     this.teisatsuSakuteki += item.getSaku();
                 }
                 if (item.getType1() == 8) { // 8: 電探

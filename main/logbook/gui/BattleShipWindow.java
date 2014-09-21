@@ -7,11 +7,10 @@ import java.util.List;
 
 import logbook.dto.BattleExDto;
 import logbook.dto.DockDto;
+import logbook.dto.EnemyShipDto;
 import logbook.dto.ItemDto;
 import logbook.dto.ShipDto;
-import logbook.dto.ShipInfoDto;
 import logbook.internal.EnemyData;
-import logbook.internal.Ship;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
@@ -57,9 +56,8 @@ public class BattleShipWindow extends BattleWindowBase {
             ShipDto ship = this.getFriendShips()[newIndex];
             if (ship != null) {
                 List<ItemDto> slots = ship.getItem();
-                List<Integer> onSlots = ship.getOnSlot(); // 現在の艦載機搭載数
-                ShipInfoDto shipInfo = Ship.get(String.valueOf(ship.getShipId()));
-                int[] maxeq = (shipInfo == null) ? null : shipInfo.getMaxeq(); // 艦載機最大搭載数
+                int[] onSlots = ship.getOnSlot(); // 現在の艦載機搭載数
+                int[] maxeq = ship.getShipInfo().getMaxeq(); // 艦載機最大搭載数
                 for (int i = 0; i < 4; ++i) {
                     if (i < slots.size()) {
                         String onSlot = "";
@@ -68,7 +66,7 @@ public class BattleShipWindow extends BattleWindowBase {
                         if (item != null) {
                             if (item.isPlane()) {
                                 String max = (maxeq == null) ? "?" : String.valueOf(maxeq[i]);
-                                onSlot = String.valueOf(onSlots.get(i)) + "/" + max;
+                                onSlot = String.valueOf(onSlots[i]) + "/" + max;
                             }
                             itemName = item.getName();
                         }
@@ -100,23 +98,24 @@ public class BattleShipWindow extends BattleWindowBase {
         if (newIndex != -1) {
             if ((this.getBattle() != null) && (newIndex < this.getBattle().getEnemy().size())) {
                 this.enemyLabels[newIndex].setFont(this.getBoldFont());
-                ItemDto[] slots = this.getBattle().getEnemySlot().get(newIndex);
-                ShipInfoDto shipInfo = this.getBattle().getEnemy().get(newIndex);
-                int[] maxeq = (shipInfo == null) ? null : shipInfo.getMaxeq(); // 艦載機最大搭載数
-                for (int i = 0; i < 5; ++i) {
-                    if (i < slots.length) {
-                        String onSlot = "";
-                        String itemName = "";
-                        ItemDto item = slots[i];
-                        if (item != null) {
-                            int type1 = item.getType1();
-                            if ((type1 == 5) || (type1 == 7)) { // 艦載機搭載中
-                                onSlot = (maxeq == null) ? "?" : String.valueOf(maxeq[i]);
+                EnemyShipDto ship = this.getBattle().getEnemy().get(newIndex);
+                if (ship != null) {
+                    List<ItemDto> slots = ship.getItem();
+                    int[] maxeq = ship.getShipInfo().getMaxeq(); // 艦載機最大搭載数
+                    for (int i = 0; i < 4; ++i) {
+                        if (i < slots.size()) {
+                            String onSlot = "";
+                            String itemName = "";
+                            ItemDto item = slots.get(i);
+                            if (item != null) {
+                                if (item.isPlane()) {
+                                    onSlot = (maxeq == null) ? "?" : String.valueOf(maxeq[i]);
+                                }
+                                itemName = item.getName();
                             }
-                            itemName = item.getName();
+                            this.enemyDetail[0][i].setText(String.valueOf(i + 1) + ":" + itemName);
+                            this.enemyDetail[1][i].setText(onSlot);
                         }
-                        this.enemyDetail[0][i].setText(String.valueOf(i + 1) + ":" + itemName);
-                        this.enemyDetail[1][i].setText(onSlot);
                     }
                 }
             }
@@ -363,16 +362,14 @@ public class BattleShipWindow extends BattleWindowBase {
         if (battle == null)
             return;
 
-        List<ShipInfoDto> enemyShips = battle.getEnemy();
-        List<int[]> eParams = battle.getEnemyParam();
+        List<EnemyShipDto> enemyShips = battle.getEnemy();
         for (int i = 0; i < enemyShips.size(); ++i) {
-            ShipInfoDto ship = enemyShips.get(i);
-            int[] eParam = eParams.get(i);
-            this.enemyLabels[i].setText(String.valueOf(i + 1) + "." + ship.getEnemyShipName());
-            this.eStatusLabels[0][i].setText(String.valueOf(eParam[0]));
-            this.eStatusLabels[1][i].setText(String.valueOf(eParam[1]));
-            this.eStatusLabels[2][i].setText(String.valueOf(eParam[2]));
-            this.eStatusLabels[3][i].setText(String.valueOf(eParam[3]));
+            EnemyShipDto ship = enemyShips.get(i);
+            this.enemyLabels[i].setText(String.valueOf(i + 1) + "." + ship.getFriendlyName());
+            this.eStatusLabels[0][i].setText(String.valueOf(ship.getKaryoku()));
+            this.eStatusLabels[1][i].setText(String.valueOf(ship.getRaisou()));
+            this.eStatusLabels[2][i].setText(String.valueOf(ship.getTaiku()));
+            this.eStatusLabels[3][i].setText(String.valueOf(ship.getSoukou()));
         }
     }
 

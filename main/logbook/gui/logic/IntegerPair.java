@@ -31,4 +31,18 @@ public class IntegerPair implements Comparable<IntegerPair> {
         }
         return ret;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof IntegerPair) {
+            IntegerPair o2 = (IntegerPair) o;
+            return (o2.now == this.now) && (o2.max == this.max);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.now * this.max;
+    }
 }

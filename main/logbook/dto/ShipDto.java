@@ -1,31 +1,23 @@
 package logbook.dto;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
-import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
-import javax.json.JsonValue;
 
-import logbook.config.MasterDataConfig;
 import logbook.constants.AppConstants;
-import logbook.data.context.GlobalContext;
 import logbook.internal.ExpTable;
-import logbook.internal.MasterData;
 import logbook.internal.Ship;
 import logbook.proto.LogbookEx.ShipDtoPb;
 import logbook.proto.Tag;
+import logbook.util.JsonUtils;
 
 /**
  * 艦娘を表します
  *
  */
-public final class ShipDto extends AbstractDto {
+public final class ShipDto extends ShipBaseDto {
 
     /** 日時 */
     private final Calendar time = Calendar.getInstance();
@@ -53,14 +45,6 @@ public final class ShipDto extends AbstractDto {
 
     private int fleetpos;
 
-    /** 名前 */
-    @Tag(5)
-    private final String name;
-
-    /** 艦種 */
-    @Tag(6)
-    private final String type;
-
     /** Lv */
     @Tag(7)
     private final int lv;
@@ -85,17 +69,9 @@ public final class ShipDto extends AbstractDto {
     @Tag(12)
     private int bull;
 
-    /** 弾Max */
-    @Tag(13)
-    private final int bullmax;
-
     /** 残燃料 */
     @Tag(14)
     private int fuel;
-
-    /** 燃料Max */
-    @Tag(15)
-    private final int fuelmax;
 
     /** 経験値 */
     @Tag(16)
@@ -115,11 +91,11 @@ public final class ShipDto extends AbstractDto {
 
     /** 装備 */
     @Tag(20)
-    private final List<Integer> slot;
+    private final int[] slot;
 
     /** 艦載機の搭載数 */
     @Tag(21)
-    private final List<Integer> onslot;
+    private final int[] onslot;
 
     /** 火力 */
     @Tag(22)
@@ -185,10 +161,6 @@ public final class ShipDto extends AbstractDto {
     @Tag(37)
     private final int luckyMax;
 
-    /** 艦娘 */
-    @Tag(38)
-    private final ShipInfoDto shipInfo;
-
     /** */
     private final int lockedEquip;
 
@@ -198,18 +170,13 @@ public final class ShipDto extends AbstractDto {
      * @param object JSON Object
      */
     public ShipDto(JsonObject object) {
+        super(object);
 
         this.id = object.getJsonNumber("api_id").intValue();
         this.locked = object.getJsonNumber("api_locked").intValue() == 1;
 
-        int shipId = object.getJsonNumber("api_ship_id").intValue();
-        ShipInfoDto shipinfo = Ship.get(String.valueOf(shipId));
-        this.shipInfo = shipinfo;
-        this.name = shipinfo.getName();
-        this.type = shipinfo.getType();
-
-        int charId = shipId;
-        int afterShipId = shipinfo.getAftershipid();
+        int charId = this.getShipId();
+        int afterShipId = this.getShipInfo().getAftershipid();
         while (afterShipId != 0) {
             charId = afterShipId;
             afterShipId = Ship.get(String.valueOf(afterShipId)).getAftershipid();
@@ -226,25 +193,13 @@ public final class ShipDto extends AbstractDto {
 
         this.bull = object.getJsonNumber("api_bull").intValue();
         this.fuel = object.getJsonNumber("api_fuel").intValue();
-        this.bullmax = shipinfo.getMaxBull();
-        this.fuelmax = shipinfo.getMaxFuel();
 
         this.exp = object.getJsonArray("api_exp").getJsonNumber(0).intValue();
         this.nowhp = object.getJsonNumber("api_nowhp").intValue();
         this.maxhp = object.getJsonNumber("api_maxhp").intValue();
         this.slotnum = object.getJsonNumber("api_slotnum").intValue();
-        this.slot = new ArrayList<Integer>();
-        JsonArray slot = object.getJsonArray("api_slot");
-        for (JsonValue jsonValue : slot) {
-            JsonNumber itemid = (JsonNumber) jsonValue;
-            this.slot.add(itemid.intValue());
-        }
-        this.onslot = new ArrayList<Integer>();
-        JsonArray onslot = object.getJsonArray("api_onslot");
-        for (JsonValue jsonValue : onslot) {
-            JsonNumber itemid = (JsonNumber) jsonValue;
-            this.onslot.add(Integer.valueOf(itemid.intValue()));
-        }
+        this.slot = JsonUtils.getIntArray(object, "api_slot");
+        this.onslot = JsonUtils.getIntArray(object, "api_onslot");
         this.karyoku = ((JsonNumber) object.getJsonArray("api_karyoku").get(0)).intValue();
         this.karyokuMax = ((JsonNumber) object.getJsonArray("api_karyoku").get(1)).intValue();
         this.raisou = ((JsonNumber) object.getJsonArray("api_raisou").get(0)).intValue();
@@ -276,21 +231,13 @@ public final class ShipDto extends AbstractDto {
         if (this.fleetid != null) {
             builder.setFleetid(this.fleetid);
         }
-        if (this.name != null) {
-            builder.setName(this.name);
-        }
-        if (this.type != null) {
-            builder.setType(this.type);
-        }
         builder.setLv(this.lv);
         builder.setCond(this.cond);
         builder.setDocktime(this.docktime);
         builder.setDockfuel(this.dockfuel);
         builder.setDockmetal(this.dockmetal);
         builder.setBull(this.bull);
-        builder.setBullmax(this.bullmax);
         builder.setFuel(this.fuel);
-        builder.setFuelmax(this.fuelmax);
         builder.setExp(this.exp);
         builder.setNowhp(this.nowhp);
         builder.setMaxhp(this.maxhp);
@@ -325,8 +272,8 @@ public final class ShipDto extends AbstractDto {
         builder.setSakutekiMax(this.sakutekiMax);
         builder.setLucky(this.lucky);
         builder.setLuckyMax(this.luckyMax);
-        if (this.shipInfo != null) {
-            builder.setShipInfo(this.shipInfo.toProto());
+        if (this.getShipInfo() != null) {
+            builder.setShipInfo(this.getShipInfo().toProto());
         }
         return builder.build();
     }
@@ -336,13 +283,6 @@ public final class ShipDto extends AbstractDto {
      */
     public int getId() {
         return this.id;
-    }
-
-    /**
-     * @return 艦娘を識別するID
-     */
-    public int getShipId() {
-        return this.shipInfo.getShipId();
     }
 
     /**
@@ -401,20 +341,6 @@ public final class ShipDto extends AbstractDto {
     }
 
     /**
-     * @return 名前
-     */
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * @return 艦種
-     */
-    public String getType() {
-        return this.type;
-    }
-
-    /**
      * @return Lv
      */
     public int getLv() {
@@ -470,13 +396,6 @@ public final class ShipDto extends AbstractDto {
     }
 
     /**
-     * @return 弾Max
-     */
-    public int getBullMax() {
-        return this.bullmax;
-    }
-
-    /**
      * @param bull 残弾
      */
     public void setBull(int bull) {
@@ -488,13 +407,6 @@ public final class ShipDto extends AbstractDto {
      */
     public int getFuel() {
         return this.fuel;
-    }
-
-    /**
-     * @return 燃料Max
-     */
-    public int getFuelMax() {
-        return this.fuelmax;
     }
 
     /**
@@ -529,7 +441,7 @@ public final class ShipDto extends AbstractDto {
         return this.maxhp;
     }
 
-    public List<Integer> getRawSlot() {
+    public int[] getRawSlot() {
         return this.slot;
     }
 
@@ -537,121 +449,23 @@ public final class ShipDto extends AbstractDto {
         return this.slotnum;
     }
 
-    public List<Integer> getOnSlot() {
+    @Override
+    public int[] getOnSlot() {
         return this.onslot;
-    }
-
-    /**
-     * @return 装備
-     */
-    public List<String> getSlot() {
-        List<String> itemNames = new ArrayList<String>();
-        Map<Integer, ItemDto> itemMap = GlobalContext.getItemMap();
-        for (int itemid : this.slot) {
-            if (-1 != itemid) {
-                ItemDto name = itemMap.get(itemid);
-                if (name != null) {
-                    itemNames.add(name.getName());
-                } else {
-                    itemNames.add("<UNKNOWN>");
-                }
-            } else {
-                itemNames.add("");
-            }
-        }
-        return itemNames;
-    }
-
-    /**
-     * @return 装備
-     */
-    public List<ItemDto> getItem() {
-        List<ItemDto> items = new ArrayList<ItemDto>();
-        Map<Integer, ItemDto> itemMap = GlobalContext.getItemMap();
-        for (int itemid : this.slot) {
-            if (-1 != itemid) {
-                ItemDto item = itemMap.get(itemid);
-                if (item != null) {
-                    items.add(item);
-                } else {
-                    items.add(null);
-                }
-            } else {
-                items.add(null);
-            }
-        }
-        return items;
     }
 
     /**
      * @return 装備ID
      */
-    public List<Integer> getItemId() {
-        return Collections.unmodifiableList(this.slot);
-    }
-
-    /**
-     * @return 飛行機を装備できるか？
-     */
-    public boolean canEquipPlane() {
-        if (this.shipInfo == null) // データを取得していない
-            return false;
-        int stype = this.shipInfo.getStype();
-        List<MasterData.ShipTypeDto> info = MasterDataConfig.get().getStype();
-        if (info.size() < stype) // データを取得していない
-            return false;
-        MasterData.ShipTypeDto shipType = info.get(stype - 1);
-        if (shipType == null) // データを取得していない
-            return false;
-        List<Boolean> equipType = shipType.getEquipType();
-        for (int i = 0; i < AppConstants.PLANE_ITEM_TYPES.length; ++i) {
-            if (equipType.get(AppConstants.PLANE_ITEM_TYPES[i] - 1)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * @return 制空値
-     */
-    public int getSeiku() {
-        List<ItemDto> items = this.getItem();
-        int seiku = 0;
-        for (int i = 0; i < 4; i++) {
-            ItemDto item = items.get(i);
-            if (item != null) {
-                if ((item.getType3() == 6)
-                        || (item.getType3() == 7)
-                        || (item.getType3() == 8)
-                        || ((item.getType3() == 10) && (item.getType2() == 11))) {
-                    //6:艦上戦闘機,7:艦上爆撃機,8:艦上攻撃機,10:水上偵察機(ただし瑞雲のみ)の場合は制空値を計算する
-                    seiku += (int) Math.floor(item.getTyku() * Math.sqrt(this.onslot.get(i)));
-                }
-            }
-        }
-        return seiku;
-    }
-
-    /**
-     * アイテムの索敵合計を計算します
-     * @return アイテムの索敵合計
-     */
-    public int getSlotSakuteki() {
-        List<ItemDto> items = this.getItem();
-        int sakuteki = 0;
-        for (int i = 0; i < 4; i++) {
-            ItemDto item = items.get(i);
-            if (item != null) {
-                sakuteki += item.getSaku();
-            }
-        }
-        return sakuteki;
+    @Override
+    public int[] getItemId() {
+        return this.slot;
     }
 
     /**
      * @return 火力
      */
+    @Override
     public int getKaryoku() {
         return this.karyoku;
     }
@@ -659,6 +473,7 @@ public final class ShipDto extends AbstractDto {
     /**
      * @return 火力(最大)
      */
+    @Override
     public int getKaryokuMax() {
         return this.karyokuMax;
     }
@@ -666,6 +481,7 @@ public final class ShipDto extends AbstractDto {
     /**
      * @return 雷装
      */
+    @Override
     public int getRaisou() {
         return this.raisou;
     }
@@ -673,6 +489,7 @@ public final class ShipDto extends AbstractDto {
     /**
      * @return 雷装(最大)
      */
+    @Override
     public int getRaisouMax() {
         return this.raisouMax;
     }
@@ -680,6 +497,7 @@ public final class ShipDto extends AbstractDto {
     /**
      * @return 対空
      */
+    @Override
     public int getTaiku() {
         return this.taiku;
     }
@@ -687,6 +505,7 @@ public final class ShipDto extends AbstractDto {
     /**
      * @return 対空(最大)
      */
+    @Override
     public int getTaikuMax() {
         return this.taikuMax;
     }
@@ -694,6 +513,7 @@ public final class ShipDto extends AbstractDto {
     /**
      * @return 装甲
      */
+    @Override
     public int getSoukou() {
         return this.soukou;
     }
@@ -701,6 +521,7 @@ public final class ShipDto extends AbstractDto {
     /**
      * @return 装甲(最大)
      */
+    @Override
     public int getSoukouMax() {
         return this.soukouMax;
     }
@@ -708,6 +529,7 @@ public final class ShipDto extends AbstractDto {
     /**
      * @return 回避
      */
+    @Override
     public int getKaihi() {
         return this.kaihi;
     }
@@ -715,6 +537,7 @@ public final class ShipDto extends AbstractDto {
     /**
      * @return 回避(最大)
      */
+    @Override
     public int getKaihiMax() {
         return this.kaihiMax;
     }
@@ -722,6 +545,7 @@ public final class ShipDto extends AbstractDto {
     /**
      * @return 対潜
      */
+    @Override
     public int getTaisen() {
         return this.taisen;
     }
@@ -729,6 +553,7 @@ public final class ShipDto extends AbstractDto {
     /**
      * @return 対潜(最大)
      */
+    @Override
     public int getTaisenMax() {
         return this.taisenMax;
     }
@@ -736,6 +561,7 @@ public final class ShipDto extends AbstractDto {
     /**
      * @return 索敵
      */
+    @Override
     public int getSakuteki() {
         return this.sakuteki;
     }
@@ -743,6 +569,7 @@ public final class ShipDto extends AbstractDto {
     /**
      * @return 索敵(最大)
      */
+    @Override
     public int getSakutekiMax() {
         return this.sakutekiMax;
     }
@@ -750,6 +577,7 @@ public final class ShipDto extends AbstractDto {
     /**
      * @return 運
      */
+    @Override
     public int getLucky() {
         return this.lucky;
     }
@@ -757,15 +585,9 @@ public final class ShipDto extends AbstractDto {
     /**
      * @return 運(最大)
      */
+    @Override
     public int getLuckyMax() {
         return this.luckyMax;
-    }
-
-    /**
-     * @return 艦娘
-     */
-    public ShipInfoDto getShipInfo() {
-        return this.shipInfo;
     }
 
     /**
