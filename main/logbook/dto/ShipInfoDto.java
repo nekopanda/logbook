@@ -141,6 +141,12 @@ public final class ShipInfoDto extends AbstractDto {
                 builder.addMaxeq(b);
             }
         }
+        if (this.param != null) {
+            builder.setParam(this.param.toProto());
+        }
+        if (this.max != null) {
+            builder.setMax(this.max.toProto());
+        }
         return builder.build();
     }
 

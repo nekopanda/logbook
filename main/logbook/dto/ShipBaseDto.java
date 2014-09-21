@@ -26,23 +26,25 @@ import org.apache.commons.lang3.StringUtils;
 public abstract class ShipBaseDto extends AbstractDto {
 
     @Tag(1)
-    private final ShipInfoDto shipInfo;
+    protected final ShipInfoDto shipInfo;
 
     /** 装備 */
     @Tag(2)
-    private final int[] slot;
+    protected final int[] slot;
+
+    @Tag(3)
+    protected final List<ItemDto> slotItem;
 
     /** 装備込のパラメータ */
-    @Tag(3)
-    private final ShipParameters param;
+    @Tag(4)
+    protected final ShipParameters param;
 
     /** 装備による上昇分 */
-    @Tag(4)
-    private final ShipParameters slotParam;
+    @Tag(5)
+    protected final ShipParameters slotParam;
 
     /**
-     * コンストラクター
-     * 
+     * 艦娘用コンストラクター
      * @param object JSON Object
      */
     public ShipBaseDto(JsonObject object) {
@@ -50,14 +52,20 @@ public abstract class ShipBaseDto extends AbstractDto {
         ShipInfoDto shipinfo = Ship.get(String.valueOf(shipId));
         this.shipInfo = shipinfo;
         this.slot = JsonUtils.getIntArray(object, "api_slot");
+        this.slotItem = this.getItem();
         ShipParameters[] params = ShipParameters.fromShip(object);
         this.param = params[0];
         this.slotParam = params[1];
     }
 
+    /**
+     * 敵艦用コンストラクター
+     * @param object JSON Object
+     */
     public ShipBaseDto(int shipId, int[] slot) {
         this.shipInfo = Ship.get(String.valueOf(shipId));
         this.slot = slot;
+        this.slotItem = this.getItem();
         ShipParameters[] params = ShipParameters.fromBaseAndSlotItem(
                 this.shipInfo.getParam(), this.getItem());
         this.param = params[0];

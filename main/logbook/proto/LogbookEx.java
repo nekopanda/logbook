@@ -277,18 +277,6 @@ public final class LogbookEx {
      * <code>E = 6;</code>
      */
     E(6, 6),
-    /**
-     * <code>B_OR_C = 7;</code>
-     */
-    B_OR_C(7, 7),
-    /**
-     * <code>C_OR_B = 8;</code>
-     */
-    C_OR_B(8, 8),
-    /**
-     * <code>D_OR_C = 9;</code>
-     */
-    D_OR_C(9, 9),
     ;
 
     /**
@@ -319,18 +307,6 @@ public final class LogbookEx {
      * <code>E = 6;</code>
      */
     public static final int E_VALUE = 6;
-    /**
-     * <code>B_OR_C = 7;</code>
-     */
-    public static final int B_OR_C_VALUE = 7;
-    /**
-     * <code>C_OR_B = 8;</code>
-     */
-    public static final int C_OR_B_VALUE = 8;
-    /**
-     * <code>D_OR_C = 9;</code>
-     */
-    public static final int D_OR_C_VALUE = 9;
 
 
     public final int getNumber() { return value; }
@@ -344,9 +320,6 @@ public final class LogbookEx {
         case 4: return C;
         case 5: return D;
         case 6: return E;
-        case 7: return B_OR_C;
-        case 8: return C_OR_B;
-        case 9: return D_OR_C;
         default: return null;
       }
     }
@@ -1291,475 +1264,6 @@ public final class LogbookEx {
     // @@protoc_insertion_point(class_scope:logbook.EnemyDataPb)
   }
 
-  public interface intListPbOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
-
-    // repeated sint32 data = 1;
-    /**
-     * <code>repeated sint32 data = 1;</code>
-     */
-    java.util.List<java.lang.Integer> getDataList();
-    /**
-     * <code>repeated sint32 data = 1;</code>
-     */
-    int getDataCount();
-    /**
-     * <code>repeated sint32 data = 1;</code>
-     */
-    int getData(int index);
-  }
-  /**
-   * Protobuf type {@code logbook.intListPb}
-   */
-  public static final class intListPb extends
-      com.google.protobuf.GeneratedMessage
-      implements intListPbOrBuilder {
-    // Use intListPb.newBuilder() to construct.
-    private intListPb(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
-      super(builder);
-      this.unknownFields = builder.getUnknownFields();
-    }
-    private intListPb(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final intListPb defaultInstance;
-    public static intListPb getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public intListPb getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
-      return this.unknownFields;
-    }
-    private intListPb(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
-      int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-            case 8: {
-              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-                data_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000001;
-              }
-              data_.add(input.readSInt32());
-              break;
-            }
-            case 10: {
-              int length = input.readRawVarint32();
-              int limit = input.pushLimit(length);
-              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001) && input.getBytesUntilLimit() > 0) {
-                data_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000001;
-              }
-              while (input.getBytesUntilLimit() > 0) {
-                data_.add(input.readSInt32());
-              }
-              input.popLimit(limit);
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
-      } finally {
-        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-          data_ = java.util.Collections.unmodifiableList(data_);
-        }
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return logbook.proto.LogbookEx.internal_static_logbook_intListPb_descriptor;
-    }
-
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return logbook.proto.LogbookEx.internal_static_logbook_intListPb_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              logbook.proto.LogbookEx.intListPb.class, logbook.proto.LogbookEx.intListPb.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<intListPb> PARSER =
-        new com.google.protobuf.AbstractParser<intListPb>() {
-      public intListPb parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new intListPb(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<intListPb> getParserForType() {
-      return PARSER;
-    }
-
-    // repeated sint32 data = 1;
-    public static final int DATA_FIELD_NUMBER = 1;
-    private java.util.List<java.lang.Integer> data_;
-    /**
-     * <code>repeated sint32 data = 1;</code>
-     */
-    public java.util.List<java.lang.Integer>
-        getDataList() {
-      return data_;
-    }
-    /**
-     * <code>repeated sint32 data = 1;</code>
-     */
-    public int getDataCount() {
-      return data_.size();
-    }
-    /**
-     * <code>repeated sint32 data = 1;</code>
-     */
-    public int getData(int index) {
-      return data_.get(index);
-    }
-
-    private void initFields() {
-      data_ = java.util.Collections.emptyList();
-    }
-    private byte memoizedIsInitialized = -1;
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      getSerializedSize();
-      for (int i = 0; i < data_.size(); i++) {
-        output.writeSInt32(1, data_.get(i));
-      }
-      getUnknownFields().writeTo(output);
-    }
-
-    private int memoizedSerializedSize = -1;
-    public int getSerializedSize() {
-      int size = memoizedSerializedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      {
-        int dataSize = 0;
-        for (int i = 0; i < data_.size(); i++) {
-          dataSize += com.google.protobuf.CodedOutputStream
-            .computeSInt32SizeNoTag(data_.get(i));
-        }
-        size += dataSize;
-        size += 1 * getDataList().size();
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
-      return size;
-    }
-
-    private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
-    }
-
-    public static logbook.proto.LogbookEx.intListPb parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static logbook.proto.LogbookEx.intListPb parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static logbook.proto.LogbookEx.intListPb parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static logbook.proto.LogbookEx.intListPb parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static logbook.proto.LogbookEx.intListPb parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static logbook.proto.LogbookEx.intListPb parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-    public static logbook.proto.LogbookEx.intListPb parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
-    }
-    public static logbook.proto.LogbookEx.intListPb parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
-    }
-    public static logbook.proto.LogbookEx.intListPb parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static logbook.proto.LogbookEx.intListPb parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(logbook.proto.LogbookEx.intListPb prototype) {
-      return newBuilder().mergeFrom(prototype);
-    }
-    public Builder toBuilder() { return newBuilder(this); }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * Protobuf type {@code logbook.intListPb}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements logbook.proto.LogbookEx.intListPbOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return logbook.proto.LogbookEx.internal_static_logbook_intListPb_descriptor;
-      }
-
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return logbook.proto.LogbookEx.internal_static_logbook_intListPb_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                logbook.proto.LogbookEx.intListPb.class, logbook.proto.LogbookEx.intListPb.Builder.class);
-      }
-
-      // Construct using logbook.proto.LogbookEx.intListPb.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-        }
-      }
-      private static Builder create() {
-        return new Builder();
-      }
-
-      public Builder clear() {
-        super.clear();
-        data_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000001);
-        return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
-      }
-
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return logbook.proto.LogbookEx.internal_static_logbook_intListPb_descriptor;
-      }
-
-      public logbook.proto.LogbookEx.intListPb getDefaultInstanceForType() {
-        return logbook.proto.LogbookEx.intListPb.getDefaultInstance();
-      }
-
-      public logbook.proto.LogbookEx.intListPb build() {
-        logbook.proto.LogbookEx.intListPb result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      public logbook.proto.LogbookEx.intListPb buildPartial() {
-        logbook.proto.LogbookEx.intListPb result = new logbook.proto.LogbookEx.intListPb(this);
-        int from_bitField0_ = bitField0_;
-        if (((bitField0_ & 0x00000001) == 0x00000001)) {
-          data_ = java.util.Collections.unmodifiableList(data_);
-          bitField0_ = (bitField0_ & ~0x00000001);
-        }
-        result.data_ = data_;
-        onBuilt();
-        return result;
-      }
-
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof logbook.proto.LogbookEx.intListPb) {
-          return mergeFrom((logbook.proto.LogbookEx.intListPb)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(logbook.proto.LogbookEx.intListPb other) {
-        if (other == logbook.proto.LogbookEx.intListPb.getDefaultInstance()) return this;
-        if (!other.data_.isEmpty()) {
-          if (data_.isEmpty()) {
-            data_ = other.data_;
-            bitField0_ = (bitField0_ & ~0x00000001);
-          } else {
-            ensureDataIsMutable();
-            data_.addAll(other.data_);
-          }
-          onChanged();
-        }
-        this.mergeUnknownFields(other.getUnknownFields());
-        return this;
-      }
-
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        logbook.proto.LogbookEx.intListPb parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (logbook.proto.LogbookEx.intListPb) e.getUnfinishedMessage();
-          throw e;
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
-        return this;
-      }
-      private int bitField0_;
-
-      // repeated sint32 data = 1;
-      private java.util.List<java.lang.Integer> data_ = java.util.Collections.emptyList();
-      private void ensureDataIsMutable() {
-        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
-          data_ = new java.util.ArrayList<java.lang.Integer>(data_);
-          bitField0_ |= 0x00000001;
-         }
-      }
-      /**
-       * <code>repeated sint32 data = 1;</code>
-       */
-      public java.util.List<java.lang.Integer>
-          getDataList() {
-        return java.util.Collections.unmodifiableList(data_);
-      }
-      /**
-       * <code>repeated sint32 data = 1;</code>
-       */
-      public int getDataCount() {
-        return data_.size();
-      }
-      /**
-       * <code>repeated sint32 data = 1;</code>
-       */
-      public int getData(int index) {
-        return data_.get(index);
-      }
-      /**
-       * <code>repeated sint32 data = 1;</code>
-       */
-      public Builder setData(
-          int index, int value) {
-        ensureDataIsMutable();
-        data_.set(index, value);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated sint32 data = 1;</code>
-       */
-      public Builder addData(int value) {
-        ensureDataIsMutable();
-        data_.add(value);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated sint32 data = 1;</code>
-       */
-      public Builder addAllData(
-          java.lang.Iterable<? extends java.lang.Integer> values) {
-        ensureDataIsMutable();
-        super.addAll(values, data_);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated sint32 data = 1;</code>
-       */
-      public Builder clearData() {
-        data_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000001);
-        onChanged();
-        return this;
-      }
-
-      // @@protoc_insertion_point(builder_scope:logbook.intListPb)
-    }
-
-    static {
-      defaultInstance = new intListPb(true);
-      defaultInstance.initFields();
-    }
-
-    // @@protoc_insertion_point(class_scope:logbook.intListPb)
-  }
-
   public interface ShipInfoDtoPbOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
@@ -1895,6 +1399,34 @@ public final class LogbookEx {
      * <code>repeated sint32 maxeq = 11;</code>
      */
     int getMaxeq(int index);
+
+    // optional .logbook.ShipParametersPb param = 12;
+    /**
+     * <code>optional .logbook.ShipParametersPb param = 12;</code>
+     */
+    boolean hasParam();
+    /**
+     * <code>optional .logbook.ShipParametersPb param = 12;</code>
+     */
+    logbook.proto.LogbookEx.ShipParametersPb getParam();
+    /**
+     * <code>optional .logbook.ShipParametersPb param = 12;</code>
+     */
+    logbook.proto.LogbookEx.ShipParametersPbOrBuilder getParamOrBuilder();
+
+    // optional .logbook.ShipParametersPb max = 13;
+    /**
+     * <code>optional .logbook.ShipParametersPb max = 13;</code>
+     */
+    boolean hasMax();
+    /**
+     * <code>optional .logbook.ShipParametersPb max = 13;</code>
+     */
+    logbook.proto.LogbookEx.ShipParametersPb getMax();
+    /**
+     * <code>optional .logbook.ShipParametersPb max = 13;</code>
+     */
+    logbook.proto.LogbookEx.ShipParametersPbOrBuilder getMaxOrBuilder();
   }
   /**
    * Protobuf type {@code logbook.ShipInfoDtoPb}
@@ -2032,6 +1564,32 @@ public final class LogbookEx {
                 maxeq_.add(input.readSInt32());
               }
               input.popLimit(limit);
+              break;
+            }
+            case 98: {
+              logbook.proto.LogbookEx.ShipParametersPb.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000200) == 0x00000200)) {
+                subBuilder = param_.toBuilder();
+              }
+              param_ = input.readMessage(logbook.proto.LogbookEx.ShipParametersPb.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(param_);
+                param_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000200;
+              break;
+            }
+            case 106: {
+              logbook.proto.LogbookEx.ShipParametersPb.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000400) == 0x00000400)) {
+                subBuilder = max_.toBuilder();
+              }
+              max_ = input.readMessage(logbook.proto.LogbookEx.ShipParametersPb.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(max_);
+                max_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000400;
               break;
             }
           }
@@ -2351,6 +1909,50 @@ public final class LogbookEx {
       return maxeq_.get(index);
     }
 
+    // optional .logbook.ShipParametersPb param = 12;
+    public static final int PARAM_FIELD_NUMBER = 12;
+    private logbook.proto.LogbookEx.ShipParametersPb param_;
+    /**
+     * <code>optional .logbook.ShipParametersPb param = 12;</code>
+     */
+    public boolean hasParam() {
+      return ((bitField0_ & 0x00000200) == 0x00000200);
+    }
+    /**
+     * <code>optional .logbook.ShipParametersPb param = 12;</code>
+     */
+    public logbook.proto.LogbookEx.ShipParametersPb getParam() {
+      return param_;
+    }
+    /**
+     * <code>optional .logbook.ShipParametersPb param = 12;</code>
+     */
+    public logbook.proto.LogbookEx.ShipParametersPbOrBuilder getParamOrBuilder() {
+      return param_;
+    }
+
+    // optional .logbook.ShipParametersPb max = 13;
+    public static final int MAX_FIELD_NUMBER = 13;
+    private logbook.proto.LogbookEx.ShipParametersPb max_;
+    /**
+     * <code>optional .logbook.ShipParametersPb max = 13;</code>
+     */
+    public boolean hasMax() {
+      return ((bitField0_ & 0x00000400) == 0x00000400);
+    }
+    /**
+     * <code>optional .logbook.ShipParametersPb max = 13;</code>
+     */
+    public logbook.proto.LogbookEx.ShipParametersPb getMax() {
+      return max_;
+    }
+    /**
+     * <code>optional .logbook.ShipParametersPb max = 13;</code>
+     */
+    public logbook.proto.LogbookEx.ShipParametersPbOrBuilder getMaxOrBuilder() {
+      return max_;
+    }
+
     private void initFields() {
       name_ = "";
       shipId_ = 0;
@@ -2363,6 +1965,8 @@ public final class LogbookEx {
       maxFuel_ = 0;
       powup_ = java.util.Collections.emptyList();
       maxeq_ = java.util.Collections.emptyList();
+      param_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+      max_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -2408,6 +2012,12 @@ public final class LogbookEx {
       }
       for (int i = 0; i < maxeq_.size(); i++) {
         output.writeSInt32(11, maxeq_.get(i));
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        output.writeMessage(12, param_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        output.writeMessage(13, max_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -2471,6 +2081,14 @@ public final class LogbookEx {
         }
         size += dataSize;
         size += 1 * getMaxeqList().size();
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(12, param_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(13, max_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -2580,6 +2198,8 @@ public final class LogbookEx {
       }
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getParamFieldBuilder();
+          getMaxFieldBuilder();
         }
       }
       private static Builder create() {
@@ -2610,6 +2230,18 @@ public final class LogbookEx {
         bitField0_ = (bitField0_ & ~0x00000200);
         maxeq_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000400);
+        if (paramBuilder_ == null) {
+          param_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+        } else {
+          paramBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000800);
+        if (maxBuilder_ == null) {
+          max_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+        } else {
+          maxBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00001000);
         return this;
       }
 
@@ -2684,6 +2316,22 @@ public final class LogbookEx {
           bitField0_ = (bitField0_ & ~0x00000400);
         }
         result.maxeq_ = maxeq_;
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+          to_bitField0_ |= 0x00000200;
+        }
+        if (paramBuilder_ == null) {
+          result.param_ = param_;
+        } else {
+          result.param_ = paramBuilder_.build();
+        }
+        if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
+          to_bitField0_ |= 0x00000400;
+        }
+        if (maxBuilder_ == null) {
+          result.max_ = max_;
+        } else {
+          result.max_ = maxBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -2752,6 +2400,12 @@ public final class LogbookEx {
             maxeq_.addAll(other.maxeq_);
           }
           onChanged();
+        }
+        if (other.hasParam()) {
+          mergeParam(other.getParam());
+        }
+        if (other.hasMax()) {
+          mergeMax(other.getMax());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -3330,6 +2984,240 @@ public final class LogbookEx {
         bitField0_ = (bitField0_ & ~0x00000400);
         onChanged();
         return this;
+      }
+
+      // optional .logbook.ShipParametersPb param = 12;
+      private logbook.proto.LogbookEx.ShipParametersPb param_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          logbook.proto.LogbookEx.ShipParametersPb, logbook.proto.LogbookEx.ShipParametersPb.Builder, logbook.proto.LogbookEx.ShipParametersPbOrBuilder> paramBuilder_;
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 12;</code>
+       */
+      public boolean hasParam() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 12;</code>
+       */
+      public logbook.proto.LogbookEx.ShipParametersPb getParam() {
+        if (paramBuilder_ == null) {
+          return param_;
+        } else {
+          return paramBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 12;</code>
+       */
+      public Builder setParam(logbook.proto.LogbookEx.ShipParametersPb value) {
+        if (paramBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          param_ = value;
+          onChanged();
+        } else {
+          paramBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000800;
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 12;</code>
+       */
+      public Builder setParam(
+          logbook.proto.LogbookEx.ShipParametersPb.Builder builderForValue) {
+        if (paramBuilder_ == null) {
+          param_ = builderForValue.build();
+          onChanged();
+        } else {
+          paramBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000800;
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 12;</code>
+       */
+      public Builder mergeParam(logbook.proto.LogbookEx.ShipParametersPb value) {
+        if (paramBuilder_ == null) {
+          if (((bitField0_ & 0x00000800) == 0x00000800) &&
+              param_ != logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance()) {
+            param_ =
+              logbook.proto.LogbookEx.ShipParametersPb.newBuilder(param_).mergeFrom(value).buildPartial();
+          } else {
+            param_ = value;
+          }
+          onChanged();
+        } else {
+          paramBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000800;
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 12;</code>
+       */
+      public Builder clearParam() {
+        if (paramBuilder_ == null) {
+          param_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+          onChanged();
+        } else {
+          paramBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000800);
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 12;</code>
+       */
+      public logbook.proto.LogbookEx.ShipParametersPb.Builder getParamBuilder() {
+        bitField0_ |= 0x00000800;
+        onChanged();
+        return getParamFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 12;</code>
+       */
+      public logbook.proto.LogbookEx.ShipParametersPbOrBuilder getParamOrBuilder() {
+        if (paramBuilder_ != null) {
+          return paramBuilder_.getMessageOrBuilder();
+        } else {
+          return param_;
+        }
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 12;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          logbook.proto.LogbookEx.ShipParametersPb, logbook.proto.LogbookEx.ShipParametersPb.Builder, logbook.proto.LogbookEx.ShipParametersPbOrBuilder> 
+          getParamFieldBuilder() {
+        if (paramBuilder_ == null) {
+          paramBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              logbook.proto.LogbookEx.ShipParametersPb, logbook.proto.LogbookEx.ShipParametersPb.Builder, logbook.proto.LogbookEx.ShipParametersPbOrBuilder>(
+                  param_,
+                  getParentForChildren(),
+                  isClean());
+          param_ = null;
+        }
+        return paramBuilder_;
+      }
+
+      // optional .logbook.ShipParametersPb max = 13;
+      private logbook.proto.LogbookEx.ShipParametersPb max_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          logbook.proto.LogbookEx.ShipParametersPb, logbook.proto.LogbookEx.ShipParametersPb.Builder, logbook.proto.LogbookEx.ShipParametersPbOrBuilder> maxBuilder_;
+      /**
+       * <code>optional .logbook.ShipParametersPb max = 13;</code>
+       */
+      public boolean hasMax() {
+        return ((bitField0_ & 0x00001000) == 0x00001000);
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb max = 13;</code>
+       */
+      public logbook.proto.LogbookEx.ShipParametersPb getMax() {
+        if (maxBuilder_ == null) {
+          return max_;
+        } else {
+          return maxBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb max = 13;</code>
+       */
+      public Builder setMax(logbook.proto.LogbookEx.ShipParametersPb value) {
+        if (maxBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          max_ = value;
+          onChanged();
+        } else {
+          maxBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00001000;
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb max = 13;</code>
+       */
+      public Builder setMax(
+          logbook.proto.LogbookEx.ShipParametersPb.Builder builderForValue) {
+        if (maxBuilder_ == null) {
+          max_ = builderForValue.build();
+          onChanged();
+        } else {
+          maxBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00001000;
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb max = 13;</code>
+       */
+      public Builder mergeMax(logbook.proto.LogbookEx.ShipParametersPb value) {
+        if (maxBuilder_ == null) {
+          if (((bitField0_ & 0x00001000) == 0x00001000) &&
+              max_ != logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance()) {
+            max_ =
+              logbook.proto.LogbookEx.ShipParametersPb.newBuilder(max_).mergeFrom(value).buildPartial();
+          } else {
+            max_ = value;
+          }
+          onChanged();
+        } else {
+          maxBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00001000;
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb max = 13;</code>
+       */
+      public Builder clearMax() {
+        if (maxBuilder_ == null) {
+          max_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+          onChanged();
+        } else {
+          maxBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00001000);
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb max = 13;</code>
+       */
+      public logbook.proto.LogbookEx.ShipParametersPb.Builder getMaxBuilder() {
+        bitField0_ |= 0x00001000;
+        onChanged();
+        return getMaxFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb max = 13;</code>
+       */
+      public logbook.proto.LogbookEx.ShipParametersPbOrBuilder getMaxOrBuilder() {
+        if (maxBuilder_ != null) {
+          return maxBuilder_.getMessageOrBuilder();
+        } else {
+          return max_;
+        }
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb max = 13;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          logbook.proto.LogbookEx.ShipParametersPb, logbook.proto.LogbookEx.ShipParametersPb.Builder, logbook.proto.LogbookEx.ShipParametersPbOrBuilder> 
+          getMaxFieldBuilder() {
+        if (maxBuilder_ == null) {
+          maxBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              logbook.proto.LogbookEx.ShipParametersPb, logbook.proto.LogbookEx.ShipParametersPb.Builder, logbook.proto.LogbookEx.ShipParametersPbOrBuilder>(
+                  max_,
+                  getParentForChildren(),
+                  isClean());
+          max_ = null;
+        }
+        return maxBuilder_;
       }
 
       // @@protoc_insertion_point(builder_scope:logbook.ShipInfoDtoPb)
@@ -4685,79 +4573,29 @@ public final class LogbookEx {
     logbook.proto.LogbookEx.DockDtoPbOrBuilder getFriendsOrBuilder(
         int index);
 
-    // repeated .logbook.ShipInfoDtoPb enemy = 3;
+    // repeated .logbook.EnemyShipDtoPb enemy = 3;
     /**
-     * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+     * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
      */
-    java.util.List<logbook.proto.LogbookEx.ShipInfoDtoPb> 
+    java.util.List<logbook.proto.LogbookEx.EnemyShipDtoPb> 
         getEnemyList();
     /**
-     * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+     * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
      */
-    logbook.proto.LogbookEx.ShipInfoDtoPb getEnemy(int index);
+    logbook.proto.LogbookEx.EnemyShipDtoPb getEnemy(int index);
     /**
-     * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+     * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
      */
     int getEnemyCount();
     /**
-     * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+     * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
      */
-    java.util.List<? extends logbook.proto.LogbookEx.ShipInfoDtoPbOrBuilder> 
+    java.util.List<? extends logbook.proto.LogbookEx.EnemyShipDtoPbOrBuilder> 
         getEnemyOrBuilderList();
     /**
-     * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+     * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
      */
-    logbook.proto.LogbookEx.ShipInfoDtoPbOrBuilder getEnemyOrBuilder(
-        int index);
-
-    // repeated .logbook.ItemDtoListPb enemy_slot = 4;
-    /**
-     * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-     */
-    java.util.List<logbook.proto.LogbookEx.ItemDtoListPb> 
-        getEnemySlotList();
-    /**
-     * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-     */
-    logbook.proto.LogbookEx.ItemDtoListPb getEnemySlot(int index);
-    /**
-     * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-     */
-    int getEnemySlotCount();
-    /**
-     * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-     */
-    java.util.List<? extends logbook.proto.LogbookEx.ItemDtoListPbOrBuilder> 
-        getEnemySlotOrBuilderList();
-    /**
-     * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-     */
-    logbook.proto.LogbookEx.ItemDtoListPbOrBuilder getEnemySlotOrBuilder(
-        int index);
-
-    // repeated .logbook.intListPb enemy_param = 5;
-    /**
-     * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-     */
-    java.util.List<logbook.proto.LogbookEx.intListPb> 
-        getEnemyParamList();
-    /**
-     * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-     */
-    logbook.proto.LogbookEx.intListPb getEnemyParam(int index);
-    /**
-     * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-     */
-    int getEnemyParamCount();
-    /**
-     * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-     */
-    java.util.List<? extends logbook.proto.LogbookEx.intListPbOrBuilder> 
-        getEnemyParamOrBuilderList();
-    /**
-     * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-     */
-    logbook.proto.LogbookEx.intListPbOrBuilder getEnemyParamOrBuilder(
+    logbook.proto.LogbookEx.EnemyShipDtoPbOrBuilder getEnemyOrBuilder(
         int index);
 
     // repeated sint32 max_friend_hp = 6;
@@ -5109,32 +4947,16 @@ public final class LogbookEx {
             }
             case 26: {
               if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
-                enemy_ = new java.util.ArrayList<logbook.proto.LogbookEx.ShipInfoDtoPb>();
+                enemy_ = new java.util.ArrayList<logbook.proto.LogbookEx.EnemyShipDtoPb>();
                 mutable_bitField0_ |= 0x00000004;
               }
-              enemy_.add(input.readMessage(logbook.proto.LogbookEx.ShipInfoDtoPb.PARSER, extensionRegistry));
-              break;
-            }
-            case 34: {
-              if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
-                enemySlot_ = new java.util.ArrayList<logbook.proto.LogbookEx.ItemDtoListPb>();
-                mutable_bitField0_ |= 0x00000008;
-              }
-              enemySlot_.add(input.readMessage(logbook.proto.LogbookEx.ItemDtoListPb.PARSER, extensionRegistry));
-              break;
-            }
-            case 42: {
-              if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
-                enemyParam_ = new java.util.ArrayList<logbook.proto.LogbookEx.intListPb>();
-                mutable_bitField0_ |= 0x00000010;
-              }
-              enemyParam_.add(input.readMessage(logbook.proto.LogbookEx.intListPb.PARSER, extensionRegistry));
+              enemy_.add(input.readMessage(logbook.proto.LogbookEx.EnemyShipDtoPb.PARSER, extensionRegistry));
               break;
             }
             case 48: {
-              if (!((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
+              if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
                 maxFriendHp_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000020;
+                mutable_bitField0_ |= 0x00000008;
               }
               maxFriendHp_.add(input.readSInt32());
               break;
@@ -5142,9 +4964,9 @@ public final class LogbookEx {
             case 50: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
-              if (!((mutable_bitField0_ & 0x00000020) == 0x00000020) && input.getBytesUntilLimit() > 0) {
+              if (!((mutable_bitField0_ & 0x00000008) == 0x00000008) && input.getBytesUntilLimit() > 0) {
                 maxFriendHp_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000020;
+                mutable_bitField0_ |= 0x00000008;
               }
               while (input.getBytesUntilLimit() > 0) {
                 maxFriendHp_.add(input.readSInt32());
@@ -5153,9 +4975,9 @@ public final class LogbookEx {
               break;
             }
             case 56: {
-              if (!((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
+              if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
                 maxFriendHpCombined_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000040;
+                mutable_bitField0_ |= 0x00000010;
               }
               maxFriendHpCombined_.add(input.readSInt32());
               break;
@@ -5163,9 +4985,9 @@ public final class LogbookEx {
             case 58: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
-              if (!((mutable_bitField0_ & 0x00000040) == 0x00000040) && input.getBytesUntilLimit() > 0) {
+              if (!((mutable_bitField0_ & 0x00000010) == 0x00000010) && input.getBytesUntilLimit() > 0) {
                 maxFriendHpCombined_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000040;
+                mutable_bitField0_ |= 0x00000010;
               }
               while (input.getBytesUntilLimit() > 0) {
                 maxFriendHpCombined_.add(input.readSInt32());
@@ -5174,9 +4996,9 @@ public final class LogbookEx {
               break;
             }
             case 64: {
-              if (!((mutable_bitField0_ & 0x00000080) == 0x00000080)) {
+              if (!((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
                 maxEnemyHp_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000080;
+                mutable_bitField0_ |= 0x00000020;
               }
               maxEnemyHp_.add(input.readSInt32());
               break;
@@ -5184,9 +5006,9 @@ public final class LogbookEx {
             case 66: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
-              if (!((mutable_bitField0_ & 0x00000080) == 0x00000080) && input.getBytesUntilLimit() > 0) {
+              if (!((mutable_bitField0_ & 0x00000020) == 0x00000020) && input.getBytesUntilLimit() > 0) {
                 maxEnemyHp_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000080;
+                mutable_bitField0_ |= 0x00000020;
               }
               while (input.getBytesUntilLimit() > 0) {
                 maxEnemyHp_.add(input.readSInt32());
@@ -5195,9 +5017,9 @@ public final class LogbookEx {
               break;
             }
             case 72: {
-              if (!((mutable_bitField0_ & 0x00000100) == 0x00000100)) {
+              if (!((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
                 startFriendHp_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000100;
+                mutable_bitField0_ |= 0x00000040;
               }
               startFriendHp_.add(input.readSInt32());
               break;
@@ -5205,9 +5027,9 @@ public final class LogbookEx {
             case 74: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
-              if (!((mutable_bitField0_ & 0x00000100) == 0x00000100) && input.getBytesUntilLimit() > 0) {
+              if (!((mutable_bitField0_ & 0x00000040) == 0x00000040) && input.getBytesUntilLimit() > 0) {
                 startFriendHp_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000100;
+                mutable_bitField0_ |= 0x00000040;
               }
               while (input.getBytesUntilLimit() > 0) {
                 startFriendHp_.add(input.readSInt32());
@@ -5216,9 +5038,9 @@ public final class LogbookEx {
               break;
             }
             case 80: {
-              if (!((mutable_bitField0_ & 0x00000200) == 0x00000200)) {
+              if (!((mutable_bitField0_ & 0x00000080) == 0x00000080)) {
                 startFriendHpCombined_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000200;
+                mutable_bitField0_ |= 0x00000080;
               }
               startFriendHpCombined_.add(input.readSInt32());
               break;
@@ -5226,9 +5048,9 @@ public final class LogbookEx {
             case 82: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
-              if (!((mutable_bitField0_ & 0x00000200) == 0x00000200) && input.getBytesUntilLimit() > 0) {
+              if (!((mutable_bitField0_ & 0x00000080) == 0x00000080) && input.getBytesUntilLimit() > 0) {
                 startFriendHpCombined_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000200;
+                mutable_bitField0_ |= 0x00000080;
               }
               while (input.getBytesUntilLimit() > 0) {
                 startFriendHpCombined_.add(input.readSInt32());
@@ -5237,9 +5059,9 @@ public final class LogbookEx {
               break;
             }
             case 88: {
-              if (!((mutable_bitField0_ & 0x00000400) == 0x00000400)) {
+              if (!((mutable_bitField0_ & 0x00000100) == 0x00000100)) {
                 startEnemyHp_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000400;
+                mutable_bitField0_ |= 0x00000100;
               }
               startEnemyHp_.add(input.readSInt32());
               break;
@@ -5247,9 +5069,9 @@ public final class LogbookEx {
             case 90: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
-              if (!((mutable_bitField0_ & 0x00000400) == 0x00000400) && input.getBytesUntilLimit() > 0) {
+              if (!((mutable_bitField0_ & 0x00000100) == 0x00000100) && input.getBytesUntilLimit() > 0) {
                 startEnemyHp_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000400;
+                mutable_bitField0_ |= 0x00000100;
               }
               while (input.getBytesUntilLimit() > 0) {
                 startEnemyHp_.add(input.readSInt32());
@@ -5268,9 +5090,9 @@ public final class LogbookEx {
               break;
             }
             case 114: {
-              if (!((mutable_bitField0_ & 0x00002000) == 0x00002000)) {
+              if (!((mutable_bitField0_ & 0x00000800) == 0x00000800)) {
                 formation_ = new com.google.protobuf.LazyStringArrayList();
-                mutable_bitField0_ |= 0x00002000;
+                mutable_bitField0_ |= 0x00000800;
               }
               formation_.add(input.readBytes());
               break;
@@ -5281,9 +5103,9 @@ public final class LogbookEx {
               break;
             }
             case 130: {
-              if (!((mutable_bitField0_ & 0x00008000) == 0x00008000)) {
+              if (!((mutable_bitField0_ & 0x00002000) == 0x00002000)) {
                 sakuteki_ = new com.google.protobuf.LazyStringArrayList();
-                mutable_bitField0_ |= 0x00008000;
+                mutable_bitField0_ |= 0x00002000;
               }
               sakuteki_.add(input.readBytes());
               break;
@@ -5332,9 +5154,9 @@ public final class LogbookEx {
               break;
             }
             case 194: {
-              if (!((mutable_bitField0_ & 0x00800000) == 0x00800000)) {
+              if (!((mutable_bitField0_ & 0x00200000) == 0x00200000)) {
                 phaseList_ = new java.util.ArrayList<logbook.proto.LogbookEx.PhasePb>();
-                mutable_bitField0_ |= 0x00800000;
+                mutable_bitField0_ |= 0x00200000;
               }
               phaseList_.add(input.readMessage(logbook.proto.LogbookEx.PhasePb.PARSER, extensionRegistry));
               break;
@@ -5354,36 +5176,30 @@ public final class LogbookEx {
           enemy_ = java.util.Collections.unmodifiableList(enemy_);
         }
         if (((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
-          enemySlot_ = java.util.Collections.unmodifiableList(enemySlot_);
-        }
-        if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
-          enemyParam_ = java.util.Collections.unmodifiableList(enemyParam_);
-        }
-        if (((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
           maxFriendHp_ = java.util.Collections.unmodifiableList(maxFriendHp_);
         }
-        if (((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
+        if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
           maxFriendHpCombined_ = java.util.Collections.unmodifiableList(maxFriendHpCombined_);
         }
-        if (((mutable_bitField0_ & 0x00000080) == 0x00000080)) {
+        if (((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
           maxEnemyHp_ = java.util.Collections.unmodifiableList(maxEnemyHp_);
         }
-        if (((mutable_bitField0_ & 0x00000100) == 0x00000100)) {
+        if (((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
           startFriendHp_ = java.util.Collections.unmodifiableList(startFriendHp_);
         }
-        if (((mutable_bitField0_ & 0x00000200) == 0x00000200)) {
+        if (((mutable_bitField0_ & 0x00000080) == 0x00000080)) {
           startFriendHpCombined_ = java.util.Collections.unmodifiableList(startFriendHpCombined_);
         }
-        if (((mutable_bitField0_ & 0x00000400) == 0x00000400)) {
+        if (((mutable_bitField0_ & 0x00000100) == 0x00000100)) {
           startEnemyHp_ = java.util.Collections.unmodifiableList(startEnemyHp_);
         }
-        if (((mutable_bitField0_ & 0x00002000) == 0x00002000)) {
+        if (((mutable_bitField0_ & 0x00000800) == 0x00000800)) {
           formation_ = new com.google.protobuf.UnmodifiableLazyStringList(formation_);
         }
-        if (((mutable_bitField0_ & 0x00008000) == 0x00008000)) {
+        if (((mutable_bitField0_ & 0x00002000) == 0x00002000)) {
           sakuteki_ = new com.google.protobuf.UnmodifiableLazyStringList(sakuteki_);
         }
-        if (((mutable_bitField0_ & 0x00800000) == 0x00800000)) {
+        if (((mutable_bitField0_ & 0x00200000) == 0x00200000)) {
           phaseList_ = java.util.Collections.unmodifiableList(phaseList_);
         }
         this.unknownFields = unknownFields.build();
@@ -5470,112 +5286,40 @@ public final class LogbookEx {
       return friends_.get(index);
     }
 
-    // repeated .logbook.ShipInfoDtoPb enemy = 3;
+    // repeated .logbook.EnemyShipDtoPb enemy = 3;
     public static final int ENEMY_FIELD_NUMBER = 3;
-    private java.util.List<logbook.proto.LogbookEx.ShipInfoDtoPb> enemy_;
+    private java.util.List<logbook.proto.LogbookEx.EnemyShipDtoPb> enemy_;
     /**
-     * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+     * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
      */
-    public java.util.List<logbook.proto.LogbookEx.ShipInfoDtoPb> getEnemyList() {
+    public java.util.List<logbook.proto.LogbookEx.EnemyShipDtoPb> getEnemyList() {
       return enemy_;
     }
     /**
-     * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+     * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
      */
-    public java.util.List<? extends logbook.proto.LogbookEx.ShipInfoDtoPbOrBuilder> 
+    public java.util.List<? extends logbook.proto.LogbookEx.EnemyShipDtoPbOrBuilder> 
         getEnemyOrBuilderList() {
       return enemy_;
     }
     /**
-     * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+     * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
      */
     public int getEnemyCount() {
       return enemy_.size();
     }
     /**
-     * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+     * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
      */
-    public logbook.proto.LogbookEx.ShipInfoDtoPb getEnemy(int index) {
+    public logbook.proto.LogbookEx.EnemyShipDtoPb getEnemy(int index) {
       return enemy_.get(index);
     }
     /**
-     * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+     * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
      */
-    public logbook.proto.LogbookEx.ShipInfoDtoPbOrBuilder getEnemyOrBuilder(
+    public logbook.proto.LogbookEx.EnemyShipDtoPbOrBuilder getEnemyOrBuilder(
         int index) {
       return enemy_.get(index);
-    }
-
-    // repeated .logbook.ItemDtoListPb enemy_slot = 4;
-    public static final int ENEMY_SLOT_FIELD_NUMBER = 4;
-    private java.util.List<logbook.proto.LogbookEx.ItemDtoListPb> enemySlot_;
-    /**
-     * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-     */
-    public java.util.List<logbook.proto.LogbookEx.ItemDtoListPb> getEnemySlotList() {
-      return enemySlot_;
-    }
-    /**
-     * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-     */
-    public java.util.List<? extends logbook.proto.LogbookEx.ItemDtoListPbOrBuilder> 
-        getEnemySlotOrBuilderList() {
-      return enemySlot_;
-    }
-    /**
-     * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-     */
-    public int getEnemySlotCount() {
-      return enemySlot_.size();
-    }
-    /**
-     * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-     */
-    public logbook.proto.LogbookEx.ItemDtoListPb getEnemySlot(int index) {
-      return enemySlot_.get(index);
-    }
-    /**
-     * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-     */
-    public logbook.proto.LogbookEx.ItemDtoListPbOrBuilder getEnemySlotOrBuilder(
-        int index) {
-      return enemySlot_.get(index);
-    }
-
-    // repeated .logbook.intListPb enemy_param = 5;
-    public static final int ENEMY_PARAM_FIELD_NUMBER = 5;
-    private java.util.List<logbook.proto.LogbookEx.intListPb> enemyParam_;
-    /**
-     * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-     */
-    public java.util.List<logbook.proto.LogbookEx.intListPb> getEnemyParamList() {
-      return enemyParam_;
-    }
-    /**
-     * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-     */
-    public java.util.List<? extends logbook.proto.LogbookEx.intListPbOrBuilder> 
-        getEnemyParamOrBuilderList() {
-      return enemyParam_;
-    }
-    /**
-     * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-     */
-    public int getEnemyParamCount() {
-      return enemyParam_.size();
-    }
-    /**
-     * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-     */
-    public logbook.proto.LogbookEx.intListPb getEnemyParam(int index) {
-      return enemyParam_.get(index);
-    }
-    /**
-     * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-     */
-    public logbook.proto.LogbookEx.intListPbOrBuilder getEnemyParamOrBuilder(
-        int index) {
-      return enemyParam_.get(index);
     }
 
     // repeated sint32 max_friend_hp = 6;
@@ -6144,8 +5888,6 @@ public final class LogbookEx {
       battleDate_ = 0L;
       friends_ = java.util.Collections.emptyList();
       enemy_ = java.util.Collections.emptyList();
-      enemySlot_ = java.util.Collections.emptyList();
-      enemyParam_ = java.util.Collections.emptyList();
       maxFriendHp_ = java.util.Collections.emptyList();
       maxFriendHpCombined_ = java.util.Collections.emptyList();
       maxEnemyHp_ = java.util.Collections.emptyList();
@@ -6186,12 +5928,6 @@ public final class LogbookEx {
       }
       for (int i = 0; i < enemy_.size(); i++) {
         output.writeMessage(3, enemy_.get(i));
-      }
-      for (int i = 0; i < enemySlot_.size(); i++) {
-        output.writeMessage(4, enemySlot_.get(i));
-      }
-      for (int i = 0; i < enemyParam_.size(); i++) {
-        output.writeMessage(5, enemyParam_.get(i));
       }
       for (int i = 0; i < maxFriendHp_.size(); i++) {
         output.writeSInt32(6, maxFriendHp_.get(i));
@@ -6270,14 +6006,6 @@ public final class LogbookEx {
       for (int i = 0; i < enemy_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(3, enemy_.get(i));
-      }
-      for (int i = 0; i < enemySlot_.size(); i++) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, enemySlot_.get(i));
-      }
-      for (int i = 0; i < enemyParam_.size(); i++) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(5, enemyParam_.get(i));
       }
       {
         int dataSize = 0;
@@ -6505,8 +6233,6 @@ public final class LogbookEx {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           getFriendsFieldBuilder();
           getEnemyFieldBuilder();
-          getEnemySlotFieldBuilder();
-          getEnemyParamFieldBuilder();
           getMapCellDtoFieldBuilder();
           getPhaseListFieldBuilder();
         }
@@ -6531,61 +6257,49 @@ public final class LogbookEx {
         } else {
           enemyBuilder_.clear();
         }
-        if (enemySlotBuilder_ == null) {
-          enemySlot_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000008);
-        } else {
-          enemySlotBuilder_.clear();
-        }
-        if (enemyParamBuilder_ == null) {
-          enemyParam_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000010);
-        } else {
-          enemyParamBuilder_.clear();
-        }
         maxFriendHp_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000008);
         maxFriendHpCombined_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000010);
         maxEnemyHp_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000080);
+        bitField0_ = (bitField0_ & ~0x00000020);
         startFriendHp_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000100);
+        bitField0_ = (bitField0_ & ~0x00000040);
         startFriendHpCombined_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000200);
+        bitField0_ = (bitField0_ & ~0x00000080);
         startEnemyHp_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000400);
+        bitField0_ = (bitField0_ & ~0x00000100);
         friendGaugeMax_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000800);
+        bitField0_ = (bitField0_ & ~0x00000200);
         enemyGaugeMax_ = 0;
-        bitField0_ = (bitField0_ & ~0x00001000);
+        bitField0_ = (bitField0_ & ~0x00000400);
         formation_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-        bitField0_ = (bitField0_ & ~0x00002000);
+        bitField0_ = (bitField0_ & ~0x00000800);
         formationMatch_ = "";
-        bitField0_ = (bitField0_ & ~0x00004000);
+        bitField0_ = (bitField0_ & ~0x00001000);
         sakuteki_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-        bitField0_ = (bitField0_ & ~0x00008000);
+        bitField0_ = (bitField0_ & ~0x00002000);
         questName_ = "";
-        bitField0_ = (bitField0_ & ~0x00010000);
+        bitField0_ = (bitField0_ & ~0x00004000);
         rank_ = "";
-        bitField0_ = (bitField0_ & ~0x00020000);
+        bitField0_ = (bitField0_ & ~0x00008000);
         if (mapCellDtoBuilder_ == null) {
           mapCellDto_ = logbook.proto.LogbookEx.MapCellDtoPb.getDefaultInstance();
         } else {
           mapCellDtoBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00040000);
+        bitField0_ = (bitField0_ & ~0x00010000);
         enemyName_ = "";
-        bitField0_ = (bitField0_ & ~0x00080000);
+        bitField0_ = (bitField0_ & ~0x00020000);
         dropFlag_ = false;
-        bitField0_ = (bitField0_ & ~0x00100000);
+        bitField0_ = (bitField0_ & ~0x00040000);
         dropType_ = "";
-        bitField0_ = (bitField0_ & ~0x00200000);
+        bitField0_ = (bitField0_ & ~0x00080000);
         dropName_ = "";
-        bitField0_ = (bitField0_ & ~0x00400000);
+        bitField0_ = (bitField0_ & ~0x00100000);
         if (phaseListBuilder_ == null) {
           phaseList_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00800000);
+          bitField0_ = (bitField0_ & ~0x00200000);
         } else {
           phaseListBuilder_.clear();
         }
@@ -6639,87 +6353,69 @@ public final class LogbookEx {
         } else {
           result.enemy_ = enemyBuilder_.build();
         }
-        if (enemySlotBuilder_ == null) {
-          if (((bitField0_ & 0x00000008) == 0x00000008)) {
-            enemySlot_ = java.util.Collections.unmodifiableList(enemySlot_);
-            bitField0_ = (bitField0_ & ~0x00000008);
-          }
-          result.enemySlot_ = enemySlot_;
-        } else {
-          result.enemySlot_ = enemySlotBuilder_.build();
-        }
-        if (enemyParamBuilder_ == null) {
-          if (((bitField0_ & 0x00000010) == 0x00000010)) {
-            enemyParam_ = java.util.Collections.unmodifiableList(enemyParam_);
-            bitField0_ = (bitField0_ & ~0x00000010);
-          }
-          result.enemyParam_ = enemyParam_;
-        } else {
-          result.enemyParam_ = enemyParamBuilder_.build();
-        }
-        if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        if (((bitField0_ & 0x00000008) == 0x00000008)) {
           maxFriendHp_ = java.util.Collections.unmodifiableList(maxFriendHp_);
-          bitField0_ = (bitField0_ & ~0x00000020);
+          bitField0_ = (bitField0_ & ~0x00000008);
         }
         result.maxFriendHp_ = maxFriendHp_;
-        if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        if (((bitField0_ & 0x00000010) == 0x00000010)) {
           maxFriendHpCombined_ = java.util.Collections.unmodifiableList(maxFriendHpCombined_);
-          bitField0_ = (bitField0_ & ~0x00000040);
+          bitField0_ = (bitField0_ & ~0x00000010);
         }
         result.maxFriendHpCombined_ = maxFriendHpCombined_;
-        if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        if (((bitField0_ & 0x00000020) == 0x00000020)) {
           maxEnemyHp_ = java.util.Collections.unmodifiableList(maxEnemyHp_);
-          bitField0_ = (bitField0_ & ~0x00000080);
+          bitField0_ = (bitField0_ & ~0x00000020);
         }
         result.maxEnemyHp_ = maxEnemyHp_;
-        if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        if (((bitField0_ & 0x00000040) == 0x00000040)) {
           startFriendHp_ = java.util.Collections.unmodifiableList(startFriendHp_);
-          bitField0_ = (bitField0_ & ~0x00000100);
+          bitField0_ = (bitField0_ & ~0x00000040);
         }
         result.startFriendHp_ = startFriendHp_;
-        if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        if (((bitField0_ & 0x00000080) == 0x00000080)) {
           startFriendHpCombined_ = java.util.Collections.unmodifiableList(startFriendHpCombined_);
-          bitField0_ = (bitField0_ & ~0x00000200);
+          bitField0_ = (bitField0_ & ~0x00000080);
         }
         result.startFriendHpCombined_ = startFriendHpCombined_;
-        if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        if (((bitField0_ & 0x00000100) == 0x00000100)) {
           startEnemyHp_ = java.util.Collections.unmodifiableList(startEnemyHp_);
-          bitField0_ = (bitField0_ & ~0x00000400);
+          bitField0_ = (bitField0_ & ~0x00000100);
         }
         result.startEnemyHp_ = startEnemyHp_;
-        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
           to_bitField0_ |= 0x00000002;
         }
         result.friendGaugeMax_ = friendGaugeMax_;
-        if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
           to_bitField0_ |= 0x00000004;
         }
         result.enemyGaugeMax_ = enemyGaugeMax_;
-        if (((bitField0_ & 0x00002000) == 0x00002000)) {
+        if (((bitField0_ & 0x00000800) == 0x00000800)) {
           formation_ = new com.google.protobuf.UnmodifiableLazyStringList(
               formation_);
-          bitField0_ = (bitField0_ & ~0x00002000);
+          bitField0_ = (bitField0_ & ~0x00000800);
         }
         result.formation_ = formation_;
-        if (((from_bitField0_ & 0x00004000) == 0x00004000)) {
+        if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
           to_bitField0_ |= 0x00000008;
         }
         result.formationMatch_ = formationMatch_;
-        if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        if (((bitField0_ & 0x00002000) == 0x00002000)) {
           sakuteki_ = new com.google.protobuf.UnmodifiableLazyStringList(
               sakuteki_);
-          bitField0_ = (bitField0_ & ~0x00008000);
+          bitField0_ = (bitField0_ & ~0x00002000);
         }
         result.sakuteki_ = sakuteki_;
-        if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
+        if (((from_bitField0_ & 0x00004000) == 0x00004000)) {
           to_bitField0_ |= 0x00000010;
         }
         result.questName_ = questName_;
-        if (((from_bitField0_ & 0x00020000) == 0x00020000)) {
+        if (((from_bitField0_ & 0x00008000) == 0x00008000)) {
           to_bitField0_ |= 0x00000020;
         }
         result.rank_ = rank_;
-        if (((from_bitField0_ & 0x00040000) == 0x00040000)) {
+        if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
           to_bitField0_ |= 0x00000040;
         }
         if (mapCellDtoBuilder_ == null) {
@@ -6727,26 +6423,26 @@ public final class LogbookEx {
         } else {
           result.mapCellDto_ = mapCellDtoBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00080000) == 0x00080000)) {
+        if (((from_bitField0_ & 0x00020000) == 0x00020000)) {
           to_bitField0_ |= 0x00000080;
         }
         result.enemyName_ = enemyName_;
-        if (((from_bitField0_ & 0x00100000) == 0x00100000)) {
+        if (((from_bitField0_ & 0x00040000) == 0x00040000)) {
           to_bitField0_ |= 0x00000100;
         }
         result.dropFlag_ = dropFlag_;
-        if (((from_bitField0_ & 0x00200000) == 0x00200000)) {
+        if (((from_bitField0_ & 0x00080000) == 0x00080000)) {
           to_bitField0_ |= 0x00000200;
         }
         result.dropType_ = dropType_;
-        if (((from_bitField0_ & 0x00400000) == 0x00400000)) {
+        if (((from_bitField0_ & 0x00100000) == 0x00100000)) {
           to_bitField0_ |= 0x00000400;
         }
         result.dropName_ = dropName_;
         if (phaseListBuilder_ == null) {
-          if (((bitField0_ & 0x00800000) == 0x00800000)) {
+          if (((bitField0_ & 0x00200000) == 0x00200000)) {
             phaseList_ = java.util.Collections.unmodifiableList(phaseList_);
-            bitField0_ = (bitField0_ & ~0x00800000);
+            bitField0_ = (bitField0_ & ~0x00200000);
           }
           result.phaseList_ = phaseList_;
         } else {
@@ -6823,62 +6519,10 @@ public final class LogbookEx {
             }
           }
         }
-        if (enemySlotBuilder_ == null) {
-          if (!other.enemySlot_.isEmpty()) {
-            if (enemySlot_.isEmpty()) {
-              enemySlot_ = other.enemySlot_;
-              bitField0_ = (bitField0_ & ~0x00000008);
-            } else {
-              ensureEnemySlotIsMutable();
-              enemySlot_.addAll(other.enemySlot_);
-            }
-            onChanged();
-          }
-        } else {
-          if (!other.enemySlot_.isEmpty()) {
-            if (enemySlotBuilder_.isEmpty()) {
-              enemySlotBuilder_.dispose();
-              enemySlotBuilder_ = null;
-              enemySlot_ = other.enemySlot_;
-              bitField0_ = (bitField0_ & ~0x00000008);
-              enemySlotBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                   getEnemySlotFieldBuilder() : null;
-            } else {
-              enemySlotBuilder_.addAllMessages(other.enemySlot_);
-            }
-          }
-        }
-        if (enemyParamBuilder_ == null) {
-          if (!other.enemyParam_.isEmpty()) {
-            if (enemyParam_.isEmpty()) {
-              enemyParam_ = other.enemyParam_;
-              bitField0_ = (bitField0_ & ~0x00000010);
-            } else {
-              ensureEnemyParamIsMutable();
-              enemyParam_.addAll(other.enemyParam_);
-            }
-            onChanged();
-          }
-        } else {
-          if (!other.enemyParam_.isEmpty()) {
-            if (enemyParamBuilder_.isEmpty()) {
-              enemyParamBuilder_.dispose();
-              enemyParamBuilder_ = null;
-              enemyParam_ = other.enemyParam_;
-              bitField0_ = (bitField0_ & ~0x00000010);
-              enemyParamBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                   getEnemyParamFieldBuilder() : null;
-            } else {
-              enemyParamBuilder_.addAllMessages(other.enemyParam_);
-            }
-          }
-        }
         if (!other.maxFriendHp_.isEmpty()) {
           if (maxFriendHp_.isEmpty()) {
             maxFriendHp_ = other.maxFriendHp_;
-            bitField0_ = (bitField0_ & ~0x00000020);
+            bitField0_ = (bitField0_ & ~0x00000008);
           } else {
             ensureMaxFriendHpIsMutable();
             maxFriendHp_.addAll(other.maxFriendHp_);
@@ -6888,7 +6532,7 @@ public final class LogbookEx {
         if (!other.maxFriendHpCombined_.isEmpty()) {
           if (maxFriendHpCombined_.isEmpty()) {
             maxFriendHpCombined_ = other.maxFriendHpCombined_;
-            bitField0_ = (bitField0_ & ~0x00000040);
+            bitField0_ = (bitField0_ & ~0x00000010);
           } else {
             ensureMaxFriendHpCombinedIsMutable();
             maxFriendHpCombined_.addAll(other.maxFriendHpCombined_);
@@ -6898,7 +6542,7 @@ public final class LogbookEx {
         if (!other.maxEnemyHp_.isEmpty()) {
           if (maxEnemyHp_.isEmpty()) {
             maxEnemyHp_ = other.maxEnemyHp_;
-            bitField0_ = (bitField0_ & ~0x00000080);
+            bitField0_ = (bitField0_ & ~0x00000020);
           } else {
             ensureMaxEnemyHpIsMutable();
             maxEnemyHp_.addAll(other.maxEnemyHp_);
@@ -6908,7 +6552,7 @@ public final class LogbookEx {
         if (!other.startFriendHp_.isEmpty()) {
           if (startFriendHp_.isEmpty()) {
             startFriendHp_ = other.startFriendHp_;
-            bitField0_ = (bitField0_ & ~0x00000100);
+            bitField0_ = (bitField0_ & ~0x00000040);
           } else {
             ensureStartFriendHpIsMutable();
             startFriendHp_.addAll(other.startFriendHp_);
@@ -6918,7 +6562,7 @@ public final class LogbookEx {
         if (!other.startFriendHpCombined_.isEmpty()) {
           if (startFriendHpCombined_.isEmpty()) {
             startFriendHpCombined_ = other.startFriendHpCombined_;
-            bitField0_ = (bitField0_ & ~0x00000200);
+            bitField0_ = (bitField0_ & ~0x00000080);
           } else {
             ensureStartFriendHpCombinedIsMutable();
             startFriendHpCombined_.addAll(other.startFriendHpCombined_);
@@ -6928,7 +6572,7 @@ public final class LogbookEx {
         if (!other.startEnemyHp_.isEmpty()) {
           if (startEnemyHp_.isEmpty()) {
             startEnemyHp_ = other.startEnemyHp_;
-            bitField0_ = (bitField0_ & ~0x00000400);
+            bitField0_ = (bitField0_ & ~0x00000100);
           } else {
             ensureStartEnemyHpIsMutable();
             startEnemyHp_.addAll(other.startEnemyHp_);
@@ -6944,7 +6588,7 @@ public final class LogbookEx {
         if (!other.formation_.isEmpty()) {
           if (formation_.isEmpty()) {
             formation_ = other.formation_;
-            bitField0_ = (bitField0_ & ~0x00002000);
+            bitField0_ = (bitField0_ & ~0x00000800);
           } else {
             ensureFormationIsMutable();
             formation_.addAll(other.formation_);
@@ -6952,14 +6596,14 @@ public final class LogbookEx {
           onChanged();
         }
         if (other.hasFormationMatch()) {
-          bitField0_ |= 0x00004000;
+          bitField0_ |= 0x00001000;
           formationMatch_ = other.formationMatch_;
           onChanged();
         }
         if (!other.sakuteki_.isEmpty()) {
           if (sakuteki_.isEmpty()) {
             sakuteki_ = other.sakuteki_;
-            bitField0_ = (bitField0_ & ~0x00008000);
+            bitField0_ = (bitField0_ & ~0x00002000);
           } else {
             ensureSakutekiIsMutable();
             sakuteki_.addAll(other.sakuteki_);
@@ -6967,12 +6611,12 @@ public final class LogbookEx {
           onChanged();
         }
         if (other.hasQuestName()) {
-          bitField0_ |= 0x00010000;
+          bitField0_ |= 0x00004000;
           questName_ = other.questName_;
           onChanged();
         }
         if (other.hasRank()) {
-          bitField0_ |= 0x00020000;
+          bitField0_ |= 0x00008000;
           rank_ = other.rank_;
           onChanged();
         }
@@ -6980,7 +6624,7 @@ public final class LogbookEx {
           mergeMapCellDto(other.getMapCellDto());
         }
         if (other.hasEnemyName()) {
-          bitField0_ |= 0x00080000;
+          bitField0_ |= 0x00020000;
           enemyName_ = other.enemyName_;
           onChanged();
         }
@@ -6988,12 +6632,12 @@ public final class LogbookEx {
           setDropFlag(other.getDropFlag());
         }
         if (other.hasDropType()) {
-          bitField0_ |= 0x00200000;
+          bitField0_ |= 0x00080000;
           dropType_ = other.dropType_;
           onChanged();
         }
         if (other.hasDropName()) {
-          bitField0_ |= 0x00400000;
+          bitField0_ |= 0x00100000;
           dropName_ = other.dropName_;
           onChanged();
         }
@@ -7001,7 +6645,7 @@ public final class LogbookEx {
           if (!other.phaseList_.isEmpty()) {
             if (phaseList_.isEmpty()) {
               phaseList_ = other.phaseList_;
-              bitField0_ = (bitField0_ & ~0x00800000);
+              bitField0_ = (bitField0_ & ~0x00200000);
             } else {
               ensurePhaseListIsMutable();
               phaseList_.addAll(other.phaseList_);
@@ -7014,7 +6658,7 @@ public final class LogbookEx {
               phaseListBuilder_.dispose();
               phaseListBuilder_ = null;
               phaseList_ = other.phaseList_;
-              bitField0_ = (bitField0_ & ~0x00800000);
+              bitField0_ = (bitField0_ & ~0x00200000);
               phaseListBuilder_ = 
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getPhaseListFieldBuilder() : null;
@@ -7323,23 +6967,23 @@ public final class LogbookEx {
         return friendsBuilder_;
       }
 
-      // repeated .logbook.ShipInfoDtoPb enemy = 3;
-      private java.util.List<logbook.proto.LogbookEx.ShipInfoDtoPb> enemy_ =
+      // repeated .logbook.EnemyShipDtoPb enemy = 3;
+      private java.util.List<logbook.proto.LogbookEx.EnemyShipDtoPb> enemy_ =
         java.util.Collections.emptyList();
       private void ensureEnemyIsMutable() {
         if (!((bitField0_ & 0x00000004) == 0x00000004)) {
-          enemy_ = new java.util.ArrayList<logbook.proto.LogbookEx.ShipInfoDtoPb>(enemy_);
+          enemy_ = new java.util.ArrayList<logbook.proto.LogbookEx.EnemyShipDtoPb>(enemy_);
           bitField0_ |= 0x00000004;
          }
       }
 
       private com.google.protobuf.RepeatedFieldBuilder<
-          logbook.proto.LogbookEx.ShipInfoDtoPb, logbook.proto.LogbookEx.ShipInfoDtoPb.Builder, logbook.proto.LogbookEx.ShipInfoDtoPbOrBuilder> enemyBuilder_;
+          logbook.proto.LogbookEx.EnemyShipDtoPb, logbook.proto.LogbookEx.EnemyShipDtoPb.Builder, logbook.proto.LogbookEx.EnemyShipDtoPbOrBuilder> enemyBuilder_;
 
       /**
-       * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+       * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
        */
-      public java.util.List<logbook.proto.LogbookEx.ShipInfoDtoPb> getEnemyList() {
+      public java.util.List<logbook.proto.LogbookEx.EnemyShipDtoPb> getEnemyList() {
         if (enemyBuilder_ == null) {
           return java.util.Collections.unmodifiableList(enemy_);
         } else {
@@ -7347,7 +6991,7 @@ public final class LogbookEx {
         }
       }
       /**
-       * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+       * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
        */
       public int getEnemyCount() {
         if (enemyBuilder_ == null) {
@@ -7357,9 +7001,9 @@ public final class LogbookEx {
         }
       }
       /**
-       * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+       * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
        */
-      public logbook.proto.LogbookEx.ShipInfoDtoPb getEnemy(int index) {
+      public logbook.proto.LogbookEx.EnemyShipDtoPb getEnemy(int index) {
         if (enemyBuilder_ == null) {
           return enemy_.get(index);
         } else {
@@ -7367,10 +7011,10 @@ public final class LogbookEx {
         }
       }
       /**
-       * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+       * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
        */
       public Builder setEnemy(
-          int index, logbook.proto.LogbookEx.ShipInfoDtoPb value) {
+          int index, logbook.proto.LogbookEx.EnemyShipDtoPb value) {
         if (enemyBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -7384,10 +7028,10 @@ public final class LogbookEx {
         return this;
       }
       /**
-       * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+       * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
        */
       public Builder setEnemy(
-          int index, logbook.proto.LogbookEx.ShipInfoDtoPb.Builder builderForValue) {
+          int index, logbook.proto.LogbookEx.EnemyShipDtoPb.Builder builderForValue) {
         if (enemyBuilder_ == null) {
           ensureEnemyIsMutable();
           enemy_.set(index, builderForValue.build());
@@ -7398,9 +7042,9 @@ public final class LogbookEx {
         return this;
       }
       /**
-       * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+       * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
        */
-      public Builder addEnemy(logbook.proto.LogbookEx.ShipInfoDtoPb value) {
+      public Builder addEnemy(logbook.proto.LogbookEx.EnemyShipDtoPb value) {
         if (enemyBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -7414,10 +7058,10 @@ public final class LogbookEx {
         return this;
       }
       /**
-       * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+       * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
        */
       public Builder addEnemy(
-          int index, logbook.proto.LogbookEx.ShipInfoDtoPb value) {
+          int index, logbook.proto.LogbookEx.EnemyShipDtoPb value) {
         if (enemyBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -7431,10 +7075,10 @@ public final class LogbookEx {
         return this;
       }
       /**
-       * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+       * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
        */
       public Builder addEnemy(
-          logbook.proto.LogbookEx.ShipInfoDtoPb.Builder builderForValue) {
+          logbook.proto.LogbookEx.EnemyShipDtoPb.Builder builderForValue) {
         if (enemyBuilder_ == null) {
           ensureEnemyIsMutable();
           enemy_.add(builderForValue.build());
@@ -7445,10 +7089,10 @@ public final class LogbookEx {
         return this;
       }
       /**
-       * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+       * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
        */
       public Builder addEnemy(
-          int index, logbook.proto.LogbookEx.ShipInfoDtoPb.Builder builderForValue) {
+          int index, logbook.proto.LogbookEx.EnemyShipDtoPb.Builder builderForValue) {
         if (enemyBuilder_ == null) {
           ensureEnemyIsMutable();
           enemy_.add(index, builderForValue.build());
@@ -7459,10 +7103,10 @@ public final class LogbookEx {
         return this;
       }
       /**
-       * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+       * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
        */
       public Builder addAllEnemy(
-          java.lang.Iterable<? extends logbook.proto.LogbookEx.ShipInfoDtoPb> values) {
+          java.lang.Iterable<? extends logbook.proto.LogbookEx.EnemyShipDtoPb> values) {
         if (enemyBuilder_ == null) {
           ensureEnemyIsMutable();
           super.addAll(values, enemy_);
@@ -7473,7 +7117,7 @@ public final class LogbookEx {
         return this;
       }
       /**
-       * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+       * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
        */
       public Builder clearEnemy() {
         if (enemyBuilder_ == null) {
@@ -7486,7 +7130,7 @@ public final class LogbookEx {
         return this;
       }
       /**
-       * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+       * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
        */
       public Builder removeEnemy(int index) {
         if (enemyBuilder_ == null) {
@@ -7499,16 +7143,16 @@ public final class LogbookEx {
         return this;
       }
       /**
-       * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+       * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
        */
-      public logbook.proto.LogbookEx.ShipInfoDtoPb.Builder getEnemyBuilder(
+      public logbook.proto.LogbookEx.EnemyShipDtoPb.Builder getEnemyBuilder(
           int index) {
         return getEnemyFieldBuilder().getBuilder(index);
       }
       /**
-       * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+       * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
        */
-      public logbook.proto.LogbookEx.ShipInfoDtoPbOrBuilder getEnemyOrBuilder(
+      public logbook.proto.LogbookEx.EnemyShipDtoPbOrBuilder getEnemyOrBuilder(
           int index) {
         if (enemyBuilder_ == null) {
           return enemy_.get(index);  } else {
@@ -7516,9 +7160,9 @@ public final class LogbookEx {
         }
       }
       /**
-       * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+       * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
        */
-      public java.util.List<? extends logbook.proto.LogbookEx.ShipInfoDtoPbOrBuilder> 
+      public java.util.List<? extends logbook.proto.LogbookEx.EnemyShipDtoPbOrBuilder> 
            getEnemyOrBuilderList() {
         if (enemyBuilder_ != null) {
           return enemyBuilder_.getMessageOrBuilderList();
@@ -7527,33 +7171,33 @@ public final class LogbookEx {
         }
       }
       /**
-       * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+       * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
        */
-      public logbook.proto.LogbookEx.ShipInfoDtoPb.Builder addEnemyBuilder() {
+      public logbook.proto.LogbookEx.EnemyShipDtoPb.Builder addEnemyBuilder() {
         return getEnemyFieldBuilder().addBuilder(
-            logbook.proto.LogbookEx.ShipInfoDtoPb.getDefaultInstance());
+            logbook.proto.LogbookEx.EnemyShipDtoPb.getDefaultInstance());
       }
       /**
-       * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+       * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
        */
-      public logbook.proto.LogbookEx.ShipInfoDtoPb.Builder addEnemyBuilder(
+      public logbook.proto.LogbookEx.EnemyShipDtoPb.Builder addEnemyBuilder(
           int index) {
         return getEnemyFieldBuilder().addBuilder(
-            index, logbook.proto.LogbookEx.ShipInfoDtoPb.getDefaultInstance());
+            index, logbook.proto.LogbookEx.EnemyShipDtoPb.getDefaultInstance());
       }
       /**
-       * <code>repeated .logbook.ShipInfoDtoPb enemy = 3;</code>
+       * <code>repeated .logbook.EnemyShipDtoPb enemy = 3;</code>
        */
-      public java.util.List<logbook.proto.LogbookEx.ShipInfoDtoPb.Builder> 
+      public java.util.List<logbook.proto.LogbookEx.EnemyShipDtoPb.Builder> 
            getEnemyBuilderList() {
         return getEnemyFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          logbook.proto.LogbookEx.ShipInfoDtoPb, logbook.proto.LogbookEx.ShipInfoDtoPb.Builder, logbook.proto.LogbookEx.ShipInfoDtoPbOrBuilder> 
+          logbook.proto.LogbookEx.EnemyShipDtoPb, logbook.proto.LogbookEx.EnemyShipDtoPb.Builder, logbook.proto.LogbookEx.EnemyShipDtoPbOrBuilder> 
           getEnemyFieldBuilder() {
         if (enemyBuilder_ == null) {
           enemyBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-              logbook.proto.LogbookEx.ShipInfoDtoPb, logbook.proto.LogbookEx.ShipInfoDtoPb.Builder, logbook.proto.LogbookEx.ShipInfoDtoPbOrBuilder>(
+              logbook.proto.LogbookEx.EnemyShipDtoPb, logbook.proto.LogbookEx.EnemyShipDtoPb.Builder, logbook.proto.LogbookEx.EnemyShipDtoPbOrBuilder>(
                   enemy_,
                   ((bitField0_ & 0x00000004) == 0x00000004),
                   getParentForChildren(),
@@ -7563,492 +7207,12 @@ public final class LogbookEx {
         return enemyBuilder_;
       }
 
-      // repeated .logbook.ItemDtoListPb enemy_slot = 4;
-      private java.util.List<logbook.proto.LogbookEx.ItemDtoListPb> enemySlot_ =
-        java.util.Collections.emptyList();
-      private void ensureEnemySlotIsMutable() {
-        if (!((bitField0_ & 0x00000008) == 0x00000008)) {
-          enemySlot_ = new java.util.ArrayList<logbook.proto.LogbookEx.ItemDtoListPb>(enemySlot_);
-          bitField0_ |= 0x00000008;
-         }
-      }
-
-      private com.google.protobuf.RepeatedFieldBuilder<
-          logbook.proto.LogbookEx.ItemDtoListPb, logbook.proto.LogbookEx.ItemDtoListPb.Builder, logbook.proto.LogbookEx.ItemDtoListPbOrBuilder> enemySlotBuilder_;
-
-      /**
-       * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-       */
-      public java.util.List<logbook.proto.LogbookEx.ItemDtoListPb> getEnemySlotList() {
-        if (enemySlotBuilder_ == null) {
-          return java.util.Collections.unmodifiableList(enemySlot_);
-        } else {
-          return enemySlotBuilder_.getMessageList();
-        }
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-       */
-      public int getEnemySlotCount() {
-        if (enemySlotBuilder_ == null) {
-          return enemySlot_.size();
-        } else {
-          return enemySlotBuilder_.getCount();
-        }
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-       */
-      public logbook.proto.LogbookEx.ItemDtoListPb getEnemySlot(int index) {
-        if (enemySlotBuilder_ == null) {
-          return enemySlot_.get(index);
-        } else {
-          return enemySlotBuilder_.getMessage(index);
-        }
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-       */
-      public Builder setEnemySlot(
-          int index, logbook.proto.LogbookEx.ItemDtoListPb value) {
-        if (enemySlotBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureEnemySlotIsMutable();
-          enemySlot_.set(index, value);
-          onChanged();
-        } else {
-          enemySlotBuilder_.setMessage(index, value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-       */
-      public Builder setEnemySlot(
-          int index, logbook.proto.LogbookEx.ItemDtoListPb.Builder builderForValue) {
-        if (enemySlotBuilder_ == null) {
-          ensureEnemySlotIsMutable();
-          enemySlot_.set(index, builderForValue.build());
-          onChanged();
-        } else {
-          enemySlotBuilder_.setMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-       */
-      public Builder addEnemySlot(logbook.proto.LogbookEx.ItemDtoListPb value) {
-        if (enemySlotBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureEnemySlotIsMutable();
-          enemySlot_.add(value);
-          onChanged();
-        } else {
-          enemySlotBuilder_.addMessage(value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-       */
-      public Builder addEnemySlot(
-          int index, logbook.proto.LogbookEx.ItemDtoListPb value) {
-        if (enemySlotBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureEnemySlotIsMutable();
-          enemySlot_.add(index, value);
-          onChanged();
-        } else {
-          enemySlotBuilder_.addMessage(index, value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-       */
-      public Builder addEnemySlot(
-          logbook.proto.LogbookEx.ItemDtoListPb.Builder builderForValue) {
-        if (enemySlotBuilder_ == null) {
-          ensureEnemySlotIsMutable();
-          enemySlot_.add(builderForValue.build());
-          onChanged();
-        } else {
-          enemySlotBuilder_.addMessage(builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-       */
-      public Builder addEnemySlot(
-          int index, logbook.proto.LogbookEx.ItemDtoListPb.Builder builderForValue) {
-        if (enemySlotBuilder_ == null) {
-          ensureEnemySlotIsMutable();
-          enemySlot_.add(index, builderForValue.build());
-          onChanged();
-        } else {
-          enemySlotBuilder_.addMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-       */
-      public Builder addAllEnemySlot(
-          java.lang.Iterable<? extends logbook.proto.LogbookEx.ItemDtoListPb> values) {
-        if (enemySlotBuilder_ == null) {
-          ensureEnemySlotIsMutable();
-          super.addAll(values, enemySlot_);
-          onChanged();
-        } else {
-          enemySlotBuilder_.addAllMessages(values);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-       */
-      public Builder clearEnemySlot() {
-        if (enemySlotBuilder_ == null) {
-          enemySlot_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000008);
-          onChanged();
-        } else {
-          enemySlotBuilder_.clear();
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-       */
-      public Builder removeEnemySlot(int index) {
-        if (enemySlotBuilder_ == null) {
-          ensureEnemySlotIsMutable();
-          enemySlot_.remove(index);
-          onChanged();
-        } else {
-          enemySlotBuilder_.remove(index);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-       */
-      public logbook.proto.LogbookEx.ItemDtoListPb.Builder getEnemySlotBuilder(
-          int index) {
-        return getEnemySlotFieldBuilder().getBuilder(index);
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-       */
-      public logbook.proto.LogbookEx.ItemDtoListPbOrBuilder getEnemySlotOrBuilder(
-          int index) {
-        if (enemySlotBuilder_ == null) {
-          return enemySlot_.get(index);  } else {
-          return enemySlotBuilder_.getMessageOrBuilder(index);
-        }
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-       */
-      public java.util.List<? extends logbook.proto.LogbookEx.ItemDtoListPbOrBuilder> 
-           getEnemySlotOrBuilderList() {
-        if (enemySlotBuilder_ != null) {
-          return enemySlotBuilder_.getMessageOrBuilderList();
-        } else {
-          return java.util.Collections.unmodifiableList(enemySlot_);
-        }
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-       */
-      public logbook.proto.LogbookEx.ItemDtoListPb.Builder addEnemySlotBuilder() {
-        return getEnemySlotFieldBuilder().addBuilder(
-            logbook.proto.LogbookEx.ItemDtoListPb.getDefaultInstance());
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-       */
-      public logbook.proto.LogbookEx.ItemDtoListPb.Builder addEnemySlotBuilder(
-          int index) {
-        return getEnemySlotFieldBuilder().addBuilder(
-            index, logbook.proto.LogbookEx.ItemDtoListPb.getDefaultInstance());
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoListPb enemy_slot = 4;</code>
-       */
-      public java.util.List<logbook.proto.LogbookEx.ItemDtoListPb.Builder> 
-           getEnemySlotBuilderList() {
-        return getEnemySlotFieldBuilder().getBuilderList();
-      }
-      private com.google.protobuf.RepeatedFieldBuilder<
-          logbook.proto.LogbookEx.ItemDtoListPb, logbook.proto.LogbookEx.ItemDtoListPb.Builder, logbook.proto.LogbookEx.ItemDtoListPbOrBuilder> 
-          getEnemySlotFieldBuilder() {
-        if (enemySlotBuilder_ == null) {
-          enemySlotBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-              logbook.proto.LogbookEx.ItemDtoListPb, logbook.proto.LogbookEx.ItemDtoListPb.Builder, logbook.proto.LogbookEx.ItemDtoListPbOrBuilder>(
-                  enemySlot_,
-                  ((bitField0_ & 0x00000008) == 0x00000008),
-                  getParentForChildren(),
-                  isClean());
-          enemySlot_ = null;
-        }
-        return enemySlotBuilder_;
-      }
-
-      // repeated .logbook.intListPb enemy_param = 5;
-      private java.util.List<logbook.proto.LogbookEx.intListPb> enemyParam_ =
-        java.util.Collections.emptyList();
-      private void ensureEnemyParamIsMutable() {
-        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
-          enemyParam_ = new java.util.ArrayList<logbook.proto.LogbookEx.intListPb>(enemyParam_);
-          bitField0_ |= 0x00000010;
-         }
-      }
-
-      private com.google.protobuf.RepeatedFieldBuilder<
-          logbook.proto.LogbookEx.intListPb, logbook.proto.LogbookEx.intListPb.Builder, logbook.proto.LogbookEx.intListPbOrBuilder> enemyParamBuilder_;
-
-      /**
-       * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-       */
-      public java.util.List<logbook.proto.LogbookEx.intListPb> getEnemyParamList() {
-        if (enemyParamBuilder_ == null) {
-          return java.util.Collections.unmodifiableList(enemyParam_);
-        } else {
-          return enemyParamBuilder_.getMessageList();
-        }
-      }
-      /**
-       * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-       */
-      public int getEnemyParamCount() {
-        if (enemyParamBuilder_ == null) {
-          return enemyParam_.size();
-        } else {
-          return enemyParamBuilder_.getCount();
-        }
-      }
-      /**
-       * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-       */
-      public logbook.proto.LogbookEx.intListPb getEnemyParam(int index) {
-        if (enemyParamBuilder_ == null) {
-          return enemyParam_.get(index);
-        } else {
-          return enemyParamBuilder_.getMessage(index);
-        }
-      }
-      /**
-       * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-       */
-      public Builder setEnemyParam(
-          int index, logbook.proto.LogbookEx.intListPb value) {
-        if (enemyParamBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureEnemyParamIsMutable();
-          enemyParam_.set(index, value);
-          onChanged();
-        } else {
-          enemyParamBuilder_.setMessage(index, value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-       */
-      public Builder setEnemyParam(
-          int index, logbook.proto.LogbookEx.intListPb.Builder builderForValue) {
-        if (enemyParamBuilder_ == null) {
-          ensureEnemyParamIsMutable();
-          enemyParam_.set(index, builderForValue.build());
-          onChanged();
-        } else {
-          enemyParamBuilder_.setMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-       */
-      public Builder addEnemyParam(logbook.proto.LogbookEx.intListPb value) {
-        if (enemyParamBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureEnemyParamIsMutable();
-          enemyParam_.add(value);
-          onChanged();
-        } else {
-          enemyParamBuilder_.addMessage(value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-       */
-      public Builder addEnemyParam(
-          int index, logbook.proto.LogbookEx.intListPb value) {
-        if (enemyParamBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureEnemyParamIsMutable();
-          enemyParam_.add(index, value);
-          onChanged();
-        } else {
-          enemyParamBuilder_.addMessage(index, value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-       */
-      public Builder addEnemyParam(
-          logbook.proto.LogbookEx.intListPb.Builder builderForValue) {
-        if (enemyParamBuilder_ == null) {
-          ensureEnemyParamIsMutable();
-          enemyParam_.add(builderForValue.build());
-          onChanged();
-        } else {
-          enemyParamBuilder_.addMessage(builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-       */
-      public Builder addEnemyParam(
-          int index, logbook.proto.LogbookEx.intListPb.Builder builderForValue) {
-        if (enemyParamBuilder_ == null) {
-          ensureEnemyParamIsMutable();
-          enemyParam_.add(index, builderForValue.build());
-          onChanged();
-        } else {
-          enemyParamBuilder_.addMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-       */
-      public Builder addAllEnemyParam(
-          java.lang.Iterable<? extends logbook.proto.LogbookEx.intListPb> values) {
-        if (enemyParamBuilder_ == null) {
-          ensureEnemyParamIsMutable();
-          super.addAll(values, enemyParam_);
-          onChanged();
-        } else {
-          enemyParamBuilder_.addAllMessages(values);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-       */
-      public Builder clearEnemyParam() {
-        if (enemyParamBuilder_ == null) {
-          enemyParam_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000010);
-          onChanged();
-        } else {
-          enemyParamBuilder_.clear();
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-       */
-      public Builder removeEnemyParam(int index) {
-        if (enemyParamBuilder_ == null) {
-          ensureEnemyParamIsMutable();
-          enemyParam_.remove(index);
-          onChanged();
-        } else {
-          enemyParamBuilder_.remove(index);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-       */
-      public logbook.proto.LogbookEx.intListPb.Builder getEnemyParamBuilder(
-          int index) {
-        return getEnemyParamFieldBuilder().getBuilder(index);
-      }
-      /**
-       * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-       */
-      public logbook.proto.LogbookEx.intListPbOrBuilder getEnemyParamOrBuilder(
-          int index) {
-        if (enemyParamBuilder_ == null) {
-          return enemyParam_.get(index);  } else {
-          return enemyParamBuilder_.getMessageOrBuilder(index);
-        }
-      }
-      /**
-       * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-       */
-      public java.util.List<? extends logbook.proto.LogbookEx.intListPbOrBuilder> 
-           getEnemyParamOrBuilderList() {
-        if (enemyParamBuilder_ != null) {
-          return enemyParamBuilder_.getMessageOrBuilderList();
-        } else {
-          return java.util.Collections.unmodifiableList(enemyParam_);
-        }
-      }
-      /**
-       * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-       */
-      public logbook.proto.LogbookEx.intListPb.Builder addEnemyParamBuilder() {
-        return getEnemyParamFieldBuilder().addBuilder(
-            logbook.proto.LogbookEx.intListPb.getDefaultInstance());
-      }
-      /**
-       * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-       */
-      public logbook.proto.LogbookEx.intListPb.Builder addEnemyParamBuilder(
-          int index) {
-        return getEnemyParamFieldBuilder().addBuilder(
-            index, logbook.proto.LogbookEx.intListPb.getDefaultInstance());
-      }
-      /**
-       * <code>repeated .logbook.intListPb enemy_param = 5;</code>
-       */
-      public java.util.List<logbook.proto.LogbookEx.intListPb.Builder> 
-           getEnemyParamBuilderList() {
-        return getEnemyParamFieldBuilder().getBuilderList();
-      }
-      private com.google.protobuf.RepeatedFieldBuilder<
-          logbook.proto.LogbookEx.intListPb, logbook.proto.LogbookEx.intListPb.Builder, logbook.proto.LogbookEx.intListPbOrBuilder> 
-          getEnemyParamFieldBuilder() {
-        if (enemyParamBuilder_ == null) {
-          enemyParamBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-              logbook.proto.LogbookEx.intListPb, logbook.proto.LogbookEx.intListPb.Builder, logbook.proto.LogbookEx.intListPbOrBuilder>(
-                  enemyParam_,
-                  ((bitField0_ & 0x00000010) == 0x00000010),
-                  getParentForChildren(),
-                  isClean());
-          enemyParam_ = null;
-        }
-        return enemyParamBuilder_;
-      }
-
       // repeated sint32 max_friend_hp = 6;
       private java.util.List<java.lang.Integer> maxFriendHp_ = java.util.Collections.emptyList();
       private void ensureMaxFriendHpIsMutable() {
-        if (!((bitField0_ & 0x00000020) == 0x00000020)) {
+        if (!((bitField0_ & 0x00000008) == 0x00000008)) {
           maxFriendHp_ = new java.util.ArrayList<java.lang.Integer>(maxFriendHp_);
-          bitField0_ |= 0x00000020;
+          bitField0_ |= 0x00000008;
          }
       }
       /**
@@ -8104,7 +7268,7 @@ public final class LogbookEx {
        */
       public Builder clearMaxFriendHp() {
         maxFriendHp_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000008);
         onChanged();
         return this;
       }
@@ -8112,9 +7276,9 @@ public final class LogbookEx {
       // repeated sint32 max_friend_hp_combined = 7;
       private java.util.List<java.lang.Integer> maxFriendHpCombined_ = java.util.Collections.emptyList();
       private void ensureMaxFriendHpCombinedIsMutable() {
-        if (!((bitField0_ & 0x00000040) == 0x00000040)) {
+        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
           maxFriendHpCombined_ = new java.util.ArrayList<java.lang.Integer>(maxFriendHpCombined_);
-          bitField0_ |= 0x00000040;
+          bitField0_ |= 0x00000010;
          }
       }
       /**
@@ -8170,7 +7334,7 @@ public final class LogbookEx {
        */
       public Builder clearMaxFriendHpCombined() {
         maxFriendHpCombined_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000010);
         onChanged();
         return this;
       }
@@ -8178,9 +7342,9 @@ public final class LogbookEx {
       // repeated sint32 max_enemy_hp = 8;
       private java.util.List<java.lang.Integer> maxEnemyHp_ = java.util.Collections.emptyList();
       private void ensureMaxEnemyHpIsMutable() {
-        if (!((bitField0_ & 0x00000080) == 0x00000080)) {
+        if (!((bitField0_ & 0x00000020) == 0x00000020)) {
           maxEnemyHp_ = new java.util.ArrayList<java.lang.Integer>(maxEnemyHp_);
-          bitField0_ |= 0x00000080;
+          bitField0_ |= 0x00000020;
          }
       }
       /**
@@ -8236,7 +7400,7 @@ public final class LogbookEx {
        */
       public Builder clearMaxEnemyHp() {
         maxEnemyHp_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000080);
+        bitField0_ = (bitField0_ & ~0x00000020);
         onChanged();
         return this;
       }
@@ -8244,9 +7408,9 @@ public final class LogbookEx {
       // repeated sint32 start_friend_hp = 9;
       private java.util.List<java.lang.Integer> startFriendHp_ = java.util.Collections.emptyList();
       private void ensureStartFriendHpIsMutable() {
-        if (!((bitField0_ & 0x00000100) == 0x00000100)) {
+        if (!((bitField0_ & 0x00000040) == 0x00000040)) {
           startFriendHp_ = new java.util.ArrayList<java.lang.Integer>(startFriendHp_);
-          bitField0_ |= 0x00000100;
+          bitField0_ |= 0x00000040;
          }
       }
       /**
@@ -8302,7 +7466,7 @@ public final class LogbookEx {
        */
       public Builder clearStartFriendHp() {
         startFriendHp_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000100);
+        bitField0_ = (bitField0_ & ~0x00000040);
         onChanged();
         return this;
       }
@@ -8310,9 +7474,9 @@ public final class LogbookEx {
       // repeated sint32 start_friend_hp_combined = 10;
       private java.util.List<java.lang.Integer> startFriendHpCombined_ = java.util.Collections.emptyList();
       private void ensureStartFriendHpCombinedIsMutable() {
-        if (!((bitField0_ & 0x00000200) == 0x00000200)) {
+        if (!((bitField0_ & 0x00000080) == 0x00000080)) {
           startFriendHpCombined_ = new java.util.ArrayList<java.lang.Integer>(startFriendHpCombined_);
-          bitField0_ |= 0x00000200;
+          bitField0_ |= 0x00000080;
          }
       }
       /**
@@ -8368,7 +7532,7 @@ public final class LogbookEx {
        */
       public Builder clearStartFriendHpCombined() {
         startFriendHpCombined_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000200);
+        bitField0_ = (bitField0_ & ~0x00000080);
         onChanged();
         return this;
       }
@@ -8376,9 +7540,9 @@ public final class LogbookEx {
       // repeated sint32 start_enemy_hp = 11;
       private java.util.List<java.lang.Integer> startEnemyHp_ = java.util.Collections.emptyList();
       private void ensureStartEnemyHpIsMutable() {
-        if (!((bitField0_ & 0x00000400) == 0x00000400)) {
+        if (!((bitField0_ & 0x00000100) == 0x00000100)) {
           startEnemyHp_ = new java.util.ArrayList<java.lang.Integer>(startEnemyHp_);
-          bitField0_ |= 0x00000400;
+          bitField0_ |= 0x00000100;
          }
       }
       /**
@@ -8434,7 +7598,7 @@ public final class LogbookEx {
        */
       public Builder clearStartEnemyHp() {
         startEnemyHp_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000400);
+        bitField0_ = (bitField0_ & ~0x00000100);
         onChanged();
         return this;
       }
@@ -8445,7 +7609,7 @@ public final class LogbookEx {
        * <code>optional sint32 friend_gauge_max = 12;</code>
        */
       public boolean hasFriendGaugeMax() {
-        return ((bitField0_ & 0x00000800) == 0x00000800);
+        return ((bitField0_ & 0x00000200) == 0x00000200);
       }
       /**
        * <code>optional sint32 friend_gauge_max = 12;</code>
@@ -8457,7 +7621,7 @@ public final class LogbookEx {
        * <code>optional sint32 friend_gauge_max = 12;</code>
        */
       public Builder setFriendGaugeMax(int value) {
-        bitField0_ |= 0x00000800;
+        bitField0_ |= 0x00000200;
         friendGaugeMax_ = value;
         onChanged();
         return this;
@@ -8466,7 +7630,7 @@ public final class LogbookEx {
        * <code>optional sint32 friend_gauge_max = 12;</code>
        */
       public Builder clearFriendGaugeMax() {
-        bitField0_ = (bitField0_ & ~0x00000800);
+        bitField0_ = (bitField0_ & ~0x00000200);
         friendGaugeMax_ = 0;
         onChanged();
         return this;
@@ -8478,7 +7642,7 @@ public final class LogbookEx {
        * <code>optional sint32 enemy_gauge_max = 13;</code>
        */
       public boolean hasEnemyGaugeMax() {
-        return ((bitField0_ & 0x00001000) == 0x00001000);
+        return ((bitField0_ & 0x00000400) == 0x00000400);
       }
       /**
        * <code>optional sint32 enemy_gauge_max = 13;</code>
@@ -8490,7 +7654,7 @@ public final class LogbookEx {
        * <code>optional sint32 enemy_gauge_max = 13;</code>
        */
       public Builder setEnemyGaugeMax(int value) {
-        bitField0_ |= 0x00001000;
+        bitField0_ |= 0x00000400;
         enemyGaugeMax_ = value;
         onChanged();
         return this;
@@ -8499,7 +7663,7 @@ public final class LogbookEx {
        * <code>optional sint32 enemy_gauge_max = 13;</code>
        */
       public Builder clearEnemyGaugeMax() {
-        bitField0_ = (bitField0_ & ~0x00001000);
+        bitField0_ = (bitField0_ & ~0x00000400);
         enemyGaugeMax_ = 0;
         onChanged();
         return this;
@@ -8508,9 +7672,9 @@ public final class LogbookEx {
       // repeated string formation = 14;
       private com.google.protobuf.LazyStringList formation_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       private void ensureFormationIsMutable() {
-        if (!((bitField0_ & 0x00002000) == 0x00002000)) {
+        if (!((bitField0_ & 0x00000800) == 0x00000800)) {
           formation_ = new com.google.protobuf.LazyStringArrayList(formation_);
-          bitField0_ |= 0x00002000;
+          bitField0_ |= 0x00000800;
          }
       }
       /**
@@ -8580,7 +7744,7 @@ public final class LogbookEx {
        */
       public Builder clearFormation() {
         formation_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-        bitField0_ = (bitField0_ & ~0x00002000);
+        bitField0_ = (bitField0_ & ~0x00000800);
         onChanged();
         return this;
       }
@@ -8604,7 +7768,7 @@ public final class LogbookEx {
        * <code>optional string formation_match = 15;</code>
        */
       public boolean hasFormationMatch() {
-        return ((bitField0_ & 0x00004000) == 0x00004000);
+        return ((bitField0_ & 0x00001000) == 0x00001000);
       }
       /**
        * <code>optional string formation_match = 15;</code>
@@ -8644,7 +7808,7 @@ public final class LogbookEx {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00004000;
+  bitField0_ |= 0x00001000;
         formationMatch_ = value;
         onChanged();
         return this;
@@ -8653,7 +7817,7 @@ public final class LogbookEx {
        * <code>optional string formation_match = 15;</code>
        */
       public Builder clearFormationMatch() {
-        bitField0_ = (bitField0_ & ~0x00004000);
+        bitField0_ = (bitField0_ & ~0x00001000);
         formationMatch_ = getDefaultInstance().getFormationMatch();
         onChanged();
         return this;
@@ -8666,7 +7830,7 @@ public final class LogbookEx {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00004000;
+  bitField0_ |= 0x00001000;
         formationMatch_ = value;
         onChanged();
         return this;
@@ -8675,9 +7839,9 @@ public final class LogbookEx {
       // repeated string sakuteki = 16;
       private com.google.protobuf.LazyStringList sakuteki_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       private void ensureSakutekiIsMutable() {
-        if (!((bitField0_ & 0x00008000) == 0x00008000)) {
+        if (!((bitField0_ & 0x00002000) == 0x00002000)) {
           sakuteki_ = new com.google.protobuf.LazyStringArrayList(sakuteki_);
-          bitField0_ |= 0x00008000;
+          bitField0_ |= 0x00002000;
          }
       }
       /**
@@ -8747,7 +7911,7 @@ public final class LogbookEx {
        */
       public Builder clearSakuteki() {
         sakuteki_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-        bitField0_ = (bitField0_ & ~0x00008000);
+        bitField0_ = (bitField0_ & ~0x00002000);
         onChanged();
         return this;
       }
@@ -8771,7 +7935,7 @@ public final class LogbookEx {
        * <code>optional string quest_name = 17;</code>
        */
       public boolean hasQuestName() {
-        return ((bitField0_ & 0x00010000) == 0x00010000);
+        return ((bitField0_ & 0x00004000) == 0x00004000);
       }
       /**
        * <code>optional string quest_name = 17;</code>
@@ -8811,7 +7975,7 @@ public final class LogbookEx {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00010000;
+  bitField0_ |= 0x00004000;
         questName_ = value;
         onChanged();
         return this;
@@ -8820,7 +7984,7 @@ public final class LogbookEx {
        * <code>optional string quest_name = 17;</code>
        */
       public Builder clearQuestName() {
-        bitField0_ = (bitField0_ & ~0x00010000);
+        bitField0_ = (bitField0_ & ~0x00004000);
         questName_ = getDefaultInstance().getQuestName();
         onChanged();
         return this;
@@ -8833,7 +7997,7 @@ public final class LogbookEx {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00010000;
+  bitField0_ |= 0x00004000;
         questName_ = value;
         onChanged();
         return this;
@@ -8845,7 +8009,7 @@ public final class LogbookEx {
        * <code>optional string rank = 18;</code>
        */
       public boolean hasRank() {
-        return ((bitField0_ & 0x00020000) == 0x00020000);
+        return ((bitField0_ & 0x00008000) == 0x00008000);
       }
       /**
        * <code>optional string rank = 18;</code>
@@ -8885,7 +8049,7 @@ public final class LogbookEx {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00020000;
+  bitField0_ |= 0x00008000;
         rank_ = value;
         onChanged();
         return this;
@@ -8894,7 +8058,7 @@ public final class LogbookEx {
        * <code>optional string rank = 18;</code>
        */
       public Builder clearRank() {
-        bitField0_ = (bitField0_ & ~0x00020000);
+        bitField0_ = (bitField0_ & ~0x00008000);
         rank_ = getDefaultInstance().getRank();
         onChanged();
         return this;
@@ -8907,7 +8071,7 @@ public final class LogbookEx {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00020000;
+  bitField0_ |= 0x00008000;
         rank_ = value;
         onChanged();
         return this;
@@ -8921,7 +8085,7 @@ public final class LogbookEx {
        * <code>optional .logbook.MapCellDtoPb map_cell_dto = 19;</code>
        */
       public boolean hasMapCellDto() {
-        return ((bitField0_ & 0x00040000) == 0x00040000);
+        return ((bitField0_ & 0x00010000) == 0x00010000);
       }
       /**
        * <code>optional .logbook.MapCellDtoPb map_cell_dto = 19;</code>
@@ -8946,7 +8110,7 @@ public final class LogbookEx {
         } else {
           mapCellDtoBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00040000;
+        bitField0_ |= 0x00010000;
         return this;
       }
       /**
@@ -8960,7 +8124,7 @@ public final class LogbookEx {
         } else {
           mapCellDtoBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00040000;
+        bitField0_ |= 0x00010000;
         return this;
       }
       /**
@@ -8968,7 +8132,7 @@ public final class LogbookEx {
        */
       public Builder mergeMapCellDto(logbook.proto.LogbookEx.MapCellDtoPb value) {
         if (mapCellDtoBuilder_ == null) {
-          if (((bitField0_ & 0x00040000) == 0x00040000) &&
+          if (((bitField0_ & 0x00010000) == 0x00010000) &&
               mapCellDto_ != logbook.proto.LogbookEx.MapCellDtoPb.getDefaultInstance()) {
             mapCellDto_ =
               logbook.proto.LogbookEx.MapCellDtoPb.newBuilder(mapCellDto_).mergeFrom(value).buildPartial();
@@ -8979,7 +8143,7 @@ public final class LogbookEx {
         } else {
           mapCellDtoBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00040000;
+        bitField0_ |= 0x00010000;
         return this;
       }
       /**
@@ -8992,14 +8156,14 @@ public final class LogbookEx {
         } else {
           mapCellDtoBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00040000);
+        bitField0_ = (bitField0_ & ~0x00010000);
         return this;
       }
       /**
        * <code>optional .logbook.MapCellDtoPb map_cell_dto = 19;</code>
        */
       public logbook.proto.LogbookEx.MapCellDtoPb.Builder getMapCellDtoBuilder() {
-        bitField0_ |= 0x00040000;
+        bitField0_ |= 0x00010000;
         onChanged();
         return getMapCellDtoFieldBuilder().getBuilder();
       }
@@ -9036,7 +8200,7 @@ public final class LogbookEx {
        * <code>optional string enemy_name = 20;</code>
        */
       public boolean hasEnemyName() {
-        return ((bitField0_ & 0x00080000) == 0x00080000);
+        return ((bitField0_ & 0x00020000) == 0x00020000);
       }
       /**
        * <code>optional string enemy_name = 20;</code>
@@ -9076,7 +8240,7 @@ public final class LogbookEx {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00080000;
+  bitField0_ |= 0x00020000;
         enemyName_ = value;
         onChanged();
         return this;
@@ -9085,7 +8249,7 @@ public final class LogbookEx {
        * <code>optional string enemy_name = 20;</code>
        */
       public Builder clearEnemyName() {
-        bitField0_ = (bitField0_ & ~0x00080000);
+        bitField0_ = (bitField0_ & ~0x00020000);
         enemyName_ = getDefaultInstance().getEnemyName();
         onChanged();
         return this;
@@ -9098,7 +8262,7 @@ public final class LogbookEx {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00080000;
+  bitField0_ |= 0x00020000;
         enemyName_ = value;
         onChanged();
         return this;
@@ -9110,7 +8274,7 @@ public final class LogbookEx {
        * <code>optional bool drop_flag = 21;</code>
        */
       public boolean hasDropFlag() {
-        return ((bitField0_ & 0x00100000) == 0x00100000);
+        return ((bitField0_ & 0x00040000) == 0x00040000);
       }
       /**
        * <code>optional bool drop_flag = 21;</code>
@@ -9122,7 +8286,7 @@ public final class LogbookEx {
        * <code>optional bool drop_flag = 21;</code>
        */
       public Builder setDropFlag(boolean value) {
-        bitField0_ |= 0x00100000;
+        bitField0_ |= 0x00040000;
         dropFlag_ = value;
         onChanged();
         return this;
@@ -9131,7 +8295,7 @@ public final class LogbookEx {
        * <code>optional bool drop_flag = 21;</code>
        */
       public Builder clearDropFlag() {
-        bitField0_ = (bitField0_ & ~0x00100000);
+        bitField0_ = (bitField0_ & ~0x00040000);
         dropFlag_ = false;
         onChanged();
         return this;
@@ -9143,7 +8307,7 @@ public final class LogbookEx {
        * <code>optional string drop_type = 22;</code>
        */
       public boolean hasDropType() {
-        return ((bitField0_ & 0x00200000) == 0x00200000);
+        return ((bitField0_ & 0x00080000) == 0x00080000);
       }
       /**
        * <code>optional string drop_type = 22;</code>
@@ -9183,7 +8347,7 @@ public final class LogbookEx {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00200000;
+  bitField0_ |= 0x00080000;
         dropType_ = value;
         onChanged();
         return this;
@@ -9192,7 +8356,7 @@ public final class LogbookEx {
        * <code>optional string drop_type = 22;</code>
        */
       public Builder clearDropType() {
-        bitField0_ = (bitField0_ & ~0x00200000);
+        bitField0_ = (bitField0_ & ~0x00080000);
         dropType_ = getDefaultInstance().getDropType();
         onChanged();
         return this;
@@ -9205,7 +8369,7 @@ public final class LogbookEx {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00200000;
+  bitField0_ |= 0x00080000;
         dropType_ = value;
         onChanged();
         return this;
@@ -9217,7 +8381,7 @@ public final class LogbookEx {
        * <code>optional string drop_name = 23;</code>
        */
       public boolean hasDropName() {
-        return ((bitField0_ & 0x00400000) == 0x00400000);
+        return ((bitField0_ & 0x00100000) == 0x00100000);
       }
       /**
        * <code>optional string drop_name = 23;</code>
@@ -9257,7 +8421,7 @@ public final class LogbookEx {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00400000;
+  bitField0_ |= 0x00100000;
         dropName_ = value;
         onChanged();
         return this;
@@ -9266,7 +8430,7 @@ public final class LogbookEx {
        * <code>optional string drop_name = 23;</code>
        */
       public Builder clearDropName() {
-        bitField0_ = (bitField0_ & ~0x00400000);
+        bitField0_ = (bitField0_ & ~0x00100000);
         dropName_ = getDefaultInstance().getDropName();
         onChanged();
         return this;
@@ -9279,7 +8443,7 @@ public final class LogbookEx {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00400000;
+  bitField0_ |= 0x00100000;
         dropName_ = value;
         onChanged();
         return this;
@@ -9289,9 +8453,9 @@ public final class LogbookEx {
       private java.util.List<logbook.proto.LogbookEx.PhasePb> phaseList_ =
         java.util.Collections.emptyList();
       private void ensurePhaseListIsMutable() {
-        if (!((bitField0_ & 0x00800000) == 0x00800000)) {
+        if (!((bitField0_ & 0x00200000) == 0x00200000)) {
           phaseList_ = new java.util.ArrayList<logbook.proto.LogbookEx.PhasePb>(phaseList_);
-          bitField0_ |= 0x00800000;
+          bitField0_ |= 0x00200000;
          }
       }
 
@@ -9440,7 +8604,7 @@ public final class LogbookEx {
       public Builder clearPhaseList() {
         if (phaseListBuilder_ == null) {
           phaseList_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00800000);
+          bitField0_ = (bitField0_ & ~0x00200000);
           onChanged();
         } else {
           phaseListBuilder_.clear();
@@ -9517,7 +8681,7 @@ public final class LogbookEx {
           phaseListBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
               logbook.proto.LogbookEx.PhasePb, logbook.proto.LogbookEx.PhasePb.Builder, logbook.proto.LogbookEx.PhasePbOrBuilder>(
                   phaseList_,
-                  ((bitField0_ & 0x00800000) == 0x00800000),
+                  ((bitField0_ & 0x00200000) == 0x00200000),
                   getParentForChildren(),
                   isClean());
           phaseList_ = null;
@@ -9563,210 +8727,34 @@ public final class LogbookEx {
      */
     int getType(int index);
 
-    // optional sint32 atap = 3;
+    // optional string name = 3;
     /**
-     * <code>optional sint32 atap = 3;</code>
-     */
-    boolean hasAtap();
-    /**
-     * <code>optional sint32 atap = 3;</code>
-     */
-    int getAtap();
-
-    // optional sint32 bakk = 4;
-    /**
-     * <code>optional sint32 bakk = 4;</code>
-     */
-    boolean hasBakk();
-    /**
-     * <code>optional sint32 bakk = 4;</code>
-     */
-    int getBakk();
-
-    // optional sint32 baku = 5;
-    /**
-     * <code>optional sint32 baku = 5;</code>
-     */
-    boolean hasBaku();
-    /**
-     * <code>optional sint32 baku = 5;</code>
-     */
-    int getBaku();
-
-    // optional sint32 houg = 6;
-    /**
-     * <code>optional sint32 houg = 6;</code>
-     */
-    boolean hasHoug();
-    /**
-     * <code>optional sint32 houg = 6;</code>
-     */
-    int getHoug();
-
-    // optional sint32 houk = 7;
-    /**
-     * <code>optional sint32 houk = 7;</code>
-     */
-    boolean hasHouk();
-    /**
-     * <code>optional sint32 houk = 7;</code>
-     */
-    int getHouk();
-
-    // optional sint32 houm = 8;
-    /**
-     * <code>optional sint32 houm = 8;</code>
-     */
-    boolean hasHoum();
-    /**
-     * <code>optional sint32 houm = 8;</code>
-     */
-    int getHoum();
-
-    // optional sint32 leng = 9;
-    /**
-     * <code>optional sint32 leng = 9;</code>
-     */
-    boolean hasLeng();
-    /**
-     * <code>optional sint32 leng = 9;</code>
-     */
-    int getLeng();
-
-    // optional sint32 luck = 10;
-    /**
-     * <code>optional sint32 luck = 10;</code>
-     */
-    boolean hasLuck();
-    /**
-     * <code>optional sint32 luck = 10;</code>
-     */
-    int getLuck();
-
-    // optional string name = 11;
-    /**
-     * <code>optional string name = 11;</code>
+     * <code>optional string name = 3;</code>
      */
     boolean hasName();
     /**
-     * <code>optional string name = 11;</code>
+     * <code>optional string name = 3;</code>
      */
     java.lang.String getName();
     /**
-     * <code>optional string name = 11;</code>
+     * <code>optional string name = 3;</code>
      */
     com.google.protobuf.ByteString
         getNameBytes();
 
-    // optional sint32 raig = 12;
+    // optional .logbook.ShipParametersPb param = 4;
     /**
-     * <code>optional sint32 raig = 12;</code>
+     * <code>optional .logbook.ShipParametersPb param = 4;</code>
      */
-    boolean hasRaig();
+    boolean hasParam();
     /**
-     * <code>optional sint32 raig = 12;</code>
+     * <code>optional .logbook.ShipParametersPb param = 4;</code>
      */
-    int getRaig();
-
-    // optional sint32 raik = 13;
+    logbook.proto.LogbookEx.ShipParametersPb getParam();
     /**
-     * <code>optional sint32 raik = 13;</code>
+     * <code>optional .logbook.ShipParametersPb param = 4;</code>
      */
-    boolean hasRaik();
-    /**
-     * <code>optional sint32 raik = 13;</code>
-     */
-    int getRaik();
-
-    // optional sint32 raim = 14;
-    /**
-     * <code>optional sint32 raim = 14;</code>
-     */
-    boolean hasRaim();
-    /**
-     * <code>optional sint32 raim = 14;</code>
-     */
-    int getRaim();
-
-    // optional sint32 rare = 15;
-    /**
-     * <code>optional sint32 rare = 15;</code>
-     */
-    boolean hasRare();
-    /**
-     * <code>optional sint32 rare = 15;</code>
-     */
-    int getRare();
-
-    // optional sint32 sakb = 16;
-    /**
-     * <code>optional sint32 sakb = 16;</code>
-     */
-    boolean hasSakb();
-    /**
-     * <code>optional sint32 sakb = 16;</code>
-     */
-    int getSakb();
-
-    // optional sint32 saku = 17;
-    /**
-     * <code>optional sint32 saku = 17;</code>
-     */
-    boolean hasSaku();
-    /**
-     * <code>optional sint32 saku = 17;</code>
-     */
-    int getSaku();
-
-    // optional sint32 soku = 18;
-    /**
-     * <code>optional sint32 soku = 18;</code>
-     */
-    boolean hasSoku();
-    /**
-     * <code>optional sint32 soku = 18;</code>
-     */
-    int getSoku();
-
-    // optional sint32 souk = 19;
-    /**
-     * <code>optional sint32 souk = 19;</code>
-     */
-    boolean hasSouk();
-    /**
-     * <code>optional sint32 souk = 19;</code>
-     */
-    int getSouk();
-
-    // optional sint32 taik = 20;
-    /**
-     * <code>optional sint32 taik = 20;</code>
-     */
-    boolean hasTaik();
-    /**
-     * <code>optional sint32 taik = 20;</code>
-     */
-    int getTaik();
-
-    // optional sint32 tais = 21;
-    /**
-     * <code>optional sint32 tais = 21;</code>
-     */
-    boolean hasTais();
-    /**
-     * <code>optional sint32 tais = 21;</code>
-     */
-    int getTais();
-
-    // optional sint32 tyku = 22;
-    /**
-     * <code>optional sint32 tyku = 22;</code>
-     */
-    boolean hasTyku();
-    /**
-     * <code>optional sint32 tyku = 22;</code>
-     */
-    int getTyku();
+    logbook.proto.LogbookEx.ShipParametersPbOrBuilder getParamOrBuilder();
   }
   /**
    * Protobuf type {@code logbook.ItemDtoPb}
@@ -9845,104 +8833,22 @@ public final class LogbookEx {
               input.popLimit(limit);
               break;
             }
-            case 24: {
+            case 26: {
               bitField0_ |= 0x00000002;
-              atap_ = input.readSInt32();
-              break;
-            }
-            case 32: {
-              bitField0_ |= 0x00000004;
-              bakk_ = input.readSInt32();
-              break;
-            }
-            case 40: {
-              bitField0_ |= 0x00000008;
-              baku_ = input.readSInt32();
-              break;
-            }
-            case 48: {
-              bitField0_ |= 0x00000010;
-              houg_ = input.readSInt32();
-              break;
-            }
-            case 56: {
-              bitField0_ |= 0x00000020;
-              houk_ = input.readSInt32();
-              break;
-            }
-            case 64: {
-              bitField0_ |= 0x00000040;
-              houm_ = input.readSInt32();
-              break;
-            }
-            case 72: {
-              bitField0_ |= 0x00000080;
-              leng_ = input.readSInt32();
-              break;
-            }
-            case 80: {
-              bitField0_ |= 0x00000100;
-              luck_ = input.readSInt32();
-              break;
-            }
-            case 90: {
-              bitField0_ |= 0x00000200;
               name_ = input.readBytes();
               break;
             }
-            case 96: {
-              bitField0_ |= 0x00000400;
-              raig_ = input.readSInt32();
-              break;
-            }
-            case 104: {
-              bitField0_ |= 0x00000800;
-              raik_ = input.readSInt32();
-              break;
-            }
-            case 112: {
-              bitField0_ |= 0x00001000;
-              raim_ = input.readSInt32();
-              break;
-            }
-            case 120: {
-              bitField0_ |= 0x00002000;
-              rare_ = input.readSInt32();
-              break;
-            }
-            case 128: {
-              bitField0_ |= 0x00004000;
-              sakb_ = input.readSInt32();
-              break;
-            }
-            case 136: {
-              bitField0_ |= 0x00008000;
-              saku_ = input.readSInt32();
-              break;
-            }
-            case 144: {
-              bitField0_ |= 0x00010000;
-              soku_ = input.readSInt32();
-              break;
-            }
-            case 152: {
-              bitField0_ |= 0x00020000;
-              souk_ = input.readSInt32();
-              break;
-            }
-            case 160: {
-              bitField0_ |= 0x00040000;
-              taik_ = input.readSInt32();
-              break;
-            }
-            case 168: {
-              bitField0_ |= 0x00080000;
-              tais_ = input.readSInt32();
-              break;
-            }
-            case 176: {
-              bitField0_ |= 0x00100000;
-              tyku_ = input.readSInt32();
+            case 34: {
+              logbook.proto.LogbookEx.ShipParametersPb.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000004) == 0x00000004)) {
+                subBuilder = param_.toBuilder();
+              }
+              param_ = input.readMessage(logbook.proto.LogbookEx.ShipParametersPb.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(param_);
+                param_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000004;
               break;
             }
           }
@@ -10027,145 +8933,17 @@ public final class LogbookEx {
       return type_.get(index);
     }
 
-    // optional sint32 atap = 3;
-    public static final int ATAP_FIELD_NUMBER = 3;
-    private int atap_;
+    // optional string name = 3;
+    public static final int NAME_FIELD_NUMBER = 3;
+    private java.lang.Object name_;
     /**
-     * <code>optional sint32 atap = 3;</code>
+     * <code>optional string name = 3;</code>
      */
-    public boolean hasAtap() {
+    public boolean hasName() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional sint32 atap = 3;</code>
-     */
-    public int getAtap() {
-      return atap_;
-    }
-
-    // optional sint32 bakk = 4;
-    public static final int BAKK_FIELD_NUMBER = 4;
-    private int bakk_;
-    /**
-     * <code>optional sint32 bakk = 4;</code>
-     */
-    public boolean hasBakk() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
-    }
-    /**
-     * <code>optional sint32 bakk = 4;</code>
-     */
-    public int getBakk() {
-      return bakk_;
-    }
-
-    // optional sint32 baku = 5;
-    public static final int BAKU_FIELD_NUMBER = 5;
-    private int baku_;
-    /**
-     * <code>optional sint32 baku = 5;</code>
-     */
-    public boolean hasBaku() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
-    }
-    /**
-     * <code>optional sint32 baku = 5;</code>
-     */
-    public int getBaku() {
-      return baku_;
-    }
-
-    // optional sint32 houg = 6;
-    public static final int HOUG_FIELD_NUMBER = 6;
-    private int houg_;
-    /**
-     * <code>optional sint32 houg = 6;</code>
-     */
-    public boolean hasHoug() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
-    }
-    /**
-     * <code>optional sint32 houg = 6;</code>
-     */
-    public int getHoug() {
-      return houg_;
-    }
-
-    // optional sint32 houk = 7;
-    public static final int HOUK_FIELD_NUMBER = 7;
-    private int houk_;
-    /**
-     * <code>optional sint32 houk = 7;</code>
-     */
-    public boolean hasHouk() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
-    }
-    /**
-     * <code>optional sint32 houk = 7;</code>
-     */
-    public int getHouk() {
-      return houk_;
-    }
-
-    // optional sint32 houm = 8;
-    public static final int HOUM_FIELD_NUMBER = 8;
-    private int houm_;
-    /**
-     * <code>optional sint32 houm = 8;</code>
-     */
-    public boolean hasHoum() {
-      return ((bitField0_ & 0x00000040) == 0x00000040);
-    }
-    /**
-     * <code>optional sint32 houm = 8;</code>
-     */
-    public int getHoum() {
-      return houm_;
-    }
-
-    // optional sint32 leng = 9;
-    public static final int LENG_FIELD_NUMBER = 9;
-    private int leng_;
-    /**
-     * <code>optional sint32 leng = 9;</code>
-     */
-    public boolean hasLeng() {
-      return ((bitField0_ & 0x00000080) == 0x00000080);
-    }
-    /**
-     * <code>optional sint32 leng = 9;</code>
-     */
-    public int getLeng() {
-      return leng_;
-    }
-
-    // optional sint32 luck = 10;
-    public static final int LUCK_FIELD_NUMBER = 10;
-    private int luck_;
-    /**
-     * <code>optional sint32 luck = 10;</code>
-     */
-    public boolean hasLuck() {
-      return ((bitField0_ & 0x00000100) == 0x00000100);
-    }
-    /**
-     * <code>optional sint32 luck = 10;</code>
-     */
-    public int getLuck() {
-      return luck_;
-    }
-
-    // optional string name = 11;
-    public static final int NAME_FIELD_NUMBER = 11;
-    private java.lang.Object name_;
-    /**
-     * <code>optional string name = 11;</code>
-     */
-    public boolean hasName() {
-      return ((bitField0_ & 0x00000200) == 0x00000200);
-    }
-    /**
-     * <code>optional string name = 11;</code>
+     * <code>optional string name = 3;</code>
      */
     public java.lang.String getName() {
       java.lang.Object ref = name_;
@@ -10182,7 +8960,7 @@ public final class LogbookEx {
       }
     }
     /**
-     * <code>optional string name = 11;</code>
+     * <code>optional string name = 3;</code>
      */
     public com.google.protobuf.ByteString
         getNameBytes() {
@@ -10198,205 +8976,33 @@ public final class LogbookEx {
       }
     }
 
-    // optional sint32 raig = 12;
-    public static final int RAIG_FIELD_NUMBER = 12;
-    private int raig_;
+    // optional .logbook.ShipParametersPb param = 4;
+    public static final int PARAM_FIELD_NUMBER = 4;
+    private logbook.proto.LogbookEx.ShipParametersPb param_;
     /**
-     * <code>optional sint32 raig = 12;</code>
+     * <code>optional .logbook.ShipParametersPb param = 4;</code>
      */
-    public boolean hasRaig() {
-      return ((bitField0_ & 0x00000400) == 0x00000400);
+    public boolean hasParam() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional sint32 raig = 12;</code>
+     * <code>optional .logbook.ShipParametersPb param = 4;</code>
      */
-    public int getRaig() {
-      return raig_;
-    }
-
-    // optional sint32 raik = 13;
-    public static final int RAIK_FIELD_NUMBER = 13;
-    private int raik_;
-    /**
-     * <code>optional sint32 raik = 13;</code>
-     */
-    public boolean hasRaik() {
-      return ((bitField0_ & 0x00000800) == 0x00000800);
+    public logbook.proto.LogbookEx.ShipParametersPb getParam() {
+      return param_;
     }
     /**
-     * <code>optional sint32 raik = 13;</code>
+     * <code>optional .logbook.ShipParametersPb param = 4;</code>
      */
-    public int getRaik() {
-      return raik_;
-    }
-
-    // optional sint32 raim = 14;
-    public static final int RAIM_FIELD_NUMBER = 14;
-    private int raim_;
-    /**
-     * <code>optional sint32 raim = 14;</code>
-     */
-    public boolean hasRaim() {
-      return ((bitField0_ & 0x00001000) == 0x00001000);
-    }
-    /**
-     * <code>optional sint32 raim = 14;</code>
-     */
-    public int getRaim() {
-      return raim_;
-    }
-
-    // optional sint32 rare = 15;
-    public static final int RARE_FIELD_NUMBER = 15;
-    private int rare_;
-    /**
-     * <code>optional sint32 rare = 15;</code>
-     */
-    public boolean hasRare() {
-      return ((bitField0_ & 0x00002000) == 0x00002000);
-    }
-    /**
-     * <code>optional sint32 rare = 15;</code>
-     */
-    public int getRare() {
-      return rare_;
-    }
-
-    // optional sint32 sakb = 16;
-    public static final int SAKB_FIELD_NUMBER = 16;
-    private int sakb_;
-    /**
-     * <code>optional sint32 sakb = 16;</code>
-     */
-    public boolean hasSakb() {
-      return ((bitField0_ & 0x00004000) == 0x00004000);
-    }
-    /**
-     * <code>optional sint32 sakb = 16;</code>
-     */
-    public int getSakb() {
-      return sakb_;
-    }
-
-    // optional sint32 saku = 17;
-    public static final int SAKU_FIELD_NUMBER = 17;
-    private int saku_;
-    /**
-     * <code>optional sint32 saku = 17;</code>
-     */
-    public boolean hasSaku() {
-      return ((bitField0_ & 0x00008000) == 0x00008000);
-    }
-    /**
-     * <code>optional sint32 saku = 17;</code>
-     */
-    public int getSaku() {
-      return saku_;
-    }
-
-    // optional sint32 soku = 18;
-    public static final int SOKU_FIELD_NUMBER = 18;
-    private int soku_;
-    /**
-     * <code>optional sint32 soku = 18;</code>
-     */
-    public boolean hasSoku() {
-      return ((bitField0_ & 0x00010000) == 0x00010000);
-    }
-    /**
-     * <code>optional sint32 soku = 18;</code>
-     */
-    public int getSoku() {
-      return soku_;
-    }
-
-    // optional sint32 souk = 19;
-    public static final int SOUK_FIELD_NUMBER = 19;
-    private int souk_;
-    /**
-     * <code>optional sint32 souk = 19;</code>
-     */
-    public boolean hasSouk() {
-      return ((bitField0_ & 0x00020000) == 0x00020000);
-    }
-    /**
-     * <code>optional sint32 souk = 19;</code>
-     */
-    public int getSouk() {
-      return souk_;
-    }
-
-    // optional sint32 taik = 20;
-    public static final int TAIK_FIELD_NUMBER = 20;
-    private int taik_;
-    /**
-     * <code>optional sint32 taik = 20;</code>
-     */
-    public boolean hasTaik() {
-      return ((bitField0_ & 0x00040000) == 0x00040000);
-    }
-    /**
-     * <code>optional sint32 taik = 20;</code>
-     */
-    public int getTaik() {
-      return taik_;
-    }
-
-    // optional sint32 tais = 21;
-    public static final int TAIS_FIELD_NUMBER = 21;
-    private int tais_;
-    /**
-     * <code>optional sint32 tais = 21;</code>
-     */
-    public boolean hasTais() {
-      return ((bitField0_ & 0x00080000) == 0x00080000);
-    }
-    /**
-     * <code>optional sint32 tais = 21;</code>
-     */
-    public int getTais() {
-      return tais_;
-    }
-
-    // optional sint32 tyku = 22;
-    public static final int TYKU_FIELD_NUMBER = 22;
-    private int tyku_;
-    /**
-     * <code>optional sint32 tyku = 22;</code>
-     */
-    public boolean hasTyku() {
-      return ((bitField0_ & 0x00100000) == 0x00100000);
-    }
-    /**
-     * <code>optional sint32 tyku = 22;</code>
-     */
-    public int getTyku() {
-      return tyku_;
+    public logbook.proto.LogbookEx.ShipParametersPbOrBuilder getParamOrBuilder() {
+      return param_;
     }
 
     private void initFields() {
       id_ = 0;
       type_ = java.util.Collections.emptyList();
-      atap_ = 0;
-      bakk_ = 0;
-      baku_ = 0;
-      houg_ = 0;
-      houk_ = 0;
-      houm_ = 0;
-      leng_ = 0;
-      luck_ = 0;
       name_ = "";
-      raig_ = 0;
-      raik_ = 0;
-      raim_ = 0;
-      rare_ = 0;
-      sakb_ = 0;
-      saku_ = 0;
-      soku_ = 0;
-      souk_ = 0;
-      taik_ = 0;
-      tais_ = 0;
-      tyku_ = 0;
+      param_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -10417,64 +9023,10 @@ public final class LogbookEx {
         output.writeSInt32(2, type_.get(i));
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeSInt32(3, atap_);
+        output.writeBytes(3, getNameBytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeSInt32(4, bakk_);
-      }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeSInt32(5, baku_);
-      }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeSInt32(6, houg_);
-      }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeSInt32(7, houk_);
-      }
-      if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        output.writeSInt32(8, houm_);
-      }
-      if (((bitField0_ & 0x00000080) == 0x00000080)) {
-        output.writeSInt32(9, leng_);
-      }
-      if (((bitField0_ & 0x00000100) == 0x00000100)) {
-        output.writeSInt32(10, luck_);
-      }
-      if (((bitField0_ & 0x00000200) == 0x00000200)) {
-        output.writeBytes(11, getNameBytes());
-      }
-      if (((bitField0_ & 0x00000400) == 0x00000400)) {
-        output.writeSInt32(12, raig_);
-      }
-      if (((bitField0_ & 0x00000800) == 0x00000800)) {
-        output.writeSInt32(13, raik_);
-      }
-      if (((bitField0_ & 0x00001000) == 0x00001000)) {
-        output.writeSInt32(14, raim_);
-      }
-      if (((bitField0_ & 0x00002000) == 0x00002000)) {
-        output.writeSInt32(15, rare_);
-      }
-      if (((bitField0_ & 0x00004000) == 0x00004000)) {
-        output.writeSInt32(16, sakb_);
-      }
-      if (((bitField0_ & 0x00008000) == 0x00008000)) {
-        output.writeSInt32(17, saku_);
-      }
-      if (((bitField0_ & 0x00010000) == 0x00010000)) {
-        output.writeSInt32(18, soku_);
-      }
-      if (((bitField0_ & 0x00020000) == 0x00020000)) {
-        output.writeSInt32(19, souk_);
-      }
-      if (((bitField0_ & 0x00040000) == 0x00040000)) {
-        output.writeSInt32(20, taik_);
-      }
-      if (((bitField0_ & 0x00080000) == 0x00080000)) {
-        output.writeSInt32(21, tais_);
-      }
-      if (((bitField0_ & 0x00100000) == 0x00100000)) {
-        output.writeSInt32(22, tyku_);
+        output.writeMessage(4, param_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -10500,83 +9052,11 @@ public final class LogbookEx {
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(3, atap_);
+          .computeBytesSize(3, getNameBytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(4, bakk_);
-      }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(5, baku_);
-      }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(6, houg_);
-      }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(7, houk_);
-      }
-      if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(8, houm_);
-      }
-      if (((bitField0_ & 0x00000080) == 0x00000080)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(9, leng_);
-      }
-      if (((bitField0_ & 0x00000100) == 0x00000100)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(10, luck_);
-      }
-      if (((bitField0_ & 0x00000200) == 0x00000200)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(11, getNameBytes());
-      }
-      if (((bitField0_ & 0x00000400) == 0x00000400)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(12, raig_);
-      }
-      if (((bitField0_ & 0x00000800) == 0x00000800)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(13, raik_);
-      }
-      if (((bitField0_ & 0x00001000) == 0x00001000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(14, raim_);
-      }
-      if (((bitField0_ & 0x00002000) == 0x00002000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(15, rare_);
-      }
-      if (((bitField0_ & 0x00004000) == 0x00004000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(16, sakb_);
-      }
-      if (((bitField0_ & 0x00008000) == 0x00008000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(17, saku_);
-      }
-      if (((bitField0_ & 0x00010000) == 0x00010000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(18, soku_);
-      }
-      if (((bitField0_ & 0x00020000) == 0x00020000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(19, souk_);
-      }
-      if (((bitField0_ & 0x00040000) == 0x00040000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(20, taik_);
-      }
-      if (((bitField0_ & 0x00080000) == 0x00080000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(21, tais_);
-      }
-      if (((bitField0_ & 0x00100000) == 0x00100000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(22, tyku_);
+          .computeMessageSize(4, param_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -10686,6 +9166,7 @@ public final class LogbookEx {
       }
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getParamFieldBuilder();
         }
       }
       private static Builder create() {
@@ -10698,46 +9179,14 @@ public final class LogbookEx {
         bitField0_ = (bitField0_ & ~0x00000001);
         type_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000002);
-        atap_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000004);
-        bakk_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000008);
-        baku_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000010);
-        houg_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000020);
-        houk_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000040);
-        houm_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000080);
-        leng_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000100);
-        luck_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000200);
         name_ = "";
-        bitField0_ = (bitField0_ & ~0x00000400);
-        raig_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000800);
-        raik_ = 0;
-        bitField0_ = (bitField0_ & ~0x00001000);
-        raim_ = 0;
-        bitField0_ = (bitField0_ & ~0x00002000);
-        rare_ = 0;
-        bitField0_ = (bitField0_ & ~0x00004000);
-        sakb_ = 0;
-        bitField0_ = (bitField0_ & ~0x00008000);
-        saku_ = 0;
-        bitField0_ = (bitField0_ & ~0x00010000);
-        soku_ = 0;
-        bitField0_ = (bitField0_ & ~0x00020000);
-        souk_ = 0;
-        bitField0_ = (bitField0_ & ~0x00040000);
-        taik_ = 0;
-        bitField0_ = (bitField0_ & ~0x00080000);
-        tais_ = 0;
-        bitField0_ = (bitField0_ & ~0x00100000);
-        tyku_ = 0;
-        bitField0_ = (bitField0_ & ~0x00200000);
+        bitField0_ = (bitField0_ & ~0x00000004);
+        if (paramBuilder_ == null) {
+          param_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+        } else {
+          paramBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
 
@@ -10778,83 +9227,15 @@ public final class LogbookEx {
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.atap_ = atap_;
+        result.name_ = name_;
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000004;
         }
-        result.bakk_ = bakk_;
-        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
-          to_bitField0_ |= 0x00000008;
+        if (paramBuilder_ == null) {
+          result.param_ = param_;
+        } else {
+          result.param_ = paramBuilder_.build();
         }
-        result.baku_ = baku_;
-        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
-          to_bitField0_ |= 0x00000010;
-        }
-        result.houg_ = houg_;
-        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
-          to_bitField0_ |= 0x00000020;
-        }
-        result.houk_ = houk_;
-        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
-          to_bitField0_ |= 0x00000040;
-        }
-        result.houm_ = houm_;
-        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
-          to_bitField0_ |= 0x00000080;
-        }
-        result.leng_ = leng_;
-        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
-          to_bitField0_ |= 0x00000100;
-        }
-        result.luck_ = luck_;
-        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
-          to_bitField0_ |= 0x00000200;
-        }
-        result.name_ = name_;
-        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
-          to_bitField0_ |= 0x00000400;
-        }
-        result.raig_ = raig_;
-        if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
-          to_bitField0_ |= 0x00000800;
-        }
-        result.raik_ = raik_;
-        if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
-          to_bitField0_ |= 0x00001000;
-        }
-        result.raim_ = raim_;
-        if (((from_bitField0_ & 0x00004000) == 0x00004000)) {
-          to_bitField0_ |= 0x00002000;
-        }
-        result.rare_ = rare_;
-        if (((from_bitField0_ & 0x00008000) == 0x00008000)) {
-          to_bitField0_ |= 0x00004000;
-        }
-        result.sakb_ = sakb_;
-        if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
-          to_bitField0_ |= 0x00008000;
-        }
-        result.saku_ = saku_;
-        if (((from_bitField0_ & 0x00020000) == 0x00020000)) {
-          to_bitField0_ |= 0x00010000;
-        }
-        result.soku_ = soku_;
-        if (((from_bitField0_ & 0x00040000) == 0x00040000)) {
-          to_bitField0_ |= 0x00020000;
-        }
-        result.souk_ = souk_;
-        if (((from_bitField0_ & 0x00080000) == 0x00080000)) {
-          to_bitField0_ |= 0x00040000;
-        }
-        result.taik_ = taik_;
-        if (((from_bitField0_ & 0x00100000) == 0x00100000)) {
-          to_bitField0_ |= 0x00080000;
-        }
-        result.tais_ = tais_;
-        if (((from_bitField0_ & 0x00200000) == 0x00200000)) {
-          to_bitField0_ |= 0x00100000;
-        }
-        result.tyku_ = tyku_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -10884,67 +9265,13 @@ public final class LogbookEx {
           }
           onChanged();
         }
-        if (other.hasAtap()) {
-          setAtap(other.getAtap());
-        }
-        if (other.hasBakk()) {
-          setBakk(other.getBakk());
-        }
-        if (other.hasBaku()) {
-          setBaku(other.getBaku());
-        }
-        if (other.hasHoug()) {
-          setHoug(other.getHoug());
-        }
-        if (other.hasHouk()) {
-          setHouk(other.getHouk());
-        }
-        if (other.hasHoum()) {
-          setHoum(other.getHoum());
-        }
-        if (other.hasLeng()) {
-          setLeng(other.getLeng());
-        }
-        if (other.hasLuck()) {
-          setLuck(other.getLuck());
-        }
         if (other.hasName()) {
-          bitField0_ |= 0x00000400;
+          bitField0_ |= 0x00000004;
           name_ = other.name_;
           onChanged();
         }
-        if (other.hasRaig()) {
-          setRaig(other.getRaig());
-        }
-        if (other.hasRaik()) {
-          setRaik(other.getRaik());
-        }
-        if (other.hasRaim()) {
-          setRaim(other.getRaim());
-        }
-        if (other.hasRare()) {
-          setRare(other.getRare());
-        }
-        if (other.hasSakb()) {
-          setSakb(other.getSakb());
-        }
-        if (other.hasSaku()) {
-          setSaku(other.getSaku());
-        }
-        if (other.hasSoku()) {
-          setSoku(other.getSoku());
-        }
-        if (other.hasSouk()) {
-          setSouk(other.getSouk());
-        }
-        if (other.hasTaik()) {
-          setTaik(other.getTaik());
-        }
-        if (other.hasTais()) {
-          setTais(other.getTais());
-        }
-        if (other.hasTyku()) {
-          setTyku(other.getTyku());
+        if (other.hasParam()) {
+          mergeParam(other.getParam());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -11072,280 +9399,16 @@ public final class LogbookEx {
         return this;
       }
 
-      // optional sint32 atap = 3;
-      private int atap_ ;
+      // optional string name = 3;
+      private java.lang.Object name_ = "";
       /**
-       * <code>optional sint32 atap = 3;</code>
+       * <code>optional string name = 3;</code>
        */
-      public boolean hasAtap() {
+      public boolean hasName() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>optional sint32 atap = 3;</code>
-       */
-      public int getAtap() {
-        return atap_;
-      }
-      /**
-       * <code>optional sint32 atap = 3;</code>
-       */
-      public Builder setAtap(int value) {
-        bitField0_ |= 0x00000004;
-        atap_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint32 atap = 3;</code>
-       */
-      public Builder clearAtap() {
-        bitField0_ = (bitField0_ & ~0x00000004);
-        atap_ = 0;
-        onChanged();
-        return this;
-      }
-
-      // optional sint32 bakk = 4;
-      private int bakk_ ;
-      /**
-       * <code>optional sint32 bakk = 4;</code>
-       */
-      public boolean hasBakk() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
-      }
-      /**
-       * <code>optional sint32 bakk = 4;</code>
-       */
-      public int getBakk() {
-        return bakk_;
-      }
-      /**
-       * <code>optional sint32 bakk = 4;</code>
-       */
-      public Builder setBakk(int value) {
-        bitField0_ |= 0x00000008;
-        bakk_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint32 bakk = 4;</code>
-       */
-      public Builder clearBakk() {
-        bitField0_ = (bitField0_ & ~0x00000008);
-        bakk_ = 0;
-        onChanged();
-        return this;
-      }
-
-      // optional sint32 baku = 5;
-      private int baku_ ;
-      /**
-       * <code>optional sint32 baku = 5;</code>
-       */
-      public boolean hasBaku() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
-      }
-      /**
-       * <code>optional sint32 baku = 5;</code>
-       */
-      public int getBaku() {
-        return baku_;
-      }
-      /**
-       * <code>optional sint32 baku = 5;</code>
-       */
-      public Builder setBaku(int value) {
-        bitField0_ |= 0x00000010;
-        baku_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint32 baku = 5;</code>
-       */
-      public Builder clearBaku() {
-        bitField0_ = (bitField0_ & ~0x00000010);
-        baku_ = 0;
-        onChanged();
-        return this;
-      }
-
-      // optional sint32 houg = 6;
-      private int houg_ ;
-      /**
-       * <code>optional sint32 houg = 6;</code>
-       */
-      public boolean hasHoug() {
-        return ((bitField0_ & 0x00000020) == 0x00000020);
-      }
-      /**
-       * <code>optional sint32 houg = 6;</code>
-       */
-      public int getHoug() {
-        return houg_;
-      }
-      /**
-       * <code>optional sint32 houg = 6;</code>
-       */
-      public Builder setHoug(int value) {
-        bitField0_ |= 0x00000020;
-        houg_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint32 houg = 6;</code>
-       */
-      public Builder clearHoug() {
-        bitField0_ = (bitField0_ & ~0x00000020);
-        houg_ = 0;
-        onChanged();
-        return this;
-      }
-
-      // optional sint32 houk = 7;
-      private int houk_ ;
-      /**
-       * <code>optional sint32 houk = 7;</code>
-       */
-      public boolean hasHouk() {
-        return ((bitField0_ & 0x00000040) == 0x00000040);
-      }
-      /**
-       * <code>optional sint32 houk = 7;</code>
-       */
-      public int getHouk() {
-        return houk_;
-      }
-      /**
-       * <code>optional sint32 houk = 7;</code>
-       */
-      public Builder setHouk(int value) {
-        bitField0_ |= 0x00000040;
-        houk_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint32 houk = 7;</code>
-       */
-      public Builder clearHouk() {
-        bitField0_ = (bitField0_ & ~0x00000040);
-        houk_ = 0;
-        onChanged();
-        return this;
-      }
-
-      // optional sint32 houm = 8;
-      private int houm_ ;
-      /**
-       * <code>optional sint32 houm = 8;</code>
-       */
-      public boolean hasHoum() {
-        return ((bitField0_ & 0x00000080) == 0x00000080);
-      }
-      /**
-       * <code>optional sint32 houm = 8;</code>
-       */
-      public int getHoum() {
-        return houm_;
-      }
-      /**
-       * <code>optional sint32 houm = 8;</code>
-       */
-      public Builder setHoum(int value) {
-        bitField0_ |= 0x00000080;
-        houm_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint32 houm = 8;</code>
-       */
-      public Builder clearHoum() {
-        bitField0_ = (bitField0_ & ~0x00000080);
-        houm_ = 0;
-        onChanged();
-        return this;
-      }
-
-      // optional sint32 leng = 9;
-      private int leng_ ;
-      /**
-       * <code>optional sint32 leng = 9;</code>
-       */
-      public boolean hasLeng() {
-        return ((bitField0_ & 0x00000100) == 0x00000100);
-      }
-      /**
-       * <code>optional sint32 leng = 9;</code>
-       */
-      public int getLeng() {
-        return leng_;
-      }
-      /**
-       * <code>optional sint32 leng = 9;</code>
-       */
-      public Builder setLeng(int value) {
-        bitField0_ |= 0x00000100;
-        leng_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint32 leng = 9;</code>
-       */
-      public Builder clearLeng() {
-        bitField0_ = (bitField0_ & ~0x00000100);
-        leng_ = 0;
-        onChanged();
-        return this;
-      }
-
-      // optional sint32 luck = 10;
-      private int luck_ ;
-      /**
-       * <code>optional sint32 luck = 10;</code>
-       */
-      public boolean hasLuck() {
-        return ((bitField0_ & 0x00000200) == 0x00000200);
-      }
-      /**
-       * <code>optional sint32 luck = 10;</code>
-       */
-      public int getLuck() {
-        return luck_;
-      }
-      /**
-       * <code>optional sint32 luck = 10;</code>
-       */
-      public Builder setLuck(int value) {
-        bitField0_ |= 0x00000200;
-        luck_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint32 luck = 10;</code>
-       */
-      public Builder clearLuck() {
-        bitField0_ = (bitField0_ & ~0x00000200);
-        luck_ = 0;
-        onChanged();
-        return this;
-      }
-
-      // optional string name = 11;
-      private java.lang.Object name_ = "";
-      /**
-       * <code>optional string name = 11;</code>
-       */
-      public boolean hasName() {
-        return ((bitField0_ & 0x00000400) == 0x00000400);
-      }
-      /**
-       * <code>optional string name = 11;</code>
+       * <code>optional string name = 3;</code>
        */
       public java.lang.String getName() {
         java.lang.Object ref = name_;
@@ -11359,7 +9422,7 @@ public final class LogbookEx {
         }
       }
       /**
-       * <code>optional string name = 11;</code>
+       * <code>optional string name = 3;</code>
        */
       public com.google.protobuf.ByteString
           getNameBytes() {
@@ -11375,402 +9438,156 @@ public final class LogbookEx {
         }
       }
       /**
-       * <code>optional string name = 11;</code>
+       * <code>optional string name = 3;</code>
        */
       public Builder setName(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000400;
+  bitField0_ |= 0x00000004;
         name_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string name = 11;</code>
+       * <code>optional string name = 3;</code>
        */
       public Builder clearName() {
-        bitField0_ = (bitField0_ & ~0x00000400);
+        bitField0_ = (bitField0_ & ~0x00000004);
         name_ = getDefaultInstance().getName();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string name = 11;</code>
+       * <code>optional string name = 3;</code>
        */
       public Builder setNameBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000400;
+  bitField0_ |= 0x00000004;
         name_ = value;
         onChanged();
         return this;
       }
 
-      // optional sint32 raig = 12;
-      private int raig_ ;
+      // optional .logbook.ShipParametersPb param = 4;
+      private logbook.proto.LogbookEx.ShipParametersPb param_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          logbook.proto.LogbookEx.ShipParametersPb, logbook.proto.LogbookEx.ShipParametersPb.Builder, logbook.proto.LogbookEx.ShipParametersPbOrBuilder> paramBuilder_;
       /**
-       * <code>optional sint32 raig = 12;</code>
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
        */
-      public boolean hasRaig() {
-        return ((bitField0_ & 0x00000800) == 0x00000800);
+      public boolean hasParam() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>optional sint32 raig = 12;</code>
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
        */
-      public int getRaig() {
-        return raig_;
+      public logbook.proto.LogbookEx.ShipParametersPb getParam() {
+        if (paramBuilder_ == null) {
+          return param_;
+        } else {
+          return paramBuilder_.getMessage();
+        }
       }
       /**
-       * <code>optional sint32 raig = 12;</code>
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
        */
-      public Builder setRaig(int value) {
-        bitField0_ |= 0x00000800;
-        raig_ = value;
-        onChanged();
+      public Builder setParam(logbook.proto.LogbookEx.ShipParametersPb value) {
+        if (paramBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          param_ = value;
+          onChanged();
+        } else {
+          paramBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000008;
         return this;
       }
       /**
-       * <code>optional sint32 raig = 12;</code>
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
        */
-      public Builder clearRaig() {
-        bitField0_ = (bitField0_ & ~0x00000800);
-        raig_ = 0;
-        onChanged();
-        return this;
-      }
-
-      // optional sint32 raik = 13;
-      private int raik_ ;
-      /**
-       * <code>optional sint32 raik = 13;</code>
-       */
-      public boolean hasRaik() {
-        return ((bitField0_ & 0x00001000) == 0x00001000);
-      }
-      /**
-       * <code>optional sint32 raik = 13;</code>
-       */
-      public int getRaik() {
-        return raik_;
-      }
-      /**
-       * <code>optional sint32 raik = 13;</code>
-       */
-      public Builder setRaik(int value) {
-        bitField0_ |= 0x00001000;
-        raik_ = value;
-        onChanged();
+      public Builder setParam(
+          logbook.proto.LogbookEx.ShipParametersPb.Builder builderForValue) {
+        if (paramBuilder_ == null) {
+          param_ = builderForValue.build();
+          onChanged();
+        } else {
+          paramBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000008;
         return this;
       }
       /**
-       * <code>optional sint32 raik = 13;</code>
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
        */
-      public Builder clearRaik() {
-        bitField0_ = (bitField0_ & ~0x00001000);
-        raik_ = 0;
-        onChanged();
-        return this;
-      }
-
-      // optional sint32 raim = 14;
-      private int raim_ ;
-      /**
-       * <code>optional sint32 raim = 14;</code>
-       */
-      public boolean hasRaim() {
-        return ((bitField0_ & 0x00002000) == 0x00002000);
-      }
-      /**
-       * <code>optional sint32 raim = 14;</code>
-       */
-      public int getRaim() {
-        return raim_;
-      }
-      /**
-       * <code>optional sint32 raim = 14;</code>
-       */
-      public Builder setRaim(int value) {
-        bitField0_ |= 0x00002000;
-        raim_ = value;
-        onChanged();
+      public Builder mergeParam(logbook.proto.LogbookEx.ShipParametersPb value) {
+        if (paramBuilder_ == null) {
+          if (((bitField0_ & 0x00000008) == 0x00000008) &&
+              param_ != logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance()) {
+            param_ =
+              logbook.proto.LogbookEx.ShipParametersPb.newBuilder(param_).mergeFrom(value).buildPartial();
+          } else {
+            param_ = value;
+          }
+          onChanged();
+        } else {
+          paramBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000008;
         return this;
       }
       /**
-       * <code>optional sint32 raim = 14;</code>
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
        */
-      public Builder clearRaim() {
-        bitField0_ = (bitField0_ & ~0x00002000);
-        raim_ = 0;
-        onChanged();
-        return this;
-      }
-
-      // optional sint32 rare = 15;
-      private int rare_ ;
-      /**
-       * <code>optional sint32 rare = 15;</code>
-       */
-      public boolean hasRare() {
-        return ((bitField0_ & 0x00004000) == 0x00004000);
-      }
-      /**
-       * <code>optional sint32 rare = 15;</code>
-       */
-      public int getRare() {
-        return rare_;
-      }
-      /**
-       * <code>optional sint32 rare = 15;</code>
-       */
-      public Builder setRare(int value) {
-        bitField0_ |= 0x00004000;
-        rare_ = value;
-        onChanged();
+      public Builder clearParam() {
+        if (paramBuilder_ == null) {
+          param_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+          onChanged();
+        } else {
+          paramBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
       /**
-       * <code>optional sint32 rare = 15;</code>
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
        */
-      public Builder clearRare() {
-        bitField0_ = (bitField0_ & ~0x00004000);
-        rare_ = 0;
+      public logbook.proto.LogbookEx.ShipParametersPb.Builder getParamBuilder() {
+        bitField0_ |= 0x00000008;
         onChanged();
-        return this;
-      }
-
-      // optional sint32 sakb = 16;
-      private int sakb_ ;
-      /**
-       * <code>optional sint32 sakb = 16;</code>
-       */
-      public boolean hasSakb() {
-        return ((bitField0_ & 0x00008000) == 0x00008000);
+        return getParamFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional sint32 sakb = 16;</code>
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
        */
-      public int getSakb() {
-        return sakb_;
+      public logbook.proto.LogbookEx.ShipParametersPbOrBuilder getParamOrBuilder() {
+        if (paramBuilder_ != null) {
+          return paramBuilder_.getMessageOrBuilder();
+        } else {
+          return param_;
+        }
       }
       /**
-       * <code>optional sint32 sakb = 16;</code>
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
        */
-      public Builder setSakb(int value) {
-        bitField0_ |= 0x00008000;
-        sakb_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint32 sakb = 16;</code>
-       */
-      public Builder clearSakb() {
-        bitField0_ = (bitField0_ & ~0x00008000);
-        sakb_ = 0;
-        onChanged();
-        return this;
-      }
-
-      // optional sint32 saku = 17;
-      private int saku_ ;
-      /**
-       * <code>optional sint32 saku = 17;</code>
-       */
-      public boolean hasSaku() {
-        return ((bitField0_ & 0x00010000) == 0x00010000);
-      }
-      /**
-       * <code>optional sint32 saku = 17;</code>
-       */
-      public int getSaku() {
-        return saku_;
-      }
-      /**
-       * <code>optional sint32 saku = 17;</code>
-       */
-      public Builder setSaku(int value) {
-        bitField0_ |= 0x00010000;
-        saku_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint32 saku = 17;</code>
-       */
-      public Builder clearSaku() {
-        bitField0_ = (bitField0_ & ~0x00010000);
-        saku_ = 0;
-        onChanged();
-        return this;
-      }
-
-      // optional sint32 soku = 18;
-      private int soku_ ;
-      /**
-       * <code>optional sint32 soku = 18;</code>
-       */
-      public boolean hasSoku() {
-        return ((bitField0_ & 0x00020000) == 0x00020000);
-      }
-      /**
-       * <code>optional sint32 soku = 18;</code>
-       */
-      public int getSoku() {
-        return soku_;
-      }
-      /**
-       * <code>optional sint32 soku = 18;</code>
-       */
-      public Builder setSoku(int value) {
-        bitField0_ |= 0x00020000;
-        soku_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint32 soku = 18;</code>
-       */
-      public Builder clearSoku() {
-        bitField0_ = (bitField0_ & ~0x00020000);
-        soku_ = 0;
-        onChanged();
-        return this;
-      }
-
-      // optional sint32 souk = 19;
-      private int souk_ ;
-      /**
-       * <code>optional sint32 souk = 19;</code>
-       */
-      public boolean hasSouk() {
-        return ((bitField0_ & 0x00040000) == 0x00040000);
-      }
-      /**
-       * <code>optional sint32 souk = 19;</code>
-       */
-      public int getSouk() {
-        return souk_;
-      }
-      /**
-       * <code>optional sint32 souk = 19;</code>
-       */
-      public Builder setSouk(int value) {
-        bitField0_ |= 0x00040000;
-        souk_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint32 souk = 19;</code>
-       */
-      public Builder clearSouk() {
-        bitField0_ = (bitField0_ & ~0x00040000);
-        souk_ = 0;
-        onChanged();
-        return this;
-      }
-
-      // optional sint32 taik = 20;
-      private int taik_ ;
-      /**
-       * <code>optional sint32 taik = 20;</code>
-       */
-      public boolean hasTaik() {
-        return ((bitField0_ & 0x00080000) == 0x00080000);
-      }
-      /**
-       * <code>optional sint32 taik = 20;</code>
-       */
-      public int getTaik() {
-        return taik_;
-      }
-      /**
-       * <code>optional sint32 taik = 20;</code>
-       */
-      public Builder setTaik(int value) {
-        bitField0_ |= 0x00080000;
-        taik_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint32 taik = 20;</code>
-       */
-      public Builder clearTaik() {
-        bitField0_ = (bitField0_ & ~0x00080000);
-        taik_ = 0;
-        onChanged();
-        return this;
-      }
-
-      // optional sint32 tais = 21;
-      private int tais_ ;
-      /**
-       * <code>optional sint32 tais = 21;</code>
-       */
-      public boolean hasTais() {
-        return ((bitField0_ & 0x00100000) == 0x00100000);
-      }
-      /**
-       * <code>optional sint32 tais = 21;</code>
-       */
-      public int getTais() {
-        return tais_;
-      }
-      /**
-       * <code>optional sint32 tais = 21;</code>
-       */
-      public Builder setTais(int value) {
-        bitField0_ |= 0x00100000;
-        tais_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint32 tais = 21;</code>
-       */
-      public Builder clearTais() {
-        bitField0_ = (bitField0_ & ~0x00100000);
-        tais_ = 0;
-        onChanged();
-        return this;
-      }
-
-      // optional sint32 tyku = 22;
-      private int tyku_ ;
-      /**
-       * <code>optional sint32 tyku = 22;</code>
-       */
-      public boolean hasTyku() {
-        return ((bitField0_ & 0x00200000) == 0x00200000);
-      }
-      /**
-       * <code>optional sint32 tyku = 22;</code>
-       */
-      public int getTyku() {
-        return tyku_;
-      }
-      /**
-       * <code>optional sint32 tyku = 22;</code>
-       */
-      public Builder setTyku(int value) {
-        bitField0_ |= 0x00200000;
-        tyku_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint32 tyku = 22;</code>
-       */
-      public Builder clearTyku() {
-        bitField0_ = (bitField0_ & ~0x00200000);
-        tyku_ = 0;
-        onChanged();
-        return this;
+      private com.google.protobuf.SingleFieldBuilder<
+          logbook.proto.LogbookEx.ShipParametersPb, logbook.proto.LogbookEx.ShipParametersPb.Builder, logbook.proto.LogbookEx.ShipParametersPbOrBuilder> 
+          getParamFieldBuilder() {
+        if (paramBuilder_ == null) {
+          paramBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              logbook.proto.LogbookEx.ShipParametersPb, logbook.proto.LogbookEx.ShipParametersPb.Builder, logbook.proto.LogbookEx.ShipParametersPbOrBuilder>(
+                  param_,
+                  getParentForChildren(),
+                  isClean());
+          param_ = null;
+        }
+        return paramBuilder_;
       }
 
       // @@protoc_insertion_point(builder_scope:logbook.ItemDtoPb)
@@ -12773,53 +10590,158 @@ public final class LogbookEx {
     // @@protoc_insertion_point(class_scope:logbook.DockDtoPb)
   }
 
-  public interface ItemDtoListPbOrBuilder
+  public interface ShipParametersPbOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
-    // repeated .logbook.ItemDtoPb data = 1;
+    // optional sint32 taik = 1;
     /**
-     * <code>repeated .logbook.ItemDtoPb data = 1;</code>
+     * <code>optional sint32 taik = 1;</code>
      */
-    java.util.List<logbook.proto.LogbookEx.ItemDtoPb> 
-        getDataList();
+    boolean hasTaik();
     /**
-     * <code>repeated .logbook.ItemDtoPb data = 1;</code>
+     * <code>optional sint32 taik = 1;</code>
      */
-    logbook.proto.LogbookEx.ItemDtoPb getData(int index);
+    int getTaik();
+
+    // optional sint32 houg = 2;
     /**
-     * <code>repeated .logbook.ItemDtoPb data = 1;</code>
+     * <code>optional sint32 houg = 2;</code>
      */
-    int getDataCount();
+    boolean hasHoug();
     /**
-     * <code>repeated .logbook.ItemDtoPb data = 1;</code>
+     * <code>optional sint32 houg = 2;</code>
      */
-    java.util.List<? extends logbook.proto.LogbookEx.ItemDtoPbOrBuilder> 
-        getDataOrBuilderList();
+    int getHoug();
+
+    // optional sint32 houm = 3;
     /**
-     * <code>repeated .logbook.ItemDtoPb data = 1;</code>
+     * <code>optional sint32 houm = 3;</code>
      */
-    logbook.proto.LogbookEx.ItemDtoPbOrBuilder getDataOrBuilder(
-        int index);
+    boolean hasHoum();
+    /**
+     * <code>optional sint32 houm = 3;</code>
+     */
+    int getHoum();
+
+    // optional sint32 raig = 4;
+    /**
+     * <code>optional sint32 raig = 4;</code>
+     */
+    boolean hasRaig();
+    /**
+     * <code>optional sint32 raig = 4;</code>
+     */
+    int getRaig();
+
+    // optional sint32 baku = 5;
+    /**
+     * <code>optional sint32 baku = 5;</code>
+     */
+    boolean hasBaku();
+    /**
+     * <code>optional sint32 baku = 5;</code>
+     */
+    int getBaku();
+
+    // optional sint32 tyku = 6;
+    /**
+     * <code>optional sint32 tyku = 6;</code>
+     */
+    boolean hasTyku();
+    /**
+     * <code>optional sint32 tyku = 6;</code>
+     */
+    int getTyku();
+
+    // optional sint32 souk = 7;
+    /**
+     * <code>optional sint32 souk = 7;</code>
+     */
+    boolean hasSouk();
+    /**
+     * <code>optional sint32 souk = 7;</code>
+     */
+    int getSouk();
+
+    // optional sint32 kaih = 8;
+    /**
+     * <code>optional sint32 kaih = 8;</code>
+     */
+    boolean hasKaih();
+    /**
+     * <code>optional sint32 kaih = 8;</code>
+     */
+    int getKaih();
+
+    // optional sint32 tais = 9;
+    /**
+     * <code>optional sint32 tais = 9;</code>
+     */
+    boolean hasTais();
+    /**
+     * <code>optional sint32 tais = 9;</code>
+     */
+    int getTais();
+
+    // optional sint32 saku = 10;
+    /**
+     * <code>optional sint32 saku = 10;</code>
+     */
+    boolean hasSaku();
+    /**
+     * <code>optional sint32 saku = 10;</code>
+     */
+    int getSaku();
+
+    // optional sint32 luck = 11;
+    /**
+     * <code>optional sint32 luck = 11;</code>
+     */
+    boolean hasLuck();
+    /**
+     * <code>optional sint32 luck = 11;</code>
+     */
+    int getLuck();
+
+    // optional sint32 soku = 12;
+    /**
+     * <code>optional sint32 soku = 12;</code>
+     */
+    boolean hasSoku();
+    /**
+     * <code>optional sint32 soku = 12;</code>
+     */
+    int getSoku();
+
+    // optional sint32 leng = 13;
+    /**
+     * <code>optional sint32 leng = 13;</code>
+     */
+    boolean hasLeng();
+    /**
+     * <code>optional sint32 leng = 13;</code>
+     */
+    int getLeng();
   }
   /**
-   * Protobuf type {@code logbook.ItemDtoListPb}
+   * Protobuf type {@code logbook.ShipParametersPb}
    */
-  public static final class ItemDtoListPb extends
+  public static final class ShipParametersPb extends
       com.google.protobuf.GeneratedMessage
-      implements ItemDtoListPbOrBuilder {
-    // Use ItemDtoListPb.newBuilder() to construct.
-    private ItemDtoListPb(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      implements ShipParametersPbOrBuilder {
+    // Use ShipParametersPb.newBuilder() to construct.
+    private ShipParametersPb(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
       this.unknownFields = builder.getUnknownFields();
     }
-    private ItemDtoListPb(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+    private ShipParametersPb(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
 
-    private static final ItemDtoListPb defaultInstance;
-    public static ItemDtoListPb getDefaultInstance() {
+    private static final ShipParametersPb defaultInstance;
+    public static ShipParametersPb getDefaultInstance() {
       return defaultInstance;
     }
 
-    public ItemDtoListPb getDefaultInstanceForType() {
+    public ShipParametersPb getDefaultInstanceForType() {
       return defaultInstance;
     }
 
@@ -12829,7 +10751,7 @@ public final class LogbookEx {
         getUnknownFields() {
       return this.unknownFields;
     }
-    private ItemDtoListPb(
+    private ShipParametersPb(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -12852,12 +10774,69 @@ public final class LogbookEx {
               }
               break;
             }
-            case 10: {
-              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-                data_ = new java.util.ArrayList<logbook.proto.LogbookEx.ItemDtoPb>();
-                mutable_bitField0_ |= 0x00000001;
-              }
-              data_.add(input.readMessage(logbook.proto.LogbookEx.ItemDtoPb.PARSER, extensionRegistry));
+            case 8: {
+              bitField0_ |= 0x00000001;
+              taik_ = input.readSInt32();
+              break;
+            }
+            case 16: {
+              bitField0_ |= 0x00000002;
+              houg_ = input.readSInt32();
+              break;
+            }
+            case 24: {
+              bitField0_ |= 0x00000004;
+              houm_ = input.readSInt32();
+              break;
+            }
+            case 32: {
+              bitField0_ |= 0x00000008;
+              raig_ = input.readSInt32();
+              break;
+            }
+            case 40: {
+              bitField0_ |= 0x00000010;
+              baku_ = input.readSInt32();
+              break;
+            }
+            case 48: {
+              bitField0_ |= 0x00000020;
+              tyku_ = input.readSInt32();
+              break;
+            }
+            case 56: {
+              bitField0_ |= 0x00000040;
+              souk_ = input.readSInt32();
+              break;
+            }
+            case 64: {
+              bitField0_ |= 0x00000080;
+              kaih_ = input.readSInt32();
+              break;
+            }
+            case 72: {
+              bitField0_ |= 0x00000100;
+              tais_ = input.readSInt32();
+              break;
+            }
+            case 80: {
+              bitField0_ |= 0x00000200;
+              saku_ = input.readSInt32();
+              break;
+            }
+            case 88: {
+              bitField0_ |= 0x00000400;
+              luck_ = input.readSInt32();
+              break;
+            }
+            case 96: {
+              bitField0_ |= 0x00000800;
+              soku_ = input.readSInt32();
+              break;
+            }
+            case 104: {
+              bitField0_ |= 0x00001000;
+              leng_ = input.readSInt32();
               break;
             }
           }
@@ -12868,78 +10847,260 @@ public final class LogbookEx {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e.getMessage()).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
-          data_ = java.util.Collections.unmodifiableList(data_);
-        }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return logbook.proto.LogbookEx.internal_static_logbook_ItemDtoListPb_descriptor;
+      return logbook.proto.LogbookEx.internal_static_logbook_ShipParametersPb_descriptor;
     }
 
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return logbook.proto.LogbookEx.internal_static_logbook_ItemDtoListPb_fieldAccessorTable
+      return logbook.proto.LogbookEx.internal_static_logbook_ShipParametersPb_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              logbook.proto.LogbookEx.ItemDtoListPb.class, logbook.proto.LogbookEx.ItemDtoListPb.Builder.class);
+              logbook.proto.LogbookEx.ShipParametersPb.class, logbook.proto.LogbookEx.ShipParametersPb.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<ItemDtoListPb> PARSER =
-        new com.google.protobuf.AbstractParser<ItemDtoListPb>() {
-      public ItemDtoListPb parsePartialFrom(
+    public static com.google.protobuf.Parser<ShipParametersPb> PARSER =
+        new com.google.protobuf.AbstractParser<ShipParametersPb>() {
+      public ShipParametersPb parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ItemDtoListPb(input, extensionRegistry);
+        return new ShipParametersPb(input, extensionRegistry);
       }
     };
 
     @java.lang.Override
-    public com.google.protobuf.Parser<ItemDtoListPb> getParserForType() {
+    public com.google.protobuf.Parser<ShipParametersPb> getParserForType() {
       return PARSER;
     }
 
-    // repeated .logbook.ItemDtoPb data = 1;
-    public static final int DATA_FIELD_NUMBER = 1;
-    private java.util.List<logbook.proto.LogbookEx.ItemDtoPb> data_;
+    private int bitField0_;
+    // optional sint32 taik = 1;
+    public static final int TAIK_FIELD_NUMBER = 1;
+    private int taik_;
     /**
-     * <code>repeated .logbook.ItemDtoPb data = 1;</code>
+     * <code>optional sint32 taik = 1;</code>
      */
-    public java.util.List<logbook.proto.LogbookEx.ItemDtoPb> getDataList() {
-      return data_;
+    public boolean hasTaik() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>repeated .logbook.ItemDtoPb data = 1;</code>
+     * <code>optional sint32 taik = 1;</code>
      */
-    public java.util.List<? extends logbook.proto.LogbookEx.ItemDtoPbOrBuilder> 
-        getDataOrBuilderList() {
-      return data_;
+    public int getTaik() {
+      return taik_;
+    }
+
+    // optional sint32 houg = 2;
+    public static final int HOUG_FIELD_NUMBER = 2;
+    private int houg_;
+    /**
+     * <code>optional sint32 houg = 2;</code>
+     */
+    public boolean hasHoug() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>repeated .logbook.ItemDtoPb data = 1;</code>
+     * <code>optional sint32 houg = 2;</code>
      */
-    public int getDataCount() {
-      return data_.size();
+    public int getHoug() {
+      return houg_;
+    }
+
+    // optional sint32 houm = 3;
+    public static final int HOUM_FIELD_NUMBER = 3;
+    private int houm_;
+    /**
+     * <code>optional sint32 houm = 3;</code>
+     */
+    public boolean hasHoum() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>repeated .logbook.ItemDtoPb data = 1;</code>
+     * <code>optional sint32 houm = 3;</code>
      */
-    public logbook.proto.LogbookEx.ItemDtoPb getData(int index) {
-      return data_.get(index);
+    public int getHoum() {
+      return houm_;
+    }
+
+    // optional sint32 raig = 4;
+    public static final int RAIG_FIELD_NUMBER = 4;
+    private int raig_;
+    /**
+     * <code>optional sint32 raig = 4;</code>
+     */
+    public boolean hasRaig() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>repeated .logbook.ItemDtoPb data = 1;</code>
+     * <code>optional sint32 raig = 4;</code>
      */
-    public logbook.proto.LogbookEx.ItemDtoPbOrBuilder getDataOrBuilder(
-        int index) {
-      return data_.get(index);
+    public int getRaig() {
+      return raig_;
+    }
+
+    // optional sint32 baku = 5;
+    public static final int BAKU_FIELD_NUMBER = 5;
+    private int baku_;
+    /**
+     * <code>optional sint32 baku = 5;</code>
+     */
+    public boolean hasBaku() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional sint32 baku = 5;</code>
+     */
+    public int getBaku() {
+      return baku_;
+    }
+
+    // optional sint32 tyku = 6;
+    public static final int TYKU_FIELD_NUMBER = 6;
+    private int tyku_;
+    /**
+     * <code>optional sint32 tyku = 6;</code>
+     */
+    public boolean hasTyku() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional sint32 tyku = 6;</code>
+     */
+    public int getTyku() {
+      return tyku_;
+    }
+
+    // optional sint32 souk = 7;
+    public static final int SOUK_FIELD_NUMBER = 7;
+    private int souk_;
+    /**
+     * <code>optional sint32 souk = 7;</code>
+     */
+    public boolean hasSouk() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>optional sint32 souk = 7;</code>
+     */
+    public int getSouk() {
+      return souk_;
+    }
+
+    // optional sint32 kaih = 8;
+    public static final int KAIH_FIELD_NUMBER = 8;
+    private int kaih_;
+    /**
+     * <code>optional sint32 kaih = 8;</code>
+     */
+    public boolean hasKaih() {
+      return ((bitField0_ & 0x00000080) == 0x00000080);
+    }
+    /**
+     * <code>optional sint32 kaih = 8;</code>
+     */
+    public int getKaih() {
+      return kaih_;
+    }
+
+    // optional sint32 tais = 9;
+    public static final int TAIS_FIELD_NUMBER = 9;
+    private int tais_;
+    /**
+     * <code>optional sint32 tais = 9;</code>
+     */
+    public boolean hasTais() {
+      return ((bitField0_ & 0x00000100) == 0x00000100);
+    }
+    /**
+     * <code>optional sint32 tais = 9;</code>
+     */
+    public int getTais() {
+      return tais_;
+    }
+
+    // optional sint32 saku = 10;
+    public static final int SAKU_FIELD_NUMBER = 10;
+    private int saku_;
+    /**
+     * <code>optional sint32 saku = 10;</code>
+     */
+    public boolean hasSaku() {
+      return ((bitField0_ & 0x00000200) == 0x00000200);
+    }
+    /**
+     * <code>optional sint32 saku = 10;</code>
+     */
+    public int getSaku() {
+      return saku_;
+    }
+
+    // optional sint32 luck = 11;
+    public static final int LUCK_FIELD_NUMBER = 11;
+    private int luck_;
+    /**
+     * <code>optional sint32 luck = 11;</code>
+     */
+    public boolean hasLuck() {
+      return ((bitField0_ & 0x00000400) == 0x00000400);
+    }
+    /**
+     * <code>optional sint32 luck = 11;</code>
+     */
+    public int getLuck() {
+      return luck_;
+    }
+
+    // optional sint32 soku = 12;
+    public static final int SOKU_FIELD_NUMBER = 12;
+    private int soku_;
+    /**
+     * <code>optional sint32 soku = 12;</code>
+     */
+    public boolean hasSoku() {
+      return ((bitField0_ & 0x00000800) == 0x00000800);
+    }
+    /**
+     * <code>optional sint32 soku = 12;</code>
+     */
+    public int getSoku() {
+      return soku_;
+    }
+
+    // optional sint32 leng = 13;
+    public static final int LENG_FIELD_NUMBER = 13;
+    private int leng_;
+    /**
+     * <code>optional sint32 leng = 13;</code>
+     */
+    public boolean hasLeng() {
+      return ((bitField0_ & 0x00001000) == 0x00001000);
+    }
+    /**
+     * <code>optional sint32 leng = 13;</code>
+     */
+    public int getLeng() {
+      return leng_;
     }
 
     private void initFields() {
-      data_ = java.util.Collections.emptyList();
+      taik_ = 0;
+      houg_ = 0;
+      houm_ = 0;
+      raig_ = 0;
+      baku_ = 0;
+      tyku_ = 0;
+      souk_ = 0;
+      kaih_ = 0;
+      tais_ = 0;
+      saku_ = 0;
+      luck_ = 0;
+      soku_ = 0;
+      leng_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -12953,8 +11114,44 @@ public final class LogbookEx {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
-      for (int i = 0; i < data_.size(); i++) {
-        output.writeMessage(1, data_.get(i));
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeSInt32(1, taik_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeSInt32(2, houg_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeSInt32(3, houm_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeSInt32(4, raig_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeSInt32(5, baku_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeSInt32(6, tyku_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeSInt32(7, souk_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeSInt32(8, kaih_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        output.writeSInt32(9, tais_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        output.writeSInt32(10, saku_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        output.writeSInt32(11, luck_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        output.writeSInt32(12, soku_);
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        output.writeSInt32(13, leng_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -12965,9 +11162,57 @@ public final class LogbookEx {
       if (size != -1) return size;
 
       size = 0;
-      for (int i = 0; i < data_.size(); i++) {
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, data_.get(i));
+          .computeSInt32Size(1, taik_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(2, houg_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(3, houm_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(4, raig_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(5, baku_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(6, tyku_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(7, souk_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(8, kaih_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(9, tais_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(10, saku_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(11, luck_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(12, soku_);
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(13, leng_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -12981,53 +11226,53 @@ public final class LogbookEx {
       return super.writeReplace();
     }
 
-    public static logbook.proto.LogbookEx.ItemDtoListPb parseFrom(
+    public static logbook.proto.LogbookEx.ShipParametersPb parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static logbook.proto.LogbookEx.ItemDtoListPb parseFrom(
+    public static logbook.proto.LogbookEx.ShipParametersPb parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static logbook.proto.LogbookEx.ItemDtoListPb parseFrom(byte[] data)
+    public static logbook.proto.LogbookEx.ShipParametersPb parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static logbook.proto.LogbookEx.ItemDtoListPb parseFrom(
+    public static logbook.proto.LogbookEx.ShipParametersPb parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static logbook.proto.LogbookEx.ItemDtoListPb parseFrom(java.io.InputStream input)
+    public static logbook.proto.LogbookEx.ShipParametersPb parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return PARSER.parseFrom(input);
     }
-    public static logbook.proto.LogbookEx.ItemDtoListPb parseFrom(
+    public static logbook.proto.LogbookEx.ShipParametersPb parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return PARSER.parseFrom(input, extensionRegistry);
     }
-    public static logbook.proto.LogbookEx.ItemDtoListPb parseDelimitedFrom(java.io.InputStream input)
+    public static logbook.proto.LogbookEx.ShipParametersPb parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return PARSER.parseDelimitedFrom(input);
     }
-    public static logbook.proto.LogbookEx.ItemDtoListPb parseDelimitedFrom(
+    public static logbook.proto.LogbookEx.ShipParametersPb parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return PARSER.parseDelimitedFrom(input, extensionRegistry);
     }
-    public static logbook.proto.LogbookEx.ItemDtoListPb parseFrom(
+    public static logbook.proto.LogbookEx.ShipParametersPb parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return PARSER.parseFrom(input);
     }
-    public static logbook.proto.LogbookEx.ItemDtoListPb parseFrom(
+    public static logbook.proto.LogbookEx.ShipParametersPb parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -13036,7 +11281,7 @@ public final class LogbookEx {
 
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(logbook.proto.LogbookEx.ItemDtoListPb prototype) {
+    public static Builder newBuilder(logbook.proto.LogbookEx.ShipParametersPb prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
@@ -13048,24 +11293,24 @@ public final class LogbookEx {
       return builder;
     }
     /**
-     * Protobuf type {@code logbook.ItemDtoListPb}
+     * Protobuf type {@code logbook.ShipParametersPb}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements logbook.proto.LogbookEx.ItemDtoListPbOrBuilder {
+       implements logbook.proto.LogbookEx.ShipParametersPbOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return logbook.proto.LogbookEx.internal_static_logbook_ItemDtoListPb_descriptor;
+        return logbook.proto.LogbookEx.internal_static_logbook_ShipParametersPb_descriptor;
       }
 
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return logbook.proto.LogbookEx.internal_static_logbook_ItemDtoListPb_fieldAccessorTable
+        return logbook.proto.LogbookEx.internal_static_logbook_ShipParametersPb_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                logbook.proto.LogbookEx.ItemDtoListPb.class, logbook.proto.LogbookEx.ItemDtoListPb.Builder.class);
+                logbook.proto.LogbookEx.ShipParametersPb.class, logbook.proto.LogbookEx.ShipParametersPb.Builder.class);
       }
 
-      // Construct using logbook.proto.LogbookEx.ItemDtoListPb.newBuilder()
+      // Construct using logbook.proto.LogbookEx.ShipParametersPb.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -13077,7 +11322,6 @@ public final class LogbookEx {
       }
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-          getDataFieldBuilder();
         }
       }
       private static Builder create() {
@@ -13086,12 +11330,32 @@ public final class LogbookEx {
 
       public Builder clear() {
         super.clear();
-        if (dataBuilder_ == null) {
-          data_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000001);
-        } else {
-          dataBuilder_.clear();
-        }
+        taik_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        houg_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        houm_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        raig_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        baku_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000010);
+        tyku_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000020);
+        souk_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000040);
+        kaih_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000080);
+        tais_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000100);
+        saku_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000200);
+        luck_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000400);
+        soku_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000800);
+        leng_ = 0;
+        bitField0_ = (bitField0_ & ~0x00001000);
         return this;
       }
 
@@ -13101,73 +11365,131 @@ public final class LogbookEx {
 
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return logbook.proto.LogbookEx.internal_static_logbook_ItemDtoListPb_descriptor;
+        return logbook.proto.LogbookEx.internal_static_logbook_ShipParametersPb_descriptor;
       }
 
-      public logbook.proto.LogbookEx.ItemDtoListPb getDefaultInstanceForType() {
-        return logbook.proto.LogbookEx.ItemDtoListPb.getDefaultInstance();
+      public logbook.proto.LogbookEx.ShipParametersPb getDefaultInstanceForType() {
+        return logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
       }
 
-      public logbook.proto.LogbookEx.ItemDtoListPb build() {
-        logbook.proto.LogbookEx.ItemDtoListPb result = buildPartial();
+      public logbook.proto.LogbookEx.ShipParametersPb build() {
+        logbook.proto.LogbookEx.ShipParametersPb result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return result;
       }
 
-      public logbook.proto.LogbookEx.ItemDtoListPb buildPartial() {
-        logbook.proto.LogbookEx.ItemDtoListPb result = new logbook.proto.LogbookEx.ItemDtoListPb(this);
+      public logbook.proto.LogbookEx.ShipParametersPb buildPartial() {
+        logbook.proto.LogbookEx.ShipParametersPb result = new logbook.proto.LogbookEx.ShipParametersPb(this);
         int from_bitField0_ = bitField0_;
-        if (dataBuilder_ == null) {
-          if (((bitField0_ & 0x00000001) == 0x00000001)) {
-            data_ = java.util.Collections.unmodifiableList(data_);
-            bitField0_ = (bitField0_ & ~0x00000001);
-          }
-          result.data_ = data_;
-        } else {
-          result.data_ = dataBuilder_.build();
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
         }
+        result.taik_ = taik_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.houg_ = houg_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.houm_ = houm_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.raig_ = raig_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.baku_ = baku_;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        result.tyku_ = tyku_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
+        }
+        result.souk_ = souk_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
+        }
+        result.kaih_ = kaih_;
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+          to_bitField0_ |= 0x00000100;
+        }
+        result.tais_ = tais_;
+        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+          to_bitField0_ |= 0x00000200;
+        }
+        result.saku_ = saku_;
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+          to_bitField0_ |= 0x00000400;
+        }
+        result.luck_ = luck_;
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+          to_bitField0_ |= 0x00000800;
+        }
+        result.soku_ = soku_;
+        if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
+          to_bitField0_ |= 0x00001000;
+        }
+        result.leng_ = leng_;
+        result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
 
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof logbook.proto.LogbookEx.ItemDtoListPb) {
-          return mergeFrom((logbook.proto.LogbookEx.ItemDtoListPb)other);
+        if (other instanceof logbook.proto.LogbookEx.ShipParametersPb) {
+          return mergeFrom((logbook.proto.LogbookEx.ShipParametersPb)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(logbook.proto.LogbookEx.ItemDtoListPb other) {
-        if (other == logbook.proto.LogbookEx.ItemDtoListPb.getDefaultInstance()) return this;
-        if (dataBuilder_ == null) {
-          if (!other.data_.isEmpty()) {
-            if (data_.isEmpty()) {
-              data_ = other.data_;
-              bitField0_ = (bitField0_ & ~0x00000001);
-            } else {
-              ensureDataIsMutable();
-              data_.addAll(other.data_);
-            }
-            onChanged();
-          }
-        } else {
-          if (!other.data_.isEmpty()) {
-            if (dataBuilder_.isEmpty()) {
-              dataBuilder_.dispose();
-              dataBuilder_ = null;
-              data_ = other.data_;
-              bitField0_ = (bitField0_ & ~0x00000001);
-              dataBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                   getDataFieldBuilder() : null;
-            } else {
-              dataBuilder_.addAllMessages(other.data_);
-            }
-          }
+      public Builder mergeFrom(logbook.proto.LogbookEx.ShipParametersPb other) {
+        if (other == logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance()) return this;
+        if (other.hasTaik()) {
+          setTaik(other.getTaik());
+        }
+        if (other.hasHoug()) {
+          setHoug(other.getHoug());
+        }
+        if (other.hasHoum()) {
+          setHoum(other.getHoum());
+        }
+        if (other.hasRaig()) {
+          setRaig(other.getRaig());
+        }
+        if (other.hasBaku()) {
+          setBaku(other.getBaku());
+        }
+        if (other.hasTyku()) {
+          setTyku(other.getTyku());
+        }
+        if (other.hasSouk()) {
+          setSouk(other.getSouk());
+        }
+        if (other.hasKaih()) {
+          setKaih(other.getKaih());
+        }
+        if (other.hasTais()) {
+          setTais(other.getTais());
+        }
+        if (other.hasSaku()) {
+          setSaku(other.getSaku());
+        }
+        if (other.hasLuck()) {
+          setLuck(other.getLuck());
+        }
+        if (other.hasSoku()) {
+          setSoku(other.getSoku());
+        }
+        if (other.hasLeng()) {
+          setLeng(other.getLeng());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -13181,11 +11503,11 @@ public final class LogbookEx {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        logbook.proto.LogbookEx.ItemDtoListPb parsedMessage = null;
+        logbook.proto.LogbookEx.ShipParametersPb parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (logbook.proto.LogbookEx.ItemDtoListPb) e.getUnfinishedMessage();
+          parsedMessage = (logbook.proto.LogbookEx.ShipParametersPb) e.getUnfinishedMessage();
           throw e;
         } finally {
           if (parsedMessage != null) {
@@ -13196,666 +11518,718 @@ public final class LogbookEx {
       }
       private int bitField0_;
 
-      // repeated .logbook.ItemDtoPb data = 1;
-      private java.util.List<logbook.proto.LogbookEx.ItemDtoPb> data_ =
-        java.util.Collections.emptyList();
-      private void ensureDataIsMutable() {
-        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
-          data_ = new java.util.ArrayList<logbook.proto.LogbookEx.ItemDtoPb>(data_);
-          bitField0_ |= 0x00000001;
-         }
+      // optional sint32 taik = 1;
+      private int taik_ ;
+      /**
+       * <code>optional sint32 taik = 1;</code>
+       */
+      public boolean hasTaik() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional sint32 taik = 1;</code>
+       */
+      public int getTaik() {
+        return taik_;
+      }
+      /**
+       * <code>optional sint32 taik = 1;</code>
+       */
+      public Builder setTaik(int value) {
+        bitField0_ |= 0x00000001;
+        taik_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint32 taik = 1;</code>
+       */
+      public Builder clearTaik() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        taik_ = 0;
+        onChanged();
+        return this;
       }
 
-      private com.google.protobuf.RepeatedFieldBuilder<
-          logbook.proto.LogbookEx.ItemDtoPb, logbook.proto.LogbookEx.ItemDtoPb.Builder, logbook.proto.LogbookEx.ItemDtoPbOrBuilder> dataBuilder_;
-
+      // optional sint32 houg = 2;
+      private int houg_ ;
       /**
-       * <code>repeated .logbook.ItemDtoPb data = 1;</code>
+       * <code>optional sint32 houg = 2;</code>
        */
-      public java.util.List<logbook.proto.LogbookEx.ItemDtoPb> getDataList() {
-        if (dataBuilder_ == null) {
-          return java.util.Collections.unmodifiableList(data_);
-        } else {
-          return dataBuilder_.getMessageList();
-        }
+      public boolean hasHoug() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>repeated .logbook.ItemDtoPb data = 1;</code>
+       * <code>optional sint32 houg = 2;</code>
        */
-      public int getDataCount() {
-        if (dataBuilder_ == null) {
-          return data_.size();
-        } else {
-          return dataBuilder_.getCount();
-        }
+      public int getHoug() {
+        return houg_;
       }
       /**
-       * <code>repeated .logbook.ItemDtoPb data = 1;</code>
+       * <code>optional sint32 houg = 2;</code>
        */
-      public logbook.proto.LogbookEx.ItemDtoPb getData(int index) {
-        if (dataBuilder_ == null) {
-          return data_.get(index);
-        } else {
-          return dataBuilder_.getMessage(index);
-        }
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoPb data = 1;</code>
-       */
-      public Builder setData(
-          int index, logbook.proto.LogbookEx.ItemDtoPb value) {
-        if (dataBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureDataIsMutable();
-          data_.set(index, value);
-          onChanged();
-        } else {
-          dataBuilder_.setMessage(index, value);
-        }
+      public Builder setHoug(int value) {
+        bitField0_ |= 0x00000002;
+        houg_ = value;
+        onChanged();
         return this;
       }
       /**
-       * <code>repeated .logbook.ItemDtoPb data = 1;</code>
+       * <code>optional sint32 houg = 2;</code>
        */
-      public Builder setData(
-          int index, logbook.proto.LogbookEx.ItemDtoPb.Builder builderForValue) {
-        if (dataBuilder_ == null) {
-          ensureDataIsMutable();
-          data_.set(index, builderForValue.build());
-          onChanged();
-        } else {
-          dataBuilder_.setMessage(index, builderForValue.build());
-        }
+      public Builder clearHoug() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        houg_ = 0;
+        onChanged();
         return this;
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoPb data = 1;</code>
-       */
-      public Builder addData(logbook.proto.LogbookEx.ItemDtoPb value) {
-        if (dataBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureDataIsMutable();
-          data_.add(value);
-          onChanged();
-        } else {
-          dataBuilder_.addMessage(value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoPb data = 1;</code>
-       */
-      public Builder addData(
-          int index, logbook.proto.LogbookEx.ItemDtoPb value) {
-        if (dataBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureDataIsMutable();
-          data_.add(index, value);
-          onChanged();
-        } else {
-          dataBuilder_.addMessage(index, value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoPb data = 1;</code>
-       */
-      public Builder addData(
-          logbook.proto.LogbookEx.ItemDtoPb.Builder builderForValue) {
-        if (dataBuilder_ == null) {
-          ensureDataIsMutable();
-          data_.add(builderForValue.build());
-          onChanged();
-        } else {
-          dataBuilder_.addMessage(builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoPb data = 1;</code>
-       */
-      public Builder addData(
-          int index, logbook.proto.LogbookEx.ItemDtoPb.Builder builderForValue) {
-        if (dataBuilder_ == null) {
-          ensureDataIsMutable();
-          data_.add(index, builderForValue.build());
-          onChanged();
-        } else {
-          dataBuilder_.addMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoPb data = 1;</code>
-       */
-      public Builder addAllData(
-          java.lang.Iterable<? extends logbook.proto.LogbookEx.ItemDtoPb> values) {
-        if (dataBuilder_ == null) {
-          ensureDataIsMutable();
-          super.addAll(values, data_);
-          onChanged();
-        } else {
-          dataBuilder_.addAllMessages(values);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoPb data = 1;</code>
-       */
-      public Builder clearData() {
-        if (dataBuilder_ == null) {
-          data_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000001);
-          onChanged();
-        } else {
-          dataBuilder_.clear();
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoPb data = 1;</code>
-       */
-      public Builder removeData(int index) {
-        if (dataBuilder_ == null) {
-          ensureDataIsMutable();
-          data_.remove(index);
-          onChanged();
-        } else {
-          dataBuilder_.remove(index);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoPb data = 1;</code>
-       */
-      public logbook.proto.LogbookEx.ItemDtoPb.Builder getDataBuilder(
-          int index) {
-        return getDataFieldBuilder().getBuilder(index);
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoPb data = 1;</code>
-       */
-      public logbook.proto.LogbookEx.ItemDtoPbOrBuilder getDataOrBuilder(
-          int index) {
-        if (dataBuilder_ == null) {
-          return data_.get(index);  } else {
-          return dataBuilder_.getMessageOrBuilder(index);
-        }
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoPb data = 1;</code>
-       */
-      public java.util.List<? extends logbook.proto.LogbookEx.ItemDtoPbOrBuilder> 
-           getDataOrBuilderList() {
-        if (dataBuilder_ != null) {
-          return dataBuilder_.getMessageOrBuilderList();
-        } else {
-          return java.util.Collections.unmodifiableList(data_);
-        }
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoPb data = 1;</code>
-       */
-      public logbook.proto.LogbookEx.ItemDtoPb.Builder addDataBuilder() {
-        return getDataFieldBuilder().addBuilder(
-            logbook.proto.LogbookEx.ItemDtoPb.getDefaultInstance());
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoPb data = 1;</code>
-       */
-      public logbook.proto.LogbookEx.ItemDtoPb.Builder addDataBuilder(
-          int index) {
-        return getDataFieldBuilder().addBuilder(
-            index, logbook.proto.LogbookEx.ItemDtoPb.getDefaultInstance());
-      }
-      /**
-       * <code>repeated .logbook.ItemDtoPb data = 1;</code>
-       */
-      public java.util.List<logbook.proto.LogbookEx.ItemDtoPb.Builder> 
-           getDataBuilderList() {
-        return getDataFieldBuilder().getBuilderList();
-      }
-      private com.google.protobuf.RepeatedFieldBuilder<
-          logbook.proto.LogbookEx.ItemDtoPb, logbook.proto.LogbookEx.ItemDtoPb.Builder, logbook.proto.LogbookEx.ItemDtoPbOrBuilder> 
-          getDataFieldBuilder() {
-        if (dataBuilder_ == null) {
-          dataBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-              logbook.proto.LogbookEx.ItemDtoPb, logbook.proto.LogbookEx.ItemDtoPb.Builder, logbook.proto.LogbookEx.ItemDtoPbOrBuilder>(
-                  data_,
-                  ((bitField0_ & 0x00000001) == 0x00000001),
-                  getParentForChildren(),
-                  isClean());
-          data_ = null;
-        }
-        return dataBuilder_;
       }
 
-      // @@protoc_insertion_point(builder_scope:logbook.ItemDtoListPb)
+      // optional sint32 houm = 3;
+      private int houm_ ;
+      /**
+       * <code>optional sint32 houm = 3;</code>
+       */
+      public boolean hasHoum() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional sint32 houm = 3;</code>
+       */
+      public int getHoum() {
+        return houm_;
+      }
+      /**
+       * <code>optional sint32 houm = 3;</code>
+       */
+      public Builder setHoum(int value) {
+        bitField0_ |= 0x00000004;
+        houm_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint32 houm = 3;</code>
+       */
+      public Builder clearHoum() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        houm_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional sint32 raig = 4;
+      private int raig_ ;
+      /**
+       * <code>optional sint32 raig = 4;</code>
+       */
+      public boolean hasRaig() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional sint32 raig = 4;</code>
+       */
+      public int getRaig() {
+        return raig_;
+      }
+      /**
+       * <code>optional sint32 raig = 4;</code>
+       */
+      public Builder setRaig(int value) {
+        bitField0_ |= 0x00000008;
+        raig_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint32 raig = 4;</code>
+       */
+      public Builder clearRaig() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        raig_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional sint32 baku = 5;
+      private int baku_ ;
+      /**
+       * <code>optional sint32 baku = 5;</code>
+       */
+      public boolean hasBaku() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional sint32 baku = 5;</code>
+       */
+      public int getBaku() {
+        return baku_;
+      }
+      /**
+       * <code>optional sint32 baku = 5;</code>
+       */
+      public Builder setBaku(int value) {
+        bitField0_ |= 0x00000010;
+        baku_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint32 baku = 5;</code>
+       */
+      public Builder clearBaku() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        baku_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional sint32 tyku = 6;
+      private int tyku_ ;
+      /**
+       * <code>optional sint32 tyku = 6;</code>
+       */
+      public boolean hasTyku() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional sint32 tyku = 6;</code>
+       */
+      public int getTyku() {
+        return tyku_;
+      }
+      /**
+       * <code>optional sint32 tyku = 6;</code>
+       */
+      public Builder setTyku(int value) {
+        bitField0_ |= 0x00000020;
+        tyku_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint32 tyku = 6;</code>
+       */
+      public Builder clearTyku() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        tyku_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional sint32 souk = 7;
+      private int souk_ ;
+      /**
+       * <code>optional sint32 souk = 7;</code>
+       */
+      public boolean hasSouk() {
+        return ((bitField0_ & 0x00000040) == 0x00000040);
+      }
+      /**
+       * <code>optional sint32 souk = 7;</code>
+       */
+      public int getSouk() {
+        return souk_;
+      }
+      /**
+       * <code>optional sint32 souk = 7;</code>
+       */
+      public Builder setSouk(int value) {
+        bitField0_ |= 0x00000040;
+        souk_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint32 souk = 7;</code>
+       */
+      public Builder clearSouk() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        souk_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional sint32 kaih = 8;
+      private int kaih_ ;
+      /**
+       * <code>optional sint32 kaih = 8;</code>
+       */
+      public boolean hasKaih() {
+        return ((bitField0_ & 0x00000080) == 0x00000080);
+      }
+      /**
+       * <code>optional sint32 kaih = 8;</code>
+       */
+      public int getKaih() {
+        return kaih_;
+      }
+      /**
+       * <code>optional sint32 kaih = 8;</code>
+       */
+      public Builder setKaih(int value) {
+        bitField0_ |= 0x00000080;
+        kaih_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint32 kaih = 8;</code>
+       */
+      public Builder clearKaih() {
+        bitField0_ = (bitField0_ & ~0x00000080);
+        kaih_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional sint32 tais = 9;
+      private int tais_ ;
+      /**
+       * <code>optional sint32 tais = 9;</code>
+       */
+      public boolean hasTais() {
+        return ((bitField0_ & 0x00000100) == 0x00000100);
+      }
+      /**
+       * <code>optional sint32 tais = 9;</code>
+       */
+      public int getTais() {
+        return tais_;
+      }
+      /**
+       * <code>optional sint32 tais = 9;</code>
+       */
+      public Builder setTais(int value) {
+        bitField0_ |= 0x00000100;
+        tais_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint32 tais = 9;</code>
+       */
+      public Builder clearTais() {
+        bitField0_ = (bitField0_ & ~0x00000100);
+        tais_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional sint32 saku = 10;
+      private int saku_ ;
+      /**
+       * <code>optional sint32 saku = 10;</code>
+       */
+      public boolean hasSaku() {
+        return ((bitField0_ & 0x00000200) == 0x00000200);
+      }
+      /**
+       * <code>optional sint32 saku = 10;</code>
+       */
+      public int getSaku() {
+        return saku_;
+      }
+      /**
+       * <code>optional sint32 saku = 10;</code>
+       */
+      public Builder setSaku(int value) {
+        bitField0_ |= 0x00000200;
+        saku_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint32 saku = 10;</code>
+       */
+      public Builder clearSaku() {
+        bitField0_ = (bitField0_ & ~0x00000200);
+        saku_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional sint32 luck = 11;
+      private int luck_ ;
+      /**
+       * <code>optional sint32 luck = 11;</code>
+       */
+      public boolean hasLuck() {
+        return ((bitField0_ & 0x00000400) == 0x00000400);
+      }
+      /**
+       * <code>optional sint32 luck = 11;</code>
+       */
+      public int getLuck() {
+        return luck_;
+      }
+      /**
+       * <code>optional sint32 luck = 11;</code>
+       */
+      public Builder setLuck(int value) {
+        bitField0_ |= 0x00000400;
+        luck_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint32 luck = 11;</code>
+       */
+      public Builder clearLuck() {
+        bitField0_ = (bitField0_ & ~0x00000400);
+        luck_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional sint32 soku = 12;
+      private int soku_ ;
+      /**
+       * <code>optional sint32 soku = 12;</code>
+       */
+      public boolean hasSoku() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
+      }
+      /**
+       * <code>optional sint32 soku = 12;</code>
+       */
+      public int getSoku() {
+        return soku_;
+      }
+      /**
+       * <code>optional sint32 soku = 12;</code>
+       */
+      public Builder setSoku(int value) {
+        bitField0_ |= 0x00000800;
+        soku_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint32 soku = 12;</code>
+       */
+      public Builder clearSoku() {
+        bitField0_ = (bitField0_ & ~0x00000800);
+        soku_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional sint32 leng = 13;
+      private int leng_ ;
+      /**
+       * <code>optional sint32 leng = 13;</code>
+       */
+      public boolean hasLeng() {
+        return ((bitField0_ & 0x00001000) == 0x00001000);
+      }
+      /**
+       * <code>optional sint32 leng = 13;</code>
+       */
+      public int getLeng() {
+        return leng_;
+      }
+      /**
+       * <code>optional sint32 leng = 13;</code>
+       */
+      public Builder setLeng(int value) {
+        bitField0_ |= 0x00001000;
+        leng_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint32 leng = 13;</code>
+       */
+      public Builder clearLeng() {
+        bitField0_ = (bitField0_ & ~0x00001000);
+        leng_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:logbook.ShipParametersPb)
     }
 
     static {
-      defaultInstance = new ItemDtoListPb(true);
+      defaultInstance = new ShipParametersPb(true);
       defaultInstance.initFields();
     }
 
-    // @@protoc_insertion_point(class_scope:logbook.ItemDtoListPb)
+    // @@protoc_insertion_point(class_scope:logbook.ShipParametersPb)
   }
 
   public interface ShipDtoPbOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
-    // optional sint64 id = 1;
+    // optional sint32 id = 10;
     /**
-     * <code>optional sint64 id = 1;</code>
+     * <code>optional sint32 id = 10;</code>
      */
     boolean hasId();
     /**
-     * <code>optional sint64 id = 1;</code>
+     * <code>optional sint32 id = 10;</code>
      */
-    long getId();
+    int getId();
 
-    // optional sint64 char_id = 2;
+    // optional sint32 char_id = 11;
     /**
-     * <code>optional sint64 char_id = 2;</code>
+     * <code>optional sint32 char_id = 11;</code>
      */
     boolean hasCharId();
     /**
-     * <code>optional sint64 char_id = 2;</code>
+     * <code>optional sint32 char_id = 11;</code>
      */
-    long getCharId();
+    int getCharId();
 
-    // optional bool locked = 3;
+    // optional sint32 sortno = 12;
     /**
-     * <code>optional bool locked = 3;</code>
+     * <code>optional sint32 sortno = 12;</code>
+     */
+    boolean hasSortno();
+    /**
+     * <code>optional sint32 sortno = 12;</code>
+     */
+    int getSortno();
+
+    // optional bool locked = 13;
+    /**
+     * <code>optional bool locked = 13;</code>
      */
     boolean hasLocked();
     /**
-     * <code>optional bool locked = 3;</code>
+     * <code>optional bool locked = 13;</code>
      */
     boolean getLocked();
 
-    // optional string fleetid = 4;
+    // optional string fleetid = 14;
     /**
-     * <code>optional string fleetid = 4;</code>
+     * <code>optional string fleetid = 14;</code>
      */
     boolean hasFleetid();
     /**
-     * <code>optional string fleetid = 4;</code>
+     * <code>optional string fleetid = 14;</code>
      */
     java.lang.String getFleetid();
     /**
-     * <code>optional string fleetid = 4;</code>
+     * <code>optional string fleetid = 14;</code>
      */
     com.google.protobuf.ByteString
         getFleetidBytes();
 
-    // optional string name = 5;
+    // optional sint32 fleetpos = 15;
     /**
-     * <code>optional string name = 5;</code>
+     * <code>optional sint32 fleetpos = 15;</code>
      */
-    boolean hasName();
+    boolean hasFleetpos();
     /**
-     * <code>optional string name = 5;</code>
+     * <code>optional sint32 fleetpos = 15;</code>
      */
-    java.lang.String getName();
-    /**
-     * <code>optional string name = 5;</code>
-     */
-    com.google.protobuf.ByteString
-        getNameBytes();
+    int getFleetpos();
 
-    // optional string type = 6;
+    // optional sint32 lv = 16;
     /**
-     * <code>optional string type = 6;</code>
-     */
-    boolean hasType();
-    /**
-     * <code>optional string type = 6;</code>
-     */
-    java.lang.String getType();
-    /**
-     * <code>optional string type = 6;</code>
-     */
-    com.google.protobuf.ByteString
-        getTypeBytes();
-
-    // optional sint64 lv = 7;
-    /**
-     * <code>optional sint64 lv = 7;</code>
+     * <code>optional sint32 lv = 16;</code>
      */
     boolean hasLv();
     /**
-     * <code>optional sint64 lv = 7;</code>
+     * <code>optional sint32 lv = 16;</code>
      */
-    long getLv();
+    int getLv();
 
-    // optional sint64 cond = 8;
+    // optional sint32 cond = 17;
     /**
-     * <code>optional sint64 cond = 8;</code>
+     * <code>optional sint32 cond = 17;</code>
      */
     boolean hasCond();
     /**
-     * <code>optional sint64 cond = 8;</code>
+     * <code>optional sint32 cond = 17;</code>
      */
-    long getCond();
+    int getCond();
 
-    // optional sint64 docktime = 9;
+    // optional sint64 docktime = 18;
     /**
-     * <code>optional sint64 docktime = 9;</code>
+     * <code>optional sint64 docktime = 18;</code>
      */
     boolean hasDocktime();
     /**
-     * <code>optional sint64 docktime = 9;</code>
+     * <code>optional sint64 docktime = 18;</code>
      */
     long getDocktime();
 
-    // optional sint64 dockfuel = 10;
+    // optional sint32 dockfuel = 19;
     /**
-     * <code>optional sint64 dockfuel = 10;</code>
+     * <code>optional sint32 dockfuel = 19;</code>
      */
     boolean hasDockfuel();
     /**
-     * <code>optional sint64 dockfuel = 10;</code>
+     * <code>optional sint32 dockfuel = 19;</code>
      */
-    long getDockfuel();
+    int getDockfuel();
 
-    // optional sint64 dockmetal = 11;
+    // optional sint32 dockmetal = 20;
     /**
-     * <code>optional sint64 dockmetal = 11;</code>
+     * <code>optional sint32 dockmetal = 20;</code>
      */
     boolean hasDockmetal();
     /**
-     * <code>optional sint64 dockmetal = 11;</code>
+     * <code>optional sint32 dockmetal = 20;</code>
      */
-    long getDockmetal();
+    int getDockmetal();
 
-    // optional sint32 bull = 12;
+    // optional sint32 bull = 21;
     /**
-     * <code>optional sint32 bull = 12;</code>
+     * <code>optional sint32 bull = 21;</code>
      */
     boolean hasBull();
     /**
-     * <code>optional sint32 bull = 12;</code>
+     * <code>optional sint32 bull = 21;</code>
      */
     int getBull();
 
-    // optional sint32 bullmax = 13;
+    // optional sint32 fuel = 22;
     /**
-     * <code>optional sint32 bullmax = 13;</code>
-     */
-    boolean hasBullmax();
-    /**
-     * <code>optional sint32 bullmax = 13;</code>
-     */
-    int getBullmax();
-
-    // optional sint32 fuel = 14;
-    /**
-     * <code>optional sint32 fuel = 14;</code>
+     * <code>optional sint32 fuel = 22;</code>
      */
     boolean hasFuel();
     /**
-     * <code>optional sint32 fuel = 14;</code>
+     * <code>optional sint32 fuel = 22;</code>
      */
     int getFuel();
 
-    // optional sint32 fuelmax = 15;
+    // optional sint32 exp = 23;
     /**
-     * <code>optional sint32 fuelmax = 15;</code>
-     */
-    boolean hasFuelmax();
-    /**
-     * <code>optional sint32 fuelmax = 15;</code>
-     */
-    int getFuelmax();
-
-    // optional sint64 exp = 16;
-    /**
-     * <code>optional sint64 exp = 16;</code>
+     * <code>optional sint32 exp = 23;</code>
      */
     boolean hasExp();
     /**
-     * <code>optional sint64 exp = 16;</code>
+     * <code>optional sint32 exp = 23;</code>
      */
-    long getExp();
+    int getExp();
 
-    // optional sint64 nowhp = 17;
+    // optional sint32 nowhp = 24;
     /**
-     * <code>optional sint64 nowhp = 17;</code>
+     * <code>optional sint32 nowhp = 24;</code>
      */
     boolean hasNowhp();
     /**
-     * <code>optional sint64 nowhp = 17;</code>
+     * <code>optional sint32 nowhp = 24;</code>
      */
-    long getNowhp();
+    int getNowhp();
 
-    // optional sint64 maxhp = 18;
+    // optional sint32 maxhp = 25;
     /**
-     * <code>optional sint64 maxhp = 18;</code>
+     * <code>optional sint32 maxhp = 25;</code>
      */
     boolean hasMaxhp();
     /**
-     * <code>optional sint64 maxhp = 18;</code>
+     * <code>optional sint32 maxhp = 25;</code>
      */
-    long getMaxhp();
+    int getMaxhp();
 
-    // optional sint32 slotnum = 19;
+    // optional sint32 slotnum = 26;
     /**
-     * <code>optional sint32 slotnum = 19;</code>
+     * <code>optional sint32 slotnum = 26;</code>
      */
     boolean hasSlotnum();
     /**
-     * <code>optional sint32 slotnum = 19;</code>
+     * <code>optional sint32 slotnum = 26;</code>
      */
     int getSlotnum();
 
-    // repeated sint64 slot = 20;
+    // repeated sint32 onslot = 27;
     /**
-     * <code>repeated sint64 slot = 20;</code>
-     */
-    java.util.List<java.lang.Long> getSlotList();
-    /**
-     * <code>repeated sint64 slot = 20;</code>
-     */
-    int getSlotCount();
-    /**
-     * <code>repeated sint64 slot = 20;</code>
-     */
-    long getSlot(int index);
-
-    // repeated sint32 onslot = 21;
-    /**
-     * <code>repeated sint32 onslot = 21;</code>
+     * <code>repeated sint32 onslot = 27;</code>
      */
     java.util.List<java.lang.Integer> getOnslotList();
     /**
-     * <code>repeated sint32 onslot = 21;</code>
+     * <code>repeated sint32 onslot = 27;</code>
      */
     int getOnslotCount();
     /**
-     * <code>repeated sint32 onslot = 21;</code>
+     * <code>repeated sint32 onslot = 27;</code>
      */
     int getOnslot(int index);
 
-    // optional sint64 karyoku = 22;
+    // optional .logbook.ShipInfoDtoPb ship_info = 1;
     /**
-     * <code>optional sint64 karyoku = 22;</code>
-     */
-    boolean hasKaryoku();
-    /**
-     * <code>optional sint64 karyoku = 22;</code>
-     */
-    long getKaryoku();
-
-    // optional sint64 karyoku_max = 23;
-    /**
-     * <code>optional sint64 karyoku_max = 23;</code>
-     */
-    boolean hasKaryokuMax();
-    /**
-     * <code>optional sint64 karyoku_max = 23;</code>
-     */
-    long getKaryokuMax();
-
-    // optional sint64 raisou = 24;
-    /**
-     * <code>optional sint64 raisou = 24;</code>
-     */
-    boolean hasRaisou();
-    /**
-     * <code>optional sint64 raisou = 24;</code>
-     */
-    long getRaisou();
-
-    // optional sint64 raisou_max = 25;
-    /**
-     * <code>optional sint64 raisou_max = 25;</code>
-     */
-    boolean hasRaisouMax();
-    /**
-     * <code>optional sint64 raisou_max = 25;</code>
-     */
-    long getRaisouMax();
-
-    // optional sint64 taiku = 26;
-    /**
-     * <code>optional sint64 taiku = 26;</code>
-     */
-    boolean hasTaiku();
-    /**
-     * <code>optional sint64 taiku = 26;</code>
-     */
-    long getTaiku();
-
-    // optional sint64 taiku_max = 27;
-    /**
-     * <code>optional sint64 taiku_max = 27;</code>
-     */
-    boolean hasTaikuMax();
-    /**
-     * <code>optional sint64 taiku_max = 27;</code>
-     */
-    long getTaikuMax();
-
-    // optional sint64 soukou = 28;
-    /**
-     * <code>optional sint64 soukou = 28;</code>
-     */
-    boolean hasSoukou();
-    /**
-     * <code>optional sint64 soukou = 28;</code>
-     */
-    long getSoukou();
-
-    // optional sint64 soukou_max = 29;
-    /**
-     * <code>optional sint64 soukou_max = 29;</code>
-     */
-    boolean hasSoukouMax();
-    /**
-     * <code>optional sint64 soukou_max = 29;</code>
-     */
-    long getSoukouMax();
-
-    // optional sint64 kaihi = 30;
-    /**
-     * <code>optional sint64 kaihi = 30;</code>
-     */
-    boolean hasKaihi();
-    /**
-     * <code>optional sint64 kaihi = 30;</code>
-     */
-    long getKaihi();
-
-    // optional sint64 kaihi_max = 31;
-    /**
-     * <code>optional sint64 kaihi_max = 31;</code>
-     */
-    boolean hasKaihiMax();
-    /**
-     * <code>optional sint64 kaihi_max = 31;</code>
-     */
-    long getKaihiMax();
-
-    // optional sint64 taisen = 32;
-    /**
-     * <code>optional sint64 taisen = 32;</code>
-     */
-    boolean hasTaisen();
-    /**
-     * <code>optional sint64 taisen = 32;</code>
-     */
-    long getTaisen();
-
-    // optional sint64 taisen_max = 33;
-    /**
-     * <code>optional sint64 taisen_max = 33;</code>
-     */
-    boolean hasTaisenMax();
-    /**
-     * <code>optional sint64 taisen_max = 33;</code>
-     */
-    long getTaisenMax();
-
-    // optional sint64 sakuteki = 34;
-    /**
-     * <code>optional sint64 sakuteki = 34;</code>
-     */
-    boolean hasSakuteki();
-    /**
-     * <code>optional sint64 sakuteki = 34;</code>
-     */
-    long getSakuteki();
-
-    // optional sint64 sakuteki_max = 35;
-    /**
-     * <code>optional sint64 sakuteki_max = 35;</code>
-     */
-    boolean hasSakutekiMax();
-    /**
-     * <code>optional sint64 sakuteki_max = 35;</code>
-     */
-    long getSakutekiMax();
-
-    // optional sint64 lucky = 36;
-    /**
-     * <code>optional sint64 lucky = 36;</code>
-     */
-    boolean hasLucky();
-    /**
-     * <code>optional sint64 lucky = 36;</code>
-     */
-    long getLucky();
-
-    // optional sint64 lucky_max = 37;
-    /**
-     * <code>optional sint64 lucky_max = 37;</code>
-     */
-    boolean hasLuckyMax();
-    /**
-     * <code>optional sint64 lucky_max = 37;</code>
-     */
-    long getLuckyMax();
-
-    // optional .logbook.ShipInfoDtoPb ship_info = 38;
-    /**
-     * <code>optional .logbook.ShipInfoDtoPb ship_info = 38;</code>
+     * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
      */
     boolean hasShipInfo();
     /**
-     * <code>optional .logbook.ShipInfoDtoPb ship_info = 38;</code>
+     * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
      */
     logbook.proto.LogbookEx.ShipInfoDtoPb getShipInfo();
     /**
-     * <code>optional .logbook.ShipInfoDtoPb ship_info = 38;</code>
+     * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
      */
     logbook.proto.LogbookEx.ShipInfoDtoPbOrBuilder getShipInfoOrBuilder();
+
+    // repeated sint32 slot = 2;
+    /**
+     * <code>repeated sint32 slot = 2;</code>
+     */
+    java.util.List<java.lang.Integer> getSlotList();
+    /**
+     * <code>repeated sint32 slot = 2;</code>
+     */
+    int getSlotCount();
+    /**
+     * <code>repeated sint32 slot = 2;</code>
+     */
+    int getSlot(int index);
+
+    // repeated .logbook.ItemDtoPb slot_item = 3;
+    /**
+     * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+     */
+    java.util.List<logbook.proto.LogbookEx.ItemDtoPb> 
+        getSlotItemList();
+    /**
+     * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+     */
+    logbook.proto.LogbookEx.ItemDtoPb getSlotItem(int index);
+    /**
+     * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+     */
+    int getSlotItemCount();
+    /**
+     * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+     */
+    java.util.List<? extends logbook.proto.LogbookEx.ItemDtoPbOrBuilder> 
+        getSlotItemOrBuilderList();
+    /**
+     * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+     */
+    logbook.proto.LogbookEx.ItemDtoPbOrBuilder getSlotItemOrBuilder(
+        int index);
+
+    // optional .logbook.ShipParametersPb param = 4;
+    /**
+     * <code>optional .logbook.ShipParametersPb param = 4;</code>
+     */
+    boolean hasParam();
+    /**
+     * <code>optional .logbook.ShipParametersPb param = 4;</code>
+     */
+    logbook.proto.LogbookEx.ShipParametersPb getParam();
+    /**
+     * <code>optional .logbook.ShipParametersPb param = 4;</code>
+     */
+    logbook.proto.LogbookEx.ShipParametersPbOrBuilder getParamOrBuilder();
+
+    // optional .logbook.ShipParametersPb slot_param = 5;
+    /**
+     * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+     */
+    boolean hasSlotParam();
+    /**
+     * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+     */
+    logbook.proto.LogbookEx.ShipParametersPb getSlotParam();
+    /**
+     * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+     */
+    logbook.proto.LogbookEx.ShipParametersPbOrBuilder getSlotParamOrBuilder();
   }
   /**
    * Protobuf type {@code logbook.ShipDtoPb}
@@ -13891,7 +12265,6 @@ public final class LogbookEx {
         throws com.google.protobuf.InvalidProtocolBufferException {
       initFields();
       int mutable_bitField0_ = 0;
-      int mutable_bitField1_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
@@ -13909,226 +12282,9 @@ public final class LogbookEx {
               }
               break;
             }
-            case 8: {
-              bitField0_ |= 0x00000001;
-              id_ = input.readSInt64();
-              break;
-            }
-            case 16: {
-              bitField0_ |= 0x00000002;
-              charId_ = input.readSInt64();
-              break;
-            }
-            case 24: {
-              bitField0_ |= 0x00000004;
-              locked_ = input.readBool();
-              break;
-            }
-            case 34: {
-              bitField0_ |= 0x00000008;
-              fleetid_ = input.readBytes();
-              break;
-            }
-            case 42: {
-              bitField0_ |= 0x00000010;
-              name_ = input.readBytes();
-              break;
-            }
-            case 50: {
-              bitField0_ |= 0x00000020;
-              type_ = input.readBytes();
-              break;
-            }
-            case 56: {
-              bitField0_ |= 0x00000040;
-              lv_ = input.readSInt64();
-              break;
-            }
-            case 64: {
-              bitField0_ |= 0x00000080;
-              cond_ = input.readSInt64();
-              break;
-            }
-            case 72: {
-              bitField0_ |= 0x00000100;
-              docktime_ = input.readSInt64();
-              break;
-            }
-            case 80: {
-              bitField0_ |= 0x00000200;
-              dockfuel_ = input.readSInt64();
-              break;
-            }
-            case 88: {
-              bitField0_ |= 0x00000400;
-              dockmetal_ = input.readSInt64();
-              break;
-            }
-            case 96: {
-              bitField0_ |= 0x00000800;
-              bull_ = input.readSInt32();
-              break;
-            }
-            case 104: {
-              bitField0_ |= 0x00001000;
-              bullmax_ = input.readSInt32();
-              break;
-            }
-            case 112: {
-              bitField0_ |= 0x00002000;
-              fuel_ = input.readSInt32();
-              break;
-            }
-            case 120: {
-              bitField0_ |= 0x00004000;
-              fuelmax_ = input.readSInt32();
-              break;
-            }
-            case 128: {
-              bitField0_ |= 0x00008000;
-              exp_ = input.readSInt64();
-              break;
-            }
-            case 136: {
-              bitField0_ |= 0x00010000;
-              nowhp_ = input.readSInt64();
-              break;
-            }
-            case 144: {
-              bitField0_ |= 0x00020000;
-              maxhp_ = input.readSInt64();
-              break;
-            }
-            case 152: {
-              bitField0_ |= 0x00040000;
-              slotnum_ = input.readSInt32();
-              break;
-            }
-            case 160: {
-              if (!((mutable_bitField0_ & 0x00080000) == 0x00080000)) {
-                slot_ = new java.util.ArrayList<java.lang.Long>();
-                mutable_bitField0_ |= 0x00080000;
-              }
-              slot_.add(input.readSInt64());
-              break;
-            }
-            case 162: {
-              int length = input.readRawVarint32();
-              int limit = input.pushLimit(length);
-              if (!((mutable_bitField0_ & 0x00080000) == 0x00080000) && input.getBytesUntilLimit() > 0) {
-                slot_ = new java.util.ArrayList<java.lang.Long>();
-                mutable_bitField0_ |= 0x00080000;
-              }
-              while (input.getBytesUntilLimit() > 0) {
-                slot_.add(input.readSInt64());
-              }
-              input.popLimit(limit);
-              break;
-            }
-            case 168: {
-              if (!((mutable_bitField0_ & 0x00100000) == 0x00100000)) {
-                onslot_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00100000;
-              }
-              onslot_.add(input.readSInt32());
-              break;
-            }
-            case 170: {
-              int length = input.readRawVarint32();
-              int limit = input.pushLimit(length);
-              if (!((mutable_bitField0_ & 0x00100000) == 0x00100000) && input.getBytesUntilLimit() > 0) {
-                onslot_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00100000;
-              }
-              while (input.getBytesUntilLimit() > 0) {
-                onslot_.add(input.readSInt32());
-              }
-              input.popLimit(limit);
-              break;
-            }
-            case 176: {
-              bitField0_ |= 0x00080000;
-              karyoku_ = input.readSInt64();
-              break;
-            }
-            case 184: {
-              bitField0_ |= 0x00100000;
-              karyokuMax_ = input.readSInt64();
-              break;
-            }
-            case 192: {
-              bitField0_ |= 0x00200000;
-              raisou_ = input.readSInt64();
-              break;
-            }
-            case 200: {
-              bitField0_ |= 0x00400000;
-              raisouMax_ = input.readSInt64();
-              break;
-            }
-            case 208: {
-              bitField0_ |= 0x00800000;
-              taiku_ = input.readSInt64();
-              break;
-            }
-            case 216: {
-              bitField0_ |= 0x01000000;
-              taikuMax_ = input.readSInt64();
-              break;
-            }
-            case 224: {
-              bitField0_ |= 0x02000000;
-              soukou_ = input.readSInt64();
-              break;
-            }
-            case 232: {
-              bitField0_ |= 0x04000000;
-              soukouMax_ = input.readSInt64();
-              break;
-            }
-            case 240: {
-              bitField0_ |= 0x08000000;
-              kaihi_ = input.readSInt64();
-              break;
-            }
-            case 248: {
-              bitField0_ |= 0x10000000;
-              kaihiMax_ = input.readSInt64();
-              break;
-            }
-            case 256: {
-              bitField0_ |= 0x20000000;
-              taisen_ = input.readSInt64();
-              break;
-            }
-            case 264: {
-              bitField0_ |= 0x40000000;
-              taisenMax_ = input.readSInt64();
-              break;
-            }
-            case 272: {
-              bitField0_ |= 0x80000000;
-              sakuteki_ = input.readSInt64();
-              break;
-            }
-            case 280: {
-              bitField1_ |= 0x00000001;
-              sakutekiMax_ = input.readSInt64();
-              break;
-            }
-            case 288: {
-              bitField1_ |= 0x00000002;
-              lucky_ = input.readSInt64();
-              break;
-            }
-            case 296: {
-              bitField1_ |= 0x00000004;
-              luckyMax_ = input.readSInt64();
-              break;
-            }
-            case 306: {
+            case 10: {
               logbook.proto.LogbookEx.ShipInfoDtoPb.Builder subBuilder = null;
-              if (((bitField1_ & 0x00000008) == 0x00000008)) {
+              if (((bitField0_ & 0x00020000) == 0x00020000)) {
                 subBuilder = shipInfo_.toBuilder();
               }
               shipInfo_ = input.readMessage(logbook.proto.LogbookEx.ShipInfoDtoPb.PARSER, extensionRegistry);
@@ -14136,7 +12292,168 @@ public final class LogbookEx {
                 subBuilder.mergeFrom(shipInfo_);
                 shipInfo_ = subBuilder.buildPartial();
               }
-              bitField1_ |= 0x00000008;
+              bitField0_ |= 0x00020000;
+              break;
+            }
+            case 16: {
+              if (!((mutable_bitField0_ & 0x00080000) == 0x00080000)) {
+                slot_ = new java.util.ArrayList<java.lang.Integer>();
+                mutable_bitField0_ |= 0x00080000;
+              }
+              slot_.add(input.readSInt32());
+              break;
+            }
+            case 18: {
+              int length = input.readRawVarint32();
+              int limit = input.pushLimit(length);
+              if (!((mutable_bitField0_ & 0x00080000) == 0x00080000) && input.getBytesUntilLimit() > 0) {
+                slot_ = new java.util.ArrayList<java.lang.Integer>();
+                mutable_bitField0_ |= 0x00080000;
+              }
+              while (input.getBytesUntilLimit() > 0) {
+                slot_.add(input.readSInt32());
+              }
+              input.popLimit(limit);
+              break;
+            }
+            case 26: {
+              if (!((mutable_bitField0_ & 0x00100000) == 0x00100000)) {
+                slotItem_ = new java.util.ArrayList<logbook.proto.LogbookEx.ItemDtoPb>();
+                mutable_bitField0_ |= 0x00100000;
+              }
+              slotItem_.add(input.readMessage(logbook.proto.LogbookEx.ItemDtoPb.PARSER, extensionRegistry));
+              break;
+            }
+            case 34: {
+              logbook.proto.LogbookEx.ShipParametersPb.Builder subBuilder = null;
+              if (((bitField0_ & 0x00040000) == 0x00040000)) {
+                subBuilder = param_.toBuilder();
+              }
+              param_ = input.readMessage(logbook.proto.LogbookEx.ShipParametersPb.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(param_);
+                param_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00040000;
+              break;
+            }
+            case 42: {
+              logbook.proto.LogbookEx.ShipParametersPb.Builder subBuilder = null;
+              if (((bitField0_ & 0x00080000) == 0x00080000)) {
+                subBuilder = slotParam_.toBuilder();
+              }
+              slotParam_ = input.readMessage(logbook.proto.LogbookEx.ShipParametersPb.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(slotParam_);
+                slotParam_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00080000;
+              break;
+            }
+            case 80: {
+              bitField0_ |= 0x00000001;
+              id_ = input.readSInt32();
+              break;
+            }
+            case 88: {
+              bitField0_ |= 0x00000002;
+              charId_ = input.readSInt32();
+              break;
+            }
+            case 96: {
+              bitField0_ |= 0x00000004;
+              sortno_ = input.readSInt32();
+              break;
+            }
+            case 104: {
+              bitField0_ |= 0x00000008;
+              locked_ = input.readBool();
+              break;
+            }
+            case 114: {
+              bitField0_ |= 0x00000010;
+              fleetid_ = input.readBytes();
+              break;
+            }
+            case 120: {
+              bitField0_ |= 0x00000020;
+              fleetpos_ = input.readSInt32();
+              break;
+            }
+            case 128: {
+              bitField0_ |= 0x00000040;
+              lv_ = input.readSInt32();
+              break;
+            }
+            case 136: {
+              bitField0_ |= 0x00000080;
+              cond_ = input.readSInt32();
+              break;
+            }
+            case 144: {
+              bitField0_ |= 0x00000100;
+              docktime_ = input.readSInt64();
+              break;
+            }
+            case 152: {
+              bitField0_ |= 0x00000200;
+              dockfuel_ = input.readSInt32();
+              break;
+            }
+            case 160: {
+              bitField0_ |= 0x00000400;
+              dockmetal_ = input.readSInt32();
+              break;
+            }
+            case 168: {
+              bitField0_ |= 0x00000800;
+              bull_ = input.readSInt32();
+              break;
+            }
+            case 176: {
+              bitField0_ |= 0x00001000;
+              fuel_ = input.readSInt32();
+              break;
+            }
+            case 184: {
+              bitField0_ |= 0x00002000;
+              exp_ = input.readSInt32();
+              break;
+            }
+            case 192: {
+              bitField0_ |= 0x00004000;
+              nowhp_ = input.readSInt32();
+              break;
+            }
+            case 200: {
+              bitField0_ |= 0x00008000;
+              maxhp_ = input.readSInt32();
+              break;
+            }
+            case 208: {
+              bitField0_ |= 0x00010000;
+              slotnum_ = input.readSInt32();
+              break;
+            }
+            case 216: {
+              if (!((mutable_bitField0_ & 0x00020000) == 0x00020000)) {
+                onslot_ = new java.util.ArrayList<java.lang.Integer>();
+                mutable_bitField0_ |= 0x00020000;
+              }
+              onslot_.add(input.readSInt32());
+              break;
+            }
+            case 218: {
+              int length = input.readRawVarint32();
+              int limit = input.pushLimit(length);
+              if (!((mutable_bitField0_ & 0x00020000) == 0x00020000) && input.getBytesUntilLimit() > 0) {
+                onslot_ = new java.util.ArrayList<java.lang.Integer>();
+                mutable_bitField0_ |= 0x00020000;
+              }
+              while (input.getBytesUntilLimit() > 0) {
+                onslot_.add(input.readSInt32());
+              }
+              input.popLimit(limit);
               break;
             }
           }
@@ -14151,6 +12468,9 @@ public final class LogbookEx {
           slot_ = java.util.Collections.unmodifiableList(slot_);
         }
         if (((mutable_bitField0_ & 0x00100000) == 0x00100000)) {
+          slotItem_ = java.util.Collections.unmodifiableList(slotItem_);
+        }
+        if (((mutable_bitField0_ & 0x00020000) == 0x00020000)) {
           onslot_ = java.util.Collections.unmodifiableList(onslot_);
         }
         this.unknownFields = unknownFields.build();
@@ -14185,66 +12505,81 @@ public final class LogbookEx {
     }
 
     private int bitField0_;
-    private int bitField1_;
-    // optional sint64 id = 1;
-    public static final int ID_FIELD_NUMBER = 1;
-    private long id_;
+    // optional sint32 id = 10;
+    public static final int ID_FIELD_NUMBER = 10;
+    private int id_;
     /**
-     * <code>optional sint64 id = 1;</code>
+     * <code>optional sint32 id = 10;</code>
      */
     public boolean hasId() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional sint64 id = 1;</code>
+     * <code>optional sint32 id = 10;</code>
      */
-    public long getId() {
+    public int getId() {
       return id_;
     }
 
-    // optional sint64 char_id = 2;
-    public static final int CHAR_ID_FIELD_NUMBER = 2;
-    private long charId_;
+    // optional sint32 char_id = 11;
+    public static final int CHAR_ID_FIELD_NUMBER = 11;
+    private int charId_;
     /**
-     * <code>optional sint64 char_id = 2;</code>
+     * <code>optional sint32 char_id = 11;</code>
      */
     public boolean hasCharId() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional sint64 char_id = 2;</code>
+     * <code>optional sint32 char_id = 11;</code>
      */
-    public long getCharId() {
+    public int getCharId() {
       return charId_;
     }
 
-    // optional bool locked = 3;
-    public static final int LOCKED_FIELD_NUMBER = 3;
-    private boolean locked_;
+    // optional sint32 sortno = 12;
+    public static final int SORTNO_FIELD_NUMBER = 12;
+    private int sortno_;
     /**
-     * <code>optional bool locked = 3;</code>
+     * <code>optional sint32 sortno = 12;</code>
      */
-    public boolean hasLocked() {
+    public boolean hasSortno() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional bool locked = 3;</code>
+     * <code>optional sint32 sortno = 12;</code>
+     */
+    public int getSortno() {
+      return sortno_;
+    }
+
+    // optional bool locked = 13;
+    public static final int LOCKED_FIELD_NUMBER = 13;
+    private boolean locked_;
+    /**
+     * <code>optional bool locked = 13;</code>
+     */
+    public boolean hasLocked() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional bool locked = 13;</code>
      */
     public boolean getLocked() {
       return locked_;
     }
 
-    // optional string fleetid = 4;
-    public static final int FLEETID_FIELD_NUMBER = 4;
+    // optional string fleetid = 14;
+    public static final int FLEETID_FIELD_NUMBER = 14;
     private java.lang.Object fleetid_;
     /**
-     * <code>optional string fleetid = 4;</code>
+     * <code>optional string fleetid = 14;</code>
      */
     public boolean hasFleetid() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
+      return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
-     * <code>optional string fleetid = 4;</code>
+     * <code>optional string fleetid = 14;</code>
      */
     public java.lang.String getFleetid() {
       java.lang.Object ref = fleetid_;
@@ -14261,7 +12596,7 @@ public final class LogbookEx {
       }
     }
     /**
-     * <code>optional string fleetid = 4;</code>
+     * <code>optional string fleetid = 14;</code>
      */
     public com.google.protobuf.ByteString
         getFleetidBytes() {
@@ -14277,663 +12612,370 @@ public final class LogbookEx {
       }
     }
 
-    // optional string name = 5;
-    public static final int NAME_FIELD_NUMBER = 5;
-    private java.lang.Object name_;
+    // optional sint32 fleetpos = 15;
+    public static final int FLEETPOS_FIELD_NUMBER = 15;
+    private int fleetpos_;
     /**
-     * <code>optional string name = 5;</code>
+     * <code>optional sint32 fleetpos = 15;</code>
      */
-    public boolean hasName() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
-    }
-    /**
-     * <code>optional string name = 5;</code>
-     */
-    public java.lang.String getName() {
-      java.lang.Object ref = name_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          name_ = s;
-        }
-        return s;
-      }
-    }
-    /**
-     * <code>optional string name = 5;</code>
-     */
-    public com.google.protobuf.ByteString
-        getNameBytes() {
-      java.lang.Object ref = name_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        name_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    // optional string type = 6;
-    public static final int TYPE_FIELD_NUMBER = 6;
-    private java.lang.Object type_;
-    /**
-     * <code>optional string type = 6;</code>
-     */
-    public boolean hasType() {
+    public boolean hasFleetpos() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
-     * <code>optional string type = 6;</code>
+     * <code>optional sint32 fleetpos = 15;</code>
      */
-    public java.lang.String getType() {
-      java.lang.Object ref = type_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          type_ = s;
-        }
-        return s;
-      }
-    }
-    /**
-     * <code>optional string type = 6;</code>
-     */
-    public com.google.protobuf.ByteString
-        getTypeBytes() {
-      java.lang.Object ref = type_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        type_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public int getFleetpos() {
+      return fleetpos_;
     }
 
-    // optional sint64 lv = 7;
-    public static final int LV_FIELD_NUMBER = 7;
-    private long lv_;
+    // optional sint32 lv = 16;
+    public static final int LV_FIELD_NUMBER = 16;
+    private int lv_;
     /**
-     * <code>optional sint64 lv = 7;</code>
+     * <code>optional sint32 lv = 16;</code>
      */
     public boolean hasLv() {
       return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
-     * <code>optional sint64 lv = 7;</code>
+     * <code>optional sint32 lv = 16;</code>
      */
-    public long getLv() {
+    public int getLv() {
       return lv_;
     }
 
-    // optional sint64 cond = 8;
-    public static final int COND_FIELD_NUMBER = 8;
-    private long cond_;
+    // optional sint32 cond = 17;
+    public static final int COND_FIELD_NUMBER = 17;
+    private int cond_;
     /**
-     * <code>optional sint64 cond = 8;</code>
+     * <code>optional sint32 cond = 17;</code>
      */
     public boolean hasCond() {
       return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     /**
-     * <code>optional sint64 cond = 8;</code>
+     * <code>optional sint32 cond = 17;</code>
      */
-    public long getCond() {
+    public int getCond() {
       return cond_;
     }
 
-    // optional sint64 docktime = 9;
-    public static final int DOCKTIME_FIELD_NUMBER = 9;
+    // optional sint64 docktime = 18;
+    public static final int DOCKTIME_FIELD_NUMBER = 18;
     private long docktime_;
     /**
-     * <code>optional sint64 docktime = 9;</code>
+     * <code>optional sint64 docktime = 18;</code>
      */
     public boolean hasDocktime() {
       return ((bitField0_ & 0x00000100) == 0x00000100);
     }
     /**
-     * <code>optional sint64 docktime = 9;</code>
+     * <code>optional sint64 docktime = 18;</code>
      */
     public long getDocktime() {
       return docktime_;
     }
 
-    // optional sint64 dockfuel = 10;
-    public static final int DOCKFUEL_FIELD_NUMBER = 10;
-    private long dockfuel_;
+    // optional sint32 dockfuel = 19;
+    public static final int DOCKFUEL_FIELD_NUMBER = 19;
+    private int dockfuel_;
     /**
-     * <code>optional sint64 dockfuel = 10;</code>
+     * <code>optional sint32 dockfuel = 19;</code>
      */
     public boolean hasDockfuel() {
       return ((bitField0_ & 0x00000200) == 0x00000200);
     }
     /**
-     * <code>optional sint64 dockfuel = 10;</code>
+     * <code>optional sint32 dockfuel = 19;</code>
      */
-    public long getDockfuel() {
+    public int getDockfuel() {
       return dockfuel_;
     }
 
-    // optional sint64 dockmetal = 11;
-    public static final int DOCKMETAL_FIELD_NUMBER = 11;
-    private long dockmetal_;
+    // optional sint32 dockmetal = 20;
+    public static final int DOCKMETAL_FIELD_NUMBER = 20;
+    private int dockmetal_;
     /**
-     * <code>optional sint64 dockmetal = 11;</code>
+     * <code>optional sint32 dockmetal = 20;</code>
      */
     public boolean hasDockmetal() {
       return ((bitField0_ & 0x00000400) == 0x00000400);
     }
     /**
-     * <code>optional sint64 dockmetal = 11;</code>
+     * <code>optional sint32 dockmetal = 20;</code>
      */
-    public long getDockmetal() {
+    public int getDockmetal() {
       return dockmetal_;
     }
 
-    // optional sint32 bull = 12;
-    public static final int BULL_FIELD_NUMBER = 12;
+    // optional sint32 bull = 21;
+    public static final int BULL_FIELD_NUMBER = 21;
     private int bull_;
     /**
-     * <code>optional sint32 bull = 12;</code>
+     * <code>optional sint32 bull = 21;</code>
      */
     public boolean hasBull() {
       return ((bitField0_ & 0x00000800) == 0x00000800);
     }
     /**
-     * <code>optional sint32 bull = 12;</code>
+     * <code>optional sint32 bull = 21;</code>
      */
     public int getBull() {
       return bull_;
     }
 
-    // optional sint32 bullmax = 13;
-    public static final int BULLMAX_FIELD_NUMBER = 13;
-    private int bullmax_;
+    // optional sint32 fuel = 22;
+    public static final int FUEL_FIELD_NUMBER = 22;
+    private int fuel_;
     /**
-     * <code>optional sint32 bullmax = 13;</code>
+     * <code>optional sint32 fuel = 22;</code>
      */
-    public boolean hasBullmax() {
+    public boolean hasFuel() {
       return ((bitField0_ & 0x00001000) == 0x00001000);
     }
     /**
-     * <code>optional sint32 bullmax = 13;</code>
-     */
-    public int getBullmax() {
-      return bullmax_;
-    }
-
-    // optional sint32 fuel = 14;
-    public static final int FUEL_FIELD_NUMBER = 14;
-    private int fuel_;
-    /**
-     * <code>optional sint32 fuel = 14;</code>
-     */
-    public boolean hasFuel() {
-      return ((bitField0_ & 0x00002000) == 0x00002000);
-    }
-    /**
-     * <code>optional sint32 fuel = 14;</code>
+     * <code>optional sint32 fuel = 22;</code>
      */
     public int getFuel() {
       return fuel_;
     }
 
-    // optional sint32 fuelmax = 15;
-    public static final int FUELMAX_FIELD_NUMBER = 15;
-    private int fuelmax_;
+    // optional sint32 exp = 23;
+    public static final int EXP_FIELD_NUMBER = 23;
+    private int exp_;
     /**
-     * <code>optional sint32 fuelmax = 15;</code>
-     */
-    public boolean hasFuelmax() {
-      return ((bitField0_ & 0x00004000) == 0x00004000);
-    }
-    /**
-     * <code>optional sint32 fuelmax = 15;</code>
-     */
-    public int getFuelmax() {
-      return fuelmax_;
-    }
-
-    // optional sint64 exp = 16;
-    public static final int EXP_FIELD_NUMBER = 16;
-    private long exp_;
-    /**
-     * <code>optional sint64 exp = 16;</code>
+     * <code>optional sint32 exp = 23;</code>
      */
     public boolean hasExp() {
-      return ((bitField0_ & 0x00008000) == 0x00008000);
+      return ((bitField0_ & 0x00002000) == 0x00002000);
     }
     /**
-     * <code>optional sint64 exp = 16;</code>
+     * <code>optional sint32 exp = 23;</code>
      */
-    public long getExp() {
+    public int getExp() {
       return exp_;
     }
 
-    // optional sint64 nowhp = 17;
-    public static final int NOWHP_FIELD_NUMBER = 17;
-    private long nowhp_;
+    // optional sint32 nowhp = 24;
+    public static final int NOWHP_FIELD_NUMBER = 24;
+    private int nowhp_;
     /**
-     * <code>optional sint64 nowhp = 17;</code>
+     * <code>optional sint32 nowhp = 24;</code>
      */
     public boolean hasNowhp() {
-      return ((bitField0_ & 0x00010000) == 0x00010000);
+      return ((bitField0_ & 0x00004000) == 0x00004000);
     }
     /**
-     * <code>optional sint64 nowhp = 17;</code>
+     * <code>optional sint32 nowhp = 24;</code>
      */
-    public long getNowhp() {
+    public int getNowhp() {
       return nowhp_;
     }
 
-    // optional sint64 maxhp = 18;
-    public static final int MAXHP_FIELD_NUMBER = 18;
-    private long maxhp_;
+    // optional sint32 maxhp = 25;
+    public static final int MAXHP_FIELD_NUMBER = 25;
+    private int maxhp_;
     /**
-     * <code>optional sint64 maxhp = 18;</code>
+     * <code>optional sint32 maxhp = 25;</code>
      */
     public boolean hasMaxhp() {
-      return ((bitField0_ & 0x00020000) == 0x00020000);
+      return ((bitField0_ & 0x00008000) == 0x00008000);
     }
     /**
-     * <code>optional sint64 maxhp = 18;</code>
+     * <code>optional sint32 maxhp = 25;</code>
      */
-    public long getMaxhp() {
+    public int getMaxhp() {
       return maxhp_;
     }
 
-    // optional sint32 slotnum = 19;
-    public static final int SLOTNUM_FIELD_NUMBER = 19;
+    // optional sint32 slotnum = 26;
+    public static final int SLOTNUM_FIELD_NUMBER = 26;
     private int slotnum_;
     /**
-     * <code>optional sint32 slotnum = 19;</code>
+     * <code>optional sint32 slotnum = 26;</code>
      */
     public boolean hasSlotnum() {
-      return ((bitField0_ & 0x00040000) == 0x00040000);
+      return ((bitField0_ & 0x00010000) == 0x00010000);
     }
     /**
-     * <code>optional sint32 slotnum = 19;</code>
+     * <code>optional sint32 slotnum = 26;</code>
      */
     public int getSlotnum() {
       return slotnum_;
     }
 
-    // repeated sint64 slot = 20;
-    public static final int SLOT_FIELD_NUMBER = 20;
-    private java.util.List<java.lang.Long> slot_;
-    /**
-     * <code>repeated sint64 slot = 20;</code>
-     */
-    public java.util.List<java.lang.Long>
-        getSlotList() {
-      return slot_;
-    }
-    /**
-     * <code>repeated sint64 slot = 20;</code>
-     */
-    public int getSlotCount() {
-      return slot_.size();
-    }
-    /**
-     * <code>repeated sint64 slot = 20;</code>
-     */
-    public long getSlot(int index) {
-      return slot_.get(index);
-    }
-
-    // repeated sint32 onslot = 21;
-    public static final int ONSLOT_FIELD_NUMBER = 21;
+    // repeated sint32 onslot = 27;
+    public static final int ONSLOT_FIELD_NUMBER = 27;
     private java.util.List<java.lang.Integer> onslot_;
     /**
-     * <code>repeated sint32 onslot = 21;</code>
+     * <code>repeated sint32 onslot = 27;</code>
      */
     public java.util.List<java.lang.Integer>
         getOnslotList() {
       return onslot_;
     }
     /**
-     * <code>repeated sint32 onslot = 21;</code>
+     * <code>repeated sint32 onslot = 27;</code>
      */
     public int getOnslotCount() {
       return onslot_.size();
     }
     /**
-     * <code>repeated sint32 onslot = 21;</code>
+     * <code>repeated sint32 onslot = 27;</code>
      */
     public int getOnslot(int index) {
       return onslot_.get(index);
     }
 
-    // optional sint64 karyoku = 22;
-    public static final int KARYOKU_FIELD_NUMBER = 22;
-    private long karyoku_;
-    /**
-     * <code>optional sint64 karyoku = 22;</code>
-     */
-    public boolean hasKaryoku() {
-      return ((bitField0_ & 0x00080000) == 0x00080000);
-    }
-    /**
-     * <code>optional sint64 karyoku = 22;</code>
-     */
-    public long getKaryoku() {
-      return karyoku_;
-    }
-
-    // optional sint64 karyoku_max = 23;
-    public static final int KARYOKU_MAX_FIELD_NUMBER = 23;
-    private long karyokuMax_;
-    /**
-     * <code>optional sint64 karyoku_max = 23;</code>
-     */
-    public boolean hasKaryokuMax() {
-      return ((bitField0_ & 0x00100000) == 0x00100000);
-    }
-    /**
-     * <code>optional sint64 karyoku_max = 23;</code>
-     */
-    public long getKaryokuMax() {
-      return karyokuMax_;
-    }
-
-    // optional sint64 raisou = 24;
-    public static final int RAISOU_FIELD_NUMBER = 24;
-    private long raisou_;
-    /**
-     * <code>optional sint64 raisou = 24;</code>
-     */
-    public boolean hasRaisou() {
-      return ((bitField0_ & 0x00200000) == 0x00200000);
-    }
-    /**
-     * <code>optional sint64 raisou = 24;</code>
-     */
-    public long getRaisou() {
-      return raisou_;
-    }
-
-    // optional sint64 raisou_max = 25;
-    public static final int RAISOU_MAX_FIELD_NUMBER = 25;
-    private long raisouMax_;
-    /**
-     * <code>optional sint64 raisou_max = 25;</code>
-     */
-    public boolean hasRaisouMax() {
-      return ((bitField0_ & 0x00400000) == 0x00400000);
-    }
-    /**
-     * <code>optional sint64 raisou_max = 25;</code>
-     */
-    public long getRaisouMax() {
-      return raisouMax_;
-    }
-
-    // optional sint64 taiku = 26;
-    public static final int TAIKU_FIELD_NUMBER = 26;
-    private long taiku_;
-    /**
-     * <code>optional sint64 taiku = 26;</code>
-     */
-    public boolean hasTaiku() {
-      return ((bitField0_ & 0x00800000) == 0x00800000);
-    }
-    /**
-     * <code>optional sint64 taiku = 26;</code>
-     */
-    public long getTaiku() {
-      return taiku_;
-    }
-
-    // optional sint64 taiku_max = 27;
-    public static final int TAIKU_MAX_FIELD_NUMBER = 27;
-    private long taikuMax_;
-    /**
-     * <code>optional sint64 taiku_max = 27;</code>
-     */
-    public boolean hasTaikuMax() {
-      return ((bitField0_ & 0x01000000) == 0x01000000);
-    }
-    /**
-     * <code>optional sint64 taiku_max = 27;</code>
-     */
-    public long getTaikuMax() {
-      return taikuMax_;
-    }
-
-    // optional sint64 soukou = 28;
-    public static final int SOUKOU_FIELD_NUMBER = 28;
-    private long soukou_;
-    /**
-     * <code>optional sint64 soukou = 28;</code>
-     */
-    public boolean hasSoukou() {
-      return ((bitField0_ & 0x02000000) == 0x02000000);
-    }
-    /**
-     * <code>optional sint64 soukou = 28;</code>
-     */
-    public long getSoukou() {
-      return soukou_;
-    }
-
-    // optional sint64 soukou_max = 29;
-    public static final int SOUKOU_MAX_FIELD_NUMBER = 29;
-    private long soukouMax_;
-    /**
-     * <code>optional sint64 soukou_max = 29;</code>
-     */
-    public boolean hasSoukouMax() {
-      return ((bitField0_ & 0x04000000) == 0x04000000);
-    }
-    /**
-     * <code>optional sint64 soukou_max = 29;</code>
-     */
-    public long getSoukouMax() {
-      return soukouMax_;
-    }
-
-    // optional sint64 kaihi = 30;
-    public static final int KAIHI_FIELD_NUMBER = 30;
-    private long kaihi_;
-    /**
-     * <code>optional sint64 kaihi = 30;</code>
-     */
-    public boolean hasKaihi() {
-      return ((bitField0_ & 0x08000000) == 0x08000000);
-    }
-    /**
-     * <code>optional sint64 kaihi = 30;</code>
-     */
-    public long getKaihi() {
-      return kaihi_;
-    }
-
-    // optional sint64 kaihi_max = 31;
-    public static final int KAIHI_MAX_FIELD_NUMBER = 31;
-    private long kaihiMax_;
-    /**
-     * <code>optional sint64 kaihi_max = 31;</code>
-     */
-    public boolean hasKaihiMax() {
-      return ((bitField0_ & 0x10000000) == 0x10000000);
-    }
-    /**
-     * <code>optional sint64 kaihi_max = 31;</code>
-     */
-    public long getKaihiMax() {
-      return kaihiMax_;
-    }
-
-    // optional sint64 taisen = 32;
-    public static final int TAISEN_FIELD_NUMBER = 32;
-    private long taisen_;
-    /**
-     * <code>optional sint64 taisen = 32;</code>
-     */
-    public boolean hasTaisen() {
-      return ((bitField0_ & 0x20000000) == 0x20000000);
-    }
-    /**
-     * <code>optional sint64 taisen = 32;</code>
-     */
-    public long getTaisen() {
-      return taisen_;
-    }
-
-    // optional sint64 taisen_max = 33;
-    public static final int TAISEN_MAX_FIELD_NUMBER = 33;
-    private long taisenMax_;
-    /**
-     * <code>optional sint64 taisen_max = 33;</code>
-     */
-    public boolean hasTaisenMax() {
-      return ((bitField0_ & 0x40000000) == 0x40000000);
-    }
-    /**
-     * <code>optional sint64 taisen_max = 33;</code>
-     */
-    public long getTaisenMax() {
-      return taisenMax_;
-    }
-
-    // optional sint64 sakuteki = 34;
-    public static final int SAKUTEKI_FIELD_NUMBER = 34;
-    private long sakuteki_;
-    /**
-     * <code>optional sint64 sakuteki = 34;</code>
-     */
-    public boolean hasSakuteki() {
-      return ((bitField0_ & 0x80000000) == 0x80000000);
-    }
-    /**
-     * <code>optional sint64 sakuteki = 34;</code>
-     */
-    public long getSakuteki() {
-      return sakuteki_;
-    }
-
-    // optional sint64 sakuteki_max = 35;
-    public static final int SAKUTEKI_MAX_FIELD_NUMBER = 35;
-    private long sakutekiMax_;
-    /**
-     * <code>optional sint64 sakuteki_max = 35;</code>
-     */
-    public boolean hasSakutekiMax() {
-      return ((bitField1_ & 0x00000001) == 0x00000001);
-    }
-    /**
-     * <code>optional sint64 sakuteki_max = 35;</code>
-     */
-    public long getSakutekiMax() {
-      return sakutekiMax_;
-    }
-
-    // optional sint64 lucky = 36;
-    public static final int LUCKY_FIELD_NUMBER = 36;
-    private long lucky_;
-    /**
-     * <code>optional sint64 lucky = 36;</code>
-     */
-    public boolean hasLucky() {
-      return ((bitField1_ & 0x00000002) == 0x00000002);
-    }
-    /**
-     * <code>optional sint64 lucky = 36;</code>
-     */
-    public long getLucky() {
-      return lucky_;
-    }
-
-    // optional sint64 lucky_max = 37;
-    public static final int LUCKY_MAX_FIELD_NUMBER = 37;
-    private long luckyMax_;
-    /**
-     * <code>optional sint64 lucky_max = 37;</code>
-     */
-    public boolean hasLuckyMax() {
-      return ((bitField1_ & 0x00000004) == 0x00000004);
-    }
-    /**
-     * <code>optional sint64 lucky_max = 37;</code>
-     */
-    public long getLuckyMax() {
-      return luckyMax_;
-    }
-
-    // optional .logbook.ShipInfoDtoPb ship_info = 38;
-    public static final int SHIP_INFO_FIELD_NUMBER = 38;
+    // optional .logbook.ShipInfoDtoPb ship_info = 1;
+    public static final int SHIP_INFO_FIELD_NUMBER = 1;
     private logbook.proto.LogbookEx.ShipInfoDtoPb shipInfo_;
     /**
-     * <code>optional .logbook.ShipInfoDtoPb ship_info = 38;</code>
+     * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
      */
     public boolean hasShipInfo() {
-      return ((bitField1_ & 0x00000008) == 0x00000008);
+      return ((bitField0_ & 0x00020000) == 0x00020000);
     }
     /**
-     * <code>optional .logbook.ShipInfoDtoPb ship_info = 38;</code>
+     * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
      */
     public logbook.proto.LogbookEx.ShipInfoDtoPb getShipInfo() {
       return shipInfo_;
     }
     /**
-     * <code>optional .logbook.ShipInfoDtoPb ship_info = 38;</code>
+     * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
      */
     public logbook.proto.LogbookEx.ShipInfoDtoPbOrBuilder getShipInfoOrBuilder() {
       return shipInfo_;
     }
 
+    // repeated sint32 slot = 2;
+    public static final int SLOT_FIELD_NUMBER = 2;
+    private java.util.List<java.lang.Integer> slot_;
+    /**
+     * <code>repeated sint32 slot = 2;</code>
+     */
+    public java.util.List<java.lang.Integer>
+        getSlotList() {
+      return slot_;
+    }
+    /**
+     * <code>repeated sint32 slot = 2;</code>
+     */
+    public int getSlotCount() {
+      return slot_.size();
+    }
+    /**
+     * <code>repeated sint32 slot = 2;</code>
+     */
+    public int getSlot(int index) {
+      return slot_.get(index);
+    }
+
+    // repeated .logbook.ItemDtoPb slot_item = 3;
+    public static final int SLOT_ITEM_FIELD_NUMBER = 3;
+    private java.util.List<logbook.proto.LogbookEx.ItemDtoPb> slotItem_;
+    /**
+     * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+     */
+    public java.util.List<logbook.proto.LogbookEx.ItemDtoPb> getSlotItemList() {
+      return slotItem_;
+    }
+    /**
+     * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+     */
+    public java.util.List<? extends logbook.proto.LogbookEx.ItemDtoPbOrBuilder> 
+        getSlotItemOrBuilderList() {
+      return slotItem_;
+    }
+    /**
+     * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+     */
+    public int getSlotItemCount() {
+      return slotItem_.size();
+    }
+    /**
+     * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+     */
+    public logbook.proto.LogbookEx.ItemDtoPb getSlotItem(int index) {
+      return slotItem_.get(index);
+    }
+    /**
+     * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+     */
+    public logbook.proto.LogbookEx.ItemDtoPbOrBuilder getSlotItemOrBuilder(
+        int index) {
+      return slotItem_.get(index);
+    }
+
+    // optional .logbook.ShipParametersPb param = 4;
+    public static final int PARAM_FIELD_NUMBER = 4;
+    private logbook.proto.LogbookEx.ShipParametersPb param_;
+    /**
+     * <code>optional .logbook.ShipParametersPb param = 4;</code>
+     */
+    public boolean hasParam() {
+      return ((bitField0_ & 0x00040000) == 0x00040000);
+    }
+    /**
+     * <code>optional .logbook.ShipParametersPb param = 4;</code>
+     */
+    public logbook.proto.LogbookEx.ShipParametersPb getParam() {
+      return param_;
+    }
+    /**
+     * <code>optional .logbook.ShipParametersPb param = 4;</code>
+     */
+    public logbook.proto.LogbookEx.ShipParametersPbOrBuilder getParamOrBuilder() {
+      return param_;
+    }
+
+    // optional .logbook.ShipParametersPb slot_param = 5;
+    public static final int SLOT_PARAM_FIELD_NUMBER = 5;
+    private logbook.proto.LogbookEx.ShipParametersPb slotParam_;
+    /**
+     * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+     */
+    public boolean hasSlotParam() {
+      return ((bitField0_ & 0x00080000) == 0x00080000);
+    }
+    /**
+     * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+     */
+    public logbook.proto.LogbookEx.ShipParametersPb getSlotParam() {
+      return slotParam_;
+    }
+    /**
+     * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+     */
+    public logbook.proto.LogbookEx.ShipParametersPbOrBuilder getSlotParamOrBuilder() {
+      return slotParam_;
+    }
+
     private void initFields() {
-      id_ = 0L;
-      charId_ = 0L;
+      id_ = 0;
+      charId_ = 0;
+      sortno_ = 0;
       locked_ = false;
       fleetid_ = "";
-      name_ = "";
-      type_ = "";
-      lv_ = 0L;
-      cond_ = 0L;
+      fleetpos_ = 0;
+      lv_ = 0;
+      cond_ = 0;
       docktime_ = 0L;
-      dockfuel_ = 0L;
-      dockmetal_ = 0L;
+      dockfuel_ = 0;
+      dockmetal_ = 0;
       bull_ = 0;
-      bullmax_ = 0;
       fuel_ = 0;
-      fuelmax_ = 0;
-      exp_ = 0L;
-      nowhp_ = 0L;
-      maxhp_ = 0L;
+      exp_ = 0;
+      nowhp_ = 0;
+      maxhp_ = 0;
       slotnum_ = 0;
-      slot_ = java.util.Collections.emptyList();
       onslot_ = java.util.Collections.emptyList();
-      karyoku_ = 0L;
-      karyokuMax_ = 0L;
-      raisou_ = 0L;
-      raisouMax_ = 0L;
-      taiku_ = 0L;
-      taikuMax_ = 0L;
-      soukou_ = 0L;
-      soukouMax_ = 0L;
-      kaihi_ = 0L;
-      kaihiMax_ = 0L;
-      taisen_ = 0L;
-      taisenMax_ = 0L;
-      sakuteki_ = 0L;
-      sakutekiMax_ = 0L;
-      lucky_ = 0L;
-      luckyMax_ = 0L;
       shipInfo_ = logbook.proto.LogbookEx.ShipInfoDtoPb.getDefaultInstance();
+      slot_ = java.util.Collections.emptyList();
+      slotItem_ = java.util.Collections.emptyList();
+      param_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+      slotParam_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -14947,119 +12989,74 @@ public final class LogbookEx {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeSInt64(1, id_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeSInt64(2, charId_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeBool(3, locked_);
-      }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeBytes(4, getFleetidBytes());
-      }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeBytes(5, getNameBytes());
-      }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeBytes(6, getTypeBytes());
-      }
-      if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        output.writeSInt64(7, lv_);
-      }
-      if (((bitField0_ & 0x00000080) == 0x00000080)) {
-        output.writeSInt64(8, cond_);
-      }
-      if (((bitField0_ & 0x00000100) == 0x00000100)) {
-        output.writeSInt64(9, docktime_);
-      }
-      if (((bitField0_ & 0x00000200) == 0x00000200)) {
-        output.writeSInt64(10, dockfuel_);
-      }
-      if (((bitField0_ & 0x00000400) == 0x00000400)) {
-        output.writeSInt64(11, dockmetal_);
-      }
-      if (((bitField0_ & 0x00000800) == 0x00000800)) {
-        output.writeSInt32(12, bull_);
-      }
-      if (((bitField0_ & 0x00001000) == 0x00001000)) {
-        output.writeSInt32(13, bullmax_);
-      }
-      if (((bitField0_ & 0x00002000) == 0x00002000)) {
-        output.writeSInt32(14, fuel_);
-      }
-      if (((bitField0_ & 0x00004000) == 0x00004000)) {
-        output.writeSInt32(15, fuelmax_);
-      }
-      if (((bitField0_ & 0x00008000) == 0x00008000)) {
-        output.writeSInt64(16, exp_);
-      }
-      if (((bitField0_ & 0x00010000) == 0x00010000)) {
-        output.writeSInt64(17, nowhp_);
-      }
       if (((bitField0_ & 0x00020000) == 0x00020000)) {
-        output.writeSInt64(18, maxhp_);
-      }
-      if (((bitField0_ & 0x00040000) == 0x00040000)) {
-        output.writeSInt32(19, slotnum_);
+        output.writeMessage(1, shipInfo_);
       }
       for (int i = 0; i < slot_.size(); i++) {
-        output.writeSInt64(20, slot_.get(i));
+        output.writeSInt32(2, slot_.get(i));
       }
-      for (int i = 0; i < onslot_.size(); i++) {
-        output.writeSInt32(21, onslot_.get(i));
+      for (int i = 0; i < slotItem_.size(); i++) {
+        output.writeMessage(3, slotItem_.get(i));
+      }
+      if (((bitField0_ & 0x00040000) == 0x00040000)) {
+        output.writeMessage(4, param_);
       }
       if (((bitField0_ & 0x00080000) == 0x00080000)) {
-        output.writeSInt64(22, karyoku_);
+        output.writeMessage(5, slotParam_);
       }
-      if (((bitField0_ & 0x00100000) == 0x00100000)) {
-        output.writeSInt64(23, karyokuMax_);
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeSInt32(10, id_);
       }
-      if (((bitField0_ & 0x00200000) == 0x00200000)) {
-        output.writeSInt64(24, raisou_);
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeSInt32(11, charId_);
       }
-      if (((bitField0_ & 0x00400000) == 0x00400000)) {
-        output.writeSInt64(25, raisouMax_);
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeSInt32(12, sortno_);
       }
-      if (((bitField0_ & 0x00800000) == 0x00800000)) {
-        output.writeSInt64(26, taiku_);
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeBool(13, locked_);
       }
-      if (((bitField0_ & 0x01000000) == 0x01000000)) {
-        output.writeSInt64(27, taikuMax_);
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeBytes(14, getFleetidBytes());
       }
-      if (((bitField0_ & 0x02000000) == 0x02000000)) {
-        output.writeSInt64(28, soukou_);
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeSInt32(15, fleetpos_);
       }
-      if (((bitField0_ & 0x04000000) == 0x04000000)) {
-        output.writeSInt64(29, soukouMax_);
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeSInt32(16, lv_);
       }
-      if (((bitField0_ & 0x08000000) == 0x08000000)) {
-        output.writeSInt64(30, kaihi_);
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeSInt32(17, cond_);
       }
-      if (((bitField0_ & 0x10000000) == 0x10000000)) {
-        output.writeSInt64(31, kaihiMax_);
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        output.writeSInt64(18, docktime_);
       }
-      if (((bitField0_ & 0x20000000) == 0x20000000)) {
-        output.writeSInt64(32, taisen_);
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        output.writeSInt32(19, dockfuel_);
       }
-      if (((bitField0_ & 0x40000000) == 0x40000000)) {
-        output.writeSInt64(33, taisenMax_);
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        output.writeSInt32(20, dockmetal_);
       }
-      if (((bitField0_ & 0x80000000) == 0x80000000)) {
-        output.writeSInt64(34, sakuteki_);
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        output.writeSInt32(21, bull_);
       }
-      if (((bitField1_ & 0x00000001) == 0x00000001)) {
-        output.writeSInt64(35, sakutekiMax_);
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        output.writeSInt32(22, fuel_);
       }
-      if (((bitField1_ & 0x00000002) == 0x00000002)) {
-        output.writeSInt64(36, lucky_);
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+        output.writeSInt32(23, exp_);
       }
-      if (((bitField1_ & 0x00000004) == 0x00000004)) {
-        output.writeSInt64(37, luckyMax_);
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        output.writeSInt32(24, nowhp_);
       }
-      if (((bitField1_ & 0x00000008) == 0x00000008)) {
-        output.writeMessage(38, shipInfo_);
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        output.writeSInt32(25, maxhp_);
+      }
+      if (((bitField0_ & 0x00010000) == 0x00010000)) {
+        output.writeSInt32(26, slotnum_);
+      }
+      for (int i = 0; i < onslot_.size(); i++) {
+        output.writeSInt32(27, onslot_.get(i));
       }
       getUnknownFields().writeTo(output);
     }
@@ -15070,90 +13067,98 @@ public final class LogbookEx {
       if (size != -1) return size;
 
       size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(1, id_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(2, charId_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(3, locked_);
-      }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(4, getFleetidBytes());
-      }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(5, getNameBytes());
-      }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(6, getTypeBytes());
-      }
-      if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(7, lv_);
-      }
-      if (((bitField0_ & 0x00000080) == 0x00000080)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(8, cond_);
-      }
-      if (((bitField0_ & 0x00000100) == 0x00000100)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(9, docktime_);
-      }
-      if (((bitField0_ & 0x00000200) == 0x00000200)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(10, dockfuel_);
-      }
-      if (((bitField0_ & 0x00000400) == 0x00000400)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(11, dockmetal_);
-      }
-      if (((bitField0_ & 0x00000800) == 0x00000800)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(12, bull_);
-      }
-      if (((bitField0_ & 0x00001000) == 0x00001000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(13, bullmax_);
-      }
-      if (((bitField0_ & 0x00002000) == 0x00002000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(14, fuel_);
-      }
-      if (((bitField0_ & 0x00004000) == 0x00004000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(15, fuelmax_);
-      }
-      if (((bitField0_ & 0x00008000) == 0x00008000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(16, exp_);
-      }
-      if (((bitField0_ & 0x00010000) == 0x00010000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(17, nowhp_);
-      }
       if (((bitField0_ & 0x00020000) == 0x00020000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(18, maxhp_);
-      }
-      if (((bitField0_ & 0x00040000) == 0x00040000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(19, slotnum_);
+          .computeMessageSize(1, shipInfo_);
       }
       {
         int dataSize = 0;
         for (int i = 0; i < slot_.size(); i++) {
           dataSize += com.google.protobuf.CodedOutputStream
-            .computeSInt64SizeNoTag(slot_.get(i));
+            .computeSInt32SizeNoTag(slot_.get(i));
         }
         size += dataSize;
-        size += 2 * getSlotList().size();
+        size += 1 * getSlotList().size();
+      }
+      for (int i = 0; i < slotItem_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, slotItem_.get(i));
+      }
+      if (((bitField0_ & 0x00040000) == 0x00040000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, param_);
+      }
+      if (((bitField0_ & 0x00080000) == 0x00080000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, slotParam_);
+      }
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(10, id_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(11, charId_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(12, sortno_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(13, locked_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(14, getFleetidBytes());
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(15, fleetpos_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(16, lv_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(17, cond_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt64Size(18, docktime_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(19, dockfuel_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(20, dockmetal_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(21, bull_);
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(22, fuel_);
+      }
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(23, exp_);
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(24, nowhp_);
+      }
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(25, maxhp_);
+      }
+      if (((bitField0_ & 0x00010000) == 0x00010000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(26, slotnum_);
       }
       {
         int dataSize = 0;
@@ -15163,74 +13168,6 @@ public final class LogbookEx {
         }
         size += dataSize;
         size += 2 * getOnslotList().size();
-      }
-      if (((bitField0_ & 0x00080000) == 0x00080000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(22, karyoku_);
-      }
-      if (((bitField0_ & 0x00100000) == 0x00100000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(23, karyokuMax_);
-      }
-      if (((bitField0_ & 0x00200000) == 0x00200000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(24, raisou_);
-      }
-      if (((bitField0_ & 0x00400000) == 0x00400000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(25, raisouMax_);
-      }
-      if (((bitField0_ & 0x00800000) == 0x00800000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(26, taiku_);
-      }
-      if (((bitField0_ & 0x01000000) == 0x01000000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(27, taikuMax_);
-      }
-      if (((bitField0_ & 0x02000000) == 0x02000000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(28, soukou_);
-      }
-      if (((bitField0_ & 0x04000000) == 0x04000000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(29, soukouMax_);
-      }
-      if (((bitField0_ & 0x08000000) == 0x08000000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(30, kaihi_);
-      }
-      if (((bitField0_ & 0x10000000) == 0x10000000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(31, kaihiMax_);
-      }
-      if (((bitField0_ & 0x20000000) == 0x20000000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(32, taisen_);
-      }
-      if (((bitField0_ & 0x40000000) == 0x40000000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(33, taisenMax_);
-      }
-      if (((bitField0_ & 0x80000000) == 0x80000000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(34, sakuteki_);
-      }
-      if (((bitField1_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(35, sakutekiMax_);
-      }
-      if (((bitField1_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(36, lucky_);
-      }
-      if (((bitField1_ & 0x00000004) == 0x00000004)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeSInt64Size(37, luckyMax_);
-      }
-      if (((bitField1_ & 0x00000008) == 0x00000008)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(38, shipInfo_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -15341,6 +13278,9 @@ public final class LogbookEx {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           getShipInfoFieldBuilder();
+          getSlotItemFieldBuilder();
+          getParamFieldBuilder();
+          getSlotParamFieldBuilder();
         }
       }
       private static Builder create() {
@@ -15349,86 +13289,68 @@ public final class LogbookEx {
 
       public Builder clear() {
         super.clear();
-        id_ = 0L;
+        id_ = 0;
         bitField0_ = (bitField0_ & ~0x00000001);
-        charId_ = 0L;
+        charId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000002);
-        locked_ = false;
+        sortno_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
-        fleetid_ = "";
+        locked_ = false;
         bitField0_ = (bitField0_ & ~0x00000008);
-        name_ = "";
+        fleetid_ = "";
         bitField0_ = (bitField0_ & ~0x00000010);
-        type_ = "";
+        fleetpos_ = 0;
         bitField0_ = (bitField0_ & ~0x00000020);
-        lv_ = 0L;
+        lv_ = 0;
         bitField0_ = (bitField0_ & ~0x00000040);
-        cond_ = 0L;
+        cond_ = 0;
         bitField0_ = (bitField0_ & ~0x00000080);
         docktime_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000100);
-        dockfuel_ = 0L;
+        dockfuel_ = 0;
         bitField0_ = (bitField0_ & ~0x00000200);
-        dockmetal_ = 0L;
+        dockmetal_ = 0;
         bitField0_ = (bitField0_ & ~0x00000400);
         bull_ = 0;
         bitField0_ = (bitField0_ & ~0x00000800);
-        bullmax_ = 0;
-        bitField0_ = (bitField0_ & ~0x00001000);
         fuel_ = 0;
+        bitField0_ = (bitField0_ & ~0x00001000);
+        exp_ = 0;
         bitField0_ = (bitField0_ & ~0x00002000);
-        fuelmax_ = 0;
+        nowhp_ = 0;
         bitField0_ = (bitField0_ & ~0x00004000);
-        exp_ = 0L;
+        maxhp_ = 0;
         bitField0_ = (bitField0_ & ~0x00008000);
-        nowhp_ = 0L;
-        bitField0_ = (bitField0_ & ~0x00010000);
-        maxhp_ = 0L;
-        bitField0_ = (bitField0_ & ~0x00020000);
         slotnum_ = 0;
-        bitField0_ = (bitField0_ & ~0x00040000);
-        slot_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00080000);
+        bitField0_ = (bitField0_ & ~0x00010000);
         onslot_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00100000);
-        karyoku_ = 0L;
-        bitField0_ = (bitField0_ & ~0x00200000);
-        karyokuMax_ = 0L;
-        bitField0_ = (bitField0_ & ~0x00400000);
-        raisou_ = 0L;
-        bitField0_ = (bitField0_ & ~0x00800000);
-        raisouMax_ = 0L;
-        bitField0_ = (bitField0_ & ~0x01000000);
-        taiku_ = 0L;
-        bitField0_ = (bitField0_ & ~0x02000000);
-        taikuMax_ = 0L;
-        bitField0_ = (bitField0_ & ~0x04000000);
-        soukou_ = 0L;
-        bitField0_ = (bitField0_ & ~0x08000000);
-        soukouMax_ = 0L;
-        bitField0_ = (bitField0_ & ~0x10000000);
-        kaihi_ = 0L;
-        bitField0_ = (bitField0_ & ~0x20000000);
-        kaihiMax_ = 0L;
-        bitField0_ = (bitField0_ & ~0x40000000);
-        taisen_ = 0L;
-        bitField0_ = (bitField0_ & ~0x80000000);
-        taisenMax_ = 0L;
-        bitField1_ = (bitField1_ & ~0x00000001);
-        sakuteki_ = 0L;
-        bitField1_ = (bitField1_ & ~0x00000002);
-        sakutekiMax_ = 0L;
-        bitField1_ = (bitField1_ & ~0x00000004);
-        lucky_ = 0L;
-        bitField1_ = (bitField1_ & ~0x00000008);
-        luckyMax_ = 0L;
-        bitField1_ = (bitField1_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00020000);
         if (shipInfoBuilder_ == null) {
           shipInfo_ = logbook.proto.LogbookEx.ShipInfoDtoPb.getDefaultInstance();
         } else {
           shipInfoBuilder_.clear();
         }
-        bitField1_ = (bitField1_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00040000);
+        slot_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00080000);
+        if (slotItemBuilder_ == null) {
+          slotItem_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00100000);
+        } else {
+          slotItemBuilder_.clear();
+        }
+        if (paramBuilder_ == null) {
+          param_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+        } else {
+          paramBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00200000);
+        if (slotParamBuilder_ == null) {
+          slotParam_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+        } else {
+          slotParamBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00400000);
         return this;
       }
 
@@ -15456,9 +13378,7 @@ public final class LogbookEx {
       public logbook.proto.LogbookEx.ShipDtoPb buildPartial() {
         logbook.proto.LogbookEx.ShipDtoPb result = new logbook.proto.LogbookEx.ShipDtoPb(this);
         int from_bitField0_ = bitField0_;
-        int from_bitField1_ = bitField1_;
         int to_bitField0_ = 0;
-        int to_bitField1_ = 0;
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
@@ -15470,19 +13390,19 @@ public final class LogbookEx {
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
-        result.locked_ = locked_;
+        result.sortno_ = sortno_;
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000008;
         }
-        result.fleetid_ = fleetid_;
+        result.locked_ = locked_;
         if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
           to_bitField0_ |= 0x00000010;
         }
-        result.name_ = name_;
+        result.fleetid_ = fleetid_;
         if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000020;
         }
-        result.type_ = type_;
+        result.fleetpos_ = fleetpos_;
         if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
           to_bitField0_ |= 0x00000040;
         }
@@ -15510,115 +13430,67 @@ public final class LogbookEx {
         if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
           to_bitField0_ |= 0x00001000;
         }
-        result.bullmax_ = bullmax_;
+        result.fuel_ = fuel_;
         if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
           to_bitField0_ |= 0x00002000;
         }
-        result.fuel_ = fuel_;
+        result.exp_ = exp_;
         if (((from_bitField0_ & 0x00004000) == 0x00004000)) {
           to_bitField0_ |= 0x00004000;
         }
-        result.fuelmax_ = fuelmax_;
+        result.nowhp_ = nowhp_;
         if (((from_bitField0_ & 0x00008000) == 0x00008000)) {
           to_bitField0_ |= 0x00008000;
         }
-        result.exp_ = exp_;
+        result.maxhp_ = maxhp_;
         if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
           to_bitField0_ |= 0x00010000;
         }
-        result.nowhp_ = nowhp_;
-        if (((from_bitField0_ & 0x00020000) == 0x00020000)) {
-          to_bitField0_ |= 0x00020000;
-        }
-        result.maxhp_ = maxhp_;
-        if (((from_bitField0_ & 0x00040000) == 0x00040000)) {
-          to_bitField0_ |= 0x00040000;
-        }
         result.slotnum_ = slotnum_;
-        if (((bitField0_ & 0x00080000) == 0x00080000)) {
-          slot_ = java.util.Collections.unmodifiableList(slot_);
-          bitField0_ = (bitField0_ & ~0x00080000);
-        }
-        result.slot_ = slot_;
-        if (((bitField0_ & 0x00100000) == 0x00100000)) {
+        if (((bitField0_ & 0x00020000) == 0x00020000)) {
           onslot_ = java.util.Collections.unmodifiableList(onslot_);
-          bitField0_ = (bitField0_ & ~0x00100000);
+          bitField0_ = (bitField0_ & ~0x00020000);
         }
         result.onslot_ = onslot_;
-        if (((from_bitField0_ & 0x00200000) == 0x00200000)) {
-          to_bitField0_ |= 0x00080000;
-        }
-        result.karyoku_ = karyoku_;
-        if (((from_bitField0_ & 0x00400000) == 0x00400000)) {
-          to_bitField0_ |= 0x00100000;
-        }
-        result.karyokuMax_ = karyokuMax_;
-        if (((from_bitField0_ & 0x00800000) == 0x00800000)) {
-          to_bitField0_ |= 0x00200000;
-        }
-        result.raisou_ = raisou_;
-        if (((from_bitField0_ & 0x01000000) == 0x01000000)) {
-          to_bitField0_ |= 0x00400000;
-        }
-        result.raisouMax_ = raisouMax_;
-        if (((from_bitField0_ & 0x02000000) == 0x02000000)) {
-          to_bitField0_ |= 0x00800000;
-        }
-        result.taiku_ = taiku_;
-        if (((from_bitField0_ & 0x04000000) == 0x04000000)) {
-          to_bitField0_ |= 0x01000000;
-        }
-        result.taikuMax_ = taikuMax_;
-        if (((from_bitField0_ & 0x08000000) == 0x08000000)) {
-          to_bitField0_ |= 0x02000000;
-        }
-        result.soukou_ = soukou_;
-        if (((from_bitField0_ & 0x10000000) == 0x10000000)) {
-          to_bitField0_ |= 0x04000000;
-        }
-        result.soukouMax_ = soukouMax_;
-        if (((from_bitField0_ & 0x20000000) == 0x20000000)) {
-          to_bitField0_ |= 0x08000000;
-        }
-        result.kaihi_ = kaihi_;
-        if (((from_bitField0_ & 0x40000000) == 0x40000000)) {
-          to_bitField0_ |= 0x10000000;
-        }
-        result.kaihiMax_ = kaihiMax_;
-        if (((from_bitField0_ & 0x80000000) == 0x80000000)) {
-          to_bitField0_ |= 0x20000000;
-        }
-        result.taisen_ = taisen_;
-        if (((from_bitField1_ & 0x00000001) == 0x00000001)) {
-          to_bitField0_ |= 0x40000000;
-        }
-        result.taisenMax_ = taisenMax_;
-        if (((from_bitField1_ & 0x00000002) == 0x00000002)) {
-          to_bitField0_ |= 0x80000000;
-        }
-        result.sakuteki_ = sakuteki_;
-        if (((from_bitField1_ & 0x00000004) == 0x00000004)) {
-          to_bitField1_ |= 0x00000001;
-        }
-        result.sakutekiMax_ = sakutekiMax_;
-        if (((from_bitField1_ & 0x00000008) == 0x00000008)) {
-          to_bitField1_ |= 0x00000002;
-        }
-        result.lucky_ = lucky_;
-        if (((from_bitField1_ & 0x00000010) == 0x00000010)) {
-          to_bitField1_ |= 0x00000004;
-        }
-        result.luckyMax_ = luckyMax_;
-        if (((from_bitField1_ & 0x00000020) == 0x00000020)) {
-          to_bitField1_ |= 0x00000008;
+        if (((from_bitField0_ & 0x00040000) == 0x00040000)) {
+          to_bitField0_ |= 0x00020000;
         }
         if (shipInfoBuilder_ == null) {
           result.shipInfo_ = shipInfo_;
         } else {
           result.shipInfo_ = shipInfoBuilder_.build();
         }
+        if (((bitField0_ & 0x00080000) == 0x00080000)) {
+          slot_ = java.util.Collections.unmodifiableList(slot_);
+          bitField0_ = (bitField0_ & ~0x00080000);
+        }
+        result.slot_ = slot_;
+        if (slotItemBuilder_ == null) {
+          if (((bitField0_ & 0x00100000) == 0x00100000)) {
+            slotItem_ = java.util.Collections.unmodifiableList(slotItem_);
+            bitField0_ = (bitField0_ & ~0x00100000);
+          }
+          result.slotItem_ = slotItem_;
+        } else {
+          result.slotItem_ = slotItemBuilder_.build();
+        }
+        if (((from_bitField0_ & 0x00200000) == 0x00200000)) {
+          to_bitField0_ |= 0x00040000;
+        }
+        if (paramBuilder_ == null) {
+          result.param_ = param_;
+        } else {
+          result.param_ = paramBuilder_.build();
+        }
+        if (((from_bitField0_ & 0x00400000) == 0x00400000)) {
+          to_bitField0_ |= 0x00080000;
+        }
+        if (slotParamBuilder_ == null) {
+          result.slotParam_ = slotParam_;
+        } else {
+          result.slotParam_ = slotParamBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
-        result.bitField1_ = to_bitField1_;
         onBuilt();
         return result;
       }
@@ -15640,23 +13512,19 @@ public final class LogbookEx {
         if (other.hasCharId()) {
           setCharId(other.getCharId());
         }
+        if (other.hasSortno()) {
+          setSortno(other.getSortno());
+        }
         if (other.hasLocked()) {
           setLocked(other.getLocked());
         }
         if (other.hasFleetid()) {
-          bitField0_ |= 0x00000008;
+          bitField0_ |= 0x00000010;
           fleetid_ = other.fleetid_;
           onChanged();
         }
-        if (other.hasName()) {
-          bitField0_ |= 0x00000010;
-          name_ = other.name_;
-          onChanged();
-        }
-        if (other.hasType()) {
-          bitField0_ |= 0x00000020;
-          type_ = other.type_;
-          onChanged();
+        if (other.hasFleetpos()) {
+          setFleetpos(other.getFleetpos());
         }
         if (other.hasLv()) {
           setLv(other.getLv());
@@ -15676,14 +13544,8 @@ public final class LogbookEx {
         if (other.hasBull()) {
           setBull(other.getBull());
         }
-        if (other.hasBullmax()) {
-          setBullmax(other.getBullmax());
-        }
         if (other.hasFuel()) {
           setFuel(other.getFuel());
-        }
-        if (other.hasFuelmax()) {
-          setFuelmax(other.getFuelmax());
         }
         if (other.hasExp()) {
           setExp(other.getExp());
@@ -15697,6 +13559,19 @@ public final class LogbookEx {
         if (other.hasSlotnum()) {
           setSlotnum(other.getSlotnum());
         }
+        if (!other.onslot_.isEmpty()) {
+          if (onslot_.isEmpty()) {
+            onslot_ = other.onslot_;
+            bitField0_ = (bitField0_ & ~0x00020000);
+          } else {
+            ensureOnslotIsMutable();
+            onslot_.addAll(other.onslot_);
+          }
+          onChanged();
+        }
+        if (other.hasShipInfo()) {
+          mergeShipInfo(other.getShipInfo());
+        }
         if (!other.slot_.isEmpty()) {
           if (slot_.isEmpty()) {
             slot_ = other.slot_;
@@ -15707,66 +13582,37 @@ public final class LogbookEx {
           }
           onChanged();
         }
-        if (!other.onslot_.isEmpty()) {
-          if (onslot_.isEmpty()) {
-            onslot_ = other.onslot_;
-            bitField0_ = (bitField0_ & ~0x00100000);
-          } else {
-            ensureOnslotIsMutable();
-            onslot_.addAll(other.onslot_);
+        if (slotItemBuilder_ == null) {
+          if (!other.slotItem_.isEmpty()) {
+            if (slotItem_.isEmpty()) {
+              slotItem_ = other.slotItem_;
+              bitField0_ = (bitField0_ & ~0x00100000);
+            } else {
+              ensureSlotItemIsMutable();
+              slotItem_.addAll(other.slotItem_);
+            }
+            onChanged();
           }
-          onChanged();
+        } else {
+          if (!other.slotItem_.isEmpty()) {
+            if (slotItemBuilder_.isEmpty()) {
+              slotItemBuilder_.dispose();
+              slotItemBuilder_ = null;
+              slotItem_ = other.slotItem_;
+              bitField0_ = (bitField0_ & ~0x00100000);
+              slotItemBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getSlotItemFieldBuilder() : null;
+            } else {
+              slotItemBuilder_.addAllMessages(other.slotItem_);
+            }
+          }
         }
-        if (other.hasKaryoku()) {
-          setKaryoku(other.getKaryoku());
+        if (other.hasParam()) {
+          mergeParam(other.getParam());
         }
-        if (other.hasKaryokuMax()) {
-          setKaryokuMax(other.getKaryokuMax());
-        }
-        if (other.hasRaisou()) {
-          setRaisou(other.getRaisou());
-        }
-        if (other.hasRaisouMax()) {
-          setRaisouMax(other.getRaisouMax());
-        }
-        if (other.hasTaiku()) {
-          setTaiku(other.getTaiku());
-        }
-        if (other.hasTaikuMax()) {
-          setTaikuMax(other.getTaikuMax());
-        }
-        if (other.hasSoukou()) {
-          setSoukou(other.getSoukou());
-        }
-        if (other.hasSoukouMax()) {
-          setSoukouMax(other.getSoukouMax());
-        }
-        if (other.hasKaihi()) {
-          setKaihi(other.getKaihi());
-        }
-        if (other.hasKaihiMax()) {
-          setKaihiMax(other.getKaihiMax());
-        }
-        if (other.hasTaisen()) {
-          setTaisen(other.getTaisen());
-        }
-        if (other.hasTaisenMax()) {
-          setTaisenMax(other.getTaisenMax());
-        }
-        if (other.hasSakuteki()) {
-          setSakuteki(other.getSakuteki());
-        }
-        if (other.hasSakutekiMax()) {
-          setSakutekiMax(other.getSakutekiMax());
-        }
-        if (other.hasLucky()) {
-          setLucky(other.getLucky());
-        }
-        if (other.hasLuckyMax()) {
-          setLuckyMax(other.getLuckyMax());
-        }
-        if (other.hasShipInfo()) {
-          mergeShipInfo(other.getShipInfo());
+        if (other.hasSlotParam()) {
+          mergeSlotParam(other.getSlotParam());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -15794,117 +13640,149 @@ public final class LogbookEx {
         return this;
       }
       private int bitField0_;
-      private int bitField1_;
 
-      // optional sint64 id = 1;
-      private long id_ ;
+      // optional sint32 id = 10;
+      private int id_ ;
       /**
-       * <code>optional sint64 id = 1;</code>
+       * <code>optional sint32 id = 10;</code>
        */
       public boolean hasId() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional sint64 id = 1;</code>
+       * <code>optional sint32 id = 10;</code>
        */
-      public long getId() {
+      public int getId() {
         return id_;
       }
       /**
-       * <code>optional sint64 id = 1;</code>
+       * <code>optional sint32 id = 10;</code>
        */
-      public Builder setId(long value) {
+      public Builder setId(int value) {
         bitField0_ |= 0x00000001;
         id_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sint64 id = 1;</code>
+       * <code>optional sint32 id = 10;</code>
        */
       public Builder clearId() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        id_ = 0L;
+        id_ = 0;
         onChanged();
         return this;
       }
 
-      // optional sint64 char_id = 2;
-      private long charId_ ;
+      // optional sint32 char_id = 11;
+      private int charId_ ;
       /**
-       * <code>optional sint64 char_id = 2;</code>
+       * <code>optional sint32 char_id = 11;</code>
        */
       public boolean hasCharId() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>optional sint64 char_id = 2;</code>
+       * <code>optional sint32 char_id = 11;</code>
        */
-      public long getCharId() {
+      public int getCharId() {
         return charId_;
       }
       /**
-       * <code>optional sint64 char_id = 2;</code>
+       * <code>optional sint32 char_id = 11;</code>
        */
-      public Builder setCharId(long value) {
+      public Builder setCharId(int value) {
         bitField0_ |= 0x00000002;
         charId_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sint64 char_id = 2;</code>
+       * <code>optional sint32 char_id = 11;</code>
        */
       public Builder clearCharId() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        charId_ = 0L;
+        charId_ = 0;
         onChanged();
         return this;
       }
 
-      // optional bool locked = 3;
-      private boolean locked_ ;
+      // optional sint32 sortno = 12;
+      private int sortno_ ;
       /**
-       * <code>optional bool locked = 3;</code>
+       * <code>optional sint32 sortno = 12;</code>
        */
-      public boolean hasLocked() {
+      public boolean hasSortno() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>optional bool locked = 3;</code>
+       * <code>optional sint32 sortno = 12;</code>
+       */
+      public int getSortno() {
+        return sortno_;
+      }
+      /**
+       * <code>optional sint32 sortno = 12;</code>
+       */
+      public Builder setSortno(int value) {
+        bitField0_ |= 0x00000004;
+        sortno_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint32 sortno = 12;</code>
+       */
+      public Builder clearSortno() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        sortno_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional bool locked = 13;
+      private boolean locked_ ;
+      /**
+       * <code>optional bool locked = 13;</code>
+       */
+      public boolean hasLocked() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional bool locked = 13;</code>
        */
       public boolean getLocked() {
         return locked_;
       }
       /**
-       * <code>optional bool locked = 3;</code>
+       * <code>optional bool locked = 13;</code>
        */
       public Builder setLocked(boolean value) {
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         locked_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional bool locked = 3;</code>
+       * <code>optional bool locked = 13;</code>
        */
       public Builder clearLocked() {
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000008);
         locked_ = false;
         onChanged();
         return this;
       }
 
-      // optional string fleetid = 4;
+      // optional string fleetid = 14;
       private java.lang.Object fleetid_ = "";
       /**
-       * <code>optional string fleetid = 4;</code>
+       * <code>optional string fleetid = 14;</code>
        */
       public boolean hasFleetid() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
-       * <code>optional string fleetid = 4;</code>
+       * <code>optional string fleetid = 14;</code>
        */
       public java.lang.String getFleetid() {
         java.lang.Object ref = fleetid_;
@@ -15918,7 +13796,7 @@ public final class LogbookEx {
         }
       }
       /**
-       * <code>optional string fleetid = 4;</code>
+       * <code>optional string fleetid = 14;</code>
        */
       public com.google.protobuf.ByteString
           getFleetidBytes() {
@@ -15934,271 +13812,156 @@ public final class LogbookEx {
         }
       }
       /**
-       * <code>optional string fleetid = 4;</code>
+       * <code>optional string fleetid = 14;</code>
        */
       public Builder setFleetid(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000008;
+  bitField0_ |= 0x00000010;
         fleetid_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string fleetid = 4;</code>
+       * <code>optional string fleetid = 14;</code>
        */
       public Builder clearFleetid() {
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
         fleetid_ = getDefaultInstance().getFleetid();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string fleetid = 4;</code>
+       * <code>optional string fleetid = 14;</code>
        */
       public Builder setFleetidBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000008;
+  bitField0_ |= 0x00000010;
         fleetid_ = value;
         onChanged();
         return this;
       }
 
-      // optional string name = 5;
-      private java.lang.Object name_ = "";
+      // optional sint32 fleetpos = 15;
+      private int fleetpos_ ;
       /**
-       * <code>optional string name = 5;</code>
+       * <code>optional sint32 fleetpos = 15;</code>
        */
-      public boolean hasName() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
-      }
-      /**
-       * <code>optional string name = 5;</code>
-       */
-      public java.lang.String getName() {
-        java.lang.Object ref = name_;
-        if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          name_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>optional string name = 5;</code>
-       */
-      public com.google.protobuf.ByteString
-          getNameBytes() {
-        java.lang.Object ref = name_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          name_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>optional string name = 5;</code>
-       */
-      public Builder setName(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000010;
-        name_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string name = 5;</code>
-       */
-      public Builder clearName() {
-        bitField0_ = (bitField0_ & ~0x00000010);
-        name_ = getDefaultInstance().getName();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string name = 5;</code>
-       */
-      public Builder setNameBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000010;
-        name_ = value;
-        onChanged();
-        return this;
-      }
-
-      // optional string type = 6;
-      private java.lang.Object type_ = "";
-      /**
-       * <code>optional string type = 6;</code>
-       */
-      public boolean hasType() {
+      public boolean hasFleetpos() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
-       * <code>optional string type = 6;</code>
+       * <code>optional sint32 fleetpos = 15;</code>
        */
-      public java.lang.String getType() {
-        java.lang.Object ref = type_;
-        if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          type_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
+      public int getFleetpos() {
+        return fleetpos_;
       }
       /**
-       * <code>optional string type = 6;</code>
+       * <code>optional sint32 fleetpos = 15;</code>
        */
-      public com.google.protobuf.ByteString
-          getTypeBytes() {
-        java.lang.Object ref = type_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          type_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>optional string type = 6;</code>
-       */
-      public Builder setType(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000020;
-        type_ = value;
+      public Builder setFleetpos(int value) {
+        bitField0_ |= 0x00000020;
+        fleetpos_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string type = 6;</code>
+       * <code>optional sint32 fleetpos = 15;</code>
        */
-      public Builder clearType() {
+      public Builder clearFleetpos() {
         bitField0_ = (bitField0_ & ~0x00000020);
-        type_ = getDefaultInstance().getType();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string type = 6;</code>
-       */
-      public Builder setTypeBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000020;
-        type_ = value;
+        fleetpos_ = 0;
         onChanged();
         return this;
       }
 
-      // optional sint64 lv = 7;
-      private long lv_ ;
+      // optional sint32 lv = 16;
+      private int lv_ ;
       /**
-       * <code>optional sint64 lv = 7;</code>
+       * <code>optional sint32 lv = 16;</code>
        */
       public boolean hasLv() {
         return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
-       * <code>optional sint64 lv = 7;</code>
+       * <code>optional sint32 lv = 16;</code>
        */
-      public long getLv() {
+      public int getLv() {
         return lv_;
       }
       /**
-       * <code>optional sint64 lv = 7;</code>
+       * <code>optional sint32 lv = 16;</code>
        */
-      public Builder setLv(long value) {
+      public Builder setLv(int value) {
         bitField0_ |= 0x00000040;
         lv_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sint64 lv = 7;</code>
+       * <code>optional sint32 lv = 16;</code>
        */
       public Builder clearLv() {
         bitField0_ = (bitField0_ & ~0x00000040);
-        lv_ = 0L;
+        lv_ = 0;
         onChanged();
         return this;
       }
 
-      // optional sint64 cond = 8;
-      private long cond_ ;
+      // optional sint32 cond = 17;
+      private int cond_ ;
       /**
-       * <code>optional sint64 cond = 8;</code>
+       * <code>optional sint32 cond = 17;</code>
        */
       public boolean hasCond() {
         return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       /**
-       * <code>optional sint64 cond = 8;</code>
+       * <code>optional sint32 cond = 17;</code>
        */
-      public long getCond() {
+      public int getCond() {
         return cond_;
       }
       /**
-       * <code>optional sint64 cond = 8;</code>
+       * <code>optional sint32 cond = 17;</code>
        */
-      public Builder setCond(long value) {
+      public Builder setCond(int value) {
         bitField0_ |= 0x00000080;
         cond_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sint64 cond = 8;</code>
+       * <code>optional sint32 cond = 17;</code>
        */
       public Builder clearCond() {
         bitField0_ = (bitField0_ & ~0x00000080);
-        cond_ = 0L;
+        cond_ = 0;
         onChanged();
         return this;
       }
 
-      // optional sint64 docktime = 9;
+      // optional sint64 docktime = 18;
       private long docktime_ ;
       /**
-       * <code>optional sint64 docktime = 9;</code>
+       * <code>optional sint64 docktime = 18;</code>
        */
       public boolean hasDocktime() {
         return ((bitField0_ & 0x00000100) == 0x00000100);
       }
       /**
-       * <code>optional sint64 docktime = 9;</code>
+       * <code>optional sint64 docktime = 18;</code>
        */
       public long getDocktime() {
         return docktime_;
       }
       /**
-       * <code>optional sint64 docktime = 9;</code>
+       * <code>optional sint64 docktime = 18;</code>
        */
       public Builder setDocktime(long value) {
         bitField0_ |= 0x00000100;
@@ -16207,7 +13970,7 @@ public final class LogbookEx {
         return this;
       }
       /**
-       * <code>optional sint64 docktime = 9;</code>
+       * <code>optional sint64 docktime = 18;</code>
        */
       public Builder clearDocktime() {
         bitField0_ = (bitField0_ & ~0x00000100);
@@ -16216,88 +13979,88 @@ public final class LogbookEx {
         return this;
       }
 
-      // optional sint64 dockfuel = 10;
-      private long dockfuel_ ;
+      // optional sint32 dockfuel = 19;
+      private int dockfuel_ ;
       /**
-       * <code>optional sint64 dockfuel = 10;</code>
+       * <code>optional sint32 dockfuel = 19;</code>
        */
       public boolean hasDockfuel() {
         return ((bitField0_ & 0x00000200) == 0x00000200);
       }
       /**
-       * <code>optional sint64 dockfuel = 10;</code>
+       * <code>optional sint32 dockfuel = 19;</code>
        */
-      public long getDockfuel() {
+      public int getDockfuel() {
         return dockfuel_;
       }
       /**
-       * <code>optional sint64 dockfuel = 10;</code>
+       * <code>optional sint32 dockfuel = 19;</code>
        */
-      public Builder setDockfuel(long value) {
+      public Builder setDockfuel(int value) {
         bitField0_ |= 0x00000200;
         dockfuel_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sint64 dockfuel = 10;</code>
+       * <code>optional sint32 dockfuel = 19;</code>
        */
       public Builder clearDockfuel() {
         bitField0_ = (bitField0_ & ~0x00000200);
-        dockfuel_ = 0L;
+        dockfuel_ = 0;
         onChanged();
         return this;
       }
 
-      // optional sint64 dockmetal = 11;
-      private long dockmetal_ ;
+      // optional sint32 dockmetal = 20;
+      private int dockmetal_ ;
       /**
-       * <code>optional sint64 dockmetal = 11;</code>
+       * <code>optional sint32 dockmetal = 20;</code>
        */
       public boolean hasDockmetal() {
         return ((bitField0_ & 0x00000400) == 0x00000400);
       }
       /**
-       * <code>optional sint64 dockmetal = 11;</code>
+       * <code>optional sint32 dockmetal = 20;</code>
        */
-      public long getDockmetal() {
+      public int getDockmetal() {
         return dockmetal_;
       }
       /**
-       * <code>optional sint64 dockmetal = 11;</code>
+       * <code>optional sint32 dockmetal = 20;</code>
        */
-      public Builder setDockmetal(long value) {
+      public Builder setDockmetal(int value) {
         bitField0_ |= 0x00000400;
         dockmetal_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sint64 dockmetal = 11;</code>
+       * <code>optional sint32 dockmetal = 20;</code>
        */
       public Builder clearDockmetal() {
         bitField0_ = (bitField0_ & ~0x00000400);
-        dockmetal_ = 0L;
+        dockmetal_ = 0;
         onChanged();
         return this;
       }
 
-      // optional sint32 bull = 12;
+      // optional sint32 bull = 21;
       private int bull_ ;
       /**
-       * <code>optional sint32 bull = 12;</code>
+       * <code>optional sint32 bull = 21;</code>
        */
       public boolean hasBull() {
         return ((bitField0_ & 0x00000800) == 0x00000800);
       }
       /**
-       * <code>optional sint32 bull = 12;</code>
+       * <code>optional sint32 bull = 21;</code>
        */
       public int getBull() {
         return bull_;
       }
       /**
-       * <code>optional sint32 bull = 12;</code>
+       * <code>optional sint32 bull = 21;</code>
        */
       public Builder setBull(int value) {
         bitField0_ |= 0x00000800;
@@ -16306,7 +14069,7 @@ public final class LogbookEx {
         return this;
       }
       /**
-       * <code>optional sint32 bull = 12;</code>
+       * <code>optional sint32 bull = 21;</code>
        */
       public Builder clearBull() {
         bitField0_ = (bitField0_ & ~0x00000800);
@@ -16315,332 +14078,200 @@ public final class LogbookEx {
         return this;
       }
 
-      // optional sint32 bullmax = 13;
-      private int bullmax_ ;
+      // optional sint32 fuel = 22;
+      private int fuel_ ;
       /**
-       * <code>optional sint32 bullmax = 13;</code>
+       * <code>optional sint32 fuel = 22;</code>
        */
-      public boolean hasBullmax() {
+      public boolean hasFuel() {
         return ((bitField0_ & 0x00001000) == 0x00001000);
       }
       /**
-       * <code>optional sint32 bullmax = 13;</code>
-       */
-      public int getBullmax() {
-        return bullmax_;
-      }
-      /**
-       * <code>optional sint32 bullmax = 13;</code>
-       */
-      public Builder setBullmax(int value) {
-        bitField0_ |= 0x00001000;
-        bullmax_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint32 bullmax = 13;</code>
-       */
-      public Builder clearBullmax() {
-        bitField0_ = (bitField0_ & ~0x00001000);
-        bullmax_ = 0;
-        onChanged();
-        return this;
-      }
-
-      // optional sint32 fuel = 14;
-      private int fuel_ ;
-      /**
-       * <code>optional sint32 fuel = 14;</code>
-       */
-      public boolean hasFuel() {
-        return ((bitField0_ & 0x00002000) == 0x00002000);
-      }
-      /**
-       * <code>optional sint32 fuel = 14;</code>
+       * <code>optional sint32 fuel = 22;</code>
        */
       public int getFuel() {
         return fuel_;
       }
       /**
-       * <code>optional sint32 fuel = 14;</code>
+       * <code>optional sint32 fuel = 22;</code>
        */
       public Builder setFuel(int value) {
-        bitField0_ |= 0x00002000;
+        bitField0_ |= 0x00001000;
         fuel_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sint32 fuel = 14;</code>
+       * <code>optional sint32 fuel = 22;</code>
        */
       public Builder clearFuel() {
-        bitField0_ = (bitField0_ & ~0x00002000);
+        bitField0_ = (bitField0_ & ~0x00001000);
         fuel_ = 0;
         onChanged();
         return this;
       }
 
-      // optional sint32 fuelmax = 15;
-      private int fuelmax_ ;
+      // optional sint32 exp = 23;
+      private int exp_ ;
       /**
-       * <code>optional sint32 fuelmax = 15;</code>
-       */
-      public boolean hasFuelmax() {
-        return ((bitField0_ & 0x00004000) == 0x00004000);
-      }
-      /**
-       * <code>optional sint32 fuelmax = 15;</code>
-       */
-      public int getFuelmax() {
-        return fuelmax_;
-      }
-      /**
-       * <code>optional sint32 fuelmax = 15;</code>
-       */
-      public Builder setFuelmax(int value) {
-        bitField0_ |= 0x00004000;
-        fuelmax_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint32 fuelmax = 15;</code>
-       */
-      public Builder clearFuelmax() {
-        bitField0_ = (bitField0_ & ~0x00004000);
-        fuelmax_ = 0;
-        onChanged();
-        return this;
-      }
-
-      // optional sint64 exp = 16;
-      private long exp_ ;
-      /**
-       * <code>optional sint64 exp = 16;</code>
+       * <code>optional sint32 exp = 23;</code>
        */
       public boolean hasExp() {
-        return ((bitField0_ & 0x00008000) == 0x00008000);
+        return ((bitField0_ & 0x00002000) == 0x00002000);
       }
       /**
-       * <code>optional sint64 exp = 16;</code>
+       * <code>optional sint32 exp = 23;</code>
        */
-      public long getExp() {
+      public int getExp() {
         return exp_;
       }
       /**
-       * <code>optional sint64 exp = 16;</code>
+       * <code>optional sint32 exp = 23;</code>
        */
-      public Builder setExp(long value) {
-        bitField0_ |= 0x00008000;
+      public Builder setExp(int value) {
+        bitField0_ |= 0x00002000;
         exp_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sint64 exp = 16;</code>
+       * <code>optional sint32 exp = 23;</code>
        */
       public Builder clearExp() {
-        bitField0_ = (bitField0_ & ~0x00008000);
-        exp_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00002000);
+        exp_ = 0;
         onChanged();
         return this;
       }
 
-      // optional sint64 nowhp = 17;
-      private long nowhp_ ;
+      // optional sint32 nowhp = 24;
+      private int nowhp_ ;
       /**
-       * <code>optional sint64 nowhp = 17;</code>
+       * <code>optional sint32 nowhp = 24;</code>
        */
       public boolean hasNowhp() {
-        return ((bitField0_ & 0x00010000) == 0x00010000);
+        return ((bitField0_ & 0x00004000) == 0x00004000);
       }
       /**
-       * <code>optional sint64 nowhp = 17;</code>
+       * <code>optional sint32 nowhp = 24;</code>
        */
-      public long getNowhp() {
+      public int getNowhp() {
         return nowhp_;
       }
       /**
-       * <code>optional sint64 nowhp = 17;</code>
+       * <code>optional sint32 nowhp = 24;</code>
        */
-      public Builder setNowhp(long value) {
-        bitField0_ |= 0x00010000;
+      public Builder setNowhp(int value) {
+        bitField0_ |= 0x00004000;
         nowhp_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sint64 nowhp = 17;</code>
+       * <code>optional sint32 nowhp = 24;</code>
        */
       public Builder clearNowhp() {
-        bitField0_ = (bitField0_ & ~0x00010000);
-        nowhp_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00004000);
+        nowhp_ = 0;
         onChanged();
         return this;
       }
 
-      // optional sint64 maxhp = 18;
-      private long maxhp_ ;
+      // optional sint32 maxhp = 25;
+      private int maxhp_ ;
       /**
-       * <code>optional sint64 maxhp = 18;</code>
+       * <code>optional sint32 maxhp = 25;</code>
        */
       public boolean hasMaxhp() {
-        return ((bitField0_ & 0x00020000) == 0x00020000);
+        return ((bitField0_ & 0x00008000) == 0x00008000);
       }
       /**
-       * <code>optional sint64 maxhp = 18;</code>
+       * <code>optional sint32 maxhp = 25;</code>
        */
-      public long getMaxhp() {
+      public int getMaxhp() {
         return maxhp_;
       }
       /**
-       * <code>optional sint64 maxhp = 18;</code>
+       * <code>optional sint32 maxhp = 25;</code>
        */
-      public Builder setMaxhp(long value) {
-        bitField0_ |= 0x00020000;
+      public Builder setMaxhp(int value) {
+        bitField0_ |= 0x00008000;
         maxhp_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sint64 maxhp = 18;</code>
+       * <code>optional sint32 maxhp = 25;</code>
        */
       public Builder clearMaxhp() {
-        bitField0_ = (bitField0_ & ~0x00020000);
-        maxhp_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00008000);
+        maxhp_ = 0;
         onChanged();
         return this;
       }
 
-      // optional sint32 slotnum = 19;
+      // optional sint32 slotnum = 26;
       private int slotnum_ ;
       /**
-       * <code>optional sint32 slotnum = 19;</code>
+       * <code>optional sint32 slotnum = 26;</code>
        */
       public boolean hasSlotnum() {
-        return ((bitField0_ & 0x00040000) == 0x00040000);
+        return ((bitField0_ & 0x00010000) == 0x00010000);
       }
       /**
-       * <code>optional sint32 slotnum = 19;</code>
+       * <code>optional sint32 slotnum = 26;</code>
        */
       public int getSlotnum() {
         return slotnum_;
       }
       /**
-       * <code>optional sint32 slotnum = 19;</code>
+       * <code>optional sint32 slotnum = 26;</code>
        */
       public Builder setSlotnum(int value) {
-        bitField0_ |= 0x00040000;
+        bitField0_ |= 0x00010000;
         slotnum_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional sint32 slotnum = 19;</code>
+       * <code>optional sint32 slotnum = 26;</code>
        */
       public Builder clearSlotnum() {
-        bitField0_ = (bitField0_ & ~0x00040000);
+        bitField0_ = (bitField0_ & ~0x00010000);
         slotnum_ = 0;
         onChanged();
         return this;
       }
 
-      // repeated sint64 slot = 20;
-      private java.util.List<java.lang.Long> slot_ = java.util.Collections.emptyList();
-      private void ensureSlotIsMutable() {
-        if (!((bitField0_ & 0x00080000) == 0x00080000)) {
-          slot_ = new java.util.ArrayList<java.lang.Long>(slot_);
-          bitField0_ |= 0x00080000;
-         }
-      }
-      /**
-       * <code>repeated sint64 slot = 20;</code>
-       */
-      public java.util.List<java.lang.Long>
-          getSlotList() {
-        return java.util.Collections.unmodifiableList(slot_);
-      }
-      /**
-       * <code>repeated sint64 slot = 20;</code>
-       */
-      public int getSlotCount() {
-        return slot_.size();
-      }
-      /**
-       * <code>repeated sint64 slot = 20;</code>
-       */
-      public long getSlot(int index) {
-        return slot_.get(index);
-      }
-      /**
-       * <code>repeated sint64 slot = 20;</code>
-       */
-      public Builder setSlot(
-          int index, long value) {
-        ensureSlotIsMutable();
-        slot_.set(index, value);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated sint64 slot = 20;</code>
-       */
-      public Builder addSlot(long value) {
-        ensureSlotIsMutable();
-        slot_.add(value);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated sint64 slot = 20;</code>
-       */
-      public Builder addAllSlot(
-          java.lang.Iterable<? extends java.lang.Long> values) {
-        ensureSlotIsMutable();
-        super.addAll(values, slot_);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated sint64 slot = 20;</code>
-       */
-      public Builder clearSlot() {
-        slot_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00080000);
-        onChanged();
-        return this;
-      }
-
-      // repeated sint32 onslot = 21;
+      // repeated sint32 onslot = 27;
       private java.util.List<java.lang.Integer> onslot_ = java.util.Collections.emptyList();
       private void ensureOnslotIsMutable() {
-        if (!((bitField0_ & 0x00100000) == 0x00100000)) {
+        if (!((bitField0_ & 0x00020000) == 0x00020000)) {
           onslot_ = new java.util.ArrayList<java.lang.Integer>(onslot_);
-          bitField0_ |= 0x00100000;
+          bitField0_ |= 0x00020000;
          }
       }
       /**
-       * <code>repeated sint32 onslot = 21;</code>
+       * <code>repeated sint32 onslot = 27;</code>
        */
       public java.util.List<java.lang.Integer>
           getOnslotList() {
         return java.util.Collections.unmodifiableList(onslot_);
       }
       /**
-       * <code>repeated sint32 onslot = 21;</code>
+       * <code>repeated sint32 onslot = 27;</code>
        */
       public int getOnslotCount() {
         return onslot_.size();
       }
       /**
-       * <code>repeated sint32 onslot = 21;</code>
+       * <code>repeated sint32 onslot = 27;</code>
        */
       public int getOnslot(int index) {
         return onslot_.get(index);
       }
       /**
-       * <code>repeated sint32 onslot = 21;</code>
+       * <code>repeated sint32 onslot = 27;</code>
        */
       public Builder setOnslot(
           int index, int value) {
@@ -16650,7 +14281,7 @@ public final class LogbookEx {
         return this;
       }
       /**
-       * <code>repeated sint32 onslot = 21;</code>
+       * <code>repeated sint32 onslot = 27;</code>
        */
       public Builder addOnslot(int value) {
         ensureOnslotIsMutable();
@@ -16659,7 +14290,7 @@ public final class LogbookEx {
         return this;
       }
       /**
-       * <code>repeated sint32 onslot = 21;</code>
+       * <code>repeated sint32 onslot = 27;</code>
        */
       public Builder addAllOnslot(
           java.lang.Iterable<? extends java.lang.Integer> values) {
@@ -16669,555 +14300,27 @@ public final class LogbookEx {
         return this;
       }
       /**
-       * <code>repeated sint32 onslot = 21;</code>
+       * <code>repeated sint32 onslot = 27;</code>
        */
       public Builder clearOnslot() {
         onslot_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00100000);
+        bitField0_ = (bitField0_ & ~0x00020000);
         onChanged();
         return this;
       }
 
-      // optional sint64 karyoku = 22;
-      private long karyoku_ ;
-      /**
-       * <code>optional sint64 karyoku = 22;</code>
-       */
-      public boolean hasKaryoku() {
-        return ((bitField0_ & 0x00200000) == 0x00200000);
-      }
-      /**
-       * <code>optional sint64 karyoku = 22;</code>
-       */
-      public long getKaryoku() {
-        return karyoku_;
-      }
-      /**
-       * <code>optional sint64 karyoku = 22;</code>
-       */
-      public Builder setKaryoku(long value) {
-        bitField0_ |= 0x00200000;
-        karyoku_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint64 karyoku = 22;</code>
-       */
-      public Builder clearKaryoku() {
-        bitField0_ = (bitField0_ & ~0x00200000);
-        karyoku_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      // optional sint64 karyoku_max = 23;
-      private long karyokuMax_ ;
-      /**
-       * <code>optional sint64 karyoku_max = 23;</code>
-       */
-      public boolean hasKaryokuMax() {
-        return ((bitField0_ & 0x00400000) == 0x00400000);
-      }
-      /**
-       * <code>optional sint64 karyoku_max = 23;</code>
-       */
-      public long getKaryokuMax() {
-        return karyokuMax_;
-      }
-      /**
-       * <code>optional sint64 karyoku_max = 23;</code>
-       */
-      public Builder setKaryokuMax(long value) {
-        bitField0_ |= 0x00400000;
-        karyokuMax_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint64 karyoku_max = 23;</code>
-       */
-      public Builder clearKaryokuMax() {
-        bitField0_ = (bitField0_ & ~0x00400000);
-        karyokuMax_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      // optional sint64 raisou = 24;
-      private long raisou_ ;
-      /**
-       * <code>optional sint64 raisou = 24;</code>
-       */
-      public boolean hasRaisou() {
-        return ((bitField0_ & 0x00800000) == 0x00800000);
-      }
-      /**
-       * <code>optional sint64 raisou = 24;</code>
-       */
-      public long getRaisou() {
-        return raisou_;
-      }
-      /**
-       * <code>optional sint64 raisou = 24;</code>
-       */
-      public Builder setRaisou(long value) {
-        bitField0_ |= 0x00800000;
-        raisou_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint64 raisou = 24;</code>
-       */
-      public Builder clearRaisou() {
-        bitField0_ = (bitField0_ & ~0x00800000);
-        raisou_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      // optional sint64 raisou_max = 25;
-      private long raisouMax_ ;
-      /**
-       * <code>optional sint64 raisou_max = 25;</code>
-       */
-      public boolean hasRaisouMax() {
-        return ((bitField0_ & 0x01000000) == 0x01000000);
-      }
-      /**
-       * <code>optional sint64 raisou_max = 25;</code>
-       */
-      public long getRaisouMax() {
-        return raisouMax_;
-      }
-      /**
-       * <code>optional sint64 raisou_max = 25;</code>
-       */
-      public Builder setRaisouMax(long value) {
-        bitField0_ |= 0x01000000;
-        raisouMax_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint64 raisou_max = 25;</code>
-       */
-      public Builder clearRaisouMax() {
-        bitField0_ = (bitField0_ & ~0x01000000);
-        raisouMax_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      // optional sint64 taiku = 26;
-      private long taiku_ ;
-      /**
-       * <code>optional sint64 taiku = 26;</code>
-       */
-      public boolean hasTaiku() {
-        return ((bitField0_ & 0x02000000) == 0x02000000);
-      }
-      /**
-       * <code>optional sint64 taiku = 26;</code>
-       */
-      public long getTaiku() {
-        return taiku_;
-      }
-      /**
-       * <code>optional sint64 taiku = 26;</code>
-       */
-      public Builder setTaiku(long value) {
-        bitField0_ |= 0x02000000;
-        taiku_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint64 taiku = 26;</code>
-       */
-      public Builder clearTaiku() {
-        bitField0_ = (bitField0_ & ~0x02000000);
-        taiku_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      // optional sint64 taiku_max = 27;
-      private long taikuMax_ ;
-      /**
-       * <code>optional sint64 taiku_max = 27;</code>
-       */
-      public boolean hasTaikuMax() {
-        return ((bitField0_ & 0x04000000) == 0x04000000);
-      }
-      /**
-       * <code>optional sint64 taiku_max = 27;</code>
-       */
-      public long getTaikuMax() {
-        return taikuMax_;
-      }
-      /**
-       * <code>optional sint64 taiku_max = 27;</code>
-       */
-      public Builder setTaikuMax(long value) {
-        bitField0_ |= 0x04000000;
-        taikuMax_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint64 taiku_max = 27;</code>
-       */
-      public Builder clearTaikuMax() {
-        bitField0_ = (bitField0_ & ~0x04000000);
-        taikuMax_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      // optional sint64 soukou = 28;
-      private long soukou_ ;
-      /**
-       * <code>optional sint64 soukou = 28;</code>
-       */
-      public boolean hasSoukou() {
-        return ((bitField0_ & 0x08000000) == 0x08000000);
-      }
-      /**
-       * <code>optional sint64 soukou = 28;</code>
-       */
-      public long getSoukou() {
-        return soukou_;
-      }
-      /**
-       * <code>optional sint64 soukou = 28;</code>
-       */
-      public Builder setSoukou(long value) {
-        bitField0_ |= 0x08000000;
-        soukou_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint64 soukou = 28;</code>
-       */
-      public Builder clearSoukou() {
-        bitField0_ = (bitField0_ & ~0x08000000);
-        soukou_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      // optional sint64 soukou_max = 29;
-      private long soukouMax_ ;
-      /**
-       * <code>optional sint64 soukou_max = 29;</code>
-       */
-      public boolean hasSoukouMax() {
-        return ((bitField0_ & 0x10000000) == 0x10000000);
-      }
-      /**
-       * <code>optional sint64 soukou_max = 29;</code>
-       */
-      public long getSoukouMax() {
-        return soukouMax_;
-      }
-      /**
-       * <code>optional sint64 soukou_max = 29;</code>
-       */
-      public Builder setSoukouMax(long value) {
-        bitField0_ |= 0x10000000;
-        soukouMax_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint64 soukou_max = 29;</code>
-       */
-      public Builder clearSoukouMax() {
-        bitField0_ = (bitField0_ & ~0x10000000);
-        soukouMax_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      // optional sint64 kaihi = 30;
-      private long kaihi_ ;
-      /**
-       * <code>optional sint64 kaihi = 30;</code>
-       */
-      public boolean hasKaihi() {
-        return ((bitField0_ & 0x20000000) == 0x20000000);
-      }
-      /**
-       * <code>optional sint64 kaihi = 30;</code>
-       */
-      public long getKaihi() {
-        return kaihi_;
-      }
-      /**
-       * <code>optional sint64 kaihi = 30;</code>
-       */
-      public Builder setKaihi(long value) {
-        bitField0_ |= 0x20000000;
-        kaihi_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint64 kaihi = 30;</code>
-       */
-      public Builder clearKaihi() {
-        bitField0_ = (bitField0_ & ~0x20000000);
-        kaihi_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      // optional sint64 kaihi_max = 31;
-      private long kaihiMax_ ;
-      /**
-       * <code>optional sint64 kaihi_max = 31;</code>
-       */
-      public boolean hasKaihiMax() {
-        return ((bitField0_ & 0x40000000) == 0x40000000);
-      }
-      /**
-       * <code>optional sint64 kaihi_max = 31;</code>
-       */
-      public long getKaihiMax() {
-        return kaihiMax_;
-      }
-      /**
-       * <code>optional sint64 kaihi_max = 31;</code>
-       */
-      public Builder setKaihiMax(long value) {
-        bitField0_ |= 0x40000000;
-        kaihiMax_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint64 kaihi_max = 31;</code>
-       */
-      public Builder clearKaihiMax() {
-        bitField0_ = (bitField0_ & ~0x40000000);
-        kaihiMax_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      // optional sint64 taisen = 32;
-      private long taisen_ ;
-      /**
-       * <code>optional sint64 taisen = 32;</code>
-       */
-      public boolean hasTaisen() {
-        return ((bitField0_ & 0x80000000) == 0x80000000);
-      }
-      /**
-       * <code>optional sint64 taisen = 32;</code>
-       */
-      public long getTaisen() {
-        return taisen_;
-      }
-      /**
-       * <code>optional sint64 taisen = 32;</code>
-       */
-      public Builder setTaisen(long value) {
-        bitField0_ |= 0x80000000;
-        taisen_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint64 taisen = 32;</code>
-       */
-      public Builder clearTaisen() {
-        bitField0_ = (bitField0_ & ~0x80000000);
-        taisen_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      // optional sint64 taisen_max = 33;
-      private long taisenMax_ ;
-      /**
-       * <code>optional sint64 taisen_max = 33;</code>
-       */
-      public boolean hasTaisenMax() {
-        return ((bitField1_ & 0x00000001) == 0x00000001);
-      }
-      /**
-       * <code>optional sint64 taisen_max = 33;</code>
-       */
-      public long getTaisenMax() {
-        return taisenMax_;
-      }
-      /**
-       * <code>optional sint64 taisen_max = 33;</code>
-       */
-      public Builder setTaisenMax(long value) {
-        bitField1_ |= 0x00000001;
-        taisenMax_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint64 taisen_max = 33;</code>
-       */
-      public Builder clearTaisenMax() {
-        bitField1_ = (bitField1_ & ~0x00000001);
-        taisenMax_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      // optional sint64 sakuteki = 34;
-      private long sakuteki_ ;
-      /**
-       * <code>optional sint64 sakuteki = 34;</code>
-       */
-      public boolean hasSakuteki() {
-        return ((bitField1_ & 0x00000002) == 0x00000002);
-      }
-      /**
-       * <code>optional sint64 sakuteki = 34;</code>
-       */
-      public long getSakuteki() {
-        return sakuteki_;
-      }
-      /**
-       * <code>optional sint64 sakuteki = 34;</code>
-       */
-      public Builder setSakuteki(long value) {
-        bitField1_ |= 0x00000002;
-        sakuteki_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint64 sakuteki = 34;</code>
-       */
-      public Builder clearSakuteki() {
-        bitField1_ = (bitField1_ & ~0x00000002);
-        sakuteki_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      // optional sint64 sakuteki_max = 35;
-      private long sakutekiMax_ ;
-      /**
-       * <code>optional sint64 sakuteki_max = 35;</code>
-       */
-      public boolean hasSakutekiMax() {
-        return ((bitField1_ & 0x00000004) == 0x00000004);
-      }
-      /**
-       * <code>optional sint64 sakuteki_max = 35;</code>
-       */
-      public long getSakutekiMax() {
-        return sakutekiMax_;
-      }
-      /**
-       * <code>optional sint64 sakuteki_max = 35;</code>
-       */
-      public Builder setSakutekiMax(long value) {
-        bitField1_ |= 0x00000004;
-        sakutekiMax_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint64 sakuteki_max = 35;</code>
-       */
-      public Builder clearSakutekiMax() {
-        bitField1_ = (bitField1_ & ~0x00000004);
-        sakutekiMax_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      // optional sint64 lucky = 36;
-      private long lucky_ ;
-      /**
-       * <code>optional sint64 lucky = 36;</code>
-       */
-      public boolean hasLucky() {
-        return ((bitField1_ & 0x00000008) == 0x00000008);
-      }
-      /**
-       * <code>optional sint64 lucky = 36;</code>
-       */
-      public long getLucky() {
-        return lucky_;
-      }
-      /**
-       * <code>optional sint64 lucky = 36;</code>
-       */
-      public Builder setLucky(long value) {
-        bitField1_ |= 0x00000008;
-        lucky_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint64 lucky = 36;</code>
-       */
-      public Builder clearLucky() {
-        bitField1_ = (bitField1_ & ~0x00000008);
-        lucky_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      // optional sint64 lucky_max = 37;
-      private long luckyMax_ ;
-      /**
-       * <code>optional sint64 lucky_max = 37;</code>
-       */
-      public boolean hasLuckyMax() {
-        return ((bitField1_ & 0x00000010) == 0x00000010);
-      }
-      /**
-       * <code>optional sint64 lucky_max = 37;</code>
-       */
-      public long getLuckyMax() {
-        return luckyMax_;
-      }
-      /**
-       * <code>optional sint64 lucky_max = 37;</code>
-       */
-      public Builder setLuckyMax(long value) {
-        bitField1_ |= 0x00000010;
-        luckyMax_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional sint64 lucky_max = 37;</code>
-       */
-      public Builder clearLuckyMax() {
-        bitField1_ = (bitField1_ & ~0x00000010);
-        luckyMax_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      // optional .logbook.ShipInfoDtoPb ship_info = 38;
+      // optional .logbook.ShipInfoDtoPb ship_info = 1;
       private logbook.proto.LogbookEx.ShipInfoDtoPb shipInfo_ = logbook.proto.LogbookEx.ShipInfoDtoPb.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           logbook.proto.LogbookEx.ShipInfoDtoPb, logbook.proto.LogbookEx.ShipInfoDtoPb.Builder, logbook.proto.LogbookEx.ShipInfoDtoPbOrBuilder> shipInfoBuilder_;
       /**
-       * <code>optional .logbook.ShipInfoDtoPb ship_info = 38;</code>
+       * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
        */
       public boolean hasShipInfo() {
-        return ((bitField1_ & 0x00000020) == 0x00000020);
+        return ((bitField0_ & 0x00040000) == 0x00040000);
       }
       /**
-       * <code>optional .logbook.ShipInfoDtoPb ship_info = 38;</code>
+       * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
        */
       public logbook.proto.LogbookEx.ShipInfoDtoPb getShipInfo() {
         if (shipInfoBuilder_ == null) {
@@ -17227,7 +14330,7 @@ public final class LogbookEx {
         }
       }
       /**
-       * <code>optional .logbook.ShipInfoDtoPb ship_info = 38;</code>
+       * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
        */
       public Builder setShipInfo(logbook.proto.LogbookEx.ShipInfoDtoPb value) {
         if (shipInfoBuilder_ == null) {
@@ -17239,11 +14342,11 @@ public final class LogbookEx {
         } else {
           shipInfoBuilder_.setMessage(value);
         }
-        bitField1_ |= 0x00000020;
+        bitField0_ |= 0x00040000;
         return this;
       }
       /**
-       * <code>optional .logbook.ShipInfoDtoPb ship_info = 38;</code>
+       * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
        */
       public Builder setShipInfo(
           logbook.proto.LogbookEx.ShipInfoDtoPb.Builder builderForValue) {
@@ -17253,15 +14356,15 @@ public final class LogbookEx {
         } else {
           shipInfoBuilder_.setMessage(builderForValue.build());
         }
-        bitField1_ |= 0x00000020;
+        bitField0_ |= 0x00040000;
         return this;
       }
       /**
-       * <code>optional .logbook.ShipInfoDtoPb ship_info = 38;</code>
+       * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
        */
       public Builder mergeShipInfo(logbook.proto.LogbookEx.ShipInfoDtoPb value) {
         if (shipInfoBuilder_ == null) {
-          if (((bitField1_ & 0x00000020) == 0x00000020) &&
+          if (((bitField0_ & 0x00040000) == 0x00040000) &&
               shipInfo_ != logbook.proto.LogbookEx.ShipInfoDtoPb.getDefaultInstance()) {
             shipInfo_ =
               logbook.proto.LogbookEx.ShipInfoDtoPb.newBuilder(shipInfo_).mergeFrom(value).buildPartial();
@@ -17272,11 +14375,11 @@ public final class LogbookEx {
         } else {
           shipInfoBuilder_.mergeFrom(value);
         }
-        bitField1_ |= 0x00000020;
+        bitField0_ |= 0x00040000;
         return this;
       }
       /**
-       * <code>optional .logbook.ShipInfoDtoPb ship_info = 38;</code>
+       * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
        */
       public Builder clearShipInfo() {
         if (shipInfoBuilder_ == null) {
@@ -17285,19 +14388,19 @@ public final class LogbookEx {
         } else {
           shipInfoBuilder_.clear();
         }
-        bitField1_ = (bitField1_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00040000);
         return this;
       }
       /**
-       * <code>optional .logbook.ShipInfoDtoPb ship_info = 38;</code>
+       * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
        */
       public logbook.proto.LogbookEx.ShipInfoDtoPb.Builder getShipInfoBuilder() {
-        bitField1_ |= 0x00000020;
+        bitField0_ |= 0x00040000;
         onChanged();
         return getShipInfoFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .logbook.ShipInfoDtoPb ship_info = 38;</code>
+       * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
        */
       public logbook.proto.LogbookEx.ShipInfoDtoPbOrBuilder getShipInfoOrBuilder() {
         if (shipInfoBuilder_ != null) {
@@ -17307,7 +14410,7 @@ public final class LogbookEx {
         }
       }
       /**
-       * <code>optional .logbook.ShipInfoDtoPb ship_info = 38;</code>
+       * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           logbook.proto.LogbookEx.ShipInfoDtoPb, logbook.proto.LogbookEx.ShipInfoDtoPb.Builder, logbook.proto.LogbookEx.ShipInfoDtoPbOrBuilder> 
@@ -17321,6 +14424,546 @@ public final class LogbookEx {
           shipInfo_ = null;
         }
         return shipInfoBuilder_;
+      }
+
+      // repeated sint32 slot = 2;
+      private java.util.List<java.lang.Integer> slot_ = java.util.Collections.emptyList();
+      private void ensureSlotIsMutable() {
+        if (!((bitField0_ & 0x00080000) == 0x00080000)) {
+          slot_ = new java.util.ArrayList<java.lang.Integer>(slot_);
+          bitField0_ |= 0x00080000;
+         }
+      }
+      /**
+       * <code>repeated sint32 slot = 2;</code>
+       */
+      public java.util.List<java.lang.Integer>
+          getSlotList() {
+        return java.util.Collections.unmodifiableList(slot_);
+      }
+      /**
+       * <code>repeated sint32 slot = 2;</code>
+       */
+      public int getSlotCount() {
+        return slot_.size();
+      }
+      /**
+       * <code>repeated sint32 slot = 2;</code>
+       */
+      public int getSlot(int index) {
+        return slot_.get(index);
+      }
+      /**
+       * <code>repeated sint32 slot = 2;</code>
+       */
+      public Builder setSlot(
+          int index, int value) {
+        ensureSlotIsMutable();
+        slot_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated sint32 slot = 2;</code>
+       */
+      public Builder addSlot(int value) {
+        ensureSlotIsMutable();
+        slot_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated sint32 slot = 2;</code>
+       */
+      public Builder addAllSlot(
+          java.lang.Iterable<? extends java.lang.Integer> values) {
+        ensureSlotIsMutable();
+        super.addAll(values, slot_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated sint32 slot = 2;</code>
+       */
+      public Builder clearSlot() {
+        slot_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00080000);
+        onChanged();
+        return this;
+      }
+
+      // repeated .logbook.ItemDtoPb slot_item = 3;
+      private java.util.List<logbook.proto.LogbookEx.ItemDtoPb> slotItem_ =
+        java.util.Collections.emptyList();
+      private void ensureSlotItemIsMutable() {
+        if (!((bitField0_ & 0x00100000) == 0x00100000)) {
+          slotItem_ = new java.util.ArrayList<logbook.proto.LogbookEx.ItemDtoPb>(slotItem_);
+          bitField0_ |= 0x00100000;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          logbook.proto.LogbookEx.ItemDtoPb, logbook.proto.LogbookEx.ItemDtoPb.Builder, logbook.proto.LogbookEx.ItemDtoPbOrBuilder> slotItemBuilder_;
+
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public java.util.List<logbook.proto.LogbookEx.ItemDtoPb> getSlotItemList() {
+        if (slotItemBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(slotItem_);
+        } else {
+          return slotItemBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public int getSlotItemCount() {
+        if (slotItemBuilder_ == null) {
+          return slotItem_.size();
+        } else {
+          return slotItemBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public logbook.proto.LogbookEx.ItemDtoPb getSlotItem(int index) {
+        if (slotItemBuilder_ == null) {
+          return slotItem_.get(index);
+        } else {
+          return slotItemBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public Builder setSlotItem(
+          int index, logbook.proto.LogbookEx.ItemDtoPb value) {
+        if (slotItemBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureSlotItemIsMutable();
+          slotItem_.set(index, value);
+          onChanged();
+        } else {
+          slotItemBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public Builder setSlotItem(
+          int index, logbook.proto.LogbookEx.ItemDtoPb.Builder builderForValue) {
+        if (slotItemBuilder_ == null) {
+          ensureSlotItemIsMutable();
+          slotItem_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          slotItemBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public Builder addSlotItem(logbook.proto.LogbookEx.ItemDtoPb value) {
+        if (slotItemBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureSlotItemIsMutable();
+          slotItem_.add(value);
+          onChanged();
+        } else {
+          slotItemBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public Builder addSlotItem(
+          int index, logbook.proto.LogbookEx.ItemDtoPb value) {
+        if (slotItemBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureSlotItemIsMutable();
+          slotItem_.add(index, value);
+          onChanged();
+        } else {
+          slotItemBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public Builder addSlotItem(
+          logbook.proto.LogbookEx.ItemDtoPb.Builder builderForValue) {
+        if (slotItemBuilder_ == null) {
+          ensureSlotItemIsMutable();
+          slotItem_.add(builderForValue.build());
+          onChanged();
+        } else {
+          slotItemBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public Builder addSlotItem(
+          int index, logbook.proto.LogbookEx.ItemDtoPb.Builder builderForValue) {
+        if (slotItemBuilder_ == null) {
+          ensureSlotItemIsMutable();
+          slotItem_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          slotItemBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public Builder addAllSlotItem(
+          java.lang.Iterable<? extends logbook.proto.LogbookEx.ItemDtoPb> values) {
+        if (slotItemBuilder_ == null) {
+          ensureSlotItemIsMutable();
+          super.addAll(values, slotItem_);
+          onChanged();
+        } else {
+          slotItemBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public Builder clearSlotItem() {
+        if (slotItemBuilder_ == null) {
+          slotItem_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00100000);
+          onChanged();
+        } else {
+          slotItemBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public Builder removeSlotItem(int index) {
+        if (slotItemBuilder_ == null) {
+          ensureSlotItemIsMutable();
+          slotItem_.remove(index);
+          onChanged();
+        } else {
+          slotItemBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public logbook.proto.LogbookEx.ItemDtoPb.Builder getSlotItemBuilder(
+          int index) {
+        return getSlotItemFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public logbook.proto.LogbookEx.ItemDtoPbOrBuilder getSlotItemOrBuilder(
+          int index) {
+        if (slotItemBuilder_ == null) {
+          return slotItem_.get(index);  } else {
+          return slotItemBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public java.util.List<? extends logbook.proto.LogbookEx.ItemDtoPbOrBuilder> 
+           getSlotItemOrBuilderList() {
+        if (slotItemBuilder_ != null) {
+          return slotItemBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(slotItem_);
+        }
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public logbook.proto.LogbookEx.ItemDtoPb.Builder addSlotItemBuilder() {
+        return getSlotItemFieldBuilder().addBuilder(
+            logbook.proto.LogbookEx.ItemDtoPb.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public logbook.proto.LogbookEx.ItemDtoPb.Builder addSlotItemBuilder(
+          int index) {
+        return getSlotItemFieldBuilder().addBuilder(
+            index, logbook.proto.LogbookEx.ItemDtoPb.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public java.util.List<logbook.proto.LogbookEx.ItemDtoPb.Builder> 
+           getSlotItemBuilderList() {
+        return getSlotItemFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          logbook.proto.LogbookEx.ItemDtoPb, logbook.proto.LogbookEx.ItemDtoPb.Builder, logbook.proto.LogbookEx.ItemDtoPbOrBuilder> 
+          getSlotItemFieldBuilder() {
+        if (slotItemBuilder_ == null) {
+          slotItemBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              logbook.proto.LogbookEx.ItemDtoPb, logbook.proto.LogbookEx.ItemDtoPb.Builder, logbook.proto.LogbookEx.ItemDtoPbOrBuilder>(
+                  slotItem_,
+                  ((bitField0_ & 0x00100000) == 0x00100000),
+                  getParentForChildren(),
+                  isClean());
+          slotItem_ = null;
+        }
+        return slotItemBuilder_;
+      }
+
+      // optional .logbook.ShipParametersPb param = 4;
+      private logbook.proto.LogbookEx.ShipParametersPb param_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          logbook.proto.LogbookEx.ShipParametersPb, logbook.proto.LogbookEx.ShipParametersPb.Builder, logbook.proto.LogbookEx.ShipParametersPbOrBuilder> paramBuilder_;
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
+       */
+      public boolean hasParam() {
+        return ((bitField0_ & 0x00200000) == 0x00200000);
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
+       */
+      public logbook.proto.LogbookEx.ShipParametersPb getParam() {
+        if (paramBuilder_ == null) {
+          return param_;
+        } else {
+          return paramBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
+       */
+      public Builder setParam(logbook.proto.LogbookEx.ShipParametersPb value) {
+        if (paramBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          param_ = value;
+          onChanged();
+        } else {
+          paramBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00200000;
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
+       */
+      public Builder setParam(
+          logbook.proto.LogbookEx.ShipParametersPb.Builder builderForValue) {
+        if (paramBuilder_ == null) {
+          param_ = builderForValue.build();
+          onChanged();
+        } else {
+          paramBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00200000;
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
+       */
+      public Builder mergeParam(logbook.proto.LogbookEx.ShipParametersPb value) {
+        if (paramBuilder_ == null) {
+          if (((bitField0_ & 0x00200000) == 0x00200000) &&
+              param_ != logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance()) {
+            param_ =
+              logbook.proto.LogbookEx.ShipParametersPb.newBuilder(param_).mergeFrom(value).buildPartial();
+          } else {
+            param_ = value;
+          }
+          onChanged();
+        } else {
+          paramBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00200000;
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
+       */
+      public Builder clearParam() {
+        if (paramBuilder_ == null) {
+          param_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+          onChanged();
+        } else {
+          paramBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00200000);
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
+       */
+      public logbook.proto.LogbookEx.ShipParametersPb.Builder getParamBuilder() {
+        bitField0_ |= 0x00200000;
+        onChanged();
+        return getParamFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
+       */
+      public logbook.proto.LogbookEx.ShipParametersPbOrBuilder getParamOrBuilder() {
+        if (paramBuilder_ != null) {
+          return paramBuilder_.getMessageOrBuilder();
+        } else {
+          return param_;
+        }
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          logbook.proto.LogbookEx.ShipParametersPb, logbook.proto.LogbookEx.ShipParametersPb.Builder, logbook.proto.LogbookEx.ShipParametersPbOrBuilder> 
+          getParamFieldBuilder() {
+        if (paramBuilder_ == null) {
+          paramBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              logbook.proto.LogbookEx.ShipParametersPb, logbook.proto.LogbookEx.ShipParametersPb.Builder, logbook.proto.LogbookEx.ShipParametersPbOrBuilder>(
+                  param_,
+                  getParentForChildren(),
+                  isClean());
+          param_ = null;
+        }
+        return paramBuilder_;
+      }
+
+      // optional .logbook.ShipParametersPb slot_param = 5;
+      private logbook.proto.LogbookEx.ShipParametersPb slotParam_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          logbook.proto.LogbookEx.ShipParametersPb, logbook.proto.LogbookEx.ShipParametersPb.Builder, logbook.proto.LogbookEx.ShipParametersPbOrBuilder> slotParamBuilder_;
+      /**
+       * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+       */
+      public boolean hasSlotParam() {
+        return ((bitField0_ & 0x00400000) == 0x00400000);
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+       */
+      public logbook.proto.LogbookEx.ShipParametersPb getSlotParam() {
+        if (slotParamBuilder_ == null) {
+          return slotParam_;
+        } else {
+          return slotParamBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+       */
+      public Builder setSlotParam(logbook.proto.LogbookEx.ShipParametersPb value) {
+        if (slotParamBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          slotParam_ = value;
+          onChanged();
+        } else {
+          slotParamBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00400000;
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+       */
+      public Builder setSlotParam(
+          logbook.proto.LogbookEx.ShipParametersPb.Builder builderForValue) {
+        if (slotParamBuilder_ == null) {
+          slotParam_ = builderForValue.build();
+          onChanged();
+        } else {
+          slotParamBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00400000;
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+       */
+      public Builder mergeSlotParam(logbook.proto.LogbookEx.ShipParametersPb value) {
+        if (slotParamBuilder_ == null) {
+          if (((bitField0_ & 0x00400000) == 0x00400000) &&
+              slotParam_ != logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance()) {
+            slotParam_ =
+              logbook.proto.LogbookEx.ShipParametersPb.newBuilder(slotParam_).mergeFrom(value).buildPartial();
+          } else {
+            slotParam_ = value;
+          }
+          onChanged();
+        } else {
+          slotParamBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00400000;
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+       */
+      public Builder clearSlotParam() {
+        if (slotParamBuilder_ == null) {
+          slotParam_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+          onChanged();
+        } else {
+          slotParamBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00400000);
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+       */
+      public logbook.proto.LogbookEx.ShipParametersPb.Builder getSlotParamBuilder() {
+        bitField0_ |= 0x00400000;
+        onChanged();
+        return getSlotParamFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+       */
+      public logbook.proto.LogbookEx.ShipParametersPbOrBuilder getSlotParamOrBuilder() {
+        if (slotParamBuilder_ != null) {
+          return slotParamBuilder_.getMessageOrBuilder();
+        } else {
+          return slotParam_;
+        }
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          logbook.proto.LogbookEx.ShipParametersPb, logbook.proto.LogbookEx.ShipParametersPb.Builder, logbook.proto.LogbookEx.ShipParametersPbOrBuilder> 
+          getSlotParamFieldBuilder() {
+        if (slotParamBuilder_ == null) {
+          slotParamBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              logbook.proto.LogbookEx.ShipParametersPb, logbook.proto.LogbookEx.ShipParametersPb.Builder, logbook.proto.LogbookEx.ShipParametersPbOrBuilder>(
+                  slotParam_,
+                  getParentForChildren(),
+                  isClean());
+          slotParam_ = null;
+        }
+        return slotParamBuilder_;
       }
 
       // @@protoc_insertion_point(builder_scope:logbook.ShipDtoPb)
@@ -19510,6 +17153,1740 @@ public final class LogbookEx {
     }
 
     // @@protoc_insertion_point(class_scope:logbook.MapCellDtoPb)
+  }
+
+  public interface EnemyShipDtoPbOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+
+    // optional sint32 karyoku = 10;
+    /**
+     * <code>optional sint32 karyoku = 10;</code>
+     */
+    boolean hasKaryoku();
+    /**
+     * <code>optional sint32 karyoku = 10;</code>
+     */
+    int getKaryoku();
+
+    // optional sint32 raisou = 11;
+    /**
+     * <code>optional sint32 raisou = 11;</code>
+     */
+    boolean hasRaisou();
+    /**
+     * <code>optional sint32 raisou = 11;</code>
+     */
+    int getRaisou();
+
+    // optional sint32 taiku = 12;
+    /**
+     * <code>optional sint32 taiku = 12;</code>
+     */
+    boolean hasTaiku();
+    /**
+     * <code>optional sint32 taiku = 12;</code>
+     */
+    int getTaiku();
+
+    // optional sint32 soukou = 13;
+    /**
+     * <code>optional sint32 soukou = 13;</code>
+     */
+    boolean hasSoukou();
+    /**
+     * <code>optional sint32 soukou = 13;</code>
+     */
+    int getSoukou();
+
+    // optional .logbook.ShipInfoDtoPb ship_info = 1;
+    /**
+     * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
+     */
+    boolean hasShipInfo();
+    /**
+     * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
+     */
+    logbook.proto.LogbookEx.ShipInfoDtoPb getShipInfo();
+    /**
+     * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
+     */
+    logbook.proto.LogbookEx.ShipInfoDtoPbOrBuilder getShipInfoOrBuilder();
+
+    // repeated sint32 slot = 2;
+    /**
+     * <code>repeated sint32 slot = 2;</code>
+     */
+    java.util.List<java.lang.Integer> getSlotList();
+    /**
+     * <code>repeated sint32 slot = 2;</code>
+     */
+    int getSlotCount();
+    /**
+     * <code>repeated sint32 slot = 2;</code>
+     */
+    int getSlot(int index);
+
+    // repeated .logbook.ItemDtoPb slot_item = 3;
+    /**
+     * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+     */
+    java.util.List<logbook.proto.LogbookEx.ItemDtoPb> 
+        getSlotItemList();
+    /**
+     * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+     */
+    logbook.proto.LogbookEx.ItemDtoPb getSlotItem(int index);
+    /**
+     * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+     */
+    int getSlotItemCount();
+    /**
+     * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+     */
+    java.util.List<? extends logbook.proto.LogbookEx.ItemDtoPbOrBuilder> 
+        getSlotItemOrBuilderList();
+    /**
+     * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+     */
+    logbook.proto.LogbookEx.ItemDtoPbOrBuilder getSlotItemOrBuilder(
+        int index);
+
+    // optional .logbook.ShipParametersPb param = 4;
+    /**
+     * <code>optional .logbook.ShipParametersPb param = 4;</code>
+     */
+    boolean hasParam();
+    /**
+     * <code>optional .logbook.ShipParametersPb param = 4;</code>
+     */
+    logbook.proto.LogbookEx.ShipParametersPb getParam();
+    /**
+     * <code>optional .logbook.ShipParametersPb param = 4;</code>
+     */
+    logbook.proto.LogbookEx.ShipParametersPbOrBuilder getParamOrBuilder();
+
+    // optional .logbook.ShipParametersPb slot_param = 5;
+    /**
+     * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+     */
+    boolean hasSlotParam();
+    /**
+     * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+     */
+    logbook.proto.LogbookEx.ShipParametersPb getSlotParam();
+    /**
+     * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+     */
+    logbook.proto.LogbookEx.ShipParametersPbOrBuilder getSlotParamOrBuilder();
+  }
+  /**
+   * Protobuf type {@code logbook.EnemyShipDtoPb}
+   */
+  public static final class EnemyShipDtoPb extends
+      com.google.protobuf.GeneratedMessage
+      implements EnemyShipDtoPbOrBuilder {
+    // Use EnemyShipDtoPb.newBuilder() to construct.
+    private EnemyShipDtoPb(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private EnemyShipDtoPb(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final EnemyShipDtoPb defaultInstance;
+    public static EnemyShipDtoPb getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public EnemyShipDtoPb getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private EnemyShipDtoPb(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              logbook.proto.LogbookEx.ShipInfoDtoPb.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000010) == 0x00000010)) {
+                subBuilder = shipInfo_.toBuilder();
+              }
+              shipInfo_ = input.readMessage(logbook.proto.LogbookEx.ShipInfoDtoPb.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(shipInfo_);
+                shipInfo_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000010;
+              break;
+            }
+            case 16: {
+              if (!((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
+                slot_ = new java.util.ArrayList<java.lang.Integer>();
+                mutable_bitField0_ |= 0x00000020;
+              }
+              slot_.add(input.readSInt32());
+              break;
+            }
+            case 18: {
+              int length = input.readRawVarint32();
+              int limit = input.pushLimit(length);
+              if (!((mutable_bitField0_ & 0x00000020) == 0x00000020) && input.getBytesUntilLimit() > 0) {
+                slot_ = new java.util.ArrayList<java.lang.Integer>();
+                mutable_bitField0_ |= 0x00000020;
+              }
+              while (input.getBytesUntilLimit() > 0) {
+                slot_.add(input.readSInt32());
+              }
+              input.popLimit(limit);
+              break;
+            }
+            case 26: {
+              if (!((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
+                slotItem_ = new java.util.ArrayList<logbook.proto.LogbookEx.ItemDtoPb>();
+                mutable_bitField0_ |= 0x00000040;
+              }
+              slotItem_.add(input.readMessage(logbook.proto.LogbookEx.ItemDtoPb.PARSER, extensionRegistry));
+              break;
+            }
+            case 34: {
+              logbook.proto.LogbookEx.ShipParametersPb.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000020) == 0x00000020)) {
+                subBuilder = param_.toBuilder();
+              }
+              param_ = input.readMessage(logbook.proto.LogbookEx.ShipParametersPb.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(param_);
+                param_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000020;
+              break;
+            }
+            case 42: {
+              logbook.proto.LogbookEx.ShipParametersPb.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000040) == 0x00000040)) {
+                subBuilder = slotParam_.toBuilder();
+              }
+              slotParam_ = input.readMessage(logbook.proto.LogbookEx.ShipParametersPb.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(slotParam_);
+                slotParam_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000040;
+              break;
+            }
+            case 80: {
+              bitField0_ |= 0x00000001;
+              karyoku_ = input.readSInt32();
+              break;
+            }
+            case 88: {
+              bitField0_ |= 0x00000002;
+              raisou_ = input.readSInt32();
+              break;
+            }
+            case 96: {
+              bitField0_ |= 0x00000004;
+              taiku_ = input.readSInt32();
+              break;
+            }
+            case 104: {
+              bitField0_ |= 0x00000008;
+              soukou_ = input.readSInt32();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
+          slot_ = java.util.Collections.unmodifiableList(slot_);
+        }
+        if (((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
+          slotItem_ = java.util.Collections.unmodifiableList(slotItem_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return logbook.proto.LogbookEx.internal_static_logbook_EnemyShipDtoPb_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return logbook.proto.LogbookEx.internal_static_logbook_EnemyShipDtoPb_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              logbook.proto.LogbookEx.EnemyShipDtoPb.class, logbook.proto.LogbookEx.EnemyShipDtoPb.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<EnemyShipDtoPb> PARSER =
+        new com.google.protobuf.AbstractParser<EnemyShipDtoPb>() {
+      public EnemyShipDtoPb parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new EnemyShipDtoPb(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<EnemyShipDtoPb> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    // optional sint32 karyoku = 10;
+    public static final int KARYOKU_FIELD_NUMBER = 10;
+    private int karyoku_;
+    /**
+     * <code>optional sint32 karyoku = 10;</code>
+     */
+    public boolean hasKaryoku() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional sint32 karyoku = 10;</code>
+     */
+    public int getKaryoku() {
+      return karyoku_;
+    }
+
+    // optional sint32 raisou = 11;
+    public static final int RAISOU_FIELD_NUMBER = 11;
+    private int raisou_;
+    /**
+     * <code>optional sint32 raisou = 11;</code>
+     */
+    public boolean hasRaisou() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional sint32 raisou = 11;</code>
+     */
+    public int getRaisou() {
+      return raisou_;
+    }
+
+    // optional sint32 taiku = 12;
+    public static final int TAIKU_FIELD_NUMBER = 12;
+    private int taiku_;
+    /**
+     * <code>optional sint32 taiku = 12;</code>
+     */
+    public boolean hasTaiku() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional sint32 taiku = 12;</code>
+     */
+    public int getTaiku() {
+      return taiku_;
+    }
+
+    // optional sint32 soukou = 13;
+    public static final int SOUKOU_FIELD_NUMBER = 13;
+    private int soukou_;
+    /**
+     * <code>optional sint32 soukou = 13;</code>
+     */
+    public boolean hasSoukou() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional sint32 soukou = 13;</code>
+     */
+    public int getSoukou() {
+      return soukou_;
+    }
+
+    // optional .logbook.ShipInfoDtoPb ship_info = 1;
+    public static final int SHIP_INFO_FIELD_NUMBER = 1;
+    private logbook.proto.LogbookEx.ShipInfoDtoPb shipInfo_;
+    /**
+     * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
+     */
+    public boolean hasShipInfo() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
+     */
+    public logbook.proto.LogbookEx.ShipInfoDtoPb getShipInfo() {
+      return shipInfo_;
+    }
+    /**
+     * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
+     */
+    public logbook.proto.LogbookEx.ShipInfoDtoPbOrBuilder getShipInfoOrBuilder() {
+      return shipInfo_;
+    }
+
+    // repeated sint32 slot = 2;
+    public static final int SLOT_FIELD_NUMBER = 2;
+    private java.util.List<java.lang.Integer> slot_;
+    /**
+     * <code>repeated sint32 slot = 2;</code>
+     */
+    public java.util.List<java.lang.Integer>
+        getSlotList() {
+      return slot_;
+    }
+    /**
+     * <code>repeated sint32 slot = 2;</code>
+     */
+    public int getSlotCount() {
+      return slot_.size();
+    }
+    /**
+     * <code>repeated sint32 slot = 2;</code>
+     */
+    public int getSlot(int index) {
+      return slot_.get(index);
+    }
+
+    // repeated .logbook.ItemDtoPb slot_item = 3;
+    public static final int SLOT_ITEM_FIELD_NUMBER = 3;
+    private java.util.List<logbook.proto.LogbookEx.ItemDtoPb> slotItem_;
+    /**
+     * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+     */
+    public java.util.List<logbook.proto.LogbookEx.ItemDtoPb> getSlotItemList() {
+      return slotItem_;
+    }
+    /**
+     * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+     */
+    public java.util.List<? extends logbook.proto.LogbookEx.ItemDtoPbOrBuilder> 
+        getSlotItemOrBuilderList() {
+      return slotItem_;
+    }
+    /**
+     * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+     */
+    public int getSlotItemCount() {
+      return slotItem_.size();
+    }
+    /**
+     * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+     */
+    public logbook.proto.LogbookEx.ItemDtoPb getSlotItem(int index) {
+      return slotItem_.get(index);
+    }
+    /**
+     * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+     */
+    public logbook.proto.LogbookEx.ItemDtoPbOrBuilder getSlotItemOrBuilder(
+        int index) {
+      return slotItem_.get(index);
+    }
+
+    // optional .logbook.ShipParametersPb param = 4;
+    public static final int PARAM_FIELD_NUMBER = 4;
+    private logbook.proto.LogbookEx.ShipParametersPb param_;
+    /**
+     * <code>optional .logbook.ShipParametersPb param = 4;</code>
+     */
+    public boolean hasParam() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional .logbook.ShipParametersPb param = 4;</code>
+     */
+    public logbook.proto.LogbookEx.ShipParametersPb getParam() {
+      return param_;
+    }
+    /**
+     * <code>optional .logbook.ShipParametersPb param = 4;</code>
+     */
+    public logbook.proto.LogbookEx.ShipParametersPbOrBuilder getParamOrBuilder() {
+      return param_;
+    }
+
+    // optional .logbook.ShipParametersPb slot_param = 5;
+    public static final int SLOT_PARAM_FIELD_NUMBER = 5;
+    private logbook.proto.LogbookEx.ShipParametersPb slotParam_;
+    /**
+     * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+     */
+    public boolean hasSlotParam() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+     */
+    public logbook.proto.LogbookEx.ShipParametersPb getSlotParam() {
+      return slotParam_;
+    }
+    /**
+     * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+     */
+    public logbook.proto.LogbookEx.ShipParametersPbOrBuilder getSlotParamOrBuilder() {
+      return slotParam_;
+    }
+
+    private void initFields() {
+      karyoku_ = 0;
+      raisou_ = 0;
+      taiku_ = 0;
+      soukou_ = 0;
+      shipInfo_ = logbook.proto.LogbookEx.ShipInfoDtoPb.getDefaultInstance();
+      slot_ = java.util.Collections.emptyList();
+      slotItem_ = java.util.Collections.emptyList();
+      param_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+      slotParam_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeMessage(1, shipInfo_);
+      }
+      for (int i = 0; i < slot_.size(); i++) {
+        output.writeSInt32(2, slot_.get(i));
+      }
+      for (int i = 0; i < slotItem_.size(); i++) {
+        output.writeMessage(3, slotItem_.get(i));
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeMessage(4, param_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeMessage(5, slotParam_);
+      }
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeSInt32(10, karyoku_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeSInt32(11, raisou_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeSInt32(12, taiku_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeSInt32(13, soukou_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, shipInfo_);
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < slot_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeSInt32SizeNoTag(slot_.get(i));
+        }
+        size += dataSize;
+        size += 1 * getSlotList().size();
+      }
+      for (int i = 0; i < slotItem_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, slotItem_.get(i));
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, param_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, slotParam_);
+      }
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(10, karyoku_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(11, raisou_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(12, taiku_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(13, soukou_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static logbook.proto.LogbookEx.EnemyShipDtoPb parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static logbook.proto.LogbookEx.EnemyShipDtoPb parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static logbook.proto.LogbookEx.EnemyShipDtoPb parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static logbook.proto.LogbookEx.EnemyShipDtoPb parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static logbook.proto.LogbookEx.EnemyShipDtoPb parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static logbook.proto.LogbookEx.EnemyShipDtoPb parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static logbook.proto.LogbookEx.EnemyShipDtoPb parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static logbook.proto.LogbookEx.EnemyShipDtoPb parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static logbook.proto.LogbookEx.EnemyShipDtoPb parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static logbook.proto.LogbookEx.EnemyShipDtoPb parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(logbook.proto.LogbookEx.EnemyShipDtoPb prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code logbook.EnemyShipDtoPb}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements logbook.proto.LogbookEx.EnemyShipDtoPbOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return logbook.proto.LogbookEx.internal_static_logbook_EnemyShipDtoPb_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return logbook.proto.LogbookEx.internal_static_logbook_EnemyShipDtoPb_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                logbook.proto.LogbookEx.EnemyShipDtoPb.class, logbook.proto.LogbookEx.EnemyShipDtoPb.Builder.class);
+      }
+
+      // Construct using logbook.proto.LogbookEx.EnemyShipDtoPb.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getShipInfoFieldBuilder();
+          getSlotItemFieldBuilder();
+          getParamFieldBuilder();
+          getSlotParamFieldBuilder();
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        karyoku_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        raisou_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        taiku_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        soukou_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        if (shipInfoBuilder_ == null) {
+          shipInfo_ = logbook.proto.LogbookEx.ShipInfoDtoPb.getDefaultInstance();
+        } else {
+          shipInfoBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000010);
+        slot_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000020);
+        if (slotItemBuilder_ == null) {
+          slotItem_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000040);
+        } else {
+          slotItemBuilder_.clear();
+        }
+        if (paramBuilder_ == null) {
+          param_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+        } else {
+          paramBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000080);
+        if (slotParamBuilder_ == null) {
+          slotParam_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+        } else {
+          slotParamBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000100);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return logbook.proto.LogbookEx.internal_static_logbook_EnemyShipDtoPb_descriptor;
+      }
+
+      public logbook.proto.LogbookEx.EnemyShipDtoPb getDefaultInstanceForType() {
+        return logbook.proto.LogbookEx.EnemyShipDtoPb.getDefaultInstance();
+      }
+
+      public logbook.proto.LogbookEx.EnemyShipDtoPb build() {
+        logbook.proto.LogbookEx.EnemyShipDtoPb result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public logbook.proto.LogbookEx.EnemyShipDtoPb buildPartial() {
+        logbook.proto.LogbookEx.EnemyShipDtoPb result = new logbook.proto.LogbookEx.EnemyShipDtoPb(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.karyoku_ = karyoku_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.raisou_ = raisou_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.taiku_ = taiku_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.soukou_ = soukou_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        if (shipInfoBuilder_ == null) {
+          result.shipInfo_ = shipInfo_;
+        } else {
+          result.shipInfo_ = shipInfoBuilder_.build();
+        }
+        if (((bitField0_ & 0x00000020) == 0x00000020)) {
+          slot_ = java.util.Collections.unmodifiableList(slot_);
+          bitField0_ = (bitField0_ & ~0x00000020);
+        }
+        result.slot_ = slot_;
+        if (slotItemBuilder_ == null) {
+          if (((bitField0_ & 0x00000040) == 0x00000040)) {
+            slotItem_ = java.util.Collections.unmodifiableList(slotItem_);
+            bitField0_ = (bitField0_ & ~0x00000040);
+          }
+          result.slotItem_ = slotItem_;
+        } else {
+          result.slotItem_ = slotItemBuilder_.build();
+        }
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        if (paramBuilder_ == null) {
+          result.param_ = param_;
+        } else {
+          result.param_ = paramBuilder_.build();
+        }
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+          to_bitField0_ |= 0x00000040;
+        }
+        if (slotParamBuilder_ == null) {
+          result.slotParam_ = slotParam_;
+        } else {
+          result.slotParam_ = slotParamBuilder_.build();
+        }
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof logbook.proto.LogbookEx.EnemyShipDtoPb) {
+          return mergeFrom((logbook.proto.LogbookEx.EnemyShipDtoPb)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(logbook.proto.LogbookEx.EnemyShipDtoPb other) {
+        if (other == logbook.proto.LogbookEx.EnemyShipDtoPb.getDefaultInstance()) return this;
+        if (other.hasKaryoku()) {
+          setKaryoku(other.getKaryoku());
+        }
+        if (other.hasRaisou()) {
+          setRaisou(other.getRaisou());
+        }
+        if (other.hasTaiku()) {
+          setTaiku(other.getTaiku());
+        }
+        if (other.hasSoukou()) {
+          setSoukou(other.getSoukou());
+        }
+        if (other.hasShipInfo()) {
+          mergeShipInfo(other.getShipInfo());
+        }
+        if (!other.slot_.isEmpty()) {
+          if (slot_.isEmpty()) {
+            slot_ = other.slot_;
+            bitField0_ = (bitField0_ & ~0x00000020);
+          } else {
+            ensureSlotIsMutable();
+            slot_.addAll(other.slot_);
+          }
+          onChanged();
+        }
+        if (slotItemBuilder_ == null) {
+          if (!other.slotItem_.isEmpty()) {
+            if (slotItem_.isEmpty()) {
+              slotItem_ = other.slotItem_;
+              bitField0_ = (bitField0_ & ~0x00000040);
+            } else {
+              ensureSlotItemIsMutable();
+              slotItem_.addAll(other.slotItem_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.slotItem_.isEmpty()) {
+            if (slotItemBuilder_.isEmpty()) {
+              slotItemBuilder_.dispose();
+              slotItemBuilder_ = null;
+              slotItem_ = other.slotItem_;
+              bitField0_ = (bitField0_ & ~0x00000040);
+              slotItemBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getSlotItemFieldBuilder() : null;
+            } else {
+              slotItemBuilder_.addAllMessages(other.slotItem_);
+            }
+          }
+        }
+        if (other.hasParam()) {
+          mergeParam(other.getParam());
+        }
+        if (other.hasSlotParam()) {
+          mergeSlotParam(other.getSlotParam());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        logbook.proto.LogbookEx.EnemyShipDtoPb parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (logbook.proto.LogbookEx.EnemyShipDtoPb) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      // optional sint32 karyoku = 10;
+      private int karyoku_ ;
+      /**
+       * <code>optional sint32 karyoku = 10;</code>
+       */
+      public boolean hasKaryoku() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional sint32 karyoku = 10;</code>
+       */
+      public int getKaryoku() {
+        return karyoku_;
+      }
+      /**
+       * <code>optional sint32 karyoku = 10;</code>
+       */
+      public Builder setKaryoku(int value) {
+        bitField0_ |= 0x00000001;
+        karyoku_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint32 karyoku = 10;</code>
+       */
+      public Builder clearKaryoku() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        karyoku_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional sint32 raisou = 11;
+      private int raisou_ ;
+      /**
+       * <code>optional sint32 raisou = 11;</code>
+       */
+      public boolean hasRaisou() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional sint32 raisou = 11;</code>
+       */
+      public int getRaisou() {
+        return raisou_;
+      }
+      /**
+       * <code>optional sint32 raisou = 11;</code>
+       */
+      public Builder setRaisou(int value) {
+        bitField0_ |= 0x00000002;
+        raisou_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint32 raisou = 11;</code>
+       */
+      public Builder clearRaisou() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        raisou_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional sint32 taiku = 12;
+      private int taiku_ ;
+      /**
+       * <code>optional sint32 taiku = 12;</code>
+       */
+      public boolean hasTaiku() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional sint32 taiku = 12;</code>
+       */
+      public int getTaiku() {
+        return taiku_;
+      }
+      /**
+       * <code>optional sint32 taiku = 12;</code>
+       */
+      public Builder setTaiku(int value) {
+        bitField0_ |= 0x00000004;
+        taiku_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint32 taiku = 12;</code>
+       */
+      public Builder clearTaiku() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        taiku_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional sint32 soukou = 13;
+      private int soukou_ ;
+      /**
+       * <code>optional sint32 soukou = 13;</code>
+       */
+      public boolean hasSoukou() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional sint32 soukou = 13;</code>
+       */
+      public int getSoukou() {
+        return soukou_;
+      }
+      /**
+       * <code>optional sint32 soukou = 13;</code>
+       */
+      public Builder setSoukou(int value) {
+        bitField0_ |= 0x00000008;
+        soukou_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint32 soukou = 13;</code>
+       */
+      public Builder clearSoukou() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        soukou_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional .logbook.ShipInfoDtoPb ship_info = 1;
+      private logbook.proto.LogbookEx.ShipInfoDtoPb shipInfo_ = logbook.proto.LogbookEx.ShipInfoDtoPb.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          logbook.proto.LogbookEx.ShipInfoDtoPb, logbook.proto.LogbookEx.ShipInfoDtoPb.Builder, logbook.proto.LogbookEx.ShipInfoDtoPbOrBuilder> shipInfoBuilder_;
+      /**
+       * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
+       */
+      public boolean hasShipInfo() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
+       */
+      public logbook.proto.LogbookEx.ShipInfoDtoPb getShipInfo() {
+        if (shipInfoBuilder_ == null) {
+          return shipInfo_;
+        } else {
+          return shipInfoBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
+       */
+      public Builder setShipInfo(logbook.proto.LogbookEx.ShipInfoDtoPb value) {
+        if (shipInfoBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          shipInfo_ = value;
+          onChanged();
+        } else {
+          shipInfoBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000010;
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
+       */
+      public Builder setShipInfo(
+          logbook.proto.LogbookEx.ShipInfoDtoPb.Builder builderForValue) {
+        if (shipInfoBuilder_ == null) {
+          shipInfo_ = builderForValue.build();
+          onChanged();
+        } else {
+          shipInfoBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000010;
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
+       */
+      public Builder mergeShipInfo(logbook.proto.LogbookEx.ShipInfoDtoPb value) {
+        if (shipInfoBuilder_ == null) {
+          if (((bitField0_ & 0x00000010) == 0x00000010) &&
+              shipInfo_ != logbook.proto.LogbookEx.ShipInfoDtoPb.getDefaultInstance()) {
+            shipInfo_ =
+              logbook.proto.LogbookEx.ShipInfoDtoPb.newBuilder(shipInfo_).mergeFrom(value).buildPartial();
+          } else {
+            shipInfo_ = value;
+          }
+          onChanged();
+        } else {
+          shipInfoBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000010;
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
+       */
+      public Builder clearShipInfo() {
+        if (shipInfoBuilder_ == null) {
+          shipInfo_ = logbook.proto.LogbookEx.ShipInfoDtoPb.getDefaultInstance();
+          onChanged();
+        } else {
+          shipInfoBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000010);
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
+       */
+      public logbook.proto.LogbookEx.ShipInfoDtoPb.Builder getShipInfoBuilder() {
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return getShipInfoFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
+       */
+      public logbook.proto.LogbookEx.ShipInfoDtoPbOrBuilder getShipInfoOrBuilder() {
+        if (shipInfoBuilder_ != null) {
+          return shipInfoBuilder_.getMessageOrBuilder();
+        } else {
+          return shipInfo_;
+        }
+      }
+      /**
+       * <code>optional .logbook.ShipInfoDtoPb ship_info = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          logbook.proto.LogbookEx.ShipInfoDtoPb, logbook.proto.LogbookEx.ShipInfoDtoPb.Builder, logbook.proto.LogbookEx.ShipInfoDtoPbOrBuilder> 
+          getShipInfoFieldBuilder() {
+        if (shipInfoBuilder_ == null) {
+          shipInfoBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              logbook.proto.LogbookEx.ShipInfoDtoPb, logbook.proto.LogbookEx.ShipInfoDtoPb.Builder, logbook.proto.LogbookEx.ShipInfoDtoPbOrBuilder>(
+                  shipInfo_,
+                  getParentForChildren(),
+                  isClean());
+          shipInfo_ = null;
+        }
+        return shipInfoBuilder_;
+      }
+
+      // repeated sint32 slot = 2;
+      private java.util.List<java.lang.Integer> slot_ = java.util.Collections.emptyList();
+      private void ensureSlotIsMutable() {
+        if (!((bitField0_ & 0x00000020) == 0x00000020)) {
+          slot_ = new java.util.ArrayList<java.lang.Integer>(slot_);
+          bitField0_ |= 0x00000020;
+         }
+      }
+      /**
+       * <code>repeated sint32 slot = 2;</code>
+       */
+      public java.util.List<java.lang.Integer>
+          getSlotList() {
+        return java.util.Collections.unmodifiableList(slot_);
+      }
+      /**
+       * <code>repeated sint32 slot = 2;</code>
+       */
+      public int getSlotCount() {
+        return slot_.size();
+      }
+      /**
+       * <code>repeated sint32 slot = 2;</code>
+       */
+      public int getSlot(int index) {
+        return slot_.get(index);
+      }
+      /**
+       * <code>repeated sint32 slot = 2;</code>
+       */
+      public Builder setSlot(
+          int index, int value) {
+        ensureSlotIsMutable();
+        slot_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated sint32 slot = 2;</code>
+       */
+      public Builder addSlot(int value) {
+        ensureSlotIsMutable();
+        slot_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated sint32 slot = 2;</code>
+       */
+      public Builder addAllSlot(
+          java.lang.Iterable<? extends java.lang.Integer> values) {
+        ensureSlotIsMutable();
+        super.addAll(values, slot_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated sint32 slot = 2;</code>
+       */
+      public Builder clearSlot() {
+        slot_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000020);
+        onChanged();
+        return this;
+      }
+
+      // repeated .logbook.ItemDtoPb slot_item = 3;
+      private java.util.List<logbook.proto.LogbookEx.ItemDtoPb> slotItem_ =
+        java.util.Collections.emptyList();
+      private void ensureSlotItemIsMutable() {
+        if (!((bitField0_ & 0x00000040) == 0x00000040)) {
+          slotItem_ = new java.util.ArrayList<logbook.proto.LogbookEx.ItemDtoPb>(slotItem_);
+          bitField0_ |= 0x00000040;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          logbook.proto.LogbookEx.ItemDtoPb, logbook.proto.LogbookEx.ItemDtoPb.Builder, logbook.proto.LogbookEx.ItemDtoPbOrBuilder> slotItemBuilder_;
+
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public java.util.List<logbook.proto.LogbookEx.ItemDtoPb> getSlotItemList() {
+        if (slotItemBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(slotItem_);
+        } else {
+          return slotItemBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public int getSlotItemCount() {
+        if (slotItemBuilder_ == null) {
+          return slotItem_.size();
+        } else {
+          return slotItemBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public logbook.proto.LogbookEx.ItemDtoPb getSlotItem(int index) {
+        if (slotItemBuilder_ == null) {
+          return slotItem_.get(index);
+        } else {
+          return slotItemBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public Builder setSlotItem(
+          int index, logbook.proto.LogbookEx.ItemDtoPb value) {
+        if (slotItemBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureSlotItemIsMutable();
+          slotItem_.set(index, value);
+          onChanged();
+        } else {
+          slotItemBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public Builder setSlotItem(
+          int index, logbook.proto.LogbookEx.ItemDtoPb.Builder builderForValue) {
+        if (slotItemBuilder_ == null) {
+          ensureSlotItemIsMutable();
+          slotItem_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          slotItemBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public Builder addSlotItem(logbook.proto.LogbookEx.ItemDtoPb value) {
+        if (slotItemBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureSlotItemIsMutable();
+          slotItem_.add(value);
+          onChanged();
+        } else {
+          slotItemBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public Builder addSlotItem(
+          int index, logbook.proto.LogbookEx.ItemDtoPb value) {
+        if (slotItemBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureSlotItemIsMutable();
+          slotItem_.add(index, value);
+          onChanged();
+        } else {
+          slotItemBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public Builder addSlotItem(
+          logbook.proto.LogbookEx.ItemDtoPb.Builder builderForValue) {
+        if (slotItemBuilder_ == null) {
+          ensureSlotItemIsMutable();
+          slotItem_.add(builderForValue.build());
+          onChanged();
+        } else {
+          slotItemBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public Builder addSlotItem(
+          int index, logbook.proto.LogbookEx.ItemDtoPb.Builder builderForValue) {
+        if (slotItemBuilder_ == null) {
+          ensureSlotItemIsMutable();
+          slotItem_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          slotItemBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public Builder addAllSlotItem(
+          java.lang.Iterable<? extends logbook.proto.LogbookEx.ItemDtoPb> values) {
+        if (slotItemBuilder_ == null) {
+          ensureSlotItemIsMutable();
+          super.addAll(values, slotItem_);
+          onChanged();
+        } else {
+          slotItemBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public Builder clearSlotItem() {
+        if (slotItemBuilder_ == null) {
+          slotItem_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000040);
+          onChanged();
+        } else {
+          slotItemBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public Builder removeSlotItem(int index) {
+        if (slotItemBuilder_ == null) {
+          ensureSlotItemIsMutable();
+          slotItem_.remove(index);
+          onChanged();
+        } else {
+          slotItemBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public logbook.proto.LogbookEx.ItemDtoPb.Builder getSlotItemBuilder(
+          int index) {
+        return getSlotItemFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public logbook.proto.LogbookEx.ItemDtoPbOrBuilder getSlotItemOrBuilder(
+          int index) {
+        if (slotItemBuilder_ == null) {
+          return slotItem_.get(index);  } else {
+          return slotItemBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public java.util.List<? extends logbook.proto.LogbookEx.ItemDtoPbOrBuilder> 
+           getSlotItemOrBuilderList() {
+        if (slotItemBuilder_ != null) {
+          return slotItemBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(slotItem_);
+        }
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public logbook.proto.LogbookEx.ItemDtoPb.Builder addSlotItemBuilder() {
+        return getSlotItemFieldBuilder().addBuilder(
+            logbook.proto.LogbookEx.ItemDtoPb.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public logbook.proto.LogbookEx.ItemDtoPb.Builder addSlotItemBuilder(
+          int index) {
+        return getSlotItemFieldBuilder().addBuilder(
+            index, logbook.proto.LogbookEx.ItemDtoPb.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .logbook.ItemDtoPb slot_item = 3;</code>
+       */
+      public java.util.List<logbook.proto.LogbookEx.ItemDtoPb.Builder> 
+           getSlotItemBuilderList() {
+        return getSlotItemFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          logbook.proto.LogbookEx.ItemDtoPb, logbook.proto.LogbookEx.ItemDtoPb.Builder, logbook.proto.LogbookEx.ItemDtoPbOrBuilder> 
+          getSlotItemFieldBuilder() {
+        if (slotItemBuilder_ == null) {
+          slotItemBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              logbook.proto.LogbookEx.ItemDtoPb, logbook.proto.LogbookEx.ItemDtoPb.Builder, logbook.proto.LogbookEx.ItemDtoPbOrBuilder>(
+                  slotItem_,
+                  ((bitField0_ & 0x00000040) == 0x00000040),
+                  getParentForChildren(),
+                  isClean());
+          slotItem_ = null;
+        }
+        return slotItemBuilder_;
+      }
+
+      // optional .logbook.ShipParametersPb param = 4;
+      private logbook.proto.LogbookEx.ShipParametersPb param_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          logbook.proto.LogbookEx.ShipParametersPb, logbook.proto.LogbookEx.ShipParametersPb.Builder, logbook.proto.LogbookEx.ShipParametersPbOrBuilder> paramBuilder_;
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
+       */
+      public boolean hasParam() {
+        return ((bitField0_ & 0x00000080) == 0x00000080);
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
+       */
+      public logbook.proto.LogbookEx.ShipParametersPb getParam() {
+        if (paramBuilder_ == null) {
+          return param_;
+        } else {
+          return paramBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
+       */
+      public Builder setParam(logbook.proto.LogbookEx.ShipParametersPb value) {
+        if (paramBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          param_ = value;
+          onChanged();
+        } else {
+          paramBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000080;
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
+       */
+      public Builder setParam(
+          logbook.proto.LogbookEx.ShipParametersPb.Builder builderForValue) {
+        if (paramBuilder_ == null) {
+          param_ = builderForValue.build();
+          onChanged();
+        } else {
+          paramBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000080;
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
+       */
+      public Builder mergeParam(logbook.proto.LogbookEx.ShipParametersPb value) {
+        if (paramBuilder_ == null) {
+          if (((bitField0_ & 0x00000080) == 0x00000080) &&
+              param_ != logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance()) {
+            param_ =
+              logbook.proto.LogbookEx.ShipParametersPb.newBuilder(param_).mergeFrom(value).buildPartial();
+          } else {
+            param_ = value;
+          }
+          onChanged();
+        } else {
+          paramBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000080;
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
+       */
+      public Builder clearParam() {
+        if (paramBuilder_ == null) {
+          param_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+          onChanged();
+        } else {
+          paramBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000080);
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
+       */
+      public logbook.proto.LogbookEx.ShipParametersPb.Builder getParamBuilder() {
+        bitField0_ |= 0x00000080;
+        onChanged();
+        return getParamFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
+       */
+      public logbook.proto.LogbookEx.ShipParametersPbOrBuilder getParamOrBuilder() {
+        if (paramBuilder_ != null) {
+          return paramBuilder_.getMessageOrBuilder();
+        } else {
+          return param_;
+        }
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb param = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          logbook.proto.LogbookEx.ShipParametersPb, logbook.proto.LogbookEx.ShipParametersPb.Builder, logbook.proto.LogbookEx.ShipParametersPbOrBuilder> 
+          getParamFieldBuilder() {
+        if (paramBuilder_ == null) {
+          paramBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              logbook.proto.LogbookEx.ShipParametersPb, logbook.proto.LogbookEx.ShipParametersPb.Builder, logbook.proto.LogbookEx.ShipParametersPbOrBuilder>(
+                  param_,
+                  getParentForChildren(),
+                  isClean());
+          param_ = null;
+        }
+        return paramBuilder_;
+      }
+
+      // optional .logbook.ShipParametersPb slot_param = 5;
+      private logbook.proto.LogbookEx.ShipParametersPb slotParam_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          logbook.proto.LogbookEx.ShipParametersPb, logbook.proto.LogbookEx.ShipParametersPb.Builder, logbook.proto.LogbookEx.ShipParametersPbOrBuilder> slotParamBuilder_;
+      /**
+       * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+       */
+      public boolean hasSlotParam() {
+        return ((bitField0_ & 0x00000100) == 0x00000100);
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+       */
+      public logbook.proto.LogbookEx.ShipParametersPb getSlotParam() {
+        if (slotParamBuilder_ == null) {
+          return slotParam_;
+        } else {
+          return slotParamBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+       */
+      public Builder setSlotParam(logbook.proto.LogbookEx.ShipParametersPb value) {
+        if (slotParamBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          slotParam_ = value;
+          onChanged();
+        } else {
+          slotParamBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000100;
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+       */
+      public Builder setSlotParam(
+          logbook.proto.LogbookEx.ShipParametersPb.Builder builderForValue) {
+        if (slotParamBuilder_ == null) {
+          slotParam_ = builderForValue.build();
+          onChanged();
+        } else {
+          slotParamBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000100;
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+       */
+      public Builder mergeSlotParam(logbook.proto.LogbookEx.ShipParametersPb value) {
+        if (slotParamBuilder_ == null) {
+          if (((bitField0_ & 0x00000100) == 0x00000100) &&
+              slotParam_ != logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance()) {
+            slotParam_ =
+              logbook.proto.LogbookEx.ShipParametersPb.newBuilder(slotParam_).mergeFrom(value).buildPartial();
+          } else {
+            slotParam_ = value;
+          }
+          onChanged();
+        } else {
+          slotParamBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000100;
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+       */
+      public Builder clearSlotParam() {
+        if (slotParamBuilder_ == null) {
+          slotParam_ = logbook.proto.LogbookEx.ShipParametersPb.getDefaultInstance();
+          onChanged();
+        } else {
+          slotParamBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000100);
+        return this;
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+       */
+      public logbook.proto.LogbookEx.ShipParametersPb.Builder getSlotParamBuilder() {
+        bitField0_ |= 0x00000100;
+        onChanged();
+        return getSlotParamFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+       */
+      public logbook.proto.LogbookEx.ShipParametersPbOrBuilder getSlotParamOrBuilder() {
+        if (slotParamBuilder_ != null) {
+          return slotParamBuilder_.getMessageOrBuilder();
+        } else {
+          return slotParam_;
+        }
+      }
+      /**
+       * <code>optional .logbook.ShipParametersPb slot_param = 5;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          logbook.proto.LogbookEx.ShipParametersPb, logbook.proto.LogbookEx.ShipParametersPb.Builder, logbook.proto.LogbookEx.ShipParametersPbOrBuilder> 
+          getSlotParamFieldBuilder() {
+        if (slotParamBuilder_ == null) {
+          slotParamBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              logbook.proto.LogbookEx.ShipParametersPb, logbook.proto.LogbookEx.ShipParametersPb.Builder, logbook.proto.LogbookEx.ShipParametersPbOrBuilder>(
+                  slotParam_,
+                  getParentForChildren(),
+                  isClean());
+          slotParam_ = null;
+        }
+        return slotParamBuilder_;
+      }
+
+      // @@protoc_insertion_point(builder_scope:logbook.EnemyShipDtoPb)
+    }
+
+    static {
+      defaultInstance = new EnemyShipDtoPb(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:logbook.EnemyShipDtoPb)
   }
 
   public interface PhasePbOrBuilder
@@ -24106,11 +23483,6 @@ public final class LogbookEx {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_logbook_EnemyDataPb_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_logbook_intListPb_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_logbook_intListPb_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
     internal_static_logbook_ShipInfoDtoPb_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -24136,10 +23508,10 @@ public final class LogbookEx {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_logbook_DockDtoPb_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_logbook_ItemDtoListPb_descriptor;
+    internal_static_logbook_ShipParametersPb_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_logbook_ItemDtoListPb_fieldAccessorTable;
+      internal_static_logbook_ShipParametersPb_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
     internal_static_logbook_ShipDtoPb_descriptor;
   private static
@@ -24155,6 +23527,11 @@ public final class LogbookEx {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_logbook_MapCellDtoPb_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_logbook_EnemyShipDtoPb_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_logbook_EnemyShipDtoPb_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
     internal_static_logbook_PhasePb_descriptor;
   private static
@@ -24172,92 +23549,91 @@ public final class LogbookEx {
       "\n\020logbook-ex.proto\022\007logbook\"[\n\013EnemyData" +
       "Pb\022\020\n\010enemy_id\030\001 \001(\021\022\022\n\nenemy_name\030\002 \001(\t" +
       "\022\023\n\013enemy_ships\030\003 \003(\t\022\021\n\tformation\030\004 \001(\t" +
-      "\"\031\n\tintListPb\022\014\n\004data\030\001 \003(\021\"\305\001\n\rShipInfo" +
-      "DtoPb\022\014\n\004name\030\002 \001(\t\022\017\n\007ship_id\030\001 \001(\021\022\r\n\005" +
-      "stype\030\003 \001(\021\022\014\n\004type\030\004 \001(\t\022\017\n\007afterlv\030\005 \001" +
-      "(\021\022\023\n\013aftershipid\030\006 \001(\021\022\020\n\010flagship\030\007 \001(" +
-      "\t\022\020\n\010max_bull\030\010 \001(\021\022\020\n\010max_fuel\030\t \001(\021\022\r\n" +
-      "\005powup\030\n \003(\021\022\r\n\005maxeq\030\013 \003(\021\"\177\n\016AirBattle" +
-      "DtoPb\022)\n\006atacks\030\001 \003(\0132\031.logbook.BattleAt",
-      "ackDtoPb\022\023\n\013touch_plane\030\002 \003(\021\022\r\n\005seiku\030\003" +
-      " \001(\t\022\016\n\006stage1\030\004 \003(\021\022\016\n\006stage2\030\005 \003(\021\"\230\005\n" +
-      "\rBattleExDtoPb\022\023\n\013battle_date\030\001 \001(\022\022#\n\007f" +
-      "riends\030\002 \003(\0132\022.logbook.DockDtoPb\022%\n\005enem" +
-      "y\030\003 \003(\0132\026.logbook.ShipInfoDtoPb\022*\n\nenemy" +
-      "_slot\030\004 \003(\0132\026.logbook.ItemDtoListPb\022\'\n\013e" +
-      "nemy_param\030\005 \003(\0132\022.logbook.intListPb\022\025\n\r" +
-      "max_friend_hp\030\006 \003(\021\022\036\n\026max_friend_hp_com" +
-      "bined\030\007 \003(\021\022\024\n\014max_enemy_hp\030\010 \003(\021\022\027\n\017sta" +
-      "rt_friend_hp\030\t \003(\021\022 \n\030start_friend_hp_co",
-      "mbined\030\n \003(\021\022\026\n\016start_enemy_hp\030\013 \003(\021\022\030\n\020" +
-      "friend_gauge_max\030\014 \001(\021\022\027\n\017enemy_gauge_ma" +
-      "x\030\r \001(\021\022\021\n\tformation\030\016 \003(\t\022\027\n\017formation_" +
-      "match\030\017 \001(\t\022\020\n\010sakuteki\030\020 \003(\t\022\022\n\nquest_n" +
-      "ame\030\021 \001(\t\022\014\n\004rank\030\022 \001(\t\022+\n\014map_cell_dto\030" +
-      "\023 \001(\0132\025.logbook.MapCellDtoPb\022\022\n\nenemy_na" +
-      "me\030\024 \001(\t\022\021\n\tdrop_flag\030\025 \001(\010\022\021\n\tdrop_type" +
-      "\030\026 \001(\t\022\021\n\tdrop_name\030\027 \001(\t\022$\n\nphase_list\030" +
-      "\030 \003(\0132\020.logbook.PhasePb\"\275\002\n\tItemDtoPb\022\n\n" +
-      "\002id\030\001 \001(\021\022\014\n\004type\030\002 \003(\021\022\014\n\004atap\030\003 \001(\021\022\014\n",
-      "\004bakk\030\004 \001(\021\022\014\n\004baku\030\005 \001(\021\022\014\n\004houg\030\006 \001(\021\022" +
-      "\014\n\004houk\030\007 \001(\021\022\014\n\004houm\030\010 \001(\021\022\014\n\004leng\030\t \001(" +
-      "\021\022\014\n\004luck\030\n \001(\021\022\014\n\004name\030\013 \001(\t\022\014\n\004raig\030\014 " +
-      "\001(\021\022\014\n\004raik\030\r \001(\021\022\014\n\004raim\030\016 \001(\021\022\014\n\004rare\030" +
-      "\017 \001(\021\022\014\n\004sakb\030\020 \001(\021\022\014\n\004saku\030\021 \001(\021\022\014\n\004sok" +
-      "u\030\022 \001(\021\022\014\n\004souk\030\023 \001(\021\022\014\n\004taik\030\024 \001(\021\022\014\n\004t" +
-      "ais\030\025 \001(\021\022\014\n\004tyku\030\026 \001(\021\"H\n\tDockDtoPb\022\n\n\002" +
-      "id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022!\n\005ships\030\003 \003(\0132\022." +
-      "logbook.ShipDtoPb\"1\n\rItemDtoListPb\022 \n\004da" +
-      "ta\030\001 \003(\0132\022.logbook.ItemDtoPb\"\231\005\n\tShipDto",
-      "Pb\022\n\n\002id\030\001 \001(\022\022\017\n\007char_id\030\002 \001(\022\022\016\n\006locke" +
-      "d\030\003 \001(\010\022\017\n\007fleetid\030\004 \001(\t\022\014\n\004name\030\005 \001(\t\022\014" +
-      "\n\004type\030\006 \001(\t\022\n\n\002lv\030\007 \001(\022\022\014\n\004cond\030\010 \001(\022\022\020" +
-      "\n\010docktime\030\t \001(\022\022\020\n\010dockfuel\030\n \001(\022\022\021\n\tdo" +
-      "ckmetal\030\013 \001(\022\022\014\n\004bull\030\014 \001(\021\022\017\n\007bullmax\030\r" +
-      " \001(\021\022\014\n\004fuel\030\016 \001(\021\022\017\n\007fuelmax\030\017 \001(\021\022\013\n\003e" +
-      "xp\030\020 \001(\022\022\r\n\005nowhp\030\021 \001(\022\022\r\n\005maxhp\030\022 \001(\022\022\017" +
-      "\n\007slotnum\030\023 \001(\021\022\014\n\004slot\030\024 \003(\022\022\016\n\006onslot\030" +
-      "\025 \003(\021\022\017\n\007karyoku\030\026 \001(\022\022\023\n\013karyoku_max\030\027 " +
-      "\001(\022\022\016\n\006raisou\030\030 \001(\022\022\022\n\nraisou_max\030\031 \001(\022\022",
-      "\r\n\005taiku\030\032 \001(\022\022\021\n\ttaiku_max\030\033 \001(\022\022\016\n\006sou" +
-      "kou\030\034 \001(\022\022\022\n\nsoukou_max\030\035 \001(\022\022\r\n\005kaihi\030\036" +
-      " \001(\022\022\021\n\tkaihi_max\030\037 \001(\022\022\016\n\006taisen\030  \001(\022\022" +
-      "\022\n\ntaisen_max\030! \001(\022\022\020\n\010sakuteki\030\" \001(\022\022\024\n" +
-      "\014sakuteki_max\030# \001(\022\022\r\n\005lucky\030$ \001(\022\022\021\n\tlu" +
-      "cky_max\030% \001(\022\022)\n\tship_info\030& \001(\0132\026.logbo" +
-      "ok.ShipInfoDtoPb\"\226\001\n\020BattleAtackDtoPb\022\"\n" +
-      "\004kind\030\001 \001(\0162\024.logbook.AtackKindPb\022\024\n\014fri" +
-      "end_atack\030\002 \001(\010\022\016\n\006origin\030\003 \003(\021\022\n\n\002ot\030\004 " +
-      "\003(\021\022\014\n\004ydam\030\005 \003(\021\022\016\n\006target\030\006 \003(\021\022\016\n\006dam",
-      "age\030\007 \003(\021\"~\n\014MapCellDtoPb\022\013\n\003map\030\001 \003(\021\022\020" +
-      "\n\010enemy_id\030\002 \001(\021\022\020\n\010color_no\030\003 \001(\021\022\023\n\013bo" +
-      "sscell_no\030\004 \001(\021\022(\n\nenemy_data\030\005 \001(\0132\024.lo" +
-      "gbook.EnemyDataPb\"\224\005\n\007PhasePb\022(\n\004kind\030\001 " +
-      "\001(\0162\032.logbook.BattlePhaseKindPb\022\025\n\rnow_f" +
-      "riend_hp\030\002 \003(\021\022\036\n\026now_friend_hp_combined" +
-      "\030\003 \003(\021\022\024\n\014now_enemy_hp\030\004 \003(\021\022-\n\016estimate" +
-      "d_rank\030\005 \001(\0162\025.logbook.ResultRankPb\022\020\n\010i" +
-      "s_night\030\006 \001(\010\022\024\n\014support_type\030\007 \001(\t\022\023\n\013t" +
-      "ouch_plane\030\010 \003(\021\022\r\n\005seiku\030\t \001(\t\022\023\n\013damag",
-      "e_rate\030\n \003(\001\022$\n\003air\030\013 \001(\0132\027.logbook.AirB" +
-      "attleDtoPb\022%\n\004air2\030\014 \001(\0132\027.logbook.AirBa" +
-      "ttleDtoPb\022*\n\007support\030\r \003(\0132\031.logbook.Bat" +
-      "tleAtackDtoPb\022*\n\007opening\030\016 \003(\0132\031.logbook" +
-      ".BattleAtackDtoPb\022*\n\007raigeki\030\017 \003(\0132\031.log" +
-      "book.BattleAtackDtoPb\022*\n\007hougeki\030\020 \003(\0132\031" +
-      ".logbook.BattleAtackDtoPb\022+\n\010hougeki1\030\021 " +
-      "\003(\0132\031.logbook.BattleAtackDtoPb\022+\n\010hougek" +
-      "i2\030\022 \003(\0132\031.logbook.BattleAtackDtoPb\022+\n\010h" +
-      "ougeki3\030\023 \003(\0132\031.logbook.BattleAtackDtoPb",
-      "*=\n\013AtackKindPb\022\007\n\003AIR\020\000\022\013\n\007SUPPORT\020\001\022\013\n" +
-      "\007HOUGEKI\020\002\022\013\n\007RAIGEKI\020\003*\250\001\n\021BattlePhaseK" +
-      "indPb\022\n\n\006BATTLE\020\000\022\014\n\010MIDNIGHT\020\001\022\017\n\013SP_MI" +
-      "DNIGHT\020\002\022\020\n\014NIGHT_TO_DAY\020\003\022\023\n\017COMBINED_B" +
-      "ATTLE\020\004\022\020\n\014COMBINED_AIR\020\005\022\025\n\021COMBINED_MI" +
-      "DNIGHT\020\006\022\030\n\024COMBINED_SP_MIDNIGHT\020\007*i\n\014Re" +
-      "sultRankPb\022\013\n\007PERFECT\020\000\022\005\n\001S\020\001\022\005\n\001A\020\002\022\005\n" +
-      "\001B\020\003\022\005\n\001C\020\004\022\005\n\001D\020\005\022\005\n\001E\020\006\022\n\n\006B_OR_C\020\007\022\n\n" +
-      "\006C_OR_B\020\010\022\n\n\006D_OR_C\020\tB\017\n\rlogbook.proto"
+      "\"\227\002\n\rShipInfoDtoPb\022\014\n\004name\030\002 \001(\t\022\017\n\007ship" +
+      "_id\030\001 \001(\021\022\r\n\005stype\030\003 \001(\021\022\014\n\004type\030\004 \001(\t\022\017" +
+      "\n\007afterlv\030\005 \001(\021\022\023\n\013aftershipid\030\006 \001(\021\022\020\n\010" +
+      "flagship\030\007 \001(\t\022\020\n\010max_bull\030\010 \001(\021\022\020\n\010max_" +
+      "fuel\030\t \001(\021\022\r\n\005powup\030\n \003(\021\022\r\n\005maxeq\030\013 \003(\021" +
+      "\022(\n\005param\030\014 \001(\0132\031.logbook.ShipParameters" +
+      "Pb\022&\n\003max\030\r \001(\0132\031.logbook.ShipParameters",
+      "Pb\"\177\n\016AirBattleDtoPb\022)\n\006atacks\030\001 \003(\0132\031.l" +
+      "ogbook.BattleAtackDtoPb\022\023\n\013touch_plane\030\002" +
+      " \003(\021\022\r\n\005seiku\030\003 \001(\t\022\016\n\006stage1\030\004 \003(\021\022\016\n\006s" +
+      "tage2\030\005 \003(\021\"\304\004\n\rBattleExDtoPb\022\023\n\013battle_" +
+      "date\030\001 \001(\022\022#\n\007friends\030\002 \003(\0132\022.logbook.Do" +
+      "ckDtoPb\022&\n\005enemy\030\003 \003(\0132\027.logbook.EnemySh" +
+      "ipDtoPb\022\025\n\rmax_friend_hp\030\006 \003(\021\022\036\n\026max_fr" +
+      "iend_hp_combined\030\007 \003(\021\022\024\n\014max_enemy_hp\030\010" +
+      " \003(\021\022\027\n\017start_friend_hp\030\t \003(\021\022 \n\030start_f" +
+      "riend_hp_combined\030\n \003(\021\022\026\n\016start_enemy_h",
+      "p\030\013 \003(\021\022\030\n\020friend_gauge_max\030\014 \001(\021\022\027\n\017ene" +
+      "my_gauge_max\030\r \001(\021\022\021\n\tformation\030\016 \003(\t\022\027\n" +
+      "\017formation_match\030\017 \001(\t\022\020\n\010sakuteki\030\020 \003(\t" +
+      "\022\022\n\nquest_name\030\021 \001(\t\022\014\n\004rank\030\022 \001(\t\022+\n\014ma" +
+      "p_cell_dto\030\023 \001(\0132\025.logbook.MapCellDtoPb\022" +
+      "\022\n\nenemy_name\030\024 \001(\t\022\021\n\tdrop_flag\030\025 \001(\010\022\021" +
+      "\n\tdrop_type\030\026 \001(\t\022\021\n\tdrop_name\030\027 \001(\t\022$\n\n" +
+      "phase_list\030\030 \003(\0132\020.logbook.PhasePb\"]\n\tIt" +
+      "emDtoPb\022\n\n\002id\030\001 \001(\021\022\014\n\004type\030\002 \003(\021\022\014\n\004nam" +
+      "e\030\003 \001(\t\022(\n\005param\030\004 \001(\0132\031.logbook.ShipPar",
+      "ametersPb\"H\n\tDockDtoPb\022\n\n\002id\030\001 \001(\t\022\014\n\004na" +
+      "me\030\002 \001(\t\022!\n\005ships\030\003 \003(\0132\022.logbook.ShipDt" +
+      "oPb\"\310\001\n\020ShipParametersPb\022\014\n\004taik\030\001 \001(\021\022\014" +
+      "\n\004houg\030\002 \001(\021\022\014\n\004houm\030\003 \001(\021\022\014\n\004raig\030\004 \001(\021" +
+      "\022\014\n\004baku\030\005 \001(\021\022\014\n\004tyku\030\006 \001(\021\022\014\n\004souk\030\007 \001" +
+      "(\021\022\014\n\004kaih\030\010 \001(\021\022\014\n\004tais\030\t \001(\021\022\014\n\004saku\030\n" +
+      " \001(\021\022\014\n\004luck\030\013 \001(\021\022\014\n\004soku\030\014 \001(\021\022\014\n\004leng" +
+      "\030\r \001(\021\"\335\003\n\tShipDtoPb\022\n\n\002id\030\n \001(\021\022\017\n\007char" +
+      "_id\030\013 \001(\021\022\016\n\006sortno\030\014 \001(\021\022\016\n\006locked\030\r \001(" +
+      "\010\022\017\n\007fleetid\030\016 \001(\t\022\020\n\010fleetpos\030\017 \001(\021\022\n\n\002",
+      "lv\030\020 \001(\021\022\014\n\004cond\030\021 \001(\021\022\020\n\010docktime\030\022 \001(\022" +
+      "\022\020\n\010dockfuel\030\023 \001(\021\022\021\n\tdockmetal\030\024 \001(\021\022\014\n" +
+      "\004bull\030\025 \001(\021\022\014\n\004fuel\030\026 \001(\021\022\013\n\003exp\030\027 \001(\021\022\r" +
+      "\n\005nowhp\030\030 \001(\021\022\r\n\005maxhp\030\031 \001(\021\022\017\n\007slotnum\030" +
+      "\032 \001(\021\022\016\n\006onslot\030\033 \003(\021\022)\n\tship_info\030\001 \001(\013" +
+      "2\026.logbook.ShipInfoDtoPb\022\014\n\004slot\030\002 \003(\021\022%" +
+      "\n\tslot_item\030\003 \003(\0132\022.logbook.ItemDtoPb\022(\n" +
+      "\005param\030\004 \001(\0132\031.logbook.ShipParametersPb\022" +
+      "-\n\nslot_param\030\005 \001(\0132\031.logbook.ShipParame" +
+      "tersPb\"\226\001\n\020BattleAtackDtoPb\022\"\n\004kind\030\001 \001(",
+      "\0162\024.logbook.AtackKindPb\022\024\n\014friend_atack\030" +
+      "\002 \001(\010\022\016\n\006origin\030\003 \003(\021\022\n\n\002ot\030\004 \003(\021\022\014\n\004yda" +
+      "m\030\005 \003(\021\022\016\n\006target\030\006 \003(\021\022\016\n\006damage\030\007 \003(\021\"" +
+      "~\n\014MapCellDtoPb\022\013\n\003map\030\001 \003(\021\022\020\n\010enemy_id" +
+      "\030\002 \001(\021\022\020\n\010color_no\030\003 \001(\021\022\023\n\013bosscell_no\030" +
+      "\004 \001(\021\022(\n\nenemy_data\030\005 \001(\0132\024.logbook.Enem" +
+      "yDataPb\"\211\002\n\016EnemyShipDtoPb\022\017\n\007karyoku\030\n " +
+      "\001(\021\022\016\n\006raisou\030\013 \001(\021\022\r\n\005taiku\030\014 \001(\021\022\016\n\006so" +
+      "ukou\030\r \001(\021\022)\n\tship_info\030\001 \001(\0132\026.logbook." +
+      "ShipInfoDtoPb\022\014\n\004slot\030\002 \003(\021\022%\n\tslot_item",
+      "\030\003 \003(\0132\022.logbook.ItemDtoPb\022(\n\005param\030\004 \001(" +
+      "\0132\031.logbook.ShipParametersPb\022-\n\nslot_par" +
+      "am\030\005 \001(\0132\031.logbook.ShipParametersPb\"\224\005\n\007" +
+      "PhasePb\022(\n\004kind\030\001 \001(\0162\032.logbook.BattlePh" +
+      "aseKindPb\022\025\n\rnow_friend_hp\030\002 \003(\021\022\036\n\026now_" +
+      "friend_hp_combined\030\003 \003(\021\022\024\n\014now_enemy_hp" +
+      "\030\004 \003(\021\022-\n\016estimated_rank\030\005 \001(\0162\025.logbook" +
+      ".ResultRankPb\022\020\n\010is_night\030\006 \001(\010\022\024\n\014suppo" +
+      "rt_type\030\007 \001(\t\022\023\n\013touch_plane\030\010 \003(\021\022\r\n\005se" +
+      "iku\030\t \001(\t\022\023\n\013damage_rate\030\n \003(\001\022$\n\003air\030\013 ",
+      "\001(\0132\027.logbook.AirBattleDtoPb\022%\n\004air2\030\014 \001" +
+      "(\0132\027.logbook.AirBattleDtoPb\022*\n\007support\030\r" +
+      " \003(\0132\031.logbook.BattleAtackDtoPb\022*\n\007openi" +
+      "ng\030\016 \003(\0132\031.logbook.BattleAtackDtoPb\022*\n\007r" +
+      "aigeki\030\017 \003(\0132\031.logbook.BattleAtackDtoPb\022" +
+      "*\n\007hougeki\030\020 \003(\0132\031.logbook.BattleAtackDt" +
+      "oPb\022+\n\010hougeki1\030\021 \003(\0132\031.logbook.BattleAt" +
+      "ackDtoPb\022+\n\010hougeki2\030\022 \003(\0132\031.logbook.Bat" +
+      "tleAtackDtoPb\022+\n\010hougeki3\030\023 \003(\0132\031.logboo" +
+      "k.BattleAtackDtoPb*=\n\013AtackKindPb\022\007\n\003AIR",
+      "\020\000\022\013\n\007SUPPORT\020\001\022\013\n\007HOUGEKI\020\002\022\013\n\007RAIGEKI\020" +
+      "\003*\250\001\n\021BattlePhaseKindPb\022\n\n\006BATTLE\020\000\022\014\n\010M" +
+      "IDNIGHT\020\001\022\017\n\013SP_MIDNIGHT\020\002\022\020\n\014NIGHT_TO_D" +
+      "AY\020\003\022\023\n\017COMBINED_BATTLE\020\004\022\020\n\014COMBINED_AI" +
+      "R\020\005\022\025\n\021COMBINED_MIDNIGHT\020\006\022\030\n\024COMBINED_S" +
+      "P_MIDNIGHT\020\007*E\n\014ResultRankPb\022\013\n\007PERFECT\020" +
+      "\000\022\005\n\001S\020\001\022\005\n\001A\020\002\022\005\n\001B\020\003\022\005\n\001C\020\004\022\005\n\001D\020\005\022\005\n\001" +
+      "E\020\006B\017\n\rlogbook.proto"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -24270,66 +23646,66 @@ public final class LogbookEx {
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_logbook_EnemyDataPb_descriptor,
               new java.lang.String[] { "EnemyId", "EnemyName", "EnemyShips", "Formation", });
-          internal_static_logbook_intListPb_descriptor =
-            getDescriptor().getMessageTypes().get(1);
-          internal_static_logbook_intListPb_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_logbook_intListPb_descriptor,
-              new java.lang.String[] { "Data", });
           internal_static_logbook_ShipInfoDtoPb_descriptor =
-            getDescriptor().getMessageTypes().get(2);
+            getDescriptor().getMessageTypes().get(1);
           internal_static_logbook_ShipInfoDtoPb_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_logbook_ShipInfoDtoPb_descriptor,
-              new java.lang.String[] { "Name", "ShipId", "Stype", "Type", "Afterlv", "Aftershipid", "Flagship", "MaxBull", "MaxFuel", "Powup", "Maxeq", });
+              new java.lang.String[] { "Name", "ShipId", "Stype", "Type", "Afterlv", "Aftershipid", "Flagship", "MaxBull", "MaxFuel", "Powup", "Maxeq", "Param", "Max", });
           internal_static_logbook_AirBattleDtoPb_descriptor =
-            getDescriptor().getMessageTypes().get(3);
+            getDescriptor().getMessageTypes().get(2);
           internal_static_logbook_AirBattleDtoPb_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_logbook_AirBattleDtoPb_descriptor,
               new java.lang.String[] { "Atacks", "TouchPlane", "Seiku", "Stage1", "Stage2", });
           internal_static_logbook_BattleExDtoPb_descriptor =
-            getDescriptor().getMessageTypes().get(4);
+            getDescriptor().getMessageTypes().get(3);
           internal_static_logbook_BattleExDtoPb_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_logbook_BattleExDtoPb_descriptor,
-              new java.lang.String[] { "BattleDate", "Friends", "Enemy", "EnemySlot", "EnemyParam", "MaxFriendHp", "MaxFriendHpCombined", "MaxEnemyHp", "StartFriendHp", "StartFriendHpCombined", "StartEnemyHp", "FriendGaugeMax", "EnemyGaugeMax", "Formation", "FormationMatch", "Sakuteki", "QuestName", "Rank", "MapCellDto", "EnemyName", "DropFlag", "DropType", "DropName", "PhaseList", });
+              new java.lang.String[] { "BattleDate", "Friends", "Enemy", "MaxFriendHp", "MaxFriendHpCombined", "MaxEnemyHp", "StartFriendHp", "StartFriendHpCombined", "StartEnemyHp", "FriendGaugeMax", "EnemyGaugeMax", "Formation", "FormationMatch", "Sakuteki", "QuestName", "Rank", "MapCellDto", "EnemyName", "DropFlag", "DropType", "DropName", "PhaseList", });
           internal_static_logbook_ItemDtoPb_descriptor =
-            getDescriptor().getMessageTypes().get(5);
+            getDescriptor().getMessageTypes().get(4);
           internal_static_logbook_ItemDtoPb_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_logbook_ItemDtoPb_descriptor,
-              new java.lang.String[] { "Id", "Type", "Atap", "Bakk", "Baku", "Houg", "Houk", "Houm", "Leng", "Luck", "Name", "Raig", "Raik", "Raim", "Rare", "Sakb", "Saku", "Soku", "Souk", "Taik", "Tais", "Tyku", });
+              new java.lang.String[] { "Id", "Type", "Name", "Param", });
           internal_static_logbook_DockDtoPb_descriptor =
-            getDescriptor().getMessageTypes().get(6);
+            getDescriptor().getMessageTypes().get(5);
           internal_static_logbook_DockDtoPb_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_logbook_DockDtoPb_descriptor,
               new java.lang.String[] { "Id", "Name", "Ships", });
-          internal_static_logbook_ItemDtoListPb_descriptor =
-            getDescriptor().getMessageTypes().get(7);
-          internal_static_logbook_ItemDtoListPb_fieldAccessorTable = new
+          internal_static_logbook_ShipParametersPb_descriptor =
+            getDescriptor().getMessageTypes().get(6);
+          internal_static_logbook_ShipParametersPb_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_logbook_ItemDtoListPb_descriptor,
-              new java.lang.String[] { "Data", });
+              internal_static_logbook_ShipParametersPb_descriptor,
+              new java.lang.String[] { "Taik", "Houg", "Houm", "Raig", "Baku", "Tyku", "Souk", "Kaih", "Tais", "Saku", "Luck", "Soku", "Leng", });
           internal_static_logbook_ShipDtoPb_descriptor =
-            getDescriptor().getMessageTypes().get(8);
+            getDescriptor().getMessageTypes().get(7);
           internal_static_logbook_ShipDtoPb_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_logbook_ShipDtoPb_descriptor,
-              new java.lang.String[] { "Id", "CharId", "Locked", "Fleetid", "Name", "Type", "Lv", "Cond", "Docktime", "Dockfuel", "Dockmetal", "Bull", "Bullmax", "Fuel", "Fuelmax", "Exp", "Nowhp", "Maxhp", "Slotnum", "Slot", "Onslot", "Karyoku", "KaryokuMax", "Raisou", "RaisouMax", "Taiku", "TaikuMax", "Soukou", "SoukouMax", "Kaihi", "KaihiMax", "Taisen", "TaisenMax", "Sakuteki", "SakutekiMax", "Lucky", "LuckyMax", "ShipInfo", });
+              new java.lang.String[] { "Id", "CharId", "Sortno", "Locked", "Fleetid", "Fleetpos", "Lv", "Cond", "Docktime", "Dockfuel", "Dockmetal", "Bull", "Fuel", "Exp", "Nowhp", "Maxhp", "Slotnum", "Onslot", "ShipInfo", "Slot", "SlotItem", "Param", "SlotParam", });
           internal_static_logbook_BattleAtackDtoPb_descriptor =
-            getDescriptor().getMessageTypes().get(9);
+            getDescriptor().getMessageTypes().get(8);
           internal_static_logbook_BattleAtackDtoPb_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_logbook_BattleAtackDtoPb_descriptor,
               new java.lang.String[] { "Kind", "FriendAtack", "Origin", "Ot", "Ydam", "Target", "Damage", });
           internal_static_logbook_MapCellDtoPb_descriptor =
-            getDescriptor().getMessageTypes().get(10);
+            getDescriptor().getMessageTypes().get(9);
           internal_static_logbook_MapCellDtoPb_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_logbook_MapCellDtoPb_descriptor,
               new java.lang.String[] { "Map", "EnemyId", "ColorNo", "BosscellNo", "EnemyData", });
+          internal_static_logbook_EnemyShipDtoPb_descriptor =
+            getDescriptor().getMessageTypes().get(10);
+          internal_static_logbook_EnemyShipDtoPb_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_logbook_EnemyShipDtoPb_descriptor,
+              new java.lang.String[] { "Karyoku", "Raisou", "Taiku", "Soukou", "ShipInfo", "Slot", "SlotItem", "Param", "SlotParam", });
           internal_static_logbook_PhasePb_descriptor =
             getDescriptor().getMessageTypes().get(11);
           internal_static_logbook_PhasePb_fieldAccessorTable = new

@@ -143,10 +143,12 @@ public final class ShipDto extends ShipBaseDto {
         ShipDtoPb.Builder builder = ShipDtoPb.newBuilder();
         builder.setId(this.id);
         builder.setCharId(this.charId);
+        builder.setSortno(this.sortno);
         builder.setLocked(this.locked);
         if (this.fleetid != null) {
             builder.setFleetid(this.fleetid);
         }
+        builder.setFleetpos(this.fleetpos);
         builder.setLv(this.lv);
         builder.setCond(this.cond);
         builder.setDocktime(this.docktime);
@@ -159,14 +161,30 @@ public final class ShipDto extends ShipBaseDto {
         builder.setMaxhp(this.maxhp);
         builder.setSlotnum(this.slotnum);
         if (this.onslot != null) {
-            for (Integer b : this.onslot) {
+            for (int b : this.onslot) {
+                builder.addOnslot(b);
+            }
+        }
+        if (this.shipInfo != null) {
+            builder.setShipInfo(this.shipInfo.toProto());
+        }
+        if (this.slot != null) {
+            for (int b : this.slot) {
+                builder.addSlot(b);
+            }
+        }
+        if (this.slotItem != null) {
+            for (ItemDto b : this.slotItem) {
                 if (b != null) {
-                    builder.addOnslot(b);
+                    builder.addSlotItem(b.toProto());
                 }
             }
         }
-        if (this.getShipInfo() != null) {
-            builder.setShipInfo(this.getShipInfo().toProto());
+        if (this.param != null) {
+            builder.setParam(this.param.toProto());
+        }
+        if (this.slotParam != null) {
+            builder.setSlotParam(this.slotParam.toProto());
         }
         return builder.build();
     }

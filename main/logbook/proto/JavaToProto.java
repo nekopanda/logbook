@@ -529,20 +529,24 @@ public class JavaToProto {
     private Message addNewJavaType(String name, Class type) {
         Message m = new JavaType(name, type);
         this.typeMap.put(type.getSimpleName(), m);
-        Field[] fields = type.getDeclaredFields();
 
-        for (Field f : fields) {
-            /*
-            int mod = f.getModifiers();
-            if (Modifier.isTransient(mod) || Modifier.isStatic(mod)) {
-                continue;
-            }*/
-            Tag tag = f.getAnnotation(Tag.class);
-            if (tag == null) {
-                //Skip this field
-                continue;
+        Class curType = type;
+        while ((curType != Object.class) && (curType != null)) {
+            Field[] fields = curType.getDeclaredFields();
+            for (Field f : fields) {
+                /*
+                int mod = f.getModifiers();
+                if (Modifier.isTransient(mod) || Modifier.isStatic(mod)) {
+                    continue;
+                }*/
+                Tag tag = f.getAnnotation(Tag.class);
+                if (tag == null) {
+                    //Skip this field
+                    continue;
+                }
+                m.addChild(this.visitField(f.getGenericType(), f.getName(), tag.value()));
             }
-            m.addChild(this.visitField(f.getGenericType(), f.getName(), tag.value()));
+            curType = curType.getSuperclass();
         }
 
         return m;

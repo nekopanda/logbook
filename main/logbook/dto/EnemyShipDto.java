@@ -3,6 +3,7 @@
  */
 package logbook.dto;
 
+import logbook.proto.LogbookEx.EnemyShipDtoPb;
 import logbook.proto.Tag;
 
 /**
@@ -12,19 +13,19 @@ import logbook.proto.Tag;
 public class EnemyShipDto extends ShipBaseDto {
 
     /** 火力 */
-    @Tag(22)
+    @Tag(10)
     private final int karyoku;
 
     /** 雷装 */
-    @Tag(24)
+    @Tag(11)
     private final int raisou;
 
     /** 対空 */
-    @Tag(26)
+    @Tag(12)
     private final int taiku;
 
     /** 装甲 */
-    @Tag(28)
+    @Tag(13)
     private final int soukou;
 
     public EnemyShipDto(int shipId, int[] slot, int[] param) {
@@ -33,6 +34,36 @@ public class EnemyShipDto extends ShipBaseDto {
         this.raisou = param[0];
         this.taiku = param[0];
         this.soukou = param[0];
+    }
+
+    public EnemyShipDtoPb toProto() {
+        EnemyShipDtoPb.Builder builder = EnemyShipDtoPb.newBuilder();
+        builder.setKaryoku(this.karyoku);
+        builder.setRaisou(this.raisou);
+        builder.setTaiku(this.taiku);
+        builder.setSoukou(this.soukou);
+        if (this.shipInfo != null) {
+            builder.setShipInfo(this.shipInfo.toProto());
+        }
+        if (this.slot != null) {
+            for (int b : this.slot) {
+                builder.addSlot(b);
+            }
+        }
+        if (this.slotItem != null) {
+            for (ItemDto b : this.slotItem) {
+                if (b != null) {
+                    builder.addSlotItem(b.toProto());
+                }
+            }
+        }
+        if (this.param != null) {
+            builder.setParam(this.param.toProto());
+        }
+        if (this.slotParam != null) {
+            builder.setSlotParam(this.slotParam.toProto());
+        }
+        return builder.build();
     }
 
     /**

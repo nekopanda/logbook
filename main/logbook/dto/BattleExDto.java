@@ -736,6 +736,13 @@ public class BattleExDto extends AbstractDto {
                 }
             }
         }
+        if (this.enemy != null) {
+            for (EnemyShipDto b : this.enemy) {
+                if (b != null) {
+                    builder.addEnemy(b.toProto());
+                }
+            }
+        }
         if (this.maxFriendHp != null) {
             for (int b : this.maxFriendHp) {
                 builder.addMaxFriendHp(b);

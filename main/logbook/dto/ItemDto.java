@@ -96,6 +96,9 @@ public final class ItemDto extends AbstractDto {
         if (this.name != null) {
             builder.setName(this.name);
         }
+        if (this.param != null) {
+            builder.setParam(this.param.toProto());
+        }
         return builder.build();
     }
 
