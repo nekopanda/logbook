@@ -8,9 +8,9 @@ import javax.json.JsonObject;
 import logbook.constants.AppConstants;
 import logbook.internal.ExpTable;
 import logbook.internal.Ship;
-import logbook.proto.LogbookEx.ShipDtoPb;
-import logbook.proto.Tag;
 import logbook.util.JsonUtils;
+
+import com.dyuproject.protostuff.Tag;
 
 /**
  * 艦娘を表します
@@ -19,10 +19,10 @@ import logbook.util.JsonUtils;
 public final class ShipDto extends ShipBaseDto {
 
     /** 日時 */
-    private final Calendar time = Calendar.getInstance();
+    private transient final Calendar time = Calendar.getInstance();
 
     /** 日時 */
-    private final Calendar condClearTime = Calendar.getInstance();
+    private transient final Calendar condClearTime = Calendar.getInstance();
 
     /** 艦娘個人を識別するID */
     @Tag(10)
@@ -95,7 +95,7 @@ public final class ShipDto extends ShipBaseDto {
     private final int[] onslot;
 
     /** */
-    private final int lockedEquip;
+    private transient final int lockedEquip;
 
     /**
      * コンストラクター
@@ -137,56 +137,6 @@ public final class ShipDto extends ShipBaseDto {
         if (this.cond < 49) {
             this.condClearTime.add(Calendar.MINUTE, Math.max(49 - this.cond, 3));
         }
-    }
-
-    public ShipDtoPb toProto() {
-        ShipDtoPb.Builder builder = ShipDtoPb.newBuilder();
-        builder.setId(this.id);
-        builder.setCharId(this.charId);
-        builder.setSortno(this.sortno);
-        builder.setLocked(this.locked);
-        if (this.fleetid != null) {
-            builder.setFleetid(this.fleetid);
-        }
-        builder.setFleetpos(this.fleetpos);
-        builder.setLv(this.lv);
-        builder.setCond(this.cond);
-        builder.setDocktime(this.docktime);
-        builder.setDockfuel(this.dockfuel);
-        builder.setDockmetal(this.dockmetal);
-        builder.setBull(this.bull);
-        builder.setFuel(this.fuel);
-        builder.setExp(this.exp);
-        builder.setNowhp(this.nowhp);
-        builder.setMaxhp(this.maxhp);
-        builder.setSlotnum(this.slotnum);
-        if (this.onslot != null) {
-            for (int b : this.onslot) {
-                builder.addOnslot(b);
-            }
-        }
-        if (this.shipInfo != null) {
-            builder.setShipInfo(this.shipInfo.toProto());
-        }
-        if (this.slot != null) {
-            for (int b : this.slot) {
-                builder.addSlot(b);
-            }
-        }
-        if (this.slotItem != null) {
-            for (ItemDto b : this.slotItem) {
-                if (b != null) {
-                    builder.addSlotItem(b.toProto());
-                }
-            }
-        }
-        if (this.param != null) {
-            builder.setParam(this.param.toProto());
-        }
-        if (this.slotParam != null) {
-            builder.setSlotParam(this.slotParam.toProto());
-        }
-        return builder.build();
     }
 
     /**

@@ -1,12 +1,12 @@
 package logbook.gui;
 
+import logbook.dto.BattleExDto;
 import logbook.dto.BattleResultDto;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.TableItemCreator;
 import logbook.gui.logic.TableRowHeader;
 import logbook.internal.BattleResultFilter;
 import logbook.internal.BattleResultServer;
-import logbook.proto.LogbookEx.BattleExDtoPb;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
@@ -53,7 +53,7 @@ public final class DropReportTable extends AbstractTableDialog {
                 if (selected != -1) {
                     TableRowHeader rowHeader = (TableRowHeader) DropReportTable.this.body.get(selected)[0];
                     BattleResultDto result = (BattleResultDto) rowHeader.get();
-                    BattleExDtoPb detail = BattleResultServer.get().getBattleDetail(result);
+                    BattleExDto detail = BattleResultServer.get().getBattleDetail(result);
                     DropReportTable.this.detailDialog.setBattle(result, detail);
                     DropReportTable.this.detailDialog.open();
                 }

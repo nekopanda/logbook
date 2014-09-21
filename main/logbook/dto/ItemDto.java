@@ -4,9 +4,9 @@ import javax.json.JsonObject;
 
 import logbook.constants.AppConstants;
 import logbook.internal.ItemType;
-import logbook.proto.LogbookEx.ItemDtoPb;
-import logbook.proto.Tag;
 import logbook.util.JsonUtils;
+
+import com.dyuproject.protostuff.Tag;
 
 /**
  * 装備を表します
@@ -83,23 +83,6 @@ public final class ItemDto extends AbstractDto {
         this.name = name;
         this.param = new ShipParameters(taik, houg, houm, raig, baku, tyku, souk,
                 houk, tais, saku, luck, soku, leng);
-    }
-
-    public ItemDtoPb toProto() {
-        ItemDtoPb.Builder builder = ItemDtoPb.newBuilder();
-        builder.setId(this.id);
-        if (this.type != null) {
-            for (int b : this.type) {
-                builder.addType(b);
-            }
-        }
-        if (this.name != null) {
-            builder.setName(this.name);
-        }
-        if (this.param != null) {
-            builder.setParam(this.param.toProto());
-        }
-        return builder.build();
     }
 
     public boolean isPlane() {

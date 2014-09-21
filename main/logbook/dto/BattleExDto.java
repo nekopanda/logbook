@@ -14,10 +14,9 @@ import javax.json.JsonObject;
 
 import logbook.data.context.GlobalContext;
 import logbook.internal.EnemyData;
-import logbook.proto.LogbookEx.BattleExDtoPb;
-import logbook.proto.LogbookEx.PhasePb;
-import logbook.proto.Tag;
 import logbook.util.JsonUtils;
+
+import com.dyuproject.protostuff.Tag;
 
 /**
  * @author Nekopanda
@@ -112,7 +111,7 @@ public class BattleExDto extends AbstractDto {
 
     /////////////////////////////////////////////////
 
-    public class Phase {
+    public static class Phase {
 
         @Tag(1)
         private final BattlePhaseKind kind;
@@ -170,7 +169,7 @@ public class BattleExDto extends AbstractDto {
         @Tag(19)
         private List<BattleAtackDto> hougeki3 = null;
 
-        public Phase(JsonObject object, BattlePhaseKind kind,
+        public Phase(BattleExDto battle, JsonObject object, BattlePhaseKind kind,
                 int[] beforeFriendHp, int[] beforeFriendHpCombined, int[] beforeEnemyHp)
         {
             int numFships = beforeFriendHp.length;
@@ -280,105 +279,11 @@ public class BattleExDto extends AbstractDto {
             }
 
             // 判定を計算
-            this.estimatedRank = this.calcResultRank();
-        }
-
-        public PhasePb toProto() {
-            PhasePb.Builder builder = PhasePb.newBuilder();
-            builder.setKind(this.kind.toProto());
-            if (this.nowFriendHp != null) {
-                for (int b : this.nowFriendHp) {
-                    builder.addNowFriendHp(b);
-                }
-            }
-            if (this.nowFriendHpCombined != null) {
-                for (int b : this.nowFriendHpCombined) {
-                    builder.addNowFriendHpCombined(b);
-                }
-            }
-            if (this.nowEnemyHp != null) {
-                for (int b : this.nowEnemyHp) {
-                    builder.addNowEnemyHp(b);
-                }
-            }
-            builder.setEstimatedRank(this.estimatedRank.toProto());
-            builder.setIsNight(this.isNight);
-            if (this.supportType != null) {
-                builder.setSupportType(this.supportType);
-            }
-            if (this.touchPlane != null) {
-                for (int b : this.touchPlane) {
-                    builder.addTouchPlane(b);
-                }
-            }
-            if (this.seiku != null) {
-                builder.setSeiku(this.seiku);
-            }
-            if (this.damageRate != null) {
-                for (double b : this.damageRate) {
-                    builder.addDamageRate(b);
-                }
-            }
-            if (this.air != null) {
-                builder.setAir(this.air.toProto());
-            }
-            if (this.air2 != null) {
-                builder.setAir2(this.air2.toProto());
-            }
-            if (this.support != null) {
-                for (BattleAtackDto b : this.support) {
-                    if (b != null) {
-                        builder.addSupport(b.toProto());
-                    }
-                }
-            }
-            if (this.opening != null) {
-                for (BattleAtackDto b : this.opening) {
-                    if (b != null) {
-                        builder.addOpening(b.toProto());
-                    }
-                }
-            }
-            if (this.raigeki != null) {
-                for (BattleAtackDto b : this.raigeki) {
-                    if (b != null) {
-                        builder.addRaigeki(b.toProto());
-                    }
-                }
-            }
-            if (this.hougeki != null) {
-                for (BattleAtackDto b : this.hougeki) {
-                    if (b != null) {
-                        builder.addHougeki(b.toProto());
-                    }
-                }
-            }
-            if (this.hougeki1 != null) {
-                for (BattleAtackDto b : this.hougeki1) {
-                    if (b != null) {
-                        builder.addHougeki1(b.toProto());
-                    }
-                }
-            }
-            if (this.hougeki2 != null) {
-                for (BattleAtackDto b : this.hougeki2) {
-                    if (b != null) {
-                        builder.addHougeki2(b.toProto());
-                    }
-                }
-            }
-            if (this.hougeki3 != null) {
-                for (BattleAtackDto b : this.hougeki3) {
-                    if (b != null) {
-                        builder.addHougeki3(b.toProto());
-                    }
-                }
-            }
-            return builder.build();
+            this.estimatedRank = this.calcResultRank(battle);
         }
 
         // 勝利判定 //
-        private ResultRank calcResultRank() {
+        private ResultRank calcResultRank(BattleExDto battle) {
             boolean isCombined = (this.nowFriendHpCombined != null);
             int numFships = this.nowFriendHp.length;
             int numFshipsCombined = isCombined ? this.nowFriendHpCombined.length : 0;
@@ -394,21 +299,21 @@ public class BattleExDto extends AbstractDto {
                 if (this.nowFriendHp[i] > 0) {
                     ++friendNowShips;
                 }
-                friendGauge += BattleExDto.this.getStartFriendHp()[i] - this.nowFriendHp[i];
+                friendGauge += battle.getStartFriendHp()[i] - this.nowFriendHp[i];
             }
             if (isCombined) {
                 for (int i = 0; i < numFshipsCombined; i++) {
                     if (this.nowFriendHpCombined[i] > 0) {
                         ++friendNowShips;
                     }
-                    friendGauge += BattleExDto.this.getStartFriendHpCombined()[i] - this.nowFriendHpCombined[i];
+                    friendGauge += battle.getStartFriendHpCombined()[i] - this.nowFriendHpCombined[i];
                 }
             }
             for (int i = 0; i < numEships; i++) {
                 if (this.nowEnemyHp[i] > 0)
                     ++enemyNowShips;
 
-                enemyGauge += BattleExDto.this.getStartEnemyHp()[i] - this.nowEnemyHp[i];
+                enemyGauge += battle.getStartEnemyHp()[i] - this.nowEnemyHp[i];
             }
 
             // 轟沈・撃沈数
@@ -416,8 +321,8 @@ public class BattleExDto extends AbstractDto {
             int enemySunk = numEships - enemyNowShips;
 
             this.damageRate = new double[] {
-                    (double) friendGauge / BattleExDto.this.getFriendGaugeMax(),
-                    (double) enemyGauge / BattleExDto.this.getEnemyGaugeMax()
+                    (double) friendGauge / battle.getFriendGaugeMax(),
+                    (double) enemyGauge / battle.getEnemyGaugeMax()
             };
 
             double friendGaugeRate = Math.floor(this.damageRate[0] * 100);
@@ -540,7 +445,7 @@ public class BattleExDto extends AbstractDto {
             };
         }
 
-        public String getRankCalcInfo() {
+        public String getRankCalcInfo(BattleExDto battle) {
             boolean isCombined = (this.nowFriendHpCombined != null);
             int numFships = this.nowFriendHp.length;
             int numFshipsCombined = isCombined ? this.nowFriendHpCombined.length : 0;
@@ -556,7 +461,7 @@ public class BattleExDto extends AbstractDto {
                 if (this.nowFriendHp[i] > 0) {
                     ++friendNowShips;
                 }
-                friendGauge += BattleExDto.this.getStartFriendHp()[i] - this.nowFriendHp[i];
+                friendGauge += battle.getStartFriendHp()[i] - this.nowFriendHp[i];
 
             }
             if (isCombined) {
@@ -564,23 +469,23 @@ public class BattleExDto extends AbstractDto {
                     if (this.nowFriendHpCombined[i] > 0) {
                         ++friendNowShips;
                     }
-                    friendGauge += BattleExDto.this.getStartFriendHpCombined()[i] - this.nowFriendHpCombined[i];
+                    friendGauge += battle.getStartFriendHpCombined()[i] - this.nowFriendHpCombined[i];
                 }
             }
             for (int i = 0; i < numEships; i++) {
                 if (this.nowEnemyHp[i] > 0)
                     ++enemyNowShips;
 
-                enemyGauge += BattleExDto.this.getStartEnemyHp()[i] - this.nowEnemyHp[i];
+                enemyGauge += battle.getStartEnemyHp()[i] - this.nowEnemyHp[i];
             }
 
             //double enemyGaugeRate = (double) enemyGauge / this.enemyGaugeMax;
             //double friendGaugeRate = (double) friendGauge / this.friendGaugeMax;
 
             return "味方[艦:" + (numFships + numFshipsCombined) + "→" + friendNowShips + " ゲージ:" +
-                    friendGauge + "/" + BattleExDto.this.getFriendGaugeMax() +
+                    friendGauge + "/" + battle.getFriendGaugeMax() +
                     "] 敵[艦:" + this.nowEnemyHp.length + "→" + enemyNowShips + " ゲージ:" + enemyGauge + "/"
-                    + BattleExDto.this.getEnemyGaugeMax() +
+                    + battle.getEnemyGaugeMax() +
                     "]" +
                     //"(" + (enemyGaugeRate / friendGaugeRate) + "/" + (friendGaugeRate / enemyGaugeRate) + ") " +
                     "判定:" + this.estimatedRank.rank();
@@ -724,103 +629,6 @@ public class BattleExDto extends AbstractDto {
         this.battleDate = Calendar.getInstance().getTime();
     }
 
-    public BattleExDtoPb toProto() {
-        BattleExDtoPb.Builder builder = BattleExDtoPb.newBuilder();
-        if (this.battleDate != null) {
-            builder.setBattleDate(this.battleDate.getTime());
-        }
-        if (this.friends != null) {
-            for (DockDto b : this.friends) {
-                if (b != null) {
-                    builder.addFriends(b.toProto());
-                }
-            }
-        }
-        if (this.enemy != null) {
-            for (EnemyShipDto b : this.enemy) {
-                if (b != null) {
-                    builder.addEnemy(b.toProto());
-                }
-            }
-        }
-        if (this.maxFriendHp != null) {
-            for (int b : this.maxFriendHp) {
-                builder.addMaxFriendHp(b);
-            }
-        }
-        if (this.maxFriendHpCombined != null) {
-            for (int b : this.maxFriendHpCombined) {
-                builder.addMaxFriendHpCombined(b);
-            }
-        }
-        if (this.maxEnemyHp != null) {
-            for (int b : this.maxEnemyHp) {
-                builder.addMaxEnemyHp(b);
-            }
-        }
-        if (this.startFriendHp != null) {
-            for (int b : this.startFriendHp) {
-                builder.addStartFriendHp(b);
-            }
-        }
-        if (this.startFriendHpCombined != null) {
-            for (int b : this.startFriendHpCombined) {
-                builder.addStartFriendHpCombined(b);
-            }
-        }
-        if (this.startEnemyHp != null) {
-            for (int b : this.startEnemyHp) {
-                builder.addStartEnemyHp(b);
-            }
-        }
-        builder.setFriendGaugeMax(this.friendGaugeMax);
-        builder.setEnemyGaugeMax(this.enemyGaugeMax);
-        if (this.formation != null) {
-            for (String b : this.formation) {
-                if (b != null) {
-                    builder.addFormation(b);
-                }
-            }
-        }
-        if (this.formationMatch != null) {
-            builder.setFormationMatch(this.formationMatch);
-        }
-        if (this.sakuteki != null) {
-            for (String b : this.sakuteki) {
-                if (b != null) {
-                    builder.addSakuteki(b);
-                }
-            }
-        }
-        if (this.questName != null) {
-            builder.setQuestName(this.questName);
-        }
-        if (this.rank != null) {
-            builder.setRank(this.rank);
-        }
-        if (this.mapCellDto != null) {
-            builder.setMapCellDto(this.mapCellDto.toProto());
-        }
-        if (this.enemyName != null) {
-            builder.setEnemyName(this.enemyName);
-        }
-        builder.setDropFlag(this.dropFlag);
-        if (this.dropType != null) {
-            builder.setDropType(this.dropType);
-        }
-        if (this.dropName != null) {
-            builder.setDropName(this.dropName);
-        }
-        if (this.phaseList != null) {
-            for (Phase b : this.phaseList) {
-                if (b != null) {
-                    builder.addPhaseList(b.toProto());
-                }
-            }
-        }
-        return builder.build();
-    }
-
     public Phase addPhase(JsonObject object, BattlePhaseKind kind) {
         if (this.phaseList.size() == 0) {
             // 最初のフェーズ
@@ -862,13 +670,15 @@ public class BattleExDto extends AbstractDto {
             JsonArray shipKe = object.getJsonArray("api_ship_ke");
             JsonArray eSlots = object.getJsonArray("api_eSlot");
             JsonArray eParams = object.getJsonArray("api_eParam");
-            int numEships = shipKe.size();
-            for (int i = 0; i < numEships; i++) {
+            for (int i = 1; i < shipKe.size(); i++) {
                 int id = shipKe.getInt(i);
-                int[] slot = JsonUtils.toIntArray(eSlots.getJsonArray(i));
-                int[] param = JsonUtils.toIntArray(eParams.getJsonArray(i));
-                this.enemy.add(new EnemyShipDto(id, slot, param));
+                if (id != -1) {
+                    int[] slot = JsonUtils.toIntArray(eSlots.getJsonArray(i - 1));
+                    int[] param = JsonUtils.toIntArray(eParams.getJsonArray(i - 1));
+                    this.enemy.add(new EnemyShipDto(id, slot, param));
+                }
             }
+            int numEships = this.enemy.size();
 
             this.startFriendHp = new int[numFships];
             this.startEnemyHp = new int[numEships];
@@ -936,11 +746,11 @@ public class BattleExDto extends AbstractDto {
 
         if (this.phaseList.size() > 0) {
             Phase phase = this.phaseList.get(0);
-            this.phaseList.add(new Phase(object, kind,
+            this.phaseList.add(new Phase(this, object, kind,
                     phase.getNowFriendHp(), phase.getNowFriendHpCombined(), phase.getNowEnemyHp()));
         }
         else {
-            this.phaseList.add(new Phase(object, kind,
+            this.phaseList.add(new Phase(this, object, kind,
                     this.startFriendHp, this.startFriendHpCombined, this.startEnemyHp));
         }
 

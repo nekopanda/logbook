@@ -14,10 +14,11 @@ import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.internal.MasterData;
 import logbook.internal.Ship;
-import logbook.proto.Tag;
 import logbook.util.JsonUtils;
 
 import org.apache.commons.lang3.StringUtils;
+
+import com.dyuproject.protostuff.Tag;
 
 /**
  * @author Nekopanda

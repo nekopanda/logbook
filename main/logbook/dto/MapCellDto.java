@@ -8,8 +8,8 @@ import javax.json.JsonObject;
 import logbook.config.MasterDataConfig;
 import logbook.internal.EnemyData;
 import logbook.internal.MasterData;
-import logbook.proto.LogbookEx.MapCellDtoPb;
-import logbook.proto.Tag;
+
+import com.dyuproject.protostuff.Tag;
 
 /**
  * @author Nekopanda
@@ -46,32 +46,6 @@ public class MapCellDto implements Comparable<MapCellDto> {
         this.colorNo = object.getInt("api_color_no");
         this.bosscellNo = object.getInt("api_bosscell_no");
         this.enemyData = EnemyData.get(this.enemyId);
-    }
-
-    public MapCellDto(MapCellDtoPb pb) {
-        for (int i = 0; i < 3; ++i) {
-            this.map[i] = pb.getMap(i);
-        }
-        this.enemyId = pb.getEnemyId();
-        this.colorNo = pb.getColorNo();
-        this.bosscellNo = pb.getBosscellNo();
-        this.enemyData = null;
-    }
-
-    public MapCellDtoPb toProto() {
-        MapCellDtoPb.Builder builder = MapCellDtoPb.newBuilder();
-        if (this.map != null) {
-            for (int b : this.map) {
-                builder.addMap(b);
-            }
-        }
-        builder.setEnemyId(this.enemyId);
-        builder.setColorNo(this.colorNo);
-        builder.setBosscellNo(this.bosscellNo);
-        if (this.enemyData != null) {
-            builder.setEnemyData(this.enemyData.toProto());
-        }
-        return builder.build();
     }
 
     private String toString(boolean detailed) {

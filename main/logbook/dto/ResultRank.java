@@ -3,7 +3,6 @@
  */
 package logbook.dto;
 
-import logbook.proto.LogbookEx.ResultRankPb;
 
 /**
  * @author Nekopanda
@@ -25,46 +24,6 @@ public enum ResultRank {
     private ResultRank(String rank, String desc) {
         this.rank = rank;
         this.description = desc;
-    }
-
-    public ResultRankPb toProto() {
-        switch (this) {
-        case PERFECT:
-            return ResultRankPb.PERFECT;
-        case S:
-            return ResultRankPb.S;
-        case A:
-            return ResultRankPb.A;
-        case B:
-            return ResultRankPb.B;
-        case C:
-            return ResultRankPb.C;
-        case D:
-            return ResultRankPb.D;
-        case E:
-            return ResultRankPb.E;
-        }
-        return null;
-    }
-
-    public static ResultRank fromProto(ResultRankPb pb) {
-        switch (pb.getNumber()) {
-        case 0:
-            return PERFECT;
-        case 1:
-            return S;
-        case 2:
-            return A;
-        case 3:
-            return B;
-        case 4:
-            return C;
-        case 5:
-            return D;
-        case 6:
-            return E;
-        }
-        return null;
     }
 
     @Override

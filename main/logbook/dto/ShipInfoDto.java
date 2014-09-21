@@ -2,9 +2,9 @@ package logbook.dto;
 
 import javax.json.JsonObject;
 
-import logbook.proto.LogbookEx.ShipInfoDtoPb;
-import logbook.proto.Tag;
 import logbook.util.JsonUtils;
+
+import com.dyuproject.protostuff.Tag;
 
 /**
  * 艦娘の名前と種別を表します
@@ -84,6 +84,8 @@ public final class ShipInfoDto extends AbstractDto {
         this.flagship = flagship;
         this.maxBull = maxBull;
         this.maxFuel = maxFuel;
+        this.param = new ShipParameters();
+        this.max = new ShipParameters();
     }
 
     /**
@@ -112,42 +114,6 @@ public final class ShipInfoDto extends AbstractDto {
         ShipParameters[] params = ShipParameters.fromMasterShip(object);
         this.param = params[0];
         this.max = params[1];
-    }
-
-    public ShipInfoDtoPb toProto() {
-        ShipInfoDtoPb.Builder builder = ShipInfoDtoPb.newBuilder();
-        if (this.name != null) {
-            builder.setName(this.name);
-        }
-        builder.setShipId(this.shipId);
-        builder.setStype(this.stype);
-        if (this.type != null) {
-            builder.setType(this.type);
-        }
-        builder.setAfterlv(this.afterlv);
-        builder.setAftershipid(this.aftershipid);
-        if (this.flagship != null) {
-            builder.setFlagship(this.flagship);
-        }
-        builder.setMaxBull(this.maxBull);
-        builder.setMaxFuel(this.maxFuel);
-        if (this.powup != null) {
-            for (int b : this.powup) {
-                builder.addPowup(b);
-            }
-        }
-        if (this.maxeq != null) {
-            for (int b : this.maxeq) {
-                builder.addMaxeq(b);
-            }
-        }
-        if (this.param != null) {
-            builder.setParam(this.param.toProto());
-        }
-        if (this.max != null) {
-            builder.setMax(this.max.toProto());
-        }
-        return builder.build();
     }
 
     /**

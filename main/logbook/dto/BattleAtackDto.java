@@ -12,8 +12,7 @@ import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
-import logbook.proto.LogbookEx.BattleAtackDtoPb;
-import logbook.proto.Tag;
+import com.dyuproject.protostuff.Tag;
 
 /**
  * @author Nekopanda
@@ -35,38 +34,6 @@ public class BattleAtackDto {
     public int[] target; // 攻撃先(0-11)
     @Tag(7)
     public int[] damage; // ダメージ
-
-    public BattleAtackDtoPb toProto() {
-        BattleAtackDtoPb.Builder builder = BattleAtackDtoPb.newBuilder();
-        builder.setKind(this.kind.toProto());
-        builder.setFriendAtack(this.friendAtack);
-        if (this.origin != null) {
-            for (int b : this.origin) {
-                builder.addOrigin(b);
-            }
-        }
-        if (this.ot != null) {
-            for (int b : this.ot) {
-                builder.addOt(b);
-            }
-        }
-        if (this.ydam != null) {
-            for (int b : this.ydam) {
-                builder.addYdam(b);
-            }
-        }
-        if (this.target != null) {
-            for (int b : this.target) {
-                builder.addTarget(b);
-            }
-        }
-        if (this.damage != null) {
-            for (int b : this.damage) {
-                builder.addDamage(b);
-            }
-        }
-        return builder.build();
-    }
 
     private static List<BattleAtackDto> makeHougeki(
             JsonArray at_list, JsonArray df_list, JsonArray damage_list) {

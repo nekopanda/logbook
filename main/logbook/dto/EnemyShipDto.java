@@ -3,8 +3,7 @@
  */
 package logbook.dto;
 
-import logbook.proto.LogbookEx.EnemyShipDtoPb;
-import logbook.proto.Tag;
+import com.dyuproject.protostuff.Tag;
 
 /**
  * @author Nekopanda
@@ -34,36 +33,6 @@ public class EnemyShipDto extends ShipBaseDto {
         this.raisou = param[0];
         this.taiku = param[0];
         this.soukou = param[0];
-    }
-
-    public EnemyShipDtoPb toProto() {
-        EnemyShipDtoPb.Builder builder = EnemyShipDtoPb.newBuilder();
-        builder.setKaryoku(this.karyoku);
-        builder.setRaisou(this.raisou);
-        builder.setTaiku(this.taiku);
-        builder.setSoukou(this.soukou);
-        if (this.shipInfo != null) {
-            builder.setShipInfo(this.shipInfo.toProto());
-        }
-        if (this.slot != null) {
-            for (int b : this.slot) {
-                builder.addSlot(b);
-            }
-        }
-        if (this.slotItem != null) {
-            for (ItemDto b : this.slotItem) {
-                if (b != null) {
-                    builder.addSlotItem(b.toProto());
-                }
-            }
-        }
-        if (this.param != null) {
-            builder.setParam(this.param.toProto());
-        }
-        if (this.slotParam != null) {
-            builder.setSlotParam(this.slotParam.toProto());
-        }
-        return builder.build();
     }
 
     /**

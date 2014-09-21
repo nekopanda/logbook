@@ -16,10 +16,10 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import logbook.constants.AppConstants;
-import logbook.proto.LogbookEx.EnemyDataPb;
-import logbook.proto.Tag;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
+
+import com.dyuproject.protostuff.Tag;
 
 /**
  * @author Nekopanda
@@ -43,25 +43,6 @@ public class EnemyData {
         this.enemyName = enemyName;
         this.enemyShips = enemyShips;
         this.formation = formation;
-    }
-
-    public EnemyDataPb toProto() {
-        EnemyDataPb.Builder builder = EnemyDataPb.newBuilder();
-        builder.setEnemyId(this.enemyId);
-        if (this.enemyName != null) {
-            builder.setEnemyName(this.enemyName);
-        }
-        if (this.enemyShips != null) {
-            for (String b : this.enemyShips) {
-                if (b != null) {
-                    builder.addEnemyShips(b);
-                }
-            }
-        }
-        if (this.formation != null) {
-            builder.setFormation(this.formation);
-        }
-        return builder.build();
     }
 
     /**

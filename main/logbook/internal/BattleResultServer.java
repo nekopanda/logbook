@@ -26,7 +26,6 @@ import logbook.constants.AppConstants;
 import logbook.dto.BattleExDto;
 import logbook.dto.BattleResultDto;
 import logbook.gui.logic.IntegerPair;
-import logbook.proto.LogbookEx.BattleExDtoPb;
 import logbook.util.ReportUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -34,6 +33,11 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.dyuproject.protostuff.LinkedBuffer;
+import com.dyuproject.protostuff.ProtostuffIOUtil;
+import com.dyuproject.protostuff.Schema;
+import com.dyuproject.protostuff.runtime.RuntimeSchema;
 
 /**
  * @author Nekopanda
@@ -45,11 +49,13 @@ public class BattleResultServer {
 
     private static DateFormat format = new SimpleDateFormat(AppConstants.BATTLE_LOGFILE_DATE_FORMAT);
 
+    private static Schema<BattleExDto> schema = RuntimeSchema.getSchema(BattleExDto.class);
+
     private static class BattleResult extends BattleResultDto {
         public File file;
         public int index;
 
-        BattleResult(BattleExDtoPb dto, File file, int index) {
+        BattleResult(BattleExDto dto, File file, int index) {
             super(dto);
             this.file = file;
             this.index = index;
@@ -67,6 +73,7 @@ public class BattleResultServer {
     }
 
     private final String path;
+    private final LinkedBuffer buffer = LinkedBuffer.allocate(128 * 1024);
 
     private Date firstBattleTime;
     private Date lastBattleTime;
@@ -79,14 +86,14 @@ public class BattleResultServer {
 
     // キャッシュ
     private File cachedFile;
-    private List<BattleExDtoPb> cachedResult;
+    private List<BattleExDto> cachedResult;
 
     private BattleResultServer(String path) {
         this.path = path;
         // ファイルを読み込んで resultList を作成
         for (File file : FileUtils.listFiles(new File(path), new String[] { "dat" }, true)) {
             try {
-                List<BattleExDtoPb> result = readResultFile(file);
+                List<BattleExDto> result = this.readResultFile(file);
                 for (int i = 0; i < result.size(); ++i) {
                     this.resultList.add(new BattleResult(result.get(i), file, i));
                 }
@@ -132,11 +139,13 @@ public class BattleResultServer {
         });
     }
 
-    private static List<BattleExDtoPb> readResultFile(File file) throws IOException {
-        List<BattleExDtoPb> result = new ArrayList<BattleExDtoPb>();
+    private List<BattleExDto> readResultFile(File file) throws IOException {
+        List<BattleExDto> result = new ArrayList<BattleExDto>();
         FileInputStream input = new FileInputStream(file);
         while (input.available() > 0) {
-            result.add(BattleExDtoPb.parseDelimitedFrom(input));
+            BattleExDto battle = schema.newMessage();
+            ProtostuffIOUtil.mergeDelimitedFrom(input, battle, schema, this.buffer);
+            result.add(battle);
         }
         input.close();
         return result;
@@ -148,13 +157,13 @@ public class BattleResultServer {
 
     public void addNewResult(BattleExDto dto) {
         File file = new File(FilenameUtils.concat(this.path, format.format(new Date()) + ".dat"));
-        BattleExDtoPb pbdto = dto.toProto();
         try {
             FileOutputStream output = null;
             try {
                 // ファイルとリストに追加
                 output = new FileOutputStream(getStoreFile(file), true);
-                pbdto.writeDelimitedTo(output);
+                ProtostuffIOUtil.writeDelimitedTo(output, dto, schema, this.buffer);
+                this.buffer.clear();
             } catch (IOException e) {
                 LOG.warn("出撃ログの書き込みに失敗しました", e);
             } finally {
@@ -167,11 +176,11 @@ public class BattleResultServer {
         }
         // ファイルとリストに追加
         int index = this.numRecordsMap.get(file.getPath());
-        this.resultList.add(new BattleResult(pbdto, file, index));
+        this.resultList.add(new BattleResult(dto, file, index));
         this.numRecordsMap.put(file.getPath(), index + 1);
         // キャッシュされているときはキャッシュにも追加
         if ((this.cachedFile != null) && file.equals(this.cachedFile)) {
-            this.cachedResult.add(pbdto);
+            this.cachedResult.add(dto);
         }
     }
 
@@ -217,12 +226,12 @@ public class BattleResultServer {
     }
 
     /** 詳細を読み込む（失敗したら null ） */
-    public BattleExDtoPb getBattleDetail(BattleResultDto summary) {
+    public BattleExDto getBattleDetail(BattleResultDto summary) {
         BattleResult result = (BattleResult) summary;
         if ((this.cachedFile == null) || (result.file.equals(this.cachedFile) == false)) {
             this.cachedFile = result.file;
             try {
-                this.cachedResult = readResultFile(result.file);
+                this.cachedResult = this.readResultFile(result.file);
             } catch (IOException e) {
                 return null;
             }

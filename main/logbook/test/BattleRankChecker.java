@@ -21,6 +21,11 @@ import logbook.dto.ResultRank;
 
 import org.apache.commons.io.FileUtils;
 
+import com.dyuproject.protostuff.LinkedBuffer;
+import com.dyuproject.protostuff.ProtostuffIOUtil;
+import com.dyuproject.protostuff.Schema;
+import com.dyuproject.protostuff.runtime.RuntimeSchema;
+
 /**
  * @author Nekopanda
  *
@@ -44,6 +49,8 @@ public class BattleRankChecker {
         int[] rankCount = new int[10];
         try {
             FileOutputStream output = new FileOutputStream("dump-data.dat");
+            Schema<BattleExDto> schema = RuntimeSchema.getSchema(BattleExDto.class);
+            LinkedBuffer buffer = LinkedBuffer.allocate(128 * 1024);
             BattleExDto battle = null;
             for (int i = 0; i < fileNameList.length; ++i) {
                 String fileName = fileNameList[i];
@@ -113,10 +120,11 @@ public class BattleRankChecker {
                         ResultRank estimatedRank = battle.getLastPhase().getEstimatedRank();
                         if (!battle.getRank().equals(estimatedRank.rank())) {
                             System.out.println("戦闘結果判定ミス: 正解ランク:" + battle.getRank() + " "
-                                    + battle.getLastPhase().getRankCalcInfo());
+                                    + battle.getLastPhase().getRankCalcInfo(battle));
                         }
 
-                        battle.toProto().writeDelimitedTo(output);
+                        ProtostuffIOUtil.writeDelimitedTo(output, battle, schema, buffer);
+                        buffer.clear();
 
                         battle = null;
                         ++resultCount;

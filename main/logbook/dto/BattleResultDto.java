@@ -5,8 +5,6 @@ import java.util.Date;
 
 import javax.json.JsonObject;
 
-import logbook.proto.LogbookEx.BattleExDtoPb;
-
 /**
  * 海戦とドロップした艦娘を表します
  */
@@ -65,13 +63,13 @@ public class BattleResultDto extends AbstractDto {
         this.battle = battle;
     }
 
-    public BattleResultDto(BattleExDtoPb dto) {
-        this.battleDate = new Date(dto.getBattleDate());
+    public BattleResultDto(BattleExDto dto) {
+        this.battleDate = dto.getBattleDate();
         this.questName = dto.getQuestName();
         this.rank = dto.getRank();
-        this.mapCell = new MapCellDto(dto.getMapCellDto());
+        this.mapCell = dto.getMapCellDto();
         this.enemyName = dto.getEnemyName();
-        this.dropFlag = dto.getDropFlag();
+        this.dropFlag = dto.getDropName().length() > 0;
         this.dropType = dto.getDropType();
         this.dropName = dto.getDropName();
         this.battle = null;

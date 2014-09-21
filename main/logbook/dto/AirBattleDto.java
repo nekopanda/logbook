@@ -9,8 +9,7 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
-import logbook.proto.LogbookEx.AirBattleDtoPb;
-import logbook.proto.Tag;
+import com.dyuproject.protostuff.Tag;
 
 /**
  * @author Nekopanda
@@ -64,36 +63,6 @@ public class AirBattleDto {
                 kouku.getJsonArray("api_plane_from"),
                 kouku.get("api_stage3"),
                 isCombined ? kouku.get("api_stage3_combined") : null);
-    }
-
-    public AirBattleDtoPb toProto() {
-        AirBattleDtoPb.Builder builder = AirBattleDtoPb.newBuilder();
-        if (this.atacks != null) {
-            for (BattleAtackDto b : this.atacks) {
-                if (b != null) {
-                    builder.addAtacks(b.toProto());
-                }
-            }
-        }
-        if (this.touchPlane != null) {
-            for (int b : this.touchPlane) {
-                builder.addTouchPlane(b);
-            }
-        }
-        if (this.seiku != null) {
-            builder.setSeiku(this.seiku);
-        }
-        if (this.stage1 != null) {
-            for (int b : this.stage1) {
-                builder.addStage1(b);
-            }
-        }
-        if (this.stage2 != null) {
-            for (int b : this.stage2) {
-                builder.addStage2(b);
-            }
-        }
-        return builder.build();
     }
 
     private static String toSeiku(int id) {

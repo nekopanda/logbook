@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import logbook.constants.AppConstants;
+import logbook.dto.BattleExDto;
+import logbook.dto.BattleExDto.Phase;
 import logbook.dto.BattleResultDto;
 import logbook.internal.BattleResultServer;
-import logbook.proto.LogbookEx.BattleExDtoPb;
-import logbook.proto.LogbookEx.PhasePb;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
@@ -34,7 +34,7 @@ public class BattleDetailDialog extends WindowBase {
     private static final Logger LOG = LogManager.getLogger(BattleResultServer.class);
 
     private BattleResultDto result;
-    private BattleExDtoPb detail;
+    private BattleExDto detail;
     private Browser browser;
 
     /*
@@ -179,7 +179,7 @@ public class BattleDetailDialog extends WindowBase {
         this.browser = new Browser(shell, SWT.NONE);
     }
 
-    public void setBattle(BattleResultDto result, BattleExDtoPb detail) {
+    public void setBattle(BattleResultDto result, BattleExDto detail) {
         Shell shell = this.getShell();
         String title = "会敵報告: " + result.getMapCell().detailedString();
         shell.setText(title);
@@ -192,11 +192,11 @@ public class BattleDetailDialog extends WindowBase {
         }
     }
 
-    private static void genPhase(HTMLGenerator gen, PhasePb phase) {
+    private static void genPhase(HTMLGenerator gen, Phase phase) {
         //
     }
 
-    private static String generateHTML(String title, BattleResultDto result, BattleExDtoPb detail)
+    private static String generateHTML(String title, BattleResultDto result, BattleExDto detail)
             throws IOException
     {
         HTMLGenerator gen = new HTMLGenerator();
@@ -212,10 +212,10 @@ public class BattleDetailDialog extends WindowBase {
 
         gen.inline("hr", null);
 
-        int numPhases = detail.getPhaseListCount();
+        int numPhases = detail.getPhaseList().size();
         for (int i = 0; i < numPhases; ++i) {
-            PhasePb phase = detail.getPhaseList(i);
-            String phaseTitle = (i + 1) + "/" + numPhases + "フェイズ: " + (phase.getIsNight() ? "夜戦" : "昼戦");
+            Phase phase = detail.getPhaseList().get(i);
+            String phaseTitle = (i + 1) + "/" + numPhases + "フェイズ: " + (phase.isNight() ? "夜戦" : "昼戦");
             gen.inline("h3", phaseTitle, null);
             genPhase(gen, phase);
         }

@@ -7,8 +7,7 @@ import java.util.List;
 
 import javax.json.JsonObject;
 
-import logbook.proto.LogbookEx.ShipParametersPb;
-import logbook.proto.Tag;
+import com.dyuproject.protostuff.Tag;
 
 /**
  * @author Nekopanda
@@ -87,24 +86,6 @@ public class ShipParameters {
         this.tais = tais;
         this.tyku = tyku;
         this.kaih = kaih;
-    }
-
-    public ShipParametersPb toProto() {
-        ShipParametersPb.Builder builder = ShipParametersPb.newBuilder();
-        builder.setTaik(this.taik);
-        builder.setHoug(this.houg);
-        builder.setHoum(this.houm);
-        builder.setRaig(this.raig);
-        builder.setBaku(this.baku);
-        builder.setTyku(this.tyku);
-        builder.setSouk(this.souk);
-        builder.setKaih(this.kaih);
-        builder.setTais(this.tais);
-        builder.setSaku(this.saku);
-        builder.setLuck(this.luck);
-        builder.setSoku(this.soku);
-        builder.setLeng(this.leng);
-        return builder.build();
     }
 
     /** マスターデータ用 */
