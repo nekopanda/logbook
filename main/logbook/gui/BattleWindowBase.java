@@ -147,8 +147,6 @@ public class BattleWindowBase extends WindowBase {
     }
 
     protected void addVerticalSeparator(int span) {
-        //Label lblsp1 = new Label(this.getShell(), SWT.SEPARATOR | SWT.VERTICAL);
-        //lblsp1.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, false, false, 1, span));
         Label label = new Label(this.getShell(), SWT.SEPARATOR | SWT.VERTICAL);
         GridData gd = new GridData(SWT.CENTER, SWT.FILL, false, false, 1, span);
         gd.widthHint = 10;

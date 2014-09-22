@@ -8,7 +8,6 @@ import java.util.List;
 import logbook.config.AppConfig;
 import logbook.dto.ItemDto;
 import logbook.dto.ShipBaseDto;
-import logbook.dto.ShipDto;
 
 /**
  * @author Nekopanda
@@ -28,14 +27,14 @@ public class SakutekiString implements Comparable<SakutekiString> {
     // 情報が不足してて計算できなかった
     private boolean sakutekiFailed = false;
 
-    public SakutekiString(List<ShipDto> ships) {
-        for (ShipDto ship : ships) {
+    public <SHIP extends ShipBaseDto> SakutekiString(List<SHIP> ships) {
+        for (SHIP ship : ships) {
             this.add(ship);
         }
         this.calc();
     }
 
-    public SakutekiString(ShipDto ship) {
+    public SakutekiString(ShipBaseDto ship) {
         this.add(ship);
         this.calc();
     }

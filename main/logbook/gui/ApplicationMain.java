@@ -124,8 +124,10 @@ public final class ApplicationMain extends WindowBase {
     private BathwaterTableDialog bathwaterTablwWindow;
     /** 任務一覧 */
     private QuestTable questTableWindow;
-    /** 戦況 */
-    private BattleWindow battleWindow;
+    /** 戦況(大) */
+    private BattleWindowLarge battleWindowLarge;
+    /** 戦況(小) */
+    private BattleWindowSmall battleWindowSmall;
     /** 自軍敵軍パラメータ */
     private BattleShipWindow battleShipWindow;
     /** 経験値計算 */
@@ -349,9 +351,15 @@ public final class ApplicationMain extends WindowBase {
 
         // 表示-戦況ウィンドウ 
         MenuItem battleWinMenu = new MenuItem(cmdmenu, SWT.CHECK);
-        battleWinMenu.setText("戦況(&W)\tCtrl+W");
+        battleWinMenu.setText("戦況-大(&W)\tCtrl+W");
         battleWinMenu.setAccelerator(SWT.CTRL + 'W');
-        this.battleWindow = new BattleWindow(this.dummyHolder, battleWinMenu);
+        this.battleWindowLarge = new BattleWindowLarge(this.dummyHolder, battleWinMenu);
+
+        // 表示-戦況ウィンドウ （小）
+        MenuItem battleWinSMenu = new MenuItem(cmdmenu, SWT.CHECK);
+        battleWinSMenu.setText("戦況-小(&S)\tCtrl+S");
+        battleWinSMenu.setAccelerator(SWT.CTRL + 'W');
+        this.battleWindowSmall = new BattleWindowSmall(this.dummyHolder, battleWinMenu);
 
         // 表示-敵味方パラメータ
         MenuItem battleShipWinMenu = new MenuItem(cmdmenu, SWT.CHECK);
@@ -731,7 +739,8 @@ public final class ApplicationMain extends WindowBase {
                 this.shipTableWindows[3],
                 this.bathwaterTablwWindow,
                 this.questTableWindow,
-                this.battleWindow,
+                this.battleWindowLarge,
+                this.battleWindowSmall,
                 this.battleShipWindow,
                 this.calcExpWindow,
                 this.shipFilterGroupWindow,
@@ -995,8 +1004,12 @@ public final class ApplicationMain extends WindowBase {
         return this.consoleComposite;
     }
 
-    public BattleWindow getBattleWindow() {
-        return this.battleWindow;
+    public BattleWindow getBattleWindowLarge() {
+        return this.battleWindowLarge;
+    }
+
+    public BattleWindow getBattleWindowSmall() {
+        return this.battleWindowSmall;
     }
 
     public BattleShipWindow getBattleShipWindow() {

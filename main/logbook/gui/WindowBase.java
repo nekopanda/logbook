@@ -450,6 +450,8 @@ public class WindowBase {
                 }
             }
         });
+        // セパレータ
+        new MenuItem(rootMenu, SWT.SEPARATOR);
         // 透明度
         this.opacity = new MenuItem[ALPHA_VALUES.length];
         for (int i = 0; i < this.opacity.length; ++i) {

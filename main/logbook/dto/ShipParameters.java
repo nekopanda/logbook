@@ -177,31 +177,31 @@ public class ShipParameters {
         this.taik += o.taik;
         this.houg += o.houg;
         this.houm += o.houm;
-        this.leng += o.leng;
         this.raig += o.raig;
         this.baku += o.baku;
         this.tyku += o.tyku;
-        this.soku += o.soku;
         this.souk += o.souk;
         this.kaih += o.kaih;
         this.tais += o.tais;
         this.saku += o.saku;
         this.luck += o.luck;
+        this.leng = Math.max(this.leng, o.leng);
+        this.soku = Math.max(this.soku, o.soku);
     }
 
     public void subtract(ShipParameters o) {
         this.taik -= o.taik;
         this.houg -= o.houg;
-        this.houm += o.houm;
-        this.leng -= o.leng;
+        this.houm -= o.houm;
         this.raig -= o.raig;
         this.tyku -= o.tyku;
-        this.soku -= o.soku;
         this.souk -= o.souk;
         this.kaih -= o.kaih;
         this.tais -= o.tais;
         this.saku -= o.saku;
         this.luck -= o.luck;
+        this.leng = Math.max(this.leng, o.leng);
+        this.soku = Math.max(this.soku, o.soku);
     }
 
     @Override

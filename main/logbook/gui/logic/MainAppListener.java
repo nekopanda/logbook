@@ -11,6 +11,7 @@ import logbook.dto.BattleExDto;
 import logbook.dto.DockDto;
 import logbook.dto.MapCellDto;
 import logbook.gui.ApplicationMain;
+import logbook.gui.BattleWindowBase;
 
 /**
  * コンソールを更新するイベントハンドラ
@@ -63,34 +64,47 @@ public class MainAppListener {
         return null;
     }
 
+    private BattleWindowBase[] getBattleWindowList() {
+        return new BattleWindowBase[] {
+                this.main.getBattleWindowLarge(),
+                this.main.getBattleWindowSmall(),
+                this.main.getBattleShipWindow()
+        };
+    }
+
     public void startSortie() {
         List<DockDto> sortieDocks = this.getSortieDocks();
         if (sortieDocks != null) {
-            this.main.getBattleWindow().updateSortieDock(sortieDocks);
-            this.main.getBattleShipWindow().updateSortieDock(sortieDocks);
+            for (BattleWindowBase window : this.getBattleWindowList()) {
+                window.updateSortieDock(sortieDocks);
+            }
         }
     }
 
     public void endSortie() {
-        this.main.getBattleWindow().endSortie();
-        this.main.getBattleShipWindow().endSortie();
+        for (BattleWindowBase window : this.getBattleWindowList()) {
+            window.endSortie();
+        }
     }
 
     public void updateSortieDock() {
         List<DockDto> sortieDocks = this.getSortieDocks();
         if (sortieDocks != null) {
-            this.main.getBattleWindow().updateSortieDock(sortieDocks);
-            this.main.getBattleShipWindow().updateSortieDock(sortieDocks);
+            for (BattleWindowBase window : this.getBattleWindowList()) {
+                window.updateSortieDock(sortieDocks);
+            }
         }
     }
 
     public void updateMapCell(MapCellDto mapCellDto) {
-        this.main.getBattleWindow().updateMapCell(mapCellDto);
-        this.main.getBattleShipWindow().updateMapCell(mapCellDto);
+        for (BattleWindowBase window : this.getBattleWindowList()) {
+            window.updateMapCell(mapCellDto);
+        }
     }
 
     public void updateBattle(BattleExDto battleDto) {
-        this.main.getBattleWindow().updateBattle(battleDto);
-        this.main.getBattleShipWindow().updateBattle(battleDto);
+        for (BattleWindowBase window : this.getBattleWindowList()) {
+            window.updateBattle(battleDto);
+        }
     }
 }
