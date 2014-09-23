@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import logbook.config.ShipConfig;
 import logbook.dto.ShipInfoDto;
 
 /**
@@ -619,6 +620,13 @@ public class Ship {
             this.put("600", ShipInfoDto.EMPTY);
         }
     };
+
+    // 始めてアクセスがあった時に読み込む
+    public static final boolean INIT_COMPLETE;
+    static {
+        ShipConfig.load();
+        INIT_COMPLETE = true;
+    }
 
     /**
      * 艦娘を取得します

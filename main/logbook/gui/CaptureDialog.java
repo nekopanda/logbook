@@ -49,6 +49,7 @@ import org.eclipse.swt.widgets.Text;
  */
 public final class CaptureDialog extends WindowBase {
 
+    private final Shell parent;
     private Shell shell;
 
     private Composite composite;
@@ -69,9 +70,7 @@ public final class CaptureDialog extends WindowBase {
      */
     public CaptureDialog(Shell parent, MenuItem menuItem) {
         super(menuItem);
-        //super.createContents(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
-        super.createContents(Display.getDefault(), SWT.CLOSE | SWT.ON_TOP | SWT.TITLE | SWT.RESIZE | SWT.TOOL, false);
-        this.getShell().setText("キャプチャ");
+        this.parent = parent;
     }
 
     /**
@@ -98,6 +97,8 @@ public final class CaptureDialog extends WindowBase {
      */
     private void createContents() {
         // シェル
+        super.createContents(this.parent, SWT.CLOSE | SWT.ON_TOP | SWT.TITLE | SWT.RESIZE | SWT.TOOL, false);
+        this.getShell().setText("キャプチャ");
         this.shell = this.getShell();
         // レイアウト
         GridLayout glShell = new GridLayout(1, false);

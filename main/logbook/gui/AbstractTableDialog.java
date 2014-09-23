@@ -38,6 +38,8 @@ import org.eclipse.swt.widgets.TableColumn;
  */
 public abstract class AbstractTableDialog extends WindowBase {
 
+    private final Shell parent;
+
     /** タイマー */
     protected Timer timer;
 
@@ -83,7 +85,7 @@ public abstract class AbstractTableDialog extends WindowBase {
      */
     public AbstractTableDialog(Shell parent, MenuItem menuItem) {
         super(menuItem);
-        super.createContents(parent, SWT.SHELL_TRIM | SWT.MODELESS, true);
+        this.parent = parent;
     }
 
     /**
@@ -100,6 +102,7 @@ public abstract class AbstractTableDialog extends WindowBase {
         }
 
         // シェルを作成
+        super.createContents(this.parent, SWT.SHELL_TRIM | SWT.MODELESS, true);
         this.shell = this.getShell();
         this.shell.setText(this.getTitle());
         this.shell.setLayout(new FillLayout());

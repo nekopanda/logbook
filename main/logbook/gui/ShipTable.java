@@ -168,6 +168,9 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
                 ShipGroupObserver.removeListener(ShipTable.this);
             }
         });
+
+        // ウィンドウタイトルを設定
+        this.shell.setText(this.getTitle());
     }
 
     @Override
@@ -222,6 +225,12 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
      */
     public ShipFilterDto getFilter() {
         return this.filter;
+    }
+
+    public void windowTitleChanged() {
+        if (this.shell != null) {
+            this.shell.setText(this.getTitle());
+        }
     }
 
     private static Menu recreateCascadeMenu(MenuItem menuItem) {

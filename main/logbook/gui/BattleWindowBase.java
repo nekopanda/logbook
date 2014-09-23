@@ -28,8 +28,10 @@ import org.eclipse.wb.swt.SWTResourceManager;
  */
 public class BattleWindowBase extends WindowBase {
 
-    private final Font normalFont;
-    private final Font boldFont;
+    private final Shell parent;
+
+    private Font normalFont;
+    private Font boldFont;
 
     // タイトル
     private final String windowText;
@@ -50,19 +52,21 @@ public class BattleWindowBase extends WindowBase {
      */
     public BattleWindowBase(Shell parent, MenuItem menuItem, String windowText) {
         super(menuItem);
-        super.createContents(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
+        this.parent = parent;
         this.windowText = windowText;
-        this.normalFont = this.getShell().getFont();
-        FontData fontData = this.normalFont.getFontData()[0];
-        String fontName = fontData.getName();
-        int size = fontData.getHeight();
-        this.boldFont = SWTResourceManager.getFont(fontName, size, SWT.BOLD);
-        this.getShell().setText(this.windowText);
     }
 
     @Override
     public void open() {
         if (!this.isWindowInitialized()) {
+            super.createContents(this.parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
+            this.normalFont = this.getShell().getFont();
+            FontData fontData = this.normalFont.getFontData()[0];
+            String fontName = fontData.getName();
+            int size = fontData.getHeight();
+            this.boldFont = SWTResourceManager.getFont(fontName, size, SWT.BOLD);
+            this.getShell().setText(this.windowText);
+
             this.createContents();
             super.registerEvents();
             this.createContentsAfter();

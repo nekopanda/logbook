@@ -17,6 +17,10 @@ public class MasterDataConfig {
 
     public static MasterData instance = null;
 
+    static {
+        load();
+    }
+
     public static MasterData get() {
         if (instance == null) {
             instance = new MasterData();

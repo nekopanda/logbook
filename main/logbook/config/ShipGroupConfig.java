@@ -20,6 +20,11 @@ public class ShipGroupConfig {
     /** 所有艦娘グループ */
     private static ShipGroupListBean group;
 
+    // 始めてアクセスした時に読み込む
+    static {
+        load();
+    }
+
     /**
      * 設定ファイルに書き込みます
      */
@@ -33,7 +38,7 @@ public class ShipGroupConfig {
     /**
      * 所有艦娘グループを読み込みます
      */
-    public static void load() {
+    private static void load() {
         try {
             ShipGroupListBean bean = BeanUtils.readObject(AppConstants.GROUP_CONFIG_FILE, ShipGroupListBean.class);
             if (bean != null) {

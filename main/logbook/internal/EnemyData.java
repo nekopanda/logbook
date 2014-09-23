@@ -16,6 +16,10 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import logbook.constants.AppConstants;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
@@ -27,7 +31,20 @@ import com.dyuproject.protostuff.Tag;
  */
 public class EnemyData {
 
+    /** ロガー */
+    private static final Logger LOG = LogManager.getLogger(EnemyData.class);
     private static Map<Integer, EnemyData> ENEMY = new TreeMap<Integer, EnemyData>();
+
+    // 始めてアクセスがあった時に読み込む
+    public static final boolean INIT_COMPLETE;
+    static {
+        try {
+            load();
+        } catch (IOException e) {
+            LOG.warn("e_idと敵艦隊の対応ファイル読み込みに失敗しました", e);
+        }
+        INIT_COMPLETE = true;
+    }
 
     @Tag(1)
     private final int enemyId;

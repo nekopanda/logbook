@@ -580,23 +580,25 @@ public class WindowBase {
      * 状態を保存
      */
     public void save() {
-        this.getWindowConfig();
-        boolean opened = this.shell.getVisible();
-        this.config.setOpened(opened);
-        if (opened && !this.shell.getMaximized()) { // 最大化されているときは記憶しない
-            Point location = this.shell.getLocation();
-            this.config.setLocationX(location.x);
-            this.config.setLocationY(location.y);
-            this.config.setMouseHoveringAware(this.treeNode.getMouseHoverAware());
-            this.config.setShareOpacitySetting(this.shareOpacitySetting);
-            this.config.setOpacityIndex(this.opacityIndex);
-            if (this.shouldSaveWindowSize()) {
-                Point size = this.shell.getSize();
-                this.config.setWidth(size.x);
-                this.config.setHeight(size.y);
+        if (this.shell != null) { // ウィンドウが作られていないときは何もしない
+            this.getWindowConfig();
+            boolean opened = this.shell.getVisible();
+            this.config.setOpened(opened);
+            if (opened && !this.shell.getMaximized()) { // 最大化されているときは記憶しない
+                Point location = this.shell.getLocation();
+                this.config.setLocationX(location.x);
+                this.config.setLocationY(location.y);
+                this.config.setMouseHoveringAware(this.treeNode.getMouseHoverAware());
+                this.config.setShareOpacitySetting(this.shareOpacitySetting);
+                this.config.setOpacityIndex(this.opacityIndex);
+                if (this.shouldSaveWindowSize()) {
+                    Point size = this.shell.getSize();
+                    this.config.setWidth(size.x);
+                    this.config.setHeight(size.y);
+                }
             }
+            AppConfig.get().getWindowConfigMap().put(this.getWindowId(), this.config);
         }
-        AppConfig.get().getWindowConfigMap().put(this.getWindowId(), this.config);
     }
 
     /**

@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -61,11 +62,11 @@ public class BattleResultServer {
         }
     }
 
+    private static String logPath = null;
     private static volatile BattleResultServer instance = null;
 
-    public synchronized static void initialize(String path, Object nofityStart) {
-        nofityStart.notify();
-        instance = new BattleResultServer(path);
+    public static void setLogPath(String path) {
+        logPath = path;
     }
 
     public static void dispose() {
@@ -76,7 +77,7 @@ public class BattleResultServer {
         if (instance == null) {
             synchronized (BattleResultServer.class) {
                 if (instance == null) {
-                    throw new RuntimeException("出撃ログの読み込みに失敗しています（または初期化されていない？）");
+                    instance = new BattleResultServer(logPath);
                 }
             }
         }
@@ -103,15 +104,18 @@ public class BattleResultServer {
     private BattleResultServer(String path) {
         this.path = path;
         // ファイルを読み込んで resultList を作成
-        for (File file : FileUtils.listFiles(new File(path), new String[] { "dat" }, true)) {
-            try {
-                List<BattleExDto> result = this.readResultFile(file);
-                for (int i = 0; i < result.size(); ++i) {
-                    this.resultList.add(new BattleResult(result.get(i), file, i));
+        File dir = new File(path);
+        if (dir.exists()) {
+            for (File file : FileUtils.listFiles(dir, new String[] { "dat" }, true)) {
+                try {
+                    List<BattleExDto> result = this.readResultFile(file);
+                    for (int i = 0; i < result.size(); ++i) {
+                        this.resultList.add(new BattleResult(result.get(i), file, i));
+                    }
+                    this.numRecordsMap.put(file.getPath(), result.size());
+                } catch (IOException e) {
+                    LOG.warn("出撃ログの読み込みに失敗しました (" + file.getPath() + ")", e);
                 }
-                this.numRecordsMap.put(file.getPath(), result.size());
-            } catch (IOException e) {
-                LOG.warn("出撃ログの読み込みに失敗しました (" + file.getPath() + ")", e);
             }
         }
 

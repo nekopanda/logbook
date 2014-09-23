@@ -1,9 +1,10 @@
 package logbook.internal;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
+import logbook.config.ItemMasterConfig;
 import logbook.dto.ItemDto;
 
 /**
@@ -15,7 +16,7 @@ public class Item {
     /**
      * アイテムプリセット値
      */
-    private static final Map<Integer, ItemDto> ITEM = new ConcurrentHashMap<Integer, ItemDto>() {
+    private static final Map<Integer, ItemDto> ITEM = new HashMap<Integer, ItemDto>() {
         {
             this.put(1, new ItemDto(1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, "12cm単装砲", 0, 0, 0, 0,
                     0, 0, 0, 0, 0, 0, 1));
@@ -343,6 +344,13 @@ public class Item {
                     0, 5, 0, 0, 0, 5, 4));
         }
     };
+
+    // 始めてアクセスがあった時に読み込む
+    public static final boolean INIT_COMPLETE;
+    static {
+        ItemMasterConfig.load();
+        INIT_COMPLETE = true;
+    }
 
     /**
      * アイテムを設定します

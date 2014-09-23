@@ -51,6 +51,7 @@ public final class CalcExpDialog extends WindowBase {
 
     private final Map<String, ShipDto> shipmap = new HashMap<String, ShipDto>();
 
+    private final Shell parent;
     private Shell shell;
     private Combo shipcombo;
     private Spinner beforelv;
@@ -71,7 +72,7 @@ public final class CalcExpDialog extends WindowBase {
      */
     public CalcExpDialog(Shell parent, MenuItem menuItem) {
         super(menuItem);
-        super.createContents(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
+        this.parent = parent;
     }
 
     /**
@@ -98,6 +99,7 @@ public final class CalcExpDialog extends WindowBase {
      */
     private void createContents() {
         // シェルを作成
+        super.createContents(this.parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
         this.shell = this.getShell();
         this.shell.setText("経験値計算機");
         this.shell.setLayout(new GridLayout(1, false));

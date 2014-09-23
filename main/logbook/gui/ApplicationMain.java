@@ -26,6 +26,7 @@ import logbook.gui.listener.TraySelectionListener;
 import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.Sound;
 import logbook.gui.widgets.FleetComposite;
+import logbook.internal.BattleResultServer;
 import logbook.internal.EnemyData;
 import logbook.server.proxy.DatabaseClient;
 import logbook.server.proxy.ProxyServer;
@@ -73,6 +74,14 @@ public final class ApplicationMain extends WindowBase {
 
     private static final int MAX_LOG_LINES = 200;
     private static final DateFormat LOG_DATE_FORMAT = new SimpleDateFormat(AppConstants.DATE_SHORT_FORMAT);
+
+    private static final long startTime = System.currentTimeMillis();
+
+    public static void print(String mes) {
+        System.out.println(mes + ": " + (System.currentTimeMillis() - startTime) + " ms");
+    }
+
+    public static ApplicationMain main;
 
     /**
      * <p>
@@ -205,18 +214,23 @@ public final class ApplicationMain extends WindowBase {
     public static void main(String[] args) {
         try {
             // 設定読み込み
+            print("起動");
             AppConfig.load();
+            /*
             ShipConfig.load();
             MasterDataConfig.load();
             ShipGroupConfig.load();
             ItemMasterConfig.load();
             ItemConfig.load();
             EnemyData.load();
+            */
+            print("設定ファイル読み込み完了");
             // シャットダウンフックを登録します
             Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHookThread()));
             // アプリケーション開始
-            ApplicationMain window = new ApplicationMain();
-            window.restore();
+            main = new ApplicationMain();
+            print("メインウィンドウ初期化開始");
+            main.restore();
         } catch (Error e) {
             LOG.fatal("メインスレッドが異常終了しました", e);
         } catch (Exception e) {
@@ -234,7 +248,9 @@ public final class ApplicationMain extends WindowBase {
         Display display = Display.getDefault();
         this.createContents();
         this.registerEvents();
+        print("ウィンドウ表示開始...");
         this.restoreWindows();
+        print("メッセージループに入ります...");
         while (!this.shell.isDisposed()) {
             if (!display.readAndDispatch()) {
                 display.sleep();
@@ -710,10 +726,12 @@ public final class ApplicationMain extends WindowBase {
             }
         });
 
-        // ログ表示リスナをセット
-        GlobalContext.setMain(this);
+        // 処理開始前に必要な値をセット
+        BattleResultServer.setLogPath(AppConfig.get().getBattleLogPath());
 
         this.configUpdated();
+
+        print("ウィンドウ構築完了");
 
         this.startThread();
     }
@@ -729,6 +747,7 @@ public final class ApplicationMain extends WindowBase {
     private void restoreWindows() {
         // まずはメインウィンドウを表示する
         this.setVisible(true);
+        print("メインウィンドウ表示完了");
         for (WindowBase window : this.getWindowList()) {
             window.restore();
         }
@@ -802,15 +821,10 @@ public final class ApplicationMain extends WindowBase {
      * スレッドを開始します
      */
     private void startThread() {
-        // 出撃ログ読み込みを開始
+        // 時間のかかる初期化を別スレッドで実行
         new AsyncLoadBattleLog(this.shell, this).start();
 
-        // プロキシサーバーを開始する
-        ProxyServer.start(AppConfig.get().getListenPort());
-
-        // Webサーバーを開始する
-        WebServer.start(AppConfig.get().getListenPort() + 1);
-
+        print("その他のスレッド起動...");
         // 非同期で画面を更新するスレッド
         ThreadManager.regist(new AsyncExecApplicationMain(this));
         // サウンドを出すスレッド
@@ -847,7 +861,7 @@ public final class ApplicationMain extends WindowBase {
                 shipNames[i] = "艦娘一覧 " + number;
             }
             this.shipTableWindows[i].getMenuItem().setText(shipNames[i] + "(&" + number + ")\tCtrl+" + number);
-            this.shipTableWindows[i].getShell().setText(this.shipTableWindows[i].getTitle());
+            this.shipTableWindows[i].windowTitleChanged();
         }
     }
 

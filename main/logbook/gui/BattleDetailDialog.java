@@ -19,13 +19,14 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class BattleDetailDialog extends WindowBase {
 
+    private final WindowBase parent;
     private BattleResultDto result;
     private BattleExDto detail;
     private Browser browser;
     private String currentHTML;
 
     public BattleDetailDialog(WindowBase parent) {
-        super.createContents(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
+        this.parent = parent;
     }
 
     /**
@@ -55,6 +56,7 @@ public class BattleDetailDialog extends WindowBase {
      * Create contents of the dialog.
      */
     private void createContents() {
+        super.createContents(this.parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
         Shell shell = this.getShell();
         shell.setLayout(new FillLayout(SWT.VERTICAL));
         this.browser = new Browser(shell, SWT.NONE);
