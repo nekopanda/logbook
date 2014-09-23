@@ -12,7 +12,6 @@ import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -62,16 +61,29 @@ public class BattleResultServer {
         }
     }
 
-    private static BattleResultServer instance = null;
+    private static volatile BattleResultServer instance = null;
 
-    public static void initialize(String path) {
+    public synchronized static void initialize(String path, Object nofityStart) {
+        nofityStart.notify();
         instance = new BattleResultServer(path);
     }
 
+    public static void dispose() {
+        instance = null;
+    }
+
     public static BattleResultServer get() {
+        if (instance == null) {
+            synchronized (BattleResultServer.class) {
+                if (instance == null) {
+                    throw new RuntimeException("出撃ログの読み込みに失敗しています（または初期化されていない？）");
+                }
+            }
+        }
         return instance;
     }
 
+    // member
     private final String path;
     private final LinkedBuffer buffer = LinkedBuffer.allocate(128 * 1024);
 
@@ -151,10 +163,6 @@ public class BattleResultServer {
         return result;
     }
 
-    private void dispose() {
-        // TODO:
-    }
-
     public void addNewResult(BattleExDto dto) {
         File file = new File(FilenameUtils.concat(this.path, format.format(new Date()) + ".dat"));
         try {
@@ -182,6 +190,10 @@ public class BattleResultServer {
         if ((this.cachedFile != null) && file.equals(this.cachedFile)) {
             this.cachedResult.add(dto);
         }
+    }
+
+    public int size() {
+        return this.resultList.size();
     }
 
     public List<BattleResultDto> getFilteredList(BattleResultFilter filter) {

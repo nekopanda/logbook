@@ -50,8 +50,8 @@ import logbook.dto.ResourceDto;
 import logbook.dto.ResourceItemDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
+import logbook.gui.ApplicationMain;
 import logbook.gui.logic.CreateReportLogic;
-import logbook.gui.logic.MainAppListener;
 import logbook.internal.EnemyData;
 import logbook.internal.Item;
 import logbook.internal.Ship;
@@ -140,13 +140,13 @@ public final class GlobalContext {
     private static BasicInfoDto basic;
 
     /** ログ表示 */
-    private static MainAppListener appListener;
+    private static ApplicationMain main;
 
     /** updateContext() が呼ばれた数 */
     private static int updateCounter = 0;
 
-    public static void setConsoleListener(MainAppListener console_) {
-        appListener = console_;
+    public static void setMain(ApplicationMain main_) {
+        main = main_;
     }
 
     /** 保有資源・資材 */
@@ -738,7 +738,7 @@ public final class GlobalContext {
                 // 出撃中ではない
                 for (int i = 0; i < isSortie.length; ++i) {
                     if (isSortie[i]) {
-                        appListener.endSortie();
+                        main.endSortie();
                         break;
                     }
                 }
@@ -881,9 +881,9 @@ public final class GlobalContext {
                 for (DockDto dock : battle.getFriends()) {
                     isSortie[Integer.parseInt(dock.getId()) - 1] = true;
                 }
-                appListener.startSortie();
+                main.startSortie();
             }
-            appListener.updateBattle(battle);
+            main.updateBattle(battle);
 
         } catch (Exception e) {
             LOG.warn("海戦情報を更新しますに失敗しました", e);
@@ -1218,7 +1218,7 @@ public final class GlobalContext {
             doDeck(data.getJsonObject().getJsonArray("api_data_deck"));
 
             if (battle != null) {
-                appListener.updateSortieDock();
+                main.updateSortieDock();
             }
 
             battle = null;
@@ -1716,8 +1716,8 @@ public final class GlobalContext {
                 CreateReportLogic.storeMaterialReport(material);
             }
 
-            appListener.startSortie();
-            appListener.updateMapCell(mapCellDto);
+            main.startSortie();
+            main.updateMapCell(mapCellDto);
 
             addConsole("出撃を更新しました");
             addConsole("行先 " + mapCellDto.toString());
@@ -1737,7 +1737,7 @@ public final class GlobalContext {
             JsonObject obj = data.getJsonObject().getJsonObject("api_data");
 
             mapCellDto = new MapCellDto(obj);
-            appListener.updateMapCell(mapCellDto);
+            main.updateMapCell(mapCellDto);
             addConsole("行先 " + mapCellDto.toString());
         } catch (Exception e) {
             LOG.warn("進撃を更新しますに失敗しました", e);
@@ -1874,8 +1874,6 @@ public final class GlobalContext {
     }
 
     private static void addConsole(Object message) {
-        appListener.printMessage(new SimpleDateFormat(AppConstants.DATE_SHORT_FORMAT).format(Calendar.getInstance()
-                .getTime())
-                + "  " + message.toString());
+        main.printMessage(message.toString());
     }
 }

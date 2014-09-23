@@ -1,5 +1,11 @@
 package logbook.gui;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
 import logbook.config.AppConfig;
 import logbook.config.ItemConfig;
 import logbook.config.ItemMasterConfig;
@@ -8,13 +14,16 @@ import logbook.config.ShipConfig;
 import logbook.config.ShipGroupConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
+import logbook.dto.BattleExDto;
+import logbook.dto.DockDto;
+import logbook.dto.MapCellDto;
 import logbook.gui.background.AsyncExecApplicationMain;
 import logbook.gui.background.AsyncExecUpdateCheck;
+import logbook.gui.background.AsyncLoadBattleLog;
 import logbook.gui.listener.HelpEventListener;
 import logbook.gui.listener.MainShellAdapter;
 import logbook.gui.listener.TraySelectionListener;
 import logbook.gui.logic.LayoutLogic;
-import logbook.gui.logic.MainAppListener;
 import logbook.gui.logic.Sound;
 import logbook.gui.widgets.FleetComposite;
 import logbook.internal.EnemyData;
@@ -44,7 +53,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
@@ -62,6 +70,9 @@ public final class ApplicationMain extends WindowBase {
 
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(ApplicationMain.class);
+
+    private static final int MAX_LOG_LINES = 200;
+    private static final DateFormat LOG_DATE_FORMAT = new SimpleDateFormat(AppConstants.DATE_SHORT_FORMAT);
 
     /**
      * <p>
@@ -185,7 +196,7 @@ public final class ApplicationMain extends WindowBase {
     /** コンソールコンポジット **/
     private Composite consoleComposite;
     /** コンソール **/
-    private List console;
+    private org.eclipse.swt.widgets.List console;
 
     /**
      * Launch the application.
@@ -638,7 +649,7 @@ public final class ApplicationMain extends WindowBase {
         this.consoleComposite.setLayout(loglayout);
         this.consoleComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
 
-        this.console = new List(this.consoleComposite, SWT.BORDER | SWT.V_SCROLL);
+        this.console = new org.eclipse.swt.widgets.List(this.consoleComposite, SWT.BORDER | SWT.V_SCROLL);
         this.console.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
 
         // 初期設定 縮小表示が有効なら縮小表示にする
@@ -698,6 +709,9 @@ public final class ApplicationMain extends WindowBase {
                 AppConfig.get().setMinimumLayout(minimum);
             }
         });
+
+        // ログ表示リスナをセット
+        GlobalContext.setMain(this);
 
         this.configUpdated();
 
@@ -788,8 +802,8 @@ public final class ApplicationMain extends WindowBase {
      * スレッドを開始します
      */
     private void startThread() {
-        // ログ表示リスナをセット
-        GlobalContext.setConsoleListener(new MainAppListener(this));
+        // 出撃ログ読み込みを開始
+        new AsyncLoadBattleLog(this.shell, this).start();
 
         // プロキシサーバーを開始する
         ProxyServer.start(AppConfig.get().getListenPort());
@@ -1012,22 +1026,81 @@ public final class ApplicationMain extends WindowBase {
         return this.consoleComposite;
     }
 
-    public BattleWindow getBattleWindowLarge() {
-        return this.battleWindowLarge;
-    }
-
-    public BattleWindow getBattleWindowSmall() {
-        return this.battleWindowSmall;
-    }
-
-    public BattleShipWindow getBattleShipWindow() {
-        return this.battleShipWindow;
-    }
-
     /**
-     * @return コンソール
+     * コンソールを更新します
+     * @param message コンソールに表示するメッセージ
      */
-    public List getConsole() {
-        return this.console;
+    public void printMessage(final String message) {
+        int size = this.console.getItemCount();
+        if (size >= MAX_LOG_LINES) {
+            this.console.remove(0);
+        }
+        this.console.add(LOG_DATE_FORMAT.format(new Date()) + "  " + message);
+        this.console.setSelection(this.console.getItemCount() - 1);
+    }
+
+    // 出撃更新 //
+
+    private List<DockDto> getSortieDocks() {
+        boolean[] isSortie = GlobalContext.getIsSortie();
+        for (int i = 0; i < 4; i++) {
+            if (isSortie[i]) {
+                DockDto dock = GlobalContext.getDock(Integer.toString(i + 1));
+                if (GlobalContext.isCombined()) {
+                    return Arrays.asList(new DockDto[] {
+                            dock,
+                            GlobalContext.getDock("2")
+                    });
+                }
+                else {
+                    return Arrays.asList(new DockDto[] { dock });
+                }
+            }
+        }
+        return null;
+    }
+
+    private BattleWindowBase[] getBattleWindowList() {
+        return new BattleWindowBase[] {
+                this.battleWindowLarge,
+                this.battleWindowSmall,
+                this.battleShipWindow
+        };
+    }
+
+    public void startSortie() {
+        List<DockDto> sortieDocks = this.getSortieDocks();
+        if (sortieDocks != null) {
+            for (BattleWindowBase window : this.getBattleWindowList()) {
+                window.updateSortieDock(sortieDocks);
+            }
+        }
+    }
+
+    public void endSortie() {
+        for (BattleWindowBase window : this.getBattleWindowList()) {
+            window.endSortie();
+        }
+    }
+
+    public void updateSortieDock() {
+        List<DockDto> sortieDocks = this.getSortieDocks();
+        if (sortieDocks != null) {
+            for (BattleWindowBase window : this.getBattleWindowList()) {
+                window.updateSortieDock(sortieDocks);
+            }
+        }
+    }
+
+    public void updateMapCell(MapCellDto mapCellDto) {
+        for (BattleWindowBase window : this.getBattleWindowList()) {
+            window.updateMapCell(mapCellDto);
+        }
+    }
+
+    public void updateBattle(BattleExDto battleDto) {
+        for (BattleWindowBase window : this.getBattleWindowList()) {
+            window.updateBattle(battleDto);
+        }
     }
 }

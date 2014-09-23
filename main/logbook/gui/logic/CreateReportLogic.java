@@ -143,7 +143,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getBattleResultHeader() {
-        return new String[] { "", "日付", "海域", "マス", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘" };
+        return new String[] { "", "日付", "海域", "マス", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘", "大破艦" };
     }
 
     /**
@@ -160,7 +160,7 @@ public final class CreateReportLogic {
                     new TableRowHeader(i + 1, item),
                     new DateTimeString(item.getBattleDate()), item.getQuestName(),
                     item.getMapCell(), item.getRank(), item.getEnemyName(), item.getDropType(),
-                    item.getDropName() });
+                    item.getDropName(), item.isHasTaiha() ? "あり" : "" });
         }
         return body;
     }

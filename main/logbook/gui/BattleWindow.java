@@ -96,59 +96,6 @@ public class BattleWindow extends BattleWindowBase {
         label.setText(String.valueOf(nowhp) + "/" + maxhp);
     }
 
-    protected static String getStatusString(int nowhp, int maxhp) {
-        double rate = (double) nowhp / (double) maxhp;
-        if (rate == 0.0) {
-            return "轟沈";
-        }
-        else if (rate <= AppConstants.BADLY_DAMAGE) {
-            return "大破";
-        }
-        else if (rate <= AppConstants.HALF_DAMAGE) {
-            return "中破";
-        }
-        else if (rate <= AppConstants.SLIGHT_DAMAGE) {
-            return "小破";
-        }
-        else {
-            return "健在";
-        }
-    }
-
-    protected static void setLabelColor(Label statusLabel, int nowhp, int maxhp, boolean friend) {
-        double rate = (double) nowhp / (double) maxhp;
-        if (rate == 0.0) {
-            if (friend)
-                setLabelRed(statusLabel);
-            else
-                setLabelNone(statusLabel);
-        }
-        else if (rate <= AppConstants.BADLY_DAMAGE) {
-            if (friend)
-                setLabelRed(statusLabel);
-            else
-                setLabelGreen(statusLabel);
-        }
-        else if (rate <= AppConstants.HALF_DAMAGE) {
-            if (friend)
-                setLabelOrange(statusLabel);
-            else
-                setLabelGreen(statusLabel);
-        }
-        else if (rate <= AppConstants.SLIGHT_DAMAGE) {
-            if (friend)
-                setLabelNone(statusLabel);
-            else
-                setLabelGreen(statusLabel);
-        }
-        else {
-            if (friend)
-                setLabelNone(statusLabel);
-            else
-                setLabelGreen(statusLabel);
-        }
-    }
-
     protected void printDock() {
         List<DockDto> docks = this.getDocks();
         if (docks == null)

@@ -5,6 +5,8 @@ import java.util.Date;
 
 import javax.json.JsonObject;
 
+import logbook.constants.AppConstants;
+
 /**
  * 海戦とドロップした艦娘を表します
  */
@@ -37,6 +39,13 @@ public class BattleResultDto extends AbstractDto {
     /** 戦闘詳細 */
     private final BattleDto battle;
 
+    /** この戦闘で大破艦が出たか　*/
+    private final boolean hasTaiha;
+
+    private final ShipDto mvp;
+
+    private final ShipDto mvpCombined;
+
     /**
      * コンストラクター
      * 
@@ -61,6 +70,9 @@ public class BattleResultDto extends AbstractDto {
         }
 
         this.battle = battle;
+        this.hasTaiha = false;
+        this.mvp = null;
+        this.mvpCombined = null;
     }
 
     public BattleResultDto(BattleExDto dto) {
@@ -73,6 +85,33 @@ public class BattleResultDto extends AbstractDto {
         this.dropType = dto.getDropType();
         this.dropName = dto.getDropName();
         this.battle = null;
+
+        // 大破艦があるか
+        BattleExDto.Phase lastPhase = dto.getLastPhase();
+        this.hasTaiha = (this.hasTaihaInFleet(lastPhase.getNowFriendHp(), dto.getMaxFriendHp()) ||
+                this.hasTaihaInFleet(lastPhase.getNowFriendHpCombined(), dto.getMaxFriendHpCombined()));
+
+        // MVP
+        this.mvp = dto.getDock().getShips().get(dto.getMvp());
+        if (dto.isCombined()) {
+            this.mvpCombined = dto.getDockCombined().getShips().get(dto.getMvpCombined());
+        }
+        else {
+            this.mvpCombined = null;
+        }
+    }
+
+    private boolean hasTaihaInFleet(int[] nowhp, int[] maxhp) {
+        if ((nowhp == null) || (maxhp == null)) {
+            return false;
+        }
+        for (int i = 0; i < nowhp.length; ++i) {
+            double rate = (double) nowhp[i] / (double) maxhp[i];
+            if (rate <= AppConstants.BADLY_DAMAGE) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -152,5 +191,26 @@ public class BattleResultDto extends AbstractDto {
      */
     public BattleDto getBattle() {
         return this.battle;
+    }
+
+    /**
+     * @return hasTaiha
+     */
+    public boolean isHasTaiha() {
+        return this.hasTaiha;
+    }
+
+    /**
+     * @return mvp
+     */
+    public ShipDto getMvp() {
+        return this.mvp;
+    }
+
+    /**
+     * @return mvpCombined
+     */
+    public ShipDto getMvpCombined() {
+        return this.mvpCombined;
     }
 }

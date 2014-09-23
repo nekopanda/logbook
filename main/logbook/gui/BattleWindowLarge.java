@@ -9,6 +9,7 @@ import logbook.dto.BattleExDto;
 import logbook.dto.DockDto;
 import logbook.dto.EnemyShipDto;
 import logbook.dto.ShipDto;
+import logbook.gui.logic.DamageRate;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -287,10 +288,22 @@ public class BattleWindowLarge extends BattleWindow {
         this.title.setText(this.getMapCellDto().detailedString());
     }
 
+    private static void printDamageLebel(Label label, int nowhp, int maxhp, boolean friend) {
+        DamageRate rate = DamageRate.fromHP(nowhp, maxhp);
+        label.setText(rate.toString());
+        if (friend) {
+            label.setBackground(rate.getFriendBackground());
+            label.setForeground(rate.getFriendForeground());
+        }
+        else {
+            label.setBackground(rate.getEnemyBackground());
+            label.setForeground(rate.getEnemyForeground());
+        }
+    }
+
     private static void printFriendHp(Label[][] labels, int index, int nowhp, int maxhp) {
         printHp(labels[0][index], nowhp, maxhp);
-        labels[1][index].setText(getStatusString(nowhp, maxhp));
-        setLabelColor(labels[1][index], nowhp, maxhp, true);
+        printDamageLebel(labels[1][index], nowhp, maxhp, true);
     }
 
     private static void printHp(
@@ -299,8 +312,7 @@ public class BattleWindowLarge extends BattleWindow {
         for (int i = 0; i < nowhp.length; ++i) {
             labels[base1 + 0][base2 + i].setText(String.valueOf(dam[base2 + i]));
             labels[base1 + 1][base2 + i].setText(String.valueOf(nowhp[i]));
-            labels[base1 + 2][base2 + i].setText(getStatusString(nowhp[i], maxhp[i]));
-            setLabelColor(labels[base1 + 2][base2 + i], nowhp[i], maxhp[i], friend);
+            printDamageLebel(labels[base1 + 2][base2 + i], nowhp[i], maxhp[i], friend);
         }
     }
 

@@ -78,36 +78,44 @@ public class BattleExDto extends AbstractDto {
     @Tag(16)
     private String sakuteki[];
 
-    /** 海域名 */
+    /** 攻撃フェーズ */
     @Tag(17)
+    private final List<Phase> phaseList = new ArrayList<Phase>();
+
+    /** 海域名 */
+    @Tag(18)
     private String questName;
 
     /** ランク */
-    @Tag(18)
+    @Tag(19)
     private String rank;
 
     /** マス */
-    @Tag(19)
+    @Tag(20)
     private MapCellDto mapCellDto;
 
     /** 敵艦隊名 */
-    @Tag(20)
+    @Tag(21)
     private String enemyName;
 
     /** ドロップフラグ */
-    @Tag(21)
+    @Tag(22)
     private boolean dropFlag;
 
     /** 艦種 */
-    @Tag(22)
+    @Tag(23)
     private String dropType;
 
     /** 艦名 */
-    @Tag(23)
+    @Tag(24)
     private String dropName;
 
-    @Tag(24)
-    private final List<Phase> phaseList = new ArrayList<Phase>();
+    /** MVP艦（ゼロ始まりのインデックス） */
+    @Tag(25)
+    private int mvp;
+
+    @Tag(26)
+    private int mvpCombined;
 
     /////////////////////////////////////////////////
 
@@ -776,6 +784,10 @@ public class BattleExDto extends AbstractDto {
             this.dropType = "";
             this.dropName = "";
         }
+        this.mvp = object.getInt("api_mvp");
+        if (JsonUtils.hasKey(object, "api_mvp_combined")) {
+            this.mvpCombined = object.getInt("api_mvp_combined");
+        }
     }
 
     private static String toFormation(int f) {
@@ -1084,5 +1096,19 @@ public class BattleExDto extends AbstractDto {
      */
     public List<Phase> getPhaseList() {
         return this.phaseList;
+    }
+
+    /**
+     * @return mvp
+     */
+    public int getMvp() {
+        return this.mvp;
+    }
+
+    /**
+     * @return mvpCombined
+     */
+    public int getMvpCombined() {
+        return this.mvpCombined;
     }
 }

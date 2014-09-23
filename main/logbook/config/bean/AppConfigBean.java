@@ -51,6 +51,9 @@ public final class AppConfigBean {
     /** 報告書の保存先 */
     private String reportPath = new File("").getAbsolutePath();
 
+    /** 出撃ログの保存先 */
+    private String battleLogPath = new File("battlelog").getAbsolutePath();
+
     /** 資源ログの書き込み間隔 */
     private int materialLogInterval = 600;
 
@@ -359,6 +362,20 @@ public final class AppConfigBean {
      */
     public void setReportPath(String reportPath) {
         this.reportPath = reportPath;
+    }
+
+    /**
+     * @return battleLogPath
+     */
+    public String getBattleLogPath() {
+        return this.battleLogPath;
+    }
+
+    /**
+     * @param battleLogPath セットする battleLogPath
+     */
+    public void setBattleLogPath(String battleLogPath) {
+        this.battleLogPath = battleLogPath;
     }
 
     /**

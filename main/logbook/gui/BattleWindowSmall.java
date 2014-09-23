@@ -9,6 +9,7 @@ import logbook.dto.BattleExDto;
 import logbook.dto.DockDto;
 import logbook.dto.EnemyShipDto;
 import logbook.dto.ShipDto;
+import logbook.gui.logic.DamageRate;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -206,6 +207,18 @@ public class BattleWindowSmall extends BattleWindow {
         for (int i = 0; i < docks.size(); ++i) {
             DockDto dock = docks.get(i);
             this.printDock(dock, i * 6);
+        }
+    }
+
+    private static void setLabelColor(Label label, int nowhp, int maxhp, boolean friend) {
+        DamageRate rate = DamageRate.fromHP(nowhp, maxhp);
+        if (friend) {
+            label.setBackground(rate.getFriendBackground());
+            label.setForeground(rate.getFriendForeground());
+        }
+        else {
+            label.setBackground(rate.getEnemyBackground());
+            label.setForeground(rate.getEnemyForeground());
         }
     }
 
