@@ -3,7 +3,6 @@
  */
 package logbook.gui;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -34,7 +33,7 @@ public class BattleWindow extends BattleWindowBase {
     protected final Label[][] infoLabels = new Label[2][12];
 
     protected Label matchLabel;
-    protected final Label resultLabel[] = new Label[2];
+    protected final Label resultLabel[] = new Label[3];
 
     protected final int[] yDamages = new int[12];
     protected final int[][] friendDamages = new int[2][12];
@@ -70,6 +69,7 @@ public class BattleWindow extends BattleWindowBase {
         this.matchLabel.setText("");
         this.resultLabel[0].setText("");
         this.resultLabel[1].setText("");
+        this.resultLabel[2].setText("");
     }
 
     protected static void setLabelRed(Label label) {
@@ -96,48 +96,57 @@ public class BattleWindow extends BattleWindowBase {
         label.setText(String.valueOf(nowhp) + "/" + maxhp);
     }
 
-    protected static void printHpStatus(Label statusLabel, int nowhp, int maxhp, boolean friend) {
+    protected static String getStatusString(int nowhp, int maxhp) {
         double rate = (double) nowhp / (double) maxhp;
         if (rate == 0.0) {
-            statusLabel.setText("轟沈");
+            return "轟沈";
+        }
+        else if (rate <= AppConstants.BADLY_DAMAGE) {
+            return "大破";
+        }
+        else if (rate <= AppConstants.HALF_DAMAGE) {
+            return "中破";
+        }
+        else if (rate <= AppConstants.SLIGHT_DAMAGE) {
+            return "小破";
+        }
+        else {
+            return "健在";
+        }
+    }
+
+    protected static void setLabelColor(Label statusLabel, int nowhp, int maxhp, boolean friend) {
+        double rate = (double) nowhp / (double) maxhp;
+        if (rate == 0.0) {
             if (friend)
                 setLabelRed(statusLabel);
             else
                 setLabelNone(statusLabel);
         }
         else if (rate <= AppConstants.BADLY_DAMAGE) {
-            statusLabel.setText("大破");
             if (friend)
                 setLabelRed(statusLabel);
             else
                 setLabelGreen(statusLabel);
         }
         else if (rate <= AppConstants.HALF_DAMAGE) {
-            statusLabel.setText("中破");
             if (friend)
                 setLabelOrange(statusLabel);
             else
                 setLabelGreen(statusLabel);
         }
         else if (rate <= AppConstants.SLIGHT_DAMAGE) {
-            statusLabel.setText("小破");
             if (friend)
                 setLabelNone(statusLabel);
             else
                 setLabelGreen(statusLabel);
         }
         else {
-            statusLabel.setText("健在");
             if (friend)
                 setLabelNone(statusLabel);
             else
                 setLabelGreen(statusLabel);
         }
-    }
-
-    protected static void printFriendHp(Label[][] labels, int index, int nowhp, int maxhp) {
-        printHp(labels[0][index], nowhp, maxhp);
-        printHpStatus(labels[1][index], nowhp, maxhp, true);
     }
 
     protected void printDock() {
@@ -233,14 +242,67 @@ public class BattleWindow extends BattleWindowBase {
         return airDamage;
     }
 
-    protected static void printHp(
-            Label[][] labels, int base1, int base2, int[] dam, int[] nowhp, int[] maxhp, boolean friend)
-    {
-        for (int i = 0; i < nowhp.length; ++i) {
-            labels[base1 + 0][base2 + i].setText(String.valueOf(dam[base2 + i]));
-            labels[base1 + 1][base2 + i].setText(String.valueOf(nowhp[i]));
-            printHpStatus(labels[base1 + 2][base2 + i], nowhp[i], maxhp[i], friend);
+    protected static class MVPShip {
+        public ShipDto ship;
+        public int ydam;
+
+        MVPShip(ShipDto ship, int ydam) {
+            this.ship = ship;
+            this.ydam = ydam;
         }
+    }
+
+    /**
+     * MVP候補を計算
+     * @param ydam
+     * @param ships
+     * @return
+     */
+    private MVPShip[] computeMVP(int[] ydam, List<ShipDto> ships) {
+        MVPShip[] sortArray = new MVPShip[ships.size()];
+        for (int i = 0; i < ships.size(); ++i) {
+            sortArray[i] = new MVPShip(ships.get(i), this.yDamages[i]);
+        }
+        Arrays.sort(sortArray, new Comparator<MVPShip>() {
+            @Override
+            public int compare(MVPShip d1, MVPShip d2) {
+                return -Integer.compare(d1.ydam, d2.ydam);
+            }
+        });
+        int numPrintShips = 0;
+        for (int i = 0; (i < 2) && (i < ships.size()); ++i) {
+            if (sortArray[i].ydam == 0) {
+                break;
+            }
+            numPrintShips++;
+        }
+        if (numPrintShips == 0) {
+            numPrintShips = 1;
+        }
+        return Arrays.copyOf(sortArray, numPrintShips);
+    }
+
+    protected String getMVPText(MVPShip[] mvp, int airDamage) {
+        if (mvp == null) {
+            return "";
+        }
+        String result0 = "MVP(砲雷のみ) ";
+        for (int i = 0; i < mvp.length; ++i) {
+            ShipDto ship = mvp[i].ship;
+            result0 += String.format("%d: %s(%d)", i + 1,
+                    (ship == null) ? "?" : ship.getName(), mvp[i].ydam);
+            if (i != (mvp.length - 1))
+                result0 += ", ";
+        }
+        result0 += " 航空戦ダメージ: " + airDamage;
+        return result0;
+    }
+
+    protected String getReulstText(double[] damageRate, String rank) {
+        String rateString = (damageRate[0] == 0.0) ? "" :
+                String.format(" (x%.3f)", damageRate[1] / damageRate[0]);
+        return String.format("損害率 自: %.1f%% vs. 敵: %.1f%%%s 結果: %s",
+                damageRate[0] * 100, damageRate[1] * 100, rateString, rank);
     }
 
     protected void printBattle() {
@@ -248,6 +310,8 @@ public class BattleWindow extends BattleWindowBase {
         BattleExDto.Phase phase1 = battle.getPhase1();
         BattleExDto.Phase phase2 = battle.getPhase2();
         BattleExDto.Phase lastPhase = battle.getLastPhase();
+        List<ShipDto> friendShips = battle.getDock().getShips();
+        List<ShipDto> friendShipsCombined = battle.isCombined() ? battle.getDockCombined().getShips() : null;
 
         if (lastPhase == null)
             return;
@@ -260,27 +324,9 @@ public class BattleWindow extends BattleWindowBase {
             airDamage += this.computeDamages(this.friendDamages[0], this.enemyDamages[0], this.yDamages, phase1);
         if (phase2 != null)
             airDamage += this.computeDamages(this.friendDamages[1], this.enemyDamages[1], this.yDamages, phase2);
-        int[][] sortArray = new int[this.yDamages.length][2];
-        for (int i = 0; i < this.yDamages.length; ++i) {
-            sortArray[i][0] = this.yDamages[i];
-            sortArray[i][1] = i;
-        }
-        Arrays.sort(sortArray, new Comparator<int[]>() {
-            @Override
-            public int compare(int[] d1, int[] d2) {
-                return -Integer.compare(d1[0], d2[0]);
-            }
-        });
-        List<ShipDto> MVPList = new ArrayList<ShipDto>();
-        for (int i = 0; i < 2; ++i) {
-            if (sortArray[i][0] == 0) {
-                break;
-            }
-            MVPList.add(this.getFriendShips()[sortArray[i][1]]);
-        }
-        if (MVPList.size() == 0) {
-            MVPList.add(this.getFriendShips()[0]);
-        }
+        MVPShip[] mvp1 = this.computeMVP(Arrays.copyOf(this.yDamages, friendShips.size()), friendShips);
+        MVPShip[] mvp2 = battle.isCombined() ? this.computeMVP(
+                Arrays.copyOfRange(this.yDamages, 6, 6 + friendShipsCombined.size()), friendShipsCombined) : null;
 
         // 情報表示
         String[] formation = battle.getFormation();
@@ -311,21 +357,9 @@ public class BattleWindow extends BattleWindowBase {
 
         this.matchLabel.setText(battle.getFormationMatch());
 
-        String result0 = "MVP(砲雷のみ) ";
-        for (int i = 0; i < MVPList.size(); ++i) {
-            ShipDto ship = MVPList.get(i);
-            result0 += String.format("%d: %s(%d)", i + 1,
-                    (ship == null) ? "?" : ship.getName(), sortArray[i][0]);
-            if (i != (MVPList.size() - 1))
-                result0 += ", ";
-        }
-        result0 += " 航空戦ダメージ: " + airDamage;
-        this.resultLabel[0].setText(result0);
-
-        String rateString = (damageRate[0] == 0.0) ? "" :
-                String.format(" (x%.3f)", damageRate[1] / damageRate[0]);
-        this.resultLabel[1].setText(String.format("損害率 自: %.1f%% vs. 敵: %.1f%%%s 結果: %s",
-                damageRate[0] * 100, damageRate[1] * 100, rateString, battle.getRank().toString()));
+        this.resultLabel[0].setText(this.getMVPText(mvp1, airDamage));
+        this.resultLabel[1].setText(this.getMVPText(mvp2, 0)); // 第二艦隊は航空戦ダメージゼロ
+        this.resultLabel[2].setText(this.getReulstText(damageRate, lastPhase.getEstimatedRank().toString()));
 
     }
 }

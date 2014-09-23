@@ -40,8 +40,12 @@ public abstract class ShipBaseDto extends AbstractDto {
     @Tag(4)
     protected final ShipParameters param;
 
-    /** 装備による上昇分 */
+    /** 装備なしのMAX(艦娘のみ) */
     @Tag(5)
+    protected final ShipParameters max;
+
+    /** 装備による上昇分 */
+    @Tag(6)
     protected final ShipParameters slotParam;
 
     /**
@@ -54,9 +58,10 @@ public abstract class ShipBaseDto extends AbstractDto {
         this.shipInfo = shipinfo;
         this.slot = JsonUtils.getIntArray(object, "api_slot");
         this.slotItem = this.getItem();
-        ShipParameters[] params = ShipParameters.fromShip(object);
+        ShipParameters[] params = ShipParameters.fromShip(object, this.getItem());
         this.param = params[0];
-        this.slotParam = params[1];
+        this.max = params[1];
+        this.slotParam = params[2];
     }
 
     /**
@@ -70,6 +75,7 @@ public abstract class ShipBaseDto extends AbstractDto {
         ShipParameters[] params = ShipParameters.fromBaseAndSlotItem(
                 this.shipInfo.getParam(), this.getItem());
         this.param = params[0];
+        this.max = null;
         this.slotParam = params[1];
     }
 
@@ -156,12 +162,16 @@ public abstract class ShipBaseDto extends AbstractDto {
         return this.shipInfo.getMaxeq();
     }
 
+    protected Map<Integer, ItemDto> getItemMap() {
+        return GlobalContext.getItemMap();
+    }
+
     /**
      * @return 装備
      */
     public List<String> getSlot() {
         List<String> itemNames = new ArrayList<String>();
-        Map<Integer, ItemDto> itemMap = GlobalContext.getItemMap();
+        Map<Integer, ItemDto> itemMap = this.getItemMap();
         for (int itemid : this.getItemId()) {
             if (-1 != itemid) {
                 ItemDto name = itemMap.get(itemid);
@@ -189,7 +199,7 @@ public abstract class ShipBaseDto extends AbstractDto {
      */
     public List<ItemDto> getItem() {
         List<ItemDto> items = new ArrayList<ItemDto>();
-        Map<Integer, ItemDto> itemMap = GlobalContext.getItemMap();
+        Map<Integer, ItemDto> itemMap = this.getItemMap();
         for (int itemid : this.getItemId()) {
             if (-1 != itemid) {
                 ItemDto item = itemMap.get(itemid);
@@ -250,7 +260,7 @@ public abstract class ShipBaseDto extends AbstractDto {
             return false;
         int stype = this.shipInfo.getStype();
         List<MasterData.ShipTypeDto> info = MasterDataConfig.get().getStype();
-        if (info.size() < stype) // データを取得していない
+        if ((stype <= 0) || (info.size() < stype)) // データを取得していない
             return false;
         MasterData.ShipTypeDto shipType = info.get(stype - 1);
         if (shipType == null) // データを取得していない
@@ -272,7 +282,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
-     * @return 火力(最大)
+     * @return 火力(最大)(艦娘のみ)
      */
     public int getKaryokuMax() {
         return this.getMax().getHoug();
@@ -286,7 +296,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
-     * @return 雷装(最大)
+     * @return 雷装(最大)(艦娘のみ)
      */
     public int getRaisouMax() {
         return this.getMax().getRaig();
@@ -300,7 +310,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
-     * @return 対空(最大)
+     * @return 対空(最大)(艦娘のみ)
      */
     public int getTaikuMax() {
         return this.getMax().getTyku();
@@ -314,7 +324,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
-     * @return 装甲(最大)
+     * @return 装甲(最大)(艦娘のみ)
      */
     public int getSoukouMax() {
         return this.getMax().getSouk();
@@ -328,7 +338,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
-     * @return 回避(最大)
+     * @return 回避(最大)(艦娘のみ)
      */
     public int getKaihiMax() {
         return this.getMax().getKaih();
@@ -342,7 +352,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
-     * @return 対潜(最大)
+     * @return 対潜(最大)(艦娘のみ)
      */
     public int getTaisenMax() {
         return this.getMax().getTais();
@@ -356,7 +366,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
-     * @return 索敵(最大)
+     * @return 索敵(最大)(艦娘のみ)
      */
     public int getSakutekiMax() {
         return this.getMax().getSaku();
@@ -370,7 +380,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
-     * @return 運(最大)
+     * @return 運(最大)(艦娘のみ)
      */
     public int getLuckyMax() {
         return this.getMax().getLuck();
@@ -394,6 +404,6 @@ public abstract class ShipBaseDto extends AbstractDto {
      * @return この艦の最大パラメータ（装備なしで）
      */
     public ShipParameters getMax() {
-        return this.shipInfo.getMax();
+        return this.max;
     }
 }

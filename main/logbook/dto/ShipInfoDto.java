@@ -92,6 +92,7 @@ public final class ShipInfoDto extends AbstractDto {
      * コンストラクター
      */
     public ShipInfoDto(JsonObject object) {
+        this.name = object.getString("api_name");
         this.shipId = object.getJsonNumber("api_id").intValue();
         this.stype = object.getJsonNumber("api_stype").intValue();
         this.flagship = object.getString("api_yomi");

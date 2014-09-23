@@ -501,14 +501,19 @@ public class WindowBase {
         this.opacityChanged(this.config.getOpacityIndex());
         // ウィンドウサイズ
         if (this.shouldSaveWindowSize()) {
-            Point size = new Point(this.config.getWidth(), this.config.getHeight());
-            if ((size.x == -1) || (size.y == -1)) {
-                size = this.getDefaultSize();
-            }
-            this.shell.setSize(size);
+            this.shell.setSize(this.getRestoreSize());
         }
 
         return changeAnimation;
+    }
+
+    public Point getRestoreSize() {
+        this.getWindowConfig();
+        Point size = new Point(this.config.getWidth(), this.config.getHeight());
+        if ((size.x == -1) || (size.y == -1)) {
+            size = this.getDefaultSize();
+        }
+        return size;
     }
 
     /**

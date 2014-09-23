@@ -3,6 +3,10 @@
  */
 package logbook.dto;
 
+import java.util.Map;
+
+import logbook.internal.Item;
+
 import com.dyuproject.protostuff.Tag;
 
 /**
@@ -65,6 +69,11 @@ public class EnemyShipDto extends ShipBaseDto {
     @Override
     public int getSoukou() {
         return this.soukou;
+    }
+
+    @Override
+    protected Map<Integer, ItemDto> getItemMap() {
+        return Item.getMap();
     }
 
 }

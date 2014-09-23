@@ -6,7 +6,6 @@ import logbook.config.ItemMasterConfig;
 import logbook.config.MasterDataConfig;
 import logbook.config.ShipConfig;
 import logbook.config.ShipGroupConfig;
-import logbook.config.bean.WindowConfigBean;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.gui.background.AsyncExecApplicationMain;
@@ -359,7 +358,7 @@ public final class ApplicationMain extends WindowBase {
         MenuItem battleWinSMenu = new MenuItem(cmdmenu, SWT.CHECK);
         battleWinSMenu.setText("戦況-小(&S)\tCtrl+S");
         battleWinSMenu.setAccelerator(SWT.CTRL + 'W');
-        this.battleWindowSmall = new BattleWindowSmall(this.dummyHolder, battleWinMenu);
+        this.battleWindowSmall = new BattleWindowSmall(this.dummyHolder, battleWinSMenu);
 
         // 表示-敵味方パラメータ
         MenuItem battleShipWinMenu = new MenuItem(cmdmenu, SWT.CHECK);
@@ -439,6 +438,16 @@ public final class ApplicationMain extends WindowBase {
         MenuItem version = new MenuItem(etcmenu, SWT.NONE);
         version.setText("バージョン情報(&A)");
         version.addSelectionListener(new HelpEventListener(this));
+
+        // テスト用
+        MenuItem testfeeder = new MenuItem(etcmenu, SWT.NONE);
+        testfeeder.setText("テストする");
+        testfeeder.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                new TestDataFeeder(ApplicationMain.this).open();
+            }
+        });
 
         // シェルイベント
         this.shell.addShellListener(new MainShellAdapter());
@@ -683,8 +692,7 @@ public final class ApplicationMain extends WindowBase {
                         }
                     }
                 } else {
-                    WindowConfigBean config = ApplicationMain.this.getWindowConfig();
-                    shell.setSize(config.getWidth(), config.getHeight());
+                    shell.setSize(ApplicationMain.this.getRestoreSize());
                 }
                 // 設定を保存
                 AppConfig.get().setMinimumLayout(minimum);

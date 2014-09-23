@@ -102,7 +102,7 @@ public class BattleShipWindow extends BattleWindowBase {
                 if (ship != null) {
                     List<ItemDto> slots = ship.getItem();
                     int[] maxeq = ship.getShipInfo().getMaxeq(); // 艦載機最大搭載数
-                    for (int i = 0; i < 4; ++i) {
+                    for (int i = 0; i < 5; ++i) {
                         if (i < slots.size()) {
                             String onSlot = "";
                             String itemName = "";

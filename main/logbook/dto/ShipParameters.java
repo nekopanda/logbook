@@ -114,10 +114,10 @@ public class ShipParameters {
             ShipParameters param = new ShipParameters();
             param.taik = object.getJsonArray("api_taik").getInt(i);
             param.houg = object.getJsonArray("api_houg").getInt(i);
-            param.leng = object.getJsonArray("api_leng").getInt(i);
+            param.leng = object.getInt("api_leng");
             param.raig = object.getJsonArray("api_raig").getInt(i);
             param.tyku = object.getJsonArray("api_tyku").getInt(i);
-            param.soku = object.getJsonArray("api_soku").getInt(i);
+            param.soku = object.getInt("api_soku");
             param.souk = object.getJsonArray("api_souk").getInt(i);
             param.kaih = object.getJsonArray("api_kaih").getInt(i);
             param.tais = object.getJsonArray("api_tais").getInt(i);
@@ -128,9 +128,9 @@ public class ShipParameters {
         return ret;
     }
 
-    /** 艦娘用 (現在値, MAX) */
-    public static ShipParameters[] fromShip(JsonObject object) {
-        ShipParameters[] ret = new ShipParameters[2];
+    /** 艦娘用 (現在値, MAX, 装備による上昇分) */
+    public static ShipParameters[] fromShip(JsonObject object, List<ItemDto> slotitem) {
+        ShipParameters[] ret = new ShipParameters[3];
         for (int i = 0; i < 2; ++i) {
             ShipParameters param = new ShipParameters();
             if (i == 0) {
@@ -140,7 +140,7 @@ public class ShipParameters {
                 param.taik = object.getInt("api_maxhp");
             }
             param.houg = object.getJsonArray("api_karyoku").getInt(i);
-            param.leng = object.getJsonArray("api_leng").getInt(i);
+            param.leng = object.getInt("api_leng");
             param.raig = object.getJsonArray("api_raisou").getInt(i);
             param.tyku = object.getJsonArray("api_taiku").getInt(i);
             param.soku = 0;
@@ -151,6 +151,16 @@ public class ShipParameters {
             param.luck = object.getJsonArray("api_lucky").getInt(i);
             ret[i] = param;
         }
+
+        // 装備の上昇分を計算
+        ShipParameters slotParam = new ShipParameters();
+        for (ItemDto item : slotitem) {
+            if (item != null) {
+                slotParam.add(item.getParam());
+            }
+        }
+        ret[2] = slotParam;
+
         return ret;
     }
 

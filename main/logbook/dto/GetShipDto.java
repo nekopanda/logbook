@@ -28,7 +28,7 @@ public final class GetShipDto extends AbstractDto {
 
         this.getDate = Calendar.getInstance().getTime();
         this.ship = ship;
-        this.resources = resources != null ? resources : new ResourceDto(0, 0, 0, 0, null, 0);
+        this.resources = resources != null ? resources : new ResourceDto(0, 0, 0, 0, 0, 0, null, 0);
     }
 
     /**

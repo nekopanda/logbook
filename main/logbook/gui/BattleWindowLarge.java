@@ -220,7 +220,10 @@ public class BattleWindowLarge extends BattleWindow {
 
         // 最後
         this.resultLabel[0] = this.addLabelWithSpan("結果予想", numColumns, 1);//6-17
+        this.beginCombined();
         this.resultLabel[1] = this.addLabelWithSpan("結果予想", numColumns, 1);//6-17
+        this.endCombined();
+        this.resultLabel[2] = this.addLabelWithSpan("結果予想", numColumns, 1);//6-17
 
         this.clearText();
     }
@@ -282,6 +285,23 @@ public class BattleWindowLarge extends BattleWindow {
             return;
 
         this.title.setText(this.getMapCellDto().detailedString());
+    }
+
+    private static void printFriendHp(Label[][] labels, int index, int nowhp, int maxhp) {
+        printHp(labels[0][index], nowhp, maxhp);
+        labels[1][index].setText(getStatusString(nowhp, maxhp));
+        setLabelColor(labels[1][index], nowhp, maxhp, true);
+    }
+
+    private static void printHp(
+            Label[][] labels, int base1, int base2, int[] dam, int[] nowhp, int[] maxhp, boolean friend)
+    {
+        for (int i = 0; i < nowhp.length; ++i) {
+            labels[base1 + 0][base2 + i].setText(String.valueOf(dam[base2 + i]));
+            labels[base1 + 1][base2 + i].setText(String.valueOf(nowhp[i]));
+            labels[base1 + 2][base2 + i].setText(getStatusString(nowhp[i], maxhp[i]));
+            setLabelColor(labels[base1 + 2][base2 + i], nowhp[i], maxhp[i], friend);
+        }
     }
 
     @Override

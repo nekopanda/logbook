@@ -369,4 +369,8 @@ public class Item {
     public static Set<Integer> keySet() {
         return ITEM.keySet();
     }
+
+    public static Map<Integer, ItemDto> getMap() {
+        return ITEM;
+    }
 }

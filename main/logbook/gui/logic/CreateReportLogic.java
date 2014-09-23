@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -304,7 +305,36 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getItemListHeader() {
-        return new String[] { "", "名称", "種別", "個数", "火力", "命中", "射程", "運", "回避", "爆装", "雷装", "索敵", "対潜", "対空", "装甲" };
+        return new String[] { "", "名称", "種別", "個数", "火力", "命中", "射程", "運", "回避", "爆装", "雷装", "索敵", "対潜", "対空", "装甲",
+                "装備してる艦娘" };
+    }
+
+    private static class ItemInfo {
+        public ItemDto item;
+        public int count = 1;
+        public Map<ShipDto, Integer> shipMap = new TreeMap<>();
+
+        public ItemInfo(ItemDto item) {
+            this.item = item;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            int count = 0;
+            for (Entry<ShipDto, Integer> entry : this.shipMap.entrySet()) {
+                if (count++ != 0) {
+                    sb.append(",");
+                }
+                sb.append(entry.getKey().getFriendlyName()).append("x").append(entry.getValue());
+            }
+            // 長さ制限
+            if (sb.length() > 100) {
+                sb.setLength(100);
+                sb.append(" ...");
+            }
+            return sb.toString();
+        }
     }
 
     /**
@@ -313,38 +343,53 @@ public final class CreateReportLogic {
      * @return 内容
      */
     public static List<Comparable[]> getItemListBody() {
-        Set<Entry<Integer, ItemDto>> items = GlobalContext.getItemMap().entrySet();
-        Map<ItemDto, Integer> itemCountMap = new HashMap<ItemDto, Integer>();
+        Map<ItemDto, ItemInfo> itemCountMap = new HashMap<ItemDto, ItemInfo>();
 
-        for (Entry<Integer, ItemDto> entry : items) {
-            ItemDto item = entry.getValue();
-            Integer count = itemCountMap.get(item);
-            if (count == null) {
-                count = 1;
+        for (ItemDto item : GlobalContext.getItemMap().values()) {
+            ItemInfo info = itemCountMap.get(item);
+            if (info == null) {
+                info = new ItemInfo(item);
+                itemCountMap.put(item, info);
             } else {
-                count = count + 1;
+                info.count++;
             }
-            itemCountMap.put(item, count);
         }
 
-        List<Entry<ItemDto, Integer>> countitems = new ArrayList<Entry<ItemDto, Integer>>(itemCountMap.entrySet());
-        Collections.sort(countitems, new Comparator<Entry<ItemDto, Integer>>() {
+        for (ShipDto ship : GlobalContext.getShipMap().values()) {
+            for (ItemDto item : ship.getItem()) {
+                if (item != null) {
+                    Map<ShipDto, Integer> shipMap = itemCountMap.get(item).shipMap;
+                    Integer count = shipMap.get(ship);
+                    if (count == null) {
+                        count = 1;
+                    }
+                    else {
+                        count++;
+                    }
+                    shipMap.put(ship, count);
+                }
+            }
+        }
+
+        List<ItemInfo> countitems = new ArrayList<ItemInfo>(itemCountMap.values());
+        Collections.sort(countitems, new Comparator<ItemInfo>() {
             @Override
-            public int compare(Entry<ItemDto, Integer> o1, Entry<ItemDto, Integer> o2) {
-                return o1.getValue().compareTo(o2.getValue());
+            public int compare(ItemInfo o1, ItemInfo o2) {
+                return Integer.compare(o1.count, o2.count);
             }
         });
 
         List<Comparable[]> body = new ArrayList<Comparable[]>();
 
         int count = 0;
-        for (Entry<ItemDto, Integer> entry : countitems) {
-            ItemDto item = entry.getKey();
+        for (ItemInfo itemInfo : countitems) {
+            ItemDto item = itemInfo.item;
             ShipParameters param = item.getParam();
             count++;
-            body.add(new Comparable[] { count, item.getName(), item.getTypeName(), entry.getValue(), param.getHoug(),
+            body.add(new Comparable[] { count, item.getName(), item.getTypeName(), itemInfo.count, param.getHoug(),
                     param.getHoum(), param.getLeng(), param.getLuck(), param.getHouk(), param.getBaku(),
-                    param.getRaig(), param.getSaku(), param.getTais(), param.getTyku(), param.getSouk()
+                    param.getRaig(), param.getSaku(), param.getTais(), param.getTyku(), param.getSouk(),
+                    itemInfo.toString()
             });
         }
         return body;
