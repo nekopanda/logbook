@@ -17,12 +17,11 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * 出撃ログを読み込みます
- *
+ * 時間のかかる初期化を別スレッドで実行します
  */
-public final class AsyncLoadBattleLog extends Thread {
+public final class BackgroundInitializer extends Thread {
 
-    private static final Logger LOG = LogManager.getLogger(AsyncLoadBattleLog.class);
+    private static final Logger LOG = LogManager.getLogger(BackgroundInitializer.class);
 
     private final Shell shell;
     private final ApplicationMain main;
@@ -32,7 +31,7 @@ public final class AsyncLoadBattleLog extends Thread {
      * 
      * @param shell
      */
-    public AsyncLoadBattleLog(Shell shell, ApplicationMain main) {
+    public BackgroundInitializer(Shell shell, ApplicationMain main) {
         this.shell = shell;
         this.main = main;
         this.setName("logbook_async_load_battle_log");
@@ -77,7 +76,7 @@ public final class AsyncLoadBattleLog extends Thread {
             this.shell.getDisplay().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    AsyncLoadBattleLog.this.main.printMessage("出撃ログ読み込み完了(" + numLogRecord + "件)");
+                    BackgroundInitializer.this.main.printMessage("出撃ログ読み込み完了(" + numLogRecord + "件)");
                 }
             });
         } catch (Exception e) {

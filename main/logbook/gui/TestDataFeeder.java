@@ -137,6 +137,19 @@ public class TestDataFeeder extends WindowBase {
         }
         Arrays.sort(this.fileList);
         this.currentIndex = 0;
+
+        for (; this.currentIndex < this.fileList.length;) {
+            String filepath = this.fileList[this.currentIndex++];
+            try {
+                Data data = new TestData(filepath);
+                GlobalContext.updateContext(data);
+                if ((this.currentIndex % 64) == 0)
+                    this.updateLabel();
+            } catch (ParseException | IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         this.updateLabel();
     }
 

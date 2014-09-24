@@ -10,6 +10,7 @@ import logbook.config.AppConfig;
 import logbook.config.bean.WindowConfigBean;
 import logbook.gui.logic.OpacityAnimation;
 import logbook.gui.logic.OpacityAnimationClient;
+import logbook.gui.logic.WindowNativeSupport;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -38,6 +39,7 @@ public class WindowBase {
     private static String[] ALPHA_TEXT = new String[] { "不透明化", "90%", "80%", "60%", "40%", "10%" };
 
     private static WindowTreeNode globalRootNode = new WindowTreeNode(true);
+    public final static WindowNativeSupport nativeService = new WindowNativeSupport();
 
     private final WindowTreeNode treeNode = new WindowTreeNode(this);
     private WindowBase parent;
@@ -46,8 +48,12 @@ public class WindowBase {
     private MenuItem menuItem;
 
     private boolean windowInitialized;
+    // ウィンドウが開いた状態か？
+    // Mainウィンドウの最小化に連動して setVisible するため
+    private boolean openState;
 
     // メニュー
+    private MenuItem topMostItem;
     private MenuItem opaqueItem;
     private MenuItem shareOpacityItem;
     private MenuItem[] opacity;
@@ -229,6 +235,17 @@ public class WindowBase {
             }
         }
 
+        public void topMostChanged(WindowBase source) {
+            final boolean newValue = source.topMostItem.getSelection();
+            WindowTreeNode node = this.getRoot();
+            node.routeEvent(new EventProc() {
+                @Override
+                public void proc(WindowBase window) {
+                    window.topMostChanged(newValue);
+                }
+            });
+        }
+
         public void opaqueChanged(WindowBase source) {
             final boolean newValue = source.opaqueItem.getSelection();
             WindowTreeNode node = this.getRoot();
@@ -369,6 +386,11 @@ public class WindowBase {
         }
     }
 
+    private void topMostChanged(boolean topMost) {
+        this.topMostItem.setSelection(topMost);
+        nativeService.setTopMost(this.getShell(), topMost);
+    }
+
     private boolean isMouseHovering() {
         if (this.shell.getVisible() == false)
             return false;
@@ -413,6 +435,7 @@ public class WindowBase {
     }
 
     private void createContents(boolean cascade) {
+        this.shell.setData(this);
         // ウィンドウ基本メニュー
         this.alphamenu = new Menu(this.shell);
         Menu rootMenu = this.alphamenu;
@@ -421,6 +444,18 @@ public class WindowBase {
             rootMenu = new Menu(this.shell, SWT.DROP_DOWN);
             rootItem.setMenu(rootMenu);
             rootItem.setText("ウィンドウ");
+        }
+
+        // 最前面に表示する
+        if (nativeService.isTopMostAvailable()) {
+            this.topMostItem = new MenuItem(rootMenu, SWT.CHECK);
+            this.topMostItem.setText("最前面に表示する");
+            this.topMostItem.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent paramSelectionEvent) {
+                    WindowBase.this.treeNode.topMostChanged(WindowBase.this);
+                }
+            });
         }
 
         // マウスで不透明化
@@ -493,6 +528,10 @@ public class WindowBase {
         if ((locationX != -1) && (locationY != -1)) {
             this.shell.setLocation(new Point(locationX, locationY));
         }
+        // 最前面に表示
+        if (nativeService.isTopMostAvailable()) {
+            this.topMostChanged(this.config.isTopMost());
+        }
         // 透過設定
         boolean changeAnimation = (this.shareOpacitySetting != this.config.isShareOpacitySetting());
         this.shareOpacitySetting = this.config.isShareOpacitySetting();
@@ -505,6 +544,20 @@ public class WindowBase {
         }
 
         return changeAnimation;
+    }
+
+    /** parent is un-minimized */
+    public void shellDeiconified(ShellEvent e) {
+        if (this.openState) {
+            this.shell.setVisible(true);
+        }
+    }
+
+    /** parent is minimized */
+    public void shellIconified(ShellEvent e) {
+        if (this.openState) {
+            this.shell.setVisible(false);
+        }
     }
 
     public Point getRestoreSize() {
@@ -556,6 +609,7 @@ public class WindowBase {
             if (this.menuItem != null) {
                 this.menuItem.setSelection(visible);
             }
+            this.openState = visible;
             this.dbgprint("setVisible alpha=" + this.shell.getAlpha());
             this.shell.setVisible(visible);
         }
@@ -588,6 +642,10 @@ public class WindowBase {
                 Point location = this.shell.getLocation();
                 this.config.setLocationX(location.x);
                 this.config.setLocationY(location.y);
+                // 最前面に表示
+                if (nativeService.isTopMostAvailable()) {
+                    this.config.setTopMost(this.topMostItem.getSelection());
+                }
                 this.config.setMouseHoveringAware(this.treeNode.getMouseHoverAware());
                 this.config.setShareOpacitySetting(this.shareOpacitySetting);
                 this.config.setOpacityIndex(this.opacityIndex);

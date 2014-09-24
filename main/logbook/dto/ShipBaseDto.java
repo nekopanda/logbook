@@ -224,11 +224,11 @@ public abstract class ShipBaseDto extends AbstractDto {
         for (int i = 0; i < 4; i++) {
             ItemDto item = items.get(i);
             if (item != null) {
-                if ((item.getType3() == 6)
-                        || (item.getType3() == 7)
-                        || (item.getType3() == 8)
-                        || ((item.getType3() == 10) && (item.getType2() == 11))) {
-                    //6:艦上戦闘機,7:艦上爆撃機,8:艦上攻撃機,10:水上偵察機(ただし瑞雲のみ)の場合は制空値を計算する
+                if ((item.getType2() == 6)
+                        || (item.getType2() == 7)
+                        || (item.getType2() == 8)
+                        || (item.getType2() == 11)) {
+                    //6:艦上戦闘機,7:艦上爆撃機,8:艦上攻撃機,11:瑞雲系の水上偵察機の場合は制空値を計算する
                     seiku += (int) Math.floor(item.getParam().getTyku() * Math.sqrt(this.getOnSlot()[i]));
                 }
             }

@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import logbook.constants.AppConstants;
 import logbook.dto.BattleExDto;
 import logbook.dto.BattleResultDto;
 import logbook.gui.logic.BattleHtmlGenerator;
@@ -46,7 +45,7 @@ public final class DropReportTable extends AbstractTableDialog {
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(DropReportTable.class);
 
-    private static DateFormat dateFormat = new SimpleDateFormat(AppConstants.DATE_FORMAT);
+    private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HHmmss.SSS");
 
     private BattleResultFilter filter = new BattleResultFilter();
 
@@ -73,10 +72,10 @@ public final class DropReportTable extends AbstractTableDialog {
                 int selected = DropReportTable.this.table.getSelectionIndex();
                 if (selected != -1) {
                     BattleResultDto result = DropReportTable.this.getItemFromIndex(selected);
+                    DropReportTable.this.detailDialog.open();
                     DropReportTable.this.detailDialog.setBattle(
                             DropReportTable.this.getHTMLOfItem(result, false),
                             DropReportTable.this.getBattleTitle(result));
-                    DropReportTable.this.detailDialog.open();
                 }
             }
         });
@@ -101,6 +100,10 @@ public final class DropReportTable extends AbstractTableDialog {
                 new BattleFilterDialog(DropReportTable.this).open();
             }
         });
+        // 保存メニュー
+        final MenuItem save = new MenuItem(this.tablemenu, SWT.NONE);
+        save.setText("選択したログを保存する");
+        save.addSelectionListener(new SaveAdapter());
     }
 
     private BattleResultDto getItemFromIndex(int index) {
@@ -109,14 +112,22 @@ public final class DropReportTable extends AbstractTableDialog {
     }
 
     private String getBattleTitle(BattleResultDto item) {
+        if (item.isPractice()) {
+            return "演習報告: " + item.getEnemyName();
+        }
         return "会敵報告: " + item.getMapCell().detailedString();
     }
 
     private String getOutputFileName(BattleResultDto item) {
-        int[] map = item.getMapCell().getMap();
         String rank = item.getRank();
-        return dateFormat.format(item.getBattleDate()) +
-                " " + map[0] + "-" + map[1] + "-" + map[2] + " " + rank;
+        if (item.isPractice()) {
+            return dateFormat.format(item.getBattleDate()) + "演習" + rank;
+        }
+        else {
+            int[] map = item.getMapCell().getMap();
+            return dateFormat.format(item.getBattleDate()) +
+                    " " + map[0] + "-" + map[1] + "-" + map[2] + " " + rank;
+        }
     }
 
     private String getHTMLOfItem(BattleResultDto item, boolean forFile) {
@@ -127,6 +138,9 @@ public final class DropReportTable extends AbstractTableDialog {
             return gen.generateHTML(title, item, detail, forFile);
         } catch (IOException e) {
             LOG.warn("会敵報告作成に失敗: CSSファイル読み込みに失敗しました", e);
+        } catch (Exception e) {
+            ApplicationMain.main.printMessage("会敵報告作成に失敗しました");
+            LOG.warn("会敵報告作成に失敗", e);
         }
         return null;
     }
@@ -150,7 +164,7 @@ public final class DropReportTable extends AbstractTableDialog {
             zipOutStream = new ZipOutputStream(
                     new BufferedOutputStream(new FileOutputStream(file)));
             for (BattleResultDto item : items) {
-                final ZipEntry entry = new ZipEntry(this.getOutputFileName(item));
+                final ZipEntry entry = new ZipEntry(this.getOutputFileName(item) + ".html");
                 zipOutStream.putNextEntry(entry);
                 zipOutStream.write(
                         this.getHTMLOfItem(item, true).getBytes(Charset.forName("UTF-8")));

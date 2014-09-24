@@ -144,11 +144,18 @@ public class BattleAtackDto {
         dto.kind = AtackKind.AIR;
         dto.friendAtack = friendAtack;
 
-        dto.origin = new int[plane_from.size()];
-        for (int i = 0; i < plane_from.size(); ++i) {
-            dto.origin[i] = (plane_from.getInt(i) - 1) % 6;
-        }
         int idx = 0;
+        for (int i = 0; i < plane_from.size(); ++i) {
+            if (plane_from.getInt(i) != -1)
+                ++idx;
+        }
+        dto.origin = new int[idx];
+        idx = 0;
+        for (int i = 0; i < plane_from.size(); ++i) {
+            if (plane_from.getInt(i) != -1)
+                dto.origin[idx++] = (plane_from.getInt(i) - 1) % 6;
+        }
+        idx = 0;
         for (int i = 0; i < 6; ++i) {
             int dam = dam_list.getInt(i + 1);
             if (dam > 0) {

@@ -53,6 +53,7 @@ import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
 import logbook.gui.ApplicationMain;
 import logbook.gui.logic.CreateReportLogic;
+import logbook.internal.BattleResultServer;
 import logbook.internal.EnemyData;
 import logbook.internal.Item;
 import logbook.internal.Ship;
@@ -901,6 +902,7 @@ public final class GlobalContext {
             if (battle != null) {
                 JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
                 battle.setResult(apidata, mapCellDto);
+                BattleResultServer.get().addNewResult(battle);
                 if (battle.isCompleteSortieBattle()) { // 演習は記録しない
                     //battleResultList.add(battle);
                     CreateReportLogic.storeBattleResultReport(battle);
@@ -924,7 +926,7 @@ public final class GlobalContext {
 
                 // ランクが合っているかチェック
                 Phase lastPhase = battle.getLastPhase();
-                if (!battle.getRank().equals(lastPhase.getEstimatedRank().rank())) {
+                if (!battle.getRank().equals(lastPhase.getEstimatedRank())) {
                     LOG.info("戦闘結果判定ミス: 正解ランク:" + battle.getRank() + " " + lastPhase.getRankCalcInfo(battle));
                 }
 

@@ -3,7 +3,6 @@
  */
 package logbook.dto;
 
-
 /**
  * @author Nekopanda
  *
@@ -24,6 +23,25 @@ public enum ResultRank {
     private ResultRank(String rank, String desc) {
         this.rank = rank;
         this.description = desc;
+    }
+
+    public static ResultRank fromRank(String rank) {
+        if (rank.equals("S")) {
+            return S;
+        }
+        if (rank.equals("A")) {
+            return A;
+        }
+        if (rank.equals("B")) {
+            return B;
+        }
+        if (rank.equals("C")) {
+            return C;
+        }
+        if (rank.equals("D")) {
+            return D;
+        }
+        return E;
     }
 
     @Override

@@ -78,7 +78,7 @@ public class BattleResultDto extends AbstractDto {
     public BattleResultDto(BattleExDto dto) {
         this.battleDate = dto.getBattleDate();
         this.questName = dto.getQuestName();
-        this.rank = dto.getRank();
+        this.rank = dto.getRank().rank();
         this.mapCell = dto.getMapCellDto();
         this.enemyName = dto.getEnemyName();
         this.dropFlag = dto.getDropName().length() > 0;
@@ -92,9 +92,15 @@ public class BattleResultDto extends AbstractDto {
                 this.hasTaihaInFleet(lastPhase.getNowFriendHpCombined(), dto.getMaxFriendHpCombined()));
 
         // MVP
-        this.mvp = dto.getDock().getShips().get(dto.getMvp());
+        if (dto.getMvp() == -1) {
+            System.out.println("MVPなし？？？");
+            this.mvp = null;
+        }
+        else {
+            this.mvp = dto.getDock().getShips().get(dto.getMvp() - 1);
+        }
         if (dto.isCombined()) {
-            this.mvpCombined = dto.getDockCombined().getShips().get(dto.getMvpCombined());
+            this.mvpCombined = dto.getDockCombined().getShips().get(dto.getMvpCombined() - 1);
         }
         else {
             this.mvpCombined = null;
@@ -128,6 +134,10 @@ public class BattleResultDto extends AbstractDto {
      */
     public String getQuestName() {
         return this.questName;
+    }
+
+    public boolean isPractice() {
+        return (this.questName == null);
     }
 
     /**

@@ -3,9 +3,6 @@
  */
 package logbook.gui;
 
-import logbook.dto.BattleExDto;
-import logbook.dto.BattleResultDto;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.events.ShellAdapter;
@@ -20,10 +17,7 @@ import org.eclipse.swt.widgets.Shell;
 public class BattleDetailDialog extends WindowBase {
 
     private final WindowBase parent;
-    private BattleResultDto result;
-    private BattleExDto detail;
     private Browser browser;
-    private String currentHTML;
 
     public BattleDetailDialog(WindowBase parent) {
         this.parent = parent;
@@ -56,7 +50,7 @@ public class BattleDetailDialog extends WindowBase {
      * Create contents of the dialog.
      */
     private void createContents() {
-        super.createContents(this.parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
+        super.createContents(this.parent, SWT.CLOSE | SWT.TITLE | SWT.MAX | SWT.MIN | SWT.RESIZE, false);
         Shell shell = this.getShell();
         shell.setLayout(new FillLayout(SWT.VERTICAL));
         this.browser = new Browser(shell, SWT.NONE);

@@ -16,7 +16,7 @@ import com.dyuproject.protostuff.Tag;
  * 艦娘を表します
  *
  */
-public final class ShipDto extends ShipBaseDto {
+public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
 
     /** 日時 */
     private transient final Calendar time = Calendar.getInstance();
@@ -372,5 +372,10 @@ public final class ShipDto extends ShipBaseDto {
      */
     public int getLockedEquip() {
         return this.lockedEquip;
+    }
+
+    @Override
+    public int compareTo(ShipDto o) {
+        return Integer.compare(this.id, o.id);
     }
 }

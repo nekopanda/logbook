@@ -1201,7 +1201,8 @@ public final class CreateReportLogic {
     private static File getStoreFile(String name, String altername) throws IOException {
         // 報告書の保存先にファイルを保存します
         File report = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), name));
-        if ((report.getParentFile() == null) && report.mkdirs()) {
+        File dir = report.getParentFile();
+        if ((dir == null) || !(dir.exists() || dir.mkdirs())) {
             // 報告書の保存先ディレクトリが無く、ディレクトリの作成に失敗した場合はカレントフォルダにファイルを保存
             report = new File(name);
         }

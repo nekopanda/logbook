@@ -6,7 +6,7 @@
         <jar destfile="./dest/logbook.jar">
             <manifest>
                 <attribute name="Main-Class" value="logbook.gui.ApplicationMain"/>
-            	<attribute name="Class-Path" value=". logbook_lib/fluent-hc-4.3.2.jar logbook_lib/httpclient-4.3.2.jar logbook_lib/httpclient-cache-4.3.2.jar logbook_lib/httpcore-4.3.1.jar logbook_lib/commons-codec-1.6.jar logbook_lib/commons-io-2.4.jar logbook_lib/commons-lang3-3.1.jar logbook_lib/commons-logging-1.1.3.jar logbook_lib/jetty-client-9.0.5.v20130815.jar logbook_lib/jetty-http-9.0.5.v20130815.jar logbook_lib/jetty-io-9.0.5.v20130815.jar logbook_lib/jetty-proxy-9.0.5.v20130815.jar logbook_lib/jetty-server-9.0.5.v20130815.jar logbook_lib/jetty-servlet-9.0.5.v20130815.jar logbook_lib/jetty-util-9.0.5.v20130815.jar logbook_lib/servlet-api-3.0.jar logbook_lib/javax.json-1.0.jar logbook_lib/swt.jar logbook_lib/log4j-api-2.0-beta8.jar logbook_lib/log4j-core-2.0-beta8.jar logbook_lib/annotation.jar logbook_lib/opencsv-2.3.jar"/>
+            	<attribute name="Class-Path" value=". logbook_lib/fluent-hc-4.3.2.jar logbook_lib/httpclient-4.3.2.jar logbook_lib/httpclient-cache-4.3.2.jar logbook_lib/httpcore-4.3.1.jar logbook_lib/commons-codec-1.6.jar logbook_lib/commons-io-2.4.jar logbook_lib/commons-lang3-3.1.jar logbook_lib/commons-logging-1.1.3.jar logbook_lib/jetty-client-9.0.5.v20130815.jar logbook_lib/jetty-http-9.0.5.v20130815.jar logbook_lib/jetty-io-9.0.5.v20130815.jar logbook_lib/jetty-proxy-9.0.5.v20130815.jar logbook_lib/jetty-server-9.0.5.v20130815.jar logbook_lib/jetty-servlet-9.0.5.v20130815.jar logbook_lib/jetty-util-9.0.5.v20130815.jar logbook_lib/servlet-api-3.0.jar logbook_lib/javax.json-1.0.jar logbook_lib/swt.jar logbook_lib/log4j-api-2.0-beta8.jar logbook_lib/log4j-core-2.0-beta8.jar logbook_lib/annotation.jar logbook_lib/opencsv-2.3.jar logbook_lib/protostuff-api-1.0.7.jar logbook_lib/protostuff-collectionschema-1.0.7.jar logbook_lib/protostuff-core-1.0.7.jar logbook_lib/protostuff-runtime-1.0.7.jar"/>
             </manifest>
             <fileset dir="./bin"/>
         </jar>
@@ -34,5 +34,9 @@
         <copy file="./lib/log4j-core-2.0-beta8.jar" todir="./dest/logbook_lib"/>
         <copy file="./lib/opencsv-2.3.jar" todir="./dest/logbook_lib"/>
         <copy file="./lib/annotation.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/protostuff-api-1.0.7.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/protostuff-collectionschema-1.0.7.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/protostuff-core-1.0.7.jar" todir="./dest/logbook_lib"/>
+        <copy file="./lib/protostuff-runtime-1.0.7.jar" todir="./dest/logbook_lib"/>
     </target>
 </project>

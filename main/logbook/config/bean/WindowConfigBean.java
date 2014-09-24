@@ -17,6 +17,8 @@ public class WindowConfigBean {
 
     private int Height;
 
+    private boolean topMost;
+
     /** マウスに反応するか */
     private boolean mouseHoveringAware;
 
@@ -150,5 +152,19 @@ public class WindowConfigBean {
      */
     public void setHeight(int height) {
         this.Height = height;
+    }
+
+    /**
+     * @return topMost
+     */
+    public boolean isTopMost() {
+        return this.topMost;
+    }
+
+    /**
+     * @param topMost セットする topMost
+     */
+    public void setTopMost(boolean topMost) {
+        this.topMost = topMost;
     }
 }

@@ -19,7 +19,7 @@ import logbook.dto.DockDto;
 import logbook.dto.MapCellDto;
 import logbook.gui.background.AsyncExecApplicationMain;
 import logbook.gui.background.AsyncExecUpdateCheck;
-import logbook.gui.background.AsyncLoadBattleLog;
+import logbook.gui.background.BackgroundInitializer;
 import logbook.gui.listener.HelpEventListener;
 import logbook.gui.listener.MainShellAdapter;
 import logbook.gui.listener.TraySelectionListener;
@@ -216,7 +216,7 @@ public final class ApplicationMain extends WindowBase {
             // 設定読み込み
             print("起動");
             AppConfig.load();
-            /*
+            /*　static initializer に移行
             ShipConfig.load();
             MasterDataConfig.load();
             ShipGroupConfig.load();
@@ -266,7 +266,7 @@ public final class ApplicationMain extends WindowBase {
     public void createContents() {
         final Display display = Display.getDefault();
         int shellStyle = 0;
-        if (AppConfig.get().isOnTop()) {
+        if ((nativeService.isTopMostAvailable() == false) && AppConfig.get().isOnTop()) {
             shellStyle |= SWT.ON_TOP;
         }
         this.dummyHolder = new Shell(display, shellStyle | SWT.TOOL);
@@ -296,6 +296,28 @@ public final class ApplicationMain extends WindowBase {
                         e.doit = true;
                     } else {
                         e.doit = false;
+                    }
+                }
+            }
+
+            @Override
+            public void shellDeiconified(ShellEvent e) {
+                // Main以外のウィンドウも連動させる
+                for (Shell shell : ApplicationMain.this.dummyHolder.getShells()) {
+                    if (shell.getData() instanceof WindowBase) {
+                        WindowBase window = (WindowBase) shell.getData();
+                        window.shellDeiconified(e);
+                    }
+                }
+            }
+
+            @Override
+            public void shellIconified(ShellEvent e) {
+                // Main以外のウィンドウも連動させる
+                for (Shell shell : ApplicationMain.this.dummyHolder.getShells()) {
+                    if (shell.getData() instanceof WindowBase) {
+                        WindowBase window = (WindowBase) shell.getData();
+                        window.shellIconified(e);
                     }
                 }
             }
@@ -822,7 +844,7 @@ public final class ApplicationMain extends WindowBase {
      */
     private void startThread() {
         // 時間のかかる初期化を別スレッドで実行
-        new AsyncLoadBattleLog(this.shell, this).start();
+        new BackgroundInitializer(this.shell, this).start();
 
         print("その他のスレッド起動...");
         // 非同期で画面を更新するスレッド

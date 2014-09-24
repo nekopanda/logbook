@@ -88,7 +88,7 @@ public class BattleExDto extends AbstractDto {
 
     /** ランク */
     @Tag(19)
-    private String rank;
+    private ResultRank rank;
 
     /** マス */
     @Tag(20)
@@ -773,7 +773,12 @@ public class BattleExDto extends AbstractDto {
             // 演習の場合はない
             this.questName = null;
         }
-        this.rank = object.getString("api_win_rank");
+        this.rank = ResultRank.fromRank(object.getString("api_win_rank"));
+        // 完全勝利Sは分からないので戦闘結果を見る
+        Phase lastPhase = this.getLastPhase();
+        if ((lastPhase != null) && (lastPhase.getEstimatedRank() == ResultRank.PERFECT)) {
+            this.rank = ResultRank.PERFECT;
+        }
         this.mapCellDto = mapInfo;
         this.enemyName = object.getJsonObject("api_enemy_info").getString("api_deck_name");
         this.dropFlag = object.containsKey("api_get_ship");
@@ -917,6 +922,10 @@ public class BattleExDto extends AbstractDto {
         return (this.questName != null) && (this.mapCellDto != null) && this.isCompleteResult();
     }
 
+    public boolean isPractice() {
+        return (this.questName == null);
+    }
+
     /** 交戦後のHP */
     public int[] getNowFriendHp() {
         return this.getLastPhase().getNowFriendHp();
@@ -1052,7 +1061,7 @@ public class BattleExDto extends AbstractDto {
     /**
      * @return rank
      */
-    public String getRank() {
+    public ResultRank getRank() {
         return this.rank;
     }
 

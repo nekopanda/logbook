@@ -178,7 +178,7 @@ public class BattleWindowBase extends WindowBase {
         for (int i = 0; i < this.enemyShips.length; ++i) {
             this.enemyShips[i] = null;
         }
-        if (this.getShell().getVisible()) {
+        if (this.isWindowInitialized() && this.getShell().getVisible()) {
             this.updateData(false);
         }
     }
@@ -195,14 +195,14 @@ public class BattleWindowBase extends WindowBase {
                 this.friendShips[(i * 6) + c] = dockShips.get(c);
             }
         }
-        if (this.getShell().getVisible()) {
+        if (this.isWindowInitialized() && this.getShell().getVisible()) {
             this.updateData(start);
         }
     }
 
     public void updateMapCell(MapCellDto data) {
         this.mapCellDto = data;
-        if (this.getShell().getVisible()) {
+        if (this.isWindowInitialized() && this.getShell().getVisible()) {
             this.updateData(false);
         }
     }
@@ -213,7 +213,7 @@ public class BattleWindowBase extends WindowBase {
         for (int i = 0; i < enemyShips.size(); ++i) {
             this.enemyShips[i] = enemyShips.get(i);
         }
-        if (this.getShell().getVisible()) {
+        if (this.isWindowInitialized() && this.getShell().getVisible()) {
             this.updateData(false);
         }
     }

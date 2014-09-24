@@ -127,18 +127,20 @@ public class BattleResultServer {
         Set<Integer> cellList = new TreeSet<Integer>();
         for (BattleResult battle : this.resultList) {
             Date battleDate = battle.getBattleDate();
-            String dropName = battle.getDropName();
-            int[] map = battle.getMapCell().getMap();
-
             if (battleDate.before(this.firstBattleTime)) {
                 this.firstBattleTime = battleDate;
             }
             if (battleDate.after(this.lastBattleTime)) {
                 this.lastBattleTime = battleDate;
             }
-            dropShipList.add(dropName);
-            mapList.add(new IntegerPair(map[0], map[1], "-"));
-            cellList.add(map[2]);
+            if (battle.isPractice() == false) {
+                String dropName = battle.getDropName();
+                int[] map = battle.getMapCell().getMap();
+
+                dropShipList.add(dropName);
+                mapList.add(new IntegerPair(map[0], map[1], "-"));
+                cellList.add(map[2]);
+            }
         }
         this.dropShipList.clear();
         this.dropShipList.addAll(dropShipList);
@@ -187,7 +189,10 @@ public class BattleResultServer {
             LOG.warn("出撃ログファイルの後処理に失敗しました", e);
         }
         // ファイルとリストに追加
-        int index = this.numRecordsMap.get(file.getPath());
+        Integer index = this.numRecordsMap.get(file.getPath());
+        if (index == null) {
+            index = new Integer(0);
+        }
         this.resultList.add(new BattleResult(dto, file, index));
         this.numRecordsMap.put(file.getPath(), index + 1);
         // キャッシュされているときはキャッシュにも追加
@@ -227,6 +232,9 @@ public class BattleResultServer {
             return false;
         }
         if ((filter.map != null)) {
+            if (dto.isPractice()) {
+                return false;
+            }
             int[] battleMap = dto.getMapCell().getMap();
             if (filter.map.compareTo(new IntegerPair(battleMap[0], battleMap[1], "-")) != 0) {
                 return false;
@@ -280,7 +288,8 @@ public class BattleResultServer {
 
     private static File getStoreFile(File file) throws IOException {
         // 報告書の保存先にファイルを保存します
-        if ((file.getParentFile() == null) && file.mkdirs()) {
+        File dir = file.getParentFile();
+        if ((dir == null) || !(dir.exists() || dir.mkdirs())) {
             // 報告書の保存先ディレクトリが無く、ディレクトリの作成に失敗した場合はカレントフォルダにファイルを保存
             file = new File(file.getName());
         }
