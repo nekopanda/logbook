@@ -41,7 +41,7 @@ public class ItemConfig {
     public static void load() {
         try {
             Map<Integer, Integer> map = BeanUtils.readObject(AppConstants.ITEM_CONFIG_FILE, Map.class);
-            if (map != null) {
+            if ((map != null) && (map.size() > 0)) {
                 GlobalContext.setItemMap(map);
             }
         } catch (Exception e) {

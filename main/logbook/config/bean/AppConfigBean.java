@@ -172,6 +172,9 @@ public final class AppConfigBean {
             null, null, null, null
     };
 
+    /** 保存したJSONを読み込ませてテストするためのウィンドウメニューを表示するかどうか */
+    private boolean enableTestWindow = false;
+
     /**
      * ポート番号を取得します。
      * @return ポート番号
@@ -972,5 +975,19 @@ public final class AppConfigBean {
      */
     public void setShipFilters(ShipFilterDto[] shipFilters) {
         this.shipFilters = shipFilters;
+    }
+
+    /**
+     * @return enableTestWindow
+     */
+    public boolean isEnableTestWindow() {
+        return this.enableTestWindow;
+    }
+
+    /**
+     * @param enableTestWindow セットする enableTestWindow
+     */
+    public void setEnableTestWindow(boolean enableTestWindow) {
+        this.enableTestWindow = enableTestWindow;
     }
 }

@@ -9,6 +9,15 @@ import java.util.Set;
  */
 public final class ShipGroupBean {
 
+    /** 互換性維持のため Long -> Integer 変換を持つSetを定義する */
+    public static class ShipSet extends LinkedHashSet<Integer> {
+        private static final long serialVersionUID = -7828201548391851142L;
+
+        public void add(Long value) {
+            this.add((int) (long) value);
+        }
+    }
+
     /** グループ名 */
     private String name;
 
@@ -16,7 +25,7 @@ public final class ShipGroupBean {
     private int id;
 
     /** 艦娘リスト */
-    private Set<Integer> ships = new LinkedHashSet<Integer>();
+    private Set<Integer> ships = new ShipSet();
 
     /**
      * グループ名を取得します。

@@ -320,7 +320,15 @@ public final class CreateReportLogic {
         public String toString() {
             StringBuilder sb = new StringBuilder();
             int count = 0;
-            for (Entry<ShipDto, Integer> entry : this.shipMap.entrySet()) {
+            // 持っている個数で個数ソート
+            List<Entry<ShipDto, Integer>> sorted = new ArrayList<>(this.shipMap.entrySet());
+            Collections.sort(sorted, new Comparator<Entry<ShipDto, Integer>>() {
+                @Override
+                public int compare(Entry<ShipDto, Integer> o1, Entry<ShipDto, Integer> o2) {
+                    return -Integer.compare(o1.getValue(), o2.getValue());
+                }
+            });
+            for (Entry<ShipDto, Integer> entry : sorted) {
                 if (count++ != 0) {
                     sb.append(",");
                 }
@@ -343,6 +351,7 @@ public final class CreateReportLogic {
     public static List<Comparable[]> getItemListBody() {
         Map<ItemDto, ItemInfo> itemCountMap = new HashMap<ItemDto, ItemInfo>();
 
+        // 装備の個数を計算
         for (ItemDto item : GlobalContext.getItemMap().values()) {
             ItemInfo info = itemCountMap.get(item);
             if (info == null) {
@@ -353,6 +362,7 @@ public final class CreateReportLogic {
             }
         }
 
+        // 艦娘が持っている個数を計算
         for (ShipDto ship : GlobalContext.getShipMap().values()) {
             for (ItemDto item : ship.getItem()) {
                 if (item != null) {

@@ -573,7 +573,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
         public List<ShipDto> getShipList() {
             List<ShipDto> ships = new ArrayList<ShipDto>();
             Map<Integer, ShipDto> shipMap = GlobalContext.getShipMap();
-            for (Integer id : this.shipGroup.getShips()) {
+            for (int id : this.shipGroup.getShips()) {
                 ShipDto ship = shipMap.get(id);
                 if (ship != null) {
                     ships.add(ship);

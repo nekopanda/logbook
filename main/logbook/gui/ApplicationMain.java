@@ -390,6 +390,8 @@ public final class ApplicationMain extends WindowBase {
         cmditemlist.setText("所有装備一覧(&I)\tCtrl+I");
         cmditemlist.setAccelerator(SWT.CTRL + 'I');
         this.itemTableWindow = new ItemTable(this.dummyHolder, cmditemlist);
+        // セパレータ
+        new MenuItem(cmdmenu, SWT.SEPARATOR);
         // コマンド-所有艦娘一覧
         for (int i = 0; i < 4; ++i) {
             MenuItem cmdshiplist = new MenuItem(cmdmenu, SWT.CHECK);
@@ -397,8 +399,6 @@ public final class ApplicationMain extends WindowBase {
             this.shipTableWindows[i] = new ShipTable(this.dummyHolder, cmdshiplist, i);
         }
 
-        // セパレータ
-        new MenuItem(cmdmenu, SWT.SEPARATOR);
         // コマンド-お風呂に入りたい艦娘
         MenuItem cmdbathwaterlist = new MenuItem(cmdmenu, SWT.CHECK);
         cmdbathwaterlist.setText("お風呂に入りたい艦娘(&N)\tCtrl+N");
@@ -506,14 +506,16 @@ public final class ApplicationMain extends WindowBase {
         version.addSelectionListener(new HelpEventListener(this));
 
         // テスト用
-        MenuItem testfeeder = new MenuItem(etcmenu, SWT.NONE);
-        testfeeder.setText("テストする");
-        testfeeder.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                new TestDataFeeder(ApplicationMain.this).open();
-            }
-        });
+        if (AppConfig.get().isEnableTestWindow()) {
+            MenuItem testfeeder = new MenuItem(etcmenu, SWT.NONE);
+            testfeeder.setText("テストする");
+            testfeeder.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    new TestDataFeeder(ApplicationMain.this).open();
+                }
+            });
+        }
 
         // シェルイベント
         this.shell.addShellListener(new MainShellAdapter());

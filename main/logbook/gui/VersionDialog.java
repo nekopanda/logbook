@@ -1,8 +1,11 @@
 package logbook.gui;
 
 import java.awt.Desktop;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import logbook.constants.AppConstants;
+import logbook.internal.MasterData;
 import logbook.server.proxy.Filter;
 
 import org.apache.commons.lang3.StringUtils;
@@ -70,8 +73,8 @@ public final class VersionDialog extends WindowBase {
         versionGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         versionGroup.setLayout(new GridLayout(2, true));
 
-        label("航海日誌", versionGroup);
-        label(AppConstants.VERSION + " ex", versionGroup);
+        label("航海日誌改", versionGroup);
+        label(AppConstants.VERSION, versionGroup);
 
         Link gowebsite = new Link(versionGroup, SWT.NONE);
         gowebsite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
@@ -95,6 +98,20 @@ public final class VersionDialog extends WindowBase {
 
         label("鎮守府サーバー", appGroup);
         label(StringUtils.defaultString(Filter.getServerName(), "未設定"), appGroup);
+
+        // データ
+        Group dataGroup = new Group(this.shell, SWT.NONE);
+        dataGroup.setText("データ更新日時");
+        dataGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        dataGroup.setLayout(new GridLayout(2, true));
+
+        label("マスターデータ", dataGroup);
+        String updateTimeStr = "不明";
+        Date masterUpdateTime = MasterData.getInstance().getMasterUpdateTime();
+        if (masterUpdateTime.getTime() > 0) {
+            updateTimeStr = (new SimpleDateFormat("yyyy/MM/dd HH:mm").format(masterUpdateTime));
+        }
+        label(updateTimeStr, dataGroup);
 
         // 設定
         Group javaGroup = new Group(this.shell, SWT.NONE);

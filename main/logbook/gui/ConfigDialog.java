@@ -208,10 +208,16 @@ public final class ConfigDialog extends Dialog {
         hidewindow.setText("最小化時にタスクトレイに格納");
         hidewindow.setSelection(AppConfig.get().isHideWindow());
 
-        final Button ontop = new Button(compositeSystem, SWT.CHECK);
-        ontop.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-        ontop.setText("最前面に表示する*");
-        ontop.setSelection(AppConfig.get().isOnTop());
+        final Button ontop;
+        if (WindowBase.nativeService.isTopMostAvailable() == false) { // 右クリックから設定できる場合は表示しない
+            ontop = new Button(compositeSystem, SWT.CHECK);
+            ontop.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+            ontop.setText("最前面に表示する*");
+            ontop.setSelection(AppConfig.get().isOnTop());
+        }
+        else {
+            ontop = null;
+        }
 
         final Button checkUpdate = new Button(compositeSystem, SWT.CHECK);
         checkUpdate.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
@@ -640,6 +646,11 @@ public final class ConfigDialog extends Dialog {
         jsonpath.setLayoutData(gdJsonpath);
         jsonpath.setText(AppConfig.get().getStoreJsonPath());
 
+        final Button btnTest = new Button(compositeDevelopment, SWT.CHECK);
+        btnTest.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+        btnTest.setText("航海日誌開発者向けメニューを追加する*");
+        btnTest.setSelection(AppConfig.get().isEnableTestWindow());
+
         Composite commandComposite = new Composite(this.shell, SWT.NONE);
         commandComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         GridLayout glCommandComposite = new GridLayout(2, false);
@@ -684,7 +695,9 @@ public final class ConfigDialog extends Dialog {
                     AppConfig.get().setListenPort(Integer.parseInt(listenport.getText()));
                 }
                 AppConfig.get().setHideWindow(hidewindow.getSelection());
-                AppConfig.get().setOnTop(ontop.getSelection());
+                if (ontop != null) {
+                    AppConfig.get().setOnTop(ontop.getSelection());
+                }
                 AppConfig.get().setCheckDoit(checkDoit.getSelection());
                 AppConfig.get().setNameOnTitlebar(nameOnTitlebar.getSelection());
                 if (StringUtils.isNumeric(soundlevel.getText())) {
@@ -740,6 +753,7 @@ public final class ConfigDialog extends Dialog {
                 // development
                 AppConfig.get().setStoreJson(btnJson.getSelection());
                 AppConfig.get().setStoreJsonPath(new File(jsonpath.getText()).getAbsolutePath());
+                AppConfig.get().setEnableTestWindow(btnTest.getSelection());
                 try {
                     AppConfig.store();
                 } catch (IOException ex) {

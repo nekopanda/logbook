@@ -74,8 +74,11 @@ public class MasterData {
     /** UseItem　（バケツとか、家具箱とか） */
     private Map<Integer, UseItemInfoDto> useItem = new HashMap<Integer, UseItemInfoDto>();
 
+    /** 最後に START2 によるマスターデータを受け取った日時 */
+    private Date masterUpdateTime = new Date(0);
+
     /** 最終更新日時 */
-    private Date lastUpdateTime = new Date();
+    private Date lastUpdateTime = new Date(0);
 
     public MasterData() {
     }
@@ -104,7 +107,7 @@ public class MasterData {
         if ((stype <= 0) || (stype > Holder.instance.stype.size())) {
             return null;
         }
-        return Holder.instance.stype.get(stype);
+        return Holder.instance.stype.get(stype - 1);
     }
 
     /** （装備でない）アイテム情報を取得 */
@@ -164,6 +167,7 @@ public class MasterData {
             }
         }
 
+        this.masterUpdateTime = new Date();
         this.lastUpdateTime = new Date();
     }
 
@@ -277,6 +281,20 @@ public class MasterData {
      */
     public void setMissionState(Map<Integer, Integer> missionState) {
         this.missionState = missionState;
+    }
+
+    /**
+     * @return masterUpdateTime
+     */
+    public Date getMasterUpdateTime() {
+        return this.masterUpdateTime;
+    }
+
+    /**
+     * @param masterUpdateTime セットする masterUpdateTime
+     */
+    public void setMasterUpdateTime(Date masterUpdateTime) {
+        this.masterUpdateTime = masterUpdateTime;
     }
 
     /**

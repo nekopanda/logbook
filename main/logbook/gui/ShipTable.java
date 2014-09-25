@@ -2,12 +2,10 @@ package logbook.gui;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import logbook.config.AppConfig;
 import logbook.config.ShipGroupConfig;
 import logbook.config.bean.ShipGroupBean;
-import logbook.data.context.GlobalContext;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipFilterDto;
 import logbook.gui.logic.CreateReportLogic;
@@ -113,7 +111,7 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
             public void widgetSelected(SelectionEvent e) {
                 StringBuilder sb = new StringBuilder();
                 for (TableItem item : ShipTable.this.table.getSelection()) {
-                    sb.append(item.getData()).append(", ");
+                    sb.append(String.valueOf(((ShipDto) item.getData()).getId())).append(", ");
                 }
                 Clipboard clipboard = new Clipboard(Display.getDefault());
                 clipboard.setContents(new Object[] { sb.toString() }, new Transfer[] { TextTransfer.getInstance() });
@@ -125,9 +123,8 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
             @Override
             public void widgetSelected(SelectionEvent e) {
                 StringBuilder sb = new StringBuilder();
-                Map<Integer, ShipDto> shipMap = GlobalContext.getShipMap();
                 for (TableItem item : ShipTable.this.table.getSelection()) {
-                    sb.append("\"").append(shipMap.get(item.getData()).getName()).append("\", ");
+                    sb.append("\"").append(((ShipDto) item.getData()).getName()).append("\", ");
                 }
                 Clipboard clipboard = new Clipboard(Display.getDefault());
                 clipboard.setContents(new Object[] { sb.toString() }, new Transfer[] { TextTransfer.getInstance() });

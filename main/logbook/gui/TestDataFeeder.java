@@ -27,7 +27,17 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * @author Nekopanda
+ * 
  * テストデータを食べさせる
+ * JSON保存先のパスをセットしてリセットを押すと準備ができます。
+ * マウスホイールを回すとJSONファイルを食べさせます。
+ * 各種ボタンで一気に食べさせることもできます。
+ * 
+ * ！注意！
+ * 動作テスト用なのでログ出力も行います。
+ * 古いログが追加されていくので本番使用環境では使わないでください。
+ * 食べさせたログは艦これ統計データベースへの送信は行いません。
+ * アクセスしたURLの情報が必要な建造や開発、艦の入れ替えなどはテストできません。
  */
 public class TestDataFeeder extends WindowBase {
 
@@ -38,7 +48,7 @@ public class TestDataFeeder extends WindowBase {
 
     public TestDataFeeder(WindowBase parent) {
         this.createContents(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
-        this.getShell().setText("テストデータを食べさせます");
+        this.getShell().setText("JSONを食べさせます");
     }
 
     /**
@@ -66,12 +76,16 @@ public class TestDataFeeder extends WindowBase {
         Shell shell = this.getShell();
         shell.setLayout(new GridLayout(2, false));
 
+        Label desc = new Label(shell, SWT.NONE);
+        desc.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
+        desc.setText("使い方はソースコード(TestDataFeeder.java)を見てください");
+
         this.filepathText = new Text(shell, SWT.BORDER);
         GridData gd = new GridData(
                 GridData.FILL_HORIZONTAL, SWT.CENTER, true, false, 1, 1);
         gd.widthHint = 250;
         this.filepathText.setLayoutData(gd);
-        this.filepathText.setText("O:\\艦これJSON\\Now\\メイン");
+        this.filepathText.setText("<よく分からない方は使わないでね>");
 
         Button btn = new Button(shell, SWT.NONE);
         btn.setText("リセット");
