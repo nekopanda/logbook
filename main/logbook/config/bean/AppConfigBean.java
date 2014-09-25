@@ -161,8 +161,8 @@ public final class AppConfigBean {
 
     /** 艦娘一覧ウィンドウの名前 */
     private String[] shipTableNames = new String[] {
-            "所有艦娘一覧",
-            "お風呂に入りたい艦娘",
+            "所有艦娘一覧 1",
+            "所有艦娘一覧 2",
             "所有艦娘一覧 3",
             "所有艦娘一覧 4"
     };

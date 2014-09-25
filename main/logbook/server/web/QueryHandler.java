@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import logbook.config.MasterDataConfig;
 import logbook.data.context.GlobalContext;
 import logbook.dto.BasicInfoDto;
 import logbook.dto.BattleExDto;
@@ -161,7 +160,7 @@ public class QueryHandler extends HttpServlet {
                     jb.add("master_items", item_array);
                 }
 
-                MasterData data = MasterDataConfig.get();
+                MasterData data = MasterData.getInstance();
 
                 { // マップ
                     JsonArrayBuilder maparea_array = Json.createArrayBuilder();
@@ -426,7 +425,7 @@ public class QueryHandler extends HttpServlet {
                     jb.add("max_ships", GlobalContext.maxChara());
                     jb.add("max_slotitems", GlobalContext.maxSlotitem());
                     jb.add("is_combined", GlobalContext.isCombined());
-                    jb.add("master_last_update_time", MasterDataConfig.get().getLastUpdateTime().getTime());
+                    jb.add("master_last_update_time", MasterData.getInstance().getLastUpdateTime().getTime());
                 }
             }
         });

@@ -59,11 +59,10 @@ public class UseItemDto {
 
     /**
      * アイテム名を取得
-     * @param masterData マスターデータを入れてください
      * @return
      */
-    public String getItemName(MasterData masterData) {
-        MasterData.UseItemInfoDto useItemDto = masterData.getUseItem(this.useItemId);
+    public String getItemName() {
+        MasterData.UseItemInfoDto useItemDto = MasterData.getUseItem(this.useItemId);
         if (useItemDto != null) {
             return useItemDto.getName();
         }

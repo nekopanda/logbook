@@ -9,7 +9,6 @@ import java.util.List;
 import logbook.config.AppConfig;
 import logbook.config.ItemConfig;
 import logbook.config.ItemMasterConfig;
-import logbook.config.MasterDataConfig;
 import logbook.config.ShipConfig;
 import logbook.config.ShipGroupConfig;
 import logbook.constants.AppConstants;
@@ -28,6 +27,7 @@ import logbook.gui.logic.Sound;
 import logbook.gui.widgets.FleetComposite;
 import logbook.internal.BattleResultServer;
 import logbook.internal.EnemyData;
+import logbook.internal.MasterData;
 import logbook.server.proxy.DatabaseClient;
 import logbook.server.proxy.ProxyServer;
 import logbook.server.web.WebServer;
@@ -82,6 +82,7 @@ public final class ApplicationMain extends WindowBase {
     }
 
     public static ApplicationMain main;
+    public static boolean disableUpdate;
 
     /**
      * <p>
@@ -109,7 +110,7 @@ public final class ApplicationMain extends WindowBase {
                 ShipGroupConfig.store();
                 ItemMasterConfig.store();
                 ItemConfig.store();
-                MasterDataConfig.store();
+                MasterData.store();
                 EnemyData.store();
             } catch (Exception e) {
                 LOG.fatal("シャットダウンスレッドで異常終了しました", e);
@@ -1067,6 +1068,8 @@ public final class ApplicationMain extends WindowBase {
      * @param message コンソールに表示するメッセージ
      */
     public void printMessage(final String message) {
+        if (disableUpdate)
+            return;
         int size = this.console.getItemCount();
         if (size >= MAX_LOG_LINES) {
             this.console.remove(0);

@@ -81,7 +81,7 @@ public final class AsyncExecApplicationMain extends Thread {
                 }
 
                 // 遠征と入渠を更新する
-                Display.getDefault().asyncExec(new UpdateDeckNdockTask(this.main));
+                Display.getDefault().syncExec(new UpdateDeckNdockTask(this.main));
 
                 long currentTime = Calendar.getInstance().getTimeInMillis();
                 // 次のアップデートは1秒後

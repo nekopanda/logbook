@@ -29,7 +29,7 @@ public class AppConstants {
     public static final String DATE_SHORT_FORMAT = "HH:mm:ss";
 
     /** 戦闘ログファイルの名前 */
-    public static final String BATTLE_LOGFILE_DATE_FORMAT = "yyyy-MM";
+    public static final String BATTLE_LOGFILE_DATE_FORMAT = "yyyy-MM-dd";
 
     /** 疲労赤色 */
     public static final int COND_RED = 19;

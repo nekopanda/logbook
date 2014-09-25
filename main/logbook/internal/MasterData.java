@@ -3,6 +3,7 @@
  */
 package logbook.internal;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -14,13 +15,43 @@ import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
+import logbook.constants.AppConstants;
 import logbook.dto.UseItemDto;
+import logbook.util.BeanUtils;
 
 /**
  * @author Nekopanda
  *
  */
 public class MasterData {
+
+    private static class Holder {
+        public static MasterData instance = null;
+    }
+
+    /**
+     * 
+     * 設定ファイルに書き込みます
+     */
+    public static void store() throws IOException {
+        BeanUtils.writeObject(AppConstants.MASTER_DATA_CONFIG, Holder.instance);
+    }
+
+    private static void load() {
+        MasterData masterData = BeanUtils.readObject(AppConstants.MASTER_DATA_CONFIG, MasterData.class);
+        if (masterData != null) {
+            Holder.instance = masterData;
+        }
+        else {
+            Holder.instance = new MasterData();
+        }
+    }
+
+    public static final boolean INIT_COMPLETE;
+    static {
+        load();
+        INIT_COMPLETE = true;
+    }
 
     /** 1-, 2-, ... , イベント海域 */
     private ArrayList<MapAreaDto> maparea = new ArrayList<MapAreaDto>();
@@ -49,7 +80,46 @@ public class MasterData {
     public MasterData() {
     }
 
-    public void doMater(JsonObject data) {
+    /** START2のマスターデータで更新 */
+    public static void updateMaster(JsonObject data) {
+        Holder.instance.doMater(data);
+    }
+
+    /** 出撃マップを更新 */
+    public static void updateMapInfo(JsonArray json_mapinfo) {
+        Holder.instance.doMapInfo(json_mapinfo);
+    }
+
+    /** 遠征データを更新 */
+    public static void updateMission(JsonArray json_mission) {
+        Holder.instance.doMission(json_mission);
+    }
+
+    public static MasterData getInstance() {
+        return Holder.instance;
+    }
+
+    /** 艦種情報を取得 */
+    public static ShipTypeDto getShipType(int stype) {
+        if ((stype <= 0) || (stype > Holder.instance.stype.size())) {
+            return null;
+        }
+        return Holder.instance.stype.get(stype);
+    }
+
+    /** （装備でない）アイテム情報を取得 */
+    public static UseItemInfoDto getUseItem(int id) {
+        Integer key = id;
+        return Holder.instance.useItem.get(key);
+    }
+
+    /** マップ情報を取得 */
+    public static MapInfoDto getMapInfo(int area, int no) {
+        int id = (area * 10) + no;
+        return Holder.instance.mapinfo.get(id);
+    }
+
+    private void doMater(JsonObject data) {
 
         JsonArray json_maparea = data.getJsonArray("api_mst_maparea");
         if (json_maparea != null) {
@@ -97,7 +167,7 @@ public class MasterData {
         this.lastUpdateTime = new Date();
     }
 
-    public void doMapInfo(JsonArray json_mapinfo) {
+    private void doMapInfo(JsonArray json_mapinfo) {
         if (json_mapinfo != null) {
             Map<Integer, Integer> newState = new HashMap<Integer, Integer>();
             for (JsonValue elem : json_mapinfo) {
@@ -111,7 +181,7 @@ public class MasterData {
         }
     }
 
-    public void doMission(JsonArray json_mission) {
+    private void doMission(JsonArray json_mission) {
         if (json_mission != null) {
             Map<Integer, Integer> newState = new HashMap<Integer, Integer>();
             for (JsonValue elem : json_mission) {
@@ -228,11 +298,6 @@ public class MasterData {
      */
     public Map<Integer, UseItemInfoDto> getUseItem() {
         return this.useItem;
-    }
-
-    public UseItemInfoDto getUseItem(int id) {
-        Integer key = id;
-        return this.useItem.get(key);
     }
 
     /**

@@ -23,7 +23,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import logbook.config.AppConfig;
-import logbook.config.MasterDataConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.dto.BattleExDto;
@@ -45,7 +44,6 @@ import logbook.dto.ShipParameters;
 import logbook.dto.UseItemDto;
 import logbook.internal.BattleResultFilter;
 import logbook.internal.BattleResultServer;
-import logbook.internal.MasterData;
 import logbook.internal.Ship;
 import logbook.util.ReportUtils;
 
@@ -698,13 +696,12 @@ public final class CreateReportLogic {
 
             String[] itemName = new String[] { "", "" };
             String[] itemCount = new String[] { "", "" };
-            MasterData masterData = MasterDataConfig.get();
             ResourceItemDto resItems = result.getItems();
             if (resItems != null) {
                 Map<Integer, UseItemDto> items = resItems.getItems();
                 int index = 0;
                 for (UseItemDto item : items.values()) {
-                    itemName[index] = item.getItemName(masterData);
+                    itemName[index] = item.getItemName();
                     itemCount[index] = String.valueOf(item.getItemCount());
                     if (++index >= 2)
                         break;

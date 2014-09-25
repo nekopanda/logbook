@@ -26,7 +26,6 @@ import javax.json.JsonValue;
 import logbook.config.AppConfig;
 import logbook.config.ItemConfig;
 import logbook.config.KdockConfig;
-import logbook.config.MasterDataConfig;
 import logbook.constants.AppConstants;
 import logbook.data.Data;
 import logbook.dto.BasicInfoDto;
@@ -56,6 +55,7 @@ import logbook.gui.logic.CreateReportLogic;
 import logbook.internal.BattleResultServer;
 import logbook.internal.EnemyData;
 import logbook.internal.Item;
+import logbook.internal.MasterData;
 import logbook.internal.Ship;
 
 import org.apache.commons.io.FileUtils;
@@ -112,7 +112,6 @@ public final class GlobalContext {
 
     /** 戦闘詳細 */
     private static BattleExDto battle = null;
-    private static boolean firstBattle = true;
 
     /** 遠征リスト */
     private static DeckMissionDto[] deckMissions = new DeckMissionDto[] { DeckMissionDto.EMPTY, DeckMissionDto.EMPTY,
@@ -849,7 +848,7 @@ public final class GlobalContext {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
             if (battle == null) {
-                battle = new BattleExDto();
+                battle = new BattleExDto(data.getCreateDate());
             }
             BattleExDto.Phase phase = battle.addPhase(apidata, phaseKind);
 
@@ -921,8 +920,6 @@ public final class GlobalContext {
                 if (battle.isCombined()) {
                     battle.getDockCombined().setUpdate(true);
                 }
-
-                firstBattle = true;
 
                 // ランクが合っているかチェック
                 Phase lastPhase = battle.getLastPhase();
@@ -1776,7 +1773,7 @@ public final class GlobalContext {
                 }
                 addConsole("装備一覧を更新しました");
 
-                MasterDataConfig.get().doMater(obj);
+                MasterData.updateMaster(obj);
             }
 
             addConsole("設定を更新しました");
@@ -1795,7 +1792,7 @@ public final class GlobalContext {
         try {
             JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
             if (apidata != null) {
-                MasterDataConfig.get().doMapInfo(apidata);
+                MasterData.updateMapInfo(apidata);
             }
         } catch (Exception e) {
             LOG.warn("マップ情報更新に失敗しました", e);
@@ -1812,7 +1809,7 @@ public final class GlobalContext {
         try {
             JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
             if (apidata != null) {
-                MasterDataConfig.get().doMission(apidata);
+                MasterData.updateMission(apidata);
             }
         } catch (Exception e) {
             LOG.warn("任務情報更新に失敗しました", e);

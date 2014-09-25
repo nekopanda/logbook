@@ -5,7 +5,6 @@ package logbook.dto;
 
 import javax.json.JsonObject;
 
-import logbook.config.MasterDataConfig;
 import logbook.internal.EnemyData;
 import logbook.internal.MasterData;
 
@@ -49,10 +48,9 @@ public class MapCellDto implements Comparable<MapCellDto> {
     }
 
     private String toString(boolean detailed) {
-        int id = (this.map[0] * 10) + this.map[1];
         String ret = "マップ:" + this.map[0] + "-" + this.map[1] + " セル:" + this.map[2];
         if (detailed) {
-            MasterData.MapInfoDto mapInfo = MasterDataConfig.get().getMapinfo().get(id);
+            MasterData.MapInfoDto mapInfo = MasterData.getMapInfo(this.map[0], this.map[1]);
             if (mapInfo != null) {
                 String mapName = mapInfo.getName();
                 ret = "マップ: " + mapName + "(" + this.map[0] + "-" + this.map[1] + ") セル:" + this.map[2];

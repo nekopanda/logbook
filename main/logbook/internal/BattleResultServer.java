@@ -170,7 +170,7 @@ public class BattleResultServer {
     }
 
     public void addNewResult(BattleExDto dto) {
-        File file = new File(FilenameUtils.concat(this.path, format.format(new Date()) + ".dat"));
+        File file = new File(FilenameUtils.concat(this.path, format.format(dto.getBattleDate()) + ".dat"));
         try {
             FileOutputStream output = null;
             try {

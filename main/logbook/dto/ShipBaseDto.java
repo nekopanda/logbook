@@ -9,7 +9,6 @@ import java.util.Map;
 
 import javax.json.JsonObject;
 
-import logbook.config.MasterDataConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.internal.MasterData;
@@ -259,10 +258,7 @@ public abstract class ShipBaseDto extends AbstractDto {
         if (this.shipInfo == null) // データを取得していない
             return false;
         int stype = this.shipInfo.getStype();
-        List<MasterData.ShipTypeDto> info = MasterDataConfig.get().getStype();
-        if ((stype <= 0) || (info.size() < stype)) // データを取得していない
-            return false;
-        MasterData.ShipTypeDto shipType = info.get(stype - 1);
+        MasterData.ShipTypeDto shipType = MasterData.getShipType(stype);
         if (shipType == null) // データを取得していない
             return false;
         List<Boolean> equipType = shipType.getEquipType();

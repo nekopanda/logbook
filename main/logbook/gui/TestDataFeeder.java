@@ -109,6 +109,16 @@ public class TestDataFeeder extends WindowBase {
             }
         });
 
+        Button btn4 = new Button(shell, SWT.NONE);
+        btn4.setText("全て読み込む");
+        btn4.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                ApplicationMain.disableUpdate = true;
+                TestDataFeeder.this.readAll();
+            }
+        });
+
         this.statusLabel = new Label(shell, SWT.NONE);
         this.statusLabel.setLayoutData(new GridData(
                 GridData.FILL_HORIZONTAL, SWT.CENTER, true, false, 2, 1));
@@ -138,19 +148,37 @@ public class TestDataFeeder extends WindowBase {
         Arrays.sort(this.fileList);
         this.currentIndex = 0;
 
-        for (; this.currentIndex < this.fileList.length;) {
+        this.updateLabel();
+    }
+
+    private void readAll() {
+        if (this.fileList == null) {
+            return;
+        }
+        // まずは100個
+        int end = Math.min(this.currentIndex + 1000, this.fileList.length);
+        for (; this.currentIndex < end;) {
             String filepath = this.fileList[this.currentIndex++];
             try {
                 Data data = new TestData(filepath);
                 GlobalContext.updateContext(data);
-                if ((this.currentIndex % 64) == 0)
-                    this.updateLabel();
             } catch (ParseException | IOException e) {
                 e.printStackTrace();
             }
         }
-
         this.updateLabel();
+        // 末尾再帰？？
+        if (this.currentIndex < this.fileList.length) {
+            this.getShell().getDisplay().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    TestDataFeeder.this.readAll();
+                }
+            });
+        }
+        else {
+            ApplicationMain.disableUpdate = false;
+        }
     }
 
     private void nextUntil(DataType type) {

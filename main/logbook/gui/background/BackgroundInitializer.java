@@ -1,13 +1,13 @@
 package logbook.gui.background;
 
 import logbook.config.AppConfig;
-import logbook.config.MasterDataConfig;
 import logbook.config.ShipGroupConfig;
 import logbook.data.context.GlobalContext;
 import logbook.gui.ApplicationMain;
 import logbook.internal.BattleResultServer;
 import logbook.internal.EnemyData;
 import logbook.internal.Item;
+import logbook.internal.MasterData;
 import logbook.internal.Ship;
 import logbook.server.proxy.ProxyServer;
 import logbook.server.web.WebServer;
@@ -56,7 +56,7 @@ public final class BackgroundInitializer extends Thread {
         try {
             boolean success = true;
             success &= Ship.INIT_COMPLETE; // ShipConfig
-            MasterDataConfig.get(); // MasterDataConfig
+            success &= MasterData.INIT_COMPLETE; // MasterData
             ShipGroupConfig.get(); // ShipGroupConfig
             success &= Item.INIT_COMPLETE; // ItemMasterConfig
             success &= GlobalContext.INIT_COMPLETE; // ItemConfig

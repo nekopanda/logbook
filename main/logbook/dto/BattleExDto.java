@@ -4,7 +4,6 @@
 package logbook.dto;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -633,8 +632,8 @@ public class BattleExDto extends AbstractDto {
         }
     }
 
-    public BattleExDto() {
-        this.battleDate = Calendar.getInstance().getTime();
+    public BattleExDto(Date date) {
+        this.battleDate = date;
     }
 
     public Phase addPhase(JsonObject object, BattlePhaseKind kind) {

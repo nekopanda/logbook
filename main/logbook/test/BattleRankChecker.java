@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Date;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -110,7 +111,7 @@ public class BattleRankChecker {
                         continue;
                     if (isBattleResult == false) {
                         if (battle == null) {
-                            battle = new BattleExDto();
+                            battle = new BattleExDto(new Date());
                         }
                         battle.addPhase(data, kind);
                     }
