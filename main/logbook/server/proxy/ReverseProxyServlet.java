@@ -1,9 +1,11 @@
 package logbook.server.proxy;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
+import java.util.zip.GZIPInputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +17,7 @@ import logbook.data.DataProxy;
 import logbook.data.DataType;
 import logbook.data.UndefinedData;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.HttpRequest;
@@ -70,6 +73,18 @@ public final class ReverseProxyServlet extends ProxyServlet {
         super.customizeProxyRequest(proxyRequest, request);
     }
 
+    @Override
+    protected String filterResponseHeader(HttpServletRequest request,
+            String headerName,
+            String headerValue)
+    {
+        // Content Encoding を取得する
+        if (headerName.equals("Content-Encoding")) {
+            request.setAttribute(Filter.CONTENT_ENCODING, headerValue);
+        }
+        return headerValue;
+    }
+
     /*
      * レスポンスが帰ってきた
      */
@@ -104,10 +119,24 @@ public final class ReverseProxyServlet extends ProxyServlet {
             byte[] postField = (byte[]) request.getAttribute(Filter.REQUEST_BODY);
             ByteArrayOutputStream stream = (ByteArrayOutputStream) request.getAttribute(Filter.RESPONSE_BODY);
             if (stream != null) {
+                byte[] responseBody = stream.toByteArray();
+
+                // 圧縮されていたら解凍する
+                String contentEncoding = (String) request.getAttribute(Filter.CONTENT_ENCODING);
+                if ((contentEncoding != null) && contentEncoding.equals("gzip")) {
+                    try {
+                        responseBody = IOUtils.toByteArray(new GZIPInputStream(new ByteArrayInputStream(responseBody)));
+                    } catch (IOException e) {
+                        //
+                    }
+                }
+
                 UndefinedData rawData = new UndefinedData(request.getRequestURL().toString(),
-                        request.getRequestURI(), postField, stream.toByteArray());
+                        request.getRequestURI(), postField, responseBody);
+
                 // 統計データベース(http://kancolle-db.net/)に送信する
                 DatabaseClient.send(rawData);
+
                 // キャプチャしたバイト配列は何のデータかを決定する
                 Data data = rawData.toDefinedData();
                 if (data.getDataType() != DataType.UNDEFINED) {

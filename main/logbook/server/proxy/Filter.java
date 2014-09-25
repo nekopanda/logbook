@@ -18,6 +18,8 @@ public class Filter {
     /** setAttribute用のキー(Request) */
     public static final String REQUEST_BODY = "req-body";
 
+    public static final String CONTENT_ENCODING = "logbook.content-encoding";
+
     private static String serverName;
 
     /**
