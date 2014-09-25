@@ -30,7 +30,7 @@ public final class CreateShipReportTable extends AbstractTableDialog {
     }
 
     @Override
-    protected String getTitle() {
+    protected String getTitleMain() {
         return "建造報告書";
     }
 

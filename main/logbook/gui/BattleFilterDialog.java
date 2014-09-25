@@ -12,6 +12,7 @@ import logbook.dto.ResultRank;
 import logbook.gui.logic.IntegerPair;
 import logbook.internal.BattleResultFilter;
 import logbook.internal.BattleResultServer;
+import logbook.util.ReportUtils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -43,7 +44,7 @@ public class BattleFilterDialog extends WindowBase {
     private List<String> shipList;
     private CheckAndCombo shipCombo;
 
-    private List<String> rankList;
+    private List<ResultRank> rankList;
     private CheckAndCombo rankCombo;
 
     private CheckAndCalender fromDate;
@@ -80,6 +81,7 @@ public class BattleFilterDialog extends WindowBase {
         Shell shell = this.getShell();
         shell.setText("フィルター");
         GridLayout glShell = new GridLayout(4, false);
+        shell.setLayout(glShell);
 
         SelectionListener listener = new SelectionAdapter() {
             @Override
@@ -94,6 +96,7 @@ public class BattleFilterDialog extends WindowBase {
         for (IntegerPair mapno : this.mapList) {
             this.mapCombo.combo.add(mapno.toString());
         }
+        this.mapCombo.button.addSelectionListener(listener);
         this.mapCombo.combo.addSelectionListener(listener);
 
         // セル
@@ -102,6 +105,7 @@ public class BattleFilterDialog extends WindowBase {
         for (Integer cellno : this.cellList) {
             this.cellCombo.combo.add(String.valueOf(cellno));
         }
+        this.cellCombo.button.addSelectionListener(listener);
         this.cellCombo.combo.addSelectionListener(listener);
 
         // ドロップ艦
@@ -110,21 +114,29 @@ public class BattleFilterDialog extends WindowBase {
         for (String shipName : this.shipList) {
             this.shipCombo.combo.add(shipName);
         }
+        this.shipCombo.button.addSelectionListener(listener);
         this.shipCombo.combo.addSelectionListener(listener);
 
         // ランク
-        this.rankList = new ArrayList<String>();
+        this.rankList = new ArrayList<ResultRank>();
         this.rankCombo = new CheckAndCombo(shell, "ランク", 1);
         for (ResultRank rank : ResultRank.values()) {
-            this.rankCombo.combo.add(rank.rank());
-            this.rankList.add(rank.rank());
+            this.rankCombo.combo.add(rank.toString());
+            this.rankList.add(rank);
         }
+        this.rankCombo.button.addSelectionListener(listener);
         this.rankCombo.combo.addSelectionListener(listener);
 
         // 時刻
-        this.fromDate = new CheckAndCalender(shell, "開始", 2);
+        Button startCheck = new Button(shell, SWT.CHECK);
+        Button endCheck = new Button(shell, SWT.CHECK);
+        this.fromDate = new CheckAndCalender(shell, startCheck, "開始日時", 2);
+        this.toDate = new CheckAndCalender(shell, endCheck, "終了日時", 2);
+        this.fromDate.setDate(ReportUtils.calendarFromDate(BattleResultServer.get().getFirstBattleTime()), false);
+        this.toDate.setDate(ReportUtils.calendarFromDate(BattleResultServer.get().getLastBattleTime()), false);
+        this.fromDate.button.addSelectionListener(listener);
+        this.toDate.button.addSelectionListener(listener);
         this.fromDate.datetime.addSelectionListener(listener);
-        this.toDate = new CheckAndCalender(shell, "終了", 2);
         this.toDate.datetime.addSelectionListener(listener);
 
         // 初期値
@@ -148,12 +160,14 @@ public class BattleFilterDialog extends WindowBase {
                 this.rankCombo.select(mapComboIdx);
             }
             if (filter.fromTime != null) {
-                this.fromDate.setDate(toCalendar(filter.fromTime));
+                this.fromDate.setDate(toCalendar(filter.fromTime), false);
             }
             if (filter.toTime != null) {
-                this.toDate.setDate(toCalendar(filter.toTime));
+                this.toDate.setDate(toCalendar(filter.toTime), true);
             }
         }
+
+        shell.pack();
     }
 
     private static Calendar toCalendar(Date date) {
@@ -170,9 +184,10 @@ public class BattleFilterDialog extends WindowBase {
         filter.map = (IntegerPair) this.getSelectedItem(this.mapCombo, this.mapList);
         filter.cell = (Integer) this.getSelectedItem(this.cellCombo, this.cellList);
         filter.dropShip = (String) this.getSelectedItem(this.shipCombo, this.shipList);
-        filter.rank = (String) this.getSelectedItem(this.rankCombo, this.rankList);
-        filter.fromTime = this.getSelectedDate(this.fromDate, false);
-        filter.toTime = this.getSelectedDate(this.toDate, true);
+        ResultRank rank = (ResultRank) this.getSelectedItem(this.rankCombo, this.rankList);
+        filter.rank = (rank != null) ? rank : null;
+        filter.fromTime = this.fromDate.getSelectedDate(false);
+        filter.toTime = this.toDate.getSelectedDate(true);
         return filter;
     }
 
@@ -182,18 +197,6 @@ public class BattleFilterDialog extends WindowBase {
             if ((idx >= 0) && (idx < data.size())) {
                 return data.get(idx);
             }
-        }
-        return null;
-    }
-
-    private Date getSelectedDate(CheckAndCalender calendar, boolean endOfDay) {
-        if (calendar.button.getSelection()) {
-            int year = calendar.datetime.getYear();
-            int month = calendar.datetime.getMonth();
-            int day = calendar.datetime.getDay();
-            Calendar cal = Calendar.getInstance();
-            cal.set(year, month, endOfDay ? (day + 1) : day);
-            return cal.getTime();
         }
         return null;
     }
@@ -209,6 +212,7 @@ public class BattleFilterDialog extends WindowBase {
         public CheckAdapter(Button button, Composite composite) {
             this.button = button;
             this.composite = composite;
+            button.addSelectionListener(this);
         }
 
         @Override
@@ -239,22 +243,37 @@ public class BattleFilterDialog extends WindowBase {
     private static class CheckAndCalender extends CheckAdapter {
         final DateTime datetime;
 
-        public CheckAndCalender(Shell shell, String text, int comboSpan) {
-            super(new Button(shell, SWT.CHECK), new DateTime(shell, SWT.CALENDAR));
+        public CheckAndCalender(Shell shell, Button check, String text, int comboSpan) {
+            super(check, new DateTime(shell, SWT.CALENDAR));
             GridData data = new GridData(GridData.FILL_HORIZONTAL);
             data.horizontalSpan = comboSpan;
             this.button.setLayoutData(data);
-            this.composite.setLayoutData(data);
+            GridData data2 = new GridData(GridData.FILL_HORIZONTAL);
+            data2.horizontalSpan = comboSpan;
+            this.composite.setLayoutData(data2);
             this.button.setText(text);
             this.datetime = (DateTime) this.composite;
         }
 
-        public void setDate(Calendar calendar) {
+        public void setDate(Calendar calendar, boolean endOfDay) {
             this.button.setSelection(true);
             this.datetime.setEnabled(true);
             this.datetime.setYear(calendar.get(Calendar.YEAR));
             this.datetime.setMonth(calendar.get(Calendar.MONTH));
-            this.datetime.setDay(calendar.get(Calendar.DAY_OF_MONTH));
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+            this.datetime.setDay(endOfDay ? (day - 1) : day);
+        }
+
+        public Date getSelectedDate(boolean endOfDay) {
+            if (this.button.getSelection()) {
+                int year = this.datetime.getYear();
+                int month = this.datetime.getMonth();
+                int day = this.datetime.getDay();
+                Calendar cal = Calendar.getInstance();
+                cal.set(year, month, endOfDay ? (day + 1) : day);
+                return cal.getTime();
+            }
+            return null;
         }
     }
 }

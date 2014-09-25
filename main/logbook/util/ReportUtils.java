@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * @author Nekopanda
@@ -43,6 +45,12 @@ public class ReportUtils {
         } catch (FileNotFoundException e) {
             return true;
         }
+    }
+
+    public static Calendar calendarFromDate(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        return cal;
     }
 
 }

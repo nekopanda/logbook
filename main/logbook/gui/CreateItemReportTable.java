@@ -30,7 +30,7 @@ public final class CreateItemReportTable extends AbstractTableDialog {
     }
 
     @Override
-    protected String getTitle() {
+    protected String getTitleMain() {
         return "開発報告書";
     }
 

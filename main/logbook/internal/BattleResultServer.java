@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -88,11 +87,12 @@ public class BattleResultServer {
     private final String path;
     private final LinkedBuffer buffer = LinkedBuffer.allocate(128 * 1024);
 
+    // フィルタ用
     private Date firstBattleTime;
     private Date lastBattleTime;
-    private final List<String> dropShipList = new ArrayList<String>();
-    private final List<IntegerPair> mapList;
-    private final List<Integer> cellList;
+    private final Set<String> dropShipList = new TreeSet<String>();
+    private final Set<IntegerPair> mapList = new TreeSet<IntegerPair>();
+    private final Set<Integer> cellList = new TreeSet<Integer>();
 
     private final List<BattleResult> resultList = new ArrayList<BattleResult>();
     private final Map<String, Integer> numRecordsMap = new HashMap<String, Integer>();
@@ -122,30 +122,9 @@ public class BattleResultServer {
         // フィルタ用パラメータを計算
         this.firstBattleTime = new Date();
         this.lastBattleTime = new Date(0);
-        Set<String> dropShipList = new HashSet<String>();
-        Set<IntegerPair> mapList = new TreeSet<IntegerPair>();
-        Set<Integer> cellList = new TreeSet<Integer>();
         for (BattleResult battle : this.resultList) {
-            Date battleDate = battle.getBattleDate();
-            if (battleDate.before(this.firstBattleTime)) {
-                this.firstBattleTime = battleDate;
-            }
-            if (battleDate.after(this.lastBattleTime)) {
-                this.lastBattleTime = battleDate;
-            }
-            if (battle.isPractice() == false) {
-                String dropName = battle.getDropName();
-                int[] map = battle.getMapCell().getMap();
-
-                dropShipList.add(dropName);
-                mapList.add(new IntegerPair(map[0], map[1], "-"));
-                cellList.add(map[2]);
-            }
+            this.update(battle);
         }
-        this.dropShipList.clear();
-        this.dropShipList.addAll(dropShipList);
-        this.mapList = new ArrayList<IntegerPair>(mapList);
-        this.cellList = new ArrayList<Integer>(cellList);
 
         // 時刻でソート
         Collections.sort(this.resultList, new Comparator<BattleResult>() {
@@ -155,6 +134,26 @@ public class BattleResultServer {
                         arg0.getBattleDate().getTime(), arg1.getBattleDate().getTime());
             }
         });
+    }
+
+    private void update(BattleResultDto battle) {
+        Date battleDate = battle.getBattleDate();
+        if (battleDate.before(this.firstBattleTime)) {
+            this.firstBattleTime = battleDate;
+        }
+        if (battleDate.after(this.lastBattleTime)) {
+            this.lastBattleTime = battleDate;
+        }
+        if (battle.isPractice() == false) {
+            String dropName = battle.getDropName();
+            int[] map = battle.getMapCell().getMap();
+
+            if (battle.isDropFlag()) {
+                this.dropShipList.add(dropName);
+            }
+            this.mapList.add(new IntegerPair(map[0], map[1], "-"));
+            this.cellList.add(map[2]);
+        }
     }
 
     private List<BattleExDto> readResultFile(File file) throws IOException {
@@ -193,7 +192,9 @@ public class BattleResultServer {
         if (index == null) {
             index = new Integer(0);
         }
-        this.resultList.add(new BattleResult(dto, file, index));
+        BattleResult resultEntry = new BattleResult(dto, file, index);
+        this.update(resultEntry);
+        this.resultList.add(resultEntry);
         this.numRecordsMap.put(file.getPath(), index + 1);
         // キャッシュされているときはキャッシュにも追加
         if ((this.cachedFile != null) && file.equals(this.cachedFile)) {
@@ -239,6 +240,12 @@ public class BattleResultServer {
             if (filter.map.compareTo(new IntegerPair(battleMap[0], battleMap[1], "-")) != 0) {
                 return false;
             }
+        }
+        if ((filter.cell != null)) {
+            if (dto.isPractice()) {
+                return false;
+            }
+            int[] battleMap = dto.getMapCell().getMap();
             if (filter.cell != battleMap[2]) {
                 return false;
             }
@@ -275,15 +282,15 @@ public class BattleResultServer {
     }
 
     public List<String> getDropShipList() {
-        return this.dropShipList;
+        return new ArrayList<String>(this.dropShipList);
     }
 
     public List<IntegerPair> getMapList() {
-        return this.mapList;
+        return new ArrayList<IntegerPair>(this.mapList);
     }
 
     public List<Integer> getCellList() {
-        return this.cellList;
+        return new ArrayList<Integer>(this.cellList);
     }
 
     private static File getStoreFile(File file) throws IOException {

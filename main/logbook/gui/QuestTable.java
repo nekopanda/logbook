@@ -29,7 +29,7 @@ public final class QuestTable extends AbstractTableDialog {
     }
 
     @Override
-    protected String getTitle() {
+    protected String getTitleMain() {
         return "任務一覧";
     }
 

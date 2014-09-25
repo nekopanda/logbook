@@ -48,7 +48,7 @@ public final class ItemTable extends AbstractTableDialog {
     }
 
     @Override
-    protected String getTitle() {
+    protected String getTitleMain() {
         return "所有装備一覧";
     }
 

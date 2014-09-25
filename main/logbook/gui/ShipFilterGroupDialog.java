@@ -187,7 +187,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
     }
 
     @Override
-    protected String getTitle() {
+    protected String getTitleMain() {
         return "グループエディター";
     }
 

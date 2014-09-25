@@ -546,6 +546,13 @@ public class WindowBase {
         return changeAnimation;
     }
 
+    public void parentActivated(WindowBase parent) {
+        // Mainウィンドウがアクティブになった時このウィンドウはMainウィンドウの直後に入れる
+        if (nativeService.isTopMostAvailable()) {
+            nativeService.setBehindTo(this.getShell(), parent.getShell());
+        }
+    }
+
     /** parent is un-minimized */
     public void shellDeiconified(ShellEvent e) {
         if (this.openState) {

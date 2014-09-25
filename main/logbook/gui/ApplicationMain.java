@@ -302,6 +302,18 @@ public final class ApplicationMain extends WindowBase {
             }
 
             @Override
+            public void shellActivated(ShellEvent event) {
+                // Main以外のウィンドウも連動させる
+                for (Shell shell : ApplicationMain.this.dummyHolder.getShells()) {
+                    if (shell.getData() instanceof WindowBase) {
+                        WindowBase window = (WindowBase) shell.getData();
+                        window.parentActivated(ApplicationMain.this);
+                        break;
+                    }
+                }
+            }
+
+            @Override
             public void shellDeiconified(ShellEvent e) {
                 // Main以外のウィンドウも連動させる
                 for (Shell shell : ApplicationMain.this.dummyHolder.getShells()) {

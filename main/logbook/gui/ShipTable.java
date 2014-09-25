@@ -174,7 +174,7 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
     }
 
     @Override
-    protected String getTitle() {
+    protected String getTitleMain() {
         String name = AppConfig.get().getShipTableNames()[this.index];
         if ((this.filter != null) && (this.filter.group != null)) {
             return name + " (" + this.filter.group.getName() + ")";

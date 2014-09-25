@@ -38,6 +38,8 @@ import org.eclipse.swt.widgets.TableColumn;
  */
 public abstract class AbstractTableDialog extends WindowBase {
 
+    private static int MAX_PRINT_ITEMS = 2000;
+
     private final Shell parent;
 
     /** タイマー */
@@ -251,6 +253,7 @@ public abstract class AbstractTableDialog extends WindowBase {
         this.table.setSortColumn(sortColumn);
         this.table.setSelection(selection);
         this.table.setTopIndex(topindex);
+        this.getShell().setText(this.getTitle());
         this.table.setRedraw(true);
         this.table.setTopIndex(topindex);
     }
@@ -279,7 +282,9 @@ public abstract class AbstractTableDialog extends WindowBase {
     protected void setTableBody() {
         TableItemCreator creator = this.getTableItemCreator();
         creator.init();
-        for (int i = 0; i < this.body.size(); i++) {
+        // 表示最大件数を制限する
+        int numPrintItems = Math.min(MAX_PRINT_ITEMS, this.body.size());
+        for (int i = 0; i < numPrintItems; i++) {
             Comparable[] line = this.body.get(i);
             creator.create(this.table, line, i);
         }
@@ -356,6 +361,16 @@ public abstract class AbstractTableDialog extends WindowBase {
         return this.config;
     }
 
+    protected final String getTitle() {
+        String title = this.getTitleMain();
+        if ((this.body != null) && (this.table != null)) {
+            if (this.table.getItemCount() != this.body.size()) {
+                title += " " + this.body.size() + "件中" + this.table.getItemCount() + "件のみ表示";
+            }
+        }
+        return title;
+    }
+
     @Override
     public void save() {
         if (this.config != null) {
@@ -403,10 +418,10 @@ public abstract class AbstractTableDialog extends WindowBase {
     protected abstract void createContents();
 
     /**
-     * タイトルを返します
+     * タイトル本文部分を返します
      * @return String
      */
-    protected abstract String getTitle();
+    protected abstract String getTitleMain();
 
     /**
      * ウインドウサイズを返します

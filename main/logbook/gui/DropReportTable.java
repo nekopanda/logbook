@@ -119,7 +119,7 @@ public final class DropReportTable extends AbstractTableDialog {
     }
 
     private String getOutputFileName(BattleResultDto item) {
-        String rank = item.getRank();
+        String rank = item.getRank().toString();
         if (item.isPractice()) {
             return dateFormat.format(item.getBattleDate()) + "演習" + rank;
         }
@@ -202,7 +202,7 @@ public final class DropReportTable extends AbstractTableDialog {
     }
 
     @Override
-    protected String getTitle() {
+    protected String getTitleMain() {
         return "ドロップ報告書";
     }
 

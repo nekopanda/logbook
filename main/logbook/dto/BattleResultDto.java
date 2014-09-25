@@ -19,7 +19,7 @@ public class BattleResultDto extends AbstractDto {
     private final String questName;
 
     /** ランク */
-    private final String rank;
+    private final ResultRank rank;
 
     /** マス */
     private final MapCellDto mapCell;
@@ -57,7 +57,7 @@ public class BattleResultDto extends AbstractDto {
 
         this.battleDate = Calendar.getInstance().getTime();
         this.questName = object.getString("api_quest_name");
-        this.rank = object.getString("api_win_rank");
+        this.rank = ResultRank.fromRank(object.getString("api_win_rank"));
         this.mapCell = mapCell;
         this.enemyName = object.getJsonObject("api_enemy_info").getString("api_deck_name");
         this.dropFlag = object.containsKey("api_get_ship");
@@ -78,7 +78,7 @@ public class BattleResultDto extends AbstractDto {
     public BattleResultDto(BattleExDto dto) {
         this.battleDate = dto.getBattleDate();
         this.questName = dto.getQuestName();
-        this.rank = dto.getRank().rank();
+        this.rank = dto.getRank();
         this.mapCell = dto.getMapCellDto();
         this.enemyName = dto.getEnemyName();
         this.dropFlag = dto.getDropName().length() > 0;
@@ -144,7 +144,7 @@ public class BattleResultDto extends AbstractDto {
      * ランクを取得します。
      * @return ランク
      */
-    public String getRank() {
+    public ResultRank getRank() {
         return this.rank;
     }
 

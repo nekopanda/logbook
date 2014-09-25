@@ -63,7 +63,7 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
     }
 
     @Override
-    protected String getTitle() {
+    protected String getTitleMain() {
         return "お風呂に入りたい艦娘";
     }
 
