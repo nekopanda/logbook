@@ -6,7 +6,6 @@ import java.util.List;
 import logbook.config.AppConfig;
 import logbook.config.ShipGroupConfig;
 import logbook.config.bean.ShipGroupBean;
-import logbook.data.context.GlobalContext;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipFilterDto;
 import logbook.gui.logic.CreateReportLogic;
@@ -269,9 +268,7 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
                     if (tableItems.length > 0) {
                         List<String> name = new ArrayList<>();
                         for (int i = 0; i < tableItems.length; i++) {
-                            long id = Long.parseLong(tableItems[i].getText(1));
-                            ShipDto ship = GlobalContext.getShipMap().get(id);
-                            name.add(ship.getName());
+                            name.add(((ShipDto) tableItems[i].getData()).getName());
                         }
                         MessageBox box = new MessageBox(ShipTable.this.shell, SWT.YES | SWT.NO
                                 | SWT.ICON_QUESTION);
@@ -279,14 +276,14 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
                         box.setMessage("「" + StringUtils.join(name, ",") + "」をグループに追加しますか？");
 
                         if (box.open() == SWT.YES) {
+                            ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
                             for (int i = 0; i < tableItems.length; i++) {
-                                long id = Long.parseLong(tableItems[i].getText(1));
-                    ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
-                        bean.getShips().add(id);
-                    }
+                                int id = Integer.parseInt(tableItems[i].getText(1));
+                                bean.getShips().add(id);
+                            }
+                            ShipGroupObserver.groupShipChanged(bean);
                         }
                     }
-                    ShipGroupObserver.groupShipChanged(bean);
                 }
             });
         }

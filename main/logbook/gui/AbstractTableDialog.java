@@ -95,12 +95,10 @@ public abstract class AbstractTableDialog extends WindowBase {
      */
     @Override
     public void open() {
-        ApplicationMain.print("open開始");
         // 初期化済みの場合
         if (this.isWindowInitialized()) {
             // リロードして表示
             this.reloadTable();
-            ApplicationMain.print("リロード完了");
             this.setVisible(true);
             return;
         }
@@ -179,10 +177,8 @@ public abstract class AbstractTableDialog extends WindowBase {
         // テーブルに内容をセット
         this.updateTableBody();
         this.setTableBody();
-        ApplicationMain.print("列幅を整える開始");
         // 列幅を整える
         this.packTableHeader();
-        ApplicationMain.print("テーブル基本項目作成完了");
 
         // ヘッダの右クリックメニュー
         this.headermenu = new Menu(this.table);
@@ -234,7 +230,6 @@ public abstract class AbstractTableDialog extends WindowBase {
         this.createContents();
         this.shell.setText(this.getTitle());
         this.setWindowInitialized(true);
-        ApplicationMain.print("表示開始");
         this.setVisible(true);
     }
 
@@ -285,7 +280,6 @@ public abstract class AbstractTableDialog extends WindowBase {
      * テーブルボディーをセットする
      */
     protected void setTableBody() {
-        ApplicationMain.print("表示オブジェクト作成");
         TableItemCreator creator = this.getTableItemCreator();
         creator.init();
         // 表示最大件数を制限する
@@ -294,7 +288,6 @@ public abstract class AbstractTableDialog extends WindowBase {
             Comparable[] line = this.body.get(i);
             creator.create(this.table, line, i);
         }
-        ApplicationMain.print("表示オブジェクト作成完了");
     }
 
     /**
