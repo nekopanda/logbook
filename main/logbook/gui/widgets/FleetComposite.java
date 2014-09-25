@@ -315,7 +315,7 @@ public class FleetComposite extends Composite {
             // 艦隊合計Lv
             totallv += ship.getLv();
             // 索敵値計
-            totalSakuteki += ship.getSakuteki();
+            totalSakuteki += ship.getSakuteki25();
 
             // 疲労している艦娘がいる場合メッセージを表示
             if (this.cond > cond) {

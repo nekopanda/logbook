@@ -24,10 +24,12 @@ public class SeaExp {
             this.put("2-2", 150);
             this.put("2-3", 200);
             this.put("2-4", 300);
+            this.put("2-5", 250);
             this.put("3-1", 310);
             this.put("3-2", 320);
             this.put("3-3", 330);
             this.put("3-4", 350);
+            this.put("3-5", 400);
             this.put("4-1", 310);
             this.put("4-2", 320);
             this.put("4-3", 330);

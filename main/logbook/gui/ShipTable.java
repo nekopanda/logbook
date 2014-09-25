@@ -6,12 +6,15 @@ import java.util.List;
 import logbook.config.AppConfig;
 import logbook.config.ShipGroupConfig;
 import logbook.config.bean.ShipGroupBean;
+import logbook.data.context.GlobalContext;
+import logbook.dto.ShipDto;
 import logbook.dto.ShipFilterDto;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.ShipGroupListener;
 import logbook.gui.logic.ShipGroupObserver;
 import logbook.gui.logic.TableItemCreator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -21,6 +24,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -262,10 +266,25 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     TableItem[] tableItems = ShipTable.this.table.getSelection();
+                    if (tableItems.length > 0) {
+                        List<String> name = new ArrayList<>();
+                        for (int i = 0; i < tableItems.length; i++) {
+                            long id = Long.parseLong(tableItems[i].getText(1));
+                            ShipDto ship = GlobalContext.getShipMap().get(id);
+                            name.add(ship.getName());
+                        }
+                        MessageBox box = new MessageBox(ShipTable.this.shell, SWT.YES | SWT.NO
+                                | SWT.ICON_QUESTION);
+                        box.setText("選択した艦娘をグループに追加");
+                        box.setMessage("「" + StringUtils.join(name, ",") + "」をグループに追加しますか？");
+
+                        if (box.open() == SWT.YES) {
+                            for (int i = 0; i < tableItems.length; i++) {
+                                long id = Long.parseLong(tableItems[i].getText(1));
                     ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
-                    for (int i = 0; i < tableItems.length; i++) {
-                        int id = Integer.parseInt(tableItems[i].getText(1));
                         bean.getShips().add(id);
+                    }
+                        }
                     }
                     ShipGroupObserver.groupShipChanged(bean);
                 }
