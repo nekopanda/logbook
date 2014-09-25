@@ -194,8 +194,8 @@ public class BattleAtackDto {
         }
     }
 
-    public static List<BattleAtackDto> makeAir(JsonArray plane_from, JsonValue raigeki, JsonValue combined) {
-        if ((raigeki == null) || (raigeki == JsonValue.NULL))
+    public static List<BattleAtackDto> makeAir(JsonValue plane_from, JsonValue raigeki, JsonValue combined) {
+        if ((raigeki == null) || (raigeki == JsonValue.NULL) || (plane_from == null) || (plane_from == JsonValue.NULL))
             return null;
 
         JsonObject raigeki_obj = (JsonObject) raigeki;
@@ -206,13 +206,13 @@ public class BattleAtackDto {
 
         BattleAtackDto fatack = makeAir(
                 true,
-                plane_from.getJsonArray(0),
+                ((JsonArray) plane_from).getJsonArray(0),
                 raigeki_obj.getJsonArray("api_edam"),
                 null);
 
         BattleAtackDto eatack = makeAir(
                 false,
-                plane_from.getJsonArray(1),
+                ((JsonArray) plane_from).getJsonArray(1),
                 raigeki_obj.getJsonArray("api_fdam"),
                 fdamCombined);
 

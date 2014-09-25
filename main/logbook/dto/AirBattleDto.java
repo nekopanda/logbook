@@ -55,7 +55,7 @@ public class AirBattleDto {
         }
 
         this.atacks = BattleAtackDto.makeAir(
-                kouku.getJsonArray("api_plane_from"),
+                kouku.get("api_plane_from"),
                 kouku.get("api_stage3"),
                 isCombined ? kouku.get("api_stage3_combined") : null);
     }
