@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import logbook.config.AppConfig;
 import logbook.config.ItemConfig;
@@ -303,12 +304,15 @@ public final class ApplicationMain extends WindowBase {
 
             @Override
             public void shellActivated(ShellEvent event) {
-                // Main以外のウィンドウも連動させる
-                for (Shell shell : ApplicationMain.this.dummyHolder.getShells()) {
-                    if (shell.getData() instanceof WindowBase) {
-                        WindowBase window = (WindowBase) shell.getData();
-                        window.parentActivated(ApplicationMain.this);
-                        break;
+                // Mainウィンドウがアクティブになった時、子ウィンドウをMainウィンドウの直後に入れる
+                if (nativeService.isTopMostAvailable()) {
+                    Set<WindowBase> windows = getActivatedWindows();
+                    WindowBase[] windowArray = windows.toArray(new WindowBase[windows.size()]);
+                    for (int i = windowArray.length - 1; i >= 0; --i) {
+                        if (windowArray[i] != ApplicationMain.this) {
+                            nativeService.setBehindTo(windowArray[i].getShell(), ApplicationMain.this.getShell());
+                            break;
+                        }
                     }
                 }
             }
@@ -1080,7 +1084,7 @@ public final class ApplicationMain extends WindowBase {
      * @param message コンソールに表示するメッセージ
      */
     public void printMessage(final String message) {
-        if (disableUpdate)
+        if (disableUpdate || this.console.isDisposed())
             return;
         int size = this.console.getItemCount();
         if (size >= MAX_LOG_LINES) {

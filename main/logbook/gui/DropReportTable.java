@@ -164,11 +164,13 @@ public final class DropReportTable extends AbstractTableDialog {
             zipOutStream = new ZipOutputStream(
                     new BufferedOutputStream(new FileOutputStream(file)));
             for (BattleResultDto item : items) {
-                final ZipEntry entry = new ZipEntry(this.getOutputFileName(item) + ".html");
-                zipOutStream.putNextEntry(entry);
-                zipOutStream.write(
-                        this.getHTMLOfItem(item, true).getBytes(Charset.forName("UTF-8")));
-                zipOutStream.closeEntry();
+                String html = this.getHTMLOfItem(item, true);
+                if (html != null) {
+                    final ZipEntry entry = new ZipEntry(this.getOutputFileName(item) + ".html");
+                    zipOutStream.putNextEntry(entry);
+                    zipOutStream.write(html.getBytes(Charset.forName("UTF-8")));
+                    zipOutStream.closeEntry();
+                }
             }
             zipOutStream.finish();
             zipOutStream.close();

@@ -92,15 +92,19 @@ public class BattleResultDto extends AbstractDto {
                 this.hasTaihaInFleet(lastPhase.getNowFriendHpCombined(), dto.getMaxFriendHpCombined()));
 
         // MVP
-        if (dto.getMvp() == -1) {
-            System.out.println("MVPなし？？？");
+        if (dto.getMvp() == -1) { // 敗北Eの時はMVPなし
             this.mvp = null;
         }
         else {
             this.mvp = dto.getDock().getShips().get(dto.getMvp() - 1);
         }
         if (dto.isCombined()) {
-            this.mvpCombined = dto.getDockCombined().getShips().get(dto.getMvpCombined() - 1);
+            if (dto.getMvpCombined() == -1) { // 敗北Eの時はMVPなし
+                this.mvpCombined = null;
+            }
+            else {
+                this.mvpCombined = dto.getDockCombined().getShips().get(dto.getMvpCombined() - 1);
+            }
         }
         else {
             this.mvpCombined = null;

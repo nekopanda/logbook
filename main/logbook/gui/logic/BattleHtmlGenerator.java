@@ -309,6 +309,13 @@ public class BattleHtmlGenerator extends HTMLGenerator {
      * @param battle
      */
     private void genFormation(BattleExDto battle) {
+        String fSakuteki = "";
+        String eSakuteki = "";
+        if (battle.getSakuteki() != null) { // 夜戦開始マスは索敵なし
+            fSakuteki = battle.getSakuteki()[0];
+            eSakuteki = battle.getSakuteki()[1];
+        }
+
         this.inline("span", "会敵: " + battle.getFormationMatch(), null);
         this.begin("table", null);
         this.begin("tr", null);
@@ -319,12 +326,12 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.begin("tr", FORMATION_CLASS[0]);
         this.inline("td", "自", null);
         this.inline("td", battle.getFormation()[0], null);
-        this.inline("td", battle.getSakuteki()[0], null);
+        this.inline("td", fSakuteki, null);
         this.end(); // tr
         this.begin("tr", null);
         this.inline("td", "敵", FORMATION_CLASS[1]);
         this.inline("td", battle.getFormation()[1], null);
-        this.inline("td", battle.getSakuteki()[1], null);
+        this.inline("td", eSakuteki, null);
         this.end(); // tr
         this.end(); // table
     }
@@ -865,20 +872,24 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.inline("td", "ランク", null);
         this.inline("td", detail.getRank().toString(), null);
         this.end(); // tr
+
+        String mvp1 = (result.getMvp() == null) ? "なし" : result.getMvp().getFriendlyName();
+        String mvp2 = (result.getMvpCombined() == null) ? "なし" : result.getMvpCombined().getFriendlyName();
+
         if (detail.isCombined()) {
             this.begin("tr", null);
             this.inline("td", "MVP(第一艦隊)", null);
-            this.inline("td", result.getMvp().getFriendlyName(), null);
+            this.inline("td", mvp1, null);
             this.end(); // tr
             this.begin("tr", null);
             this.inline("td", "MVP(第二艦隊)", null);
-            this.inline("td", result.getMvpCombined().getFriendlyName(), null);
+            this.inline("td", mvp2, null);
             this.end(); // tr
         }
         else {
             this.begin("tr", null);
             this.inline("td", "MVP", null);
-            this.inline("td", result.getMvp().getFriendlyName(), null);
+            this.inline("td", mvp1, null);
             this.end(); // tr
         }
         this.begin("tr", null);

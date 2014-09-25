@@ -81,7 +81,7 @@ public final class AsyncExecApplicationMain extends Thread {
                 }
 
                 // 遠征と入渠を更新する
-                Display.getDefault().syncExec(new UpdateDeckNdockTask(this.main));
+                Display.getDefault().asyncExec(new UpdateDeckNdockTask(this.main));
 
                 long currentTime = Calendar.getInstance().getTimeInMillis();
                 // 次のアップデートは1秒後
@@ -124,6 +124,9 @@ public final class AsyncExecApplicationMain extends Thread {
 
         @Override
         public void run() {
+            if (this.main.getShell().isDisposed()) {
+                return;
+            }
             Button itemList = this.main.getItemList();
             String setText = "所有装備(" + GlobalContext.getItemMap().size() + "/"
                     + GlobalContext.maxSlotitem() + ")";
@@ -150,6 +153,9 @@ public final class AsyncExecApplicationMain extends Thread {
 
         @Override
         public void run() {
+            if (this.main.getShell().isDisposed()) {
+                return;
+            }
             Button shipList = this.main.getShipList();
             String setText = "所有艦娘(" + GlobalContext.getShipMap().size() + "/" + GlobalContext.maxChara()
                     + ")";
@@ -209,6 +215,9 @@ public final class AsyncExecApplicationMain extends Thread {
 
         @Override
         public void run() {
+            if (this.main.getShell().isDisposed()) {
+                return;
+            }
             // 現在時刻
             Date now = Calendar.getInstance().getTime();
             List<String> notice = new ArrayList<String>();
@@ -417,6 +426,9 @@ public final class AsyncExecApplicationMain extends Thread {
 
         @Override
         public void run() {
+            if (this.main.getShell().isDisposed()) {
+                return;
+            }
             // タブを更新する
             CTabItem maintab = this.main.getTabFolder().getItem(0);
             maintab.setToolTipText(

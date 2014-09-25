@@ -96,8 +96,7 @@ public class BattleFilterDialog extends WindowBase {
         for (IntegerPair mapno : this.mapList) {
             this.mapCombo.combo.add(mapno.toString());
         }
-        this.mapCombo.button.addSelectionListener(listener);
-        this.mapCombo.combo.addSelectionListener(listener);
+        this.mapCombo.initState(listener);
 
         // セル
         this.cellList = BattleResultServer.get().getCellList();
@@ -105,8 +104,7 @@ public class BattleFilterDialog extends WindowBase {
         for (Integer cellno : this.cellList) {
             this.cellCombo.combo.add(String.valueOf(cellno));
         }
-        this.cellCombo.button.addSelectionListener(listener);
-        this.cellCombo.combo.addSelectionListener(listener);
+        this.cellCombo.initState(listener);
 
         // ドロップ艦
         this.shipList = BattleResultServer.get().getDropShipList();
@@ -114,8 +112,7 @@ public class BattleFilterDialog extends WindowBase {
         for (String shipName : this.shipList) {
             this.shipCombo.combo.add(shipName);
         }
-        this.shipCombo.button.addSelectionListener(listener);
-        this.shipCombo.combo.addSelectionListener(listener);
+        this.shipCombo.initState(listener);
 
         // ランク
         this.rankList = new ArrayList<ResultRank>();
@@ -124,20 +121,15 @@ public class BattleFilterDialog extends WindowBase {
             this.rankCombo.combo.add(rank.toString());
             this.rankList.add(rank);
         }
-        this.rankCombo.button.addSelectionListener(listener);
-        this.rankCombo.combo.addSelectionListener(listener);
+        this.rankCombo.initState(listener);
 
         // 時刻
         Button startCheck = new Button(shell, SWT.CHECK);
         Button endCheck = new Button(shell, SWT.CHECK);
         this.fromDate = new CheckAndCalender(shell, startCheck, "開始日時", 2);
         this.toDate = new CheckAndCalender(shell, endCheck, "終了日時", 2);
-        this.fromDate.setDate(ReportUtils.calendarFromDate(BattleResultServer.get().getFirstBattleTime()), false);
-        this.toDate.setDate(ReportUtils.calendarFromDate(BattleResultServer.get().getLastBattleTime()), false);
-        this.fromDate.button.addSelectionListener(listener);
-        this.toDate.button.addSelectionListener(listener);
-        this.fromDate.datetime.addSelectionListener(listener);
-        this.toDate.datetime.addSelectionListener(listener);
+        this.fromDate.initState(listener, BattleResultServer.get().getFirstBattleTime());
+        this.toDate.initState(listener, BattleResultServer.get().getLastBattleTime());
 
         // 初期値
         BattleResultFilter filter = this.parent.getFilter();
@@ -231,12 +223,19 @@ public class BattleFilterDialog extends WindowBase {
             this.composite.setLayoutData(data);
             this.button.setText(text);
             this.combo = (Combo) this.composite;
+            this.combo.setEnabled(false);
         }
 
         public void select(int idx) {
             this.button.setSelection(true);
             this.combo.setEnabled(true);
             this.combo.select(idx);
+        }
+
+        public void initState(SelectionListener listener) {
+            this.button.addSelectionListener(listener);
+            this.combo.addSelectionListener(listener);
+            this.combo.select(0);
         }
     }
 
@@ -274,6 +273,12 @@ public class BattleFilterDialog extends WindowBase {
                 return cal.getTime();
             }
             return null;
+        }
+
+        public void initState(SelectionListener listener, Date date) {
+            this.button.addSelectionListener(listener);
+            this.datetime.addSelectionListener(listener);
+            this.setDate(ReportUtils.calendarFromDate(date), false);
         }
     }
 }

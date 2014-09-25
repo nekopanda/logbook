@@ -163,6 +163,15 @@ public final class ResourceChartDialog extends WindowBase {
         save.addSelectionListener(new SaveImageAdapter(this.shell, this.combo, this.canvas, this.log));
     }
 
+    @Override
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+        if (visible) {
+            // マウスホイールイベントを期間選択コンボボックスに流すためにフォーカスする
+            this.combo.setFocus();
+        }
+    }
+
     /**
      * 資材ログのグラフイメージを作成する
      * 

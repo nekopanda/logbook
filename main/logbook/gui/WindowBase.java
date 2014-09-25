@@ -4,7 +4,9 @@
 package logbook.gui;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import logbook.config.AppConfig;
 import logbook.config.bean.WindowConfigBean;
@@ -40,6 +42,13 @@ public class WindowBase {
 
     private static WindowTreeNode globalRootNode = new WindowTreeNode(true);
     public final static WindowNativeSupport nativeService = new WindowNativeSupport();
+
+    /** アクティブになったウィンドウ順 */
+    private final static Set<WindowBase> activatedWindows = new LinkedHashSet<>();
+
+    public static Set<WindowBase> getActivatedWindows() {
+        return activatedWindows;
+    }
 
     private final WindowTreeNode treeNode = new WindowTreeNode(this);
     private WindowBase parent;
@@ -360,6 +369,15 @@ public class WindowBase {
                 // ツリーから切り離す
                 WindowBase.this.shareOpacitySetting = false;
                 WindowBase.this.updateTreeNodeState();
+                activatedWindows.remove(WindowBase.this);
+            }
+        });
+        // アクティブウィンドウ順検出用
+        this.shell.addShellListener(new ShellAdapter() {
+            @Override
+            public void shellActivated(ShellEvent event) {
+                activatedWindows.remove(WindowBase.this);
+                activatedWindows.add(WindowBase.this);
             }
         });
         if (this.menuItem != null) {
@@ -546,13 +564,6 @@ public class WindowBase {
         return changeAnimation;
     }
 
-    public void parentActivated(WindowBase parent) {
-        // Mainウィンドウがアクティブになった時このウィンドウはMainウィンドウの直後に入れる
-        if (nativeService.isTopMostAvailable()) {
-            nativeService.setBehindTo(this.getShell(), parent.getShell());
-        }
-    }
-
     /** parent is un-minimized */
     public void shellDeiconified(ShellEvent e) {
         if (this.openState) {
@@ -674,7 +685,7 @@ public class WindowBase {
         this.treeNode.routeEvent(new EventProc() {
             @Override
             public void proc(WindowBase window) {
-                if (window.shell.getVisible()) {
+                if ((window.shell != null) && window.shell.getVisible()) {
                     Rectangle displayRect = window.shell.getDisplay().getClientArea();
                     // ディスプレイサイズより大きい時は小さくする
                     Rectangle windowRect = window.shell.getBounds();
