@@ -79,10 +79,10 @@ public final class ReverseProxyServlet extends ProxyServlet {
             String headerValue)
     {
         // Content Encoding を取得する
-        if (headerName.equals("Content-Encoding")) {
+        if (headerName.compareToIgnoreCase("Content-Encoding") == 0) {
             request.setAttribute(Filter.CONTENT_ENCODING, headerValue);
         }
-        return headerValue;
+        return super.filterResponseHeader(request, headerName, headerValue);
     }
 
     /*
