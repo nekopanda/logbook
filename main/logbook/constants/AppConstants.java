@@ -13,7 +13,7 @@ import org.eclipse.swt.graphics.RGB;
 public class AppConstants {
 
     /** バージョン */
-    public static final String VERSION = "0.6.12";
+    public static final String VERSION = "1.0.0 beta";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://nekopanda.blog.jp/");
@@ -379,5 +379,5 @@ public class AppConstants {
     public static final String MESSAGE_TOTAL_LV = "艦隊合計Lv:{0}。";
 
     /** タイトルバーに表示するデフォルトテキスト */
-    public static final String TITLEBAR_TEXT = "航海日誌改 " + VERSION;
+    public static final String TITLEBAR_TEXT = "航海日誌拡張版 " + VERSION;
 }

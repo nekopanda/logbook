@@ -73,7 +73,7 @@ public final class VersionDialog extends WindowBase {
         versionGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         versionGroup.setLayout(new GridLayout(2, true));
 
-        label("航海日誌改", versionGroup);
+        label("航海日誌 拡張版", versionGroup);
         label(AppConstants.VERSION, versionGroup);
 
         Link gowebsite = new Link(versionGroup, SWT.NONE);
