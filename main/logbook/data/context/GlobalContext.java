@@ -746,7 +746,7 @@ public final class GlobalContext {
                 Arrays.fill(isSortie, false);
 
                 // 戦闘結果がある場合、ダメージ計算があっているか検証します
-                if (battle != null) {
+                if ((battle != null) && (battle.getDock() != null)) {
                     checkBattleDamage(battle.getFriends().get(0).getShips(), battle.getLastPhase().getNowFriendHp());
                     if (battle.isCombined()) {
                         checkBattleDamage(battle.getFriends().get(1).getShips(),
@@ -852,9 +852,20 @@ public final class GlobalContext {
             }
             BattleExDto.Phase phase = battle.addPhase(apidata, phaseKind);
 
+            if (battle.getDock() == null) { // 情報が不足しているので処理しない
+                battle = null;
+                return;
+            }
+
             List<ShipDto> sunkShips = new ArrayList<ShipDto>();
             List<ShipDto> ships = battle.getFriends().get(0).getShips();
             int[] nowFriendHp = phase.getNowFriendHp();
+
+            if (battle.getDock().getShips().size() != nowFriendHp.length) { // 情報が不足しているので処理しない
+                battle = null;
+                return;
+            }
+
             for (int i = 0; i < ships.size(); ++i) {
                 checkShipSunk(ships.get(i), nowFriendHp[i], sunkShips);
             }
@@ -901,8 +912,12 @@ public final class GlobalContext {
             if (battle != null) {
                 JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
                 battle.setResult(apidata, mapCellDto);
-                BattleResultServer.get().addNewResult(battle);
-                if (battle.isCompleteSortieBattle()) { // 演習は記録しない
+
+                if (battle.isCompleteResult()) { // 情報が不足している場合は記録しない
+                    BattleResultServer.get().addNewResult(battle);
+                }
+
+                if (battle.isPractice() == false) { // 演習は記録しない
                     //battleResultList.add(battle);
                     CreateReportLogic.storeBattleResultReport(battle);
 
@@ -1207,7 +1222,7 @@ public final class GlobalContext {
             }
 
             // 戦闘結果がある場合、ダメージ計算があっているか検証します
-            if (battle != null) {
+            if ((battle != null) && (battle.getDock() != null)) {
                 checkBattleDamage(battle.getDock().getShips(), battle.getNowFriendHp());
                 if (battle.isCombined()) {
                     checkBattleDamage(battle.getDockCombined().getShips(), battle.getNowFriendHpCombined());

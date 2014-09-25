@@ -31,12 +31,17 @@ public class EnemyShipDto extends ShipBaseDto {
     @Tag(13)
     private final int soukou;
 
-    public EnemyShipDto(int shipId, int[] slot, int[] param) {
+    /** レベル */
+    @Tag(14)
+    private final int lv;
+
+    public EnemyShipDto(int shipId, int[] slot, int[] param, int lv) {
         super(shipId, slot);
         this.karyoku = param[0];
         this.raisou = param[0];
         this.taiku = param[0];
         this.soukou = param[0];
+        this.lv = lv;
     }
 
     /**
@@ -69,6 +74,11 @@ public class EnemyShipDto extends ShipBaseDto {
     @Override
     public int getSoukou() {
         return this.soukou;
+    }
+
+    @Override
+    public int getLv() {
+        return this.lv;
     }
 
     @Override

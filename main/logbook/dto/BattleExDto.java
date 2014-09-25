@@ -677,12 +677,13 @@ public class BattleExDto extends AbstractDto {
             JsonArray shipKe = object.getJsonArray("api_ship_ke");
             JsonArray eSlots = object.getJsonArray("api_eSlot");
             JsonArray eParams = object.getJsonArray("api_eParam");
+            JsonArray eLevel = object.getJsonArray("api_ship_lv");
             for (int i = 1; i < shipKe.size(); i++) {
                 int id = shipKe.getInt(i);
                 if (id != -1) {
                     int[] slot = JsonUtils.toIntArray(eSlots.getJsonArray(i - 1));
                     int[] param = JsonUtils.toIntArray(eParams.getJsonArray(i - 1));
-                    this.enemy.add(new EnemyShipDto(id, slot, param));
+                    this.enemy.add(new EnemyShipDto(id, slot, param, eLevel.getInt(i)));
                 }
             }
             int numEships = this.enemy.size();
@@ -913,12 +914,16 @@ public class BattleExDto extends AbstractDto {
 
     /** 戦闘結果も含んでいるか */
     public boolean isCompleteResult() {
-        return (this.rank != null) && (this.phaseList.size() > 0);
-    }
-
-    /** 演習ではなく出撃か */
-    public boolean isCompleteSortieBattle() {
-        return (this.questName != null) && (this.mapCellDto != null) && this.isCompleteResult();
+        if (this.questName != null) {
+            // 出撃の場合
+            if (this.mapCellDto == null) {
+                return false;
+            }
+        }
+        else {
+            // 演習の場合
+        }
+        return (this.getDock() != null) && (this.rank != null) && (this.phaseList.size() > 0);
     }
 
     public boolean isPractice() {

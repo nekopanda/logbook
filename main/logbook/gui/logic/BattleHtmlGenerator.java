@@ -899,9 +899,14 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.end(); // table
     }
 
+    /** 戦闘結果が不完全の場合はnullが返ることがある */
     public String generateHTML(String title, BattleResultDto result, BattleExDto battle, boolean genCharset)
             throws IOException
     {
+        if (battle.isCompleteResult() == false) {
+            return null;
+        }
+
         this.genHeader(title, genCharset);
         this.begin("body", null);
 

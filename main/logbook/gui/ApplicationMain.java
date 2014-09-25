@@ -267,12 +267,8 @@ public final class ApplicationMain extends WindowBase {
      */
     public void createContents() {
         final Display display = Display.getDefault();
-        int shellStyle = 0;
-        if ((nativeService.isTopMostAvailable() == false) && AppConfig.get().isOnTop()) {
-            shellStyle |= SWT.ON_TOP;
-        }
-        this.dummyHolder = new Shell(display, shellStyle | SWT.TOOL);
-        super.createContents(display, shellStyle | SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
+        this.dummyHolder = new Shell(display, SWT.TOOL);
+        super.createContents(display, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
         this.shell = this.getShell();
         this.shell.setText(AppConstants.TITLEBAR_TEXT);
         GridLayout glShell = new GridLayout(1, false);
@@ -310,7 +306,7 @@ public final class ApplicationMain extends WindowBase {
                     WindowBase[] windowArray = windows.toArray(new WindowBase[windows.size()]);
                     for (int i = windowArray.length - 1; i >= 0; --i) {
                         if (windowArray[i] != ApplicationMain.this) {
-                            nativeService.setBehindTo(windowArray[i].getShell(), ApplicationMain.this.getShell());
+                            windowArray[i].setBehindTo(ApplicationMain.this);
                             break;
                         }
                     }
@@ -416,14 +412,14 @@ public final class ApplicationMain extends WindowBase {
 
         // 表示-戦況ウィンドウ 
         MenuItem battleWinMenu = new MenuItem(cmdmenu, SWT.CHECK);
-        battleWinMenu.setText("戦況-大(&W)\tCtrl+W");
+        battleWinMenu.setText("戦況(&W)\tCtrl+W");
         battleWinMenu.setAccelerator(SWT.CTRL + 'W');
         this.battleWindowLarge = new BattleWindowLarge(this.dummyHolder, battleWinMenu);
 
         // 表示-戦況ウィンドウ （小）
         MenuItem battleWinSMenu = new MenuItem(cmdmenu, SWT.CHECK);
-        battleWinSMenu.setText("戦況-小(&S)\tCtrl+S");
-        battleWinSMenu.setAccelerator(SWT.CTRL + 'W');
+        battleWinSMenu.setText("戦況-横(&H)\tCtrl+H");
+        battleWinSMenu.setAccelerator(SWT.CTRL + 'H');
         this.battleWindowSmall = new BattleWindowSmall(this.dummyHolder, battleWinSMenu);
 
         // 表示-敵味方パラメータ

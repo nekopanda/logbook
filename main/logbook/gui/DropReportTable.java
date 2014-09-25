@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 
 import logbook.dto.BattleExDto;
@@ -160,20 +161,39 @@ public final class DropReportTable extends AbstractTableDialog {
     private void writeToZipFile(List<BattleResultDto> items, File file) {
         Shell shell = this.getShell();
         ZipOutputStream zipOutStream = null;
+        List<String> failedList = new ArrayList<String>();
         try {
             zipOutStream = new ZipOutputStream(
                     new BufferedOutputStream(new FileOutputStream(file)));
             for (BattleResultDto item : items) {
+                String fileName = this.getOutputFileName(item) + ".html";
                 String html = this.getHTMLOfItem(item, true);
                 if (html != null) {
-                    final ZipEntry entry = new ZipEntry(this.getOutputFileName(item) + ".html");
-                    zipOutStream.putNextEntry(entry);
-                    zipOutStream.write(html.getBytes(Charset.forName("UTF-8")));
-                    zipOutStream.closeEntry();
+                    final ZipEntry entry = new ZipEntry(fileName);
+                    try {
+                        zipOutStream.putNextEntry(entry);
+                        zipOutStream.write(html.getBytes(Charset.forName("UTF-8")));
+                        zipOutStream.closeEntry();
+                    } catch (ZipException e) {
+                        failedList.add(fileName);
+                    }
+                }
+                else {
+                    failedList.add(fileName);
                 }
             }
             zipOutStream.finish();
             zipOutStream.close();
+            if (failedList.size() > 0) {
+                StringBuilder sb = new StringBuilder("以下のファイルを書き込めませんでした\r\n");
+                for (String failedFile : failedList) {
+                    sb.append(failedFile).append("\r\n");
+                }
+                MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR);
+                messageBox.setText("一部でエラーが発生しました");
+                messageBox.setMessage(sb.toString());
+                messageBox.open();
+            }
         } catch (IOException ex) {
             MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR);
             messageBox.setText("書き込めませんでした");

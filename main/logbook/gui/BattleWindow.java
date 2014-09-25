@@ -294,8 +294,8 @@ public class BattleWindow extends BattleWindowBase {
                 this.infoLabels[i][4].setText("航空戦:");
                 this.infoLabels[i][5].setText((seiku != null) ? seiku : "なし");
             }
-            this.infoLabels[i][6].setText("stage1");
-            this.infoLabels[i][7].setText("stage2");
+            this.infoLabels[i][6].setText("Stage1");
+            this.infoLabels[i][7].setText("Stage2");
             if (air != null) {
                 this.printPlaneCount(this.infoLabels[i], 8, air[0], i);
                 this.printPlaneCount(this.infoLabels[i], 10, air[1], i);

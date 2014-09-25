@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class WindowNativeSupport {
 
+    private static int HWND_TOP = 0;
     private static int HWND_TOPMOST = -1;
     private static int HWND_NOTOPMOST = -2;
     private static int SWP_NOACTIVATE = 0x0010;
@@ -64,8 +65,9 @@ public class WindowNativeSupport {
     public void setBehindTo(Shell shell, Shell behindTo) {
         try {
             Rectangle rect = shell.getBounds();
+            int insertAfter = (behindTo != null) ? (int) this.handleField.get(behindTo) : HWND_TOP;
             Object[] args = new Object[] {
-                    this.handleField.get(shell), this.handleField.get(behindTo),
+                    this.handleField.get(shell), insertAfter,
                     rect.x, rect.y, rect.width, rect.height, SWP_NOACTIVATE };
             this.setWindowPosMethod.invoke(null, args);
         } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {

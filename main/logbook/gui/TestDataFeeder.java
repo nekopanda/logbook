@@ -85,7 +85,7 @@ public class TestDataFeeder extends WindowBase {
                 GridData.FILL_HORIZONTAL, SWT.CENTER, true, false, 1, 1);
         gd.widthHint = 250;
         this.filepathText.setLayoutData(gd);
-        this.filepathText.setText("<よく分からない方は使わないでね>");
+        this.filepathText.setText("<よく分からないときは使わないでね>");
 
         Button btn = new Button(shell, SWT.NONE);
         btn.setText("リセット");

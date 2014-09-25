@@ -316,6 +316,13 @@ public class WindowBase {
         });
     }
 
+    private int getDefaultStyle() {
+        if ((nativeService.isTopMostAvailable() == false) && AppConfig.get().isOnTop()) {
+            return SWT.ON_TOP;
+        }
+        return 0;
+    }
+
     /**
      *　shellを作成。open()などから呼び出す
      * @param display shellの引数
@@ -323,7 +330,7 @@ public class WindowBase {
      */
     protected void createContents(Display display, int style, boolean menuCascade) {
         if (this.shell == null) {
-            this.shell = new Shell(display, style);
+            this.shell = new Shell(display, style | this.getDefaultStyle());
             this.createContents(menuCascade);
         }
     }
@@ -335,7 +342,7 @@ public class WindowBase {
      */
     protected void createContents(Shell shell, int style, boolean menuCascade) {
         if (this.shell == null) {
-            this.shell = new Shell(shell, style);
+            this.shell = new Shell(shell, style | this.getDefaultStyle());
             this.createContents(menuCascade);
         }
     }
@@ -348,7 +355,7 @@ public class WindowBase {
     protected void createContents(WindowBase parent, int style, boolean menuCascade) {
         if (this.shell == null) {
             this.parent = parent;
-            this.shell = new Shell(parent.shell, style);
+            this.shell = new Shell(parent.shell, style | this.getDefaultStyle());
             this.createContents(menuCascade);
         }
     }
@@ -562,6 +569,21 @@ public class WindowBase {
         }
 
         return changeAnimation;
+    }
+
+    public void setBehindTo(WindowBase behindTo) {
+        if (behindTo.shell.isDisposed() || this.shell.isDisposed()) {
+            return;
+        }
+        if (nativeService.isTopMostAvailable()) {
+            if (behindTo.topMostItem.getSelection() == this.topMostItem.getSelection()) {
+                // 同じ場合だけbehindToをセットする
+                nativeService.setBehindTo(this.shell, behindTo.shell);
+            }
+            else {
+                nativeService.setBehindTo(this.shell, null);
+            }
+        }
     }
 
     /** parent is un-minimized */

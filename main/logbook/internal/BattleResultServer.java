@@ -110,7 +110,9 @@ public class BattleResultServer {
                 try {
                     List<BattleExDto> result = this.readResultFile(file);
                     for (int i = 0; i < result.size(); ++i) {
-                        this.resultList.add(new BattleResult(result.get(i), file, i));
+                        if (result.get(i).isCompleteResult()) {
+                            this.resultList.add(new BattleResult(result.get(i), file, i));
+                        }
                     }
                     this.numRecordsMap.put(file.getPath(), result.size());
                 } catch (IOException e) {
@@ -188,17 +190,19 @@ public class BattleResultServer {
             LOG.warn("出撃ログファイルの後処理に失敗しました", e);
         }
         // ファイルとリストに追加
-        Integer index = this.numRecordsMap.get(file.getPath());
-        if (index == null) {
-            index = new Integer(0);
-        }
-        BattleResult resultEntry = new BattleResult(dto, file, index);
-        this.update(resultEntry);
-        this.resultList.add(resultEntry);
-        this.numRecordsMap.put(file.getPath(), index + 1);
-        // キャッシュされているときはキャッシュにも追加
-        if ((this.cachedFile != null) && file.equals(this.cachedFile)) {
-            this.cachedResult.add(dto);
+        if (dto.isCompleteResult()) {
+            Integer index = this.numRecordsMap.get(file.getPath());
+            if (index == null) {
+                index = new Integer(0);
+            }
+            BattleResult resultEntry = new BattleResult(dto, file, index);
+            this.update(resultEntry);
+            this.resultList.add(resultEntry);
+            this.numRecordsMap.put(file.getPath(), index + 1);
+            // キャッシュされているときはキャッシュにも追加
+            if ((this.cachedFile != null) && file.equals(this.cachedFile)) {
+                this.cachedResult.add(dto);
+            }
         }
     }
 
