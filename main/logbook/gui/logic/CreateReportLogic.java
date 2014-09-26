@@ -894,7 +894,7 @@ public final class CreateReportLogic {
                 IOUtils.write(StringUtils.join(header, ',') + "\r\n", stream, AppConstants.CHARSET);
             }
             for (Comparable[] colums : body) {
-                IOUtils.write(StringUtils.join(colums.toString(), ',') + "\r\n", stream, AppConstants.CHARSET);
+                IOUtils.write(StringUtils.join(toStringArray(colums), ',') + "\r\n", stream, AppConstants.CHARSET);
             }
         } finally {
             stream.close();
