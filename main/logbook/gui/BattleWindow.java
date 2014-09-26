@@ -12,6 +12,7 @@ import logbook.dto.AirBattleDto;
 import logbook.dto.BattleAtackDto;
 import logbook.dto.BattleExDto;
 import logbook.dto.DockDto;
+import logbook.dto.ResultRank;
 import logbook.dto.ShipDto;
 import logbook.internal.EnemyData;
 
@@ -67,9 +68,11 @@ public class BattleWindow extends BattleWindowBase {
 
         // その他
         this.matchLabel.setText("");
-        this.resultLabel[0].setText("");
-        this.resultLabel[1].setText("");
-        this.resultLabel[2].setText("");
+        for (int i = 0; i < 3; ++i) {
+            this.resultLabel[i].setText("");
+            this.resultLabel[i].setBackground(null);
+            this.resultLabel[i].setForeground(null);
+        }
     }
 
     protected static void setLabelRed(Label label) {
@@ -304,9 +307,16 @@ public class BattleWindow extends BattleWindowBase {
 
         this.matchLabel.setText(battle.getFormationMatch());
 
+        ResultRank rank = lastPhase.getEstimatedRank();
         this.resultLabel[0].setText(this.getMVPText(mvp1, airDamage));
         this.resultLabel[1].setText(this.getMVPText(mvp2, 0)); // 第二艦隊は航空戦ダメージゼロ
-        this.resultLabel[2].setText(this.getReulstText(damageRate, lastPhase.getEstimatedRank().toString()));
+        this.resultLabel[2].setText(this.getReulstText(damageRate, rank.toString()));
 
+        if ((rank == ResultRank.C) || (rank == ResultRank.D) || (rank == ResultRank.E)) {
+            for (int i = 0; i < 3; ++i) {
+                this.resultLabel[i].setBackground(SWTResourceManager.getColor(AppConstants.LOSE_BATTLE_COLOR));
+                this.resultLabel[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+            }
+        }
     }
 }

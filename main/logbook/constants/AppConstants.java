@@ -55,8 +55,14 @@ public class AppConstants {
     /** 疲労緑色 */
     public static final RGB COND_GREEN_COLOR = new RGB(0, 128, 0);
 
+    /** 小破の色 */
+    public static final RGB SYOHA_SHIP_COLOR = new RGB(210, 255, 0);
+
     /** 轟沈の色 */
     public static final RGB SUNK_SHIP_COLOR = new RGB(77, 166, 223);
+
+    /** 敗北の色 */
+    public static final RGB LOSE_BATTLE_COLOR = new RGB(230, 10, 20);
 
     /** 5分前 */
     public static final RGB TIME_IN_5_MIN = new RGB(255, 215, 0);

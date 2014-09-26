@@ -17,7 +17,7 @@ public enum DamageRate {
 
     MUKIZU("無傷", 0, null, null),
     KENZAI("健在", 1, null, null),
-    SYOHA("小破", 2, null, null),
+    SYOHA("小破", 2, SWTResourceManager.getColor(AppConstants.SYOHA_SHIP_COLOR), null),
     TYUHA("中破", 3,
             SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR),
             SWTResourceManager.getColor(SWT.COLOR_WHITE)),

@@ -5,9 +5,11 @@ package logbook.gui;
 
 import java.util.List;
 
+import logbook.constants.AppConstants;
 import logbook.dto.BattleExDto;
 import logbook.dto.DockDto;
 import logbook.dto.EnemyShipDto;
+import logbook.dto.ResultRank;
 import logbook.dto.ShipDto;
 import logbook.gui.logic.DamageRate;
 
@@ -18,6 +20,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
  * @author Nekopanda
@@ -159,9 +162,7 @@ public class BattleWindowSmall extends BattleWindow {
 
         this.resultLabel[2] = addLabel(this.resultCompo, SWT.CENTER, SWT.LEFT, "");
         this.resultLabel[0] = addLabel(this.resultCompo, SWT.CENTER, SWT.LEFT, "");
-        this.beginCombined();
-        this.resultLabel[1] = addLabel(this.resultCompo, SWT.CENTER, SWT.LEFT, "");
-        this.endCombined();
+        this.resultLabel[1] = addLabel(this.resultCompo, SWT.FILL, SWT.CENTER, "");
     }
 
     @Override
@@ -185,6 +186,8 @@ public class BattleWindowSmall extends BattleWindow {
                     setLabelNone(this.enemyHpLabels[c][i]);
             }
         }
+
+        this.resultCompo.setBackground(null);
     }
 
     private void printDock(DockDto dock, int base) {
@@ -296,6 +299,11 @@ public class BattleWindowSmall extends BattleWindow {
                     friendMaxHp[1], true);
         }
         printHp(this.enemyHpLabels, 1, 0, this.enemyDamages[last], lastPhase.getNowEnemyHp(), maxEnemyHp, false);
+
+        ResultRank rank = lastPhase.getEstimatedRank();
+        if ((rank == ResultRank.C) || (rank == ResultRank.D) || (rank == ResultRank.E)) {
+            this.resultCompo.setBackground(SWTResourceManager.getColor(AppConstants.LOSE_BATTLE_COLOR));
+        }
 
         this.resultCompo.layout();
     }

@@ -220,11 +220,11 @@ public class BattleWindowLarge extends BattleWindow {
         this.addHorizontalSeparator(numColumns);
 
         // 最後
-        this.resultLabel[0] = this.addLabelWithSpan("結果予想", numColumns, 1);//6-17
+        this.resultLabel[0] = this.addLabel("結果予想", SWT.DEFAULT, SWT.CENTER, SWT.FILL, numColumns, 1);//6-17
         this.beginCombined();
-        this.resultLabel[1] = this.addLabelWithSpan("結果予想", numColumns, 1);//6-17
+        this.resultLabel[1] = this.addLabel("結果予想", SWT.DEFAULT, SWT.CENTER, SWT.FILL, numColumns, 1);//6-17
         this.endCombined();
-        this.resultLabel[2] = this.addLabelWithSpan("結果予想", numColumns, 1);//6-17
+        this.resultLabel[2] = this.addLabel("結果予想", SWT.DEFAULT, SWT.CENTER, SWT.FILL, numColumns, 1);//6-17
 
         this.clearText();
     }

@@ -113,17 +113,21 @@ public class BattleWindowBase extends WindowBase {
         this.combinedMode = false;
     }
 
-    protected Label addLabel(String text, int width, int align, int horizontalSpan, int verticalSpan) {
+    protected Label addLabel(String text, int width, int textalign, int align, int horizontalSpan, int verticalSpan) {
         Label label = new Label(this.getShell(), SWT.NONE);
         if (this.combinedMode) {
             this.labelsForCombined.add(label);
         }
-        label.setAlignment(align);
+        label.setAlignment(textalign);
         GridData gd = new GridData(align, SWT.CENTER, false, false, horizontalSpan, verticalSpan);
         gd.widthHint = width;
         label.setLayoutData(gd);
         label.setText(text);
         return label;
+    }
+
+    protected Label addLabel(String text, int width, int align, int horizontalSpan, int verticalSpan) {
+        return this.addLabel(text, width, align, align, horizontalSpan, verticalSpan);
     }
 
     protected Label addLabelWithSize(String text, int width) {
