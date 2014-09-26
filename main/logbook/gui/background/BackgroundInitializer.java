@@ -14,6 +14,7 @@ import logbook.server.web.WebServer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -23,7 +24,7 @@ public final class BackgroundInitializer extends Thread {
 
     private static final Logger LOG = LogManager.getLogger(BackgroundInitializer.class);
 
-    private final Shell shell;
+    private final Display display;
     private final ApplicationMain main;
 
     /**
@@ -32,7 +33,7 @@ public final class BackgroundInitializer extends Thread {
      * @param shell
      */
     public BackgroundInitializer(Shell shell, ApplicationMain main) {
-        this.shell = shell;
+        this.display = shell.getDisplay();
         this.main = main;
         this.setName("logbook_async_load_battle_log");
     }
@@ -73,7 +74,7 @@ public final class BackgroundInitializer extends Thread {
             // 出撃ログファイル読み込み
             final int numLogRecord = BattleResultServer.get().size();
             ApplicationMain.print("バックグラウンド初期化完了");
-            this.shell.getDisplay().asyncExec(new Runnable() {
+            this.display.asyncExec(new Runnable() {
                 @Override
                 public void run() {
                     BackgroundInitializer.this.main.printMessage("出撃ログ読み込み完了(" + numLogRecord + "件)");

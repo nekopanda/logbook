@@ -672,19 +672,18 @@ public abstract class AbstractTableDialog extends WindowBase {
 
         @Override
         public void run() {
-            synchronized (this.dialog.shell) {
-                if (!this.dialog.shell.isDisposed()) {
-                    this.dialog.display.asyncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            CyclicReloadTask.this.dialog.reloadTable();
-                        }
-                    });
-                } else {
-                    // ウインドウが消えていたらタスクをキャンセルする
-                    this.cancel();
+            this.dialog.display.asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    if (!CyclicReloadTask.this.dialog.shell.isDisposed()) {
+                        CyclicReloadTask.this.dialog.reloadTable();
+                    }
+                    else {
+                        // ウインドウが消えていたらタスクをキャンセルする
+                        CyclicReloadTask.this.cancel();
+                    }
                 }
-            }
+            });
         }
     }
 }

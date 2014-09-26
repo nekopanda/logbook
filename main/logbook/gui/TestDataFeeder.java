@@ -186,7 +186,9 @@ public class TestDataFeeder extends WindowBase {
             this.getShell().getDisplay().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    TestDataFeeder.this.readAll();
+                    if (!TestDataFeeder.this.getShell().isDisposed()) {
+                        TestDataFeeder.this.readAll();
+                    }
                 }
             });
         }
