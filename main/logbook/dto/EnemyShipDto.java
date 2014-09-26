@@ -37,43 +37,12 @@ public class EnemyShipDto extends ShipBaseDto {
 
     public EnemyShipDto(int shipId, int[] slot, int[] param, int lv) {
         super(shipId, slot);
+        // ここで送られてくるパラメータは装備を含まない素の値なのであまり役に立たない
         this.karyoku = param[0];
-        this.raisou = param[0];
-        this.taiku = param[0];
-        this.soukou = param[0];
+        this.raisou = param[1];
+        this.taiku = param[2];
+        this.soukou = param[3];
         this.lv = lv;
-    }
-
-    /**
-     * @return 火力
-     */
-    @Override
-    public int getKaryoku() {
-        return this.karyoku;
-    }
-
-    /**
-     * @return 雷装
-     */
-    @Override
-    public int getRaisou() {
-        return this.raisou;
-    }
-
-    /**
-     * @return 対空
-     */
-    @Override
-    public int getTaiku() {
-        return this.taiku;
-    }
-
-    /**
-     * @return 装甲
-     */
-    @Override
-    public int getSoukou() {
-        return this.soukou;
     }
 
     @Override
