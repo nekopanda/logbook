@@ -212,14 +212,8 @@ public class BattleWindowSmall extends BattleWindow {
 
     private static void setLabelColor(Label label, int nowhp, int maxhp, boolean friend) {
         DamageRate rate = DamageRate.fromHP(nowhp, maxhp);
-        if (friend) {
-            label.setBackground(rate.getFriendBackground());
-            label.setForeground(rate.getFriendForeground());
-        }
-        else {
-            label.setBackground(rate.getEnemyBackground());
-            label.setForeground(rate.getEnemyForeground());
-        }
+        label.setBackground(rate.getBackground());
+        label.setForeground(rate.getForeground());
     }
 
     private static void printFriendHp(Label[][] labels, int index, int nowhp, int maxhp) {

@@ -13,7 +13,7 @@ import org.eclipse.swt.graphics.RGB;
 public class AppConstants {
 
     /** バージョン */
-    public static final String VERSION = "1.0.0 beta";
+    public static final String VERSION = "1.0.0 beta2";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://nekopanda.blog.jp/");
@@ -54,6 +54,9 @@ public class AppConstants {
 
     /** 疲労緑色 */
     public static final RGB COND_GREEN_COLOR = new RGB(0, 128, 0);
+
+    /** 轟沈の色 */
+    public static final RGB SUNK_SHIP_COLOR = new RGB(77, 166, 223);
 
     /** 5分前 */
     public static final RGB TIME_IN_5_MIN = new RGB(255, 215, 0);

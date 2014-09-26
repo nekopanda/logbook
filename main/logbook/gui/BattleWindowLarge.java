@@ -288,31 +288,25 @@ public class BattleWindowLarge extends BattleWindow {
         this.title.setText(this.getMapCellDto().detailedString());
     }
 
-    private static void printDamageLebel(Label label, int nowhp, int maxhp, boolean friend) {
+    private static void printDamageLebel(Label label, int nowhp, int maxhp) {
         DamageRate rate = DamageRate.fromHP(nowhp, maxhp);
         label.setText(rate.toString());
-        if (friend) {
-            label.setBackground(rate.getFriendBackground());
-            label.setForeground(rate.getFriendForeground());
-        }
-        else {
-            label.setBackground(rate.getEnemyBackground());
-            label.setForeground(rate.getEnemyForeground());
-        }
+        label.setBackground(rate.getBackground());
+        label.setForeground(rate.getForeground());
     }
 
     private static void printFriendHp(Label[][] labels, int index, int nowhp, int maxhp) {
         printHp(labels[0][index], nowhp, maxhp);
-        printDamageLebel(labels[1][index], nowhp, maxhp, true);
+        printDamageLebel(labels[1][index], nowhp, maxhp);
     }
 
     private static void printHp(
-            Label[][] labels, int base1, int base2, int[] dam, int[] nowhp, int[] maxhp, boolean friend)
+            Label[][] labels, int base1, int base2, int[] dam, int[] nowhp, int[] maxhp)
     {
         for (int i = 0; i < nowhp.length; ++i) {
             labels[base1 + 0][base2 + i].setText(String.valueOf(dam[base2 + i]));
             labels[base1 + 1][base2 + i].setText(String.valueOf(nowhp[i]));
-            printDamageLebel(labels[base1 + 2][base2 + i], nowhp[i], maxhp[i], friend);
+            printDamageLebel(labels[base1 + 2][base2 + i], nowhp[i], maxhp[i]);
         }
     }
 
@@ -361,22 +355,21 @@ public class BattleWindowLarge extends BattleWindow {
         }
 
         // 昼戦後HP
-        printHp(this.friendHpLabels, 2, 0, this.friendDamages[0], phase1.getNowFriendHp(), friendMaxHp[0], true);
+        printHp(this.friendHpLabels, 2, 0, this.friendDamages[0], phase1.getNowFriendHp(), friendMaxHp[0]);
         if (battle.isCombined()) {
             printHp(this.friendHpLabels, 2, 6, this.friendDamages[0], phase1.getNowFriendHpCombined(),
-                    friendMaxHp[1], true);
+                    friendMaxHp[1]);
         }
-        printHp(this.enemyHpLabels, 2, 0, this.enemyDamages[0], phase1.getNowEnemyHp(), maxEnemyHp, false);
+        printHp(this.enemyHpLabels, 2, 0, this.enemyDamages[0], phase1.getNowEnemyHp(), maxEnemyHp);
 
         // 夜戦後HP
         if (phase2 != null) {
-            printHp(this.friendHpLabels, 5, 0, this.friendDamages[1], phase2.getNowFriendHp(), friendMaxHp[0],
-                    true);
+            printHp(this.friendHpLabels, 5, 0, this.friendDamages[1], phase2.getNowFriendHp(), friendMaxHp[0]);
             if (battle.isCombined()) {
                 printHp(this.friendHpLabels, 5, 6, this.friendDamages[1], phase2.getNowFriendHpCombined(),
-                        friendMaxHp[1], true);
+                        friendMaxHp[1]);
             }
-            printHp(this.enemyHpLabels, 5, 0, this.enemyDamages[1], phase2.getNowEnemyHp(), maxEnemyHp, false);
+            printHp(this.enemyHpLabels, 5, 0, this.enemyDamages[1], phase2.getNowEnemyHp(), maxEnemyHp);
         }
     }
 
