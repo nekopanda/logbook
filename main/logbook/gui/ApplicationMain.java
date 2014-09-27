@@ -319,23 +319,13 @@ public final class ApplicationMain extends WindowBase {
             @Override
             public void shellDeiconified(ShellEvent e) {
                 // Main以外のウィンドウも連動させる
-                for (Shell shell : ApplicationMain.this.dummyHolder.getShells()) {
-                    if (shell.getData() instanceof WindowBase) {
-                        WindowBase window = (WindowBase) shell.getData();
-                        window.shellDeiconified(e);
-                    }
-                }
+                ApplicationMain.this.childDeiconified();
             }
 
             @Override
             public void shellIconified(ShellEvent e) {
                 // Main以外のウィンドウも連動させる
-                for (Shell shell : ApplicationMain.this.dummyHolder.getShells()) {
-                    if (shell.getData() instanceof WindowBase) {
-                        WindowBase window = (WindowBase) shell.getData();
-                        window.shellIconified(e);
-                    }
-                }
+                ApplicationMain.this.childIconified();
             }
         });
 
@@ -741,6 +731,16 @@ public final class ApplicationMain extends WindowBase {
                 // タブを整理する
                 ApplicationMain.this.tabFolder.setSelection(0);
 
+                if (AppConfig.get().isCloseWhenMinimized()) {
+                    // 他のウィンドウを連動させる
+                    if (minimum) {
+                        ApplicationMain.this.childIconified();
+                    }
+                    else {
+                        ApplicationMain.this.childDeiconified();
+                    }
+                }
+
                 shell.setRedraw(true);
                 // ウインドウサイズを調節
                 if (minimum) {
@@ -807,6 +807,26 @@ public final class ApplicationMain extends WindowBase {
     private void moveWindowsIntoDisplay() {
         for (WindowBase window : this.getWindowList()) {
             window.moveIntoDisplay();
+        }
+    }
+
+    // Main以外のウィンドウも連動させる
+    private void childDeiconified() {
+        for (Shell shell : ApplicationMain.this.dummyHolder.getShells()) {
+            if (shell.getData() instanceof WindowBase) {
+                WindowBase window = (WindowBase) shell.getData();
+                window.shellDeiconified();
+            }
+        }
+    }
+
+    // Main以外のウィンドウも連動させる
+    private void childIconified() {
+        for (Shell shell : ApplicationMain.this.dummyHolder.getShells()) {
+            if (shell.getData() instanceof WindowBase) {
+                WindowBase window = (WindowBase) shell.getData();
+                window.shellIconified();
+            }
         }
     }
 

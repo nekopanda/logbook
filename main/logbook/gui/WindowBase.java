@@ -593,14 +593,14 @@ public class WindowBase {
     }
 
     /** parent is un-minimized */
-    public void shellDeiconified(ShellEvent e) {
+    public void shellDeiconified() {
         if (this.openState) {
             this.shell.setVisible(true);
         }
     }
 
     /** parent is minimized */
-    public void shellIconified(ShellEvent e) {
+    public void shellIconified() {
         if (this.openState) {
             this.shell.setVisible(false);
         }

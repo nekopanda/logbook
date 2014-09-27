@@ -175,6 +175,9 @@ public final class AppConfigBean {
     /** 保存したJSONを読み込ませてテストするためのウィンドウメニューを表示するかどうか */
     private boolean enableTestWindow = false;
 
+    /** 縮小表示の時は他のウィンドウを閉じる */
+    private boolean closeWhenMinimized = true;
+
     /**
      * ポート番号を取得します。
      * @return ポート番号
@@ -989,5 +992,19 @@ public final class AppConfigBean {
      */
     public void setEnableTestWindow(boolean enableTestWindow) {
         this.enableTestWindow = enableTestWindow;
+    }
+
+    /**
+     * @return closeWhenMinimized
+     */
+    public boolean isCloseWhenMinimized() {
+        return this.closeWhenMinimized;
+    }
+
+    /**
+     * @param closeWhenMinimized セットする closeWhenMinimized
+     */
+    public void setCloseWhenMinimized(boolean closeWhenMinimized) {
+        this.closeWhenMinimized = closeWhenMinimized;
     }
 }

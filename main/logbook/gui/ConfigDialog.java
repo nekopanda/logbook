@@ -210,6 +210,11 @@ public final class ConfigDialog extends Dialog {
         hidewindow.setText("最小化時にタスクトレイに格納");
         hidewindow.setSelection(AppConfig.get().isHideWindow());
 
+        final Button closewindow = new Button(compositeSystem, SWT.CHECK);
+        closewindow.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        closewindow.setText("縮小表示の時は開いているウィンドウを閉じる");
+        closewindow.setSelection(AppConfig.get().isCloseWhenMinimized());
+
         final Button ontop;
         if (WindowBase.nativeService.isTopMostAvailable() == false) { // 右クリックから設定できる場合は表示しない
             ontop = new Button(compositeSystem, SWT.CHECK);
@@ -697,6 +702,7 @@ public final class ConfigDialog extends Dialog {
                     AppConfig.get().setListenPort(Integer.parseInt(listenport.getText()));
                 }
                 AppConfig.get().setHideWindow(hidewindow.getSelection());
+                AppConfig.get().setCloseWhenMinimized(closewindow.getSelection());
                 if (ontop != null) {
                     AppConfig.get().setOnTop(ontop.getSelection());
                 }
