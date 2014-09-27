@@ -155,6 +155,8 @@ public final class ApplicationMain extends WindowBase {
     private CalcExpDialog calcExpWindow;
     /** グループエディター */
     private ShipFilterGroupDialog shipFilterGroupWindow;
+    /** ツール */
+    private LauncherWindow launcherWindow;
 
     /** コマンドボタン */
     private Composite commandComposite;
@@ -475,8 +477,12 @@ public final class ApplicationMain extends WindowBase {
                 new CreatePacFileDialog(ApplicationMain.this.dummyHolder).open();
             }
         });
-        // セパレータ
+        // セパレータ 
         new MenuItem(etcmenu, SWT.SEPARATOR);
+        // その他-ツール
+        MenuItem toolwindows = new MenuItem(etcmenu, SWT.CHECK);
+        toolwindows.setText("ツール");
+        this.launcherWindow = new LauncherWindow(this.dummyHolder, toolwindows);
         // その他-ウィンドウをディスプレイ内に移動
         MenuItem movewindows = new MenuItem(etcmenu, SWT.NONE);
         movewindows.setText("ウィンドウを呼び戻す");
@@ -804,7 +810,7 @@ public final class ApplicationMain extends WindowBase {
         }
     }
 
-    private WindowBase[] getWindowList() {
+    public WindowBase[] getWindowList() {
         return new WindowBase[] {
                 this.captureWindow,
                 this.dropReportWindow,
@@ -823,6 +829,7 @@ public final class ApplicationMain extends WindowBase {
                 this.battleShipWindow,
                 this.calcExpWindow,
                 this.shipFilterGroupWindow,
+                this.launcherWindow
         };
     }
 

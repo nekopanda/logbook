@@ -570,6 +570,7 @@ public class WindowBase {
         this.opacityChanged(this.config.getOpacityIndex());
         // ウィンドウサイズ
         if (this.shouldSaveWindowSize()) {
+            System.out.println(this.getClass().getSimpleName() + ": setSize()");
             this.shell.setSize(this.getRestoreSize());
         }
 
