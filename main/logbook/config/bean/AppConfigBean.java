@@ -37,7 +37,7 @@ public final class AppConfigBean {
     private float soundLevel = 0.85f;
 
     /** 透明度 */
-    private int alpha = 255;
+    //private int alpha = 255;
 
     /** 遠征のリマインド */
     private boolean missionRemind = true;
@@ -291,17 +291,17 @@ public final class AppConfigBean {
      * 透明度を取得します。
      * @return 透明度
      */
-    public int getAlpha() {
-        return this.alpha;
-    }
+    //public int getAlpha() {
+    //    return this.alpha;
+    //}
 
     /**
      * 透明度を設定します。
      * @param alpha 透明度
      */
-    public void setAlpha(int alpha) {
-        this.alpha = alpha;
-    }
+    //public void setAlpha(int alpha) {
+    //    this.alpha = alpha;
+    //}
 
     /**
      * 遠征のリマインドを取得します。

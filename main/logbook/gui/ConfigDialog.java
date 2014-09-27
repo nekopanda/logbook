@@ -153,6 +153,7 @@ public final class ConfigDialog extends Dialog {
         soundlevel.setText(Integer.toString((int) (AppConfig.get().getSoundLevel() * 100)));
         new Label(compositeSystem, SWT.NONE);
 
+        /*
         Label label7 = new Label(compositeSystem, SWT.NONE);
         label7.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
         label7.setText("透明度*");
@@ -163,6 +164,7 @@ public final class ConfigDialog extends Dialog {
         alpha.setLayoutData(gdAlpha);
         alpha.setText(Integer.toString(AppConfig.get().getAlpha()));
         new Label(compositeSystem, SWT.NONE);
+        */
 
         Label label8 = new Label(compositeSystem, SWT.NONE);
         label8.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -704,9 +706,11 @@ public final class ConfigDialog extends Dialog {
                     float level = (float) Integer.parseInt(soundlevel.getText()) / 100;
                     AppConfig.get().setSoundLevel(level);
                 }
+                /*
                 if (StringUtils.isNumeric(alpha.getText())) {
                     AppConfig.get().setAlpha(Integer.parseInt(alpha.getText()));
                 }
+                */
                 AppConfig.get().setReportPath(reportDir.getText());
                 AppConfig.get().setMaterialLogInterval(materialintervalSpinner.getSelection());
                 AppConfig.get().setCheckUpdate(checkUpdate.getSelection());
