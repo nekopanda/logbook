@@ -115,6 +115,6 @@ public class LauncherWindow extends WindowBase {
      */
     @Override
     protected Point getDefaultSize() {
-        return new Point(500, 50);
+        return new Point(500, 80);
     }
 }
