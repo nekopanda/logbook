@@ -304,6 +304,9 @@ public class BattleWindowSmall extends BattleWindow {
         if ((rank == ResultRank.C) || (rank == ResultRank.D) || (rank == ResultRank.E)) {
             this.resultCompo.setBackground(SWTResourceManager.getColor(AppConstants.LOSE_BATTLE_COLOR));
         }
+        else {
+            this.resultCompo.setBackground(null);
+        }
 
         this.resultCompo.layout();
     }
