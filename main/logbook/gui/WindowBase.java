@@ -51,7 +51,10 @@ public class WindowBase {
     }
 
     private final WindowTreeNode treeNode = new WindowTreeNode(this);
+    // アプリ上の仮想的な親子関係
     private WindowBase parent;
+    // OS上での実際の親子関係
+    private Shell actualParent;
     private Shell shell;
     private Menu alphamenu;
     private MenuItem menuItem;
@@ -342,6 +345,7 @@ public class WindowBase {
      */
     protected void createContents(Shell shell, int style, boolean menuCascade) {
         if (this.shell == null) {
+            this.actualParent = shell;
             this.shell = new Shell(shell, style | this.getDefaultStyle());
             this.createContents(menuCascade);
         }
@@ -354,6 +358,7 @@ public class WindowBase {
      */
     protected void createContents(WindowBase parent, int style, boolean menuCascade) {
         if (this.shell == null) {
+            this.actualParent = parent.getShell();
             this.parent = parent;
             this.shell = new Shell(parent.shell, style | this.getDefaultStyle());
             this.createContents(menuCascade);
@@ -646,13 +651,22 @@ public class WindowBase {
 
     public void setVisible(boolean visible) {
         if (this.shell.getVisible() != visible) {
+            // 関連付けられたメニューがある場合はメニューも連動させる
             if (this.menuItem != null) {
                 this.menuItem.setSelection(visible);
+            }
+            if (visible) {
+                activatedWindows.remove(this);
+                activatedWindows.add(this);
             }
             this.openState = visible;
             this.dbgprint("setVisible alpha=" + this.shell.getAlpha());
             this.shell.setVisible(visible);
         }
+    }
+
+    public Shell getActualParent() {
+        return this.actualParent;
     }
 
     /**
