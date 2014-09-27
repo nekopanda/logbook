@@ -143,7 +143,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.begin("tr", null);
 
         this.inline("th", "", null);
-        this.inline("th", "名前", null);
+        this.inline("th", "艦名", null);
         this.inline("th", "cond.", null);
         this.inline("th", "制空", null);
         this.inline("th", "索敵", null);
@@ -265,20 +265,19 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.begin("div", BOX_CLASS);
         this.begin("table", SLOTITEM_TABLE_CLASS[ci]);
 
-        List<List<ItemDto>> itemList = new ArrayList<>();
         this.begin("tr", null);
-        for (int i = 0; i < ships.size(); ++i) {
-            SHIP ship = ships.get(i);
-            this.inline("th", getColSpan(2), String.valueOf(i + 1) + "." + ship.getFriendlyName(), null);
-            itemList.add(ship.getItem());
+        this.inline("th", "艦名", null);
+        for (int c = 0; c < 5; ++c) {
+            this.inline("th", getColSpan(2), "装備" + (c + 1), null);
         }
         this.end(); // tr
 
-        for (int c = 0; c < 5; ++c) {
+        for (int i = 0; i < ships.size(); ++i) {
             this.begin("tr", null);
-            for (int i = 0; i < ships.size(); ++i) {
-                SHIP ship = ships.get(i);
-                List<ItemDto> items = itemList.get(i);
+            SHIP ship = ships.get(i);
+            this.inline("td", String.valueOf(i + 1) + "." + ship.getFriendlyName(), null);
+            List<ItemDto> items = ship.getItem();
+            for (int c = 0; c < 5; ++c) {
                 String onSlot = "";
                 String itemName = String.valueOf(c + 1) + ". ";
                 int[] onSlots = ship.getOnSlot(); // 現在の艦載機搭載数
