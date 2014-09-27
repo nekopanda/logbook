@@ -169,7 +169,6 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.end(); // tr
 
         int totalSeiku = 0;
-        double totalSakuteki = 0;
         int totalNowHp = 0;
         int totalMaxHp = 0;
 
@@ -181,7 +180,6 @@ public class BattleHtmlGenerator extends HTMLGenerator {
             int maxhp = hp[1][i];
 
             totalSeiku += seiku;
-            totalSakuteki += sakuteki.getValue();
             totalNowHp += nowhp;
             totalMaxHp += maxhp;
 
@@ -229,11 +227,12 @@ public class BattleHtmlGenerator extends HTMLGenerator {
 
         this.begin("tr", null);
 
+        SakutekiString totalSakuteki = new SakutekiString(ships);
         this.inline("td", "", null);
         this.inline("td", "合計", null);
         this.inline("td", "", null);
         this.inline("td", String.valueOf(totalSeiku), null);
-        this.inline("td", String.format("%.1f", totalSakuteki), null);
+        this.inline("td", totalSakuteki.toString(), null);
         this.inline("td", totalNowHp + "/" + totalMaxHp, null);
 
         for (int i = 0; i < numPhases; ++i) {
