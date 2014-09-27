@@ -269,7 +269,7 @@ public class BattleFilterDialog extends WindowBase {
                 int month = this.datetime.getMonth();
                 int day = this.datetime.getDay();
                 Calendar cal = Calendar.getInstance();
-                cal.set(year, month, endOfDay ? (day + 1) : day);
+                cal.set(year, month, endOfDay ? (day + 1) : day, 0, 0, 0);
                 return cal.getTime();
             }
             return null;
