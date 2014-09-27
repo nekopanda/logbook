@@ -42,9 +42,16 @@ public class BattleResultDto extends AbstractDto {
     /** この戦闘で大破艦が出たか　*/
     private final boolean hasTaiha;
 
-    private final ShipDto mvp;
+    private final boolean isCombined;
 
-    private final ShipDto mvpCombined;
+    /** メモリ節約のためShipDtoは持たない */
+    private final String mvp;
+
+    private final String mvpCombined;
+
+    private final String flagShip;
+
+    private final String flagShipCombined;
 
     /**
      * コンストラクター
@@ -71,8 +78,11 @@ public class BattleResultDto extends AbstractDto {
 
         this.battle = battle;
         this.hasTaiha = false;
+        this.isCombined = false;
         this.mvp = null;
         this.mvpCombined = null;
+        this.flagShip = null;
+        this.flagShipCombined = null;
     }
 
     public BattleResultDto(BattleExDto dto) {
@@ -91,23 +101,37 @@ public class BattleResultDto extends AbstractDto {
         this.hasTaiha = (this.hasTaihaInFleet(lastPhase.getNowFriendHp(), dto.getMaxFriendHp()) ||
                 this.hasTaihaInFleet(lastPhase.getNowFriendHpCombined(), dto.getMaxFriendHpCombined()));
 
+        this.isCombined = dto.isCombined();
+
         // MVP
         if (dto.getMvp() == -1) { // 敗北Eの時はMVPなし
             this.mvp = null;
         }
         else {
-            this.mvp = dto.getDock().getShips().get(dto.getMvp() - 1);
+            this.mvp = dto.getDock().getShips().get(dto.getMvp() - 1).getFriendlyName();
         }
         if (dto.isCombined()) {
             if (dto.getMvpCombined() == -1) { // 敗北Eの時はMVPなし
                 this.mvpCombined = null;
             }
             else {
-                this.mvpCombined = dto.getDockCombined().getShips().get(dto.getMvpCombined() - 1);
+                this.mvpCombined = dto.getDockCombined().getShips()
+                        .get(dto.getMvpCombined() - 1).getFriendlyName();
             }
         }
         else {
             this.mvpCombined = null;
+        }
+
+        // 旗艦
+        this.flagShip = dto.getDock().getShips().get(0).getFriendlyName();
+        ;
+        if (dto.isCombined()) {
+            this.flagShipCombined = dto.getDockCombined()
+                    .getShips().get(0).getFriendlyName();
+        }
+        else {
+            this.flagShipCombined = null;
         }
     }
 
@@ -217,14 +241,35 @@ public class BattleResultDto extends AbstractDto {
     /**
      * @return mvp
      */
-    public ShipDto getMvp() {
+    public String getMvp() {
         return this.mvp;
     }
 
     /**
      * @return mvpCombined
      */
-    public ShipDto getMvpCombined() {
+    public String getMvpCombined() {
         return this.mvpCombined;
+    }
+
+    /**
+     * @return flagShip
+     */
+    public String getFlagShip() {
+        return this.flagShip;
+    }
+
+    /**
+     * @return flagShipCombined
+     */
+    public String getFlagShipCombined() {
+        return this.flagShipCombined;
+    }
+
+    /**
+     * @return isCombined
+     */
+    public boolean isCombined() {
+        return this.isCombined;
     }
 }

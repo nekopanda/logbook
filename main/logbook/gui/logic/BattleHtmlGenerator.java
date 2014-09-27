@@ -871,8 +871,8 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.inline("td", detail.getRank().toString(), null);
         this.end(); // tr
 
-        String mvp1 = (result.getMvp() == null) ? "なし" : result.getMvp().getFriendlyName();
-        String mvp2 = (result.getMvpCombined() == null) ? "なし" : result.getMvpCombined().getFriendlyName();
+        String mvp1 = (result.getMvp() == null) ? "なし" : result.getMvp();
+        String mvp2 = (result.getMvpCombined() == null) ? "なし" : result.getMvpCombined();
 
         if (detail.isCombined()) {
             this.begin("tr", null);
