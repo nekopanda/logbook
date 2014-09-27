@@ -526,11 +526,11 @@ public final class GlobalContext {
             break;
         // 演習
         case PRACTICE_BATTLE:
-            doBattle(data, BattlePhaseKind.BATTLE);
+            doBattle(data, BattlePhaseKind.PRACTICE_BATTLE);
             break;
         // 演習
         case PRACTICE_BATTLE_MIDNIGHT:
-            doBattle(data, BattlePhaseKind.MIDNIGHT);
+            doBattle(data, BattlePhaseKind.PRACTICE_MIDNIGHT);
             break;
         // 演習結果
         case PRACTICE_BATTLE_RESULT:
@@ -746,7 +746,7 @@ public final class GlobalContext {
                 Arrays.fill(isSortie, false);
 
                 // 戦闘結果がある場合、ダメージ計算があっているか検証します
-                if ((battle != null) && (battle.getDock() != null)) {
+                if ((battle != null) && (battle.getDock() != null) && (battle.isPractice() == false)) {
                     checkBattleDamage(battle.getFriends().get(0).getShips(), battle.getLastPhase().getNowFriendHp());
                     if (battle.isCombined()) {
                         checkBattleDamage(battle.getFriends().get(1).getShips(),
@@ -866,24 +866,22 @@ public final class GlobalContext {
                 return;
             }
 
-            for (int i = 0; i < ships.size(); ++i) {
-                checkShipSunk(ships.get(i), nowFriendHp[i], sunkShips);
-            }
-            if (battle.isCombined()) {
-                List<ShipDto> shipsCombined = battle.getFriends().get(1).getShips();
-                int[] nowFriendHpCombined = phase.getNowFriendHpCombined();
-                for (int i = 0; i < shipsCombined.size(); ++i) {
-                    checkShipSunk(shipsCombined.get(i), nowFriendHpCombined[i], sunkShips);
+            if ((phaseKind != BattlePhaseKind.PRACTICE_BATTLE) &&
+                    (phaseKind != BattlePhaseKind.PRACTICE_MIDNIGHT))
+            { // 演習ではやらない
+                for (int i = 0; i < ships.size(); ++i) {
+                    checkShipSunk(ships.get(i), nowFriendHp[i], sunkShips);
+                }
+                if (battle.isCombined()) {
+                    List<ShipDto> shipsCombined = battle.getFriends().get(1).getShips();
+                    int[] nowFriendHpCombined = phase.getNowFriendHpCombined();
+                    for (int i = 0; i < shipsCombined.size(); ++i) {
+                        checkShipSunk(shipsCombined.get(i), nowFriendHpCombined[i], sunkShips);
+                    }
                 }
             }
 
             addConsole("海戦情報を更新しました");
-            addConsole("自=" + Arrays.toString(phase.getNowFriendHp()));
-            if (battle.isCombined()) {
-                addConsole("連=" + Arrays.toString(phase.getNowFriendHpCombined()));
-            }
-            addConsole("敵=" + Arrays.toString(phase.getNowEnemyHp()));
-            addConsole("→ " + phase.getEstimatedRank().toString());
             for (ShipDto ship : sunkShips) {
                 addConsole(ship.getName() + "(id:" + ship.getId() + ",lv:" + ship.getLv() + ") 轟沈しました！");
             }
@@ -1222,7 +1220,7 @@ public final class GlobalContext {
             }
 
             // 戦闘結果がある場合、ダメージ計算があっているか検証します
-            if ((battle != null) && (battle.getDock() != null)) {
+            if ((battle != null) && (battle.getDock() != null) && (battle.isPractice() == false)) {
                 checkBattleDamage(battle.getDock().getShips(), battle.getNowFriendHp());
                 if (battle.isCombined()) {
                     checkBattleDamage(battle.getDockCombined().getShips(), battle.getNowFriendHpCombined());

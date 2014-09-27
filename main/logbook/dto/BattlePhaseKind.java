@@ -11,6 +11,8 @@ public enum BattlePhaseKind {
 
     BATTLE(false),
     MIDNIGHT(true),
+    PRACTICE_BATTLE(false),
+    PRACTICE_MIDNIGHT(true),
     SP_MIDNIGHT(true),
     NIGHT_TO_DAY(false),
     COMBINED_BATTLE(false),
