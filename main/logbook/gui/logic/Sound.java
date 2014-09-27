@@ -114,7 +114,7 @@ public final class Sound {
      * 
      */
     public static void randomExpeditionSoundPlay() {
-        randomPlay(getExpeditionSoundFiles());
+        randomPlay(getFileList("./sound/expedition"));
     }
 
     /**
@@ -122,7 +122,7 @@ public final class Sound {
      * 
      */
     public static void randomDockSoundPlay() {
-        randomPlay(getDockSoundFiles());
+        randomPlay(getFileList("./sound/dock"));
     }
 
     /**
@@ -130,7 +130,11 @@ public final class Sound {
      * 
      */
     public static void randomBadlySoundPlay() {
-        randomPlay(getBadlySoundFiles());
+        randomPlay(getFileList("./sound/badly"));
+    }
+
+    public static void randomWarningPlay() {
+        randomPlay(getFileList("./sound/warning"));
     }
 
     /**
@@ -138,36 +142,10 @@ public final class Sound {
      * 
      * @return サウンドファイル
      */
-    private static List<File> getExpeditionSoundFiles() {
-        File expedition = new File("./sound/expedition");
+    private static List<File> getFileList(String path) {
+        File expedition = new File(path);
         if (expedition.exists() && expedition.isDirectory()) {
             return new ArrayList<File>(FileUtils.listFiles(expedition, EXTENSIONS, true));
-        }
-        return Collections.emptyList();
-    }
-
-    /**
-     * お風呂からあがる時に再生するサウンドを取得します
-     * 
-     * @return サウンドファイル
-     */
-    private static List<File> getDockSoundFiles() {
-        File dock = new File("./sound/dock");
-        if (dock.exists() && dock.isDirectory()) {
-            return new ArrayList<File>(FileUtils.listFiles(dock, EXTENSIONS, true));
-        }
-        return Collections.emptyList();
-    }
-
-    /**
-     * 大破した時に再生するサウンドを取得します
-     * 
-     * @return サウンドファイル
-     */
-    private static List<File> getBadlySoundFiles() {
-        File dock = new File("./sound/badly");
-        if (dock.exists() && dock.isDirectory()) {
-            return new ArrayList<File>(FileUtils.listFiles(dock, EXTENSIONS, true));
         }
         return Collections.emptyList();
     }

@@ -52,6 +52,7 @@ import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
 import logbook.gui.ApplicationMain;
 import logbook.gui.logic.CreateReportLogic;
+import logbook.gui.logic.Sound;
 import logbook.internal.BattleResultServer;
 import logbook.internal.EnemyData;
 import logbook.internal.Item;
@@ -62,6 +63,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.ToolTip;
 
 /**
  * 遠征・入渠などの情報を管理します
@@ -1807,6 +1810,19 @@ public final class GlobalContext {
             JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
             if (apidata != null) {
                 MasterData.updateMapInfo(apidata);
+            }
+            // 艦娘の空き枠が少ない時はバルーンを出す
+            if (AppConfig.get().isUseTaskbarNotify()) {
+                int aki = maxChara - shipMap.size();
+                if (aki <= AppConfig.get().getNotifyFully()) {
+                    ToolTip tip = new ToolTip(ApplicationMain.main.getShell(), SWT.BALLOON
+                            | SWT.ICON_ERROR);
+                    tip.setText("母港の空き警告");
+                    tip.setMessage("母港の空きがあと" + aki + "隻分しかありません");
+                    ApplicationMain.main.getTrayItem().setToolTip(tip);
+                    tip.setVisible(true);
+                    Sound.randomWarningPlay();
+                }
             }
         } catch (Exception e) {
             LOG.warn("マップ情報更新に失敗しました", e);
