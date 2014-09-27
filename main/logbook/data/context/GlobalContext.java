@@ -9,7 +9,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -785,32 +784,6 @@ public final class GlobalContext {
                 doNdockSub(apiNdock);
                 //addConsole("入渠情報を更新しました");
 
-                // 遠征の状態を更新する
-                deckMissions = new DeckMissionDto[] { DeckMissionDto.EMPTY, DeckMissionDto.EMPTY, DeckMissionDto.EMPTY };
-                for (int i = 1; i < apiDeckPort.size(); i++) {
-                    JsonObject object = (JsonObject) apiDeckPort.get(i);
-                    String name = object.getString("api_name");
-                    JsonArray jmission = object.getJsonArray("api_mission");
-
-                    int section = ((JsonNumber) jmission.get(1)).intValue();
-                    long milis = ((JsonNumber) jmission.get(2)).longValue();
-                    int fleetid = object.getInt("api_id");
-
-                    Set<Integer> ships = new LinkedHashSet<Integer>();
-                    JsonArray shiparray = object.getJsonArray("api_ship");
-                    for (JsonValue jsonValue : shiparray) {
-                        int shipid = ((JsonNumber) jsonValue).intValue();
-                        if (shipid != -1) {
-                            ships.add(shipid);
-                        }
-                    }
-
-                    Date time = null;
-                    if (milis > 0) {
-                        time = new Date(milis);
-                    }
-                    deckMissions[i - 1] = new DeckMissionDto(name, section, time, fleetid, ships);
-                }
                 //addConsole("遠征情報を更新しました");
 
                 // 連合艦隊を更新する
@@ -1269,7 +1242,7 @@ public final class GlobalContext {
     }
 
     /**
-     * 艦隊を設定します
+     * 艦隊と遠征の状態を更新します
      * 
      * @param apidata
      */
@@ -1277,16 +1250,20 @@ public final class GlobalContext {
         dock.clear();
         for (int i = 0; i < apidata.size(); i++) {
             JsonObject jsonObject = (JsonObject) apidata.get(i);
-            String fleetid = String.valueOf(jsonObject.getInt("api_id"));
+            int fleetid = jsonObject.getInt("api_id");
+            String fleetidstr = String.valueOf(fleetid);
             String name = jsonObject.getString("api_name");
             JsonArray apiship = jsonObject.getJsonArray("api_ship");
 
-            DockDto dockdto = new DockDto(fleetid, name);
-            dock.put(fleetid, dockdto);
+            DockDto dockdto = new DockDto(fleetidstr, name);
+            List<Integer> shipIds = new ArrayList<Integer>();
+            dock.put(fleetidstr, dockdto);
 
             for (int j = 0; j < apiship.size(); j++) {
-                ShipDto ship = shipMap.get(apiship.getInt(j));
+                int shipId = apiship.getInt(j);
+                shipIds.add(shipId);
 
+                ShipDto ship = shipMap.get(shipId);
                 if (ship != null) {
                     dockdto.addShip(ship);
 
@@ -1294,9 +1271,20 @@ public final class GlobalContext {
                         setSecretary(ship);
                     }
                     // 艦隊IDを設定
-                    ship.setFleetid(fleetid);
+                    ship.setFleetid(fleetidstr);
                     ship.setFleetpos(j);
                 }
+            }
+
+            if (i >= 1) {
+                JsonArray jmission = jsonObject.getJsonArray("api_mission");
+                int section = ((JsonNumber) jmission.get(1)).intValue();
+                long milis = ((JsonNumber) jmission.get(2)).longValue();
+                Date time = null;
+                if (milis > 0) {
+                    time = new Date(milis);
+                }
+                deckMissions[i - 1] = new DeckMissionDto(name, section, time, fleetid, shipIds);
             }
         }
     }
