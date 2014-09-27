@@ -466,6 +466,12 @@ public class BattleHtmlGenerator extends HTMLGenerator {
     private void genAtackTableContent(BattleAtackDto atack,
             ShipBaseDto[] originShips, ShipBaseDto[] targetShips)
     {
+        if (atack.origin.length == 0) {
+            this.begin("tr", null);
+            this.inline("td", "なし", null);
+            this.end(); // tr
+            return;
+        }
         int ci = (atack.friendAtack) ? 0 : 1;
 
         this.begin("tr", null);
