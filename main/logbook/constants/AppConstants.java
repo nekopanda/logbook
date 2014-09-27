@@ -13,14 +13,14 @@ import org.eclipse.swt.graphics.RGB;
 public class AppConstants {
 
     /** バージョン */
-    public static final String VERSION = "1.0.0 beta3";
+    public static final String VERSION = "1.0.0 beta4";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://nekopanda.blog.jp/");
 
     /** アップデートチェック先 */
     public static final URI UPDATE_CHECK_URI = URI
-            .create("https://googledrive.com/host/0B83tioTzFacPdnlSRW5vcEVFUFk/checkversion.txt");
+            .create("https://googledrive.com/host/0B83tioTzFacPdnlSRW5vcEVFUFk/okversions.txt");
 
     /** 日付書式 */
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";

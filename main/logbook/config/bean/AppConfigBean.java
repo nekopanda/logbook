@@ -58,7 +58,7 @@ public final class AppConfigBean {
     private int materialLogInterval = 600;
 
     /** アップデートチェック */
-    private boolean checkUpdate = true;
+    private boolean updateCheck = true;
 
     /** 終了時に確認する */
     private boolean checkDoit = true;
@@ -401,16 +401,16 @@ public final class AppConfigBean {
      * アップデートチェックを取得します。
      * @return アップデートチェック
      */
-    public boolean isCheckUpdate() {
-        return this.checkUpdate;
+    public boolean isUpdateCheck() {
+        return this.updateCheck;
     }
 
     /**
      * アップデートチェックを設定します。
      * @param checkUpdate アップデートチェック
      */
-    public void setCheckUpdate(boolean checkUpdate) {
-        this.checkUpdate = checkUpdate;
+    public void setUpdateCheck(boolean checkUpdate) {
+        this.updateCheck = checkUpdate;
     }
 
     /**

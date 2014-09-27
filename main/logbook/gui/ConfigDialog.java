@@ -224,7 +224,7 @@ public final class ConfigDialog extends Dialog {
         final Button checkUpdate = new Button(compositeSystem, SWT.CHECK);
         checkUpdate.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
         checkUpdate.setText("起動時にアップデートチェック*");
-        checkUpdate.setSelection(AppConfig.get().isCheckUpdate());
+        checkUpdate.setSelection(AppConfig.get().isUpdateCheck());
 
         final Button checkDoit = new Button(compositeSystem, SWT.CHECK);
         checkDoit.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
@@ -713,7 +713,7 @@ public final class ConfigDialog extends Dialog {
                 */
                 AppConfig.get().setReportPath(reportDir.getText());
                 AppConfig.get().setMaterialLogInterval(materialintervalSpinner.getSelection());
-                AppConfig.get().setCheckUpdate(checkUpdate.getSelection());
+                AppConfig.get().setUpdateCheck(checkUpdate.getSelection());
                 AppConfig.get().setAllowOnlyFromLocalhost(onlyFromLocalhost.getSelection());
                 // fleettab
                 AppConfig.get().setDisplayCount(displaycount.getSelection());
