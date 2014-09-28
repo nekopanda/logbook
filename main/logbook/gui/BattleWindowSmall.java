@@ -289,7 +289,10 @@ public class BattleWindowSmall extends BattleWindow {
         for (int i = 0; i < enemyShips.size(); ++i) {
             EnemyShipDto ship = enemyShips.get(i);
             this.enemyLabels[i].setText(String.valueOf(i + 1) + "." + ship.getFriendlyName());
-            this.enemyHpLabels[0][i].setText(String.valueOf(maxEnemyHp[i]) + "/" + maxEnemyHp[i]);
+            this.enemyLabels[i].setToolTipText(ship.getDetailedString());
+            // this.enemyHpLabels[0][i].setText(String.valueOf(maxEnemyHp[i]) + "/" + maxEnemyHp[i]);
+            // 3桁だとはみ出すという苦情が来たので・・・
+            this.enemyHpLabels[0][i].setText(String.valueOf(maxEnemyHp[i]));
         }
 
         // 昼戦後HP

@@ -125,20 +125,19 @@ public class BattleWindow extends BattleWindowBase {
         }
     }
 
-    private String toPlaneCount(int lost, int total) {
-        int after = total - lost;
-        return String.valueOf(total) + "→" + after /*+ "(-" + lost + ")"*/;
-    }
-
     // idx: 味方=0, 敵=1
     private void printPlaneCount(Label[] labels, int base, AirBattleDto air, int idx) {
         labels[base + 0].setText("");
         labels[base + 1].setText("");
         if (air != null) {
+            String[] short1 = air.getStage1ShortString();
+            String[] short2 = air.getStage2ShortString();
+            String[] detail1 = air.getStage1DetailedString();
+            String[] detail2 = air.getStage2DetailedString();
             if (air.stage1 != null)
-                labels[base + 0].setText(this.toPlaneCount(air.stage1[(idx * 2) + 0], air.stage1[(idx * 2) + 1]));
+                this.setLabelText(labels[base + 0], short1[idx], detail1[idx]);
             if (air.stage2 != null)
-                labels[base + 1].setText(this.toPlaneCount(air.stage2[(idx * 2) + 0], air.stage2[(idx * 2) + 1]));
+                this.setLabelText(labels[base + 1], short2[idx], detail2[idx]);
         }
     }
 
@@ -255,6 +254,15 @@ public class BattleWindow extends BattleWindowBase {
                 damageRate[0] * 100, damageRate[1] * 100, rateString, rank);
     }
 
+    private void setLabelText(Label label, String text) {
+        this.setLabelText(label, text, text);
+    }
+
+    private void setLabelText(Label label, String text, String tooltipText) {
+        label.setText(text);
+        label.setToolTipText(tooltipText);
+    }
+
     protected void printBattle() {
         BattleExDto battle = this.getBattle();
         BattleExDto.Phase phase1 = battle.getPhase1();
@@ -280,19 +288,28 @@ public class BattleWindow extends BattleWindowBase {
 
         // 情報表示
         String[] formation = battle.getFormation();
-        int[] touchPlane = lastPhase.getTouchPlane();
+        int[] rawTouchPlane = lastPhase.getTouchPlane();
+        String[] touchPlane = null;
         String[] sakuteki = battle.getSakuteki();
         String seiku = lastPhase.getSeiku();
         AirBattleDto[] air = lastPhase.getAirBattleDto();
         double[] damageRate = lastPhase.getDamageRate();
 
+        if (rawTouchPlane != null) {
+            touchPlane = AirBattleDto.toTouchPlaneString(rawTouchPlane);
+        }
+
         for (int i = 0; i < 2; ++i) {
-            if (formation[i] != null)
-                this.infoLabels[i][1].setText(FORM_PREFIX + formation[i]);
+            if (formation[i] != null) {
+                this.setLabelText(this.infoLabels[i][1], FORM_PREFIX + formation[i]);
+            }
             if (touchPlane != null)
-                this.infoLabels[i][2].setText(TOUCH_PREFIX + ((touchPlane[i] != -1) ? "あり" : "なし"));
-            if (sakuteki != null)
-                this.infoLabels[i][3].setText(SAKUTEKI_PREFIX + sakuteki[i]);
+                this.setLabelText(this.infoLabels[i][2],
+                        TOUCH_PREFIX + ((rawTouchPlane[i] != -1) ? "あり" : "なし"),
+                        TOUCH_PREFIX + touchPlane[i]);
+            if (sakuteki != null) {
+                this.setLabelText(this.infoLabels[i][3], SAKUTEKI_PREFIX + sakuteki[i]);
+            }
             if (i == 0) {
                 this.infoLabels[i][4].setText("航空戦:");
                 this.infoLabels[i][5].setText((seiku != null) ? seiku : "なし");

@@ -9,6 +9,8 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
+import logbook.internal.Item;
+
 import com.dyuproject.protostuff.Tag;
 
 /**
@@ -80,5 +82,81 @@ public class AirBattleDto {
         default:
             return "不明(" + id + ")";
         }
+    }
+
+    public String[] getStage1ShortString() {
+        return getNumPlaneString(this.stage1, false);
+    }
+
+    public String[] getStage2ShortString() {
+        return getNumPlaneString(this.stage2, false);
+    }
+
+    public String[] getStage1DetailedString() {
+        return getNumPlaneString(this.stage1, true);
+    }
+
+    public String[] getStage2DetailedString() {
+        return getNumPlaneString(this.stage2, true);
+    }
+
+    /**
+     * 艦載機ロスト表示を生成(味方・敵)
+     * @param stage
+     * @return
+     */
+    private static String[] getNumPlaneString(int[] stage, boolean detail) {
+        if (stage == null) {
+            return new String[] { "", "" };
+        }
+        int flost = stage[0];
+        int fall = stage[1];
+        int elost = stage[2];
+        int eall = stage[3];
+        int fremain = fall - flost;
+        int eremain = eall - elost;
+        if (detail) {
+            return new String[] {
+                    String.valueOf(fall) + "→" + fremain + " (-" + flost + ")",
+                    String.valueOf(eall) + "→" + eremain + " (-" + elost + ")"
+            };
+        }
+        else {
+            return new String[] {
+                    String.valueOf(fall) + "→" + fremain,
+                    String.valueOf(eall) + "→" + eremain
+            };
+        }
+    }
+
+    public static String[] toTouchPlaneString(int[] touchPlane) {
+        if (touchPlane == null) {
+            return new String[] { "", "" };
+        }
+        String[] ret = new String[2];
+        for (int i = 0; i < 2; ++i) {
+            if (touchPlane[i] == -1) {
+                ret[i] = "なし";
+            }
+            else {
+                ItemDto item = Item.get(touchPlane[i]);
+                if (item != null) {
+                    ret[i] = item.getName();
+                }
+                else {
+                    ret[i] = "あり（機体不明）";
+                }
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * 触接表示を生成(味方・敵)
+     * @param touchPlane
+     * @return
+     */
+    public String[] getTouchPlane() {
+        return toTouchPlaneString(this.touchPlane);
     }
 }

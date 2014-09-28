@@ -259,6 +259,7 @@ public class BattleWindowLarge extends BattleWindow {
             ShipDto ship = ships.get(i);
             this.friendLabels[base + i].setText(String.valueOf(i + 1) + "." +
                     ship.getFriendlyName());
+            this.friendLabels[base + i].setToolTipText(ship.getDetailedString());
             printFriendHp(this.friendHpLabels, base + i, ship.getNowhp(), ship.getMaxhp());
         }
     }
@@ -351,6 +352,7 @@ public class BattleWindowLarge extends BattleWindow {
         for (int i = 0; i < enemyShips.size(); ++i) {
             EnemyShipDto ship = enemyShips.get(i);
             this.enemyLabels[i].setText(String.valueOf(i + 1) + "." + ship.getFriendlyName());
+            this.enemyLabels[i].setToolTipText(ship.getDetailedString());
             this.enemyHpLabels[0][i].setText(String.valueOf(maxEnemyHp[i]) + "/" + maxEnemyHp[i]);
         }
 

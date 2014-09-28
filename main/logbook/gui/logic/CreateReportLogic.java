@@ -128,6 +128,9 @@ public final class CreateReportLogic {
             }
 
             item.setText(toStringArray(text));
+
+            // TODO:
+
             return item;
         }
     };

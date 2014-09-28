@@ -32,13 +32,16 @@ public class AppConstants {
     public static final String BATTLE_LOGFILE_DATE_FORMAT = "yyyy-MM-dd";
 
     /** 疲労赤色 */
-    public static final int COND_RED = 19;
+    public static final int COND_RED = 20;
 
     /** 疲労オレンジ色 */
-    public static final int COND_ORANGE = 29;
+    public static final int COND_ORANGE = 30;
 
     /** 疲労緑色 */
     public static final int COND_GREEN = 50;
+
+    /** 疲労緑色 */
+    public static final int COND_YELLOW = 75;
 
     /** 遠征色 */
     public static final RGB MISSION_COLOR = new RGB(102, 51, 255);
@@ -54,6 +57,12 @@ public class AppConstants {
 
     /** 疲労緑色 */
     public static final RGB COND_GREEN_COLOR = new RGB(0, 128, 0);
+
+    /** 疲労緑色 */
+    public static final RGB COND_YELLOW_COLOR = new RGB(190, 255, 61);
+
+    /** 疲労緑色 */
+    public static final RGB COND_U75_COLOR = new RGB(171, 249, 204);
 
     /** 小破の色 */
     public static final RGB SYOHA_SHIP_COLOR = new RGB(210, 255, 0);

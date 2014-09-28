@@ -18,7 +18,6 @@ import logbook.dto.BattleResultDto;
 import logbook.dto.ItemDto;
 import logbook.dto.ShipBaseDto;
 import logbook.dto.ShipDto;
-import logbook.internal.Item;
 
 /**
  * @author Nekopanda
@@ -334,54 +333,6 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.end(); // table
     }
 
-    /**
-     * 艦載機ロスト表示を生成
-     * @param stage
-     * @return
-     */
-    private static String[] getNumPlaneString(int[] stage) {
-        if (stage == null) {
-            return new String[] { "", "" };
-        }
-        int flost = stage[0];
-        int fall = stage[1];
-        int elost = stage[2];
-        int eall = stage[3];
-        int fremain = fall - flost;
-        int eremain = eall - elost;
-        return new String[] {
-                String.valueOf(fall) + "→" + fremain + " (-" + flost + ")",
-                String.valueOf(eall) + "→" + eremain + " (-" + elost + ")"
-        };
-    }
-
-    /**
-     * 触接表示を生成
-     * @param touchPlane
-     * @return
-     */
-    private static String[] getTouchPlane(int[] touchPlane) {
-        if (touchPlane == null) {
-            return new String[] { "", "" };
-        }
-        String[] ret = new String[2];
-        for (int i = 0; i < 2; ++i) {
-            if (touchPlane[i] == -1) {
-                ret[i] = "なし";
-            }
-            else {
-                ItemDto item = Item.get(touchPlane[i]);
-                if (item != null) {
-                    ret[i] = item.getName();
-                }
-                else {
-                    ret[i] = "あり（機体不明）";
-                }
-            }
-        }
-        return ret;
-    }
-
     private static <T> void copyToOffset(List<? extends T> src, T[] array, int offset) {
         if (src == null) {
             return;
@@ -573,9 +524,9 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         }
 
         this.inline("h3", title, AIR_TABLE_CLASS);
-        String[] stage1 = getNumPlaneString(air.stage1);
-        String[] stage2 = getNumPlaneString(air.stage2);
-        String[] touch = getTouchPlane(air.touchPlane);
+        String[] stage1 = air.getStage1DetailedString();
+        String[] stage2 = air.getStage2DetailedString();
+        String[] touch = air.getTouchPlane();
         this.begin("table", null);
         this.begin("tr", null);
         this.inline("th", getRowSpan(2), "", null);
