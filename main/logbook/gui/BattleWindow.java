@@ -109,7 +109,7 @@ public class BattleWindow extends BattleWindowBase {
                 this.infoLabels[1][0].setText(name);
             }
             else {
-                this.infoLabels[1][0].setText("KCRDB互換ログ");
+                this.infoLabels[1][0].setText("KCRDB互換データ");
             }
             String[] ships = enemyData.getEnemyShips();
             for (int i = 0; i < 6; ++i) {

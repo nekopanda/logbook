@@ -901,7 +901,7 @@ public final class GlobalContext {
                     if (mapCellDto != null) {
                         int enemyId = mapCellDto.getEnemyId();
                         EnemyData enemyData = battle.getEnemyData(enemyId, battle.getEnemyName());
-                        if (EnemyData.get(enemyId) == null) {
+                        if ((mapCellDto.getEnemyData() == null) || (mapCellDto.getEnemyData().getEnemyName() == null)) {
                             addConsole("eid=" + enemyId + "の敵編成をデータべスに追加");
                         }
                         EnemyData.set(enemyId, enemyData);
