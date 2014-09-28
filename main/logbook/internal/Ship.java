@@ -189,12 +189,12 @@ public class Ship {
             this.put("170", new ShipInfoDto("浜風", "駆逐艦", "はまかぜ", 30, 20, 15));
             this.put("171", new ShipInfoDto("Bismarck", "戦艦", "ビスマルク", 30, 110, 90));
             this.put("172", new ShipInfoDto("Bismarck改", "戦艦", "ビスマルク", 50, 115, 95));
-            this.put("173", new ShipInfoDto("Bismarckzwei", "戦艦", "ビスマルク", 0, 135, 105));
+            this.put("173", new ShipInfoDto("Bismarckzwei", "戦艦", "ビスマルク", 75, 135, 105));
             this.put("174", new ShipInfoDto("Z1", "駆逐艦", "レーベレヒト・マース", 30, 20, 20));
             this.put("175", new ShipInfoDto("Z3", "駆逐艦", "マックス・シュルツ", 30, 20, 20));
             this.put("176", ShipInfoDto.EMPTY);
             this.put("177", ShipInfoDto.EMPTY);
-            this.put("178", ShipInfoDto.EMPTY);
+            this.put("178", new ShipInfoDto("Bismarckdrei", "戦艦", "ビスマルク", 0, 155, 110));
             this.put("179", new ShipInfoDto("Z1zwei", "駆逐艦", "レーベレヒト・マース", 0, 25, 20));
             this.put("180", new ShipInfoDto("Z3zwei", "駆逐艦", "マックス・シュルツ", 0, 25, 20));
             this.put("181", new ShipInfoDto("天津風", "駆逐艦", "あまつかぜ", 20, 20, 20));
@@ -608,7 +608,7 @@ public class Ship {
             this.put("589", new ShipInfoDto("北方棲姫", "航空戦艦", "", 0, 0, 0));
             this.put("590", new ShipInfoDto("北方棲姫", "航空戦艦", "", 0, 0, 0));
             this.put("591", new ShipInfoDto("軽巡ツ級", "軽巡洋艦", "", 0, 0, 0));
-            this.put("592", new ShipInfoDto("コンゴウ*", "戦艦", "mist*", 0, 0, 0));
+            this.put("592", new ShipInfoDto("軽巡ツ級", "軽巡洋艦", "elite", 0, 0, 0));
             this.put("593", ShipInfoDto.EMPTY);
             this.put("594", ShipInfoDto.EMPTY);
             this.put("595", ShipInfoDto.EMPTY);
