@@ -235,9 +235,9 @@ public class BattleWindowLarge extends BattleWindow {
 
         // 味方
         for (int i = 0; i < 12; ++i) {
-            this.friendLabels[i].setText("-");
+            setLabelText(this.friendLabels[i], "-", "");
             for (int c = 0; c < 8; ++c) {
-                this.friendHpLabels[c][i].setText("");
+                setLabelText(this.friendHpLabels[c][i], "");
                 if ((c == 1) || (c == 4) || (c == 7))
                     setLabelNone(this.friendHpLabels[c][i]);
             }
@@ -246,7 +246,7 @@ public class BattleWindowLarge extends BattleWindow {
         // 敵
         for (int i = 0; i < 6; ++i) {
             for (int c = 0; c < 8; ++c) {
-                this.enemyHpLabels[c][i].setText("");
+                setLabelText(this.enemyHpLabels[c][i], "");
                 if ((c == 4) || (c == 7))
                     setLabelNone(this.enemyHpLabels[c][i]);
             }

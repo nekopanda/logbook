@@ -70,7 +70,7 @@ public class BattleShipWindow extends BattleWindowBase {
                             }
                             itemName = item.getName();
                         }
-                        this.friendDetail[0][i].setText(String.valueOf(i + 1) + ":" + itemName);
+                        setLabelText(this.friendDetail[0][i], String.valueOf(i + 1) + ":" + itemName);
                         this.friendDetail[1][i].setText(onSlot);
                     }
                 }
@@ -113,7 +113,7 @@ public class BattleShipWindow extends BattleWindowBase {
                                 }
                                 itemName = item.getName();
                             }
-                            this.enemyDetail[0][i].setText(String.valueOf(i + 1) + ":" + itemName);
+                            setLabelText(this.enemyDetail[0][i], String.valueOf(i + 1) + ":" + itemName);
                             this.enemyDetail[1][i].setText(onSlot);
                         }
                     }
@@ -319,8 +319,7 @@ public class BattleShipWindow extends BattleWindowBase {
         List<ShipDto> ships = dock.getShips();
         for (int i = 0; i < ships.size(); ++i) {
             ShipDto ship = ships.get(i);
-            this.friendLabels[base + i].setText(String.valueOf(i + 1) + "." +
-                    ship.getName() + "(Lv." + ship.getLv() + ")");
+            setLabelText(this.friendLabels[base + i], String.valueOf(i + 1) + "." + ship.getFriendlyName(), "");
             this.fStatusLabels[4][base + i].setText(String.valueOf(ship.getFuel()) + "/" + ship.getFuelMax());
             this.fStatusLabels[5][base + i].setText(String.valueOf(ship.getBull()) + "/" + ship.getBullMax());
             this.fStatusLabels[0][base + i].setText(String.valueOf(ship.getKaryoku()));
@@ -365,7 +364,7 @@ public class BattleShipWindow extends BattleWindowBase {
         List<EnemyShipDto> enemyShips = battle.getEnemy();
         for (int i = 0; i < enemyShips.size(); ++i) {
             EnemyShipDto ship = enemyShips.get(i);
-            this.enemyLabels[i].setText(String.valueOf(i + 1) + "." + ship.getFriendlyName());
+            setLabelText(this.enemyLabels[i], String.valueOf(i + 1) + "." + ship.getFriendlyName(), "");
             this.eStatusLabels[0][i].setText(String.valueOf(ship.getKaryoku()));
             this.eStatusLabels[1][i].setText(String.valueOf(ship.getRaisou()));
             this.eStatusLabels[2][i].setText(String.valueOf(ship.getTaiku()));

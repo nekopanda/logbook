@@ -172,7 +172,7 @@ public class BattleWindowSmall extends BattleWindow {
         // 味方
         for (int i = 0; i < 12; ++i) {
             for (int c = 0; c < 3; ++c) {
-                this.friendHpLabels[c][i].setText("");
+                setLabelText(this.friendHpLabels[c][i], "");
                 if ((c == 0) || (c == 2))
                     setLabelNone(this.friendHpLabels[c][i]);
             }
@@ -181,7 +181,7 @@ public class BattleWindowSmall extends BattleWindow {
         // 敵
         for (int i = 0; i < 6; ++i) {
             for (int c = 0; c < 3; ++c) {
-                this.enemyHpLabels[c][i].setText("");
+                setLabelText(this.enemyHpLabels[c][i], "");
                 if (c == 2)
                     setLabelNone(this.enemyHpLabels[c][i]);
             }
@@ -194,7 +194,7 @@ public class BattleWindowSmall extends BattleWindow {
         List<ShipDto> ships = dock.getShips();
         for (int i = 0; i < ships.size(); ++i) {
             ShipDto ship = ships.get(i);
-            printFriendHp(this.friendHpLabels, base + i, ship.getNowhp(), ship.getMaxhp());
+            printFriendHp(this.friendHpLabels, base + i, ship.getNowhp(), ship.getMaxhp(), ship);
         }
     }
 
@@ -213,24 +213,25 @@ public class BattleWindowSmall extends BattleWindow {
         }
     }
 
-    private static void setLabelColor(Label label, int nowhp, int maxhp, boolean friend) {
+    private static void setLabelColor(Label label, int nowhp, int maxhp) {
         DamageRate rate = DamageRate.fromHP(nowhp, maxhp);
         label.setBackground(rate.getBackground());
         label.setForeground(rate.getForeground());
     }
 
-    private static void printFriendHp(Label[][] labels, int index, int nowhp, int maxhp) {
+    private static void printFriendHp(Label[][] labels, int index, int nowhp, int maxhp, ShipDto ship) {
         printHp(labels[0][index], nowhp, maxhp);
-        setLabelColor(labels[0][index], nowhp, maxhp, true);
+        labels[0][index].setToolTipText(ship.getDetailedString());
+        setLabelColor(labels[0][index], nowhp, maxhp);
     }
 
     private static void printHp(
-            Label[][] labels, int base1, int base2, int[] dam, int[] nowhp, int[] maxhp, boolean friend)
+            Label[][] labels, int base1, int base2, int[] dam, int[] nowhp, int[] maxhp)
     {
         for (int i = 0; i < nowhp.length; ++i) {
             labels[base1 + 0][base2 + i].setText(String.valueOf(dam[base2 + i]));
             labels[base1 + 1][base2 + i].setText(String.valueOf(nowhp[i]));
-            setLabelColor(labels[base1 + 1][base2 + i], nowhp[i], maxhp[i], friend);
+            setLabelColor(labels[base1 + 1][base2 + i], nowhp[i], maxhp[i]);
         }
     }
 
@@ -271,6 +272,11 @@ public class BattleWindowSmall extends BattleWindow {
             return;
 
         // 味方
+        @SuppressWarnings("unchecked")
+        List<ShipDto>[] ships = new List[] {
+                battle.getDock().getShips(),
+                battle.isCombined() ? battle.getDockCombined().getShips() : null
+        };
         int[][] friendStartHp = new int[][] { battle.getStartFriendHp(), battle.getStartFriendHpCombined() };
         int[][] friendMaxHp = new int[][] { battle.getMaxFriendHp(), battle.getMaxFriendHpCombined() };
         for (int i = 0; i < friendStartHp.length; ++i) {
@@ -278,7 +284,7 @@ public class BattleWindowSmall extends BattleWindow {
             int[] maxHp = friendMaxHp[i];
             if (startHp != null) {
                 for (int c = 0; c < startHp.length; ++c) {
-                    printFriendHp(this.friendHpLabels, (i * 6) + c, startHp[c], maxHp[c]);
+                    printFriendHp(this.friendHpLabels, (i * 6) + c, startHp[c], maxHp[c], ships[i].get(c));
                 }
             }
         }
@@ -296,12 +302,12 @@ public class BattleWindowSmall extends BattleWindow {
         }
 
         // 昼戦後HP
-        printHp(this.friendHpLabels, 1, 0, this.friendDamages[last], lastPhase.getNowFriendHp(), friendMaxHp[0], true);
+        printHp(this.friendHpLabels, 1, 0, this.friendDamages[last], lastPhase.getNowFriendHp(), friendMaxHp[0]);
         if (battle.isCombined()) {
             printHp(this.friendHpLabels, 1, 6, this.friendDamages[last], lastPhase.getNowFriendHpCombined(),
-                    friendMaxHp[1], true);
+                    friendMaxHp[1]);
         }
-        printHp(this.enemyHpLabels, 1, 0, this.enemyDamages[last], lastPhase.getNowEnemyHp(), maxEnemyHp, false);
+        printHp(this.enemyHpLabels, 1, 0, this.enemyDamages[last], lastPhase.getNowEnemyHp(), maxEnemyHp);
 
         ResultRank rank = lastPhase.getEstimatedRank();
         if ((rank == ResultRank.C) || (rank == ResultRank.D) || (rank == ResultRank.E)) {

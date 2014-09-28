@@ -298,6 +298,12 @@ public class WindowBase {
 
     }
 
+    void dispose() {
+        if (this.shell != null) {
+            this.shell.dispose();
+        }
+    }
+
     /**
      * 子ウィンドウ用のコンストラクタ
      * @param menuItem

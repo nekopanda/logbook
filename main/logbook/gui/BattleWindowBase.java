@@ -172,6 +172,15 @@ public class BattleWindowBase extends WindowBase {
         }
     }
 
+    protected static void setLabelText(Label label, String text) {
+        setLabelText(label, text, text);
+    }
+
+    protected static void setLabelText(Label label, String text, String tooltipText) {
+        label.setText(text);
+        label.setToolTipText(tooltipText);
+    }
+
     public void endSortie() {
         this.mapCellDto = null;
         this.battle = null;

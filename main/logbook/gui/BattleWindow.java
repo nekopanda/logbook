@@ -57,13 +57,13 @@ public class BattleWindow extends BattleWindowBase {
     protected void clearText() {
         // 情報
         for (int i = 0; i < 12; ++i) {
-            this.infoLabels[0][i].setText("");
-            this.infoLabels[1][i].setText("");
+            setLabelText(this.infoLabels[0][i], "");
+            setLabelText(this.infoLabels[1][i], "");
         }
 
         // 敵
         for (int i = 0; i < 6; ++i) {
-            this.enemyLabels[i].setText("-");
+            setLabelText(this.enemyLabels[i], "-");
         }
 
         // その他
@@ -135,9 +135,9 @@ public class BattleWindow extends BattleWindowBase {
             String[] detail1 = air.getStage1DetailedString();
             String[] detail2 = air.getStage2DetailedString();
             if (air.stage1 != null)
-                this.setLabelText(labels[base + 0], short1[idx], detail1[idx]);
+                setLabelText(labels[base + 0], short1[idx], detail1[idx]);
             if (air.stage2 != null)
-                this.setLabelText(labels[base + 1], short2[idx], detail2[idx]);
+                setLabelText(labels[base + 1], short2[idx], detail2[idx]);
         }
     }
 
@@ -254,15 +254,6 @@ public class BattleWindow extends BattleWindowBase {
                 damageRate[0] * 100, damageRate[1] * 100, rateString, rank);
     }
 
-    private void setLabelText(Label label, String text) {
-        this.setLabelText(label, text, text);
-    }
-
-    private void setLabelText(Label label, String text, String tooltipText) {
-        label.setText(text);
-        label.setToolTipText(tooltipText);
-    }
-
     protected void printBattle() {
         BattleExDto battle = this.getBattle();
         BattleExDto.Phase phase1 = battle.getPhase1();
@@ -301,14 +292,14 @@ public class BattleWindow extends BattleWindowBase {
 
         for (int i = 0; i < 2; ++i) {
             if (formation[i] != null) {
-                this.setLabelText(this.infoLabels[i][1], FORM_PREFIX + formation[i]);
+                setLabelText(this.infoLabels[i][1], FORM_PREFIX + formation[i]);
             }
             if (touchPlane != null)
-                this.setLabelText(this.infoLabels[i][2],
+                setLabelText(this.infoLabels[i][2],
                         TOUCH_PREFIX + ((rawTouchPlane[i] != -1) ? "あり" : "なし"),
                         TOUCH_PREFIX + touchPlane[i]);
             if (sakuteki != null) {
-                this.setLabelText(this.infoLabels[i][3], SAKUTEKI_PREFIX + sakuteki[i]);
+                setLabelText(this.infoLabels[i][3], SAKUTEKI_PREFIX + sakuteki[i]);
             }
             if (i == 0) {
                 this.infoLabels[i][4].setText("航空戦:");
