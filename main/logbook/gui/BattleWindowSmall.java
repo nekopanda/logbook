@@ -29,6 +29,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
  */
 public class BattleWindowSmall extends BattleWindow {
 
+    private Label title;
     private final Composite[] infoCompo = new Composite[2];
     private Composite damageCompo;
     private Composite resultCompo;
@@ -99,6 +100,40 @@ public class BattleWindowSmall extends BattleWindow {
 
         int nameWidth = 80;
 
+        this.title = new Label(this.getShell(), SWT.NONE);
+        this.title.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
+        this.title.setFont(this.getBoldFont());
+        this.title.setText("出撃中ではありません");
+
+        int numColumns = 12;
+        this.currentCompo = this.damageCompo = new Composite(this.getShell(), SWT.NONE);
+        this.damageCompo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 3));
+        this.damageCompo.setLayout(this.makeGridLayout(numColumns));
+
+        // ヘッダ行作成
+        this.createHpHeaders();
+        this.addLabel("");
+        this.createHpHeaders();
+        this.addLabel("");
+        this.createHpHeaders();
+        this.addLabel("敵艦名", SWT.LEFT, nameWidth);
+        this.addHorizontalSeparator(numColumns);
+
+        // 中身作成
+        for (int i = 0; i < 6; ++i) {
+            this.createHpLabels(this.friendHpLabels, i);
+            if (i == 0)
+                this.addVerticalSeparator(this.damageCompo, 6);
+            this.createHpLabels(this.friendHpLabels, i + 6);
+            if (i == 0)
+                this.addVerticalSeparator(this.damageCompo, 6);
+            this.createHpLabels(this.enemyHpLabels, i);
+            this.enemyLabels[i] = this.addLabel("-", SWT.LEFT, nameWidth);
+        }
+
+        this.currentCompo = this.getShell();
+        this.addHorizontalSeparator(2);
+
         for (int i = 0; i < 2; ++i) {
             this.currentCompo = this.infoCompo[i] = new Composite(this.getShell(), SWT.NONE);
 
@@ -124,34 +159,10 @@ public class BattleWindowSmall extends BattleWindow {
             this.infoLabels[i][7] = this.addLabel("Stage2");
             this.infoLabels[i][8] = this.addLabel("000→000");
             this.infoLabels[i][9] = this.addLabel("000→000");
+            this.beginCombined();
             this.infoLabels[i][10] = this.addLabel("000→000");
             this.infoLabels[i][11] = this.addLabel("000→000");
-        }
-
-        int numColumns = 12;
-        this.currentCompo = this.damageCompo = new Composite(this.getShell(), SWT.NONE);
-        this.damageCompo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        this.damageCompo.setLayout(this.makeGridLayout(numColumns));
-
-        // ヘッダ行作成
-        this.createHpHeaders();
-        this.addLabel("");
-        this.createHpHeaders();
-        this.addLabel("");
-        this.createHpHeaders();
-        this.addLabel("敵艦名", SWT.LEFT, nameWidth);
-        this.addHorizontalSeparator(numColumns);
-
-        // 中身作成
-        for (int i = 0; i < 6; ++i) {
-            this.createHpLabels(this.friendHpLabels, i);
-            if (i == 0)
-                this.addVerticalSeparator(this.damageCompo, 6);
-            this.createHpLabels(this.friendHpLabels, i + 6);
-            if (i == 0)
-                this.addVerticalSeparator(this.damageCompo, 6);
-            this.createHpLabels(this.enemyHpLabels, i);
-            this.enemyLabels[i] = this.addLabel("-", SWT.LEFT, nameWidth);
+            this.endCombined();
         }
 
         // 結果表示領域
@@ -215,6 +226,16 @@ public class BattleWindowSmall extends BattleWindow {
             DockDto dock = docks.get(i);
             this.printDock(dock, i * 6);
         }
+    }
+
+    @Override
+    protected void printMap() {
+        super.printMap();
+
+        if (this.getMapCellDto() == null)
+            return;
+
+        this.title.setText(this.getMapCellDto().toString());
     }
 
     private static void setLabelColor(Label label, int nowhp, int maxhp) {

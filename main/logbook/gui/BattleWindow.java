@@ -12,6 +12,7 @@ import logbook.dto.AirBattleDto;
 import logbook.dto.BattleAtackDto;
 import logbook.dto.BattleExDto;
 import logbook.dto.DockDto;
+import logbook.dto.MapCellDto;
 import logbook.dto.ResultRank;
 import logbook.dto.ShipDto;
 import logbook.internal.EnemyData;
@@ -97,17 +98,27 @@ public class BattleWindow extends BattleWindowBase {
         if (this.getMapCellDto() == null)
             return;
 
-        EnemyData enemyData = this.getMapCellDto().getEnemyData();
-        if (enemyData != null) {
+        MapCellDto dto = this.getMapCellDto();
+        EnemyData enemyData = dto.getEnemyData();
+        if (dto.getEnemyId() == -1) {
+            // 次のマスは敵がいない
+        }
+        else if (enemyData != null) {
             String name = enemyData.getEnemyName();
             if (name != null) {
                 this.infoLabels[1][0].setText(name);
+            }
+            else {
+                this.infoLabels[1][0].setText("KCRDB互換ログ");
             }
             String[] ships = enemyData.getEnemyShips();
             for (int i = 0; i < 6; ++i) {
                 this.enemyLabels[i].setText(String.valueOf(i + 1) + "." + ships[i]);
             }
             this.infoLabels[1][1].setText(FORM_PREFIX + enemyData.getFormation());
+        }
+        else {
+            this.infoLabels[1][0].setText("データがありません[" + dto.getEnemyId() + "]");
         }
     }
 

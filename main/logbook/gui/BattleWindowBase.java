@@ -97,13 +97,9 @@ public class BattleWindowBase extends WindowBase {
             }
 
             this.clearText();
-            super.setVisible(true);
-
             this.setWindowInitialized(true);
         }
-        else {
-            this.setVisible(true);
-        }
+        this.setVisible(true);
     }
 
     /**

@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.data.UndefinedData;
+import logbook.gui.ApplicationMain;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,6 +18,7 @@ import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.util.StringContentProvider;
 import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.util.UrlEncoded;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * 艦これ統計データベースに送信する
@@ -124,7 +126,7 @@ public class DatabaseClient extends Thread {
             this.httpClient.start();
 
             while (true) {
-                UndefinedData data = this.dataQueue.take();
+                final UndefinedData data = this.dataQueue.take();
                 if (skipCount > 0) {
                     --skipCount;
                     continue;
@@ -136,6 +138,19 @@ public class DatabaseClient extends Thread {
                         if (HttpStatus.isSuccess(response.getStatus())) {
                             // 成功したらエラーカウンタをリセット
                             skipCount = errorCount = 0;
+                            // ログに出す
+                            if (AppConfig.get().isDatabaseSendLog()) {
+                                Display.getDefault().asyncExec(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (!ApplicationMain.main.getShell().isDisposed()) {
+                                            String url = data.getUrl();
+                                            ApplicationMain.main.printMessage("DBへ送信しました("
+                                                    + url.substring(url.lastIndexOf('/') + 1) + ")");
+                                        }
+                                    }
+                                });
+                            }
                             break;
                         }
                         else {

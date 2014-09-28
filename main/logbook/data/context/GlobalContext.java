@@ -858,9 +858,11 @@ public final class GlobalContext {
             }
 
             addConsole("海戦情報を更新しました");
+            /*
             for (ShipDto ship : sunkShips) {
                 addConsole(ship.getName() + "(id:" + ship.getId() + ",lv:" + ship.getLv() + ") 轟沈しました！");
             }
+            */
 
             if (mapCellDto == null) {
                 // 出撃していない場合は出撃させる
@@ -899,6 +901,9 @@ public final class GlobalContext {
                     if (mapCellDto != null) {
                         int enemyId = mapCellDto.getEnemyId();
                         EnemyData enemyData = battle.getEnemyData(enemyId, battle.getEnemyName());
+                        if (EnemyData.get(enemyId) == null) {
+                            addConsole("eid=" + enemyId + "の敵編成をデータべスに追加");
+                        }
                         EnemyData.set(enemyId, enemyData);
                         mapCellDto.setEnemyData(enemyData);
                     }

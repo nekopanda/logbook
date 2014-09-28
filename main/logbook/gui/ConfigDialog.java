@@ -632,6 +632,11 @@ public final class ConfigDialog extends Dialog {
         accessKeyText.setLayoutData(gdAccessKeyText);
         accessKeyText.setText(AppConfig.get().getAccessKey());
 
+        final Button databaseLogButton = new Button(compositeProxy, SWT.CHECK);
+        databaseLogButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
+        databaseLogButton.setText("データベースへの送信をログ出力する");
+        databaseLogButton.setSelection(AppConfig.get().isDatabaseSendLog());
+
         // Development タブ
         Composite compositeDevelopment = new Composite(this.composite, SWT.NONE);
         this.compositeMap.put("development", compositeDevelopment);
@@ -759,6 +764,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setProxyPort(proxyPortSpinner.getSelection());
                 AppConfig.get().setSendDatabase(sendDatabaseButton.getSelection());
                 AppConfig.get().setAccessKey(accessKeyText.getText());
+                AppConfig.get().setDatabaseSendLog(databaseLogButton.getSelection());
 
                 // development
                 AppConfig.get().setStoreJson(btnJson.getSelection());

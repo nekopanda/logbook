@@ -67,7 +67,6 @@ public class WindowBase {
     private boolean windowInitialized;
     // ウィンドウが開いた状態か？
     // Mainウィンドウの最小化に連動して setVisible するため
-    private boolean openState = false;
     private boolean topMost = false;
     private boolean showTitlebar = true;
 
@@ -604,7 +603,7 @@ public class WindowBase {
             if (this.moveWithDrag()) {
                 // タイトルバーを表示にする
                 this.showTitlebarItem = new MenuItem(rootMenu, SWT.CHECK);
-                this.showTitlebarItem.setText("タイトルバーを表示にする");
+                this.showTitlebarItem.setText("タイトルバーを表示する");
                 this.showTitlebarItem.addSelectionListener(new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent paramSelectionEvent) {
@@ -736,14 +735,14 @@ public class WindowBase {
 
     /** parent is un-minimized */
     public void shellDeiconified() {
-        if (this.openState) {
+        if ((this.menuItem != null) && this.menuItem.getSelection()) {
             this.shell.setVisible(true);
         }
     }
 
     /** parent is minimized */
     public void shellIconified() {
-        if (this.openState) {
+        if ((this.menuItem != null) && this.menuItem.getSelection()) {
             this.shell.setVisible(false);
         }
     }
@@ -802,7 +801,6 @@ public class WindowBase {
                 activatedWindows.remove(this);
                 activatedWindows.add(this);
             }
-            this.openState = visible;
             this.dbgprint("setVisible alpha=" + this.shell.getAlpha());
             this.shell.setVisible(visible);
         }

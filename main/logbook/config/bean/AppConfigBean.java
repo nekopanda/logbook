@@ -153,6 +153,9 @@ public final class AppConfigBean {
     /** 艦これ統計データベースへ送信するときのアクセスキー */
     private String accessKey = "";
 
+    /** 艦これ統計データベースへのデータ送信をログ出力するか？ */
+    private boolean databaseSendLog = false;
+
     /** ウィンドウの表示状態 */
     private Map<String, WindowConfigBean> windowConfigMap = new HashMap<String, WindowConfigBean>();
 
@@ -1006,5 +1009,19 @@ public final class AppConfigBean {
      */
     public void setCloseWhenMinimized(boolean closeWhenMinimized) {
         this.closeWhenMinimized = closeWhenMinimized;
+    }
+
+    /**
+     * @return databaseSendLog
+     */
+    public boolean isDatabaseSendLog() {
+        return this.databaseSendLog;
+    }
+
+    /**
+     * @param databaseSendLog セットする databaseSendLog
+     */
+    public void setDatabaseSendLog(boolean databaseSendLog) {
+        this.databaseSendLog = databaseSendLog;
     }
 }
