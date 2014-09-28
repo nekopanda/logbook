@@ -134,7 +134,7 @@ public class BattleWindowLarge extends BattleWindow {
         this.title = new Label(this.getShell(), SWT.NONE);
         this.title.setFont(this.getBoldFont());
         this.title.setLayoutData(new GridData(SWT.FILL, SWT.LEFT, false, false, numColumns, 1));
-        this.title.setText("初期化完了");
+        this.title.setText("出撃中ではありません");
 
         // 各カラムの最小幅を定義 //
         /*
