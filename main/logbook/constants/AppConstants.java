@@ -58,11 +58,28 @@ public class AppConstants {
     /** 疲労緑色 */
     public static final RGB COND_GREEN_COLOR = new RGB(0, 128, 0);
 
-    /** 疲労緑色 */
-    public static final RGB COND_YELLOW_COLOR = new RGB(190, 255, 61);
+    /** テーブルの疲労度色 */
+    public static final RGB[] COND_TABLE_LOCOR = new RGB[] {
+            new RGB(122, 206, 255), // #7aceff (100-85)
+            new RGB(146, 255, 255), // #92ffff (84-76)
+            new RGB(137, 240, 171), // #89f0ab (75-63)
+            new RGB(170, 255, 143), // #aaff8f (62-50)
+            new RGB(228, 255, 220), // #e4ffdc (49-40)
+            new RGB(254, 207, 143), // #fecf8f (39-30)
+            new RGB(252, 137, 94), // #fc895e (29-20)
+            new RGB(253, 140, 143) // #fd8c8f (19-0)
+    };
 
-    /** 疲労緑色 */
-    public static final RGB COND_U75_COLOR = new RGB(171, 249, 204);
+    public static final int[] COND_TABLE = new int[] {
+            85,
+            76,
+            63,
+            50,
+            40,
+            30,
+            20,
+            0
+    };
 
     /** 小破の色 */
     public static final RGB SYOHA_SHIP_COLOR = new RGB(210, 255, 0);

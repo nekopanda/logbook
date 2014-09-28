@@ -701,7 +701,10 @@ public abstract class AbstractTableDialog extends WindowBase {
                 @Override
                 public void run() {
                     if (!CyclicReloadTask.this.dialog.shell.isDisposed()) {
-                        CyclicReloadTask.this.dialog.reloadTable();
+                        // 見えているときだけ処理する
+                        if (CyclicReloadTask.this.dialog.shell.isVisible()) {
+                            CyclicReloadTask.this.dialog.reloadTable();
+                        }
                     }
                     else {
                         // ウインドウが消えていたらタスクをキャンセルする

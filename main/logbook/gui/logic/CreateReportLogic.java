@@ -54,6 +54,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.wb.swt.SWTResourceManager;
@@ -96,6 +97,16 @@ public final class CreateReportLogic {
             this.docks = GlobalContext.getNDockShipSet();
         }
 
+        private Color getCondColor(int cond) {
+            for (int i = 0; i < AppConstants.COND_TABLE_LOCOR.length; ++i) {
+                if (cond >= AppConstants.COND_TABLE[i]) {
+                    return SWTResourceManager.getColor(AppConstants.COND_TABLE_LOCOR[i]);
+                }
+            }
+            // 0より小さいってあり得ないけど
+            return SWTResourceManager.getColor(AppConstants.COND_RED_COLOR);
+        }
+
         @Override
         public TableItem create(Table table, Comparable[] text, int count) {
             // 艦娘
@@ -111,12 +122,16 @@ public final class CreateReportLogic {
             }
 
             // 疲労
+            /*
             int cond = ship.getCond();
             if (cond <= AppConstants.COND_RED) {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
             } else if (cond <= AppConstants.COND_ORANGE) {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
             }
+            */
+            // 疲労は 12 番目
+            item.setBackground(12, this.getCondColor(ship.getCond()));
 
             // 遠征
             if (this.deckmissions.contains(ship.getId())) {
@@ -128,8 +143,6 @@ public final class CreateReportLogic {
             }
 
             item.setText(toStringArray(text));
-
-            // TODO:
 
             return item;
         }

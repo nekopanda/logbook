@@ -76,21 +76,6 @@ public class BattleWindow extends BattleWindowBase {
         }
     }
 
-    protected static void setLabelRed(Label label) {
-        label.setBackground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
-        label.setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-    }
-
-    protected static void setLabelOrange(Label label) {
-        label.setBackground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
-        label.setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-    }
-
-    protected static void setLabelGreen(Label label) {
-        label.setBackground(SWTResourceManager.getColor(AppConstants.COND_GREEN_COLOR));
-        label.setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-    }
-
     protected static void setLabelNone(Label label) {
         label.setBackground(null);
         label.setForeground(null);
