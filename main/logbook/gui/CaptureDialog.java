@@ -34,6 +34,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -90,6 +91,11 @@ public final class CaptureDialog extends WindowBase {
         this.registerEvents();
         this.setWindowInitialized(true);
         this.setVisible(true);
+    }
+
+    @Override
+    protected boolean moveWithDrag() {
+        return true;
     }
 
     /**
@@ -177,6 +183,11 @@ public final class CaptureDialog extends WindowBase {
                 }
             }
         });
+
+        // 選択する項目はドラックで移動できないようにする
+        for (Control c : new Control[] { this.text, button, this.interval, this.intervalms, this.capture }) {
+            c.setData("disable-drag-move", true);
+        }
 
         this.shell.pack();
     }

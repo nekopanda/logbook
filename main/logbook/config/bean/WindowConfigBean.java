@@ -17,7 +17,9 @@ public class WindowConfigBean {
 
     private int Height;
 
-    private boolean topMost;
+    private boolean topMost = false;
+
+    private boolean showTitlebar = true;
 
     /** マウスに反応するか */
     private boolean mouseHoveringAware;
@@ -166,5 +168,19 @@ public class WindowConfigBean {
      */
     public void setTopMost(boolean topMost) {
         this.topMost = topMost;
+    }
+
+    /**
+     * @return showTitlebar
+     */
+    public boolean isShowTitlebar() {
+        return this.showTitlebar;
+    }
+
+    /**
+     * @param showTitlebar セットする showTitlebar
+     */
+    public void setShowTitlebar(boolean showTitlebar) {
+        this.showTitlebar = showTitlebar;
     }
 }

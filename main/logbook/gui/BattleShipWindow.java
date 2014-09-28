@@ -250,6 +250,9 @@ public class BattleShipWindow extends BattleWindowBase {
         // イベント登録
         for (int i = 0; i < 12; ++i) {
             final int currentIndex = i;
+            // このラベルでのウィンドウのドラックとウィンドウの右クリックメニューを無効化
+            this.friendLabels[i].setData("disable-drag-move", true);
+            this.friendLabels[i].setData("disable-window-menu", true);
             this.friendLabels[i].addMouseMoveListener(new MouseMoveListener() {
                 @Override
                 public void mouseMove(MouseEvent e) {
@@ -272,6 +275,9 @@ public class BattleShipWindow extends BattleWindowBase {
                 }
             });
             if (i < 6) {
+                // このラベルでのウィンドウのドラックを無効化
+                this.enemyLabels[i].setData("disable-drag-move", true);
+                this.enemyLabels[i].setData("disable-window-menu", true);
                 this.enemyLabels[i].addMouseMoveListener(new MouseMoveListener() {
                     @Override
                     public void mouseMove(MouseEvent e) {
@@ -294,19 +300,6 @@ public class BattleShipWindow extends BattleWindowBase {
                     }
                 });
             }
-        }
-    }
-
-    /**
-     * 艦名は選択解除があるのでウィンドウメニューを外しておく
-     */
-    @Override
-    protected void createContentsAfter() {
-        for (int i = 0; i < 12; ++i) {
-            this.friendLabels[i].setMenu(null);
-        }
-        for (int i = 0; i < 6; ++i) {
-            this.enemyLabels[i].setMenu(null);
         }
     }
 

@@ -15,6 +15,9 @@ import logbook.gui.logic.OpacityAnimationClient;
 import logbook.gui.logic.WindowNativeSupport;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellAdapter;
@@ -59,16 +62,22 @@ public class WindowBase {
     private Menu alphamenu;
     private MenuItem menuItem;
 
+    private DragMoveEventHandler dragMoveHandler;
+
     private boolean windowInitialized;
     // ウィンドウが開いた状態か？
     // Mainウィンドウの最小化に連動して setVisible するため
-    private boolean openState;
+    private boolean openState = false;
+    private boolean topMost = false;
+    private boolean showTitlebar = true;
 
     // メニュー
     private MenuItem topMostItem;
+    private MenuItem showTitlebarItem;
     private MenuItem opaqueItem;
     private MenuItem shareOpacityItem;
     private MenuItem[] opacity;
+    private MenuItem closeItem;
 
     // 設定
     private WindowConfigBean config;
@@ -258,6 +267,17 @@ public class WindowBase {
             });
         }
 
+        public void showTitlebarChanged(WindowBase source) {
+            final boolean newValue = source.showTitlebarItem.getSelection();
+            WindowTreeNode node = this.getRoot();
+            node.routeEvent(new EventProc() {
+                @Override
+                public void proc(WindowBase window) {
+                    window.showTitlebarChanged(newValue);
+                }
+            });
+        }
+
         public void opaqueChanged(WindowBase source) {
             final boolean newValue = source.opaqueItem.getSelection();
             WindowTreeNode node = this.getRoot();
@@ -291,6 +311,42 @@ public class WindowBase {
         }
     }
 
+    private static class DragMoveEventHandler implements MouseListener, MouseMoveListener {
+        private final Shell shell;
+        private boolean blnMouseDown = false;
+        private final Point pos = new Point(0, 0);
+
+        public DragMoveEventHandler(Shell shell) {
+            this.shell = shell;
+        }
+
+        @Override
+        public void mouseUp(MouseEvent arg0) {
+            this.blnMouseDown = false;
+        }
+
+        @Override
+        public void mouseDown(MouseEvent e) {
+            if (e.button == 1) { // 左クリックのみ
+                this.blnMouseDown = true;
+                this.pos.x = e.x;
+                this.pos.y = e.y;
+            }
+        }
+
+        @Override
+        public void mouseDoubleClick(MouseEvent arg0) {
+        }
+
+        @Override
+        public void mouseMove(MouseEvent e) {
+            if (this.blnMouseDown) {
+                Point loc = this.shell.getLocation();
+                this.shell.setLocation(loc.x + (e.x - this.pos.x), loc.y + (e.y - this.pos.y));
+            }
+        }
+    }
+
     /**
      * 親ウィンドウ用のコンストラクタ
      */
@@ -319,10 +375,19 @@ public class WindowBase {
                     WindowBase.this.shell.setActive();
                 }
                 else {
-                    WindowBase.this.setVisible(false);
+                    WindowBase.this.hideWindow();
                 }
             }
         });
+    }
+
+    public static void setDataToAllChild(Control c, String key, Object data) {
+        c.setData(key, data);
+        if (c instanceof Composite) {
+            for (final Control cc : ((Composite) c).getChildren()) {
+                setDataToAllChild(cc, key, data);
+            }
+        }
     }
 
     private int getDefaultStyle() {
@@ -398,33 +463,76 @@ public class WindowBase {
                 activatedWindows.add(WindowBase.this);
             }
         });
+        // ドラックでウィンドウ移動
+        if (this.moveWithDrag()) { // dragMoveHandler
+            this.dragMoveHandler = new DragMoveEventHandler(this.shell);
+            this.addMouseListener(this.shell);
+        }
         if (this.menuItem != null) {
             // 閉じたときにメニューを連動させる
             this.shell.addShellListener(new ShellAdapter() {
                 @Override
                 public void shellClosed(ShellEvent e) {
                     e.doit = false;
-                    // 閉じる前に位置を記憶
-                    WindowBase.this.save();
-                    WindowBase.this.menuItem.setSelection(false);
-                    WindowBase.this.setVisible(false);
+                    WindowBase.this.hideWindow();
                 }
             });
         }
     }
 
     private static void setMenu(Control c, Menu ma) {
-        c.setMenu(ma);
-        if (c instanceof Composite) {
-            for (final Control cc : ((Composite) c).getChildren()) {
-                setMenu(cc, ma);
+        if (c.getData("disable-window-menu") == null) {
+            if (c instanceof Composite) {
+                for (final Control cc : ((Composite) c).getChildren()) {
+                    setMenu(cc, ma);
+                }
+            }
+            if (c.getData("disable-window-menu-this") == null) {
+                c.setMenu(ma);
             }
         }
     }
 
+    private void addMouseListener(Control c) {
+        if (c.getData("disable-drag-move") == null) {
+            if (c instanceof Composite) {
+                for (final Control cc : ((Composite) c).getChildren()) {
+                    this.addMouseListener(cc);
+                }
+            }
+            if (c.getData("disable-drag-move-this") == null) {
+                c.addMouseListener(this.dragMoveHandler);
+                c.addMouseMoveListener(this.dragMoveHandler);
+            }
+        }
+    }
+
+    private void hideWindow() {
+        // 閉じる前に位置を記憶
+        WindowBase.this.save();
+        WindowBase.this.menuItem.setSelection(false);
+        WindowBase.this.setVisible(false);
+    }
+
     private void topMostChanged(boolean topMost) {
         this.topMostItem.setSelection(topMost);
-        nativeService.setTopMost(this.getShell(), topMost);
+        if (this.topMost != topMost) {
+            this.topMost = topMost;
+            nativeService.setTopMost(this.getShell(), topMost);
+        }
+    }
+
+    /**
+     * @param newValue
+     */
+    protected void showTitlebarChanged(boolean showTitlebar) {
+        if (this.moveWithDrag()) {
+            this.showTitlebarItem.setSelection(showTitlebar);
+            if (this.showTitlebar != showTitlebar) {
+                this.showTitlebar = showTitlebar;
+                nativeService.toggleTitlebar(this.getShell(), showTitlebar);
+            }
+        }
     }
 
     private boolean isMouseHovering() {
@@ -482,8 +590,8 @@ public class WindowBase {
             rootItem.setText("ウィンドウ");
         }
 
-        // 最前面に表示する
         if (nativeService.isTopMostAvailable()) {
+            // 最前面に表示する
             this.topMostItem = new MenuItem(rootMenu, SWT.CHECK);
             this.topMostItem.setText("最前面に表示する");
             this.topMostItem.addSelectionListener(new SelectionAdapter() {
@@ -492,6 +600,18 @@ public class WindowBase {
                     WindowBase.this.treeNode.topMostChanged(WindowBase.this);
                 }
             });
+
+            if (this.moveWithDrag()) {
+                // タイトルバーを表示にする
+                this.showTitlebarItem = new MenuItem(rootMenu, SWT.CHECK);
+                this.showTitlebarItem.setText("タイトルバーを表示にする");
+                this.showTitlebarItem.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent paramSelectionEvent) {
+                        WindowBase.this.treeNode.showTitlebarChanged(WindowBase.this);
+                    }
+                });
+            }
         }
 
         // マウスで不透明化
@@ -536,6 +656,19 @@ public class WindowBase {
                 }
             });
         }
+        if (this.menuItem != null) {
+            // セパレータ
+            new MenuItem(rootMenu, SWT.SEPARATOR);
+            // ウィンドウを閉じる
+            this.closeItem = new MenuItem(rootMenu, SWT.NONE);
+            this.closeItem.setText("ウィンドウを閉じる");
+            this.closeItem.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent paramSelectionEvent) {
+                    WindowBase.this.hideWindow();
+                }
+            });
+        }
 
         // 初期状態を設定
         if (this.parent != null) {
@@ -567,6 +700,9 @@ public class WindowBase {
         // 最前面に表示
         if (nativeService.isTopMostAvailable()) {
             this.topMostChanged(this.config.isTopMost());
+            if (this.moveWithDrag()) {
+                this.showTitlebarChanged(this.config.isShowTitlebar());
+            }
         }
         // 透過設定
         boolean changeAnimation = (this.shareOpacitySetting != this.config.isShareOpacitySetting());
@@ -706,6 +842,9 @@ public class WindowBase {
                 // 最前面に表示
                 if (nativeService.isTopMostAvailable()) {
                     this.config.setTopMost(this.topMostItem.getSelection());
+                    if (this.moveWithDrag()) {
+                        this.config.setShowTitlebar(this.showTitlebarItem.getSelection());
+                    }
                 }
                 this.config.setMouseHoveringAware(this.treeNode.getMouseHoverAware());
                 this.config.setShareOpacitySetting(this.shareOpacitySetting);
@@ -789,6 +928,15 @@ public class WindowBase {
      * @return
      */
     protected boolean shouldSaveWindowSize() {
+        return false;
+    }
+
+    /**
+     * ウィンドウがドラックで動かすことができるか？
+     * trueにすると"disable-drag-move"が設定されていないコントロールを動かすとウィンドウが動くようになる
+     * @return
+     */
+    protected boolean moveWithDrag() {
         return false;
     }
 

@@ -49,6 +49,11 @@ public class LauncherWindow extends WindowBase {
         this.setVisible(true);
     }
 
+    @Override
+    protected boolean moveWithDrag() {
+        return true;
+    }
+
     /**
      * Create contents of the dialog.
      */
@@ -94,6 +99,7 @@ public class LauncherWindow extends WindowBase {
             });
             // ボタンのサイズを設定
             button.setLayoutData(rowData);
+            button.setData("disable-drag-move", true);
         }
 
         System.out.println("shell.pack()");

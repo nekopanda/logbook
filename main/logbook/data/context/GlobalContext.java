@@ -1725,7 +1725,6 @@ public final class GlobalContext {
             ApplicationMain.main.updateMapCell(mapCellDto);
 
             addConsole("出撃を更新しました");
-            addConsole("行先 " + mapCellDto.toString());
         } catch (Exception e) {
             LOG.warn("出撃を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1743,7 +1742,6 @@ public final class GlobalContext {
 
             mapCellDto = new MapCellDto(obj);
             ApplicationMain.main.updateMapCell(mapCellDto);
-            addConsole("行先 " + mapCellDto.toString());
         } catch (Exception e) {
             LOG.warn("進撃を更新しますに失敗しました", e);
             LOG.warn(data);

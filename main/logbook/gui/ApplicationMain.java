@@ -264,6 +264,11 @@ public final class ApplicationMain extends WindowBase {
         this.trayItem.dispose();
     }
 
+    @Override
+    protected boolean moveWithDrag() {
+        return true;
+    }
+
     /**
      * 画面レイアウトを作成します
      */
@@ -776,6 +781,16 @@ public final class ApplicationMain extends WindowBase {
                 AppConfig.get().setMinimumLayout(minimum);
             }
         });
+
+        // 選択する項目はドラックで移動できないようにする
+        for (Control c : new Control[] { this.commandComposite,
+                this.deckNotice, this.ndockNotice,
+                this.deck1time, this.deck2time,
+                this.deck3time, this.ndock1time, this.ndock2time, this.ndock3time, this.ndock4time,
+                this.consoleComposite }) {
+            c.setData("disable-drag-move", true);
+        }
+        this.tabFolder.setData("disable-drag-move-this", true);
 
         // 処理開始前に必要な値をセット
         BattleResultServer.setLogPath(AppConfig.get().getBattleLogPath());

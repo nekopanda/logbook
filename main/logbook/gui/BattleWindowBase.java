@@ -122,6 +122,17 @@ public class BattleWindowBase extends WindowBase {
         }
     }
 
+    @Override
+    protected boolean moveWithDrag() {
+        return true;
+    }
+
+    @Override
+    protected void showTitlebarChanged(boolean newValue) {
+        super.showTitlebarChanged(newValue);
+        this.getShell().pack();
+    }
+
     protected void beginDraw() {
         this.getShell().setRedraw(false);
     }
