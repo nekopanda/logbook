@@ -277,7 +277,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
             List<ItemDto> items = ship.getItem();
             for (int c = 0; c < 5; ++c) {
                 String onSlot = "";
-                String itemName = String.valueOf(c + 1) + ". ";
+                String itemName = "";
                 int[] onSlots = ship.getOnSlot(); // 現在の艦載機搭載数
                 int[] maxeq = ship.getShipInfo().getMaxeq(); // 艦載機最大搭載数
                 if (c < items.size()) {

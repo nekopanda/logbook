@@ -17,6 +17,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -28,6 +29,9 @@ import org.eclipse.wb.swt.SWTResourceManager;
  */
 public class BattleWindowBase extends WindowBase {
 
+    /** addLabel の対象となる Composite */
+    protected Composite currentCompo;
+
     private final Shell parent;
 
     private Font normalFont;
@@ -36,7 +40,15 @@ public class BattleWindowBase extends WindowBase {
     // タイトル
     private final String windowText;
 
+    /**
+     *  連合艦隊の第二艦隊用のラベル
+     */
     private final List<Label> labelsForCombined = new ArrayList<Label>();
+    /**
+     *  最初の表示で大きさを決定するラベルたち
+     *  SWT.DEFAULTで追加されたLabelは最初の表示でサイズを決定しその後サイズを変えない
+     */
+    private final List<Label> fixedSizedLabels = new ArrayList<Label>();
     private boolean combinedMode = false;
 
     private final ShipDto[] friendShips = new ShipDto[12];
@@ -67,15 +79,31 @@ public class BattleWindowBase extends WindowBase {
             this.boldFont = SWTResourceManager.getFont(fontName, size, SWT.BOLD);
             this.getShell().setText(this.windowText);
 
+            this.currentCompo = this.getShell();
             this.createContents();
             super.registerEvents();
             this.createContentsAfter();
             this.combinedMode = true;
             this.setCombinedMode(false);
             this.getShell().pack();
+
+            // 最初の表示で大きさを固定する
+            for (Label label : this.fixedSizedLabels) {
+                Object data = label.getLayoutData();
+                if (data instanceof GridData) {
+                    GridData gd = (GridData) data;
+                    gd.widthHint = label.getSize().x;
+                }
+            }
+
+            this.clearText();
+            super.setVisible(true);
+
             this.setWindowInitialized(true);
         }
-        this.setVisible(true);
+        else {
+            this.setVisible(true);
+        }
     }
 
     /**
@@ -113,41 +141,41 @@ public class BattleWindowBase extends WindowBase {
         this.combinedMode = false;
     }
 
-    protected Label addLabel(String text, int width, int textalign, int align, int horizontalSpan, int verticalSpan) {
-        Label label = new Label(this.getShell(), SWT.NONE);
+    protected Label addLabel(String text, int width, int textalign, int align, boolean excess,
+            int horizontalSpan, int verticalSpan) {
+        Label label = new Label(this.currentCompo, SWT.NONE);
         if (this.combinedMode) {
             this.labelsForCombined.add(label);
         }
         label.setAlignment(textalign);
-        GridData gd = new GridData(align, SWT.CENTER, false, false, horizontalSpan, verticalSpan);
+        GridData gd = new GridData(align, SWT.CENTER, excess, false, horizontalSpan, verticalSpan);
         gd.widthHint = width;
         label.setLayoutData(gd);
         label.setText(text);
+        if (width == SWT.DEFAULT) {
+            this.fixedSizedLabels.add(label);
+        }
         return label;
     }
 
     protected Label addLabel(String text, int width, int align, int horizontalSpan, int verticalSpan) {
-        return this.addLabel(text, width, align, align, horizontalSpan, verticalSpan);
+        return this.addLabel(text, width, align, align, true, horizontalSpan, verticalSpan);
     }
 
-    protected Label addLabelWithSize(String text, int width) {
-        return this.addLabel(text, width, SWT.CENTER, 1, 1);
+    protected Label addLabel(String text, int align, int width) {
+        return this.addLabel(text, width, align, SWT.FILL, true, 1, 1);
     }
 
     protected Label addLabel(String text) {
-        return this.addLabel(text, SWT.DEFAULT, SWT.CENTER, 1, 1);
-    }
-
-    protected Label addLabelWithAlign(String text, int align) {
-        return this.addLabel(text, SWT.DEFAULT, align, 1, 1);
+        return this.addLabel(text, SWT.DEFAULT, SWT.CENTER, SWT.FILL, false, 1, 1);
     }
 
     protected Label addLabelWithSpan(String text, int horizontalSpan, int verticalSpan) {
-        return this.addLabel(text, SWT.DEFAULT, SWT.CENTER, horizontalSpan, verticalSpan);
+        return this.addLabel(text, SWT.DEFAULT, SWT.CENTER, SWT.FILL, false, horizontalSpan, verticalSpan);
     }
 
     protected void addHorizontalSeparator(int span) {
-        Label label = new Label(this.getShell(), SWT.SEPARATOR | SWT.HORIZONTAL);
+        Label label = new Label(this.currentCompo, SWT.SEPARATOR | SWT.HORIZONTAL);
         label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, span, 1));
         if (this.combinedMode) {
             this.labelsForCombined.add(label);
@@ -155,7 +183,7 @@ public class BattleWindowBase extends WindowBase {
     }
 
     protected void addVerticalSeparator(int span) {
-        Label label = new Label(this.getShell(), SWT.SEPARATOR | SWT.VERTICAL);
+        Label label = new Label(this.currentCompo, SWT.SEPARATOR | SWT.VERTICAL);
         GridData gd = new GridData(SWT.CENTER, SWT.FILL, false, false, 1, span);
         gd.widthHint = 10;
         label.setLayoutData(gd);
@@ -165,7 +193,7 @@ public class BattleWindowBase extends WindowBase {
     }
 
     protected void skipSlot() {
-        Label label = new Label(this.getShell(), SWT.NONE);
+        Label label = new Label(this.currentCompo, SWT.NONE);
         label.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
         if (this.combinedMode) {
             this.labelsForCombined.add(label);
@@ -241,6 +269,9 @@ public class BattleWindowBase extends WindowBase {
     }
 
     protected void createContents() {
+    }
+
+    protected void clearText() {
     }
 
     protected void updateData(boolean start) {

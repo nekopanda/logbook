@@ -16,6 +16,7 @@ import logbook.gui.logic.DamageRate;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MenuItem;
@@ -40,35 +41,35 @@ public class BattleWindowSmall extends BattleWindow {
         super(parent, menuItem);
     }
 
-    private static Label addLabel(Composite compo, int align, String text, int width, int horizontalSpan) {
-        Label label = new Label(compo, SWT.NONE);
-        GridData gd = new GridData(SWT.CENTER, SWT.CENTER, false, false, horizontalSpan, 1);
-        gd.widthHint = width;
-        label.setAlignment(align);
-        label.setLayoutData(gd);
-        label.setText(text);
-        return label;
+    /*
+        private static Label addLabel(Composite compo, String text, int align, int width, boolean excess, int horizontalSpan) {
+            Label label = new Label(compo, SWT.NONE);
+            GridData gd = new GridData(SWT.FILL, SWT.CENTER, excess, false, horizontalSpan, 1);
+            gd.widthHint = width;
+            label.setAlignment(align);
+            label.setLayoutData(gd);
+            label.setText(text);
+            return label;
+        }
+
+        private static Label addLabel(Composite compo, String text, int align, int width) {
+            return addLabel(compo, text, align, width, true, 1);
+        }
+
+        private static Label addLabel(Composite compo, String text, int horizontalSpan) {
+            return addLabel(compo, text, SWT.CENTER, SWT.DEFAULT, false, horizontalSpan);
+        }
+    */
+    private void createHpHeaders() {
+        this.addLabel("開始時");
+        this.addLabel("Dmg");
+        this.addLabel("残");
     }
 
-    private static Label addLabel(Composite compo, int galign, int align, String text) {
-        Label label = new Label(compo, SWT.NONE);
-        GridData gd = new GridData(galign, SWT.CENTER, false, false, 1, 1);
-        label.setAlignment(align);
-        label.setLayoutData(gd);
-        label.setText(text);
-        return label;
-    }
-
-    private void createHpHeaders(int hpWidth, int damWidth) {
-        addLabel(this.damageCompo, SWT.CENTER, "開始時", hpWidth, 1);
-        addLabel(this.damageCompo, SWT.CENTER, "Dmg", damWidth, 1);
-        addLabel(this.damageCompo, SWT.CENTER, "残", damWidth, 1);
-    }
-
-    private void createHpLabels(Label[][] labels, int i, int hpWidth, int damWidth) {
-        labels[0][i] = addLabel(this.damageCompo, SWT.CENTER, "0", hpWidth, 1); //0 開始時HP
-        labels[1][i] = addLabel(this.damageCompo, SWT.CENTER, "0", damWidth, 1); //2 Dmg
-        labels[2][i] = addLabel(this.damageCompo, SWT.CENTER, "0", damWidth, 1); //3 後HP
+    private void createHpLabels(Label[][] labels, int i) {
+        labels[0][i] = this.addLabel("000"); //0 開始時HP
+        labels[1][i] = this.addLabel("000"); //2 Dmg
+        labels[2][i] = this.addLabel("000"); //3 後HP
     }
 
     protected void addHorizontalSeparator(Composite compo, int span) {
@@ -96,73 +97,76 @@ public class BattleWindowSmall extends BattleWindow {
     protected void createContents() {
         this.getShell().setLayout(this.makeGridLayout(3));
 
-        int battleWidth = 120;
         int nameWidth = 80;
-        int hpWidth = 40;
-        int damWidth = 28;
 
         for (int i = 0; i < 2; ++i) {
-            this.infoCompo[i] = new Composite(this.getShell(), SWT.NONE);
+            this.currentCompo = this.infoCompo[i] = new Composite(this.getShell(), SWT.NONE);
 
             this.infoCompo[i].setLayout(this.makeGridLayout(3));
 
-            this.infoLabels[i][0] = addLabel(this.infoCompo[i], SWT.CENTER, "艦隊名", battleWidth, 2);
-            this.addVerticalSeparator(this.infoCompo[i], 7);
-            this.infoLabels[i][1] = addLabel(this.infoCompo[i], SWT.CENTER, "陣形", battleWidth / 2, 1);
-            this.infoLabels[i][2] = addLabel(this.infoCompo[i], SWT.CENTER, "触接", battleWidth / 2, 1);
-            this.infoLabels[i][3] = addLabel(this.infoCompo[i], SWT.CENTER, "索敵", battleWidth, 2);
+            this.infoLabels[i][0] = this.addLabelWithSpan("艦隊名", 2, 1);
+            this.addVerticalSeparator(7);
+            this.infoLabels[i][1] = this.addLabel("陣形:単縦");
+            this.infoLabels[i][2] = this.addLabel("触接:あり");
+            this.infoLabels[i][3] = this.addLabelWithSpan("索敵:", 2, 1);
 
             if (i == 0) {
-                this.infoLabels[i][4] = addLabel(this.infoCompo[i], SWT.CENTER, "航空戦", battleWidth / 2, 1);
-                this.infoLabels[i][5] = addLabel(this.infoCompo[i], SWT.CENTER, "制空状態", battleWidth / 2, 1);
-                this.infoLabels[i][6] = addLabel(this.infoCompo[i], SWT.CENTER, "Stage1", battleWidth / 2, 1);
+                this.infoLabels[i][4] = this.addLabel("航空戦");
+                this.infoLabels[i][5] = this.addLabel("制空状態");
+                this.infoLabels[i][6] = this.addLabel("Stage1");
             }
             else {
-                this.matchLabel = addLabel(this.infoCompo[i], SWT.CENTER, "会敵", battleWidth, 2);
-                this.infoLabels[i][6] = addLabel(this.infoCompo[i], SWT.CENTER, "Stage1", battleWidth / 2, 1);
+                this.matchLabel = this.addLabelWithSpan("会敵", 2, 1);
+                this.infoLabels[i][6] = this.addLabel("Stage1");
                 this.infoLabels[i][4] = this.infoLabels[i][5] = this.infoLabels[i][6];
             }
 
-            this.infoLabels[i][7] = addLabel(this.infoCompo[i], SWT.CENTER, "Stage2", battleWidth / 2, 1);
-            this.infoLabels[i][8] = addLabel(this.infoCompo[i], SWT.CENTER, "ロスト1", battleWidth / 2, 1);
-            this.infoLabels[i][9] = addLabel(this.infoCompo[i], SWT.CENTER, "ロスト2", battleWidth / 2, 1);
-            this.infoLabels[i][10] = addLabel(this.infoCompo[i], SWT.CENTER, "ロスト3", battleWidth / 2, 1);
-            this.infoLabels[i][11] = addLabel(this.infoCompo[i], SWT.CENTER, "ロスト4", battleWidth / 2, 1);
+            this.infoLabels[i][7] = this.addLabel("Stage2");
+            this.infoLabels[i][8] = this.addLabel("000→000");
+            this.infoLabels[i][9] = this.addLabel("000→000");
+            this.infoLabels[i][10] = this.addLabel("000→000");
+            this.infoLabels[i][11] = this.addLabel("000→000");
         }
 
         int numColumns = 12;
-        this.damageCompo = new Composite(this.getShell(), SWT.NONE);
+        this.currentCompo = this.damageCompo = new Composite(this.getShell(), SWT.NONE);
+        this.damageCompo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         this.damageCompo.setLayout(this.makeGridLayout(numColumns));
 
         // ヘッダ行作成
-        this.createHpHeaders(hpWidth, damWidth);
-        addLabel(this.damageCompo, SWT.CENTER, "", SWT.DEFAULT, 1);
-        this.createHpHeaders(hpWidth, damWidth);
-        addLabel(this.damageCompo, SWT.CENTER, "", SWT.DEFAULT, 1);
-        this.createHpHeaders(hpWidth, damWidth);
-        addLabel(this.damageCompo, SWT.LEFT, "敵艦名", nameWidth, 1);
-        this.addHorizontalSeparator(this.damageCompo, numColumns);
+        this.createHpHeaders();
+        this.addLabel("");
+        this.createHpHeaders();
+        this.addLabel("");
+        this.createHpHeaders();
+        this.addLabel("敵艦名", SWT.LEFT, nameWidth);
+        this.addHorizontalSeparator(numColumns);
 
         // 中身作成
         for (int i = 0; i < 6; ++i) {
-            this.createHpLabels(this.friendHpLabels, i, hpWidth, damWidth);
+            this.createHpLabels(this.friendHpLabels, i);
             if (i == 0)
                 this.addVerticalSeparator(this.damageCompo, 6);
-            this.createHpLabels(this.friendHpLabels, i + 6, hpWidth, damWidth);
+            this.createHpLabels(this.friendHpLabels, i + 6);
             if (i == 0)
                 this.addVerticalSeparator(this.damageCompo, 6);
-            this.createHpLabels(this.enemyHpLabels, i, hpWidth, damWidth);
-            this.enemyLabels[i] = addLabel(this.damageCompo, SWT.LEFT, "-", nameWidth, 1);
+            this.createHpLabels(this.enemyHpLabels, i);
+            this.enemyLabels[i] = this.addLabel("-", SWT.LEFT, nameWidth);
         }
 
         // 結果表示領域
         this.resultCompo = new Composite(this.getShell(), SWT.BORDER);
-        this.resultCompo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 3, 1));
-        this.resultCompo.setLayout(this.makeGridLayout(3));
+        this.resultCompo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+        RowLayout rowLayout = new RowLayout();
+        rowLayout.marginBottom = rowLayout.marginHeight = 0;
+        rowLayout.marginLeft = rowLayout.marginRight = 0;
+        rowLayout.marginTop = rowLayout.marginWidth = 0;
+        rowLayout.wrap = false;
+        this.resultCompo.setLayout(rowLayout);
 
-        this.resultLabel[2] = addLabel(this.resultCompo, SWT.CENTER, SWT.LEFT, "");
-        this.resultLabel[0] = addLabel(this.resultCompo, SWT.CENTER, SWT.LEFT, "");
-        this.resultLabel[1] = addLabel(this.resultCompo, SWT.FILL, SWT.CENTER, "");
+        this.resultLabel[2] = new Label(this.resultCompo, SWT.NONE);
+        this.resultLabel[0] = new Label(this.resultCompo, SWT.NONE);
+        this.resultLabel[1] = new Label(this.resultCompo, SWT.NONE);
     }
 
     @Override

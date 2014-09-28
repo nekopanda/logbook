@@ -54,6 +54,7 @@ public class BattleWindow extends BattleWindowBase {
         super(parent, menuItem, "戦況");
     }
 
+    @Override
     protected void clearText() {
         // 情報
         for (int i = 0; i < 12; ++i) {
@@ -63,7 +64,7 @@ public class BattleWindow extends BattleWindowBase {
 
         // 敵
         for (int i = 0; i < 6; ++i) {
-            setLabelText(this.enemyLabels[i], "-");
+            setLabelText(this.enemyLabels[i], "-", "");
         }
 
         // その他

@@ -38,33 +38,33 @@ public class BattleWindowLarge extends BattleWindow {
         super(parent, menuItem);
     }
 
-    private void addInfoLabel(Label[] labels, int row, int width) {
+    private void addInfoLabel(Label[] labels, int row) {
         switch (row) {
         case 0:
-            labels[0] = this.addLabel("艦隊名", width, SWT.CENTER, 2, 1);
+            labels[0] = this.addLabelWithSpan("艦隊名", 2, 1);
             break;
         case 1:
-            labels[1] = this.addLabelWithSize("陣形", width / 2);
-            labels[2] = this.addLabelWithSize("触接", width / 2);
+            labels[1] = this.addLabel("陣形:単縦陣");
+            labels[2] = this.addLabel("触接:あり");
             break;
         case 2:
-            labels[3] = this.addLabel("索敵", width, SWT.CENTER, 2, 1);
+            labels[3] = this.addLabelWithSpan("索敵", 2, 1);
             break;
         case 3:
-            labels[4] = this.addLabelWithSize("航空戦:", width / 2);
-            labels[5] = this.addLabelWithSize("制空状態", width / 2);
+            labels[4] = this.addLabel("航空戦:");
+            labels[5] = this.addLabel("制空状態");
             break;
         case 4:
-            labels[6] = this.addLabelWithSize("stage1", width / 2);
-            labels[7] = this.addLabelWithSize("stage2", width / 2);
+            labels[6] = this.addLabel("Stage1");
+            labels[7] = this.addLabel("Stage2");
             break;
         case 5:
-            labels[8] = this.addLabelWithSize("ロスト1", width / 2);
-            labels[9] = this.addLabelWithSize("ロスト2", width / 2);
+            labels[8] = this.addLabel("000→000");
+            labels[9] = this.addLabel("000→000");
             break;
         case 6:
-            labels[10] = this.addLabelWithSize("ロスト3", width / 2);
-            labels[11] = this.addLabelWithSize("ロスト4", width / 2);
+            labels[10] = this.addLabel("000→000");
+            labels[11] = this.addLabel("000→000");
             break;
         default:
             this.skipSlot();
@@ -73,50 +73,50 @@ public class BattleWindowLarge extends BattleWindow {
         }
     }
 
-    private void addEnemyInfoLabel(Label[] labels, int row, int width) {
+    private void addEnemyInfoLabel(Label[] labels, int row) {
         switch (row) {
         case 0:
-            labels[0] = this.addLabel("艦隊名", width, SWT.CENTER, 2, 1);
+            labels[0] = this.addLabelWithSpan("艦隊名", 2, 1);
             break;
         case 1:
-            labels[1] = this.addLabelWithSize("陣形", width / 2);
-            labels[2] = this.addLabelWithSize("触接", width / 2);
+            labels[1] = this.addLabel("陣形:単縦陣");
+            labels[2] = this.addLabel("触接:あり");
             break;
         case 2:
-            labels[3] = this.addLabel("索敵", width, SWT.CENTER, 2, 1);
+            labels[3] = this.addLabelWithSpan("索敵:", 2, 1);
             break;
         case 3:
-            labels[4] = labels[5] = labels[6] = this.addLabelWithSize("stage1", width / 2);
-            labels[7] = this.addLabelWithSize("stage2", width / 2);
+            labels[4] = labels[5] = labels[6] = this.addLabel("Stage1");
+            labels[7] = this.addLabel("Stage2");
             break;
         case 4:
-            labels[8] = this.addLabelWithSize("ロスト1", width / 2);
-            labels[9] = this.addLabelWithSize("ロスト2", width / 2);
+            labels[8] = this.addLabel("000→000");
+            labels[9] = this.addLabel("000→000");
             break;
         case 5:
-            labels[10] = this.addLabelWithSize("ロスト3", width / 2);
-            labels[11] = this.addLabelWithSize("ロスト4", width / 2);
+            labels[10] = this.addLabel("000→000");
+            labels[11] = this.addLabel("000→000");
             break;
         }
     }
 
-    private void createHpLabels(Label[][] labels, int i, int hpWidth, int damWidth, int statusWidth) {
+    private void createHpLabels(Label[][] labels, int i) {
         if ((i == 0) || (i == 6)) {
             this.addVerticalSeparator(6); //2
             this.addLabelWithSpan("→", 1, 6);//12
             this.addVerticalSeparator(6); //2
         }
-        labels[2][i] = this.addLabelWithSize("0", damWidth); //13 HP
-        labels[3][i] = this.addLabelWithSize("0", damWidth); //13 HP
-        labels[4][i] = this.addLabelWithSize("健在", statusWidth); //14 HP
+        labels[2][i] = this.addLabel("000"); //13 HP
+        labels[3][i] = this.addLabel("000"); //13 HP
+        labels[4][i] = this.addLabel("健在"); //14 HP
         if ((i == 0) || (i == 6)) {
             this.addVerticalSeparator(6); //2
             this.addLabelWithSpan("→", 1, 6);//15
             this.addVerticalSeparator(6); //2
         }
-        labels[5][i] = this.addLabelWithSize("0", damWidth); //13 HP
-        labels[6][i] = this.addLabelWithSize("0", damWidth); //13 HP
-        labels[7][i] = this.addLabelWithSize("健在", statusWidth); //17 HP
+        labels[5][i] = this.addLabel("000"); //13 HP
+        labels[6][i] = this.addLabel("000"); //13 HP
+        labels[7][i] = this.addLabel("健在"); //17 HP
     }
 
     @Override
@@ -134,33 +134,37 @@ public class BattleWindowLarge extends BattleWindow {
         this.title = new Label(this.getShell(), SWT.NONE);
         this.title.setFont(this.getBoldFont());
         this.title.setLayoutData(new GridData(SWT.FILL, SWT.LEFT, false, false, numColumns, 1));
+        this.title.setText("初期化完了");
 
         // 各カラムの最小幅を定義 //
+        /*
         int battleWidth = 130;
         int nameWidth = 110;
         int hpWidth = 40;
         int statusWidth = 25;
         int damWidth = 28;
+        */
+        int nameWidth = 60;
 
         this.skipSlot();//1
         this.skipSlot(); //2 separator
-        this.addLabel("状態", battleWidth, SWT.CENTER, 2, 1);//3-4
+        this.addLabelWithSpan("状態", 2, 1);//3-4
         this.skipSlot(); //5 separator
-        this.addLabelWithSize("艦名", nameWidth);//6
-        this.addLabelWithSize("HP", hpWidth);//7-8
-        this.addLabelWithSize("", statusWidth);//7-8
+        this.addLabel("艦名", SWT.CENTER, nameWidth);//6
+        this.addLabel("HP");//7-8
+        this.addLabel("");//7-8
         this.skipSlot(); //5 separator
-        this.addLabelWithSize("", 15);//9
+        this.addLabel("");//9
         this.skipSlot(); //5 separator
-        this.addLabelWithSize("Dmg", damWidth);//10
-        this.addLabelWithSize("残", damWidth);//11
-        this.addLabelWithSize("", statusWidth);//12
+        this.addLabel("Dmg");//10
+        this.addLabel("残");//11
+        this.addLabel("");//12
         this.skipSlot(); //5 separator
-        this.addLabelWithSize("", 15);//13
+        this.addLabel("");//13
         this.skipSlot(); //5 separator
-        this.addLabelWithSize("Dmg", damWidth);//14
-        this.addLabelWithSize("残", damWidth);//15
-        this.addLabelWithSize("", statusWidth);//16
+        this.addLabel("Dmg");//14
+        this.addLabel("残");//15
+        this.addLabel("");//16
 
         this.addHorizontalSeparator(numColumns);
 
@@ -177,13 +181,13 @@ public class BattleWindowLarge extends BattleWindow {
             }
             if ((i == 0) || (i == 6))
                 this.addVerticalSeparator(6); //2
-            this.addInfoLabel(this.infoLabels[0], i, battleWidth);//3-4
+            this.addInfoLabel(this.infoLabels[0], i);//3-4
             if ((i == 0) || (i == 6))
                 this.addVerticalSeparator(6);//5
-            this.friendLabels[i] = this.addLabel("艦名" + (i + 1), nameWidth, SWT.LEFT, 1, 1);//6
-            this.friendHpLabels[0][i] = this.addLabelWithSize("0/0", hpWidth); //10 HP
-            this.friendHpLabels[1][i] = this.addLabelWithSize("健在", statusWidth); //10 HP
-            this.createHpLabels(this.friendHpLabels, i, hpWidth, damWidth, statusWidth); // 10-17
+            this.friendLabels[i] = this.addLabel("艦名" + (i + 1), SWT.LEFT, nameWidth);//6
+            this.friendHpLabels[0][i] = this.addLabel("000/000"); //10 HP
+            this.friendHpLabels[1][i] = this.addLabel("健在"); //10 HP
+            this.createHpLabels(this.friendHpLabels, i); // 10-17
         }
 
         this.endCombined();
@@ -208,25 +212,26 @@ public class BattleWindowLarge extends BattleWindow {
                 this.addLabelWithSpan("敵", 1, 6); //1
                 this.addVerticalSeparator(6); //2
             }
-            this.addEnemyInfoLabel(this.infoLabels[1], i, battleWidth);//3-4
+            this.addEnemyInfoLabel(this.infoLabels[1], i);//3-4
             if (i == 0)
                 this.addVerticalSeparator(6); //5
-            this.enemyLabels[i] = this.addLabel("艦名" + (i + 1), nameWidth, SWT.LEFT, 1, 1); //6
+            this.enemyLabels[i] = this.addLabel("艦名" + (i + 1), SWT.LEFT, nameWidth); //6
             this.enemyHpLabels[1][i] = this.enemyHpLabels[0][i] =
-                    this.addLabelWithSpan("0/0", 2, 1); //10 HP
-            this.createHpLabels(this.enemyHpLabels, i, hpWidth, damWidth, statusWidth); // 10-17
+                    this.addLabelWithSpan("0000", 2, 1); //10 HP
+            this.createHpLabels(this.enemyHpLabels, i); // 10-17
         }
 
         this.addHorizontalSeparator(numColumns);
 
         // 最後
-        this.resultLabel[0] = this.addLabel("結果予想", SWT.DEFAULT, SWT.CENTER, SWT.FILL, numColumns, 1);//6-17
+        this.resultLabel[0] = this.addLabel("結果予想", SWT.DEFAULT, SWT.CENTER, SWT.FILL, true, numColumns, 1);//6-17
         this.beginCombined();
-        this.resultLabel[1] = this.addLabel("結果予想", SWT.DEFAULT, SWT.CENTER, SWT.FILL, numColumns, 1);//6-17
+        this.resultLabel[1] = this.addLabel("結果予想", SWT.DEFAULT, SWT.CENTER, SWT.FILL, true, numColumns, 1);//6-17
         this.endCombined();
-        this.resultLabel[2] = this.addLabel("結果予想", SWT.DEFAULT, SWT.CENTER, SWT.FILL, numColumns, 1);//6-17
+        this.resultLabel[2] = this.addLabel("結果予想", SWT.DEFAULT, SWT.CENTER, SWT.FILL, true, numColumns, 1);//6-17
 
-        this.clearText();
+        // この状態で長さを決める
+        this.getShell().layout();
     }
 
     @Override

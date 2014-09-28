@@ -299,9 +299,11 @@ public final class ApplicationMain extends WindowBase {
                     }
                 }
 
-                // 他のウィンドウを閉じる
-                for (WindowBase win : ApplicationMain.this.getWindowList()) {
-                    win.dispose();
+                if (e.doit) {
+                    // 他のウィンドウを閉じる
+                    for (WindowBase win : ApplicationMain.this.getWindowList()) {
+                        win.dispose();
+                    }
                 }
             }
 
