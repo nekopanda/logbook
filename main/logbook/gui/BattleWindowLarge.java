@@ -24,8 +24,6 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class BattleWindowLarge extends BattleWindow {
 
-    private Label title;
-
     // 名前
     private final Label[] friendLabels = new Label[12];
     // 0,1: 開始前, 2,3,4: 昼戦後, 5,6,7: 夜戦後
@@ -377,40 +375,6 @@ public class BattleWindowLarge extends BattleWindow {
                         friendMaxHp[1]);
             }
             printHp(this.enemyHpLabels, 5, 0, this.enemyDamages[1], phase2.getNowEnemyHp(), maxEnemyHp);
-        }
-    }
-
-    @Override
-    protected void updateData(boolean start) {
-        this.beginDraw();
-        try {
-            if (this.getBattle() != null) {
-                this.printDock();
-                this.printMap();
-                this.printBattle();
-            }
-            else if (this.getDocks() == null) {
-                // 出撃中でない
-                this.clearText();
-                this.title.setText("出撃中ではありません");
-            }
-            else if (this.getMapCellDto() == null) {
-                // 移動中
-                this.clearText();
-                if (start) {
-                    this.title.setText("出撃しました");
-                }
-                else {
-                    this.title.setText("移動中...");
-                }
-                this.printDock();
-            }
-            else {
-                // 移動中
-                this.printMap();
-            }
-        } finally {
-            this.endDraw();
         }
     }
 }

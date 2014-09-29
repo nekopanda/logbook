@@ -29,6 +29,8 @@ import org.eclipse.wb.swt.SWTResourceManager;
  */
 public class BattleWindow extends BattleWindowBase {
 
+    protected Label title;
+
     // 名前
     protected final Label[] enemyLabels = new Label[6];
 
@@ -326,6 +328,40 @@ public class BattleWindow extends BattleWindowBase {
                 this.resultLabel[i].setBackground(null);
                 this.resultLabel[i].setForeground(null);
             }
+        }
+    }
+
+    @Override
+    protected void updateData(boolean start) {
+        this.beginDraw();
+        try {
+            if (this.getBattle() != null) {
+                this.printDock();
+                this.printMap();
+                this.printBattle();
+            }
+            else if (this.getDocks() == null) {
+                // 出撃中でない
+                this.clearText();
+                this.title.setText("出撃中ではありません");
+            }
+            else if (this.getMapCellDto() == null) {
+                // 移動中
+                this.clearText();
+                if (start) {
+                    this.title.setText("出撃しました");
+                }
+                else {
+                    this.title.setText("移動中...");
+                }
+                this.printDock();
+            }
+            else {
+                // 移動中
+                this.printMap();
+            }
+        } finally {
+            this.endDraw();
         }
     }
 }
