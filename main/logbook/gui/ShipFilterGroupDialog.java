@@ -20,6 +20,7 @@ import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.ShipGroupListener;
 import logbook.gui.logic.ShipGroupObserver;
 import logbook.gui.logic.TableItemCreator;
+import logbook.gui.logic.TableRowHeader;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
@@ -40,6 +41,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
@@ -209,7 +211,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
             for (int i = 0; i < shipList.size(); i++) {
                 ShipDto ship = shipList.get(i);
                 body.add(new Comparable[] {
-                        i + 1,
+                        new TableRowHeader(i + 1, ship),
                         ship.getId(),
                         ship.getFleetid(),
                         ship.getName(),
@@ -224,7 +226,25 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
 
     @Override
     protected TableItemCreator getTableItemCreator() {
-        return CreateReportLogic.DEFAULT_TABLE_ITEM_CREATOR;
+        return new TableItemCreator() {
+
+            @Override
+            public void init() {
+            }
+
+            @Override
+            public TableItem create(Table table, Comparable[] text, int count) {
+                ShipDto ship = (ShipDto) ((TableRowHeader) text[0]).get();
+                TableItem item = new TableItem(table, SWT.NONE);
+                // 偶数行に背景色を付ける
+                if ((count % 2) != 0) {
+                    item.setBackground(SWTResourceManager.getColor(AppConstants.ROW_BACKGROUND));
+                }
+                item.setBackground(6, CreateReportLogic.getTableCondColor(ship.getEstimatedCond()));
+                item.setText(CreateReportLogic.toStringArray(text));
+                return item;
+            }
+        };
     }
 
     @Override

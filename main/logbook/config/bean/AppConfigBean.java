@@ -72,6 +72,10 @@ public final class AppConfigBean {
     /** ローカルループバックアドレスからの接続のみ受け入れる */
     private boolean allowOnlyFromLocalhost = true;
 
+    private boolean printSortieLog = false;
+
+    private boolean printSunkLog = false;
+
     /** 遠征-1分前に通知する */
     private boolean noticeDeckmission = true;
 
@@ -481,6 +485,34 @@ public final class AppConfigBean {
      */
     public void setAllowOnlyFromLocalhost(boolean allowOnlyFromLocalhost) {
         this.allowOnlyFromLocalhost = allowOnlyFromLocalhost;
+    }
+
+    /**
+     * @return printSortieLog
+     */
+    public boolean isPrintSortieLog() {
+        return this.printSortieLog;
+    }
+
+    /**
+     * @param printSortieLog セットする printSortieLog
+     */
+    public void setPrintSortieLog(boolean printSortieLog) {
+        this.printSortieLog = printSortieLog;
+    }
+
+    /**
+     * @return printSunkLog
+     */
+    public boolean isPrintSunkLog() {
+        return this.printSunkLog;
+    }
+
+    /**
+     * @param printSunkLog セットする printSunkLog
+     */
+    public void setPrintSunkLog(boolean printSunkLog) {
+        this.printSunkLog = printSunkLog;
     }
 
     /**

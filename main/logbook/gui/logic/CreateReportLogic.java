@@ -65,6 +65,16 @@ import org.eclipse.wb.swt.SWTResourceManager;
  */
 public final class CreateReportLogic {
 
+    public static Color getTableCondColor(int cond) {
+        for (int i = 0; i < AppConstants.COND_TABLE_LOCOR.length; ++i) {
+            if (cond >= AppConstants.COND_TABLE[i]) {
+                return SWTResourceManager.getColor(AppConstants.COND_TABLE_LOCOR[i]);
+            }
+        }
+        // 0より小さいってあり得ないけど
+        return SWTResourceManager.getColor(AppConstants.COND_RED_COLOR);
+    }
+
     /** テーブルアイテム作成(デフォルト) */
     public static final TableItemCreator DEFAULT_TABLE_ITEM_CREATOR = new TableItemCreator() {
 
@@ -97,16 +107,6 @@ public final class CreateReportLogic {
             this.docks = GlobalContext.getNDockShipSet();
         }
 
-        private Color getCondColor(int cond) {
-            for (int i = 0; i < AppConstants.COND_TABLE_LOCOR.length; ++i) {
-                if (cond >= AppConstants.COND_TABLE[i]) {
-                    return SWTResourceManager.getColor(AppConstants.COND_TABLE_LOCOR[i]);
-                }
-            }
-            // 0より小さいってあり得ないけど
-            return SWTResourceManager.getColor(AppConstants.COND_RED_COLOR);
-        }
-
         @Override
         public TableItem create(Table table, Comparable[] text, int count) {
             // 艦娘
@@ -131,7 +131,7 @@ public final class CreateReportLogic {
             }
             */
             // 疲労は 12 番目
-            item.setBackground(12, this.getCondColor(ship.getCond()));
+            item.setBackground(12, getTableCondColor(ship.getCond()));
 
             // 遠征
             if (this.deckmissions.contains(ship.getId())) {

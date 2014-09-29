@@ -858,11 +858,19 @@ public final class GlobalContext {
             }
 
             addConsole("海戦情報を更新しました");
-            /*
-            for (ShipDto ship : sunkShips) {
-                addConsole(ship.getName() + "(id:" + ship.getId() + ",lv:" + ship.getLv() + ") 轟沈しました！");
+            if (AppConfig.get().isPrintSortieLog()) {
+                addConsole("自=" + Arrays.toString(phase.getNowFriendHp()));
+                if (battle.isCombined()) {
+                    addConsole("連=" + Arrays.toString(phase.getNowFriendHpCombined()));
+                }
+                addConsole("敵=" + Arrays.toString(phase.getNowEnemyHp()));
+                addConsole("→ " + phase.getEstimatedRank().toString());
             }
-            */
+            if (AppConfig.get().isPrintSunkLog()) {
+                for (ShipDto ship : sunkShips) {
+                    addConsole(ship.getName() + "(id:" + ship.getId() + ",lv:" + ship.getLv() + ") 轟沈しました！");
+                }
+            }
 
             if (mapCellDto == null) {
                 // 出撃していない場合は出撃させる
@@ -902,7 +910,7 @@ public final class GlobalContext {
                         int enemyId = mapCellDto.getEnemyId();
                         EnemyData enemyData = battle.getEnemyData(enemyId, battle.getEnemyName());
                         if ((mapCellDto.getEnemyData() == null) || (mapCellDto.getEnemyData().getEnemyName() == null)) {
-                            addConsole("eid=" + enemyId + "の敵編成をデータべスに追加");
+                            addConsole("eid=" + enemyId + "の敵編成をデータべースに追加");
                         }
                         EnemyData.set(enemyId, enemyData);
                         mapCellDto.setEnemyData(enemyData);
@@ -1730,6 +1738,8 @@ public final class GlobalContext {
             ApplicationMain.main.updateMapCell(mapCellDto);
 
             addConsole("出撃を更新しました");
+            if (AppConfig.get().isPrintSortieLog())
+                addConsole("行先 " + mapCellDto.toString());
         } catch (Exception e) {
             LOG.warn("出撃を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1747,6 +1757,8 @@ public final class GlobalContext {
 
             mapCellDto = new MapCellDto(obj);
             ApplicationMain.main.updateMapCell(mapCellDto);
+            if (AppConfig.get().isPrintSortieLog())
+                addConsole("行先 " + mapCellDto.toString());
         } catch (Exception e) {
             LOG.warn("進撃を更新しますに失敗しました", e);
             LOG.warn(data);

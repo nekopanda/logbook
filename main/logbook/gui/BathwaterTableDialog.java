@@ -12,6 +12,7 @@ import logbook.dto.ShipDto;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.HpString;
 import logbook.gui.logic.TableItemCreator;
+import logbook.gui.logic.TableRowHeader;
 import logbook.gui.logic.TimeLogic;
 
 import org.eclipse.swt.SWT;
@@ -127,7 +128,7 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
                     / (float) (ship.getMaxhp() - ship.getNowhp()) / 1000));
             // 整形
             body.add(new Comparable[] {
-                    i + 1,
+                    new TableRowHeader(i + 1, ship),
                     ship.getId(),
                     ship.getFleetid(),
                     ship.getCond(),
@@ -154,6 +155,7 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
 
             @Override
             public TableItem create(Table table, Comparable[] text, int count) {
+                ShipDto ship = (ShipDto) ((TableRowHeader) text[0]).get();
                 TableItem item = new TableItem(table, SWT.NONE);
                 // 偶数行に背景色を付ける
                 if ((count % 2) != 0) {
@@ -163,6 +165,7 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
                 if (text[10].equals("遠征")) {
                     item.setForeground(SWTResourceManager.getColor(AppConstants.MISSION_COLOR));
                 }
+                item.setBackground(3, CreateReportLogic.getTableCondColor(ship.getCond()));
                 return item;
             }
         };
