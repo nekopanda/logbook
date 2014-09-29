@@ -3,6 +3,7 @@ package logbook.gui.background;
 import java.awt.Desktop;
 import java.nio.charset.Charset;
 
+import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 
 import org.apache.commons.io.IOUtils;
@@ -47,7 +48,9 @@ public final class AsyncExecUpdateCheck extends Thread {
                 }
             }
 
-            if (ok == false) {
+            AppConfig.get().setLatestVersion(okversions[0]);
+
+            if ((ok == false) && AppConfig.get().isUpdateCheck()) {
                 Display.getDefault().asyncExec(new Runnable() {
                     @Override
                     public void run() {
@@ -78,8 +81,11 @@ public final class AsyncExecUpdateCheck extends Thread {
                 });
             }
         } catch (Exception e) {
-            // アップデートチェック失敗はクラス名のみ
-            LOG.info(e.getClass().getName() + "が原因でアップデートチェックに失敗しました");
+            // チェックしなくてもいい設定の場合はエラーを無視する
+            if (AppConfig.get().isUpdateCheck()) {
+                // アップデートチェック失敗はクラス名のみ
+                LOG.info(e.getClass().getName() + "が原因でアップデートチェックに失敗しました");
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ import java.awt.Desktop;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.internal.MasterData;
 import logbook.server.proxy.Filter;
@@ -75,6 +76,17 @@ public final class VersionDialog extends WindowBase {
 
         label("航海日誌 拡張版", versionGroup);
         label(AppConstants.VERSION, versionGroup);
+
+        String latestVersion = AppConfig.get().getLatestVersion();
+        if (latestVersion != null) {
+            String text = "最新版です";
+            if (latestVersion.equals(AppConstants.VERSION) == false) {
+                text = "最新版 " + latestVersion + " が公開されています";
+            }
+            Label update = new Label(versionGroup, SWT.NONE);
+            update.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
+            update.setText(text);
+        }
 
         Link gowebsite = new Link(versionGroup, SWT.NONE);
         gowebsite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));

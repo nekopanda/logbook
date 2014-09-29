@@ -922,9 +922,7 @@ public final class ApplicationMain extends WindowBase {
         ThreadManager.start();
 
         // アップデートチェックする
-        if (AppConfig.get().isUpdateCheck()) {
-            new AsyncExecUpdateCheck(this.shell).start();
-        }
+        new AsyncExecUpdateCheck(this.shell).start();
     }
 
     @Override

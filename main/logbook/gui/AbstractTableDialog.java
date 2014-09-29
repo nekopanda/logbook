@@ -586,23 +586,20 @@ public abstract class AbstractTableDialog extends WindowBase {
 
         @Override
         public final int compare(Comparable[] o1, Comparable[] o2) {
-            int ret;
             Comparable o1c = o1[this.index];
             Comparable o2c = o2[this.index];
             if (o1c == null) {
                 if (o2c == null) {
-                    ret = 0;
+                    return 0;
                 }
                 else {
-                    ret = -1;
+                    return 1;
                 }
             }
             else if (o2c == null) {
-                ret = 1;
+                return -1;
             }
-            else {
-                ret = o1[this.index].compareTo(o2[this.index]);
-            }
+            int ret = o1[this.index].compareTo(o2[this.index]);
             return this.order ? ret : -ret;
         }
 
