@@ -1,5 +1,7 @@
 package logbook.gui.widgets;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -283,8 +285,12 @@ public class FleetComposite extends Composite {
         }
         // 艦隊合計Lv
         int totallv = 0;
-        // 索敵値計
+        // 索敵値計(素)
         int totalSakuteki = 0;
+        // 偵察機索敵値計
+        int totalSakutekiSurvey = 0;
+        // 電探索敵値計
+        int totalSakutekiRader = 0;
 
         for (int i = 0; i < ships.size(); i++) {
             ShipDto ship = ships.get(i);
@@ -312,8 +318,12 @@ public class FleetComposite extends Composite {
             float fuelraito = fuelmax != 0 ? (float) fuel / (float) fuelmax : 1f;
             // 艦隊合計Lv
             totallv += ship.getLv();
-            // 索敵値計
-            totalSakuteki += ship.getSakuteki25();
+            // 索敵値計(素)
+            totalSakuteki += ship.getSakuteki();
+            // 偵察機索敵値計
+            totalSakutekiSurvey += ship.getSakutekiSurvey();
+            // 電探索敵値計
+            totalSakutekiRader += ship.getSakutekiRader();
 
             // 疲労している艦娘がいる場合メッセージを表示
             if (this.cond > cond) {
@@ -510,6 +520,12 @@ public class FleetComposite extends Composite {
         for (ShipDto shipDto : ships) {
             seiku += shipDto.getSeiku();
         }
+        // 索敵値を計算
+        // 偵察機索敵値×2 ＋ 電探索敵値 ＋ √(艦隊の装備込み索敵値合計 - 偵察機索敵値 - 電探索敵値)
+        BigDecimal sakuteki = BigDecimal.valueOf((totalSakutekiSurvey * 2) + totalSakutekiRader
+                + Math.sqrt(totalSakuteki - totalSakutekiSurvey - totalSakutekiRader));
+        sakuteki = sakuteki.setScale(2, RoundingMode.HALF_UP);
+
         if (GlobalContext.isMission(this.dock.getId())) {
             // 遠征中
             StyleRange style = new StyleRange();
@@ -546,7 +562,7 @@ public class FleetComposite extends Composite {
         // 制空
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_SEIKU, seiku), null);
         // 索敵
-        this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_SAKUTEKI, totalSakuteki), null);
+        this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_SAKUTEKI, sakuteki), null);
         // 合計Lv
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_TOTAL_LV, totallv), null);
 
