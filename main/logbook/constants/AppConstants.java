@@ -413,6 +413,12 @@ public class AppConstants {
     /** メッセージ  艦隊合計Lv:{0} */
     public static final String MESSAGE_TOTAL_LV = "艦隊合計Lv:{0}。";
 
+    /** メッセージ  ドラム缶:{0} ({1}隻) */
+    public static final String MESSAGE_TOTAL_DRAM = "ドラム缶:{0} ({1}隻)。";
+
+    /** メッセージ  大発:{0} (+{1}%) */
+    public static final String MESSAGE_TOTAL_DAIHATSU = "大発:{0} (+{1}%)";
+
     /** タイトルバーに表示するデフォルトテキスト */
     public static final String TITLEBAR_TEXT = "航海日誌拡張版 " + VERSION;
 }

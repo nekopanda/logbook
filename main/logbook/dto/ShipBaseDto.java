@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package logbook.dto;
 
@@ -249,6 +249,45 @@ public abstract class ShipBaseDto extends AbstractDto {
             }
         }
         return sakuteki;
+    }
+
+    /**
+     * /ドラム缶の合計を計算します
+     * @return ドラム缶の合計値
+     */
+    public int getDram() {
+        // ドラム缶合計
+        int dram = 0;
+        List<ItemDto> items = this.getItem();
+        for (int i = 0; i < 4; i++) {
+            ItemDto item = items.get(i);
+            if (item != null) {
+                if (item.getName().equals("ドラム缶(輸送用)")) {
+                    dram++;
+                }
+            }
+        }
+        return dram;
+    }
+
+    /**
+     * /大発の合計を計算します
+     * @return 大発の合計値
+     */
+    public int getDaihatsu() {
+        // 大発合計
+        int daihatsu = 0;
+        List<ItemDto> items = this.getItem();
+        int sakuteki = 0;
+        for (int i = 0; i < 4; i++) {
+            ItemDto item = items.get(i);
+            if (item != null) {
+                if (item.getName().equals("大発動艇")) {
+                    daihatsu++;
+                }
+            }
+        }
+        return daihatsu;
     }
 
     /**
