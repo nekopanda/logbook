@@ -129,7 +129,7 @@ public class ShipParameters {
     }
 
     /** 艦娘用 (現在値, MAX, 装備による上昇分) */
-    public static ShipParameters[] fromShip(JsonObject object, List<ItemDto> slotitem) {
+    public static ShipParameters[] fromShip(JsonObject object, List<ItemDto> slotitem, ShipInfoDto masterShip) {
         ShipParameters[] ret = new ShipParameters[3];
         for (int i = 0; i < 2; ++i) {
             ShipParameters param = new ShipParameters();
@@ -143,7 +143,7 @@ public class ShipParameters {
             param.leng = object.getInt("api_leng");
             param.raig = object.getJsonArray("api_raisou").getInt(i);
             param.tyku = object.getJsonArray("api_taiku").getInt(i);
-            param.soku = 0;
+            param.soku = masterShip.getParam().getSoku();
             param.souk = object.getJsonArray("api_soukou").getInt(i);
             param.kaih = object.getJsonArray("api_kaihi").getInt(i);
             param.tais = object.getJsonArray("api_taisen").getInt(i);

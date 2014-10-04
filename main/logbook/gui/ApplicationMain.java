@@ -1,5 +1,6 @@
 package logbook.gui;
 
+import java.awt.Desktop;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -800,6 +801,7 @@ public final class ApplicationMain extends WindowBase {
         print("ウィンドウ構築完了");
 
         this.startThread();
+        this.updateCheck();
     }
 
     @Override
@@ -920,11 +922,62 @@ public final class ApplicationMain extends WindowBase {
         ThreadManager.regist(new ThreadStateObserver(this.shell));
 
         ThreadManager.start();
+    }
 
+    private void updateCheck() {
         // アップデートチェックする
-        if (AppConfig.get().isUpdateCheck()) {
-            new AsyncExecUpdateCheck(this.shell).start();
-        }
+        final Display display = this.shell.getDisplay();
+        new AsyncExecUpdateCheck(new AsyncExecUpdateCheck.UpdateResult() {
+
+            @Override
+            public void onSuccess(final String[] okversions) {
+                boolean ok = false;
+                for (String okversion : okversions) {
+                    if (AppConstants.VERSION.equals(okversion)) {
+                        ok = true;
+                        break;
+                    }
+                }
+
+                if ((ok == false) && AppConfig.get().isUpdateCheck()) {
+                    display.asyncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (ApplicationMain.this.shell.isDisposed()) {
+                                // ウインドウが閉じられていたらなにもしない
+                                return;
+                            }
+
+                            MessageBox box = new MessageBox(ApplicationMain.this.shell, SWT.YES | SWT.NO
+                                    | SWT.ICON_QUESTION);
+                            box.setText("新しいバージョン");
+                            box.setMessage("新しいバージョンがあります。ホームページを開きますか？\r\n"
+                                    + "現在のバージョン:" + AppConstants.VERSION + "\r\n"
+                                    + "新しいバージョン:" + okversions[0] + "\r\n"
+                                    + "※自動アップデートチェックは[その他]-[設定]からOFFに出来ます");
+
+                            // OKを押されたらホームページへ移動する
+                            if (box.open() == SWT.YES) {
+                                try {
+                                    Desktop.getDesktop().browse(AppConstants.HOME_PAGE_URI);
+                                } catch (Exception e) {
+                                    LOG.warn("ウェブサイトに移動が失敗しました", e);
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+                // チェックしなくてもいい設定の場合はエラーを無視する
+                if (AppConfig.get().isUpdateCheck()) {
+                    // アップデートチェック失敗はクラス名のみ
+                    LOG.info(e.getClass().getName() + "が原因でアップデートチェックに失敗しました");
+                }
+            }
+        }).start();
     }
 
     @Override

@@ -44,7 +44,7 @@ public class SakutekiString implements Comparable<SakutekiString> {
         int[] onslot = ship.getOnSlot();
         // 装備込の索敵値計
         this.totalSakuteki += ship.getSakuteki();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < items.size(); i++) {
             ItemDto item = items.get(i);
             if (item != null) {
                 // 装備の索敵値

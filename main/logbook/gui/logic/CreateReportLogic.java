@@ -505,7 +505,7 @@ public final class CreateReportLogic {
                 fleet = String.valueOf(ship.getFleetid()) + "-" + String.valueOf(ship.getFleetpos() + 1);
             }
 
-            String now = "";
+            String now = null;
             if (missionSet.contains(ship.getId())) {
                 now = "遠征中";
             }
