@@ -60,9 +60,6 @@ public final class AppConfigBean {
     /** アップデートチェック */
     private boolean updateCheck = true;
 
-    /** 最新バージョン */
-    private String latestVersion = null;
-
     /** 終了時に確認する */
     private boolean checkDoit = true;
 
@@ -424,20 +421,6 @@ public final class AppConfigBean {
      */
     public void setUpdateCheck(boolean checkUpdate) {
         this.updateCheck = checkUpdate;
-    }
-
-    /**
-     * @return latestVersion
-     */
-    public String getLatestVersion() {
-        return this.latestVersion;
-    }
-
-    /**
-     * @param latestVersion セットする latestVersion
-     */
-    public void setLatestVersion(String latestVersion) {
-        this.latestVersion = latestVersion;
     }
 
     /**
