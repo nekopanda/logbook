@@ -37,7 +37,7 @@ public final class AppConfigBean {
     private float soundLevel = 0.85f;
 
     /** 透明度 */
-    private int alpha = 255;
+    //private int alpha = 255;
 
     /** 遠征のリマインド */
     private boolean missionRemind = true;
@@ -58,7 +58,7 @@ public final class AppConfigBean {
     private int materialLogInterval = 600;
 
     /** アップデートチェック */
-    private boolean checkUpdate = true;
+    private boolean updateCheck = true;
 
     /** 終了時に確認する */
     private boolean checkDoit = true;
@@ -174,6 +174,9 @@ public final class AppConfigBean {
 
     /** 保存したJSONを読み込ませてテストするためのウィンドウメニューを表示するかどうか */
     private boolean enableTestWindow = false;
+
+    /** 縮小表示の時は他のウィンドウを閉じる */
+    private boolean closeWhenMinimized = true;
 
     /**
      * ポート番号を取得します。
@@ -291,17 +294,17 @@ public final class AppConfigBean {
      * 透明度を取得します。
      * @return 透明度
      */
-    public int getAlpha() {
-        return this.alpha;
-    }
+    //public int getAlpha() {
+    //    return this.alpha;
+    //}
 
     /**
      * 透明度を設定します。
      * @param alpha 透明度
      */
-    public void setAlpha(int alpha) {
-        this.alpha = alpha;
-    }
+    //public void setAlpha(int alpha) {
+    //    this.alpha = alpha;
+    //}
 
     /**
      * 遠征のリマインドを取得します。
@@ -401,16 +404,16 @@ public final class AppConfigBean {
      * アップデートチェックを取得します。
      * @return アップデートチェック
      */
-    public boolean isCheckUpdate() {
-        return this.checkUpdate;
+    public boolean isUpdateCheck() {
+        return this.updateCheck;
     }
 
     /**
      * アップデートチェックを設定します。
      * @param checkUpdate アップデートチェック
      */
-    public void setCheckUpdate(boolean checkUpdate) {
-        this.checkUpdate = checkUpdate;
+    public void setUpdateCheck(boolean checkUpdate) {
+        this.updateCheck = checkUpdate;
     }
 
     /**
@@ -989,5 +992,19 @@ public final class AppConfigBean {
      */
     public void setEnableTestWindow(boolean enableTestWindow) {
         this.enableTestWindow = enableTestWindow;
+    }
+
+    /**
+     * @return closeWhenMinimized
+     */
+    public boolean isCloseWhenMinimized() {
+        return this.closeWhenMinimized;
+    }
+
+    /**
+     * @param closeWhenMinimized セットする closeWhenMinimized
+     */
+    public void setCloseWhenMinimized(boolean closeWhenMinimized) {
+        this.closeWhenMinimized = closeWhenMinimized;
     }
 }

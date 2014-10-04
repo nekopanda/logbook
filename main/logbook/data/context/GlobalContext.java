@@ -9,7 +9,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -52,6 +51,7 @@ import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
 import logbook.gui.ApplicationMain;
 import logbook.gui.logic.CreateReportLogic;
+import logbook.gui.logic.Sound;
 import logbook.internal.BattleResultServer;
 import logbook.internal.EnemyData;
 import logbook.internal.Item;
@@ -62,6 +62,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.ToolTip;
 
 /**
  * 遠征・入渠などの情報を管理します
@@ -526,11 +528,11 @@ public final class GlobalContext {
             break;
         // 演習
         case PRACTICE_BATTLE:
-            doBattle(data, BattlePhaseKind.BATTLE);
+            doBattle(data, BattlePhaseKind.PRACTICE_BATTLE);
             break;
         // 演習
         case PRACTICE_BATTLE_MIDNIGHT:
-            doBattle(data, BattlePhaseKind.MIDNIGHT);
+            doBattle(data, BattlePhaseKind.PRACTICE_MIDNIGHT);
             break;
         // 演習結果
         case PRACTICE_BATTLE_RESULT:
@@ -746,7 +748,7 @@ public final class GlobalContext {
                 Arrays.fill(isSortie, false);
 
                 // 戦闘結果がある場合、ダメージ計算があっているか検証します
-                if ((battle != null) && (battle.getDock() != null)) {
+                if ((battle != null) && (battle.getDock() != null) && (battle.isPractice() == false)) {
                     checkBattleDamage(battle.getFriends().get(0).getShips(), battle.getLastPhase().getNowFriendHp());
                     if (battle.isCombined()) {
                         checkBattleDamage(battle.getFriends().get(1).getShips(),
@@ -782,32 +784,6 @@ public final class GlobalContext {
                 doNdockSub(apiNdock);
                 //addConsole("入渠情報を更新しました");
 
-                // 遠征の状態を更新する
-                deckMissions = new DeckMissionDto[] { DeckMissionDto.EMPTY, DeckMissionDto.EMPTY, DeckMissionDto.EMPTY };
-                for (int i = 1; i < apiDeckPort.size(); i++) {
-                    JsonObject object = (JsonObject) apiDeckPort.get(i);
-                    String name = object.getString("api_name");
-                    JsonArray jmission = object.getJsonArray("api_mission");
-
-                    int section = ((JsonNumber) jmission.get(1)).intValue();
-                    long milis = ((JsonNumber) jmission.get(2)).longValue();
-                    int fleetid = object.getInt("api_id");
-
-                    Set<Integer> ships = new LinkedHashSet<Integer>();
-                    JsonArray shiparray = object.getJsonArray("api_ship");
-                    for (JsonValue jsonValue : shiparray) {
-                        int shipid = ((JsonNumber) jsonValue).intValue();
-                        if (shipid != -1) {
-                            ships.add(shipid);
-                        }
-                    }
-
-                    Date time = null;
-                    if (milis > 0) {
-                        time = new Date(milis);
-                    }
-                    deckMissions[i - 1] = new DeckMissionDto(name, section, time, fleetid, ships);
-                }
                 //addConsole("遠征情報を更新しました");
 
                 // 連合艦隊を更新する
@@ -866,24 +842,22 @@ public final class GlobalContext {
                 return;
             }
 
-            for (int i = 0; i < ships.size(); ++i) {
-                checkShipSunk(ships.get(i), nowFriendHp[i], sunkShips);
-            }
-            if (battle.isCombined()) {
-                List<ShipDto> shipsCombined = battle.getFriends().get(1).getShips();
-                int[] nowFriendHpCombined = phase.getNowFriendHpCombined();
-                for (int i = 0; i < shipsCombined.size(); ++i) {
-                    checkShipSunk(shipsCombined.get(i), nowFriendHpCombined[i], sunkShips);
+            if ((phaseKind != BattlePhaseKind.PRACTICE_BATTLE) &&
+                    (phaseKind != BattlePhaseKind.PRACTICE_MIDNIGHT))
+            { // 演習ではやらない
+                for (int i = 0; i < ships.size(); ++i) {
+                    checkShipSunk(ships.get(i), nowFriendHp[i], sunkShips);
+                }
+                if (battle.isCombined()) {
+                    List<ShipDto> shipsCombined = battle.getFriends().get(1).getShips();
+                    int[] nowFriendHpCombined = phase.getNowFriendHpCombined();
+                    for (int i = 0; i < shipsCombined.size(); ++i) {
+                        checkShipSunk(shipsCombined.get(i), nowFriendHpCombined[i], sunkShips);
+                    }
                 }
             }
 
             addConsole("海戦情報を更新しました");
-            addConsole("自=" + Arrays.toString(phase.getNowFriendHp()));
-            if (battle.isCombined()) {
-                addConsole("連=" + Arrays.toString(phase.getNowFriendHpCombined()));
-            }
-            addConsole("敵=" + Arrays.toString(phase.getNowEnemyHp()));
-            addConsole("→ " + phase.getEstimatedRank().toString());
             for (ShipDto ship : sunkShips) {
                 addConsole(ship.getName() + "(id:" + ship.getId() + ",lv:" + ship.getLv() + ") 轟沈しました！");
             }
@@ -1222,7 +1196,7 @@ public final class GlobalContext {
             }
 
             // 戦闘結果がある場合、ダメージ計算があっているか検証します
-            if ((battle != null) && (battle.getDock() != null)) {
+            if ((battle != null) && (battle.getDock() != null) && (battle.isPractice() == false)) {
                 checkBattleDamage(battle.getDock().getShips(), battle.getNowFriendHp());
                 if (battle.isCombined()) {
                     checkBattleDamage(battle.getDockCombined().getShips(), battle.getNowFriendHpCombined());
@@ -1268,7 +1242,7 @@ public final class GlobalContext {
     }
 
     /**
-     * 艦隊を設定します
+     * 艦隊と遠征の状態を更新します
      * 
      * @param apidata
      */
@@ -1276,16 +1250,20 @@ public final class GlobalContext {
         dock.clear();
         for (int i = 0; i < apidata.size(); i++) {
             JsonObject jsonObject = (JsonObject) apidata.get(i);
-            String fleetid = String.valueOf(jsonObject.getInt("api_id"));
+            int fleetid = jsonObject.getInt("api_id");
+            String fleetidstr = String.valueOf(fleetid);
             String name = jsonObject.getString("api_name");
             JsonArray apiship = jsonObject.getJsonArray("api_ship");
 
-            DockDto dockdto = new DockDto(fleetid, name);
-            dock.put(fleetid, dockdto);
+            DockDto dockdto = new DockDto(fleetidstr, name);
+            List<Integer> shipIds = new ArrayList<Integer>();
+            dock.put(fleetidstr, dockdto);
 
             for (int j = 0; j < apiship.size(); j++) {
-                ShipDto ship = shipMap.get(apiship.getInt(j));
+                int shipId = apiship.getInt(j);
+                shipIds.add(shipId);
 
+                ShipDto ship = shipMap.get(shipId);
                 if (ship != null) {
                     dockdto.addShip(ship);
 
@@ -1293,9 +1271,20 @@ public final class GlobalContext {
                         setSecretary(ship);
                     }
                     // 艦隊IDを設定
-                    ship.setFleetid(fleetid);
+                    ship.setFleetid(fleetidstr);
                     ship.setFleetpos(j);
                 }
+            }
+
+            if (i >= 1) {
+                JsonArray jmission = jsonObject.getJsonArray("api_mission");
+                int section = ((JsonNumber) jmission.get(1)).intValue();
+                long milis = ((JsonNumber) jmission.get(2)).longValue();
+                Date time = null;
+                if (milis > 0) {
+                    time = new Date(milis);
+                }
+                deckMissions[i - 1] = new DeckMissionDto(name, section, time, fleetid, shipIds);
             }
         }
     }
@@ -1736,7 +1725,6 @@ public final class GlobalContext {
             ApplicationMain.main.updateMapCell(mapCellDto);
 
             addConsole("出撃を更新しました");
-            addConsole("行先 " + mapCellDto.toString());
         } catch (Exception e) {
             LOG.warn("出撃を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1754,7 +1742,6 @@ public final class GlobalContext {
 
             mapCellDto = new MapCellDto(obj);
             ApplicationMain.main.updateMapCell(mapCellDto);
-            addConsole("行先 " + mapCellDto.toString());
         } catch (Exception e) {
             LOG.warn("進撃を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1809,6 +1796,19 @@ public final class GlobalContext {
             JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
             if (apidata != null) {
                 MasterData.updateMapInfo(apidata);
+            }
+            // 艦娘の空き枠が少ない時はバルーンを出す
+            if (AppConfig.get().isUseTaskbarNotify()) {
+                int aki = maxChara - shipMap.size();
+                if (aki <= AppConfig.get().getNotifyFully()) {
+                    ToolTip tip = new ToolTip(ApplicationMain.main.getShell(), SWT.BALLOON
+                            | SWT.ICON_ERROR);
+                    tip.setText("母港の空き警告");
+                    tip.setMessage("母港の空きがあと" + aki + "隻分しかありません");
+                    ApplicationMain.main.getTrayItem().setToolTip(tip);
+                    tip.setVisible(true);
+                    Sound.randomWarningPlay();
+                }
             }
         } catch (Exception e) {
             LOG.warn("マップ情報更新に失敗しました", e);

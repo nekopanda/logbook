@@ -271,6 +271,25 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 名前:装備1,装備2,...
+     * @return
+     */
+    public String getDetailedString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.getFriendlyName()).append(": ");
+        int idx = 0;
+        for (ItemDto item : this.getItem()) {
+            if (item != null) {
+                if (idx++ > 0) {
+                    sb.append(", ");
+                }
+                sb.append(item.getName());
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
      * @return 火力
      */
     public int getKaryoku() {

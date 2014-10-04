@@ -95,6 +95,7 @@ public class BattleAtackDto {
             JsonArray rai_list, JsonArray dam_list, JsonArray ydam_list) {
         int[] originMap = new int[6];
         int[] targetMap = new int[6];
+        boolean[] targetEnabled = new boolean[6];
         BattleAtackDto dto = new BattleAtackDto();
         dto.kind = AtackKind.RAIGEKI;
         dto.friendAtack = friendAtack;
@@ -104,7 +105,7 @@ public class BattleAtackDto {
             int rai = rai_list.getInt(i + 1);
             if (rai > 0) {
                 originMap[i] = idx++;
-                targetMap[rai - 1] = 1;
+                targetEnabled[rai - 1] = true;
             }
         }
         dto.origin = new int[idx];
@@ -113,9 +114,9 @@ public class BattleAtackDto {
 
         idx = 0;
         for (int i = 0; i < 6; ++i) {
-            int tmp = targetMap[i];
-            targetMap[i] = idx;
-            idx += tmp;
+            if (targetEnabled[i]) {
+                targetMap[i] = idx++;
+            }
         }
         dto.target = new int[idx];
         dto.damage = new int[idx];
@@ -129,7 +130,7 @@ public class BattleAtackDto {
                 dto.ydam[originMap[i]] = ydam;
                 dto.ot[originMap[i]] = targetMap[rai - 1];
             }
-            if (dam > 0) {
+            if (targetEnabled[i]) {
                 dto.target[targetMap[i]] = i;
                 dto.damage[targetMap[i]] = dam;
             }

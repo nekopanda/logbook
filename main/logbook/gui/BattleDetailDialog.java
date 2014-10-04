@@ -16,10 +16,10 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class BattleDetailDialog extends WindowBase {
 
-    private final WindowBase parent;
+    private final Shell parent;
     private Browser browser;
 
-    public BattleDetailDialog(WindowBase parent) {
+    public BattleDetailDialog(Shell parent) {
         this.parent = parent;
     }
 

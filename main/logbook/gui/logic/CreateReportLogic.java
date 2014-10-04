@@ -128,6 +128,9 @@ public final class CreateReportLogic {
             }
 
             item.setText(toStringArray(text));
+
+            // TODO:
+
             return item;
         }
     };
@@ -141,7 +144,8 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getBattleResultHeader() {
-        return new String[] { "", "日付", "海域", "マス", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘", "大破艦" };
+        return new String[] { "", "日付", "海域", "マス", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘",
+                "大破艦", "旗艦", "旗艦(第二艦隊)", "MVP", "MVP(第二艦隊)" };
     }
 
     /**
@@ -158,7 +162,9 @@ public final class CreateReportLogic {
                     new TableRowHeader(i + 1, item),
                     new DateTimeString(item.getBattleDate()), item.getQuestName(),
                     item.getMapCell(), item.getRank(), item.getEnemyName(), item.getDropType(),
-                    item.getDropName(), item.isHasTaiha() ? "あり" : "" });
+                    item.getDropName(), item.isHasTaiha() ? "あり" : "",
+                    item.getFlagShip(), item.getFlagShipCombined(),
+                    item.getMvp(), item.getMvpCombined() });
         }
         return body;
     }
@@ -894,7 +900,7 @@ public final class CreateReportLogic {
                 IOUtils.write(StringUtils.join(header, ',') + "\r\n", stream, AppConstants.CHARSET);
             }
             for (Comparable[] colums : body) {
-                IOUtils.write(StringUtils.join(colums.toString(), ',') + "\r\n", stream, AppConstants.CHARSET);
+                IOUtils.write(StringUtils.join(toStringArray(colums), ',') + "\r\n", stream, AppConstants.CHARSET);
             }
         } finally {
             stream.close();

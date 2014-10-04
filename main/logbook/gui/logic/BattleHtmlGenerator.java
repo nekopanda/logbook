@@ -18,7 +18,6 @@ import logbook.dto.BattleResultDto;
 import logbook.dto.ItemDto;
 import logbook.dto.ShipBaseDto;
 import logbook.dto.ShipDto;
-import logbook.internal.Item;
 
 /**
  * @author Nekopanda
@@ -143,7 +142,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.begin("tr", null);
 
         this.inline("th", "", null);
-        this.inline("th", "名前", null);
+        this.inline("th", "艦名", null);
         this.inline("th", "cond.", null);
         this.inline("th", "制空", null);
         this.inline("th", "索敵", null);
@@ -169,7 +168,6 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.end(); // tr
 
         int totalSeiku = 0;
-        double totalSakuteki = 0;
         int totalNowHp = 0;
         int totalMaxHp = 0;
 
@@ -181,7 +179,6 @@ public class BattleHtmlGenerator extends HTMLGenerator {
             int maxhp = hp[1][i];
 
             totalSeiku += seiku;
-            totalSakuteki += sakuteki.getValue();
             totalNowHp += nowhp;
             totalMaxHp += maxhp;
 
@@ -229,11 +226,12 @@ public class BattleHtmlGenerator extends HTMLGenerator {
 
         this.begin("tr", null);
 
+        SakutekiString totalSakuteki = new SakutekiString(ships);
         this.inline("td", "", null);
         this.inline("td", "合計", null);
         this.inline("td", "", null);
         this.inline("td", String.valueOf(totalSeiku), null);
-        this.inline("td", String.format("%.1f", totalSakuteki), null);
+        this.inline("td", totalSakuteki.toString(), null);
         this.inline("td", totalNowHp + "/" + totalMaxHp, null);
 
         for (int i = 0; i < numPhases; ++i) {
@@ -265,22 +263,21 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.begin("div", BOX_CLASS);
         this.begin("table", SLOTITEM_TABLE_CLASS[ci]);
 
-        List<List<ItemDto>> itemList = new ArrayList<>();
         this.begin("tr", null);
-        for (int i = 0; i < ships.size(); ++i) {
-            SHIP ship = ships.get(i);
-            this.inline("th", getColSpan(2), String.valueOf(i + 1) + "." + ship.getFriendlyName(), null);
-            itemList.add(ship.getItem());
+        this.inline("th", "艦名", null);
+        for (int c = 0; c < 5; ++c) {
+            this.inline("th", getColSpan(2), "装備" + (c + 1), null);
         }
         this.end(); // tr
 
-        for (int c = 0; c < 5; ++c) {
+        for (int i = 0; i < ships.size(); ++i) {
             this.begin("tr", null);
-            for (int i = 0; i < ships.size(); ++i) {
-                SHIP ship = ships.get(i);
-                List<ItemDto> items = itemList.get(i);
+            SHIP ship = ships.get(i);
+            this.inline("td", String.valueOf(i + 1) + "." + ship.getFriendlyName(), null);
+            List<ItemDto> items = ship.getItem();
+            for (int c = 0; c < 5; ++c) {
                 String onSlot = "";
-                String itemName = String.valueOf(c + 1) + ". ";
+                String itemName = "";
                 int[] onSlots = ship.getOnSlot(); // 現在の艦載機搭載数
                 int[] maxeq = ship.getShipInfo().getMaxeq(); // 艦載機最大搭載数
                 if (c < items.size()) {
@@ -334,54 +331,6 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.inline("td", eSakuteki, null);
         this.end(); // tr
         this.end(); // table
-    }
-
-    /**
-     * 艦載機ロスト表示を生成
-     * @param stage
-     * @return
-     */
-    private static String[] getNumPlaneString(int[] stage) {
-        if (stage == null) {
-            return new String[] { "", "" };
-        }
-        int flost = stage[0];
-        int fall = stage[1];
-        int elost = stage[2];
-        int eall = stage[3];
-        int fremain = fall - flost;
-        int eremain = eall - elost;
-        return new String[] {
-                String.valueOf(fall) + "→" + fremain + " (-" + flost + ")",
-                String.valueOf(eall) + "→" + eremain + " (-" + elost + ")"
-        };
-    }
-
-    /**
-     * 触接表示を生成
-     * @param touchPlane
-     * @return
-     */
-    private static String[] getTouchPlane(int[] touchPlane) {
-        if (touchPlane == null) {
-            return new String[] { "", "" };
-        }
-        String[] ret = new String[2];
-        for (int i = 0; i < 2; ++i) {
-            if (touchPlane[i] == -1) {
-                ret[i] = "なし";
-            }
-            else {
-                ItemDto item = Item.get(touchPlane[i]);
-                if (item != null) {
-                    ret[i] = item.getName();
-                }
-                else {
-                    ret[i] = "あり（機体不明）";
-                }
-            }
-        }
-        return ret;
     }
 
     private static <T> void copyToOffset(List<? extends T> src, T[] array, int offset) {
@@ -468,6 +417,12 @@ public class BattleHtmlGenerator extends HTMLGenerator {
     private void genAtackTableContent(BattleAtackDto atack,
             ShipBaseDto[] originShips, ShipBaseDto[] targetShips)
     {
+        if (atack.origin.length == 0) {
+            this.begin("tr", null);
+            this.inline("td", "なし", null);
+            this.end(); // tr
+            return;
+        }
         int ci = (atack.friendAtack) ? 0 : 1;
 
         this.begin("tr", null);
@@ -569,9 +524,9 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         }
 
         this.inline("h3", title, AIR_TABLE_CLASS);
-        String[] stage1 = getNumPlaneString(air.stage1);
-        String[] stage2 = getNumPlaneString(air.stage2);
-        String[] touch = getTouchPlane(air.touchPlane);
+        String[] stage1 = air.getStage1DetailedString();
+        String[] stage2 = air.getStage2DetailedString();
+        String[] touch = air.getTouchPlane();
         this.begin("table", null);
         this.begin("tr", null);
         this.inline("th", getRowSpan(2), "", null);
@@ -873,8 +828,8 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.inline("td", detail.getRank().toString(), null);
         this.end(); // tr
 
-        String mvp1 = (result.getMvp() == null) ? "なし" : result.getMvp().getFriendlyName();
-        String mvp2 = (result.getMvpCombined() == null) ? "なし" : result.getMvpCombined().getFriendlyName();
+        String mvp1 = (result.getMvp() == null) ? "なし" : result.getMvp();
+        String mvp2 = (result.getMvpCombined() == null) ? "なし" : result.getMvpCombined();
 
         if (detail.isCombined()) {
             this.begin("tr", null);

@@ -13,14 +13,14 @@ import org.eclipse.swt.graphics.RGB;
 public class AppConstants {
 
     /** バージョン */
-    public static final String VERSION = "1.0.0 beta";
+    public static final String VERSION = "1.0.0";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://nekopanda.blog.jp/");
 
     /** アップデートチェック先 */
     public static final URI UPDATE_CHECK_URI = URI
-            .create("https://googledrive.com/host/0B83tioTzFacPdnlSRW5vcEVFUFk/checkversion.txt");
+            .create("https://googledrive.com/host/0B83tioTzFacPdnlSRW5vcEVFUFk/okversions.txt");
 
     /** 日付書式 */
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -32,13 +32,16 @@ public class AppConstants {
     public static final String BATTLE_LOGFILE_DATE_FORMAT = "yyyy-MM-dd";
 
     /** 疲労赤色 */
-    public static final int COND_RED = 19;
+    public static final int COND_RED = 20;
 
     /** 疲労オレンジ色 */
-    public static final int COND_ORANGE = 29;
+    public static final int COND_ORANGE = 30;
 
     /** 疲労緑色 */
     public static final int COND_GREEN = 50;
+
+    /** 疲労緑色 */
+    public static final int COND_YELLOW = 75;
 
     /** 遠征色 */
     public static final RGB MISSION_COLOR = new RGB(102, 51, 255);
@@ -54,6 +57,21 @@ public class AppConstants {
 
     /** 疲労緑色 */
     public static final RGB COND_GREEN_COLOR = new RGB(0, 128, 0);
+
+    /** 疲労緑色 */
+    public static final RGB COND_YELLOW_COLOR = new RGB(190, 255, 61);
+
+    /** 疲労緑色 */
+    public static final RGB COND_U75_COLOR = new RGB(171, 249, 204);
+
+    /** 小破の色 */
+    public static final RGB SYOHA_SHIP_COLOR = new RGB(210, 255, 0);
+
+    /** 轟沈の色 */
+    public static final RGB SUNK_SHIP_COLOR = new RGB(77, 166, 223);
+
+    /** 敗北の色 */
+    public static final RGB LOSE_BATTLE_COLOR = new RGB(230, 10, 20);
 
     /** 5分前 */
     public static final RGB TIME_IN_5_MIN = new RGB(255, 215, 0);

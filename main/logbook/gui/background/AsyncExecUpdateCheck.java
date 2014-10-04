@@ -36,9 +36,18 @@ public final class AsyncExecUpdateCheck extends Thread {
     @Override
     public void run() {
         try {
-            final String newversion = IOUtils.toString(AppConstants.UPDATE_CHECK_URI, Charset.forName("UTF-8"));
+            final String[] okversions = IOUtils.toString(AppConstants.UPDATE_CHECK_URI, Charset.forName("UTF-8"))
+                    .split(";");
 
-            if (!AppConstants.VERSION.equals(newversion)) {
+            boolean ok = false;
+            for (String okversion : okversions) {
+                if (AppConstants.VERSION.equals(okversion)) {
+                    ok = true;
+                    break;
+                }
+            }
+
+            if (ok == false) {
                 Display.getDefault().asyncExec(new Runnable() {
                     @Override
                     public void run() {
@@ -54,7 +63,7 @@ public final class AsyncExecUpdateCheck extends Thread {
                         box.setText("新しいバージョン");
                         box.setMessage("新しいバージョンがあります。ホームページを開きますか？\r\n"
                                 + "現在のバージョン:" + AppConstants.VERSION + "\r\n"
-                                + "新しいバージョン:" + newversion + "\r\n"
+                                + "新しいバージョン:" + okversions[0] + "\r\n"
                                 + "※自動アップデートチェックは[その他]-[設定]からOFFに出来ます");
 
                         // OKを押されたらホームページへ移動する

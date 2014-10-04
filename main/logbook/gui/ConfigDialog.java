@@ -153,6 +153,7 @@ public final class ConfigDialog extends Dialog {
         soundlevel.setText(Integer.toString((int) (AppConfig.get().getSoundLevel() * 100)));
         new Label(compositeSystem, SWT.NONE);
 
+        /*
         Label label7 = new Label(compositeSystem, SWT.NONE);
         label7.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
         label7.setText("透明度*");
@@ -163,6 +164,7 @@ public final class ConfigDialog extends Dialog {
         alpha.setLayoutData(gdAlpha);
         alpha.setText(Integer.toString(AppConfig.get().getAlpha()));
         new Label(compositeSystem, SWT.NONE);
+        */
 
         Label label8 = new Label(compositeSystem, SWT.NONE);
         label8.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -208,6 +210,11 @@ public final class ConfigDialog extends Dialog {
         hidewindow.setText("最小化時にタスクトレイに格納");
         hidewindow.setSelection(AppConfig.get().isHideWindow());
 
+        final Button closewindow = new Button(compositeSystem, SWT.CHECK);
+        closewindow.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        closewindow.setText("縮小表示の時は開いているウィンドウを閉じる");
+        closewindow.setSelection(AppConfig.get().isCloseWhenMinimized());
+
         final Button ontop;
         if (WindowBase.nativeService.isTopMostAvailable() == false) { // 右クリックから設定できる場合は表示しない
             ontop = new Button(compositeSystem, SWT.CHECK);
@@ -222,7 +229,7 @@ public final class ConfigDialog extends Dialog {
         final Button checkUpdate = new Button(compositeSystem, SWT.CHECK);
         checkUpdate.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
         checkUpdate.setText("起動時にアップデートチェック*");
-        checkUpdate.setSelection(AppConfig.get().isCheckUpdate());
+        checkUpdate.setSelection(AppConfig.get().isUpdateCheck());
 
         final Button checkDoit = new Button(compositeSystem, SWT.CHECK);
         checkDoit.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
@@ -695,6 +702,7 @@ public final class ConfigDialog extends Dialog {
                     AppConfig.get().setListenPort(Integer.parseInt(listenport.getText()));
                 }
                 AppConfig.get().setHideWindow(hidewindow.getSelection());
+                AppConfig.get().setCloseWhenMinimized(closewindow.getSelection());
                 if (ontop != null) {
                     AppConfig.get().setOnTop(ontop.getSelection());
                 }
@@ -704,12 +712,14 @@ public final class ConfigDialog extends Dialog {
                     float level = (float) Integer.parseInt(soundlevel.getText()) / 100;
                     AppConfig.get().setSoundLevel(level);
                 }
+                /*
                 if (StringUtils.isNumeric(alpha.getText())) {
                     AppConfig.get().setAlpha(Integer.parseInt(alpha.getText()));
                 }
+                */
                 AppConfig.get().setReportPath(reportDir.getText());
                 AppConfig.get().setMaterialLogInterval(materialintervalSpinner.getSelection());
-                AppConfig.get().setCheckUpdate(checkUpdate.getSelection());
+                AppConfig.get().setUpdateCheck(checkUpdate.getSelection());
                 AppConfig.get().setAllowOnlyFromLocalhost(onlyFromLocalhost.getSelection());
                 // fleettab
                 AppConfig.get().setDisplayCount(displaycount.getSelection());

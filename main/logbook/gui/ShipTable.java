@@ -15,10 +15,14 @@ import logbook.gui.logic.TableItemCreator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
@@ -111,6 +115,33 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
         this.addGroupCascade.setText("選択した艦娘をグループに追加(&A)");
         this.removeGroupCascade = new MenuItem(this.tablemenu, SWT.CASCADE);
         this.removeGroupCascade.setText("選択した艦娘をグループから除去(&D)");
+
+        MenuItem idCopy = new MenuItem(this.tablemenu, SWT.NONE);
+        idCopy.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                StringBuilder sb = new StringBuilder();
+                for (TableItem item : ShipTable.this.table.getSelection()) {
+                    sb.append(String.valueOf(((ShipDto) item.getData()).getId())).append(", ");
+                }
+                Clipboard clipboard = new Clipboard(Display.getDefault());
+                clipboard.setContents(new Object[] { sb.toString() }, new Transfer[] { TextTransfer.getInstance() });
+            }
+        });
+        idCopy.setText("艦娘個人IDをコピー(&1)");
+        MenuItem shipCopy = new MenuItem(this.tablemenu, SWT.NONE);
+        shipCopy.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                StringBuilder sb = new StringBuilder();
+                for (TableItem item : ShipTable.this.table.getSelection()) {
+                    sb.append("\"").append(((ShipDto) item.getData()).getName()).append("\", ");
+                }
+                Clipboard clipboard = new Clipboard(Display.getDefault());
+                clipboard.setContents(new Object[] { sb.toString() }, new Transfer[] { TextTransfer.getInstance() });
+            }
+        });
+        shipCopy.setText("艦娘の名前をコピー(&2)");
 
         // フィルタを復元
         ShipFilterDto[] shipFilters = AppConfig.get().getShipFilters();

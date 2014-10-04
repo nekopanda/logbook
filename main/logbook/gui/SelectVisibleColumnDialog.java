@@ -90,11 +90,12 @@ public final class SelectVisibleColumnDialog extends WindowBase {
         @Override
         public void shellClosed(ShellEvent e) {
             TreeItem[] items = this.tree.getItems();
-            boolean[] visibles = this.dialog.getConfig().getVisibleColumn();
+            boolean[] visibles = new boolean[items.length + 1];
+            visibles[0] = true;
             for (int i = 0; i < items.length; i++) {
                 visibles[i + 1] = items[i].getChecked();
             }
-            this.dialog.reloadTable();
+            this.dialog.setColumnVisible(visibles);
         }
     }
 }

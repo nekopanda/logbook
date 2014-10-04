@@ -1,7 +1,7 @@
 package logbook.dto;
 
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 import logbook.internal.Deck;
 
@@ -29,7 +29,7 @@ public final class DeckMissionDto extends AbstractDto {
     private final int fleetid;
 
     /** 艦娘 */
-    private final Set<Integer> ships;
+    private final List<Integer> ships;
 
     /**
      * コンストラクター
@@ -46,7 +46,7 @@ public final class DeckMissionDto extends AbstractDto {
     /**
      * コンストラクター
      */
-    public DeckMissionDto(String name, int missionId, Date time, int fleetid, Set<Integer> ships) {
+    public DeckMissionDto(String name, int missionId, Date time, int fleetid, List<Integer> ships) {
         this.name = name;
         this.missionId = missionId;
         this.mission = Deck.get(missionId);
@@ -93,7 +93,7 @@ public final class DeckMissionDto extends AbstractDto {
     /**
      * @return 艦娘
      */
-    public Set<Integer> getShips() {
+    public List<Integer> getShips() {
         return this.ships;
     }
 }

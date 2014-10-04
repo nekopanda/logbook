@@ -32,6 +32,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -92,6 +93,11 @@ public final class CalcExpDialog extends WindowBase {
         this.registerEvents();
         this.setWindowInitialized(true);
         this.setVisible(true);
+    }
+
+    @Override
+    protected boolean moveWithDrag() {
+        return true;
     }
 
     /**
@@ -233,6 +239,13 @@ public final class CalcExpDialog extends WindowBase {
         this.evalcombo.addSelectionListener(new UpdateListener());
         this.flagbtn.addSelectionListener(new UpdateListener());
         this.mvpbtn.addSelectionListener(new UpdateListener());
+
+        // 選択する項目はドラックで移動できないようにする
+        for (Control c : new Control[] { this.shipcombo, reload, this.beforexp, this.afterexp, this.getexp,
+                this.needexp, this.beforelv, this.afterlv, this.seacombo, this.evalcombo, this.flagbtn,
+                this.mvpbtn }) {
+            c.setData("disable-drag-move", true);
+        }
 
         this.shell.pack();
         this.setShipComboData();

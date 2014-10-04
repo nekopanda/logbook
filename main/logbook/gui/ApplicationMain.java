@@ -155,6 +155,8 @@ public final class ApplicationMain extends WindowBase {
     private CalcExpDialog calcExpWindow;
     /** グループエディター */
     private ShipFilterGroupDialog shipFilterGroupWindow;
+    /** ツール */
+    private LauncherWindow launcherWindow;
 
     /** コマンドボタン */
     private Composite commandComposite;
@@ -262,6 +264,11 @@ public final class ApplicationMain extends WindowBase {
         this.trayItem.dispose();
     }
 
+    @Override
+    protected boolean moveWithDrag() {
+        return true;
+    }
+
     /**
      * 画面レイアウトを作成します
      */
@@ -296,6 +303,13 @@ public final class ApplicationMain extends WindowBase {
                         e.doit = false;
                     }
                 }
+
+                if (e.doit) {
+                    // 他のウィンドウを閉じる
+                    for (WindowBase win : ApplicationMain.this.getWindowList()) {
+                        win.dispose();
+                    }
+                }
             }
 
             @Override
@@ -305,7 +319,8 @@ public final class ApplicationMain extends WindowBase {
                     Set<WindowBase> windows = getActivatedWindows();
                     WindowBase[] windowArray = windows.toArray(new WindowBase[windows.size()]);
                     for (int i = windowArray.length - 1; i >= 0; --i) {
-                        if (windowArray[i] != ApplicationMain.this) {
+                        WindowBase win = windowArray[i];
+                        if (win.getShell().getVisible() && (win.getActualParent() == ApplicationMain.this.dummyHolder)) {
                             windowArray[i].setBehindTo(ApplicationMain.this);
                             break;
                         }
@@ -316,23 +331,13 @@ public final class ApplicationMain extends WindowBase {
             @Override
             public void shellDeiconified(ShellEvent e) {
                 // Main以外のウィンドウも連動させる
-                for (Shell shell : ApplicationMain.this.dummyHolder.getShells()) {
-                    if (shell.getData() instanceof WindowBase) {
-                        WindowBase window = (WindowBase) shell.getData();
-                        window.shellDeiconified(e);
-                    }
-                }
+                ApplicationMain.this.childDeiconified();
             }
 
             @Override
             public void shellIconified(ShellEvent e) {
                 // Main以外のウィンドウも連動させる
-                for (Shell shell : ApplicationMain.this.dummyHolder.getShells()) {
-                    if (shell.getData() instanceof WindowBase) {
-                        WindowBase window = (WindowBase) shell.getData();
-                        window.shellIconified(e);
-                    }
-                }
+                ApplicationMain.this.childIconified();
             }
         });
 
@@ -474,8 +479,12 @@ public final class ApplicationMain extends WindowBase {
                 new CreatePacFileDialog(ApplicationMain.this.dummyHolder).open();
             }
         });
-        // セパレータ
+        // セパレータ 
         new MenuItem(etcmenu, SWT.SEPARATOR);
+        // その他-ツール
+        MenuItem toolwindows = new MenuItem(etcmenu, SWT.CHECK);
+        toolwindows.setText("ツール");
+        this.launcherWindow = new LauncherWindow(this.dummyHolder, toolwindows);
         // その他-ウィンドウをディスプレイ内に移動
         MenuItem movewindows = new MenuItem(etcmenu, SWT.NONE);
         movewindows.setText("ウィンドウを呼び戻す");
@@ -734,6 +743,16 @@ public final class ApplicationMain extends WindowBase {
                 // タブを整理する
                 ApplicationMain.this.tabFolder.setSelection(0);
 
+                if (AppConfig.get().isCloseWhenMinimized()) {
+                    // 他のウィンドウを連動させる
+                    if (minimum) {
+                        ApplicationMain.this.childIconified();
+                    }
+                    else {
+                        ApplicationMain.this.childDeiconified();
+                    }
+                }
+
                 shell.setRedraw(true);
                 // ウインドウサイズを調節
                 if (minimum) {
@@ -762,6 +781,16 @@ public final class ApplicationMain extends WindowBase {
                 AppConfig.get().setMinimumLayout(minimum);
             }
         });
+
+        // 選択する項目はドラックで移動できないようにする
+        for (Control c : new Control[] { this.commandComposite,
+                this.deckNotice, this.ndockNotice,
+                this.deck1time, this.deck2time,
+                this.deck3time, this.ndock1time, this.ndock2time, this.ndock3time, this.ndock4time,
+                this.consoleComposite }) {
+            c.setData("disable-drag-move", true);
+        }
+        this.tabFolder.setData("disable-drag-move-this", true);
 
         // 処理開始前に必要な値をセット
         BattleResultServer.setLogPath(AppConfig.get().getBattleLogPath());
@@ -803,7 +832,27 @@ public final class ApplicationMain extends WindowBase {
         }
     }
 
-    private WindowBase[] getWindowList() {
+    // Main以外のウィンドウも連動させる
+    private void childDeiconified() {
+        for (Shell shell : ApplicationMain.this.dummyHolder.getShells()) {
+            if (shell.getData() instanceof WindowBase) {
+                WindowBase window = (WindowBase) shell.getData();
+                window.shellDeiconified();
+            }
+        }
+    }
+
+    // Main以外のウィンドウも連動させる
+    private void childIconified() {
+        for (Shell shell : ApplicationMain.this.dummyHolder.getShells()) {
+            if (shell.getData() instanceof WindowBase) {
+                WindowBase window = (WindowBase) shell.getData();
+                window.shellIconified();
+            }
+        }
+    }
+
+    public WindowBase[] getWindowList() {
         return new WindowBase[] {
                 this.captureWindow,
                 this.dropReportWindow,
@@ -822,6 +871,7 @@ public final class ApplicationMain extends WindowBase {
                 this.battleShipWindow,
                 this.calcExpWindow,
                 this.shipFilterGroupWindow,
+                this.launcherWindow
         };
     }
 
@@ -872,7 +922,7 @@ public final class ApplicationMain extends WindowBase {
         ThreadManager.start();
 
         // アップデートチェックする
-        if (AppConfig.get().isCheckUpdate()) {
+        if (AppConfig.get().isUpdateCheck()) {
             new AsyncExecUpdateCheck(this.shell).start();
         }
     }

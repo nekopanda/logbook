@@ -16,6 +16,8 @@ import logbook.gui.listener.TableToCsvSaveAdapter;
 import logbook.gui.logic.TableItemCreator;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -182,7 +184,6 @@ public abstract class AbstractTableDialog extends WindowBase {
 
         // ヘッダの右クリックメニュー
         this.headermenu = new Menu(this.table);
-        boolean[] visibles = this.getConfig().getVisibleColumn();
         for (int i = 0; i < this.header.length; ++i) {
             final MenuItem item = new MenuItem(this.headermenu, SWT.CHECK);
             final int column_index = i;
@@ -196,8 +197,18 @@ public abstract class AbstractTableDialog extends WindowBase {
                     AbstractTableDialog.this.setColumnVisible(column_index, selected);
                 }
             });
-            item.setSelection(visibles[i]);
         }
+        this.headermenu.addMenuListener(new MenuAdapter() {
+            @Override
+            public void menuShown(MenuEvent e) {
+                // 開くときに設定を反映させておく
+                MenuItem[] items = AbstractTableDialog.this.headermenu.getItems();
+                boolean[] visibles = AbstractTableDialog.this.getConfig().getVisibleColumn();
+                for (int i = 0; i < items.length; ++i) {
+                    items[i].setSelection(visibles[i]);
+                }
+            }
+        });
 
         // クリック位置によってメニュー切り替え
         this.table.addListener(SWT.MenuDetect, new Listener() {
@@ -320,6 +331,7 @@ public abstract class AbstractTableDialog extends WindowBase {
         }
     }
 
+    /** １列だけ操作する */
     protected void setColumnVisible(int index, boolean visible) {
         TableColumn[] columns = this.table.getColumns();
         if (visible) {
@@ -328,6 +340,19 @@ public abstract class AbstractTableDialog extends WindowBase {
         else {
             columns[index].setWidth(0);
         }
+    }
+
+    /** まとめて変更する */
+    public void setColumnVisible(boolean[] visibles) {
+        this.table.setRedraw(false);
+        boolean[] old = this.getConfig().getVisibleColumn();
+        for (int i = 0; i < old.length; i++) {
+            if (old[i] != visibles[i]) {
+                old[i] = visibles[i];
+                this.setColumnVisible(i, visibles[i]);
+            }
+        }
+        this.table.setRedraw(true);
     }
 
     private void resetColumnOrder() {
@@ -672,19 +697,18 @@ public abstract class AbstractTableDialog extends WindowBase {
 
         @Override
         public void run() {
-            synchronized (this.dialog.shell) {
-                if (!this.dialog.shell.isDisposed()) {
-                    this.dialog.display.asyncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            CyclicReloadTask.this.dialog.reloadTable();
-                        }
-                    });
-                } else {
-                    // ウインドウが消えていたらタスクをキャンセルする
-                    this.cancel();
+            this.dialog.display.asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    if (!CyclicReloadTask.this.dialog.shell.isDisposed()) {
+                        CyclicReloadTask.this.dialog.reloadTable();
+                    }
+                    else {
+                        // ウインドウが消えていたらタスクをキャンセルする
+                        CyclicReloadTask.this.cancel();
+                    }
                 }
-            }
+            });
         }
     }
 }

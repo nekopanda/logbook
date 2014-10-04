@@ -70,7 +70,7 @@ public class BattleShipWindow extends BattleWindowBase {
                             }
                             itemName = item.getName();
                         }
-                        this.friendDetail[0][i].setText(String.valueOf(i + 1) + ":" + itemName);
+                        setLabelText(this.friendDetail[0][i], String.valueOf(i + 1) + ":" + itemName);
                         this.friendDetail[1][i].setText(onSlot);
                     }
                 }
@@ -113,7 +113,7 @@ public class BattleShipWindow extends BattleWindowBase {
                                 }
                                 itemName = item.getName();
                             }
-                            this.enemyDetail[0][i].setText(String.valueOf(i + 1) + ":" + itemName);
+                            setLabelText(this.enemyDetail[0][i], String.valueOf(i + 1) + ":" + itemName);
                             this.enemyDetail[1][i].setText(onSlot);
                         }
                     }
@@ -138,7 +138,8 @@ public class BattleShipWindow extends BattleWindowBase {
         }
     }
 
-    private void clearText() {
+    @Override
+    protected void clearText() {
         // 味方
         for (int i = 0; i < 12; ++i) {
             this.friendLabels[i].setText("-");
@@ -172,26 +173,22 @@ public class BattleShipWindow extends BattleWindowBase {
         this.getShell().setLayout(layout);
 
         // 各カラムの最小幅を定義 //
-        int slotitemWidth = 140;
-        int onslotWidth = 40;
-        int nameWidth = 100;
-        int fuelWidth = 50;
-        int bullWidth = 50;
-        int paramWidth = 25;
+        int slotitemWidth = 90;
+        int nameWidth = 110;
 
         this.skipSlot(); //1 separator
         this.skipSlot(); //2 separator
         this.addLabel("装備", slotitemWidth, SWT.CENTER, 2, 1);//3-4
         this.skipSlot(); //4 separator
-        this.addLabelWithSize("艦名", nameWidth);//5
+        this.addLabel("艦名", SWT.CENTER, nameWidth);//5
         this.skipSlot(); //6 separator
-        this.addLabelWithSize("燃料", fuelWidth);//8
-        this.addLabelWithSize("弾薬", bullWidth);//9
+        this.addLabel("燃料");//8
+        this.addLabel("弾薬");//9
         this.skipSlot(); //10 separator
-        this.addLabelWithSize("火力", paramWidth);//11
-        this.addLabelWithSize("雷装", paramWidth);//12
-        this.addLabelWithSize("対空", paramWidth);//13
-        this.addLabelWithSize("装甲", paramWidth);//14
+        this.addLabel("火力");//11
+        this.addLabel("雷装");//12
+        this.addLabel("対空");//13
+        this.addLabel("装甲");//14
 
         this.addHorizontalSeparator(numColumns);
 
@@ -208,21 +205,21 @@ public class BattleShipWindow extends BattleWindowBase {
             }
             if ((i == 0) || (i == 6))
                 this.addVerticalSeparator(6); //2
-            this.friendDetail[0][i] = this.addLabel("詳細" + (i + 1), slotitemWidth - onslotWidth, SWT.LEFT, 1, 1); //3 詳細
-            this.friendDetail[1][i] = this.addLabel("艦載機" + (i + 1), onslotWidth, SWT.CENTER, 1, 1); //3 詳細
+            this.friendDetail[0][i] = this.addLabel("詳細" + (i + 1), SWT.LEFT, slotitemWidth); //3 詳細
+            this.friendDetail[1][i] = this.addLabel("00/00"); //3 詳細
             if ((i == 0) || (i == 6))
                 this.addVerticalSeparator(6);//4
-            this.friendLabels[i] = this.addLabel("艦名" + (i + 1), nameWidth, SWT.LEFT, 1, 1);//5
+            this.friendLabels[i] = this.addLabel("艦名" + (i + 1), SWT.LEFT, nameWidth);//5
             if ((i == 0) || (i == 6))
                 this.addVerticalSeparator(6);//6
-            this.fStatusLabels[4][i] = this.addLabelWithSize("0", fuelWidth); //8 燃料
-            this.fStatusLabels[5][i] = this.addLabelWithSize("0", bullWidth); //9 弾薬
+            this.fStatusLabels[4][i] = this.addLabel("000/000"); //8 燃料
+            this.fStatusLabels[5][i] = this.addLabel("000/000"); //9 弾薬
             if ((i == 0) || (i == 6))
                 this.addVerticalSeparator(6);//10
-            this.fStatusLabels[0][i] = this.addLabelWithSize("0", paramWidth); //11 燃料
-            this.fStatusLabels[1][i] = this.addLabelWithSize("0", paramWidth); //12 弾薬
-            this.fStatusLabels[2][i] = this.addLabelWithSize("0", paramWidth); //13 燃料
-            this.fStatusLabels[3][i] = this.addLabelWithSize("0", paramWidth); //14 弾薬
+            this.fStatusLabels[0][i] = this.addLabel("0000"); //11 燃料
+            this.fStatusLabels[1][i] = this.addLabel("0000"); //12 弾薬
+            this.fStatusLabels[2][i] = this.addLabel("0000"); //13 燃料
+            this.fStatusLabels[3][i] = this.addLabel("0000"); //14 弾薬
         }
 
         this.endCombined();
@@ -234,25 +231,28 @@ public class BattleShipWindow extends BattleWindowBase {
                 this.addLabelWithSpan("敵", 1, 6); //1
                 this.addVerticalSeparator(6); //2
             }
-            this.enemyDetail[0][i] = this.addLabel("詳細" + (i + 1), slotitemWidth - 25, SWT.LEFT, 1, 1); //19 詳細
-            this.enemyDetail[1][i] = this.addLabel("艦載機" + (i + 1), 25, SWT.CENTER, 1, 1); //3 詳細
+            this.enemyDetail[0][i] = this.addLabel("詳細" + (i + 1), SWT.LEFT, slotitemWidth); //3 詳細
+            this.enemyDetail[1][i] = this.addLabel("000"); //3 詳細
             if (i == 0)
                 this.addVerticalSeparator(6); //5
-            this.enemyLabels[i] = this.addLabel("艦名" + (i + 1), nameWidth, SWT.LEFT, 1, 1); //6
+            this.enemyLabels[i] = this.addLabel("艦名" + (i + 1), SWT.LEFT, nameWidth);//5
             if (i == 0)
                 this.addVerticalSeparator(6); //5
             this.addLabelWithSpan("", 2, 1); //6
             if (i == 0)
                 this.addVerticalSeparator(6); //5
-            this.eStatusLabels[0][i] = this.addLabelWithSize("0", paramWidth); //8 燃料
-            this.eStatusLabels[1][i] = this.addLabelWithSize("0", paramWidth); //9 弾薬
-            this.eStatusLabels[2][i] = this.addLabelWithSize("0", paramWidth); //8 燃料
-            this.eStatusLabels[3][i] = this.addLabelWithSize("0", paramWidth); //9 弾薬
+            this.eStatusLabels[0][i] = this.addLabel("0000"); //8 燃料
+            this.eStatusLabels[1][i] = this.addLabel("0000"); //9 弾薬
+            this.eStatusLabels[2][i] = this.addLabel("0000"); //8 燃料
+            this.eStatusLabels[3][i] = this.addLabel("0000"); //9 弾薬
         }
 
         // イベント登録
         for (int i = 0; i < 12; ++i) {
             final int currentIndex = i;
+            // このラベルでのウィンドウのドラックとウィンドウの右クリックメニューを無効化
+            this.friendLabels[i].setData("disable-drag-move", true);
+            this.friendLabels[i].setData("disable-window-menu", true);
             this.friendLabels[i].addMouseMoveListener(new MouseMoveListener() {
                 @Override
                 public void mouseMove(MouseEvent e) {
@@ -275,6 +275,9 @@ public class BattleShipWindow extends BattleWindowBase {
                 }
             });
             if (i < 6) {
+                // このラベルでのウィンドウのドラックを無効化
+                this.enemyLabels[i].setData("disable-drag-move", true);
+                this.enemyLabels[i].setData("disable-window-menu", true);
                 this.enemyLabels[i].addMouseMoveListener(new MouseMoveListener() {
                     @Override
                     public void mouseMove(MouseEvent e) {
@@ -298,29 +301,13 @@ public class BattleShipWindow extends BattleWindowBase {
                 });
             }
         }
-
-        this.clearText();
-    }
-
-    /**
-     * 艦名は選択解除があるのでウィンドウメニューを外しておく
-     */
-    @Override
-    protected void createContentsAfter() {
-        for (int i = 0; i < 12; ++i) {
-            this.friendLabels[i].setMenu(null);
-        }
-        for (int i = 0; i < 6; ++i) {
-            this.enemyLabels[i].setMenu(null);
-        }
     }
 
     private void printDock(DockDto dock, int base) {
         List<ShipDto> ships = dock.getShips();
         for (int i = 0; i < ships.size(); ++i) {
             ShipDto ship = ships.get(i);
-            this.friendLabels[base + i].setText(String.valueOf(i + 1) + "." +
-                    ship.getName() + "(Lv." + ship.getLv() + ")");
+            setLabelText(this.friendLabels[base + i], String.valueOf(i + 1) + "." + ship.getFriendlyName(), "");
             this.fStatusLabels[4][base + i].setText(String.valueOf(ship.getFuel()) + "/" + ship.getFuelMax());
             this.fStatusLabels[5][base + i].setText(String.valueOf(ship.getBull()) + "/" + ship.getBullMax());
             this.fStatusLabels[0][base + i].setText(String.valueOf(ship.getKaryoku()));
@@ -365,7 +352,7 @@ public class BattleShipWindow extends BattleWindowBase {
         List<EnemyShipDto> enemyShips = battle.getEnemy();
         for (int i = 0; i < enemyShips.size(); ++i) {
             EnemyShipDto ship = enemyShips.get(i);
-            this.enemyLabels[i].setText(String.valueOf(i + 1) + "." + ship.getFriendlyName());
+            setLabelText(this.enemyLabels[i], String.valueOf(i + 1) + "." + ship.getFriendlyName(), "");
             this.eStatusLabels[0][i].setText(String.valueOf(ship.getKaryoku()));
             this.eStatusLabels[1][i].setText(String.valueOf(ship.getRaisou()));
             this.eStatusLabels[2][i].setText(String.valueOf(ship.getTaiku()));

@@ -318,13 +318,12 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     /**
      * @return 次のレベルまでの経験値
      */
-    public String getNext() {
-        String next = "";
+    public Integer getNext() {
         Integer nextLvExp = ExpTable.get().get(this.lv + 1);
         if (nextLvExp != null) {
-            next = String.valueOf(nextLvExp - this.exp);
+            return nextLvExp - this.exp;
         }
-        return next;
+        return null;
     }
 
     /**

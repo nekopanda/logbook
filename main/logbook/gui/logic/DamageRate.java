@@ -15,47 +15,29 @@ import org.eclipse.wb.swt.SWTResourceManager;
  */
 public enum DamageRate {
 
-    MUKIZU("無傷", 0,
-            null, null,
-            SWTResourceManager.getColor(AppConstants.COND_GREEN_COLOR),
-            SWTResourceManager.getColor(SWT.COLOR_WHITE)),
-    KENZAI("健在", 1,
-            null, null,
-            SWTResourceManager.getColor(AppConstants.COND_GREEN_COLOR),
-            SWTResourceManager.getColor(SWT.COLOR_WHITE)),
-    SYOHA("小破", 2,
-            null, null,
-            SWTResourceManager.getColor(AppConstants.COND_GREEN_COLOR),
-            SWTResourceManager.getColor(SWT.COLOR_WHITE)),
+    MUKIZU("無傷", 0, null, null),
+    KENZAI("健在", 1, null, null),
+    SYOHA("小破", 2, SWTResourceManager.getColor(AppConstants.SYOHA_SHIP_COLOR), null),
     TYUHA("中破", 3,
             SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR),
-            SWTResourceManager.getColor(SWT.COLOR_WHITE),
-            SWTResourceManager.getColor(AppConstants.COND_GREEN_COLOR),
             SWTResourceManager.getColor(SWT.COLOR_WHITE)),
     TAIHA("大破", 4,
             SWTResourceManager.getColor(AppConstants.COND_RED_COLOR),
-            SWTResourceManager.getColor(SWT.COLOR_WHITE),
-            SWTResourceManager.getColor(AppConstants.COND_GREEN_COLOR),
             SWTResourceManager.getColor(SWT.COLOR_WHITE)),
     GOTIN("轟沈", 5,
-            SWTResourceManager.getColor(AppConstants.COND_RED_COLOR),
-            SWTResourceManager.getColor(SWT.COLOR_WHITE),
-            null, null);
+            SWTResourceManager.getColor(AppConstants.SUNK_SHIP_COLOR),
+            SWTResourceManager.getColor(SWT.COLOR_WHITE));
 
     private final String str;
     private final int level;
-    private final Color friendBackground;
-    private final Color friendForeground;
-    private final Color enemyBackground;
-    private final Color enemyForeground;
+    private final Color background;
+    private final Color foreground;
 
-    private DamageRate(String str, int level, Color fb, Color ff, Color eb, Color ef) {
+    private DamageRate(String str, int level, Color fb, Color ff) {
         this.str = str;
         this.level = level;
-        this.friendBackground = fb;
-        this.friendForeground = ff;
-        this.enemyBackground = eb;
-        this.enemyForeground = ef;
+        this.background = fb;
+        this.foreground = ff;
     }
 
     public static DamageRate fromHP(int nowhp, int maxhp) {
@@ -90,28 +72,14 @@ public enum DamageRate {
     /**
      * @return friendBackground
      */
-    public Color getFriendBackground() {
-        return this.friendBackground;
+    public Color getBackground() {
+        return this.background;
     }
 
     /**
      * @return friendForeground
      */
-    public Color getFriendForeground() {
-        return this.friendForeground;
-    }
-
-    /**
-     * @return enemyBackground
-     */
-    public Color getEnemyBackground() {
-        return this.enemyBackground;
-    }
-
-    /**
-     * @return enemyForeground
-     */
-    public Color getEnemyForeground() {
-        return this.enemyForeground;
+    public Color getForeground() {
+        return this.foreground;
     }
 }

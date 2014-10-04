@@ -57,7 +57,7 @@ public final class DropReportTable extends AbstractTableDialog {
      */
     public DropReportTable(Shell parent, MenuItem menuItem) {
         super(parent, menuItem);
-        this.detailDialog = new BattleDetailDialog(this);
+        this.detailDialog = new BattleDetailDialog(parent);
     }
 
     public void updateFilter(BattleResultFilter filter) {
