@@ -1,7 +1,5 @@
 package logbook.dto;
 
-import java.util.regex.Pattern;
-
 import logbook.config.bean.ShipGroupBean;
 
 /**
@@ -13,8 +11,6 @@ public final class ShipFilterDto extends AbstractDto {
     public String nametext;
     /** 名前.正規表現を使用する */
     public boolean regexp;
-    /** 名前.正規表現パターン */
-    public Pattern namepattern;
 
     /** 艦種.駆逐艦 */
     public boolean destroyer = true;

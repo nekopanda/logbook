@@ -26,7 +26,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -159,13 +158,10 @@ public final class ShipFilterDialog extends WindowBase {
         Group namegroup = new Group(composite, SWT.NONE);
         namegroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         namegroup.setLayout(new RowLayout());
-        namegroup.setText("名前");
-
-        Label namelabel = new Label(namegroup, SWT.NONE);
-        namelabel.setText("名前:");
+        namegroup.setText("フリーワード検索(半角SPでAND検索)");
 
         this.nametext = new Text(namegroup, SWT.BORDER);
-        this.nametext.setLayoutData(new RowData(160, SWT.DEFAULT));
+        this.nametext.setLayoutData(new RowData(180, SWT.DEFAULT));
         this.nametext.addModifyListener(new ApplyFilterModifyAdapter());
 
         this.regexp = new Button(namegroup, SWT.CHECK);

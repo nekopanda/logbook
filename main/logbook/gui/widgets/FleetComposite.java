@@ -1,5 +1,7 @@
 package logbook.gui.widgets;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -285,8 +287,12 @@ public class FleetComposite extends Composite {
         }
         // 艦隊合計Lv
         int totallv = 0;
-        // 索敵値計
+        // 索敵値計(素)
         int totalSakuteki = 0;
+        // 偵察機索敵値計
+        int totalSakutekiSurvey = 0;
+        // 電探索敵値計
+        int totalSakutekiRader = 0;
 
         for (int i = 0; i < ships.size(); i++) {
             ShipDto ship = ships.get(i);
