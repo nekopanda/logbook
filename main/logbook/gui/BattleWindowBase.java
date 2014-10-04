@@ -16,6 +16,7 @@ import logbook.gui.logic.LayoutLogic;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -97,13 +98,14 @@ public class BattleWindowBase extends WindowBase {
             }
 
             this.clearText();
-            super.setVisible(true);
-
+            // ウィンドウサイズ復元
+            Point winSize = this.getWindowConfig().getSize();
+            if ((winSize.x != -1) && (winSize.y != -1)) {
+                this.getShell().setSize(winSize);
+            }
             this.setWindowInitialized(true);
         }
-        else {
-            this.setVisible(true);
-        }
+        this.setVisible(true);
     }
 
     /**
@@ -120,6 +122,15 @@ public class BattleWindowBase extends WindowBase {
             }
             super.setVisible(visible);
         }
+    }
+
+    /**
+     * ウィンドウサイズを保存・リストアするべきか？
+     * @return
+     */
+    @Override
+    protected boolean shouldSaveWindowSize() {
+        return true;
     }
 
     @Override

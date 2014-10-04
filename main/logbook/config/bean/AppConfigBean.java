@@ -72,6 +72,10 @@ public final class AppConfigBean {
     /** ローカルループバックアドレスからの接続のみ受け入れる */
     private boolean allowOnlyFromLocalhost = true;
 
+    private boolean printSortieLog = false;
+
+    private boolean printSunkLog = false;
+
     /** 遠征-1分前に通知する */
     private boolean noticeDeckmission = true;
 
@@ -152,6 +156,9 @@ public final class AppConfigBean {
 
     /** 艦これ統計データベースへ送信するときのアクセスキー */
     private String accessKey = "";
+
+    /** 艦これ統計データベースへのデータ送信をログ出力するか？ */
+    private boolean databaseSendLog = false;
 
     /** ウィンドウの表示状態 */
     private Map<String, WindowConfigBean> windowConfigMap = new HashMap<String, WindowConfigBean>();
@@ -478,6 +485,34 @@ public final class AppConfigBean {
      */
     public void setAllowOnlyFromLocalhost(boolean allowOnlyFromLocalhost) {
         this.allowOnlyFromLocalhost = allowOnlyFromLocalhost;
+    }
+
+    /**
+     * @return printSortieLog
+     */
+    public boolean isPrintSortieLog() {
+        return this.printSortieLog;
+    }
+
+    /**
+     * @param printSortieLog セットする printSortieLog
+     */
+    public void setPrintSortieLog(boolean printSortieLog) {
+        this.printSortieLog = printSortieLog;
+    }
+
+    /**
+     * @return printSunkLog
+     */
+    public boolean isPrintSunkLog() {
+        return this.printSunkLog;
+    }
+
+    /**
+     * @param printSunkLog セットする printSunkLog
+     */
+    public void setPrintSunkLog(boolean printSunkLog) {
+        this.printSunkLog = printSunkLog;
     }
 
     /**
@@ -1006,5 +1041,19 @@ public final class AppConfigBean {
      */
     public void setCloseWhenMinimized(boolean closeWhenMinimized) {
         this.closeWhenMinimized = closeWhenMinimized;
+    }
+
+    /**
+     * @return databaseSendLog
+     */
+    public boolean isDatabaseSendLog() {
+        return this.databaseSendLog;
+    }
+
+    /**
+     * @param databaseSendLog セットする databaseSendLog
+     */
+    public void setDatabaseSendLog(boolean databaseSendLog) {
+        this.databaseSendLog = databaseSendLog;
     }
 }

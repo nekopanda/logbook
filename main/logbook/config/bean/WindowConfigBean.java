@@ -3,6 +3,8 @@
  */
 package logbook.config.bean;
 
+import org.eclipse.swt.graphics.Point;
+
 /**
  * @author Nekopanda
  *
@@ -154,6 +156,10 @@ public class WindowConfigBean {
      */
     public void setHeight(int height) {
         this.Height = height;
+    }
+
+    public Point getSize() {
+        return new Point(this.Width, this.Height);
     }
 
     /**

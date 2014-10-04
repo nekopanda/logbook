@@ -12,6 +12,7 @@ import logbook.dto.AirBattleDto;
 import logbook.dto.BattleAtackDto;
 import logbook.dto.BattleExDto;
 import logbook.dto.DockDto;
+import logbook.dto.MapCellDto;
 import logbook.dto.ResultRank;
 import logbook.dto.ShipDto;
 import logbook.internal.EnemyData;
@@ -76,21 +77,6 @@ public class BattleWindow extends BattleWindowBase {
         }
     }
 
-    protected static void setLabelRed(Label label) {
-        label.setBackground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
-        label.setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-    }
-
-    protected static void setLabelOrange(Label label) {
-        label.setBackground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
-        label.setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-    }
-
-    protected static void setLabelGreen(Label label) {
-        label.setBackground(SWTResourceManager.getColor(AppConstants.COND_GREEN_COLOR));
-        label.setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-    }
-
     protected static void setLabelNone(Label label) {
         label.setBackground(null);
         label.setForeground(null);
@@ -112,17 +98,27 @@ public class BattleWindow extends BattleWindowBase {
         if (this.getMapCellDto() == null)
             return;
 
-        EnemyData enemyData = this.getMapCellDto().getEnemyData();
-        if (enemyData != null) {
+        MapCellDto dto = this.getMapCellDto();
+        EnemyData enemyData = dto.getEnemyData();
+        if (dto.getEnemyId() == -1) {
+            // 次のマスは敵がいない
+        }
+        else if (enemyData != null) {
             String name = enemyData.getEnemyName();
             if (name != null) {
                 this.infoLabels[1][0].setText(name);
+            }
+            else {
+                this.infoLabels[1][0].setText("KCRDB互換データ");
             }
             String[] ships = enemyData.getEnemyShips();
             for (int i = 0; i < 6; ++i) {
                 this.enemyLabels[i].setText(String.valueOf(i + 1) + "." + ships[i]);
             }
             this.infoLabels[1][1].setText(FORM_PREFIX + enemyData.getFormation());
+        }
+        else {
+            this.infoLabels[1][0].setText("データがありません[" + dto.getEnemyId() + "]");
         }
     }
 

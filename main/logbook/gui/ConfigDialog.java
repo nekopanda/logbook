@@ -94,6 +94,9 @@ public final class ConfigDialog extends Dialog {
         TreeItem systemroot = new TreeItem(tree, SWT.NONE);
         systemroot.setText("一般");
         systemroot.setData("system");
+        TreeItem maintab = new TreeItem(systemroot, SWT.NONE);
+        maintab.setText("メインタブ");
+        maintab.setData("maintab");
         TreeItem fleettab = new TreeItem(systemroot, SWT.NONE);
         fleettab.setText("艦隊タブ");
         fleettab.setData("fleettab");
@@ -245,6 +248,21 @@ public final class ConfigDialog extends Dialog {
         onlyFromLocalhost.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
         onlyFromLocalhost.setText("ローカルループバックアドレスからの接続のみ受け入れる*");
         onlyFromLocalhost.setSelection(AppConfig.get().isAllowOnlyFromLocalhost());
+
+        // メインタブ タブ
+        Composite compositeMainTab = new Composite(this.composite, SWT.NONE);
+        this.compositeMap.put("maintab", compositeMainTab);
+        compositeMainTab.setLayout(new GridLayout(1, false));
+
+        final Button printSortieLog = new Button(compositeMainTab, SWT.CHECK);
+        printSortieLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        printSortieLog.setText("マップや勝利判定をログに表示");
+        printSortieLog.setSelection(AppConfig.get().isPrintSortieLog());
+
+        final Button printSunkLog = new Button(compositeMainTab, SWT.CHECK);
+        printSunkLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        printSunkLog.setText("艦娘の轟沈をログに表示（ダメコン未対応）");
+        printSunkLog.setSelection(AppConfig.get().isPrintSunkLog());
 
         // 艦隊タブ タブ
         Composite compositeFleetTab = new Composite(this.composite, SWT.NONE);
@@ -632,6 +650,11 @@ public final class ConfigDialog extends Dialog {
         accessKeyText.setLayoutData(gdAccessKeyText);
         accessKeyText.setText(AppConfig.get().getAccessKey());
 
+        final Button databaseLogButton = new Button(compositeProxy, SWT.CHECK);
+        databaseLogButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
+        databaseLogButton.setText("データベースへの送信をログ出力する");
+        databaseLogButton.setSelection(AppConfig.get().isDatabaseSendLog());
+
         // Development タブ
         Composite compositeDevelopment = new Composite(this.composite, SWT.NONE);
         this.compositeMap.put("development", compositeDevelopment);
@@ -721,6 +744,9 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setMaterialLogInterval(materialintervalSpinner.getSelection());
                 AppConfig.get().setUpdateCheck(checkUpdate.getSelection());
                 AppConfig.get().setAllowOnlyFromLocalhost(onlyFromLocalhost.getSelection());
+                // maintab
+                AppConfig.get().setPrintSortieLog(printSortieLog.getSelection());
+                AppConfig.get().setPrintSunkLog(printSunkLog.getSelection());
                 // fleettab
                 AppConfig.get().setDisplayCount(displaycount.getSelection());
                 AppConfig.get().setDefaultSea(seacombo.getItem(seacombo.getSelectionIndex()));
@@ -759,6 +785,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setProxyPort(proxyPortSpinner.getSelection());
                 AppConfig.get().setSendDatabase(sendDatabaseButton.getSelection());
                 AppConfig.get().setAccessKey(accessKeyText.getText());
+                AppConfig.get().setDatabaseSendLog(databaseLogButton.getSelection());
 
                 // development
                 AppConfig.get().setStoreJson(btnJson.getSelection());
