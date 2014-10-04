@@ -362,9 +362,6 @@ public abstract class AbstractTableDialog extends Dialog {
 
         @Override
         public final int compare(String[] o1, String[] o2) {
-            int length = Math.max(o1[this.index].length(), o2[this.index].length());
-            String o1str = StringUtils.leftPad(o1[this.index], length, '0');
-            String o2str = StringUtils.leftPad(o2[this.index], length, '0');
             if (StringUtils.isEmpty(o1[this.index]) && StringUtils.isEmpty(o2[this.index])) {
                 return 0;
             }
@@ -374,6 +371,9 @@ public abstract class AbstractTableDialog extends Dialog {
             if (StringUtils.isEmpty(o2[this.index])) {
                 return -1;
             }
+            int length = Math.max(o1[this.index].length(), o2[this.index].length());
+            String o1str = StringUtils.leftPad(o1[this.index], length, '0');
+            String o2str = StringUtils.leftPad(o2[this.index], length, '0');
             if (!this.order) {
                 return o2str.compareTo(o1str);
             } else {
