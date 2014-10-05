@@ -413,6 +413,24 @@ public class AppConstants {
     /** メッセージ  艦隊合計Lv:{0} */
     public static final String MESSAGE_TOTAL_LV = "艦隊合計Lv:{0}。";
 
+    /** Push 通知のアプリケーション名*/
+    public static final String PUSH_NOTIFY_APPNAME = "航海日誌";
+
+    /** Push 通知のイベント名 */
+    public static final String PUSH_NOTIFY_EVENT = "遠征・入渠";
+
+    /** Push通知の priority (-2: verylow, -1: moderate, 0: normal, 1: high, 2: emergency */
+    public static final String PUSH_NOTIFY_PRIORITY = "0";
+
+    /** Prowl のアクセス先 URI */
+    public static final String PUSH_NOTIFY_PROWL_URI = "https://api.prowlapp.com/publicapi/add";
+
+    /** NMA のアクセス先 URI */
+    public static final String PUSH_NOTIFY_NMA_URI = "https://www.notifymyandroid.com/publicapi/notify";
+
+    /** im.kayac.com のアクセス先 URI */
+    public static final String PUSH_NOTIFY_IMKAYAC_URI = "http://im.kayac.com/api/post/";
+
     /** メッセージ  ドラム缶:{0} ({1}隻) */
     public static final String MESSAGE_TOTAL_DRAM = "ドラム缶:{0} ({1}隻)。";
 
