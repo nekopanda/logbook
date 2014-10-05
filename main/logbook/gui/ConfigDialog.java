@@ -107,7 +107,7 @@ public final class ConfigDialog extends Dialog {
         capture.setText("キャプチャ");
         capture.setData("capture");
         TreeItem chart = new TreeItem(systemroot, SWT.NONE);
-        chart.setText("資材チャート");
+        chart.setText("資材ログ");
         chart.setData("chart");
         TreeItem window = new TreeItem(systemroot, SWT.NONE);
         window.setText("ウィンドウ");
@@ -193,20 +193,6 @@ public final class ConfigDialog extends Dialog {
             }
         });
         reportSavedirBtn.setText("選択...");
-
-        Label materialintervallabel = new Label(compositeSystem, SWT.NONE);
-        materialintervallabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        materialintervallabel.setText("資材ログ保存間隔(秒)");
-
-        final Spinner materialintervalSpinner = new Spinner(compositeSystem, SWT.BORDER);
-        materialintervalSpinner.setMaximum(60 * 60 * 24);
-        materialintervalSpinner.setMinimum(10);
-        materialintervalSpinner.setSelection(AppConfig.get().getMaterialLogInterval());
-        GridData gdMaterialIntervalSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdMaterialIntervalSpinner.widthHint = 55;
-        materialintervalSpinner.setLayoutData(gdMaterialIntervalSpinner);
-
-        new Label(compositeSystem, SWT.NONE);
 
         final Button hidewindow = new Button(compositeSystem, SWT.CHECK);
         hidewindow.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
@@ -445,17 +431,39 @@ public final class ConfigDialog extends Dialog {
         createDateFolder.setText("日付のフォルダを作成する");
         createDateFolder.setSelection(AppConfig.get().isCreateDateFolder());
 
-        // 資材チャート タブ
+        // 資材ログ タブ
         Composite compositeChart = new Composite(this.composite, SWT.NONE);
         this.compositeMap.put("chart", compositeChart);
         compositeChart.setLayout(new GridLayout(3, false));
 
-        final Label fuel = new Label(compositeChart, SWT.NONE);
+        Label materialintervallabel = new Label(compositeChart, SWT.NONE);
+        materialintervallabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        materialintervallabel.setText("資材ログ保存間隔(秒)");
+
+        final Spinner materialintervalSpinner = new Spinner(compositeChart, SWT.BORDER);
+        materialintervalSpinner.setMaximum(60 * 60 * 24);
+        materialintervalSpinner.setMinimum(10);
+        materialintervalSpinner.setSelection(AppConfig.get().getMaterialLogInterval());
+        GridData gdMaterialIntervalSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1);
+        gdMaterialIntervalSpinner.widthHint = 55;
+        materialintervalSpinner.setLayoutData(gdMaterialIntervalSpinner);
+
+        final Button detailMaterial = new Button(compositeChart, SWT.CHECK);
+        detailMaterial.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        detailMaterial.setText("遠征帰還時や開発・建造時に資材ログ出力する");
+        detailMaterial.setSelection(AppConfig.get().isMaterialLogDetail());
+
+        Group chartGroup = new Group(compositeChart, SWT.NONE);
+        chartGroup.setText("資材チャート");
+        chartGroup.setLayout(new GridLayout(3, false));
+        chartGroup.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+
+        final Label fuel = new Label(chartGroup, SWT.NONE);
         fuel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
         fuel.setText("燃料の色■");
         fuel.setForeground(SWTResourceManager.getColor(AppConfig.get().getFuelColor()));
 
-        Button changeFuelColor = new Button(compositeChart, SWT.NONE);
+        Button changeFuelColor = new Button(chartGroup, SWT.NONE);
         changeFuelColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         changeFuelColor.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -469,7 +477,7 @@ public final class ConfigDialog extends Dialog {
         });
         changeFuelColor.setText("色の設定");
 
-        Button resetFuelColor = new Button(compositeChart, SWT.NONE);
+        Button resetFuelColor = new Button(chartGroup, SWT.NONE);
         resetFuelColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         resetFuelColor.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -479,12 +487,12 @@ public final class ConfigDialog extends Dialog {
         });
         resetFuelColor.setText("リセット");
 
-        final Label ammo = new Label(compositeChart, SWT.NONE);
+        final Label ammo = new Label(chartGroup, SWT.NONE);
         ammo.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
         ammo.setText("弾薬の色■");
         ammo.setForeground(SWTResourceManager.getColor(AppConfig.get().getAmmoColor()));
 
-        Button changeAmmoColor = new Button(compositeChart, SWT.NONE);
+        Button changeAmmoColor = new Button(chartGroup, SWT.NONE);
         changeAmmoColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         changeAmmoColor.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -498,7 +506,7 @@ public final class ConfigDialog extends Dialog {
         });
         changeAmmoColor.setText("色の設定");
 
-        Button resetAmmoColor = new Button(compositeChart, SWT.NONE);
+        Button resetAmmoColor = new Button(chartGroup, SWT.NONE);
         resetAmmoColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         resetAmmoColor.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -508,12 +516,12 @@ public final class ConfigDialog extends Dialog {
         });
         resetAmmoColor.setText("リセット");
 
-        final Label metal = new Label(compositeChart, SWT.NONE);
+        final Label metal = new Label(chartGroup, SWT.NONE);
         metal.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
         metal.setText("鋼材の色■");
         metal.setForeground(SWTResourceManager.getColor(AppConfig.get().getMetalColor()));
 
-        Button changeMetalColor = new Button(compositeChart, SWT.NONE);
+        Button changeMetalColor = new Button(chartGroup, SWT.NONE);
         changeMetalColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         changeMetalColor.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -527,7 +535,7 @@ public final class ConfigDialog extends Dialog {
         });
         changeMetalColor.setText("色の設定");
 
-        Button resetMetalColor = new Button(compositeChart, SWT.NONE);
+        Button resetMetalColor = new Button(chartGroup, SWT.NONE);
         resetMetalColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         resetMetalColor.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -537,12 +545,12 @@ public final class ConfigDialog extends Dialog {
         });
         resetMetalColor.setText("リセット");
 
-        final Label bauxite = new Label(compositeChart, SWT.NONE);
+        final Label bauxite = new Label(chartGroup, SWT.NONE);
         bauxite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
         bauxite.setText("ボーキの色■");
         bauxite.setForeground(SWTResourceManager.getColor(AppConfig.get().getBauxiteColor()));
 
-        Button changeBauxiteColor = new Button(compositeChart, SWT.NONE);
+        Button changeBauxiteColor = new Button(chartGroup, SWT.NONE);
         changeBauxiteColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         changeBauxiteColor.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -556,7 +564,7 @@ public final class ConfigDialog extends Dialog {
         });
         changeBauxiteColor.setText("色の設定");
 
-        Button resetBauxiteColor = new Button(compositeChart, SWT.NONE);
+        Button resetBauxiteColor = new Button(chartGroup, SWT.NONE);
         resetBauxiteColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         resetBauxiteColor.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -741,7 +749,6 @@ public final class ConfigDialog extends Dialog {
                 }
                 */
                 AppConfig.get().setReportPath(reportDir.getText());
-                AppConfig.get().setMaterialLogInterval(materialintervalSpinner.getSelection());
                 AppConfig.get().setUpdateCheck(checkUpdate.getSelection());
                 AppConfig.get().setAllowOnlyFromLocalhost(onlyFromLocalhost.getSelection());
                 // maintab
@@ -770,6 +777,8 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setImageFormat(imageformatCombo.getItem(imageformatCombo.getSelectionIndex()));
                 AppConfig.get().setCreateDateFolder(createDateFolder.getSelection());
                 // チャート
+                AppConfig.get().setMaterialLogInterval(materialintervalSpinner.getSelection());
+                AppConfig.get().setMaterialLogDetail(detailMaterial.getSelection());
                 AppConfig.get().setFuelColor(fuel.getForeground().getRGB());
                 AppConfig.get().setAmmoColor(ammo.getForeground().getRGB());
                 AppConfig.get().setMetalColor(metal.getForeground().getRGB());

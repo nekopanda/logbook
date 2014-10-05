@@ -162,6 +162,13 @@ public final class GlobalContext {
         INIT_COMPLETE = true;
     }
 
+    private static enum MATERIAL_DIFF {
+        NEW_VALUE,
+        OBTAINED,
+        CONSUMED,
+        NONE;
+    }
+
     /**
      * @return 装備Map
      */
@@ -970,9 +977,7 @@ public final class GlobalContext {
             ResourceItemDto items = new ResourceItemDto();
             items.loadBaseMaterialsFromField(data);
             items.setResearchMaterials(Integer.parseInt(data.getField("api_item5")));
-            material = material.clone().consumed(items);
-            material.setEvent("建造");
-            CreateReportLogic.storeMaterialReport(material);
+            updateDetailedMaterial("建造", items, MATERIAL_DIFF.CONSUMED);
 
             addConsole("建造(投入資源)情報を更新しました");
         } catch (Exception e) {
@@ -1123,9 +1128,7 @@ public final class GlobalContext {
             JsonArray newMaterial = apidata.getJsonArray("api_material");
             ResourceItemDto items = new ResourceItemDto();
             items.loadMaterialFronJson(newMaterial);
-            material = items.toMaterialDto();
-            material.setEvent("装備開発");
-            CreateReportLogic.storeMaterialReport(material);
+            updateDetailedMaterial("装備開発", items, MATERIAL_DIFF.NEW_VALUE);
 
             addConsole("装備開発情報を更新しました");
         } catch (Exception e) {
@@ -1565,11 +1568,7 @@ public final class GlobalContext {
                 ResourceItemDto items = new ResourceItemDto();
                 items.loadMissionResult(apidata);
                 result.setItems(items);
-                if (material != null) {
-                    material = material.clone().obtained(items);
-                    material.setEvent("遠征帰還");
-                    CreateReportLogic.storeMaterialReport(material);
-                }
+                updateDetailedMaterial("遠征帰還", items, MATERIAL_DIFF.OBTAINED);
             }
 
             CreateReportLogic.storeCreateMissionReport(result);
@@ -1703,10 +1702,7 @@ public final class GlobalContext {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
             ResourceItemDto items = new ResourceItemDto();
             items.loadQuestClear(apidata);
-            if (material != null) {
-                material = material.clone().obtained(items);
-                material.setEvent("任務をクリア");
-            }
+            updateDetailedMaterial("任務をクリア", items, MATERIAL_DIFF.OBTAINED);
 
         } catch (Exception e) {
             LOG.warn("消化した任務を除去しますに失敗しました", e);
@@ -1734,10 +1730,7 @@ public final class GlobalContext {
             JsonObject obj = data.getJsonObject().getJsonObject("api_data");
 
             mapCellDto = new MapCellDto(obj);
-            if (material != null) {
-                material.setEvent("出撃");
-                CreateReportLogic.storeMaterialReport(material);
-            }
+            updateDetailedMaterial("出撃", null, MATERIAL_DIFF.NONE);
 
             ApplicationMain.main.startSortie();
             ApplicationMain.main.updateMapCell(mapCellDto);
@@ -1909,6 +1902,28 @@ public final class GlobalContext {
         } catch (Exception e) {
             LOG.warn("連合艦隊情報更新に失敗しました", e);
             LOG.warn(data);
+        }
+    }
+
+    private static void updateDetailedMaterial(String ev, ResourceItemDto res, MATERIAL_DIFF diff) {
+        if (material != null) {
+            switch (diff) {
+            case NEW_VALUE:
+                material = res.toMaterialDto();
+                break;
+            case OBTAINED:
+                material = material.clone().obtained(res);
+                break;
+            case CONSUMED:
+                material = material.clone().consumed(res);
+                break;
+            default:
+                break;
+            }
+            material.setEvent(ev);
+            if (AppConfig.get().isMaterialLogDetail()) {
+                CreateReportLogic.storeMaterialReport(material);
+            }
         }
     }
 

@@ -57,6 +57,9 @@ public final class AppConfigBean {
     /** 資源ログの書き込み間隔 */
     private int materialLogInterval = 600;
 
+    /** 遠征帰還や開発・建造時に資材ログ出力する */
+    private boolean materialLogDetail = true;
+
     /** アップデートチェック */
     private boolean updateCheck = true;
 
@@ -405,6 +408,20 @@ public final class AppConfigBean {
      */
     public void setMaterialLogInterval(int materialLogInterval) {
         this.materialLogInterval = materialLogInterval;
+    }
+
+    /**
+     * @return materialLogDetail
+     */
+    public boolean isMaterialLogDetail() {
+        return this.materialLogDetail;
+    }
+
+    /**
+     * @param materialLogDetail セットする materialLogDetail
+     */
+    public void setMaterialLogDetail(boolean materialLogDetail) {
+        this.materialLogDetail = materialLogDetail;
     }
 
     /**
