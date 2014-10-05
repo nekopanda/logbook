@@ -178,9 +178,11 @@ public abstract class AbstractTableDialog extends WindowBase {
         this.setTableHeader();
         // テーブルに内容をセット
         this.updateTableBody();
+        this.sortBody();
         this.setTableBody();
         // 列幅を整える
         this.packTableHeader();
+        this.setSortDirectionToHeader();
 
         // ヘッダの右クリックメニュー
         this.headermenu = new Menu(this.table);
