@@ -18,6 +18,7 @@ import logbook.data.context.GlobalContext;
 import logbook.dto.BattleExDto;
 import logbook.dto.DockDto;
 import logbook.dto.MapCellDto;
+import logbook.dto.PracticeUserExDto;
 import logbook.gui.background.AsyncExecApplicationMain;
 import logbook.gui.background.AsyncExecUpdateCheck;
 import logbook.gui.background.BackgroundInitializer;
@@ -154,6 +155,8 @@ public final class ApplicationMain extends WindowBase {
     private BattleShipWindow battleShipWindow;
     /** 経験値計算 */
     private CalcExpDialog calcExpWindow;
+    /** 経験値計算 */
+    private CalcPracticeExpDialog calcPracticeExpWindow;
     /** グループエディター */
     private ShipFilterGroupDialog shipFilterGroupWindow;
     /** ツール */
@@ -457,6 +460,12 @@ public final class ApplicationMain extends WindowBase {
         calcexp.setText("経験値計算機(&C)\tCtrl+C");
         calcexp.setAccelerator(SWT.CTRL + 'C');
         this.calcExpWindow = new CalcExpDialog(this.dummyHolder, calcexp);
+
+        // 計算機-演習経験値計算
+        MenuItem calcpracticeexp = new MenuItem(calcmenu, SWT.CHECK);
+        calcpracticeexp.setText("演習経験値計算機(&C)\tCtrl+V");
+        calcpracticeexp.setAccelerator(SWT.CTRL + 'V');
+        this.calcPracticeExpWindow = new CalcPracticeExpDialog(this.dummyHolder, calcpracticeexp);
 
         // その他-グループエディター
         MenuItem shipgroup = new MenuItem(etcmenu, SWT.CHECK);
@@ -872,6 +881,7 @@ public final class ApplicationMain extends WindowBase {
                 this.battleWindowSmall,
                 this.battleShipWindow,
                 this.calcExpWindow,
+                this.calcPracticeExpWindow,
                 this.shipFilterGroupWindow,
                 this.launcherWindow
         };
@@ -1258,5 +1268,9 @@ public final class ApplicationMain extends WindowBase {
         for (BattleWindowBase window : this.getBattleWindowList()) {
             window.updateBattle(battleDto);
         }
+    }
+
+    public void updateCalcPracticeExp(PracticeUserExDto practiceUserExDto) {
+        this.calcPracticeExpWindow.updatePracticeUser(practiceUserExDto);
     }
 }
