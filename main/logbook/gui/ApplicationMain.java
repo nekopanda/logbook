@@ -18,7 +18,7 @@ import logbook.data.context.GlobalContext;
 import logbook.dto.BattleExDto;
 import logbook.dto.DockDto;
 import logbook.dto.MapCellDto;
-import logbook.dto.PracticeUserExDto;
+import logbook.dto.PracticeUserDetailDto;
 import logbook.gui.background.AsyncExecApplicationMain;
 import logbook.gui.background.AsyncExecUpdateCheck;
 import logbook.gui.background.BackgroundInitializer;
@@ -1270,7 +1270,7 @@ public final class ApplicationMain extends WindowBase {
         }
     }
 
-    public void updateCalcPracticeExp(PracticeUserExDto practiceUserExDto) {
+    public void updateCalcPracticeExp(PracticeUserDetailDto practiceUserExDto) {
         this.calcPracticeExpWindow.updatePracticeUser(practiceUserExDto);
     }
 }

@@ -43,8 +43,8 @@ import logbook.dto.MapCellDto;
 import logbook.dto.MaterialDto;
 import logbook.dto.MissionResultDto;
 import logbook.dto.NdockDto;
+import logbook.dto.PracticeUserDetailDto;
 import logbook.dto.PracticeUserDto;
-import logbook.dto.PracticeUserExDto;
 import logbook.dto.QuestDto;
 import logbook.dto.ResourceDto;
 import logbook.dto.ResourceItemDto;
@@ -1858,7 +1858,12 @@ public final class GlobalContext {
         try {
             JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
             for (int i = 0; i < apidata.size(); ++i) {
-                practiceUser[i] = new PracticeUserDto((JsonObject) apidata.get(i));
+                PracticeUserDto dto = new PracticeUserDto((JsonObject) apidata.get(i));
+                if ((practiceUser[i] == null) || (practiceUser[i].getId() != dto.getId()))
+                    practiceUser[i] = dto;
+                else
+                    // stateだけ更新
+                    practiceUser[i].setState(dto.getState());
             }
             addConsole("演習情報を更新しました");
         } catch (Exception e) {
@@ -1874,9 +1879,17 @@ public final class GlobalContext {
     private static void doPracticeEnemyinfo(Data data) {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
-            PracticeUserExDto practiceUser = new PracticeUserExDto(apidata);
+            PracticeUserDetailDto dto = new PracticeUserDetailDto(apidata);
 
-            ApplicationMain.main.updateCalcPracticeExp(practiceUser);
+            // 持っている情報をアップデートする
+            for (int i = 0; i < 5; ++i) {
+                if ((practiceUser[i] != null) && (practiceUser[i].getId() == dto.getId())) {
+                    practiceUser[i] = dto;
+                    break;
+                }
+            }
+
+            ApplicationMain.main.updateCalcPracticeExp(dto);
             addConsole("演習相手艦隊情報を更新しました");
         } catch (Exception e) {
             LOG.warn("演習相手艦隊情報更新に失敗しました", e);

@@ -2,7 +2,7 @@ package logbook.gui;
 
 import java.util.List;
 
-import logbook.dto.PracticeUserExDto;
+import logbook.dto.PracticeUserDetailDto;
 import logbook.dto.ShipInfoDto;
 import logbook.internal.PracticeEvaluateExp;
 import logbook.util.CalcPracticeExpUtils;
@@ -43,7 +43,7 @@ public final class CalcPracticeExpDialog extends WindowBase {
     private final int[] levels = { 1, 1, 1, 1, 1, 1 };
     private final String[] shipNames = { "敵旗艦", "敵2艦目", "敵3艦目", "敵4艦目", "敵5艦目", "敵6艦目" };
 
-    private PracticeUserExDto practiceUser;
+    private PracticeUserDetailDto practiceUser;
 
     /**
      * Create the dialog.
@@ -224,7 +224,7 @@ public final class CalcPracticeExpDialog extends WindowBase {
         this.getShell().setRedraw(true);
     }
 
-    public void updatePracticeUser(PracticeUserExDto practiceUserExDto) {
+    public void updatePracticeUser(PracticeUserDetailDto practiceUserExDto) {
         this.clearData();
         this.practiceUser = practiceUserExDto;
         List<ShipInfoDto> ships = this.practiceUser.getShips();

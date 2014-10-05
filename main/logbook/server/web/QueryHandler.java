@@ -29,6 +29,7 @@ import logbook.dto.KdockDto;
 import logbook.dto.MapCellDto;
 import logbook.dto.MaterialDto;
 import logbook.dto.NdockDto;
+import logbook.dto.PracticeUserDetailDto;
 import logbook.dto.PracticeUserDto;
 import logbook.dto.QuestDto;
 import logbook.dto.ShipDto;
@@ -270,6 +271,12 @@ public class QueryHandler extends HttpServlet {
                 .add("state", item.getState());
     }
 
+    private static JsonObjectBuilder practiceEnemyShipToJson(ShipInfoDto info, int level) {
+        return Json.createObjectBuilder()
+                .add("ship_id", info.getShipId())
+                .add("level", level);
+    }
+
     private static JsonObject createQueryRespons() {
         final JsonObjectBuilder jb = Json.createObjectBuilder();
         Display.getDefault().syncExec(new Runnable() {
@@ -397,6 +404,18 @@ public class QueryHandler extends HttpServlet {
                             user_item.add("id", dto.getId());
                             user_item.add("name", dto.getName());
                             user_item.add("state", dto.getState());
+
+                            if (dto instanceof PracticeUserDetailDto) {
+                                PracticeUserDetailDto detailDto = (PracticeUserDetailDto) dto;
+                                JsonArrayBuilder ship_array = Json.createArrayBuilder();
+                                List<ShipInfoDto> shipList = detailDto.getShips();
+                                int[] levelList = detailDto.getShipsLevel();
+                                for (int i = 0; i < shipList.size(); ++i) {
+                                    ship_array.add(practiceEnemyShipToJson(shipList.get(i), levelList[i]));
+                                }
+                                user_item.add("ships", ship_array);
+                            }
+
                             ensyu_root.add(user_item);
                         }
                     }
