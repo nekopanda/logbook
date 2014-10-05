@@ -10,21 +10,25 @@ import java.util.List;
 
 import logbook.dto.ResultRank;
 import logbook.gui.logic.IntegerPair;
+import logbook.gui.logic.LayoutLogic;
 import logbook.internal.BattleResultFilter;
 import logbook.internal.BattleResultServer;
+import logbook.internal.TimeSpanKind;
 import logbook.util.ReportUtils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DateTime;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -47,11 +51,17 @@ public class BattleFilterDialog extends WindowBase {
     private List<ResultRank> rankList;
     private CheckAndCombo rankCombo;
 
-    private CheckAndCalender fromDate;
-    private CheckAndCalender toDate;
+    private List<Boolean> kindList;
+    private CheckAndCombo kindCombo;
+
+    private List<TimeSpanKind> timeList;
+    private CheckAndCombo timeCombo;
+
+    private LabelAndCalender fromDate;
+    private LabelAndCalender toDate;
 
     public BattleFilterDialog(DropReportTable parent) {
-        super.createContents(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
+        super.createContents(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE, false);
         this.parent = parent;
     }
 
@@ -61,17 +71,25 @@ public class BattleFilterDialog extends WindowBase {
      */
     @Override
     public void open() {
-        Shell shell = this.getShell();
-        this.createContents();
-        this.registerEvents();
-        shell.open();
-        shell.layout();
-        Display display = shell.getDisplay();
-        while (!shell.isDisposed()) {
-            if (!display.readAndDispatch()) {
-                display.sleep();
-            }
+        if (!this.isWindowInitialized()) {
+            this.createContents();
+            this.registerEvents();
+            // 閉じたときに dispose しない
+            this.getShell().addShellListener(new ShellAdapter() {
+                @Override
+                public void shellClosed(ShellEvent e) {
+                    e.doit = false;
+                    BattleFilterDialog.this.setVisible(false);
+                }
+            });
+            this.setWindowInitialized(true);
         }
+        if (this.getShell().getVisible() == false) {
+            this.getShell().pack();
+            this.setVisible(true);
+        }
+        this.getShell().setActive();
+        return;
     }
 
     /**
@@ -86,6 +104,7 @@ public class BattleFilterDialog extends WindowBase {
         SelectionListener listener = new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                BattleFilterDialog.this.updateCalenderVisible();
                 BattleFilterDialog.this.parent.updateFilter(BattleFilterDialog.this.createFilter());
             }
         };
@@ -123,11 +142,29 @@ public class BattleFilterDialog extends WindowBase {
         }
         this.rankCombo.initState(listener);
 
+        // 戦闘種別
+        this.kindList = new ArrayList<Boolean>();
+        this.kindCombo = new CheckAndCombo(shell, "戦闘種別", 1);
+        this.kindCombo.combo.add("出撃のみ");
+        this.kindList.add(false);
+        this.kindCombo.combo.add("演習のみ");
+        this.kindList.add(true);
+        this.kindCombo.initState(listener);
+
+        // ランク
+        this.timeList = new ArrayList<TimeSpanKind>();
+        this.timeCombo = new CheckAndCombo(shell, "期間", 1);
+        for (TimeSpanKind time : TimeSpanKind.values()) {
+            this.timeCombo.combo.add(time.toString());
+            this.timeList.add(time);
+        }
+        this.timeCombo.initState(listener);
+
         // 時刻
-        Button startCheck = new Button(shell, SWT.CHECK);
-        Button endCheck = new Button(shell, SWT.CHECK);
-        this.fromDate = new CheckAndCalender(shell, startCheck, "開始日時", 2);
-        this.toDate = new CheckAndCalender(shell, endCheck, "終了日時", 2);
+        Label startLabel = new Label(shell, SWT.NONE);
+        Label endLabel = new Label(shell, SWT.NONE);
+        this.fromDate = new LabelAndCalender(shell, startLabel, "開始", 2);
+        this.toDate = new LabelAndCalender(shell, endLabel, "終了", 2);
         this.fromDate.initState(listener, BattleResultServer.get().getFirstBattleTime());
         this.toDate.initState(listener, BattleResultServer.get().getLastBattleTime());
 
@@ -138,6 +175,10 @@ public class BattleFilterDialog extends WindowBase {
             int cellIdx = (filter.cell == null) ? -1 : this.cellList.indexOf(filter.cell);
             int dtopShipIdx = (filter.dropShip == null) ? -1 : this.shipList.indexOf(filter.dropShip);
             int mapComboIdx = (filter.rank == null) ? -1 : this.rankList.indexOf(filter.rank);
+            int kindIdx =
+                    (filter.printPractice == null) ? -1 :
+                            filter.printPractice ? 1 : 0;
+            int timeSpanIdx = (filter.timeSpan == null) ? -1 : this.timeList.indexOf(filter.timeSpan);
 
             if (mapIdx != -1) {
                 this.mapCombo.select(mapIdx);
@@ -151,6 +192,12 @@ public class BattleFilterDialog extends WindowBase {
             if (mapComboIdx != -1) {
                 this.rankCombo.select(mapComboIdx);
             }
+            if (kindIdx != -1) {
+                this.kindCombo.select(kindIdx);
+            }
+            if (timeSpanIdx != -1) {
+                this.timeCombo.select(timeSpanIdx);
+            }
             if (filter.fromTime != null) {
                 this.fromDate.setDate(toCalendar(filter.fromTime), false);
             }
@@ -159,6 +206,7 @@ public class BattleFilterDialog extends WindowBase {
             }
         }
 
+        this.updateCalenderVisible();
         shell.pack();
     }
 
@@ -173,17 +221,26 @@ public class BattleFilterDialog extends WindowBase {
         if (filter == null) {
             filter = new BattleResultFilter();
         }
-        filter.map = (IntegerPair) this.getSelectedItem(this.mapCombo, this.mapList);
-        filter.cell = (Integer) this.getSelectedItem(this.cellCombo, this.cellList);
-        filter.dropShip = (String) this.getSelectedItem(this.shipCombo, this.shipList);
-        ResultRank rank = (ResultRank) this.getSelectedItem(this.rankCombo, this.rankList);
-        filter.rank = (rank != null) ? rank : null;
-        filter.fromTime = this.fromDate.getSelectedDate(false);
-        filter.toTime = this.toDate.getSelectedDate(true);
+        filter.map = (IntegerPair) getSelectedItem(this.mapCombo, this.mapList);
+        filter.cell = (Integer) getSelectedItem(this.cellCombo, this.cellList);
+        filter.dropShip = (String) getSelectedItem(this.shipCombo, this.shipList);
+        filter.rank = (ResultRank) getSelectedItem(this.rankCombo, this.rankList);
+        filter.printPractice = (Boolean) getSelectedItem(this.kindCombo, this.kindList);
+        TimeSpanKind timeSpan = (TimeSpanKind) getSelectedItem(this.timeCombo, this.timeList);
+        if (timeSpan == TimeSpanKind.MANUAL) {
+            filter.timeSpan = null;
+            filter.fromTime = this.fromDate.getSelectedDate(false);
+            filter.toTime = this.toDate.getSelectedDate(true);
+        }
+        else {
+            filter.timeSpan = timeSpan;
+            filter.fromTime = null;
+            filter.toTime = null;
+        }
         return filter;
     }
 
-    private Object getSelectedItem(CheckAndCombo combo, List data) {
+    private static Object getSelectedItem(CheckAndCombo combo, List<?> data) {
         if (combo.button.getSelection()) {
             int idx = combo.combo.getSelectionIndex();
             if ((idx >= 0) && (idx < data.size())) {
@@ -191,6 +248,18 @@ public class BattleFilterDialog extends WindowBase {
             }
         }
         return null;
+    }
+
+    private void updateCalenderVisible() {
+        TimeSpanKind timeSpan = (TimeSpanKind) getSelectedItem(this.timeCombo, this.timeList);
+        boolean isManual = (timeSpan == TimeSpanKind.MANUAL);
+        if (isManual ^ this.fromDate.getVisible()) {
+            this.fromDate.setVisible(isManual);
+            this.toDate.setVisible(isManual);
+            if (isManual) {
+                this.getShell().pack();
+            }
+        }
     }
 
     /**
@@ -239,24 +308,26 @@ public class BattleFilterDialog extends WindowBase {
         }
     }
 
-    private static class CheckAndCalender extends CheckAdapter {
+    private static class LabelAndCalender {
         final DateTime datetime;
+        final Label label;
+        boolean visible;
 
-        public CheckAndCalender(Shell shell, Button check, String text, int comboSpan) {
-            super(check, new DateTime(shell, SWT.CALENDAR));
+        public LabelAndCalender(Shell shell, Label label, String text, int comboSpan) {
+            this.label = label;
+            this.datetime = new DateTime(shell, SWT.CALENDAR);
             GridData data = new GridData(GridData.FILL_HORIZONTAL);
             data.horizontalSpan = comboSpan;
-            this.button.setLayoutData(data);
+            data.horizontalAlignment = SWT.CENTER;
+            this.label.setLayoutData(data);
             GridData data2 = new GridData(GridData.FILL_HORIZONTAL);
             data2.horizontalSpan = comboSpan;
-            this.composite.setLayoutData(data2);
-            this.button.setText(text);
-            this.datetime = (DateTime) this.composite;
+            this.datetime.setLayoutData(data2);
+            this.label.setText(text);
+            this.visible = true;
         }
 
         public void setDate(Calendar calendar, boolean endOfDay) {
-            this.button.setSelection(true);
-            this.datetime.setEnabled(true);
             this.datetime.setYear(calendar.get(Calendar.YEAR));
             this.datetime.setMonth(calendar.get(Calendar.MONTH));
             int day = calendar.get(Calendar.DAY_OF_MONTH);
@@ -264,19 +335,27 @@ public class BattleFilterDialog extends WindowBase {
         }
 
         public Date getSelectedDate(boolean endOfDay) {
-            if (this.button.getSelection()) {
-                int year = this.datetime.getYear();
-                int month = this.datetime.getMonth();
-                int day = this.datetime.getDay();
-                Calendar cal = Calendar.getInstance();
-                cal.set(year, month, endOfDay ? (day + 1) : day, 0, 0, 0);
-                return cal.getTime();
+            int year = this.datetime.getYear();
+            int month = this.datetime.getMonth();
+            int day = this.datetime.getDay();
+            Calendar cal = Calendar.getInstance();
+            cal.set(year, month, endOfDay ? (day + 1) : day, 0, 0, 0);
+            return cal.getTime();
+        }
+
+        public void setVisible(boolean visible) {
+            if (this.visible != visible) {
+                this.visible = visible;
+                LayoutLogic.hide(this.label, !visible);
+                LayoutLogic.hide(this.datetime, !visible);
             }
-            return null;
+        }
+
+        public boolean getVisible() {
+            return this.visible;
         }
 
         public void initState(SelectionListener listener, Date date) {
-            this.button.addSelectionListener(listener);
             this.datetime.addSelectionListener(listener);
             this.setDate(ReportUtils.calendarFromDate(date), false);
         }
