@@ -66,6 +66,10 @@ public final class CalcExpDialog extends WindowBase {
     private Text getexp;
     private Text needexp;
     private Text battlecount;
+    private Spinner kikanlv;
+    private Spinner nisekimelv;
+    private Text swinpracticeexp;
+    private Text abwinpracticeexp;
 
     /**
      * Create the dialog.
@@ -209,6 +213,71 @@ public final class CalcExpDialog extends WindowBase {
         gdBattlecount.widthHint = 55;
         this.battlecount.setLayoutData(gdBattlecount);
 
+        //演習経験値ここから
+        Composite plan5 = new Composite(this.shell, SWT.NONE);
+        plan5.setLayout(new FillLayout());
+        plan5.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        new Label(plan5, SWT.SEPARATOR | SWT.HORIZONTAL);
+
+        Composite plan6 = new Composite(this.shell, SWT.NONE);
+        plan6.setLayout(new RowLayout());
+        plan6.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Label label13 = new Label(plan6, SWT.NONE);
+        label13.setText("演習基本経験値(仮)");
+
+        Composite plan7 = new Composite(this.shell, SWT.NONE);
+        plan7.setLayout(new GridLayout(3, false));
+        plan7.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Label label14 = new Label(plan7, SWT.NONE);
+        label14.setText("旗艦レベル");
+        this.kikanlv = new Spinner(plan7, SWT.BORDER);
+        GridData kikan = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        kikan.widthHint = 45;
+        this.kikanlv.setLayoutData(kikan);
+        this.kikanlv.setMaximum(150);
+        this.kikanlv.setMinimum(1);
+        Label label15 = new Label(plan7, SWT.NONE);
+        label15.setText("Lv");
+
+        Label label16 = new Label(plan7, SWT.NONE);
+        label16.setText("2隻目レベル");
+        this.nisekimelv = new Spinner(plan7, SWT.BORDER);
+        GridData nisekime = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        nisekime.widthHint = 45;
+        this.nisekimelv.setLayoutData(nisekime);
+        this.nisekimelv.setMaximum(150);
+        this.nisekimelv.setMinimum(1);
+        Label label17 = new Label(plan7, SWT.NONE);
+        label17.setText("Lv");
+
+        SelectionListener KikanLvListener = new KikanLvListener(this.kikanlv);
+        this.kikanlv.addSelectionListener(KikanLvListener);
+        this.kikanlv.addMouseWheelListener(new WheelListener(this.kikanlv, KikanLvListener));
+        SelectionListener NisekimeLvListener = new NisekimeLvListener(this.nisekimelv);
+        this.nisekimelv.addSelectionListener(NisekimeLvListener);
+        this.nisekimelv.addMouseWheelListener(new WheelListener(this.nisekimelv, NisekimeLvListener));
+
+        Composite practice = new Composite(this.shell, SWT.NONE);
+        practice.setLayout(new GridLayout(3, false));
+        practice.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Label label18 = new Label(practice, SWT.NONE);
+        label18.setText("S勝利");
+        this.swinpracticeexp = new Text(practice, SWT.BORDER | SWT.READ_ONLY);
+        GridData gdPracticeSWinGetexp = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        gdPracticeSWinGetexp.widthHint = 55;
+        this.swinpracticeexp.setLayoutData(gdPracticeSWinGetexp);
+        Label label19 = new Label(practice, SWT.NONE);
+        label19.setText("Exp");
+        Label label20 = new Label(practice, SWT.NONE);
+        label20.setText("A,B勝利");
+        this.abwinpracticeexp = new Text(practice, SWT.BORDER | SWT.READ_ONLY);
+        GridData gdPracticeABWinGetexp = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        gdPracticeABWinGetexp.widthHint = 55;
+        this.abwinpracticeexp.setLayoutData(gdPracticeABWinGetexp);
+        Label label21 = new Label(practice, SWT.NONE);
+        label21.setText("Exp");
+        //演習経験値ここまで
+
         // 海域のインデックス値を復元
         for (int i = 0; i < this.seacombo.getItemCount(); i++) {
             if (this.seacombo.getItem(i).equals(AppConfig.get().getDefaultSea())) {
@@ -243,7 +312,7 @@ public final class CalcExpDialog extends WindowBase {
         // 選択する項目はドラックで移動できないようにする
         for (Control c : new Control[] { this.shipcombo, reload, this.beforexp, this.afterexp, this.getexp,
                 this.needexp, this.beforelv, this.afterlv, this.seacombo, this.evalcombo, this.flagbtn,
-                this.mvpbtn }) {
+                this.mvpbtn, this.kikanlv, this.nisekimelv }) {
             c.setData("disable-drag-move", true);
         }
 
@@ -313,11 +382,32 @@ public final class CalcExpDialog extends WindowBase {
         CalcExpDialog.flag = this.flagbtn.getSelection();
         // MVPチェックを保存
         CalcExpDialog.mvp = this.mvpbtn.getSelection();
+
+        //演習獲得経験値
+        //敵旗艦の累積経験値
+        int kikanexp = this.kikanlv.getSelection();
+        //敵2隻目の累積経験値
+        int nisekimeexp = this.nisekimelv.getSelection();
+        //補正前経験値 (補正前経験値) = (旗艦Lvの必要累計経験値) / 100 + (2隻目Lvの必要累計経験値) / 300
+        int practicebase = (ExpTable.get().get(kikanexp) / 100) + (ExpTable.get().get(nisekimeexp) / 300);
+
+        //基本経験値計算
+        if (practicebase <= 500) {
+            //1) 補正前経験値 ≦ 500 の場合、(基本経験値) = (補正前経験値) * (評価による補正)
+            this.swinpracticeexp.setText(String.valueOf((int) (practicebase * 1.2)));
+            this.abwinpracticeexp.setText(String.valueOf((int) (practicebase * 1.0)));
+        }
+        else {
+            //2) 補正前経験値 ＞ 500 の場合、(基本経験値) = {500 + √(補正前経験値 - 500)} * (評価による補正)
+            this.swinpracticeexp.setText(String.valueOf((int) ((500 + Math.sqrt(practicebase - 500)) * 1.2)));
+            this.abwinpracticeexp.setText(String.valueOf((int) ((500 + Math.sqrt(practicebase - 500)) * 1.0)));
+        }
+
     }
 
     /**
      * コンボボックスに艦娘をセットします
-     * 
+     *
      * @param combo
      */
     private void setShipComboData() {
@@ -370,7 +460,7 @@ public final class CalcExpDialog extends WindowBase {
 
     /**
      * 艦娘のプルダウン表示用文字列を作成します
-     * 
+     *
      * @param ship
      * @param padlength
      * @return
@@ -382,7 +472,7 @@ public final class CalcExpDialog extends WindowBase {
 
     /**
      * 艦娘の状態を更新する
-     * 
+     *
      */
     private final class ReloadListener extends SelectionAdapter {
         @Override
@@ -463,6 +553,46 @@ public final class CalcExpDialog extends WindowBase {
         public void widgetSelected(SelectionEvent e) {
             String afterexpstr = String.valueOf(ExpTable.get().get(this.afterlv.getSelection()));
             this.afterexp.setText(afterexpstr);
+            CalcExpDialog.this.calc();
+        }
+    }
+
+    /**
+     * 演習旗艦レベル変更された
+     *
+     */
+    private final class KikanLvListener extends SelectionAdapter {
+        private final Spinner kikanlv;
+
+        /**
+         * @param kikanlv
+         */
+        private KikanLvListener(Spinner kikanlv) {
+            this.kikanlv = kikanlv;
+        }
+
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+            CalcExpDialog.this.calc();
+        }
+    }
+
+    /**
+     * 演習2隻目のレベル変更された
+     *
+     */
+    private final class NisekimeLvListener extends SelectionAdapter {
+        private final Spinner nisekimelv;
+
+        /**
+         * @param kikanlv
+         */
+        private NisekimeLvListener(Spinner nisekimelv) {
+            this.nisekimelv = nisekimelv;
+        }
+
+        @Override
+        public void widgetSelected(SelectionEvent e) {
             CalcExpDialog.this.calc();
         }
     }
