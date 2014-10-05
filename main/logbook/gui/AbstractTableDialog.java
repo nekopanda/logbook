@@ -243,7 +243,9 @@ public abstract class AbstractTableDialog extends WindowBase {
         TableConfigBean.SortKey[] sortKeys = this.getConfig().getSortKeys();
         if (sortKeys != null) {
             for (TableConfigBean.SortKey key : sortKeys) {
-                this.orderflgs[key.index] = key.order;
+                if (key != null) {
+                    this.orderflgs[key.index] = key.order;
+                }
             }
         }
 
@@ -563,7 +565,7 @@ public abstract class AbstractTableDialog extends WindowBase {
 
     private void setSortDirectionToHeader() {
         TableConfigBean.SortKey[] sortKeys = this.getConfig().getSortKeys();
-        if ((sortKeys != null) && (sortKeys.length > 0)) {
+        if ((sortKeys != null) && (sortKeys[0] != null)) {
             TableColumn headerColumn = this.table.getColumn(sortKeys[0].index);
             boolean orderflg = sortKeys[0].order;
             if (orderflg) {
