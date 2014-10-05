@@ -83,7 +83,7 @@ public final class CalcPracticeExpDialog extends WindowBase {
      */
     private void createContents() {
         // シェルを作成
-        super.createContents(this.parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
+        super.createContents(this.parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE, false);
         this.shell = this.getShell();
         this.shell.setText("演習経験値計算機");
         this.shell.setLayout(new GridLayout(1, false));
@@ -310,4 +310,3 @@ public final class CalcPracticeExpDialog extends WindowBase {
 
     }
 }
-
