@@ -129,7 +129,7 @@ public final class ApplicationMain extends WindowBase {
     /** トレイ */
     private TrayItem trayItem;
 
-    /** ウィンドウたち */
+    /** キャプチャ */
     private CaptureDialog captureWindow;
     /** ドロップ報告書 */
     private DropReportTable dropReportWindow;
@@ -147,15 +147,15 @@ public final class ApplicationMain extends WindowBase {
     private BathwaterTableDialog bathwaterTablwWindow;
     /** 任務一覧 */
     private QuestTable questTableWindow;
-    /** 戦況(大) */
+    /** 戦況 */
     private BattleWindowLarge battleWindowLarge;
-    /** 戦況(小) */
+    /** 戦況-横 */
     private BattleWindowSmall battleWindowSmall;
     /** 自軍敵軍パラメータ */
     private BattleShipWindow battleShipWindow;
     /** 経験値計算 */
     private CalcExpDialog calcExpWindow;
-    /** 経験値計算 */
+    /** 演習経験値計算 */
     private CalcPracticeExpDialog calcPracticeExpWindow;
     /** グループエディター */
     private ShipFilterGroupDialog shipFilterGroupWindow;
@@ -232,7 +232,7 @@ public final class ApplicationMain extends WindowBase {
             ItemConfig.load();
             EnemyData.load();
             */
-            print("設定ファイル読み込み完了");
+            print("基本設定ファイル読み込み完了");
             // シャットダウンフックを登録します
             Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHookThread()));
             // アプリケーション開始

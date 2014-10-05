@@ -364,20 +364,22 @@ public class WindowBase {
      * @param menuItem
      */
     public WindowBase(MenuItem menuItem) {
-        this.menuItem = menuItem;
-        this.menuItem.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                boolean open = WindowBase.this.menuItem.getSelection();
-                if (open) {
-                    WindowBase.this.open();
-                    WindowBase.this.shell.setActive();
+        if (menuItem != null) {
+            this.menuItem = menuItem;
+            this.menuItem.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    boolean open = WindowBase.this.menuItem.getSelection();
+                    if (open) {
+                        WindowBase.this.open();
+                        WindowBase.this.shell.setActive();
+                    }
+                    else {
+                        WindowBase.this.hideWindow();
+                    }
                 }
-                else {
-                    WindowBase.this.hideWindow();
-                }
-            }
-        });
+            });
+        }
     }
 
     public static void setDataToAllChild(Control c, String key, Object data) {
@@ -711,7 +713,6 @@ public class WindowBase {
         this.opacityChanged(this.config.getOpacityIndex());
         // ウィンドウサイズ
         if (this.shouldSaveWindowSize()) {
-            System.out.println(this.getClass().getSimpleName() + ": setSize()");
             this.shell.setSize(this.getRestoreSize());
         }
 
