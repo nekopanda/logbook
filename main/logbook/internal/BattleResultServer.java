@@ -236,6 +236,16 @@ public class BattleResultServer {
         if ((filter.dropShip != null) && (filter.dropShip.equals(dto.getDropName()) == false)) {
             return false;
         }
+        if (filter.timeSpan != null) {
+            Date from = filter.timeSpan.getFrom();
+            Date to = filter.timeSpan.getTo();
+            if (from.after(dto.getBattleDate())) {
+                return false;
+            }
+            if (to.before(dto.getBattleDate())) {
+                return false;
+            }
+        }
         if ((filter.map != null)) {
             if (dto.isPractice()) {
                 return false;
@@ -256,6 +266,12 @@ public class BattleResultServer {
         }
         if ((filter.rank != null) && (filter.rank.equals(dto.getRank()) == false)) {
             return false;
+        }
+        if (filter.printPractice != null) {
+            // 排他的論理和です
+            if (dto.isPractice() ^ filter.printPractice) {
+                return false;
+            }
         }
         return true;
     }
