@@ -237,6 +237,14 @@ public abstract class AbstractTableDialog extends WindowBase {
             }
         });
 
+        // orderflgsを初期化
+        TableConfigBean.SortKey[] sortKeys = this.getConfig().getSortKeys();
+        if (sortKeys != null) {
+            for (TableConfigBean.SortKey key : sortKeys) {
+                this.orderflgs[key.index] = key.order;
+            }
+        }
+
         this.display = this.shell.getDisplay();
         this.createContents();
         this.shell.setText(this.getTitle());
@@ -249,7 +257,6 @@ public abstract class AbstractTableDialog extends WindowBase {
      */
     protected void reloadTable() {
         this.table.setRedraw(false);
-        TableColumn sortColumn = this.table.getSortColumn();
         int topindex = this.table.getTopIndex();
         int selection = this.table.getSelectionIndex();
         int prevItemCount = this.table.getItemCount();
@@ -261,7 +268,7 @@ public abstract class AbstractTableDialog extends WindowBase {
         if (prevItemCount == 0) { // 表示アイテムがなかった時だけカラムの大きさを再計算
             this.packTableHeader();
         }
-        this.table.setSortColumn(sortColumn);
+        this.setSortDirectionToHeader();
         this.table.setSelection(selection);
         this.table.setTopIndex(topindex);
         this.getShell().setText(this.getTitle());
@@ -544,19 +551,27 @@ public abstract class AbstractTableDialog extends WindowBase {
         }
         this.orderflgs[index] = orderflg;
 
-        if (orderflg) {
-            this.table.setSortColumn(headerColumn);
-            this.table.setSortDirection(SWT.UP);
-        } else {
-            this.table.setSortColumn(headerColumn);
-            this.table.setSortDirection(SWT.DOWN);
-        }
-
+        this.setSortDirectionToHeader();
         this.sortBody();
         this.setTableBody();
 
         //this.shell.setRedraw(true);
         this.table.setRedraw(true);
+    }
+
+    private void setSortDirectionToHeader() {
+        TableConfigBean.SortKey[] sortKeys = this.getConfig().getSortKeys();
+        if ((sortKeys != null) && (sortKeys.length > 0)) {
+            TableColumn headerColumn = this.table.getColumn(sortKeys[0].index);
+            boolean orderflg = sortKeys[0].order;
+            if (orderflg) {
+                this.table.setSortColumn(headerColumn);
+                this.table.setSortDirection(SWT.UP);
+            } else {
+                this.table.setSortColumn(headerColumn);
+                this.table.setSortDirection(SWT.DOWN);
+            }
+        }
     }
 
     private void sortBody() {
