@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import logbook.constants.AppConstants;
+import logbook.gui.background.AsyncExecUpdateCheck;
 import logbook.internal.MasterData;
 import logbook.server.proxy.Filter;
 
@@ -18,6 +19,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
@@ -75,6 +77,45 @@ public final class VersionDialog extends WindowBase {
 
         label("航海日誌 拡張版", versionGroup);
         label(AppConstants.VERSION, versionGroup);
+
+        final String updateText = "アップデートを確認中...";
+        final Label update = new Label(versionGroup, SWT.NONE);
+        update.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
+        update.setText(updateText);
+        final Display display = this.shell.getDisplay();
+        new AsyncExecUpdateCheck(new AsyncExecUpdateCheck.UpdateResult() {
+
+            @Override
+            public void onSuccess(final String[] okversions) {
+                display.asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (VersionDialog.this.shell.isDisposed() == false) {
+                            String text = updateText + "最新版です";
+                            if (okversions[0].equals(AppConstants.VERSION) == false) {
+                                text = "最新版 " + okversions[0] + " が公開されています";
+                            }
+                            update.setText(text);
+                            VersionDialog.this.shell.layout();
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onError(final Exception e) {
+                LOG.info(e.getClass().getName() + "が原因でアップデートチェックに失敗しました");
+                display.asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (VersionDialog.this.shell.isDisposed() == false) {
+                            update.setText("アップデートの確認に失敗");
+                            VersionDialog.this.shell.layout();
+                        }
+                    }
+                });
+            }
+        }).start();
 
         Link gowebsite = new Link(versionGroup, SWT.NONE);
         gowebsite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));

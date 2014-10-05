@@ -43,6 +43,7 @@ import logbook.dto.MapCellDto;
 import logbook.dto.MaterialDto;
 import logbook.dto.MissionResultDto;
 import logbook.dto.NdockDto;
+import logbook.dto.PracticeUserDetailDto;
 import logbook.dto.PracticeUserDto;
 import logbook.dto.QuestDto;
 import logbook.dto.ResourceDto;
@@ -159,6 +160,13 @@ public final class GlobalContext {
     static {
         ItemConfig.load();
         INIT_COMPLETE = true;
+    }
+
+    private static enum MATERIAL_DIFF {
+        NEW_VALUE,
+        OBTAINED,
+        CONSUMED,
+        NONE;
     }
 
     /**
@@ -574,6 +582,10 @@ public final class GlobalContext {
         case PRACTICE:
             doPractice(data);
             break;
+        // 演習情報 
+        case PRACTICE_ENEMYINFO:
+            doPracticeEnemyinfo(data);
+            break;
         // 連合艦隊
         case COMBINED:
             doCombined(data);
@@ -965,9 +977,7 @@ public final class GlobalContext {
             ResourceItemDto items = new ResourceItemDto();
             items.loadBaseMaterialsFromField(data);
             items.setResearchMaterials(Integer.parseInt(data.getField("api_item5")));
-            material = material.clone().consumed(items);
-            material.setEvent("建造");
-            CreateReportLogic.storeMaterialReport(material);
+            updateDetailedMaterial("建造", items, MATERIAL_DIFF.CONSUMED);
 
             addConsole("建造(投入資源)情報を更新しました");
         } catch (Exception e) {
@@ -1041,7 +1051,8 @@ public final class GlobalContext {
 
             // 艦娘の装備を追加します
             JsonValue slotitem = apidata.get("api_slotitem");
-            if (slotitem != null) {
+            // まるゆは JsonValue.NULL になるので注意！
+            if ((slotitem != null) && (slotitem != JsonValue.NULL)) {
                 JsonArray slotitemArray = (JsonArray) slotitem;
                 for (int i = 0; i < slotitemArray.size(); i++) {
                     JsonObject object = (JsonObject) slotitemArray.get(i);
@@ -1118,9 +1129,7 @@ public final class GlobalContext {
             JsonArray newMaterial = apidata.getJsonArray("api_material");
             ResourceItemDto items = new ResourceItemDto();
             items.loadMaterialFronJson(newMaterial);
-            material = items.toMaterialDto();
-            material.setEvent("装備開発");
-            CreateReportLogic.storeMaterialReport(material);
+            updateDetailedMaterial("装備開発", items, MATERIAL_DIFF.NEW_VALUE);
 
             addConsole("装備開発情報を更新しました");
         } catch (Exception e) {
@@ -1560,11 +1569,7 @@ public final class GlobalContext {
                 ResourceItemDto items = new ResourceItemDto();
                 items.loadMissionResult(apidata);
                 result.setItems(items);
-                if (material != null) {
-                    material = material.clone().obtained(items);
-                    material.setEvent("遠征帰還");
-                    CreateReportLogic.storeMaterialReport(material);
-                }
+                updateDetailedMaterial("遠征帰還", items, MATERIAL_DIFF.OBTAINED);
             }
 
             CreateReportLogic.storeCreateMissionReport(result);
@@ -1698,10 +1703,7 @@ public final class GlobalContext {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
             ResourceItemDto items = new ResourceItemDto();
             items.loadQuestClear(apidata);
-            if (material != null) {
-                material = material.clone().obtained(items);
-                material.setEvent("任務をクリア");
-            }
+            updateDetailedMaterial("任務をクリア", items, MATERIAL_DIFF.OBTAINED);
 
         } catch (Exception e) {
             LOG.warn("消化した任務を除去しますに失敗しました", e);
@@ -1729,10 +1731,7 @@ public final class GlobalContext {
             JsonObject obj = data.getJsonObject().getJsonObject("api_data");
 
             mapCellDto = new MapCellDto(obj);
-            if (material != null) {
-                material.setEvent("出撃");
-                CreateReportLogic.storeMaterialReport(material);
-            }
+            updateDetailedMaterial("出撃", null, MATERIAL_DIFF.NONE);
 
             ApplicationMain.main.startSortie();
             ApplicationMain.main.updateMapCell(mapCellDto);
@@ -1859,11 +1858,41 @@ public final class GlobalContext {
         try {
             JsonArray apidata = data.getJsonObject().getJsonArray("api_data");
             for (int i = 0; i < apidata.size(); ++i) {
-                practiceUser[i] = new PracticeUserDto((JsonObject) apidata.get(i));
+                PracticeUserDto dto = new PracticeUserDto((JsonObject) apidata.get(i));
+                if ((practiceUser[i] == null) || (practiceUser[i].getId() != dto.getId()))
+                    practiceUser[i] = dto;
+                else
+                    // stateだけ更新
+                    practiceUser[i].setState(dto.getState());
             }
             addConsole("演習情報を更新しました");
         } catch (Exception e) {
             LOG.warn("演習情報更新に失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 演習相手艦隊情報を処理します
+     * @param data
+     */
+    private static void doPracticeEnemyinfo(Data data) {
+        try {
+            JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+            PracticeUserDetailDto dto = new PracticeUserDetailDto(apidata);
+
+            // 持っている情報をアップデートする
+            for (int i = 0; i < 5; ++i) {
+                if ((practiceUser[i] != null) && (practiceUser[i].getId() == dto.getId())) {
+                    practiceUser[i] = dto;
+                    break;
+                }
+            }
+
+            ApplicationMain.main.updateCalcPracticeExp(dto);
+            addConsole("演習相手艦隊情報を更新しました");
+        } catch (Exception e) {
+            LOG.warn("演習相手艦隊情報更新に失敗しました", e);
             LOG.warn(data);
         }
     }
@@ -1887,6 +1916,28 @@ public final class GlobalContext {
         } catch (Exception e) {
             LOG.warn("連合艦隊情報更新に失敗しました", e);
             LOG.warn(data);
+        }
+    }
+
+    private static void updateDetailedMaterial(String ev, ResourceItemDto res, MATERIAL_DIFF diff) {
+        if (material != null) {
+            switch (diff) {
+            case NEW_VALUE:
+                material = res.toMaterialDto();
+                break;
+            case OBTAINED:
+                material = material.clone().obtained(res);
+                break;
+            case CONSUMED:
+                material = material.clone().consumed(res);
+                break;
+            default:
+                break;
+            }
+            material.setEvent(ev);
+            if (AppConfig.get().isMaterialLogDetail()) {
+                CreateReportLogic.storeMaterialReport(material);
+            }
         }
     }
 

@@ -19,7 +19,7 @@ public final class QuestDto extends AbstractDto {
     /** api_type */
     private int type;
 
-    /** api_state */
+    /** api_state (1:特になし 2:遂行中 3:完了) */
     private int state;
 
     /** api_title */
@@ -43,8 +43,30 @@ public final class QuestDto extends AbstractDto {
     /** api_bonus_flag */
     private int bonusFlag;
 
-    /** api_progress_flag */
+    /** api_progress_flag (0:50%未満, 1:50%以上, 2:80%以上) */
     private int progressFlag;
+
+    public String getStateString() {
+        switch (this.state) {
+        case 2:
+            return "遂行中";
+        case 3:
+            return "達成";
+        default:
+            return "";
+        }
+    }
+
+    public String getProgressString() {
+        switch (this.progressFlag) {
+        case 1:
+            return "50%";
+        case 2:
+            return "80%";
+        default:
+            return "";
+        }
+    }
 
     /**
      * api_noを取得します。

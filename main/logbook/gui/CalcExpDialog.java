@@ -77,6 +77,15 @@ public final class CalcExpDialog extends WindowBase {
     }
 
     /**
+     * 「新しいウィンドウを開く」用
+     */
+    public CalcExpDialog() {
+        super();
+        // アプリ上での親はないが、メインウィンドウの子ウィンドウとして作成する
+        this.parent = ApplicationMain.main.getShell();
+    }
+
+    /**
      * Open the dialog.
      */
     @Override
@@ -105,7 +114,7 @@ public final class CalcExpDialog extends WindowBase {
      */
     private void createContents() {
         // シェルを作成
-        super.createContents(this.parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
+        super.createContents(this.parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE, false);
         this.shell = this.getShell();
         this.shell.setText("経験値計算機");
         this.shell.setLayout(new GridLayout(1, false));
@@ -246,6 +255,18 @@ public final class CalcExpDialog extends WindowBase {
                 this.mvpbtn }) {
             c.setData("disable-drag-move", true);
         }
+
+        // 「新しいウィンドウを作る」を右クリックメニューに追加する
+        final MenuItem createNewWin = new MenuItem(this.getMenu(), SWT.PUSH, 0);
+        createNewWin.setText("新しいウィンドウを開く(&N)\tCtrl+N");
+        createNewWin.setAccelerator(SWT.CTRL + 'N');
+        createNewWin.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                new CalcExpDialog().open();
+            }
+        });
+        new MenuItem(this.getMenu(), SWT.SEPARATOR, 1);
 
         this.shell.pack();
         this.setShipComboData();

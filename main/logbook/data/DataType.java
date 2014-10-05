@@ -81,6 +81,8 @@ public enum DataType {
     MISSION("/kcsapi/api_get_member/mission"),
     /** 演習情報 */
     PRACTICE("/kcsapi/api_get_member/practice"),
+    /** 演習情報 */
+    PRACTICE_ENEMYINFO("/kcsapi/api_req_member/get_practice_enemyinfo"),
     /** 戦闘 */
     PRACTICE_BATTLE("/kcsapi/api_req_practice/battle"),
     /** 戦闘(夜戦) */

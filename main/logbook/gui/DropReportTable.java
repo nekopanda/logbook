@@ -21,6 +21,7 @@ import logbook.gui.logic.TableItemCreator;
 import logbook.gui.logic.TableRowHeader;
 import logbook.internal.BattleResultFilter;
 import logbook.internal.BattleResultServer;
+import logbook.internal.TimeSpanKind;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
@@ -50,6 +51,8 @@ public final class DropReportTable extends AbstractTableDialog {
 
     private BattleResultFilter filter = new BattleResultFilter();
 
+    private BattleFilterDialog battleFilterDialog;
+
     private final BattleDetailDialog detailDialog;
 
     /**
@@ -58,6 +61,8 @@ public final class DropReportTable extends AbstractTableDialog {
     public DropReportTable(Shell parent, MenuItem menuItem) {
         super(parent, menuItem);
         this.detailDialog = new BattleDetailDialog(parent);
+        this.filter.printPractice = false;
+        this.filter.timeSpan = TimeSpanKind.LAST_24HOURS;
     }
 
     public void updateFilter(BattleResultFilter filter) {
@@ -80,27 +85,26 @@ public final class DropReportTable extends AbstractTableDialog {
                 }
             }
         });
-        // フィルターメニュー
-        final MenuItem filter = new MenuItem(this.opemenu, SWT.PUSH);
-        filter.setText("フィルター(&F)\tCtrl+F");
-        filter.setAccelerator(SWT.CTRL + 'F');
-        filter.addSelectionListener(new SelectionAdapter() {
+        SelectionListener filterListener = new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                new BattleFilterDialog(DropReportTable.this).open();
+                if (DropReportTable.this.battleFilterDialog == null)
+                    DropReportTable.this.battleFilterDialog =
+                            new BattleFilterDialog(DropReportTable.this);
+                DropReportTable.this.battleFilterDialog.open();
             }
-        });
+        };
+        // フィルターメニュー
+        final MenuItem filter = new MenuItem(this.menubar, SWT.PUSH);
+        filter.setText("フィルター");
+        filter.setAccelerator(SWT.CTRL + 'F');
+        filter.addSelectionListener(filterListener);
         // セパレータ
         new MenuItem(this.tablemenu, SWT.SEPARATOR);
         // 右クリックメニューに追加する
         final MenuItem filtertable = new MenuItem(this.tablemenu, SWT.NONE);
-        filtertable.setText("フィルター(&F)");
-        filtertable.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                new BattleFilterDialog(DropReportTable.this).open();
-            }
-        });
+        filtertable.setText("フィルター(&F)\tCtrl+F");
+        filtertable.addSelectionListener(filterListener);
         // 保存メニュー
         final MenuItem save = new MenuItem(this.tablemenu, SWT.NONE);
         save.setText("選択したログを保存する");

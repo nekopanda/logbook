@@ -328,12 +328,24 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     TableItem[] tableItems = ShipTable.this.table.getSelection();
-                    ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
-                    for (int i = 0; i < tableItems.length; i++) {
-                        int id = Integer.parseInt(tableItems[i].getText(1));
-                        bean.getShips().remove(id);
+                    if (tableItems.length > 0) {
+                        List<String> name = new ArrayList<>();
+                        for (int i = 0; i < tableItems.length; i++) {
+                            name.add(((ShipDto) tableItems[i].getData()).getName());
+                        }
+                        MessageBox box = new MessageBox(ShipTable.this.shell, SWT.YES | SWT.NO
+                                | SWT.ICON_QUESTION);
+                        box.setText("選択した艦娘をグループから除去");
+                        box.setMessage("「" + StringUtils.join(name, ",") + "」をグループから除去しますか？");
+
+                        if (box.open() == SWT.YES) {
+                            for (int i = 0; i < tableItems.length; i++) {
+                                long id = Long.parseLong(tableItems[i].getText(1));
+                                ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
+                                bean.getShips().remove(id);
+                            }
+                        }
                     }
-                    ShipGroupObserver.groupShipChanged(bean);
                 }
             });
         }

@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -128,6 +127,8 @@ public final class CreateReportLogic {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
             } else if (cond <= AppConstants.COND_ORANGE) {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
+            } else if (cond >= AppConstants.COND_GREEN) {
+                item.setForeground(SWTResourceManager.getColor(AppConstants.COND_GREEN_COLOR));
             }
             */
             // 疲労は 12 番目
@@ -505,7 +506,7 @@ public final class CreateReportLogic {
                 fleet = String.valueOf(ship.getFleetid()) + "-" + String.valueOf(ship.getFleetpos() + 1);
             }
 
-            String now = "";
+            String now = null;
             if (missionSet.contains(ship.getId())) {
                 now = "遠征中";
             }
@@ -761,7 +762,7 @@ public final class CreateReportLogic {
      * @return
      */
     public static String[] getCreateQuestHeader() {
-        return new String[] { "No.", "表示位置", "状態", "タイトル", "内容", "燃料", "弾薬", "鋼材", "ボーキ" };
+        return new String[] { "No.", "表示位置", "状態", "進捗", "タイトル", "内容", "燃料", "弾薬", "鋼材", "ボーキ" };
     }
 
     /**
@@ -776,25 +777,11 @@ public final class CreateReportLogic {
             if (quest == null)
                 continue;
 
-            String state = "";
-            switch (quest.getState()) {
-            case 1:
-                state = "";
-                break;
-            case 2:
-                state = "遂行中";
-                break;
-            case 3:
-                state = "達成";
-                break;
-            default:
-                continue;
-            }
-
             body.add(new Comparable[] {
                     quest.getNo(),
                     "" + quest.getPage() + "-" + quest.getPos(),
-                    state,
+                    quest.getStateString(),
+                    quest.getProgressString(),
                     quest.getTitle(),
                     quest.getDetail(),
                     quest.getFuel(),
@@ -947,26 +934,71 @@ public final class CreateReportLogic {
      * @return フィルタ結果
      */
     private static boolean shipFilter(ShipDto ship, ShipFilterDto filter) {
-        // 名前でフィルタ
+        // テキストでフィルタ
         if (!StringUtils.isEmpty(filter.nametext)) {
+            // 検索ワード
+            String[] words = StringUtils.split(filter.nametext, " ");
+            // 検索対象
+            // 名前
+            String name = ship.getName();
+            // 艦種
+            String type = ship.getType();
+            // 装備
+            List<ItemDto> item = ship.getItem();
+
             // テキストが入力されている場合処理する
             if (filter.regexp) {
                 // 正規表現で検索
-                try {
-                    filter.namepattern = Pattern.compile(filter.nametext);
-                } catch (PatternSyntaxException e) {
-                    // 無効な正規表現はfalseを返す
-                    return false;
-                }
-                Matcher matcher = filter.namepattern.matcher(ship.getName());
-                if (!matcher.find()) {
-                    // マッチしない
-                    return false;
+                for (int i = 0; i < words.length; i++) {
+                    Pattern pattern;
+                    try {
+                        pattern = Pattern.compile(words[i]);
+                    } catch (PatternSyntaxException e) {
+                        // 無効な正規表現はfalseを返す
+                        return false;
+                    }
+                    boolean find = false;
+
+                    // 名前で検索
+                    find = find ? find : pattern.matcher(name).find();
+                    // 艦種で検索
+                    find = find ? find : pattern.matcher(type).find();
+                    // 装備で検索
+                    for (ItemDto itemDto : item) {
+                        if ((itemDto == null) || (itemDto.getName() == null)) {
+                            find = find ? find : false;
+                        } else {
+                            find = find ? find : pattern.matcher(itemDto.getName()).find();
+                        }
+                    }
+
+                    if (!find) {
+                        // どれにもマッチしない場合
+                        return false;
+                    }
                 }
             } else {
                 // 部分一致で検索する
-                if (ship.getName().indexOf(filter.nametext) == -1) {
-                    return false;
+                for (int i = 0; i < words.length; i++) {
+                    boolean find = false;
+
+                    // 名前で検索
+                    find = find ? find : name.indexOf(words[i]) != -1;
+                    // 艦種で検索
+                    find = find ? find : type.indexOf(words[i]) != -1;
+                    // 装備で検索
+                    for (ItemDto itemDto : item) {
+                        if ((itemDto == null) || (itemDto.getName() == null)) {
+                            find = find ? find : false;
+                        } else {
+                            find = find ? find : itemDto.getName().indexOf(words[i]) != -1;
+                        }
+                    }
+
+                    if (!find) {
+                        // どれにもマッチしない場合
+                        return false;
+                    }
                 }
             }
         }

@@ -29,7 +29,6 @@ import org.eclipse.wb.swt.SWTResourceManager;
  */
 public class BattleWindowSmall extends BattleWindow {
 
-    private Label title;
     private final Composite[] infoCompo = new Composite[2];
     private Composite damageCompo;
     private Composite resultCompo;
@@ -343,32 +342,5 @@ public class BattleWindowSmall extends BattleWindow {
         }
 
         this.resultCompo.layout();
-    }
-
-    @Override
-    protected void updateData(boolean start) {
-        this.beginDraw();
-        try {
-            if (this.getBattle() != null) {
-                this.printDock();
-                this.printMap();
-                this.printBattle();
-            }
-            else if (this.getDocks() == null) {
-                // 出撃中でない
-                this.clearText();
-            }
-            else if (this.getMapCellDto() == null) {
-                // 移動中
-                this.clearText();
-                this.printDock();
-            }
-            else {
-                // 移動中
-                this.printMap();
-            }
-        } finally {
-            this.endDraw();
-        }
     }
 }

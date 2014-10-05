@@ -81,6 +81,7 @@ public class LauncherWindow extends WindowBase {
                 "戦横",
                 "パラ",
                 "経験",
+                "演習",
                 "グル",
                 "ロー" // 最後は自分
         };
@@ -102,7 +103,6 @@ public class LauncherWindow extends WindowBase {
             button.setData("disable-drag-move", true);
         }
 
-        System.out.println("shell.pack()");
         shell.layout();
     }
 

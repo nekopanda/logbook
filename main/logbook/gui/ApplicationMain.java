@@ -1,5 +1,6 @@
 package logbook.gui;
 
+import java.awt.Desktop;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -17,6 +18,7 @@ import logbook.data.context.GlobalContext;
 import logbook.dto.BattleExDto;
 import logbook.dto.DockDto;
 import logbook.dto.MapCellDto;
+import logbook.dto.PracticeUserDetailDto;
 import logbook.gui.background.AsyncExecApplicationMain;
 import logbook.gui.background.AsyncExecUpdateCheck;
 import logbook.gui.background.BackgroundInitializer;
@@ -24,6 +26,7 @@ import logbook.gui.listener.HelpEventListener;
 import logbook.gui.listener.MainShellAdapter;
 import logbook.gui.listener.TraySelectionListener;
 import logbook.gui.logic.LayoutLogic;
+import logbook.gui.logic.PushNotify;
 import logbook.gui.logic.Sound;
 import logbook.gui.widgets.FleetComposite;
 import logbook.internal.BattleResultServer;
@@ -127,7 +130,7 @@ public final class ApplicationMain extends WindowBase {
     /** トレイ */
     private TrayItem trayItem;
 
-    /** ウィンドウたち */
+    /** キャプチャ */
     private CaptureDialog captureWindow;
     /** ドロップ報告書 */
     private DropReportTable dropReportWindow;
@@ -145,14 +148,16 @@ public final class ApplicationMain extends WindowBase {
     private BathwaterTableDialog bathwaterTablwWindow;
     /** 任務一覧 */
     private QuestTable questTableWindow;
-    /** 戦況(大) */
+    /** 戦況 */
     private BattleWindowLarge battleWindowLarge;
-    /** 戦況(小) */
+    /** 戦況-横 */
     private BattleWindowSmall battleWindowSmall;
     /** 自軍敵軍パラメータ */
     private BattleShipWindow battleShipWindow;
     /** 経験値計算 */
     private CalcExpDialog calcExpWindow;
+    /** 演習経験値計算 */
+    private CalcPracticeExpDialog calcPracticeExpWindow;
     /** グループエディター */
     private ShipFilterGroupDialog shipFilterGroupWindow;
     /** ツール */
@@ -228,7 +233,7 @@ public final class ApplicationMain extends WindowBase {
             ItemConfig.load();
             EnemyData.load();
             */
-            print("設定ファイル読み込み完了");
+            print("基本設定ファイル読み込み完了");
             // シャットダウンフックを登録します
             Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHookThread()));
             // アプリケーション開始
@@ -456,6 +461,12 @@ public final class ApplicationMain extends WindowBase {
         calcexp.setText("経験値計算機(&C)\tCtrl+C");
         calcexp.setAccelerator(SWT.CTRL + 'C');
         this.calcExpWindow = new CalcExpDialog(this.dummyHolder, calcexp);
+
+        // 計算機-演習経験値計算
+        MenuItem calcpracticeexp = new MenuItem(calcmenu, SWT.CHECK);
+        calcpracticeexp.setText("演習経験値計算機(&C)\tCtrl+V");
+        calcpracticeexp.setAccelerator(SWT.CTRL + 'V');
+        this.calcPracticeExpWindow = new CalcPracticeExpDialog(this.dummyHolder, calcpracticeexp);
 
         // その他-グループエディター
         MenuItem shipgroup = new MenuItem(etcmenu, SWT.CHECK);
@@ -800,6 +811,7 @@ public final class ApplicationMain extends WindowBase {
         print("ウィンドウ構築完了");
 
         this.startThread();
+        this.updateCheck();
     }
 
     @Override
@@ -870,6 +882,7 @@ public final class ApplicationMain extends WindowBase {
                 this.battleWindowSmall,
                 this.battleShipWindow,
                 this.calcExpWindow,
+                this.calcPracticeExpWindow,
                 this.shipFilterGroupWindow,
                 this.launcherWindow
         };
@@ -916,15 +929,68 @@ public final class ApplicationMain extends WindowBase {
         ThreadManager.regist(new AsyncExecApplicationMain(this));
         // サウンドを出すスレッド
         ThreadManager.regist(new Sound.PlayerThread());
+        // Push通知を行うスレッド
+        ThreadManager.regist(new PushNotify.PushNotifyThread());
         // スレッドを監視するスレッド
         ThreadManager.regist(new ThreadStateObserver(this.shell));
 
         ThreadManager.start();
+    }
 
+    private void updateCheck() {
         // アップデートチェックする
-        if (AppConfig.get().isUpdateCheck()) {
-            new AsyncExecUpdateCheck(this.shell).start();
-        }
+        final Display display = this.shell.getDisplay();
+        new AsyncExecUpdateCheck(new AsyncExecUpdateCheck.UpdateResult() {
+
+            @Override
+            public void onSuccess(final String[] okversions) {
+                boolean ok = false;
+                for (String okversion : okversions) {
+                    if (AppConstants.VERSION.equals(okversion)) {
+                        ok = true;
+                        break;
+                    }
+                }
+
+                if ((ok == false) && AppConfig.get().isUpdateCheck()) {
+                    display.asyncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (ApplicationMain.this.shell.isDisposed()) {
+                                // ウインドウが閉じられていたらなにもしない
+                                return;
+                            }
+
+                            MessageBox box = new MessageBox(ApplicationMain.this.shell, SWT.YES | SWT.NO
+                                    | SWT.ICON_QUESTION);
+                            box.setText("新しいバージョン");
+                            box.setMessage("新しいバージョンがあります。ホームページを開きますか？\r\n"
+                                    + "現在のバージョン:" + AppConstants.VERSION + "\r\n"
+                                    + "新しいバージョン:" + okversions[0] + "\r\n"
+                                    + "※自動アップデートチェックは[その他]-[設定]からOFFに出来ます");
+
+                            // OKを押されたらホームページへ移動する
+                            if (box.open() == SWT.YES) {
+                                try {
+                                    Desktop.getDesktop().browse(AppConstants.HOME_PAGE_URI);
+                                } catch (Exception e) {
+                                    LOG.warn("ウェブサイトに移動が失敗しました", e);
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+                // チェックしなくてもいい設定の場合はエラーを無視する
+                if (AppConfig.get().isUpdateCheck()) {
+                    // アップデートチェック失敗はクラス名のみ
+                    LOG.info(e.getClass().getName() + "が原因でアップデートチェックに失敗しました");
+                }
+            }
+        }).start();
     }
 
     @Override
@@ -1205,5 +1271,9 @@ public final class ApplicationMain extends WindowBase {
         for (BattleWindowBase window : this.getBattleWindowList()) {
             window.updateBattle(battleDto);
         }
+    }
+
+    public void updateCalcPracticeExp(PracticeUserDetailDto practiceUserExDto) {
+        this.calcPracticeExpWindow.updatePracticeUser(practiceUserExDto);
     }
 }

@@ -1,5 +1,7 @@
 package logbook.gui.widgets;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -248,7 +250,7 @@ public class FleetComposite extends Composite {
 
     /**
      * 艦隊を更新します
-     * 
+     *
      * @param dock
      * @param combinedFleetbadlyDamaed 連合艦隊の他の艦隊の艦が大破している
      */
@@ -285,8 +287,12 @@ public class FleetComposite extends Composite {
         }
         // 艦隊合計Lv
         int totallv = 0;
-        // 索敵値計
+        // 索敵値計(素)
         int totalSakuteki = 0;
+        // 偵察機索敵値計
+        int totalSakutekiSurvey = 0;
+        // 電探索敵値計
+        int totalSakutekiRader = 0;
 
         for (int i = 0; i < ships.size(); i++) {
             ShipDto ship = ships.get(i);
@@ -405,6 +411,7 @@ public class FleetComposite extends Composite {
                     this.bullstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
                 }
             }
+
             // ステータス.ダメコン
             List<ItemDto> item = ship.getItem();
             int dmgcsty = 0;
@@ -500,6 +507,7 @@ public class FleetComposite extends Composite {
             // コンディション
             this.condLabels[i].setText(MessageFormat.format("{0} cond.", cond));
             this.bullstLabels[i].getParent().layout();
+
         }
         // メッセージを更新する
         // 入渠中の艦娘を探す
@@ -514,6 +522,22 @@ public class FleetComposite extends Composite {
         int seiku = 0;
         for (ShipDto shipDto : ships) {
             seiku += shipDto.getSeiku();
+        }
+        // ドラム缶、大発の合計
+        int dram = 0;
+        int dramKanmusu = 0;
+        int daihatsu = 0;
+        for (ShipDto shipDto : ships) {
+            if (shipDto.getDram() > 0) {
+                dramKanmusu++;
+                dram += shipDto.getDram();
+            }
+            daihatsu += shipDto.getDaihatsu();
+        }
+        //大発による遠征効率UPの上限
+        int daihatsuUp = daihatsu * 5;
+        if (daihatsuUp > 20) {
+            daihatsuUp = 20;
         }
 
         StyleRange messageStyle = new StyleRange();
@@ -571,12 +595,26 @@ public class FleetComposite extends Composite {
         if (this.clearDate != null) {
             this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_COND, this.clearDate), null);
         }
+        // 索敵 計算
         SakutekiString fleetStatus = new SakutekiString(ships);
         // 制空
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_SEIKU, seiku), null);
+        // 索敵
         this.addStyledText(this.message,
                 MessageFormat.format(AppConstants.MESSAGE_SAKUTEKI, fleetStatus.toString()), null);
+        // 合計Lv
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_TOTAL_LV, totallv), null);
+
+        if (dram > 0) {
+            // ドラム缶合計数
+            this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_TOTAL_DRAM, dram, dramKanmusu),
+                    null);
+        }
+        if (daihatsu > 0) {
+            // 大発合計数
+            this.addStyledText(this.message,
+                    MessageFormat.format(AppConstants.MESSAGE_TOTAL_DAIHATSU, daihatsu, daihatsuUp), null);
+        }
 
         this.updateTabIcon();
         this.postFatal();
@@ -653,7 +691,7 @@ public class FleetComposite extends Composite {
 
     /**
      * スタイル付きテキストを設定します
-     * 
+     *
      * @param text StyledText
      * @param str 文字
      * @param style スタイル
@@ -680,7 +718,7 @@ public class FleetComposite extends Composite {
 
     /**
      * あと何回戦闘すればよいかを取得します
-     * 
+     *
      * @param ship 艦娘
      * @param isFlagship 旗艦
      * @return 回数

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package logbook.dto;
 
@@ -56,8 +56,8 @@ public abstract class ShipBaseDto extends AbstractDto {
         ShipInfoDto shipinfo = Ship.get(String.valueOf(shipId));
         this.shipInfo = shipinfo;
         this.slot = JsonUtils.getIntArray(object, "api_slot");
-        this.slotItem = this.getItem();
-        ShipParameters[] params = ShipParameters.fromShip(object, this.getItem());
+        this.slotItem = this.createItemList();
+        ShipParameters[] params = ShipParameters.fromShip(object, this.getItem(), shipinfo);
         this.param = params[0];
         this.max = params[1];
         this.slotParam = params[2];
@@ -70,7 +70,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     public ShipBaseDto(int shipId, int[] slot) {
         this.shipInfo = Ship.get(String.valueOf(shipId));
         this.slot = slot;
-        this.slotItem = this.getItem();
+        this.slotItem = this.createItemList();
         ShipParameters[] params = ShipParameters.fromBaseAndSlotItem(
                 this.shipInfo.getParam(), this.getItem());
         this.param = params[0];
@@ -193,10 +193,7 @@ public abstract class ShipBaseDto extends AbstractDto {
         return this.slot;
     }
 
-    /**
-     * @return 装備
-     */
-    public List<ItemDto> getItem() {
+    private List<ItemDto> createItemList() {
         List<ItemDto> items = new ArrayList<ItemDto>();
         Map<Integer, ItemDto> itemMap = this.getItemMap();
         for (int itemid : this.getItemId()) {
@@ -215,12 +212,22 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * @return 装備
+     */
+    public List<ItemDto> getItem() {
+        if (this.slotItem == null) {
+            return this.createItemList();
+        }
+        return this.slotItem;
+    }
+
+    /**
      * @return 制空値
      */
     public int getSeiku() {
         List<ItemDto> items = this.getItem();
         int seiku = 0;
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < items.size(); i++) {
             ItemDto item = items.get(i);
             if (item != null) {
                 if ((item.getType2() == 6)
@@ -240,15 +247,52 @@ public abstract class ShipBaseDto extends AbstractDto {
      * @return アイテムの索敵合計
      */
     public int getSlotSakuteki() {
-        List<ItemDto> items = this.getItem();
         int sakuteki = 0;
-        for (int i = 0; i < 4; i++) {
-            ItemDto item = items.get(i);
+        for (ItemDto item : this.getItem()) {
             if (item != null) {
                 sakuteki += item.getParam().getSaku();
             }
         }
         return sakuteki;
+    }
+
+    /**
+     * /ドラム缶の合計を計算します
+     * @return ドラム缶の合計値
+     */
+    public int getDram() {
+        // ドラム缶合計
+        int dram = 0;
+        List<ItemDto> items = this.getItem();
+        for (int i = 0; i < 4; i++) {
+            ItemDto item = items.get(i);
+            if (item != null) {
+                if (item.getName().equals("ドラム缶(輸送用)")) {
+                    dram++;
+                }
+            }
+        }
+        return dram;
+    }
+
+    /**
+     * /大発の合計を計算します
+     * @return 大発の合計値
+     */
+    public int getDaihatsu() {
+        // 大発合計
+        int daihatsu = 0;
+        List<ItemDto> items = this.getItem();
+        int sakuteki = 0;
+        for (int i = 0; i < 4; i++) {
+            ItemDto item = items.get(i);
+            if (item != null) {
+                if (item.getName().equals("大発動艇")) {
+                    daihatsu++;
+                }
+            }
+        }
+        return daihatsu;
     }
 
     /**
