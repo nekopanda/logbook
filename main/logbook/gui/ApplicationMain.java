@@ -26,6 +26,7 @@ import logbook.gui.listener.HelpEventListener;
 import logbook.gui.listener.MainShellAdapter;
 import logbook.gui.listener.TraySelectionListener;
 import logbook.gui.logic.LayoutLogic;
+import logbook.gui.logic.PushNotify;
 import logbook.gui.logic.Sound;
 import logbook.gui.widgets.FleetComposite;
 import logbook.internal.BattleResultServer;
@@ -928,6 +929,8 @@ public final class ApplicationMain extends WindowBase {
         ThreadManager.regist(new AsyncExecApplicationMain(this));
         // サウンドを出すスレッド
         ThreadManager.regist(new Sound.PlayerThread());
+        // Push通知を行うスレッド
+        ThreadManager.regist(new PushNotify.PushNotifyThread());
         // スレッドを監視するスレッド
         ThreadManager.regist(new ThreadStateObserver(this.shell));
 

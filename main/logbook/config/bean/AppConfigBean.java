@@ -51,6 +51,30 @@ public final class AppConfigBean {
     /** 報告書の保存先 */
     private String reportPath = new File("").getAbsolutePath();
 
+    /** Prowl による Push 通知設定 */
+    private boolean NotifyProwl = false;
+
+    /** Prowl による Push 通知 APIKey */
+    private String ProwlAPIKey = "";
+
+    /** NMA による Push 通知設定 */
+    private boolean NotifyNMA = false;
+
+    /** NMA による Push 通知 APIKey */
+    private String NMAAPIKey = "";
+
+    /** ImKayac による Push 通知設定 */
+    private boolean NotifyImKayac = false;
+
+    /** ImKayac による Push 通知 UserName */
+    private String ImKayacUserName = "";
+
+    /** ImKayac による Push 通知 Password */
+    private String ImKayacPasswd = "";
+
+    /** ImKayac による Push 通知 Password */
+    private String ImKayacPrivateKey = "";
+
     /** 出撃ログの保存先 */
     private String battleLogPath = new File("battlelog").getAbsolutePath();
 
@@ -367,6 +391,118 @@ public final class AppConfigBean {
      */
     public String getReportPath() {
         return this.reportPath;
+    }
+
+    /** Prowl による Push 通知の設定を取得します
+     * @return Prowl による Push 通知の設定
+     */
+    public boolean getNotifyProwl() {
+        return this.NotifyProwl;
+    }
+
+    /** Prowl による Push 通知の API Key を取得します
+     * @return API Key
+     */
+    public String getProwlAPIKey() {
+        return this.ProwlAPIKey;
+    }
+
+    /** Prowl による Push 通知を設定します
+     * @param Prowl による Push 通知
+     */
+    public void setNotifyProwl(boolean prowlflg) {
+        this.NotifyProwl = prowlflg;
+    }
+
+    /** Prowl による Push 通知の API Key を設定します
+     * @param API Key
+     */
+    public void setProwlAPIKey(String apikey) {
+        this.ProwlAPIKey = apikey;
+    }
+
+    /** NMA による Push 通知の設定を取得します
+     * @return NMA による Push 通知の設定
+     */
+    public boolean getNotifyNMA() {
+        return this.NotifyNMA;
+    }
+
+    /** NMA による Push 通知の API Key を取得します
+     * @return API Key
+     */
+    public String getNMAAPIKey() {
+        return this.NMAAPIKey;
+    }
+
+    /** NMA による Push 通知を設定します
+     * @param NMA による Push 通知
+     */
+    public void setNotifyNMA(boolean nmaflg) {
+        this.NotifyNMA = nmaflg;
+    }
+
+    /** NMA による Push 通知の API Key を設定します
+     * @param API Key
+     */
+    public void setNMAAPIKey(String apikey) {
+        this.NMAAPIKey = apikey;
+    }
+
+    /** ImKayac による Push 通知の設定を取得します
+     * @return ImKayac による Push 通知の設定
+     */
+    public boolean getNotifyImKayac() {
+        return this.NotifyImKayac;
+    }
+
+    /** ImKayac による Push 通知の UserName を取得します
+     * @return UserName
+     */
+    public String getImKayacUserName() {
+        return this.ImKayacUserName;
+    }
+
+    /** ImKayac による Push 通知の Password を取得します
+     * @return Password
+     */
+    public String getImKayacPasswd() {
+        return this.ImKayacPasswd;
+    }
+
+    /** ImKayac による Push 通知の PrivateKey を取得します
+     * @return PrivateKey
+     */
+    public String getImKayacPrivateKey() {
+        return this.ImKayacPrivateKey;
+    }
+
+    /** ImKayac による Push 通知を設定します
+     * @param ImKayac による Push 通知
+     */
+    public void setNotifyImKayac(boolean imkayacflg) {
+        this.NotifyImKayac = imkayacflg;
+    }
+
+    /** ImKayac による Push 通知の UserName を設定します
+     * @param UserName
+     */
+    public void setImKayacUserName(String username) {
+        this.ImKayacUserName = username;
+    }
+
+    /** ImKayac による Push 通知の Password を設定します
+     * @param Password
+     */
+    public void setImKayacPasswd(String passwd) {
+        this.ImKayacPasswd = passwd;
+    }
+
+    /** ImKayac による Push 通知の PrivateKey を設定します
+     * @param privatekey
+     */
+    public void setImKayacPrivateKey(String privatekey) {
+        this.ImKayacPrivateKey = privatekey;
     }
 
     /**
