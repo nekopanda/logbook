@@ -762,7 +762,7 @@ public final class CreateReportLogic {
      * @return
      */
     public static String[] getCreateQuestHeader() {
-        return new String[] { "No.", "表示位置", "状態", "タイトル", "内容", "燃料", "弾薬", "鋼材", "ボーキ" };
+        return new String[] { "No.", "表示位置", "状態", "進捗", "タイトル", "内容", "燃料", "弾薬", "鋼材", "ボーキ" };
     }
 
     /**
@@ -777,25 +777,11 @@ public final class CreateReportLogic {
             if (quest == null)
                 continue;
 
-            String state = "";
-            switch (quest.getState()) {
-            case 1:
-                state = "";
-                break;
-            case 2:
-                state = "遂行中";
-                break;
-            case 3:
-                state = "達成";
-                break;
-            default:
-                continue;
-            }
-
             body.add(new Comparable[] {
                     quest.getNo(),
                     "" + quest.getPage() + "-" + quest.getPos(),
-                    state,
+                    quest.getStateString(),
+                    quest.getProgressString(),
                     quest.getTitle(),
                     quest.getDetail(),
                     quest.getFuel(),
