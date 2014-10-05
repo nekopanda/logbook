@@ -1051,7 +1051,8 @@ public final class GlobalContext {
 
             // 艦娘の装備を追加します
             JsonValue slotitem = apidata.get("api_slotitem");
-            if (slotitem != null) {
+            // まるゆは JsonValue.NULL になるので注意！
+            if ((slotitem != null) && (slotitem != JsonValue.NULL)) {
                 JsonArray slotitemArray = (JsonArray) slotitem;
                 for (int i = 0; i < slotitemArray.size(); i++) {
                     JsonObject object = (JsonObject) slotitemArray.get(i);
