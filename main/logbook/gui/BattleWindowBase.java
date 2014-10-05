@@ -87,41 +87,44 @@ public class BattleWindowBase extends WindowBase {
             this.combinedMode = true;
             this.setCombinedMode(false);
             this.getShell().pack();
-
-            // 最初の表示で大きさを固定する
-            for (Label label : this.fixedSizedLabels) {
-                Object data = label.getLayoutData();
-                if (data instanceof GridData) {
-                    GridData gd = (GridData) data;
-                    gd.widthHint = label.getSize().x;
-                }
-            }
-
-            this.clearText();
-            // ウィンドウサイズ復元
-            Point winSize = this.getWindowConfig().getSize();
-            if ((winSize.x != -1) && (winSize.y != -1)) {
-                this.getShell().setSize(winSize);
-            }
             this.setWindowInitialized(true);
+            this.setVisible(true);
+
+            // 表示後に実行する
+            // (表示前にサイズを取得すると正しく取得できないことがある？)
+            this.getShell().getDisplay().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    // 最初の表示で大きさを固定する
+                    for (Label label : BattleWindowBase.this.fixedSizedLabels) {
+                        Object data = label.getLayoutData();
+                        if (data instanceof GridData) {
+                            GridData gd = (GridData) data;
+                            gd.widthHint = label.getSize().x;
+                        }
+                    }
+
+                    //        BattleWindowBase.this.clearText();
+                    // ウィンドウサイズ復元
+                    Point winSize = BattleWindowBase.this.getWindowConfig().getSize();
+                    if ((winSize.x != -1) && (winSize.y != -1)) {
+                        BattleWindowBase.this.getShell().setSize(winSize);
+                    }
+
+                    BattleWindowBase.this.updateData(false);
+                }
+            });
         }
-        this.setVisible(true);
+        else {
+            this.updateData(false);
+            this.setVisible(true);
+        }
     }
 
     /**
      * 
      */
     protected void createContentsAfter() {
-    }
-
-    @Override
-    public void setVisible(boolean visible) {
-        if (this.getShell().getVisible() != visible) {
-            if (visible) {
-                this.updateData(false);
-            }
-            super.setVisible(visible);
-        }
     }
 
     /**
