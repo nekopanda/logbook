@@ -44,6 +44,7 @@ import logbook.dto.MaterialDto;
 import logbook.dto.MissionResultDto;
 import logbook.dto.NdockDto;
 import logbook.dto.PracticeUserDto;
+import logbook.dto.PracticeUserExDto;
 import logbook.dto.QuestDto;
 import logbook.dto.ResourceDto;
 import logbook.dto.ResourceItemDto;
@@ -573,6 +574,10 @@ public final class GlobalContext {
         // 演習
         case PRACTICE:
             doPractice(data);
+            break;
+        // 演習情報 
+        case PRACTICE_ENEMYINFO:
+            doPracticeEnemyinfo(data);
             break;
         // 連合艦隊
         case COMBINED:
@@ -1864,6 +1869,23 @@ public final class GlobalContext {
             addConsole("演習情報を更新しました");
         } catch (Exception e) {
             LOG.warn("演習情報更新に失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 演習相手艦隊情報を処理します
+     * @param data
+     */
+    private static void doPracticeEnemyinfo(Data data) {
+        try {
+            JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+            PracticeUserExDto practiceUser = new PracticeUserExDto(apidata);
+
+            ApplicationMain.main.updateCalcPracticeExp(practiceUser);
+            addConsole("演習相手艦隊情報を更新しました");
+        } catch (Exception e) {
+            LOG.warn("演習相手艦隊情報更新に失敗しました", e);
             LOG.warn(data);
         }
     }
