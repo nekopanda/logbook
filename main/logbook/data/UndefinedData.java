@@ -7,6 +7,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -81,6 +82,10 @@ public class UndefinedData implements Data {
                     }
                     // レスポンスのJSONを復号します
                     InputStream stream = new ByteArrayInputStream(this.response);
+                    if ((this.response[0] == (byte) 0x1f) && (this.response[1] == (byte) 0x8b)) {
+                        // レスポンスの先頭2バイトが0x1f, 0x8bであればgzip圧縮されている
+                        stream = new GZIPInputStream(stream);
+                    }
                     // レスポンスボディのJSONはsvdata=から始まるので除去します
                     int read;
                     while (((read = stream.read()) != -1) && (read != '=')) {
