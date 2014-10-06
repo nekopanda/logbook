@@ -264,7 +264,7 @@ public abstract class ShipBaseDto extends AbstractDto {
         // ドラム缶合計
         int dram = 0;
         List<ItemDto> items = this.getItem();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < items.size(); i++) {
             ItemDto item = items.get(i);
             if (item != null) {
                 if (item.getName().equals("ドラム缶(輸送用)")) {
@@ -283,8 +283,7 @@ public abstract class ShipBaseDto extends AbstractDto {
         // 大発合計
         int daihatsu = 0;
         List<ItemDto> items = this.getItem();
-        int sakuteki = 0;
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < items.size(); i++) {
             ItemDto item = items.get(i);
             if (item != null) {
                 if (item.getName().equals("大発動艇")) {
