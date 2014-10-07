@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -155,7 +156,13 @@ public abstract class AbstractTableDialog extends WindowBase {
         resetOrder.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                AbstractTableDialog.this.resetColumnOrder();
+                MessageBox box = new MessageBox(AbstractTableDialog.this.getShell(), SWT.YES | SWT.NO
+                        | SWT.ICON_QUESTION);
+                box.setText("列の順番をリセット");
+                box.setMessage("列の順番を初期表示に戻します。よろしいですか？");
+                if (box.open() == SWT.YES) {
+                    AbstractTableDialog.this.resetColumnOrder();
+                }
             }
         });
 
