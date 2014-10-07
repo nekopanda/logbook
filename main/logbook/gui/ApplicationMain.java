@@ -501,7 +501,7 @@ public final class ApplicationMain extends WindowBase {
         this.launcherWindow = new LauncherWindow(this.dummyHolder, toolwindows);
         // その他-ウィンドウをディスプレイ内に移動
         MenuItem movewindows = new MenuItem(etcmenu, SWT.NONE);
-        movewindows.setText("ウィンドウを呼び戻す");
+        movewindows.setText("画面外のウィンドウを戻す");
         movewindows.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
