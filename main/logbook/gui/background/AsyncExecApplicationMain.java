@@ -259,6 +259,9 @@ public final class AsyncExecApplicationMain extends Thread {
                     PushNotify.add(StringUtils.join(notice, "\r\n"));
                 }
             }
+
+            // エラー表示を更新（入渠遠征とは関係ないけど）
+            this.updateErrorLabel();
         }
 
         /**
@@ -411,6 +414,29 @@ public final class AsyncExecApplicationMain extends Thread {
                 ndockTimeTexts[i].setText(time);
             }
             return noticeflg;
+        }
+
+        /** エラー表示を更新 */
+        private void updateErrorLabel() {
+            int state = GlobalContext.getState();
+            Label errorLabel = ApplicationMain.main.getErrorLabel();
+            boolean printLabel = false;
+            String errorText = "正常";
+            if ((state != 0) && (state != 1)) {
+                errorText = "データが不完全です（理由不明）";
+                if (state == 2) {
+                    errorText = "艦これのリロードが必要です";
+                }
+                else if (state == 3) {
+                    errorText = "航海日誌の再起動が必要です\r\n（アカウントが変更されたため）";
+                }
+                printLabel = true;
+            }
+            if ((errorLabel.getText().equals(errorText) == false) || (errorLabel.getVisible() != printLabel)) {
+                errorLabel.setText(errorText);
+                errorLabel.setVisible(printLabel);
+                ApplicationMain.main.getMainComposite().layout();
+            }
         }
     }
 

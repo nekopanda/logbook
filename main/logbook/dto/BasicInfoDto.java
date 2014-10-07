@@ -12,6 +12,7 @@ import javax.json.JsonObject;
 public class BasicInfoDto {
 
     private String nickname;
+    private long memberId;
     private int deckCount;
     private int kdockCount;
     private int ndockCount;
@@ -24,6 +25,7 @@ public class BasicInfoDto {
 
     public BasicInfoDto(JsonObject data) {
         this.setNickname(data.getString("api_nickname"));
+        this.setMemberId(Long.valueOf(data.getString("api_member_id")));
         this.setDeckCount(data.getInt("api_count_deck"));
         this.setKdockCount(data.getInt("api_count_kdock"));
         this.setNdockCount(data.getInt("api_count_ndock"));
@@ -39,7 +41,7 @@ public class BasicInfoDto {
      * @return nickname
      */
     public String getNickname() {
-        return nickname;
+        return this.nickname;
     }
 
     /**
@@ -50,10 +52,24 @@ public class BasicInfoDto {
     }
 
     /**
+     * @return memberId
+     */
+    public long getMemberId() {
+        return this.memberId;
+    }
+
+    /**
+     * @param memberId セットする memberId
+     */
+    public void setMemberId(long memberId) {
+        this.memberId = memberId;
+    }
+
+    /**
      * @return deckCount
      */
     public int getDeckCount() {
-        return deckCount;
+        return this.deckCount;
     }
 
     /**
@@ -67,7 +83,7 @@ public class BasicInfoDto {
      * @return kdockCount
      */
     public int getKdockCount() {
-        return kdockCount;
+        return this.kdockCount;
     }
 
     /**
@@ -81,7 +97,7 @@ public class BasicInfoDto {
      * @return ndockCount
      */
     public int getNdockCount() {
-        return ndockCount;
+        return this.ndockCount;
     }
 
     /**
@@ -95,7 +111,7 @@ public class BasicInfoDto {
      * @return missionCount
      */
     public int getMissionCount() {
-        return missionCount;
+        return this.missionCount;
     }
 
     /**
@@ -109,7 +125,7 @@ public class BasicInfoDto {
      * @return missionSuccess
      */
     public int getMissionSuccess() {
-        return missionSuccess;
+        return this.missionSuccess;
     }
 
     /**
@@ -123,7 +139,7 @@ public class BasicInfoDto {
      * @return practiceWin
      */
     public int getPracticeWin() {
-        return practiceWin;
+        return this.practiceWin;
     }
 
     /**
@@ -137,7 +153,7 @@ public class BasicInfoDto {
      * @return practiceLose
      */
     public int getPracticeLose() {
-        return practiceLose;
+        return this.practiceLose;
     }
 
     /**
@@ -151,7 +167,7 @@ public class BasicInfoDto {
      * @return sortieWin
      */
     public int getSortieWin() {
-        return sortieWin;
+        return this.sortieWin;
     }
 
     /**
@@ -165,7 +181,7 @@ public class BasicInfoDto {
      * @return sortieLose
      */
     public int getSortieLose() {
-        return sortieLose;
+        return this.sortieLose;
     }
 
     /**
