@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.text.DateFormat;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,8 +45,11 @@ public class ResourceLog extends AbstractDto {
      */
     @CheckForNull
     public static ResourceLog getInstance(File file) throws IOException {
-        // 日付フォーマット
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        // 日付フォーマット（複数対応する）
+        SimpleDateFormat[] formats = new SimpleDateFormat[] {
+                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"), // オリジナルの記録フォーマット
+                new SimpleDateFormat("yyyy/MM/dd HH:mm") // Excelで保存した時のフォーマット
+        };
 
         List<SortableLog> logs = new ArrayList<>();
         // データを読み込む
@@ -54,12 +59,24 @@ public class ResourceLog extends AbstractDto {
             if (ite.hasNext()) {
                 ite.next();
             }
+            ParsePosition pos = new ParsePosition(0);
             while (ite.hasNext()) {
                 String line = ite.next();
                 // 日付,（直前のイベント,）燃料,弾薬,鋼材,ボーキ,高速修復材,高速建造材,開発資材
                 String[] colums = line.split(",");
                 try {
-                    Date date = format.parse(colums[0]);
+                    pos.setIndex(0);
+                    Date date = null;
+                    for (DateFormat format : formats) {
+                        date = format.parse(colums[0], pos);
+                        if (date != null) {
+                            break;
+                        }
+                    }
+                    if (date == null) {
+                        continue;
+                    }
+
                     int baseIdx;
                     // 拡張版の方は１列追加してしまったので、両方に対応させる！
                     if (NumberUtils.isNumber(colums[1])) {
@@ -71,7 +88,7 @@ public class ResourceLog extends AbstractDto {
                         baseIdx = 2;
                     }
                     logs.add(new SortableLog(date.getTime(),
-							Integer.parseInt(colums[baseIdx + 0]), Integer.parseInt(colums[baseIdx + 1]),
+                            Integer.parseInt(colums[baseIdx + 0]), Integer.parseInt(colums[baseIdx + 1]),
                             Integer.parseInt(colums[baseIdx + 2]), Integer.parseInt(colums[baseIdx + 3])));
 
                 } catch (Exception e) {

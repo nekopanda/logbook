@@ -1,7 +1,5 @@
 package logbook.gui.widgets;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -22,20 +20,20 @@ import logbook.gui.logic.TimeString;
 import logbook.internal.EvaluateExp;
 import logbook.internal.SeaExp;
 import logbook.util.CalcExpUtils;
+import logbook.util.SwtUtils;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolTip;
 import org.eclipse.wb.swt.SWTResourceManager;
@@ -45,6 +43,8 @@ import org.eclipse.wb.swt.SWTResourceManager;
  *
  */
 public class FleetComposite extends Composite {
+    /** ロガー */
+    private static final Logger LOG = LogManager.getLogger(FleetComposite.class);
 
     /** 警告 */
     private static final int WARN = 1;
@@ -52,15 +52,15 @@ public class FleetComposite extends Composite {
     private static final int FATAL = 2;
     /** 1艦隊に編成できる艦娘の数 */
     private static final int MAXCHARA = 6;
+    /** フォント大きい */
+    private final static int LARGE = 2;
+    /** フォント小さい */
+    private final static int SMALL = -1;
 
     /** タブ */
     private final CTabItem tab;
     /** メイン画面 */
     private final ApplicationMain main;
-    /** フォント大きい */
-    private final Font large;
-    /** フォント小さい */
-    private final Font small;
     /** 艦隊 */
     private DockDto dock;
 
@@ -122,13 +122,6 @@ public class FleetComposite extends Composite {
         glParent.verticalSpacing = 0;
         this.setLayout(glParent);
 
-        FontData normalfd = parent.getShell().getFont().getFontData()[0];
-        FontData largefd = new FontData(normalfd.getName(), normalfd.getHeight() + 2, normalfd.getStyle());
-        FontData smallfd = new FontData(normalfd.getName(), normalfd.getHeight() - 1, normalfd.getStyle());
-
-        this.large = new Font(Display.getCurrent(), largefd);
-        this.small = new Font(Display.getCurrent(), smallfd);
-
         this.fleetGroup = new Composite(this, SWT.NONE);
         this.fleetGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         GridLayout glShipGroup = new GridLayout(3, false);
@@ -176,12 +169,10 @@ public class FleetComposite extends Composite {
             nameComposite.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 
             Label namelabel = new Label(nameComposite, SWT.NONE);
-            namelabel.setFont(this.large);
-            namelabel.setText("名前");
+            SwtUtils.initLabel(namelabel, "名前", LARGE, new GridData());
 
             Label lvlabel = new Label(nameComposite, SWT.NONE);
-            lvlabel.setFont(this.small);
-            lvlabel.setText("Lv.0");
+            SwtUtils.initLabel(lvlabel, "Lv.0", SMALL, 1.4, new GridData(SWT.CENTER, SWT.BOTTOM, false, false, 1, 1));
             // HP
             Composite hpComposite = new Composite(this.fleetGroup, SWT.NONE);
             GridLayout glHp = new GridLayout(3, false);
@@ -195,13 +186,16 @@ public class FleetComposite extends Composite {
             hpComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 
             Label hp = new Label(hpComposite, SWT.NONE);
-            hp.setFont(this.small);
+            SwtUtils.initLabel(hp, "/", SMALL, new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
             Label hpgauge = new Label(hpComposite, SWT.NONE);
+            hpgauge.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, false, false, 1, 1));
             Label hpmsg = new Label(hpComposite, SWT.NONE);
-            hpmsg.setText("健在");
+            SwtUtils.initLabel(hpmsg, "健在", new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
 
             // ステータス
-            new Label(this.fleetGroup, SWT.NONE);
+            Label skip1 = new Label(this.fleetGroup, SWT.NONE);
+            SwtUtils.initLabel(skip1, "", new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
+
             Composite stateComposite = new Composite(this.fleetGroup, SWT.NONE);
             GridLayout glState = new GridLayout(6, false);
             glState.horizontalSpacing = 0;
@@ -214,23 +208,21 @@ public class FleetComposite extends Composite {
             stateComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
             Label condst = new Label(stateComposite, SWT.NONE);
-            condst.setText("疲");
+            SwtUtils.initLabel(condst, "疲", new GridData());
             Label fuelst = new Label(stateComposite, SWT.NONE);
-            fuelst.setText("燃");
+            SwtUtils.initLabel(fuelst, "燃", new GridData());
             Label bullst = new Label(stateComposite, SWT.NONE);
-            bullst.setText("弾");
+            SwtUtils.initLabel(bullst, "弾", new GridData());
             Label dmgcsty = new Label(stateComposite, SWT.NONE);
-            dmgcsty.setText("ダ");
+            SwtUtils.initLabel(dmgcsty, "ダ", new GridData());
             Label dmgcstm = new Label(stateComposite, SWT.NONE);
-            dmgcstm.setText("ダ");
+            SwtUtils.initLabel(dmgcstm, "ダ", new GridData());
             Label next = new Label(stateComposite, SWT.NONE);
-            next.setFont(this.small);
-            next.setText("");
+            SwtUtils.initLabel(next, "", SMALL, new GridData());
 
             // 疲労
             Label cond = new Label(this.fleetGroup, SWT.NONE);
-            cond.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-            cond.setText("49 cond.");
+            SwtUtils.initLabel(cond, "49 cond.", new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 
             this.iconLabels[i] = iconlabel;
             this.nameLabels[i] = namelabel;
@@ -743,12 +735,5 @@ public class FleetComposite extends Composite {
             }
         }
         return null;
-    }
-
-    @Override
-    public void dispose() {
-        super.dispose();
-        this.large.dispose();
-        this.small.dispose();
     }
 }
