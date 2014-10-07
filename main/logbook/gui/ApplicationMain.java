@@ -37,6 +37,7 @@ import logbook.server.proxy.ProxyServer;
 import logbook.server.web.WebServer;
 import logbook.thread.ThreadManager;
 import logbook.thread.ThreadStateObserver;
+import logbook.util.SwtUtils;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,6 +51,8 @@ import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -581,40 +584,49 @@ public final class ApplicationMain extends WindowBase {
 
         // メインコンポジット
         this.mainComposite = new Composite(this.tabFolder, SWT.NONE);
-        GridLayout glMain = new GridLayout(1, false);
-        glMain.horizontalSpacing = 1;
-        glMain.marginTop = 0;
-        glMain.marginWidth = 0;
-        glMain.marginHeight = 0;
-        glMain.marginBottom = 0;
-        glMain.verticalSpacing = 1;
-        this.mainComposite.setLayout(glMain);
+        this.mainComposite.setLayout(new FormLayout());
         this.mainComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         mainItem.setControl(this.mainComposite);
 
         // 遠征
-        this.deckGroup = new Group(this.mainComposite, SWT.NONE);
-        this.deckGroup.setText("遠征");
-        this.deckGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        GridLayout glDeckGroup = new GridLayout(2, false);
-        glDeckGroup.verticalSpacing = 1;
-        glDeckGroup.marginTop = 0;
-        glDeckGroup.marginWidth = 0;
-        glDeckGroup.marginHeight = 0;
-        glDeckGroup.marginBottom = 0;
-        glDeckGroup.horizontalSpacing = 1;
-        this.deckGroup.setLayout(glDeckGroup);
+        Label deckLabel = new Label(this.mainComposite, SWT.NONE);
+        deckLabel.setText("遠征");
+        deckLabel.setLayoutData(SwtUtils.makeFormData(
+                new FormAttachment(0, 7), // 7 pixel indent
+                null, // free width
+                new FormAttachment(0),
+                null)); // free height
 
-        this.deckNotice = new Button(this.deckGroup, SWT.CHECK);
+        this.deckNotice = new Button(this.mainComposite, SWT.CHECK);
         this.deckNotice.setSelection(AppConfig.get().isNoticeDeckmission());
-        this.deckNotice.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
+        this.deckNotice.setLayoutData(SwtUtils.makeFormData(
+                null, // free width
+                new FormAttachment(100),
+                new FormAttachment(0),
+                null)); // free height
+        this.deckNotice.setText("1分前に通知する");
         this.deckNotice.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 AppConfig.get().setNoticeDeckmission(ApplicationMain.this.deckNotice.getSelection());
             }
         });
-        this.deckNotice.setText("1分前に通知する");
+
+        this.deckGroup = new Group(this.mainComposite, SWT.NONE);
+        this.deckGroup.setLayoutData(SwtUtils.makeFormData(
+                new FormAttachment(0),
+                new FormAttachment(100),
+                new FormAttachment(0),
+                null));
+
+        GridLayout glDeckGroup = new GridLayout(2, false);
+        glDeckGroup.verticalSpacing = 1;
+        glDeckGroup.marginTop = 2;
+        glDeckGroup.marginWidth = 0;
+        glDeckGroup.marginHeight = 0;
+        glDeckGroup.marginBottom = 0;
+        glDeckGroup.horizontalSpacing = 1;
+        this.deckGroup.setLayout(glDeckGroup);
 
         this.deck1name = new Label(this.deckGroup, SWT.NONE);
         this.deck1name.setText("ここに艦隊2の艦隊名が入ります");
@@ -647,21 +659,21 @@ public final class ApplicationMain extends WindowBase {
         this.deck3time.setLayoutData(gddeck3time);
 
         // 入渠
-        this.ndockGroup = new Group(this.mainComposite, SWT.NONE);
-        this.ndockGroup.setText("入渠");
-        this.ndockGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        GridLayout glNdockGroup = new GridLayout(2, false);
-        glNdockGroup.verticalSpacing = 1;
-        glNdockGroup.marginTop = 0;
-        glNdockGroup.marginWidth = 0;
-        glNdockGroup.marginHeight = 0;
-        glNdockGroup.marginBottom = 0;
-        glNdockGroup.horizontalSpacing = 1;
-        this.ndockGroup.setLayout(glNdockGroup);
+        Label ndockLabel = new Label(this.mainComposite, SWT.NONE);
+        ndockLabel.setText("入渠");
+        ndockLabel.setLayoutData(SwtUtils.makeFormData(
+                new FormAttachment(0, 7), // 7 pixel indent
+                null, // free width
+                new FormAttachment(this.deckGroup),
+                null)); // free height
 
-        this.ndockNotice = new Button(this.ndockGroup, SWT.CHECK);
+        this.ndockNotice = new Button(this.mainComposite, SWT.CHECK);
         this.ndockNotice.setSelection(AppConfig.get().isNoticeNdock());
-        this.ndockNotice.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
+        this.ndockNotice.setLayoutData(SwtUtils.makeFormData(
+                null, // free width
+                new FormAttachment(100),
+                new FormAttachment(this.deckGroup),
+                null)); // free height
         this.ndockNotice.setText("1分前に通知する");
         this.ndockNotice.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -669,6 +681,22 @@ public final class ApplicationMain extends WindowBase {
                 AppConfig.get().setNoticeNdock(ApplicationMain.this.ndockNotice.getSelection());
             }
         });
+
+        this.ndockGroup = new Group(this.mainComposite, SWT.NONE);
+        this.ndockGroup.setLayoutData(SwtUtils.makeFormData(
+                new FormAttachment(0),
+                new FormAttachment(100),
+                new FormAttachment(this.deckGroup),
+                null));
+
+        GridLayout glNdockGroup = new GridLayout(2, false);
+        glNdockGroup.verticalSpacing = 1;
+        glNdockGroup.marginTop = 2;
+        glNdockGroup.marginWidth = 0;
+        glNdockGroup.marginHeight = 0;
+        glNdockGroup.marginBottom = 0;
+        glNdockGroup.horizontalSpacing = 1;
+        this.ndockGroup.setLayout(glNdockGroup);
 
         this.ndock1name = new Label(this.ndockGroup, SWT.NONE);
         this.ndock1name.setText("ドッグ1に浸かっている艦娘の名前");
@@ -720,7 +748,11 @@ public final class ApplicationMain extends WindowBase {
         loglayout.marginBottom = 0;
         loglayout.horizontalSpacing = 1;
         this.consoleComposite.setLayout(loglayout);
-        this.consoleComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
+        this.consoleComposite.setLayoutData(SwtUtils.makeFormData(
+                new FormAttachment(0),
+                new FormAttachment(100),
+                new FormAttachment(this.ndockGroup),
+                new FormAttachment(100)));
 
         this.console = new org.eclipse.swt.widgets.List(this.consoleComposite, SWT.BORDER | SWT.V_SCROLL);
         this.console.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
