@@ -155,6 +155,9 @@ public final class GlobalContext {
     /** 連合艦隊 */
     private static boolean combined;
 
+    /** 情報の取得状態 0:母港情報未受信 1:正常 2:マスターデータの更新が必要 3:アカウントが変わった！   */
+    private static int state = 0;
+
     // 始めてアクセスがあった時に読み込む
     public static final boolean INIT_COMPLETE;
     static {
@@ -413,6 +416,14 @@ public final class GlobalContext {
      */
     public static boolean isCombined() {
         return combined;
+    }
+
+    /**
+     * データ受信状態
+     * @return 0:母港情報未受信 1:正常 2:未取得のデータ有り
+     */
+    public static int getState() {
+        return state;
     }
 
     /**
@@ -743,6 +754,34 @@ public final class GlobalContext {
     }
 
     /**
+     * 取得した情報に不完全なものがないかチェック
+     * @return　新しいstate
+     */
+    private static int checkDataState() {
+        if (state == 3) {
+            // アカウントが変わった場合はチェックするまでもない
+            return state;
+        }
+        // 所有艦娘のマスターデータが全てあるか見る
+        for (ShipDto ship : shipMap.values()) {
+            if (ship.getShipInfo().getName().length() == 0) {
+                return 2;
+            }
+        }
+        // 艦娘の装備IDが全てあるか見る
+        for (ShipDto ship : shipMap.values()) {
+            for (int itemId : ship.getItemId()) {
+                if (itemId != -1) {
+                    if (itemMap.containsKey(itemId) == false) {
+                        return 2;
+                    }
+                }
+            }
+        }
+        return 1; // 正常
+    }
+
+    /**
      * 母港を更新します
      * @param data
      */
@@ -810,6 +849,9 @@ public final class GlobalContext {
                     }
                     //addConsole("連合艦隊を更新しました");
                 }
+
+                state = checkDataState();
+
                 addConsole("母港情報を更新しました");
             }
         } catch (Exception e) {
@@ -1083,6 +1125,8 @@ public final class GlobalContext {
             // 建造ドック更新
             doKdockSub(apidata.getJsonArray("api_kdock"));
 
+            state = checkDataState();
+
             addConsole("建造(入手)情報を更新しました");
         } catch (Exception e) {
             LOG.warn("建造(入手)情報を更新しますに失敗しました", e);
@@ -1130,6 +1174,8 @@ public final class GlobalContext {
             ResourceItemDto items = new ResourceItemDto();
             items.loadMaterialFronJson(newMaterial);
             updateDetailedMaterial("装備開発", items, MATERIAL_DIFF.NEW_VALUE);
+
+            state = checkDataState();
 
             addConsole("装備開発情報を更新しました");
         } catch (Exception e) {
@@ -1195,6 +1241,8 @@ public final class GlobalContext {
             // 艦隊を設定
             doDeck(apidata.getJsonArray("api_deck_data"));
 
+            state = checkDataState();
+
             addConsole("保有艦娘情報３を更新しました");
         } catch (Exception e) {
             LOG.warn("保有艦娘を更新しますに失敗しました", e);
@@ -1256,6 +1304,7 @@ public final class GlobalContext {
                 }
             }
             doDeck(apidata);
+
             addConsole("艦隊を更新しました");
         } catch (Exception e) {
             LOG.warn("艦隊を更新しますに失敗しました", e);
@@ -1470,7 +1519,12 @@ public final class GlobalContext {
         // 最大所有装備数
         maxSlotitem = apidata.getJsonNumber("api_max_slotitem").intValue();
         // 残り全部
+        BasicInfoDto old = basic;
         basic = new BasicInfoDto(apidata);
+        if ((old != null) && (old.getMemberId() != basic.getMemberId())) {
+            // アカウントが変わった
+            state = 3;
+        }
     }
 
     /**
@@ -1574,6 +1628,8 @@ public final class GlobalContext {
 
             CreateReportLogic.storeCreateMissionReport(result);
             missionResultList.add(result);
+
+            state = checkDataState();
 
             addConsole("遠征(帰還)情報を更新しました");
         } catch (Exception e) {

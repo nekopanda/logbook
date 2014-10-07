@@ -216,6 +216,8 @@ public final class ApplicationMain extends WindowBase {
     private Text ndock4time;
     /** コンソールコンポジット **/
     private Composite consoleComposite;
+    /** エラー表示 **/
+    private Label errorLabel;
     /** コンソール **/
     private org.eclipse.swt.widgets.List console;
 
@@ -501,7 +503,7 @@ public final class ApplicationMain extends WindowBase {
         this.launcherWindow = new LauncherWindow(this.dummyHolder, toolwindows);
         // その他-ウィンドウをディスプレイ内に移動
         MenuItem movewindows = new MenuItem(etcmenu, SWT.NONE);
-        movewindows.setText("ウィンドウを呼び戻す");
+        movewindows.setText("画面外のウィンドウを戻す");
         movewindows.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -737,6 +739,18 @@ public final class ApplicationMain extends WindowBase {
         GridData gdndock4time = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
         gdndock4time.widthHint = 75;
         this.ndock4time.setLayoutData(gdndock4time);
+
+        // エラー表示
+        this.errorLabel = new Label(this.mainComposite, SWT.NONE);
+        this.errorLabel.setLayoutData(SwtUtils.makeFormData(
+                new FormAttachment(0),
+                new FormAttachment(100),
+                new FormAttachment(this.ndockGroup),
+                null));
+        this.errorLabel.setAlignment(SWT.CENTER);
+        this.errorLabel.setBackground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
+        this.errorLabel.setText("エラー表示");
+        this.errorLabel.setVisible(false);
 
         // コンソール
         this.consoleComposite = new Composite(this.mainComposite, SWT.NONE);
@@ -1216,6 +1230,14 @@ public final class ApplicationMain extends WindowBase {
      */
     public Text getNdock4time() {
         return this.ndock4time;
+    }
+
+    /**
+     * エラーラベルを取得
+     * @return
+     */
+    public Label getErrorLabel() {
+        return this.errorLabel;
     }
 
     /**

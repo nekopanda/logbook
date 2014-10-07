@@ -24,6 +24,8 @@ public class TableConfigBean {
 
     private boolean[] visibleColumn;
 
+    private int[] columnWidth;
+
     private int[] columnOrder;
 
     private SortKey[] sortKeys;
@@ -40,6 +42,20 @@ public class TableConfigBean {
      */
     public void setVisibleColumn(boolean[] visibleColumn) {
         this.visibleColumn = visibleColumn;
+    }
+
+    /**
+     * @return columnWidth
+     */
+    public int[] getColumnWidth() {
+        return this.columnWidth;
+    }
+
+    /**
+     * @param columnWidth セットする columnWidth
+     */
+    public void setColumnWidth(int[] columnWidth) {
+        this.columnWidth = columnWidth;
     }
 
     /**

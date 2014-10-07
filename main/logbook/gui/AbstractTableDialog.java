@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -155,7 +156,13 @@ public abstract class AbstractTableDialog extends WindowBase {
         resetOrder.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                AbstractTableDialog.this.resetColumnOrder();
+                MessageBox box = new MessageBox(AbstractTableDialog.this.getShell(), SWT.YES | SWT.NO
+                        | SWT.ICON_QUESTION);
+                box.setText("列の順番をリセット");
+                box.setMessage("列の順番を初期表示に戻します。よろしいですか？");
+                if (box.open() == SWT.YES) {
+                    AbstractTableDialog.this.resetColumnOrder();
+                }
             }
         });
 
@@ -330,12 +337,18 @@ public abstract class AbstractTableDialog extends WindowBase {
      */
     protected void packTableHeader() {
         boolean[] visibles = this.getConfig().getVisibleColumn();
+        int[] widths = this.getConfig().getColumnWidth();
 
         TableColumn[] columns = this.table.getColumns();
 
         for (int i = 0; i < columns.length; i++) {
             if (visibles[i]) {
-                columns[i].pack();
+                if (widths[i] < 5) {
+                    columns[i].pack();
+                }
+                else {
+                    columns[i].setWidth(widths[i]);
+                }
             } else {
                 columns[i].setWidth(0);
             }
@@ -393,6 +406,9 @@ public abstract class AbstractTableDialog extends WindowBase {
             if (this.config == null) {
                 this.config = this.getDefaultTableConfig();
             }
+            if (this.config.getColumnWidth() == null) { // 互換性維持
+                this.config.setColumnWidth(new int[this.header.length]);
+            }
         }
         return this.config;
     }
@@ -410,7 +426,19 @@ public abstract class AbstractTableDialog extends WindowBase {
     @Override
     public void save() {
         if (this.config != null) {
+            // 列の順番
             this.config.setColumnOrder(this.table.getColumnOrder());
+            // 列のサイズ
+            int[] widths = this.config.getColumnWidth();
+            TableColumn[] columns = this.table.getColumns();
+            for (int i = 0; i < columns.length; i++) {
+                int cur = columns[i].getWidth();
+                if (cur >= 5) {
+                    widths[i] = cur;
+                }
+            }
+            this.config.setColumnWidth(widths);
+
             AppConfig.get().getTableConfigMap().put(this.getWindowId(), this.config);
         }
         super.save();
@@ -498,10 +526,12 @@ public abstract class AbstractTableDialog extends WindowBase {
         boolean[] visibles = new boolean[this.header.length];
         Arrays.fill(visibles, true);
         config.setVisibleColumn(visibles);
+        int[] columnWidth = new int[this.header.length];
         int[] columnOrder = new int[this.header.length];
         for (int i = 0; i < this.header.length; ++i) {
             columnOrder[i] = i;
         }
+        config.setColumnWidth(columnWidth);
         config.setColumnOrder(columnOrder);
         TableConfigBean.SortKey[] sortKeys = new TableConfigBean.SortKey[3];
         config.setSortKeys(sortKeys);
