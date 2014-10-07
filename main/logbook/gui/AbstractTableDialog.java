@@ -166,6 +166,21 @@ public abstract class AbstractTableDialog extends WindowBase {
             }
         });
 
+        MenuItem resetWidth = new MenuItem(this.opemenu, SWT.NONE);
+        resetWidth.setText("列幅を自動調整");
+        resetWidth.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                MessageBox box = new MessageBox(AbstractTableDialog.this.getShell(), SWT.YES | SWT.NO
+                        | SWT.ICON_QUESTION);
+                box.setText("列幅を自動調整");
+                box.setMessage("表示されているすべての列の幅が現在の表示データを使って自動調整されます。よろしいですか？");
+                if (box.open() == SWT.YES) {
+                    AbstractTableDialog.this.restoreColumnWidth(true);
+                }
+            }
+        });
+
         // ウィンドウの基本メニューを設定
         super.registerEvents();
 
@@ -187,8 +202,8 @@ public abstract class AbstractTableDialog extends WindowBase {
         this.updateTableBody();
         this.sortBody();
         this.setTableBody();
-        // 列幅を整える
-        this.packTableHeader();
+        // 列幅を復元
+        this.restoreColumnWidth(false);
         this.setSortDirectionToHeader();
 
         // ヘッダの右クリックメニュー
@@ -276,9 +291,6 @@ public abstract class AbstractTableDialog extends WindowBase {
         this.updateTableBody();
         this.sortBody();
         this.setTableBody();
-        if (prevItemCount == 0) { // 表示アイテムがなかった時だけカラムの大きさを再計算
-            this.packTableHeader();
-        }
         this.setSortDirectionToHeader();
         this.table.setSelection(selection);
         this.table.setTopIndex(topindex);
@@ -302,7 +314,6 @@ public abstract class AbstractTableDialog extends WindowBase {
         if (this.config.getColumnOrder() != null) {
             this.table.setColumnOrder(this.config.getColumnOrder());
         }
-        this.packTableHeader();
     }
 
     /**
@@ -333,9 +344,9 @@ public abstract class AbstractTableDialog extends WindowBase {
     }
 
     /**
-     * テーブルヘッダーの幅を調節する
+     * テーブルヘッダーの幅を復元する
      */
-    protected void packTableHeader() {
+    protected void restoreColumnWidth(boolean resetAll) {
         boolean[] visibles = this.getConfig().getVisibleColumn();
         int[] widths = this.getConfig().getColumnWidth();
 
@@ -343,7 +354,7 @@ public abstract class AbstractTableDialog extends WindowBase {
 
         for (int i = 0; i < columns.length; i++) {
             if (visibles[i]) {
-                if (widths[i] < 5) {
+                if ((widths[i] < 5) || resetAll) {
                     columns[i].pack();
                 }
                 else {
