@@ -158,7 +158,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getBattleResultHeader() {
-        return new String[] { "", "日付", "海域", "マス", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘",
+        return new String[] { "No.", "日付", "海域", "マス", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘",
                 "大破艦", "旗艦", "旗艦(第二艦隊)", "MVP", "MVP(第二艦隊)" };
     }
 
@@ -189,7 +189,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getBattleResultStoreHeader() {
-        return new String[] { "", "日付", "海域", "マス", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘",
+        return new String[] { "No.", "日付", "海域", "マス", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘",
                 "味方艦1", "味方艦1HP",
                 "味方艦2", "味方艦2HP",
                 "味方艦3", "味方艦3HP",
@@ -264,7 +264,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getCreateShipHeader() {
-        return new String[] { "", "日付", "種類", "名前", "艦種", "燃料", "弾薬", "鋼材", "ボーキ", "開発資材", "空きドック", "秘書艦", "司令部Lv" };
+        return new String[] { "No.", "日付", "種類", "名前", "艦種", "燃料", "弾薬", "鋼材", "ボーキ", "開発資材", "空きドック", "秘書艦", "司令部Lv" };
     }
 
     /**
@@ -290,7 +290,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getCreateItemHeader() {
-        return new String[] { "", "日付", "開発装備", "種別", "燃料", "弾薬", "鋼材", "ボーキ", "秘書艦", "司令部Lv" };
+        return new String[] { "No.", "日付", "開発装備", "種別", "燃料", "弾薬", "鋼材", "ボーキ", "秘書艦", "司令部Lv" };
     }
 
     /**
@@ -323,7 +323,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getItemListHeader() {
-        return new String[] { "", "名称", "種別", "個数", "火力", "命中", "射程", "運", "回避", "爆装", "雷装", "索敵", "対潜", "対空", "装甲",
+        return new String[] { "No.", "名称", "種別", "個数", "火力", "命中", "射程", "運", "回避", "爆装", "雷装", "索敵", "対潜", "対空", "装甲",
                 "装備してる艦娘" };
     }
 
@@ -430,7 +430,7 @@ public final class CreateReportLogic {
      */
     public static String[] getShipListHeader() {
         return new String[] {
-                "",
+                "No.",
                 "ID",
                 "鍵",//
                 "艦隊",
@@ -710,7 +710,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getCreateMissionResultHeader() {
-        return new String[] { "", "日付", "結果", "遠征", "燃料", "弾薬", "鋼材", "ボーキ", "アイテム1", "個数", "アイテム2", "個数" };
+        return new String[] { "No.", "日付", "結果", "遠征", "燃料", "弾薬", "鋼材", "ボーキ", "アイテム1", "個数", "アイテム2", "個数" };
     }
 
     /**
@@ -799,7 +799,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getMaterialHeader() {
-        return new String[] { "", "日付", "直前のイベント", "燃料", "弾薬", "鋼材", "ボーキ", "高速修復材", "高速建造材", "開発資材" };
+        return new String[] { "No.", "日付", "直前のイベント", "燃料", "弾薬", "鋼材", "ボーキ", "高速修復材", "高速建造材", "開発資材" };
     }
 
     /**
@@ -836,7 +836,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getLostHeader() {
-        return new String[] { "", "日付", "種別", "個別ID", "名前", "原因" };
+        return new String[] { "No.", "日付", "種別", "個別ID", "名前", "原因" };
     }
 
     /**

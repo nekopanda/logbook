@@ -64,7 +64,7 @@ public final class SelectVisibleColumnDialog extends WindowBase {
 
         Tree tree = new Tree(this.shell, SWT.BORDER | SWT.CHECK);
 
-        for (int i = 1; i < header.length; i++) {
+        for (int i = 0; i < header.length; i++) {
             TreeItem column = new TreeItem(tree, SWT.CHECK);
             column.setText(header[i]);
             column.setChecked(visibles[i]);
@@ -90,10 +90,9 @@ public final class SelectVisibleColumnDialog extends WindowBase {
         @Override
         public void shellClosed(ShellEvent e) {
             TreeItem[] items = this.tree.getItems();
-            boolean[] visibles = new boolean[items.length + 1];
-            visibles[0] = true;
+            boolean[] visibles = new boolean[items.length];
             for (int i = 0; i < items.length; i++) {
-                visibles[i + 1] = items[i].getChecked();
+                visibles[i] = items[i].getChecked();
             }
             this.dialog.setColumnVisible(visibles);
         }
