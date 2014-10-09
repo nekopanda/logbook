@@ -1204,6 +1204,8 @@ public final class GlobalContext {
                 }
             }
 
+            state = checkDataState();
+
             addConsole("保有装備情報を更新しました");
         } catch (Exception e) {
             LOG.warn("保有装備を更新しますに失敗しました", e);
