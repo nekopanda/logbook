@@ -38,7 +38,7 @@ public class TestData implements Data {
         String typeString = filename.substring(splitpos + 1);
         this.date = format.parse(timeString);
         this.type = DataType.valueOf(typeString);
-        String jsonString = FileUtils.readFileToString(new File(filepath), Charset.forName("MS932"));
+        String jsonString = FileUtils.readFileToString(new File(filepath), Charset.forName("UTF-8"));
         JsonReader jsonreader = Json.createReader(new StringReader(jsonString));
         this.json = jsonreader.readObject();
     }

@@ -129,7 +129,7 @@ public class FleetComposite extends Composite {
         glShipGroup.marginTop = 0;
         glShipGroup.marginWidth = 1;
         glShipGroup.marginHeight = 0;
-        glShipGroup.marginBottom = 0;
+        glShipGroup.marginBottom = 4;
         glShipGroup.verticalSpacing = 0;
         this.fleetGroup.setLayout(glShipGroup);
         this.init();

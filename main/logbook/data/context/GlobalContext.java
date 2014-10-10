@@ -2,6 +2,7 @@ package logbook.data.context;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -628,7 +629,7 @@ public final class GlobalContext {
             // ファイルパス
             File file = new File(FilenameUtils.concat(AppConfig.get().getStoreJsonPath(), fname));
 
-            FileUtils.write(file, data.getJsonObject().toString());
+            FileUtils.write(file, data.getJsonObject().toString(), Charset.forName("UTF-8"));
         } catch (IOException e) {
             LOG.warn("JSONオブジェクトを保存するに失敗しました", e);
             LOG.warn(data);
