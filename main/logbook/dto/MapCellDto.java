@@ -78,7 +78,7 @@ public class MapCellDto implements Comparable<MapCellDto> {
     public int compareTo(MapCellDto arg0) {
         int ret = 0;
         for (int i = 0; (i < 3) && (ret == 0); ++i) {
-            ret = Integer.compare(this.map[i], this.map[i]);
+            ret = Integer.compare(this.map[i], arg0.map[i]);
         }
         return ret;
     }

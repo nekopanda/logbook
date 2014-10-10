@@ -176,7 +176,9 @@ public abstract class AbstractTableDialog extends WindowBase {
                 box.setText("列幅を自動調整");
                 box.setMessage("表示されているすべての列の幅が現在の表示データを使って自動調整されます。よろしいですか？");
                 if (box.open() == SWT.YES) {
+                    AbstractTableDialog.this.table.setRedraw(false);
                     AbstractTableDialog.this.restoreColumnWidth(true);
+                    AbstractTableDialog.this.table.setRedraw(true);
                 }
             }
         });
