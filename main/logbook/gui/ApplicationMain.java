@@ -84,8 +84,22 @@ public final class ApplicationMain extends WindowBase {
 
     private static final long startTime = System.currentTimeMillis();
 
-    public static void print(String mes) {
+    public static void sysPrint(String mes) {
         System.out.println(mes + ": " + (System.currentTimeMillis() - startTime) + " ms");
+    }
+
+    public static void logPrint(final String mes) {
+        if (main.display.getThread() == Thread.currentThread()) {
+            main.printMessage(mes);
+        }
+        else {
+            main.display.asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    main.printMessage(mes);
+                }
+            });
+        }
     }
 
     public static ApplicationMain main;
@@ -129,6 +143,8 @@ public final class ApplicationMain extends WindowBase {
     private Shell shell;
     /** 表示しない親ウィンドウ */
     private Shell dummyHolder;
+    /** ディスプレイ */
+    private Display display;
 
     /** トレイ */
     private TrayItem trayItem;
@@ -228,7 +244,7 @@ public final class ApplicationMain extends WindowBase {
     public static void main(String[] args) {
         try {
             // 設定読み込み
-            print("起動");
+            sysPrint("起動");
             AppConfig.load();
             /*　static initializer に移行
             ShipConfig.load();
@@ -238,12 +254,12 @@ public final class ApplicationMain extends WindowBase {
             ItemConfig.load();
             EnemyData.load();
             */
-            print("基本設定ファイル読み込み完了");
+            sysPrint("基本設定ファイル読み込み完了");
             // シャットダウンフックを登録します
             Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHookThread()));
             // アプリケーション開始
             main = new ApplicationMain();
-            print("メインウィンドウ初期化開始");
+            sysPrint("メインウィンドウ初期化開始");
             main.restore();
         } catch (Error e) {
             LOG.fatal("メインスレッドが異常終了しました", e);
@@ -262,9 +278,9 @@ public final class ApplicationMain extends WindowBase {
         Display display = Display.getDefault();
         this.createContents();
         this.registerEvents();
-        print("ウィンドウ表示開始...");
+        sysPrint("ウィンドウ表示開始...");
         this.restoreWindows();
-        print("メッセージループに入ります...");
+        sysPrint("メッセージループに入ります...");
         while (!this.shell.isDisposed()) {
             if (!display.readAndDispatch()) {
                 display.sleep();
@@ -283,9 +299,9 @@ public final class ApplicationMain extends WindowBase {
      * 画面レイアウトを作成します
      */
     public void createContents() {
-        final Display display = Display.getDefault();
-        this.dummyHolder = new Shell(display, SWT.TOOL);
-        super.createContents(display, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
+        this.display = Display.getDefault();
+        this.dummyHolder = new Shell(this.display, SWT.TOOL);
+        super.createContents(this.display, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
         this.shell = this.getShell();
         this.shell.setText(AppConstants.TITLEBAR_TEXT);
         GridLayout glShell = new GridLayout(1, false);
@@ -543,7 +559,7 @@ public final class ApplicationMain extends WindowBase {
         // キーが押された時に呼ばれるリスナーを追加します
         this.shell.addHelpListener(new HelpEventListener(this));
 
-        this.trayItem = this.addTrayItem(display);
+        this.trayItem = this.addTrayItem(this.display);
 
         // コマンドボタン
         this.commandComposite = new Composite(this.shell, SWT.NONE);
@@ -854,7 +870,7 @@ public final class ApplicationMain extends WindowBase {
 
         this.configUpdated();
 
-        print("ウィンドウ構築完了");
+        sysPrint("ウィンドウ構築完了");
 
         this.startThread();
         this.updateCheck();
@@ -871,7 +887,7 @@ public final class ApplicationMain extends WindowBase {
     private void restoreWindows() {
         // まずはメインウィンドウを表示する
         this.setVisible(true);
-        print("メインウィンドウ表示完了");
+        sysPrint("メインウィンドウ表示完了");
         for (WindowBase window : this.getWindowList()) {
             window.restore();
         }
@@ -970,7 +986,7 @@ public final class ApplicationMain extends WindowBase {
         // 時間のかかる初期化を別スレッドで実行
         new BackgroundInitializer(this.shell, this).start();
 
-        print("その他のスレッド起動...");
+        sysPrint("その他のスレッド起動...");
         // 非同期で画面を更新するスレッド
         ThreadManager.regist(new AsyncExecApplicationMain(this));
         // サウンドを出すスレッド

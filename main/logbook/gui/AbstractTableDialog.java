@@ -286,8 +286,7 @@ public abstract class AbstractTableDialog extends WindowBase {
     protected void reloadTable() {
         this.table.setRedraw(false);
         int topindex = this.table.getTopIndex();
-        int selection = this.table.getSelectionIndex();
-        int prevItemCount = this.table.getItemCount();
+        int[] selection = this.table.getSelectionIndices();
         this.table.setSortColumn(null);
         this.disposeTableBody();
         this.updateTableBody();
