@@ -48,7 +48,6 @@ import logbook.dto.NdockDto;
 import logbook.dto.PracticeUserDetailDto;
 import logbook.dto.PracticeUserDto;
 import logbook.dto.QuestDto;
-import logbook.dto.ResourceDto;
 import logbook.dto.ResourceItemDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
@@ -89,7 +88,7 @@ public final class GlobalContext {
     private static List<GetShipDto> getShipList = new ArrayList<GetShipDto>();
 
     /** 建造(投入資源) */
-    private static Map<String, ResourceDto> getShipResource = new HashMap<String, ResourceDto>();
+    private static Map<String, GetShipDto> getShipResource = new HashMap<String, GetShipDto>();
 
     /** 開発 */
     private static List<CreateItemDto> createItemList = new ArrayList<CreateItemDto>();
@@ -245,10 +244,24 @@ public final class GlobalContext {
     }
 
     /**
+     * @param list 建造艦娘List
+     */
+    public static void addGetshipList(List<GetShipDto> list) {
+        getShipList.addAll(list);
+    }
+
+    /**
      * @return 開発アイテムList
      */
     public static List<CreateItemDto> getCreateItemList() {
         return createItemList;
+    }
+
+    /**
+     * @param list 開発アイテムList
+     */
+    public static void addCreateItemList(List<CreateItemDto> list) {
+        createItemList.addAll(list);
     }
 
     /**
@@ -270,6 +283,13 @@ public final class GlobalContext {
      */
     public static List<MissionResultDto> getMissionResultList() {
         return missionResultList;
+    }
+
+    /**
+     * @param list 遠征結果
+     */
+    public static void addMissionResultList(List<MissionResultDto> list) {
+        missionResultList.addAll(list);
     }
 
     /**
@@ -1023,24 +1043,18 @@ public final class GlobalContext {
         try {
             String kdockid = data.getField("api_kdock_id");
             // 投入資源
-            ResourceDto resource = new ResourceDto(
-                    Integer.parseInt(data.getField("api_large_flag")),
-                    Integer.parseInt(data.getField("api_item1")),
-                    Integer.parseInt(data.getField("api_item2")),
-                    Integer.parseInt(data.getField("api_item3")),
-                    Integer.parseInt(data.getField("api_item4")),
-                    Integer.parseInt(data.getField("api_item5")),
-                    secretary, hqLevel
-                    );
+            ResourceItemDto res = new ResourceItemDto();
+            res.loadBaseMaterialsFromField(data);
+            res.setResearchMaterials(Integer.parseInt(data.getField("api_item5")));
+            GetShipDto resource = new GetShipDto(
+                    Integer.parseInt(data.getField("api_large_flag")) == 1,
+                    res, secretary, hqLevel, -1);
             lastBuildKdock = kdockid;
             getShipResource.put(kdockid, resource);
             KdockConfig.store(kdockid, resource);
 
             // 資源に反映させてレポート
-            ResourceItemDto items = new ResourceItemDto();
-            items.loadBaseMaterialsFromField(data);
-            items.setResearchMaterials(Integer.parseInt(data.getField("api_item5")));
-            updateDetailedMaterial("建造", items, MATERIAL_DIFF.CONSUMED);
+            updateDetailedMaterial("建造", res, MATERIAL_DIFF.CONSUMED);
 
             addConsole("建造(投入資源)情報を更新しました");
         } catch (Exception e) {
@@ -1059,7 +1073,7 @@ public final class GlobalContext {
 
             // 建造ドックの空きをカウントします
             if (lastBuildKdock != null) {
-                ResourceDto resource = getShipResource.get(lastBuildKdock);
+                GetShipDto resource = getShipResource.get(lastBuildKdock);
                 if (resource != null) {
                     int freecount = 0;
                     for (int i = 0; i < apidata.size(); i++) {
@@ -1126,11 +1140,11 @@ public final class GlobalContext {
             ShipDto ship = new ShipDto(apiShip);
             shipMap.put(Integer.valueOf(ship.getId()), ship);
             // 投入資源を取得する
-            ResourceDto resource = getShipResource.get(dock);
-            if (resource == null) {
-                resource = KdockConfig.load(dock);
+            GetShipDto dto = getShipResource.get(dock);
+            if (dto == null) {
+                dto = KdockConfig.load(dock);
             }
-            GetShipDto dto = new GetShipDto(ship, resource);
+            dto.setShip(ship);
             getShipList.add(dto);
             CreateReportLogic.storeCreateShipReport(dto);
             // 投入資源を除去する
@@ -1159,14 +1173,9 @@ public final class GlobalContext {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
 
             // 投入資源
-            ResourceDto resources = new ResourceDto(
-                    Integer.parseInt(data.getField("api_item1")),
-                    Integer.parseInt(data.getField("api_item2")),
-                    Integer.parseInt(data.getField("api_item3")),
-                    Integer.parseInt(data.getField("api_item4")),
-                    secretary, hqLevel);
-
-            CreateItemDto createitem = new CreateItemDto(apidata, resources);
+            ResourceItemDto res = new ResourceItemDto();
+            res.loadBaseMaterialsFromField(data);
+            CreateItemDto createitem = new CreateItemDto(apidata, res, secretary, hqLevel);
             if (createitem.isCreateFlag()) {
                 ItemDto item = addSlotitem(apidata.getJsonObject("api_slot_item"));
                 if (item != null) {
@@ -1660,27 +1669,19 @@ public final class GlobalContext {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
 
-            MissionResultDto result = new MissionResultDto();
-
             int clearResult = apidata.getJsonNumber("api_clear_result").intValue();
-            result.setClearResult(clearResult);
-            result.setQuestName(apidata.getString("api_quest_name"));
+            String questName = apidata.getString("api_quest_name");
+            ResourceItemDto res = new ResourceItemDto();
 
             if (clearResult != 0) {
-                JsonArray getMaterial = apidata.getJsonArray("api_get_material");
-                result.setFuel(getMaterial.getInt(0));
-                result.setAmmo(getMaterial.getInt(1));
-                result.setMetal(getMaterial.getInt(2));
-                result.setBauxite(getMaterial.getInt(3));
-
                 // 資源に反映させてレポート
-                ResourceItemDto items = new ResourceItemDto();
-                items.loadMissionResult(apidata);
-                result.setItems(items);
-                updateDetailedMaterial("遠征帰還", items, MATERIAL_DIFF.OBTAINED);
+                res.loadMissionResult(apidata);
+                updateDetailedMaterial("遠征帰還", res, MATERIAL_DIFF.OBTAINED);
             }
 
-            CreateReportLogic.storeCreateMissionReport(result);
+            MissionResultDto result = new MissionResultDto(clearResult, questName, res);
+
+            CreateReportLogic.storeMissionReport(result);
             missionResultList.add(result);
 
             state = checkDataState();

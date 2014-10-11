@@ -22,6 +22,11 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -47,6 +52,12 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
     /** フィルター */
     private ShipFilterDto filter = null;
 
+    private Composite groupCompo;
+    private Composite filterCompo;
+
+    private Button allShipButton;
+    private final List<Button> groupButtons = new ArrayList<Button>();
+
     private MenuItem groupFilterCascade;
     private MenuItem addGroupCascade;
     private MenuItem removeGroupCascade;
@@ -70,8 +81,39 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
         this.shell.setText(this.getTitle());
     }
 
+    /**
+     * Create contents of the dialog.
+     */
+    @Override
+    protected void createContentsBefore() {
+        GridLayout shellLayout = new GridLayout(1, false);
+        shellLayout.marginLeft = shellLayout.marginRight = shellLayout.marginTop = shellLayout.marginBottom = 0;
+        shellLayout.marginHeight = shellLayout.marginWidth = 0;
+        shellLayout.verticalSpacing = shellLayout.horizontalSpacing = 0;
+        this.getShell().setLayout(shellLayout);
+
+        this.groupCompo = new Composite(this.getShell(), SWT.NONE);
+        RowLayout groupLayout = new RowLayout();
+        groupLayout.marginLeft = groupLayout.marginRight = groupLayout.marginTop = groupLayout.marginBottom = 0;
+        groupLayout.marginHeight = groupLayout.marginWidth = 0;
+        this.groupCompo.setLayout(groupLayout);
+        this.groupCompo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+        this.filterCompo = new Composite(this.getShell(), SWT.NONE);
+        RowLayout filterLayout = new RowLayout();
+        filterLayout.marginLeft = filterLayout.marginRight = filterLayout.marginTop = filterLayout.marginBottom = 0;
+        filterLayout.marginHeight = filterLayout.marginWidth = 0;
+        this.filterCompo.setLayout(filterLayout);
+        this.filterCompo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+    }
+
     @Override
     protected void createContents() {
+        this.table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+
+        this.allShipButton = new Button(this.groupCompo, SWT.RADIO);
+        this.allShipButton.setText("全艦娘");
+
         // メニューバーに追加する
         // フィルターメニュー
         final MenuItem filter = new MenuItem(this.opemenu, SWT.PUSH);
@@ -278,6 +320,35 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
     @Override
     public void listChanged() {
         List<ShipGroupBean> groups = ShipGroupConfig.get().getGroup();
+
+        for (Button button : this.groupButtons) {
+            button.dispose();
+        }
+        for (final ShipGroupBean groupBean : groups) {
+            final Button groupButton = new Button(this.groupCompo, SWT.RADIO);
+            groupButton.setText(groupBean.getName());
+            this.groupButtons.add(groupButton);
+            groupButton.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    if (ShipTable.this.filter.group != groupBean) {
+                        ShipTable.this.filter.group = groupBean;
+                        // TODO: update
+                    }
+                }
+            });
+            if (this.filter.group == groupBean) {
+                // 現在選択中
+                groupButton.setSelection(true);
+            }
+        }
+        if ((this.filter.group != null) && (groups.indexOf(this.filter.group) == -1)) {
+            // 表示中のグループが消えた
+            this.filter.group = null;
+            // TODO: update
+        }
+        this.allShipButton.setSelection(this.filter.group == null);
+        this.getShell().layout();
 
         Menu groupFilterMenu = recreateCascadeMenu(this.groupFilterCascade);
         this.currentGroupItems.clear();

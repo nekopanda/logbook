@@ -13,31 +13,38 @@ public final class MissionResultDto extends AbstractDto {
     private final Date date;
 
     /** 失敗・成功 */
-    private String clearResult;
+    private final String clearResult;
 
     /** 遠征名 */
-    private String questName;
-
-    /** 燃料 */
-    private int fuel;
-
-    /** 弾薬 */
-    private int ammo;
-
-    /** 鋼材 */
-    private int metal;
-
-    /** ボーキイト */
-    private int bauxite;
+    private final String questName;
 
     /** アイテム */
-    private ResourceItemDto items;
+    private final ResourceItemDto res;
 
     /**
      * コンストラクター
      */
-    public MissionResultDto() {
+    public MissionResultDto(int clearResult, String questName, ResourceItemDto res) {
         this.date = Calendar.getInstance().getTime();
+        this.clearResult = toClearResult(clearResult);
+        this.questName = questName;
+        this.res = res;
+    }
+
+    public MissionResultDto(Date date, String clearResult, String questName, ResourceItemDto res) {
+        this.date = date;
+        this.clearResult = clearResult;
+        this.questName = questName;
+        this.res = res;
+    }
+
+    private static String toClearResult(int flag) {
+        if (flag == 0) {
+            return "失敗";
+        } else if (flag == 2) {
+            return "大成功";
+        }
+        return "成功";
     }
 
     /**
@@ -59,21 +66,6 @@ public final class MissionResultDto extends AbstractDto {
     }
 
     /**
-     * 失敗・成功をセットする
-     * 
-     * @param 失敗・成功フラグ
-     */
-    public void setClearResult(int clearResult) {
-        this.clearResult = "成功";
-
-        if (clearResult == 0) {
-            this.clearResult = "失敗";
-        } else if (clearResult == 2) {
-            this.clearResult = "大成功";
-        }
-    }
-
-    /**
      * 遠征名を取得する
      * 
      * @return 遠征名
@@ -83,30 +75,12 @@ public final class MissionResultDto extends AbstractDto {
     }
 
     /**
-     * 遠征名をセットする
-     * 
-     * @param 遠征名
-     */
-    public void setQuestName(String questName) {
-        this.questName = questName;
-    }
-
-    /**
      * 燃料を取得する
      * 
      * @return 燃料
      */
     public int getFuel() {
-        return this.fuel;
-    }
-
-    /**
-     * 燃料をセットする
-     * 
-     * @param 燃料
-     */
-    public void setFuel(int fuel) {
-        this.fuel = fuel;
+        return this.res.getFuel();
     }
 
     /**
@@ -115,16 +89,7 @@ public final class MissionResultDto extends AbstractDto {
      * @return 弾薬
      */
     public int getAmmo() {
-        return this.ammo;
-    }
-
-    /**
-     * 弾薬をセットする
-     * 
-     * @param 弾薬
-     */
-    public void setAmmo(int ammo) {
-        this.ammo = ammo;
+        return this.res.getAmmo();
     }
 
     /**
@@ -133,16 +98,7 @@ public final class MissionResultDto extends AbstractDto {
      * @return 鋼材
      */
     public int getMetal() {
-        return this.metal;
-    }
-
-    /**
-     * 鋼材をセットする
-     * 
-     * @param 鋼材
-     */
-    public void setMetal(int metal) {
-        this.metal = metal;
+        return this.res.getMetal();
     }
 
     /**
@@ -151,29 +107,13 @@ public final class MissionResultDto extends AbstractDto {
      * @return ボーキイト
      */
     public int getBauxite() {
-        return this.bauxite;
-    }
-
-    /**
-     * ボーキイトをセットする
-     * 
-     * @param ボーキイト
-     */
-    public void setBauxite(int bauxite) {
-        this.bauxite = bauxite;
+        return this.res.getBauxite();
     }
 
     /**
      * @return item
      */
-    public ResourceItemDto getItems() {
-        return this.items;
-    }
-
-    /**
-     * @param item セットする item
-     */
-    public void setItems(ResourceItemDto items) {
-        this.items = items;
+    public ResourceItemDto getResources() {
+        return this.res;
     }
 }

@@ -1,9 +1,15 @@
 package logbook.gui.background;
 
+import java.util.List;
+
 import logbook.config.AppConfig;
 import logbook.config.ShipGroupConfig;
 import logbook.data.context.GlobalContext;
+import logbook.dto.CreateItemDto;
+import logbook.dto.GetShipDto;
+import logbook.dto.MissionResultDto;
 import logbook.gui.ApplicationMain;
+import logbook.gui.logic.CreateReportLogic;
 import logbook.internal.BattleResultServer;
 import logbook.internal.EnemyData;
 import logbook.internal.Item;
@@ -69,7 +75,7 @@ public final class BackgroundInitializer extends Thread {
         try {
             // 出撃ログファイル読み込み
             final int numLogRecord = BattleResultServer.get().size();
-            ApplicationMain.sysPrint("バックグラウンド初期化完了");
+            ApplicationMain.sysPrint("出撃ログ読み込み完了");
             this.display.asyncExec(new Runnable() {
                 @Override
                 public void run() {
@@ -78,6 +84,34 @@ public final class BackgroundInitializer extends Thread {
             });
         } catch (Exception e) {
             LOG.warn("出撃ログの読み込みに失敗しました (" + AppConfig.get().getBattleLogPath() + ")", e);
+        }
+
+        try {
+            // その他の報告書を読み込む
+            final List<CreateItemDto> createItemList = CreateReportLogic.loadCreateItemReport();
+            final List<GetShipDto> createShipList = CreateReportLogic.loadCreateShipReport();
+            final List<MissionResultDto> missionResultList = CreateReportLogic.loadMissionReport();
+            ApplicationMain.print("バックグラウンド初期化完了");
+
+            this.display.asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    if (createItemList != null) {
+                        GlobalContext.addCreateItemList(createItemList);
+                        BackgroundInitializer.this.main.printMessage("開発ログ読み込み完了(" + createItemList.size() + "件)");
+                    }
+                    if (createShipList != null) {
+                        GlobalContext.addGetshipList(createShipList);
+                        BackgroundInitializer.this.main.printMessage("建造ログ読み込み完了(" + createShipList.size() + "件)");
+                    }
+                    if (missionResultList != null) {
+                        GlobalContext.addMissionResultList(missionResultList);
+                        BackgroundInitializer.this.main.printMessage("遠征ログ読み込み完了(" + missionResultList.size() + "件)");
+                    }
+                }
+            });
+        } catch (Exception e) {
+            LOG.warn("報告書のバックグランド読み込みでエラー", e);
         }
     }
 }
