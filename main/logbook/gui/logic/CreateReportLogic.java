@@ -611,7 +611,7 @@ public final class CreateReportLogic {
         return new IntegerPair((index / 10) + 1, (index % 10) + 1, "-");
     }
 
-    private static class ShipWithSortNumber {
+    public static class ShipWithSortNumber {
         public ShipDto ship;
         /** Lv順, 艦種順, NEW順, 修理順 (ゼロ始まり) */
         public int[] sortNumber = new int[4];
@@ -639,7 +639,7 @@ public final class CreateReportLogic {
         }
     }
 
-    private static List<ShipWithSortNumber> getShipWithSortNumber() {
+    public static List<ShipWithSortNumber> getShipWithSortNumber() {
         List<ShipWithSortNumber> ships = new ArrayList<ShipWithSortNumber>();
         for (ShipDto ship : GlobalContext.getShipMap().values()) {
             ships.add(new ShipWithSortNumber(ship));
