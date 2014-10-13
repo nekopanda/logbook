@@ -254,7 +254,7 @@ public class Ship {
             this.put("235", new ShipInfoDto("響改", "駆逐艦", "ひびき", 70, 20, 15));
             this.put("236", new ShipInfoDto("雷改", "駆逐艦", "いかづち", 0, 20, 15));
             this.put("237", new ShipInfoDto("電改", "駆逐艦", "いなづま", 0, 20, 15));
-            this.put("238", new ShipInfoDto("初春改", "駆逐艦", "はつはる", 0, 20, 15));
+            this.put("238", new ShipInfoDto("初春改", "駆逐艦", "はつはる", 65, 20, 15));
             this.put("239", new ShipInfoDto("子日改", "駆逐艦", "ねのひ", 0, 20, 15));
             this.put("240", new ShipInfoDto("若葉改", "駆逐艦", "わかば", 0, 20, 15));
             this.put("241", new ShipInfoDto("初霜改", "駆逐艦", "はつしも", 0, 20, 15));
@@ -342,7 +342,7 @@ public class Ship {
             this.put("323", new ShipInfoDto("春雨改", "駆逐艦", "はるさめ", 0, 20, 15));
             this.put("324", new ShipInfoDto("早霜改", "駆逐艦", "はやしも", 0, 20, 15));
             this.put("325", new ShipInfoDto("清霜改", "駆逐艦", "きよしも", 0, 20, 15));
-            this.put("326", ShipInfoDto.EMPTY);
+            this.put("326", new ShipInfoDto("初春改二", "駆逐艦", "はつはる", 0, 20, 15));
             this.put("327", ShipInfoDto.EMPTY);
             this.put("328", ShipInfoDto.EMPTY);
             this.put("329", ShipInfoDto.EMPTY);
