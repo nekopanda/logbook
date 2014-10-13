@@ -25,7 +25,7 @@ public class ResourceChart {
     /** グラフエリアの左マージン */
     private static final int LEFT_WIDTH = 70;
     /** グラフエリアの右マージン */
-    private static final int RIGHT_WIDTH = 40;
+    private static final int RIGHT_WIDTH = 45;
     /** グラフエリアの上マージン */
     private static final int TOP_HEIGHT = 30;
     /** グラフエリアの下マージン */
@@ -45,6 +45,7 @@ public class ResourceChart {
     private final int height;
 
     private int max;
+    private int min;
     private long[] time = {};
     private Resource[] resources = {};
 
@@ -90,16 +91,16 @@ public class ResourceChart {
         // 横
         gc.drawLine(LEFT_WIDTH - 5, this.height - BOTTOM_HEIGHT, this.width - RIGHT_WIDTH, this.height - BOTTOM_HEIGHT);
 
-        // 横軸を描く
+        // 縦軸を描く
         gc.setLineWidth(1);
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 5; i++) {
             // 軸
             gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_GRAY));
             int jh = (int) ((h * i) / 4) + TOP_HEIGHT;
             gc.drawLine(LEFT_WIDTH - 5, jh, this.width - RIGHT_WIDTH, jh);
             //ラベルを設定
             gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-            String label = Integer.toString((int) (((float) this.max * (4 - i)) / 4));
+            String label = Integer.toString((int) (((float) (this.max - this.min) * (4 - i)) / 4) + this.min);
             int labelWidth = getStringWidth(gc, label);
             int labelHeight = gc.getFontMetrics().getHeight();
             int x = LEFT_WIDTH - labelWidth - 5;
@@ -107,7 +108,7 @@ public class ResourceChart {
             gc.drawString(label, x, y);
         }
         SimpleDateFormat format = new SimpleDateFormat("M月d日 HH:mm");
-        // 縦軸を描く
+        // 横軸を描く
         for (int i = 0; i < 5; i++) {
             //ラベルを設定
             gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
@@ -116,7 +117,7 @@ public class ResourceChart {
             String label = format.format(new Date(normalizeTime(this.time[idx], TimeUnit.MINUTES.toMillis(10))));
             int labelWidth = getStringWidth(gc, label);
             int x = ((int) ((w * i) / 4) + LEFT_WIDTH) - (labelWidth / 2);
-            int y = (this.height - BOTTOM_HEIGHT) + 2;
+            int y = (this.height - BOTTOM_HEIGHT) + 6;
             gc.drawText(label, x, y, true);
         }
         // 判例を描く
@@ -150,7 +151,7 @@ public class ResourceChart {
             Path path = new Path(Display.getCurrent());
 
             float x = LEFT_WIDTH;
-            float y = (h * (1 - ((float) values[0] / this.max))) + TOP_HEIGHT;
+            float y = (h * (1 - ((float) (values[0] - this.min) / (this.max - this.min)))) + TOP_HEIGHT;
             path.moveTo(x, y);
 
             for (int j = 1; j < values.length; j++) {
@@ -158,7 +159,7 @@ public class ResourceChart {
                 if (values[j] != -1) {
 
                     float x1 = ((w * j) / values.length) + LEFT_WIDTH;
-                    float y1 = (h * (1 - ((float) values[j] / this.max))) + TOP_HEIGHT;
+                    float y1 = (h * (1 - ((float) (values[j] - this.min) / (this.max - this.min)))) + TOP_HEIGHT;
                     path.lineTo(x1, y1);
                 }
             }
@@ -181,6 +182,8 @@ public class ResourceChart {
         // データを準備する
         // データMax値
         this.max = Integer.MIN_VALUE;
+        // データMin値
+        this.min = Integer.MAX_VALUE;
         // グラフに必要なデータ配列の長さ
         int length = (int) (this.term / this.notch) + 1;
         // 時間軸
@@ -223,12 +226,18 @@ public class ResourceChart {
                         values[j] = 0;
                     }
                 }
-                // 資材最大数を設定
-                this.max = Math.max(values[j], this.max);
+                if (values[j] >= 0) {
+                    // 資材最大数を設定
+                    this.max = Math.max(values[j], this.max);
+                    // 資材最小数を設定
+                    this.min = Math.min(values[j], this.min);
+                }
             }
         }
         // 資材の最大数を1000単位にする、資材の最大数が1000未満なら1000に設定
         this.max = (int) Math.max(normalize(this.max, 1000), 1000);
+        // 資材の最小数を0.8でかけた後1000単位にする、
+        this.min = (int) Math.max(normalize((long) (this.min * 0.8f), 1000), 0);
     }
 
     /**
