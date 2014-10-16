@@ -923,7 +923,9 @@ public class BattleExDto extends AbstractDto {
         else {
             // 演習の場合
         }
-        return (this.getDock() != null) && (this.rank != null) && (this.phaseList.size() > 0);
+        return (this.friends != null) && (this.getDock() != null) &&
+                (this.rank != null) && (this.phaseList != null) &&
+                (this.phaseList.size() > 0);
     }
 
     public boolean isPractice() {
