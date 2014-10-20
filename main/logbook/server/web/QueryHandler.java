@@ -392,6 +392,8 @@ public class QueryHandler extends HttpServlet {
                     }
                     jb.add("quest", quest_array);
                     jb.add("num_quest", GlobalContext.getQuest().size());
+                    Date updateTime = GlobalContext.getQuestLastUpdate();
+                    jb.add("quest_last_update_time", (updateTime != null) ? updateTime.getTime() : 0);
                 }
 
                 { // 出撃
@@ -426,6 +428,9 @@ public class QueryHandler extends HttpServlet {
                         }
                     }
                     jb.add("practice", ensyu_root);
+
+                    Date updateTime = GlobalContext.getPracticeUserLastUpdate();
+                    jb.add("practice_last_update_time", (updateTime != null) ? updateTime.getTime() : 0);
                 }
 
                 { // 出撃数, 遠征数

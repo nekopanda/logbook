@@ -263,7 +263,7 @@ public class BattleWindowLarge extends BattleWindow {
             this.friendLabels[base + i].setText(String.valueOf(i + 1) + "." +
                     ship.getFriendlyName());
             this.friendLabels[base + i].setToolTipText(ship.getDetailedString());
-            printFriendHp(this.friendHpLabels, base + i, ship.getNowhp(), ship.getMaxhp());
+            printFriendHp(this.friendHpLabels, base + i, ship.getNowhp(), ship.getMaxhp(), true);
         }
     }
 
@@ -292,25 +292,25 @@ public class BattleWindowLarge extends BattleWindow {
         this.title.setText(this.getMapCellDto().detailedString());
     }
 
-    private static void printDamageLebel(Label label, int nowhp, int maxhp) {
+    private static void printDamageLebel(Label label, int nowhp, int maxhp, boolean friend) {
         DamageRate rate = DamageRate.fromHP(nowhp, maxhp);
-        label.setText(rate.toString());
+        label.setText(rate.toString(friend));
         label.setBackground(rate.getBackground());
         label.setForeground(rate.getForeground());
     }
 
-    private static void printFriendHp(Label[][] labels, int index, int nowhp, int maxhp) {
+    private static void printFriendHp(Label[][] labels, int index, int nowhp, int maxhp, boolean friend) {
         printHp(labels[0][index], nowhp, maxhp);
-        printDamageLebel(labels[1][index], nowhp, maxhp);
+        printDamageLebel(labels[1][index], nowhp, maxhp, friend);
     }
 
     private static void printHp(
-            Label[][] labels, int base1, int base2, int[] dam, int[] nowhp, int[] maxhp)
+            Label[][] labels, int base1, int base2, int[] dam, int[] nowhp, int[] maxhp, boolean friend)
     {
         for (int i = 0; i < nowhp.length; ++i) {
             labels[base1 + 0][base2 + i].setText(String.valueOf(dam[base2 + i]));
             labels[base1 + 1][base2 + i].setText(String.valueOf(nowhp[i]));
-            printDamageLebel(labels[base1 + 2][base2 + i], nowhp[i], maxhp[i]);
+            printDamageLebel(labels[base1 + 2][base2 + i], nowhp[i], maxhp[i], friend);
         }
     }
 
@@ -344,7 +344,7 @@ public class BattleWindowLarge extends BattleWindow {
             int[] maxHp = friendMaxHp[i];
             if (startHp != null) {
                 for (int c = 0; c < startHp.length; ++c) {
-                    printFriendHp(this.friendHpLabels, (i * 6) + c, startHp[c], maxHp[c]);
+                    printFriendHp(this.friendHpLabels, (i * 6) + c, startHp[c], maxHp[c], true);
                 }
             }
         }
@@ -360,21 +360,21 @@ public class BattleWindowLarge extends BattleWindow {
         }
 
         // 昼戦後HP
-        printHp(this.friendHpLabels, 2, 0, this.friendDamages[0], phase1.getNowFriendHp(), friendMaxHp[0]);
+        printHp(this.friendHpLabels, 2, 0, this.friendDamages[0], phase1.getNowFriendHp(), friendMaxHp[0], true);
         if (battle.isCombined()) {
             printHp(this.friendHpLabels, 2, 6, this.friendDamages[0], phase1.getNowFriendHpCombined(),
-                    friendMaxHp[1]);
+                    friendMaxHp[1], true);
         }
-        printHp(this.enemyHpLabels, 2, 0, this.enemyDamages[0], phase1.getNowEnemyHp(), maxEnemyHp);
+        printHp(this.enemyHpLabels, 2, 0, this.enemyDamages[0], phase1.getNowEnemyHp(), maxEnemyHp, false);
 
         // 夜戦後HP
         if (phase2 != null) {
-            printHp(this.friendHpLabels, 5, 0, this.friendDamages[1], phase2.getNowFriendHp(), friendMaxHp[0]);
+            printHp(this.friendHpLabels, 5, 0, this.friendDamages[1], phase2.getNowFriendHp(), friendMaxHp[0], true);
             if (battle.isCombined()) {
                 printHp(this.friendHpLabels, 5, 6, this.friendDamages[1], phase2.getNowFriendHpCombined(),
-                        friendMaxHp[1]);
+                        friendMaxHp[1], true);
             }
-            printHp(this.enemyHpLabels, 5, 0, this.enemyDamages[1], phase2.getNowEnemyHp(), maxEnemyHp);
+            printHp(this.enemyHpLabels, 5, 0, this.enemyDamages[1], phase2.getNowEnemyHp(), maxEnemyHp, false);
         }
     }
 }

@@ -135,8 +135,14 @@ public final class GlobalContext {
     /** 演習リスト */
     private static PracticeUserDto[] practiceUser = new PracticeUserDto[] { null, null, null, null, null };
 
+    /** 最後に演習リストが更新された時間 */
+    private static Date practiceUserLastUpdate = null;
+
     /** 任務Map */
     private static ArrayList<QuestDto> questList = new ArrayList<QuestDto>();
+
+    /** 最後に任務情報を受け取った時間 */
+    private static Date questLastUpdate;
 
     /** 出撃中か */
     private static boolean[] isSortie = new boolean[4];
@@ -339,6 +345,10 @@ public final class GlobalContext {
         return practiceUser;
     }
 
+    public static Date getPracticeUserLastUpdate() {
+        return practiceUserLastUpdate;
+    }
+
     /**
      * 艦隊が遠征中かを調べます
      * 
@@ -382,6 +392,10 @@ public final class GlobalContext {
      */
     public static List<QuestDto> getQuest() {
         return questList;
+    }
+
+    public static Date getQuestLastUpdate() {
+        return questLastUpdate;
     }
 
     /**
@@ -1691,11 +1705,13 @@ public final class GlobalContext {
             int page_count = apidata.getJsonNumber("api_page_count").intValue();
             if (page_count == 0) { // 任務が１つもない時
                 questList.clear();
+                questLastUpdate = new Date();
             }
             else if ((disp_page > page_count) || apidata.isNull("api_list")) {
                 // 表示ページが全体ページ数より後ろの場合は任務情報が何も送られてこない
             }
             else {
+                Date now = new Date();
                 // 足りない要素を足す
                 for (int i = questList.size(); i < (page_count * items_per_page); ++i) {
                     questList.add(null);
@@ -1711,6 +1727,7 @@ public final class GlobalContext {
                         // 任務を作成
                         int index = ((disp_page - 1) * items_per_page) + (pos - 1);
                         QuestDto quest = new QuestDto();
+                        quest.setTime(now);
                         quest.setNo(questobject.getInt("api_no"));
                         quest.setPage(disp_page);
                         quest.setPos(pos++);
@@ -1735,6 +1752,16 @@ public final class GlobalContext {
                     for (int i = questList.size() - 1; i >= (((disp_page - 1) * items_per_page) + (pos - 1)); --i) {
                         questList.remove(i);
                     }
+                }
+                // 全て揃った？
+                if (questList.contains(null) == false) {
+                    Date updateTime = now;
+                    for (QuestDto quest : questList) {
+                        if (updateTime.after(quest.getTime())) {
+                            updateTime = quest.getTime();
+                        }
+                    }
+                    questLastUpdate = updateTime;
                 }
             }
             addConsole("任務を更新しました");
@@ -1924,6 +1951,7 @@ public final class GlobalContext {
                     // stateだけ更新
                     practiceUser[i].setState(dto.getState());
             }
+            practiceUserLastUpdate = new Date();
             addConsole("演習情報を更新しました");
         } catch (Exception e) {
             LOG.warn("演習情報更新に失敗しました", e);

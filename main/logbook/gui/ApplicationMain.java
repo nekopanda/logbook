@@ -639,7 +639,9 @@ public final class ApplicationMain extends WindowBase {
 
         GridLayout glDeckGroup = new GridLayout(2, false);
         glDeckGroup.verticalSpacing = 1;
-        glDeckGroup.marginTop = 2;
+        // なぜかMacだとスペースが全くないので自分で大きさを計算
+        glDeckGroup.marginTop = Math.max(0,
+                SwtUtils.ComputeHeaderHeight(this.deckGroup, 1.4) - this.deckGroup.getClientArea().y);
         glDeckGroup.marginWidth = 0;
         glDeckGroup.marginHeight = 0;
         glDeckGroup.marginBottom = 0;
@@ -709,7 +711,8 @@ public final class ApplicationMain extends WindowBase {
 
         GridLayout glNdockGroup = new GridLayout(2, false);
         glNdockGroup.verticalSpacing = 1;
-        glNdockGroup.marginTop = 2;
+        glNdockGroup.marginTop = Math.max(0,
+                SwtUtils.ComputeHeaderHeight(this.ndockGroup, 1.4) - this.ndockGroup.getClientArea().y);
         glNdockGroup.marginWidth = 0;
         glNdockGroup.marginHeight = 0;
         glNdockGroup.marginBottom = 0;

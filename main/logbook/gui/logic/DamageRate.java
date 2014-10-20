@@ -65,6 +65,13 @@ public enum DamageRate {
         return this.str;
     }
 
+    public String toString(boolean friend) {
+        if ((friend == false) && (this.level == 5)) {
+            return "撃沈";
+        }
+        return this.str;
+    }
+
     public int getLevel() {
         return this.level;
     }

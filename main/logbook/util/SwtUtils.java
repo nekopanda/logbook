@@ -7,7 +7,9 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TaskBar;
@@ -54,6 +56,21 @@ public final class SwtUtils {
     private static int defaultFontStyle = 0;
     private static int DPI_Y = 0;
 
+    private static void checkControl(Control control) {
+        if (defaultFontName == null) {
+            FontData fd = control.getFont().getFontData()[0];
+            defaultFontName = fd.getName();
+            defaultFontSize = fd.getHeight();
+            defaultFontStyle = fd.getStyle();
+            DPI_Y = control.getDisplay().getDPI().y;
+        }
+    }
+
+    public static int ComputeHeaderHeight(Group group, double lineHeight) {
+        checkControl(group);
+        return (int) (((defaultFontSize * DPI_Y) / 72.0) * lineHeight);
+    }
+
     /**
      * 行間はデフォルト値 120%
      * @param lbl
@@ -70,13 +87,7 @@ public final class SwtUtils {
     }
 
     public static GridData initLabel(Label lbl, String text, int fontSizeDiff, double lineHeight, GridData gd) {
-        if (defaultFontName == null) {
-            FontData fd = lbl.getFont().getFontData()[0];
-            defaultFontName = fd.getName();
-            defaultFontSize = fd.getHeight();
-            defaultFontStyle = fd.getStyle();
-            DPI_Y = lbl.getDisplay().getDPI().y;
-        }
+        checkControl(lbl);
         int heightInPoint = defaultFontSize + fontSizeDiff;
         Font font = SWTResourceManager.getFont(defaultFontName, heightInPoint, defaultFontStyle);
         lbl.setFont(font);
