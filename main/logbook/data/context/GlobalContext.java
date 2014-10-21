@@ -616,6 +616,14 @@ public final class GlobalContext {
         case COMBINED:
             doCombined(data);
             break;
+        // 入渠開始
+        case NYUKYO_START:
+            doNyukyoStart(data);
+            break;
+        // 高速修復
+        case NYUKYO_SPEEDCHANGE:
+            doSpeedChange(data);
+            break;
         default:
             break;
         }
@@ -1672,13 +1680,20 @@ public final class GlobalContext {
         }
     }
 
+    // 修理が終わった艦はHPを回復させる
+    private static void ndockFinished(int shipId) {
+        ShipDto ship = shipMap.get(shipId);
+        if (ship != null) {
+            ship.setNowhp(ship.getMaxhp());
+            ship.setDockTime(0);
+        }
+    }
+
     /**
      * 入渠を更新します
      * @param apidata
      */
     private static void doNdockSub(JsonArray apidata) {
-        ndocks = new NdockDto[] { NdockDto.EMPTY, NdockDto.EMPTY, NdockDto.EMPTY, NdockDto.EMPTY };
-
         for (int i = 0; i < apidata.size(); i++) {
             JsonObject object = (JsonObject) apidata.get(i);
             int id = object.getJsonNumber("api_ship_id").intValue();
@@ -1687,8 +1702,51 @@ public final class GlobalContext {
             Date time = null;
             if (milis > 0) {
                 time = new Date(milis);
+                ndocks[i] = new NdockDto(id, time);
             }
-            ndocks[i] = new NdockDto(id, time);
+            else if (ndocks[i].getNdocktime() != null) {
+                ndockFinished(ndocks[i].getNdockid());
+                ndocks[i] = NdockDto.EMPTY;
+            }
+        }
+    }
+
+    /**
+     * 入渠開始
+     * @param apidata
+     */
+    private static void doNyukyoStart(Data data) {
+        try {
+            int id = Integer.valueOf(data.getField("api_ship_id"));
+            boolean highspeed = data.getField("api_highspeed").equals("1");
+
+            if (highspeed) {
+                ndockFinished(id);
+            }
+
+            // 高速修復出ない場合は直後にndockが送られてくる
+            addConsole("入渠情報を更新しました");
+        } catch (Exception e) {
+            LOG.warn("入渠を更新しますに失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 入渠中に高速修復を使った
+     * @param apidata
+     */
+    private static void doSpeedChange(Data data) {
+        try {
+            int id = Integer.valueOf(data.getField("api_ndock_id"));
+
+            ndockFinished(ndocks[id - 1].getNdockid());
+            ndocks[id - 1] = NdockDto.EMPTY;
+
+            addConsole("バケツを使いました");
+        } catch (Exception e) {
+            LOG.warn("入渠を更新しますに失敗しました", e);
+            LOG.warn(data);
         }
     }
 

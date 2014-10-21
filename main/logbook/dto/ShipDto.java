@@ -56,7 +56,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
 
     /** 入渠時間 */
     @Tag(18)
-    private final long docktime;
+    private long docktime;
 
     /** 修復資材 燃料 */
     @Tag(19)
@@ -234,6 +234,13 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
      */
     public long getDocktime() {
         return this.docktime;
+    }
+
+    /**
+     * 入渠時間をセット
+     */
+    public void setDockTime(long docktime) {
+        this.docktime = docktime;
     }
 
     /**
