@@ -75,6 +75,18 @@ public final class AppConfigBean {
     /** ImKayac による Push 通知 Password */
     private String ImKayacPrivateKey = "";
 
+    /** 遠征Push通知のPriority */
+    private int PushPriorityMission = 0;
+
+    /** 入渠Push通知のPriority */
+    private int PushPriorityNdock = 0;
+
+    /** 遠征帰投時にPush通知する */
+    private boolean PushMission = true;
+
+    /**　入渠完了時にPush通知する */
+    private boolean PushNdock = true;
+
     /** 出撃ログの保存先 */
     private String battleLogPath = new File("battlelog").getAbsolutePath();
 
@@ -506,6 +518,62 @@ public final class AppConfigBean {
      */
     public void setImKayacPrivateKey(String privatekey) {
         this.ImKayacPrivateKey = privatekey;
+    }
+
+    /** 遠征帰投時にPush通知する を取得します
+     * @return PushMission
+     */
+    public boolean getPushMission() {
+        return this.PushMission;
+    }
+
+    /** 入渠完了時にPush通知する を取得します
+     * @return PushNdock
+     */
+    public boolean getPushNdock() {
+        return this.PushNdock;
+    }
+
+    /** 遠征帰投時にPush通知する を設定します
+     * @param PushMission
+     */
+    public void setPushMission(boolean pushmission) {
+        this.PushMission = pushmission;
+    }
+
+    /** 入渠完了時にPush通知する を設定します
+     * @param PushNdock
+     */
+    public void setPushNdock(boolean pushndock) {
+        this.PushNdock = pushndock;
+    }
+
+    /** 遠征Push通知の Priorityを取得します
+     * @return priority
+     */
+    public int getPushPriorityMission() {
+        return this.PushPriorityMission;
+    }
+
+    /** 入渠Push通知の Priorityを取得します
+     * @return priority
+     */
+    public int getPushPriorityNdock() {
+        return this.PushPriorityNdock;
+    }
+
+    /** 遠征Push通知のPriorityを設定します
+     * @param priority
+     */
+    public void setPushPriorityMission(int priority) {
+        this.PushPriorityMission = priority;
+    }
+
+    /** 入渠Push通知のPriorityを設定します
+     * @param priority
+     */
+    public void setPushPriorityNdock(int priority) {
+        this.PushPriorityNdock = priority;
     }
 
     /**

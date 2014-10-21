@@ -416,12 +416,6 @@ public class AppConstants {
     /** Push 通知のアプリケーション名*/
     public static final String PUSH_NOTIFY_APPNAME = "航海日誌";
 
-    /** Push 通知のイベント名 */
-    public static final String PUSH_NOTIFY_EVENT = "遠征・入渠";
-
-    /** Push通知の priority (-2: verylow, -1: moderate, 0: normal, 1: high, 2: emergency */
-    public static final String PUSH_NOTIFY_PRIORITY = "0";
-
     /** Prowl のアクセス先 URI */
     public static final String PUSH_NOTIFY_PROWL_URI = "https://api.prowlapp.com/publicapi/add";
 
