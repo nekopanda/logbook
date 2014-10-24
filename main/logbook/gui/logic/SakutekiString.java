@@ -6,7 +6,7 @@ package logbook.gui.logic;
 import java.util.List;
 
 import logbook.config.AppConfig;
-import logbook.dto.ItemDto;
+import logbook.dto.ItemInfoDto;
 import logbook.dto.ShipBaseDto;
 
 /**
@@ -40,12 +40,12 @@ public class SakutekiString implements Comparable<SakutekiString> {
     }
 
     private void add(ShipBaseDto ship) {
-        List<ItemDto> items = ship.getItem();
+        List<ItemInfoDto> items = ship.getItem();
         int[] onslot = ship.getOnSlot();
         // 装備込の索敵値計
         this.totalSakuteki += ship.getSakuteki();
         for (int i = 0; i < items.size(); i++) {
-            ItemDto item = items.get(i);
+            ItemInfoDto item = items.get(i);
             if (item != null) {
                 // 装備の索敵値
                 this.slotSakuteki += item.getParam().getSaku();

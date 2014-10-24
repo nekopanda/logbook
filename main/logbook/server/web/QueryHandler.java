@@ -25,6 +25,7 @@ import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
 import logbook.dto.EnemyShipDto;
 import logbook.dto.ItemDto;
+import logbook.dto.ItemInfoDto;
 import logbook.dto.KdockDto;
 import logbook.dto.MapCellDto;
 import logbook.dto.MaterialDto;
@@ -100,7 +101,7 @@ public class QueryHandler extends HttpServlet {
                 .add("maxeq", maxeq_array);
     }
 
-    private static JsonObjectBuilder itemInfoToJson(ItemDto item) {
+    private static JsonObjectBuilder itemInfoToJson(ItemInfoDto item) {
         return Json.createObjectBuilder()
                 .add("id", item.getId())
                 .add("name", item.getName())
@@ -261,6 +262,8 @@ public class QueryHandler extends HttpServlet {
     private static JsonObjectBuilder itemToJson(int id, ItemDto item) {
         return Json.createObjectBuilder()
                 .add("id", id)
+                .add("locked", item.isLocked())
+                .add("level", item.getLevel())
                 .add("item_id", item.getId());
     }
 

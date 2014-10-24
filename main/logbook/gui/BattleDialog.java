@@ -10,7 +10,7 @@ import logbook.data.context.GlobalContext;
 import logbook.dto.BattleDto;
 import logbook.dto.BattleResultDto;
 import logbook.dto.DockDto;
-import logbook.dto.ItemDto;
+import logbook.dto.ItemInfoDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
 
@@ -242,11 +242,11 @@ public final class BattleDialog extends Dialog {
         lbleItem5.setLayoutData(gdeItem5);
 
         List<ShipInfoDto> enemyships = battle.getEnemy();
-        List<ItemDto[]> enemySlots = battle.getEnemySlot();
+        List<ItemInfoDto[]> enemySlots = battle.getEnemySlot();
 
         for (int i = 0; i < enemyships.size(); i++) {
             ShipInfoDto ship = enemyships.get(i);
-            ItemDto[] slot = enemySlots.get(i);
+            ItemInfoDto[] slot = enemySlots.get(i);
 
             String name = ship.getName();
             if (!StringUtils.isEmpty(ship.getFlagship())) {
@@ -370,10 +370,10 @@ public final class BattleDialog extends Dialog {
         sb.append("     <tbody>").append("\r\n");
 
         List<ShipInfoDto> enemyships = battle.getEnemy();
-        List<ItemDto[]> enemySlots = battle.getEnemySlot();
+        List<ItemInfoDto[]> enemySlots = battle.getEnemySlot();
         for (int i = 0; i < enemyships.size(); i++) {
             ShipInfoDto ship = enemyships.get(i);
-            ItemDto[] slot = enemySlots.get(i);
+            ItemInfoDto[] slot = enemySlots.get(i);
 
             String name = ship.getName();
             if (!StringUtils.isEmpty(ship.getFlagship())) {

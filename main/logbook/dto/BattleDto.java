@@ -23,7 +23,7 @@ public final class BattleDto extends AbstractDto {
     private final List<ShipInfoDto> enemy = new ArrayList<>();
 
     /** 敵装備 */
-    private final List<ItemDto[]> enemySlot = new ArrayList<>();
+    private final List<ItemInfoDto[]> enemySlot = new ArrayList<>();
 
     /** 味方HP */
     private final int[] nowFriendHp = new int[6];
@@ -76,7 +76,7 @@ public final class BattleDto extends AbstractDto {
         JsonArray eSlots = object.getJsonArray("api_eSlot");
         for (int i = 0; i < eSlots.size(); i++) {
             JsonArray eSlot = eSlots.getJsonArray(i);
-            ItemDto[] slot = new ItemDto[5];
+            ItemInfoDto[] slot = new ItemInfoDto[5];
             for (int j = 0; j < eSlot.size(); j++) {
                 slot[j] = Item.get(eSlot.getInt(j));
             }
@@ -212,7 +212,7 @@ public final class BattleDto extends AbstractDto {
      * 敵装備を取得します。
      * @return 敵装備
      */
-    public List<ItemDto[]> getEnemySlot() {
+    public List<ItemInfoDto[]> getEnemySlot() {
         return this.enemySlot;
     }
 

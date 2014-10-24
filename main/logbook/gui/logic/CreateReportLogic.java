@@ -31,6 +31,7 @@ import logbook.dto.DockDto;
 import logbook.dto.EnemyShipDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
+import logbook.dto.ItemInfoDto;
 import logbook.dto.LostEntityDto;
 import logbook.dto.MaterialDto;
 import logbook.dto.MissionResultDto;
@@ -323,16 +324,19 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getItemListHeader() {
-        return new String[] { "No.", "名称", "種別", "個数", "火力", "命中", "射程", "運", "回避", "爆装", "雷装", "索敵", "対潜", "対空", "装甲",
+        return new String[] { "No.", "名称", "種別", "個数", "施錠", "改修",
+                "火力", "命中", "射程", "運", "回避", "爆装", "雷装", "索敵", "対潜", "対空", "装甲",
                 "装備してる艦娘" };
     }
 
     private static class ItemInfo {
-        public ItemDto item;
-        public int count = 1;
+        public ItemInfoDto item;
+        public int count = 0;
+        public int locked = 0;
+        public int maxLevel = 0;
         public Map<ShipDto, Integer> shipMap = new TreeMap<>();
 
-        public ItemInfo(ItemDto item) {
+        public ItemInfo(ItemInfoDto item) {
             this.item = item;
         }
 
@@ -369,24 +373,27 @@ public final class CreateReportLogic {
      * @return 内容
      */
     public static List<Comparable[]> getItemListBody() {
-        Map<ItemDto, ItemInfo> itemCountMap = new HashMap<ItemDto, ItemInfo>();
+        Map<Integer, ItemInfo> itemCountMap = new HashMap<Integer, ItemInfo>();
 
         // 装備の個数を計算
         for (ItemDto item : GlobalContext.getItemMap().values()) {
-            ItemInfo info = itemCountMap.get(item);
+            ItemInfo info = itemCountMap.get(item.getSlotitemId());
             if (info == null) {
-                info = new ItemInfo(item);
-                itemCountMap.put(item, info);
-            } else {
-                info.count++;
+                info = new ItemInfo(item.getInfo());
+                itemCountMap.put(item.getSlotitemId(), info);
             }
+            info.count++;
+            if (item.isLocked()) {
+                info.locked++;
+            }
+            info.maxLevel = Math.max(info.maxLevel, item.getLevel());
         }
 
         // 艦娘が持っている個数を計算
         for (ShipDto ship : GlobalContext.getShipMap().values()) {
-            for (ItemDto item : ship.getItem()) {
+            for (ItemInfoDto item : ship.getItem()) {
                 if (item != null) {
-                    Map<ShipDto, Integer> shipMap = itemCountMap.get(item).shipMap;
+                    Map<ShipDto, Integer> shipMap = itemCountMap.get(item.getId()).shipMap;
                     Integer count = shipMap.get(ship);
                     if (count == null) {
                         count = 1;
@@ -411,10 +418,12 @@ public final class CreateReportLogic {
 
         int count = 0;
         for (ItemInfo itemInfo : countitems) {
-            ItemDto item = itemInfo.item;
+            ItemInfoDto item = itemInfo.item;
             ShipParameters param = item.getParam();
+            String level = (itemInfo.maxLevel != 0) ? "★+" + itemInfo.maxLevel : null;
             count++;
-            body.add(new Comparable[] { count, item.getName(), item.getTypeName(), itemInfo.count, param.getHoug(),
+            body.add(new Comparable[] { count, item.getName(), item.getTypeName(), itemInfo.count,
+                    itemInfo.locked, level, param.getHoug(),
                     param.getHoum(), param.getLeng(), param.getLuck(), param.getHouk(), param.getBaku(),
                     param.getRaig(), param.getSaku(), param.getTais(), param.getTyku(), param.getSouk(),
                     itemInfo.toString()
@@ -543,12 +552,12 @@ public final class CreateReportLogic {
             List<String> slotString = ship.getSlot();
             HpString[] onSlotString = new HpString[4];
             if (ship.canEquipPlane()) { // 飛行機を装備できる場合だけ
-                List<ItemDto> slotItem = ship.getItem();
+                List<ItemInfoDto> slotItem = ship.getItem();
                 int[] onSlot = ship.getOnSlot();
                 int[] maxEq = shipInfo.getMaxeq();
                 int slotNum = ship.getSlotNum();
                 for (int i = 0; i < slotNum; ++i) {
-                    ItemDto item = slotItem.get(i);
+                    ItemInfoDto item = slotItem.get(i);
                     int cur = ((item != null) && item.isPlane()) ? onSlot[i] : 0;
                     int max = maxEq != null ? maxEq[i] : 0;
                     onSlotString[i] = new HpString(cur, max);
@@ -944,7 +953,7 @@ public final class CreateReportLogic {
             // 艦種
             String type = ship.getType();
             // 装備
-            List<ItemDto> item = ship.getItem();
+            List<ItemInfoDto> item = ship.getItem();
 
             // テキストが入力されている場合処理する
             if (filter.regexp) {
@@ -964,7 +973,7 @@ public final class CreateReportLogic {
                     // 艦種で検索
                     find = find ? find : pattern.matcher(type).find();
                     // 装備で検索
-                    for (ItemDto itemDto : item) {
+                    for (ItemInfoDto itemDto : item) {
                         if ((itemDto == null) || (itemDto.getName() == null)) {
                             find = find ? find : false;
                         } else {
@@ -987,7 +996,7 @@ public final class CreateReportLogic {
                     // 艦種で検索
                     find = find ? find : type.indexOf(words[i]) != -1;
                     // 装備で検索
-                    for (ItemDto itemDto : item) {
+                    for (ItemInfoDto itemDto : item) {
                         if ((itemDto == null) || (itemDto.getName() == null)) {
                             find = find ? find : false;
                         } else {
@@ -1091,9 +1100,9 @@ public final class CreateReportLogic {
         }
         // 装備でフィルタ
         if (!StringUtils.isEmpty(filter.itemname)) {
-            List<ItemDto> item = ship.getItem();
+            List<ItemInfoDto> item = ship.getItem();
             boolean hit = false;
-            for (ItemDto itemDto : item) {
+            for (ItemInfoDto itemDto : item) {
                 if (itemDto != null) {
                     if (filter.itemname.equals(itemDto.getName())) {
                         hit = true;

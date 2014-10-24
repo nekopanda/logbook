@@ -139,7 +139,7 @@ public class AirBattleDto {
                 ret[i] = "なし";
             }
             else {
-                ItemDto item = Item.get(touchPlane[i]);
+                ItemInfoDto item = Item.get(touchPlane[i]);
                 if (item != null) {
                     ret[i] = item.getName();
                 }

@@ -51,7 +51,7 @@ public class EnemyShipDto extends ShipBaseDto {
     }
 
     @Override
-    protected Map<Integer, ItemDto> getItemMap() {
+    protected Map<Integer, ItemInfoDto> getItemMap() {
         return Item.getMap();
     }
 

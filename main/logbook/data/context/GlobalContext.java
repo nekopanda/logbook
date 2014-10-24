@@ -7,12 +7,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
@@ -38,6 +38,7 @@ import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
+import logbook.dto.ItemInfoDto;
 import logbook.dto.KdockDto;
 import logbook.dto.LostEntityDto;
 import logbook.dto.MapCellDto;
@@ -190,12 +191,13 @@ public final class GlobalContext {
      * 装備を復元する
      * @param map
      */
-    public static void setItemMap(Map<Integer, Integer> map) {
-        for (Entry<Integer, Integer> entry : map.entrySet()) {
-            Integer id = entry.getValue();
-            ItemDto item = Item.get(id);
-            if (item != null) {
-                itemMap.put(entry.getKey(), item);
+    public static void setItemMap(Collection<ItemDto> items) {
+        for (ItemDto item : items) {
+            int id = item.getSlotitemId();
+            ItemInfoDto info = Item.get(id);
+            if (info != null) {
+                item.setInfo(info);
+                itemMap.put(item.getId(), item);
             }
         }
     }
@@ -759,52 +761,6 @@ public final class GlobalContext {
     }
 
     /**
-     * ダメージ計算があっているか検証します
-     * @param dockShips 更新されたShipDto
-     * @param nowhp ダメージ計算結果
-     */
-    private static void checkBattleDamage(List<ShipDto> dockShips, int[] nowhp) {
-        for (int i = 0; i < dockShips.size(); ++i) {
-            ShipDto new_ship = shipMap.get(dockShips.get(i).getId());
-            if (new_ship == null)
-                continue; // 轟沈した！
-            if (new_ship.getNowhp() != nowhp[i]) {
-                LOG.warn("ダメージ計算ミスが発生しています。" + new_ship.getName() + "の現在のHPは" + new_ship.getNowhp()
-                        + "ですが、ダメージ計算では" + nowhp[i] + "と計算されていました。");
-                addConsole("ダメージ計算ミス発生！（詳細はログ）");
-            }
-        }
-    }
-
-    /**
-     * 取得した情報に不完全なものがないかチェック
-     * @return　新しいstate
-     */
-    private static int checkDataState() {
-        if (state == 3) {
-            // アカウントが変わった場合はチェックするまでもない
-            return state;
-        }
-        // 所有艦娘のマスターデータが全てあるか見る
-        for (ShipDto ship : shipMap.values()) {
-            if (ship.getShipInfo().getName().length() == 0) {
-                return 2;
-            }
-        }
-        // 艦娘の装備IDが全てあるか見る
-        for (ShipDto ship : shipMap.values()) {
-            for (int itemId : ship.getItemId()) {
-                if (itemId != -1) {
-                    if (itemMap.containsKey(itemId) == false) {
-                        return 2;
-                    }
-                }
-            }
-        }
-        return 1; // 正常
-    }
-
-    /**
      * 母港を更新します
      * @param data
      */
@@ -1120,13 +1076,7 @@ public final class GlobalContext {
             if ((slotitem != null) && (slotitem != JsonValue.NULL)) {
                 JsonArray slotitemArray = (JsonArray) slotitem;
                 for (int i = 0; i < slotitemArray.size(); i++) {
-                    JsonObject object = (JsonObject) slotitemArray.get(i);
-                    int typeid = object.getInt("api_slotitem_id");
-                    int id = object.getJsonNumber("api_id").intValue();
-                    ItemDto item = Item.get(typeid);
-                    if (item != null) {
-                        itemMap.put(id, item);
-                    }
+                    addSlotitem((JsonObject) slotitemArray.get(i));
                 }
             }
             // 艦娘を追加します
@@ -1176,13 +1126,8 @@ public final class GlobalContext {
 
             CreateItemDto createitem = new CreateItemDto(apidata, resources);
             if (createitem.isCreateFlag()) {
-                JsonObject object = apidata.getJsonObject("api_slot_item");
-                int typeid = object.getJsonNumber("api_slotitem_id").intValue();
-                int id = object.getInt("api_id");
-                ItemDto item = Item.get(typeid);
+                ItemDto item = addSlotitem(apidata.getJsonObject("api_slot_item"));
                 if (item != null) {
-                    itemMap.put(id, item);
-
                     createitem.setName(item.getName());
                     createitem.setType(item.getTypeName());
                     createItemList.add(createitem);
@@ -1219,12 +1164,7 @@ public final class GlobalContext {
             itemMap.clear();
             for (int i = 0; i < apidata.size(); i++) {
                 JsonObject object = (JsonObject) apidata.get(i);
-                int typeid = object.getJsonNumber("api_slotitem_id").intValue();
-                int id = object.getInt("api_id");
-                ItemDto item = Item.get(typeid);
-                if (item != null) {
-                    itemMap.put(id, item);
-                }
+                addSlotitem(object);
             }
 
             state = checkDataState();
@@ -1930,7 +1870,7 @@ public final class GlobalContext {
                 JsonArray apiMstSlotitem = obj.getJsonArray("api_mst_slotitem");
                 for (int i = 0; i < apiMstSlotitem.size(); i++) {
                     JsonObject object = (JsonObject) apiMstSlotitem.get(i);
-                    ItemDto item = new ItemDto(object);
+                    ItemInfoDto item = new ItemInfoDto(object);
                     int id = object.getJsonNumber("api_id").intValue();
                     Item.set(id, item);
                 }
@@ -2062,6 +2002,66 @@ public final class GlobalContext {
             LOG.warn("連合艦隊情報更新に失敗しました", e);
             LOG.warn(data);
         }
+    }
+
+    // 補助メソッド //
+
+    /**
+     * ダメージ計算があっているか検証します
+     * @param dockShips 更新されたShipDto
+     * @param nowhp ダメージ計算結果
+     */
+    private static void checkBattleDamage(List<ShipDto> dockShips, int[] nowhp) {
+        for (int i = 0; i < dockShips.size(); ++i) {
+            ShipDto new_ship = shipMap.get(dockShips.get(i).getId());
+            if (new_ship == null)
+                continue; // 轟沈した！
+            if (new_ship.getNowhp() != nowhp[i]) {
+                LOG.warn("ダメージ計算ミスが発生しています。" + new_ship.getName() + "の現在のHPは" + new_ship.getNowhp()
+                        + "ですが、ダメージ計算では" + nowhp[i] + "と計算されていました。");
+                addConsole("ダメージ計算ミス発生！（詳細はログ）");
+            }
+        }
+    }
+
+    /**
+     * 取得した情報に不完全なものがないかチェック
+     * @return　新しいstate
+     */
+    private static int checkDataState() {
+        if (state == 3) {
+            // アカウントが変わった場合はチェックするまでもない
+            return state;
+        }
+        // 所有艦娘のマスターデータが全てあるか見る
+        for (ShipDto ship : shipMap.values()) {
+            if (ship.getShipInfo().getName().length() == 0) {
+                return 2;
+            }
+        }
+        // 艦娘の装備IDが全てあるか見る
+        for (ShipDto ship : shipMap.values()) {
+            for (int itemId : ship.getItemId()) {
+                if (itemId != -1) {
+                    if (itemMap.containsKey(itemId) == false) {
+                        return 2;
+                    }
+                }
+            }
+        }
+        return 1; // 正常
+    }
+
+    /** 装備アイテムをitemMapに追加 */
+    private static ItemDto addSlotitem(JsonObject object) {
+        int slotitemId = object.getInt("api_slotitem_id");
+        ItemInfoDto info = Item.get(slotitemId);
+        if (info != null) {
+            ItemDto dto = new ItemDto(info, object);
+            itemMap.put(dto.getId(), dto);
+            return dto;
+        }
+        return null;
     }
 
     private static void updateDetailedMaterial(String ev, ResourceItemDto res, MATERIAL_DIFF diff) {
