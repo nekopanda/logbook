@@ -40,7 +40,7 @@ public final class BackgroundInitializer extends Thread {
 
     @Override
     public void run() {
-        ApplicationMain.print("バックグラウンド初期化開始");
+        ApplicationMain.sysPrint("バックグラウンド初期化開始");
         try {
             // プロキシサーバーを開始する
             ProxyServer.start(AppConfig.get().getListenPort());
@@ -51,7 +51,7 @@ public final class BackgroundInitializer extends Thread {
         } catch (Exception e) {
             LOG.warn("サーバ起動に失敗しました", e);
         }
-        ApplicationMain.print("サーバ起動完了");
+        ApplicationMain.sysPrint("サーバ起動完了");
 
         // 設定ファイルを読み込む（遅延初期化が実装されているが先読みしておく）
         try {
@@ -68,12 +68,12 @@ public final class BackgroundInitializer extends Thread {
         } catch (Exception e) {
             LOG.warn("設定ファイル読み込みでエラーが発生しました", e);
         }
-        ApplicationMain.print("設定ファイル読み込み完了");
+        ApplicationMain.sysPrint("設定ファイル読み込み完了");
 
         try {
             // 出撃ログファイル読み込み
             final int numLogRecord = BattleResultServer.get().size();
-            ApplicationMain.print("バックグラウンド初期化完了");
+            ApplicationMain.sysPrint("バックグラウンド初期化完了");
             this.display.asyncExec(new Runnable() {
                 @Override
                 public void run() {

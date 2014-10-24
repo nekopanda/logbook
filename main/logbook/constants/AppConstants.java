@@ -13,7 +13,7 @@ import org.eclipse.swt.graphics.RGB;
 public class AppConstants {
 
     /** バージョン */
-    public static final String VERSION = "1.1.0";
+    public static final String VERSION = "1.2.0";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://nekopanda.blog.jp/");
@@ -416,12 +416,6 @@ public class AppConstants {
     /** Push 通知のアプリケーション名*/
     public static final String PUSH_NOTIFY_APPNAME = "航海日誌";
 
-    /** Push 通知のイベント名 */
-    public static final String PUSH_NOTIFY_EVENT = "遠征・入渠";
-
-    /** Push通知の priority (-2: verylow, -1: moderate, 0: normal, 1: high, 2: emergency */
-    public static final String PUSH_NOTIFY_PRIORITY = "0";
-
     /** Prowl のアクセス先 URI */
     public static final String PUSH_NOTIFY_PROWL_URI = "https://api.prowlapp.com/publicapi/add";
 
@@ -438,5 +432,4 @@ public class AppConstants {
     public static final String MESSAGE_TOTAL_DAIHATSU = "大発:{0} (+{1}%)";
 
     /** タイトルバーに表示するデフォルトテキスト */
-    public static final String TITLEBAR_TEXT = "航海日誌拡張版 " + VERSION;
-}
+    public static final String TITLEBAR_TEXT = "航海日誌拡張版 " + VERSION;}

@@ -90,7 +90,7 @@ public class EnemyData {
 
     public static void store() throws IOException {
         CSVWriter writer = new CSVWriter(new OutputStreamWriter(
-                new FileOutputStream(AppConstants.ENEMY_DATA_FILE), "MS932"));
+                new FileOutputStream(AppConstants.ENEMY_DATA_FILE), AppConstants.CHARSET));
         List<String> flatten = new ArrayList<String>();
         for (Entry<Integer, EnemyData> e : ENEMY.entrySet()) {
             EnemyData data = e.getValue();
@@ -111,7 +111,7 @@ public class EnemyData {
     public static void load() throws IOException {
         if (AppConstants.ENEMY_DATA_FILE.exists()) {
             CSVReader reader = new CSVReader(new InputStreamReader(
-                    new FileInputStream(AppConstants.ENEMY_DATA_FILE), "MS932"));
+                    new FileInputStream(AppConstants.ENEMY_DATA_FILE), AppConstants.CHARSET));
             for (String[] entry : reader.readAll()) {
                 if (entry.length >= 8) {
                     String[] enemyShips = new String[6];

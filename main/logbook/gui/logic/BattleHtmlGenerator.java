@@ -207,7 +207,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                 DamageRate rate = DamageRate.fromHP(remain, maxhp);
                 this.inline("td", String.valueOf(dam), null);
                 this.inline("td", String.valueOf(remain), null);
-                this.inline("td", rate.toString(), DAMAGE_LABEL_CLASS[rate.getLevel()]);
+                this.inline("td", rate.toString(isFriend), DAMAGE_LABEL_CLASS[rate.getLevel()]);
             }
 
             this.inline("td", String.valueOf(ship.getKaryoku()), null);

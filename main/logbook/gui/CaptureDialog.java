@@ -374,6 +374,7 @@ public final class CaptureDialog extends WindowBase {
                             }
 
                             writer.write(null, new IIOImage(AwtUtils.trim(image, this.trimRect), null, null), iwp);
+                            ApplicationMain.logPrint("キャプチャしました [" + file.getName() + "]");
                         } finally {
                             writer.dispose();
                         }

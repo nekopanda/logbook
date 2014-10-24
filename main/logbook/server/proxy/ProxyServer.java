@@ -2,10 +2,12 @@ package logbook.server.proxy;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.jetty.proxy.ConnectHandler;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 /**
@@ -28,12 +30,21 @@ public final class ProxyServer {
             ServerConnector connector = new ServerConnector(server, 1, 1);
             connector.setPort(port);
             server.setConnectors(new Connector[] { connector });
+            /*// httpsをプロキシできないので下のコードに移行
+                        ServletHandler servletHandler = new ServletHandler();
+                        servletHandler.addServletWithMapping(ReverseProxyServlet.class, "/*");
+                        servletHandler.setServer(server);
 
-            ServletHandler servletHandler = new ServletHandler();
-            servletHandler.addServletWithMapping(ReverseProxyServlet.class, "/*");
-            servletHandler.setServer(server);
+                        server.setHandler(servletHandler);
+            */
+            // httpsをプロキシできるようにConnectHandlerを設定
+            ConnectHandler proxy = new ConnectHandler();
+            server.setHandler(proxy);
 
-            server.setHandler(servletHandler);
+            // httpはこっちのハンドラでプロキシ
+            ServletContextHandler context = new ServletContextHandler(proxy, "/", ServletContextHandler.SESSIONS);
+            ServletHolder proxyServlet = new ServletHolder(new ReverseProxyServlet());
+            context.addServlet(proxyServlet, "/*");
 
             server.start();
         } catch (Exception e) {

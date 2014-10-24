@@ -91,6 +91,10 @@ public enum DataType {
     PRACTICE_BATTLE_RESULT("/kcsapi/api_req_practice/battle_result"),
     /** 連合艦隊操作 */
     COMBINED("/kcsapi/api_req_hensei/combined"),
+    /** 入渠開始 */
+    NYUKYO_START("/kcsapi/api_req_nyukyo/start"),
+    /** 高速修復 */
+    NYUKYO_SPEEDCHANGE("/kcsapi/api_req_nyukyo/speedchange"),
     /** フィルタ前のデータ */
     UNDEFINED(null);
 

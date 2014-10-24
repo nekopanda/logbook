@@ -221,15 +221,16 @@ public final class AsyncExecApplicationMain extends Thread {
             }
             // 現在時刻
             Date now = Calendar.getInstance().getTime();
-            List<String> notice = new ArrayList<String>();
+            List<String> noticeMission = new ArrayList<String>();
+            List<String> noticeNdock = new ArrayList<String>();
             boolean visibleHome = false;
             // 遠征を更新する
-            if (this.updateDeck(now, notice)) {
+            if (this.updateDeck(now, noticeMission)) {
                 Sound.randomExpeditionSoundPlay();
                 visibleHome |= AppConfig.get().isVisibleOnReturnMission();
             }
             // 入渠を更新する
-            if (this.updateNdock(now, notice)) {
+            if (this.updateNdock(now, noticeNdock)) {
                 Sound.randomDockSoundPlay();
                 visibleHome |= AppConfig.get().isVisibleOnReturnBathwater();
             }
@@ -240,6 +241,9 @@ public final class AsyncExecApplicationMain extends Thread {
                 // バルーンツールチップを表示する
                 try {
                     // 遠征・入渠のお知らせ
+                    List<String> notice = new ArrayList<String>();
+                    notice.addAll(noticeMission);
+                    notice.addAll(noticeNdock);
                     if (notice.size() > 0) {
                         ToolTip tip = new ToolTip(this.main.getShell(), SWT.BALLOON
                                 | SWT.ICON_INFORMATION);
@@ -252,13 +256,21 @@ public final class AsyncExecApplicationMain extends Thread {
                     LOG.warn("お知らせの表示に失敗しました", e);
                 }
             }
-            if (AppConfig.get().getNotifyProwl() || AppConfig.get().getNotifyNMA()
-                    || AppConfig.get().getNotifyImKayac()) {
-                // Push 通知
-                if (notice.size() > 0) {
-                    PushNotify.add(StringUtils.join(notice, "\r\n"));
-                }
+
+            // Push通知 遠征
+            if ((noticeMission.size() > 0) && AppConfig.get().getPushMission()) {
+                PushNotify.add(StringUtils.join(noticeMission, "\r\n"), "遠征",
+                        AppConfig.get().getPushPriorityMission());
             }
+
+            // Push通知 入渠
+            if ((noticeNdock.size() > 0) && AppConfig.get().getPushNdock()) {
+                PushNotify.add(StringUtils.join(noticeNdock, "\r\n"), "入渠",
+                        AppConfig.get().getPushPriorityNdock());
+            }
+
+            // エラー表示を更新（入渠遠征とは関係ないけど）
+            this.updateErrorLabel();
         }
 
         /**
@@ -411,6 +423,29 @@ public final class AsyncExecApplicationMain extends Thread {
                 ndockTimeTexts[i].setText(time);
             }
             return noticeflg;
+        }
+
+        /** エラー表示を更新 */
+        private void updateErrorLabel() {
+            int state = GlobalContext.getState();
+            Label errorLabel = ApplicationMain.main.getErrorLabel();
+            boolean printLabel = false;
+            String errorText = "正常";
+            if ((state != 0) && (state != 1)) {
+                errorText = "データが不完全です（理由不明）";
+                if (state == 2) {
+                    errorText = "艦これのリロードが必要です";
+                }
+                else if (state == 3) {
+                    errorText = "航海日誌の再起動が必要です\r\n（アカウントが変更されたため）";
+                }
+                printLabel = true;
+            }
+            if ((errorLabel.getText().equals(errorText) == false) || (errorLabel.getVisible() != printLabel)) {
+                errorLabel.setText(errorText);
+                errorLabel.setVisible(printLabel);
+                ApplicationMain.main.getMainComposite().layout();
+            }
         }
     }
 

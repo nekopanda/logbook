@@ -35,6 +35,8 @@ import logbook.dto.QuestDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
 import logbook.dto.ShipParameters;
+import logbook.gui.logic.CreateReportLogic;
+import logbook.gui.logic.CreateReportLogic.ShipWithSortNumber;
 import logbook.internal.Item;
 import logbook.internal.MasterData;
 import logbook.internal.MasterData.MapAreaDto;
@@ -299,8 +301,12 @@ public class QueryHandler extends HttpServlet {
 
                 { // 艦娘リストを配列で追加
                     JsonArrayBuilder ship_array = Json.createArrayBuilder();
-                    for (ShipDto ship : GlobalContext.getShipMap().values()) {
-                        ship_array.add(shipToJson(ship));
+                    for (ShipWithSortNumber ship : CreateReportLogic.getShipWithSortNumber()) {
+                        JsonArrayBuilder sortNumber_array = Json.createArrayBuilder();
+                        for (int sort_number : ship.sortNumber) {
+                            sortNumber_array.add(sort_number);
+                        }
+                        ship_array.add(shipToJson(ship.ship).add("sort_number", sortNumber_array));
                     }
                     jb.add("ships", ship_array);
                 }
@@ -386,6 +392,8 @@ public class QueryHandler extends HttpServlet {
                     }
                     jb.add("quest", quest_array);
                     jb.add("num_quest", GlobalContext.getQuest().size());
+                    Date updateTime = GlobalContext.getQuestLastUpdate();
+                    jb.add("quest_last_update_time", (updateTime != null) ? updateTime.getTime() : 0);
                 }
 
                 { // 出撃
@@ -420,6 +428,9 @@ public class QueryHandler extends HttpServlet {
                         }
                     }
                     jb.add("practice", ensyu_root);
+
+                    Date updateTime = GlobalContext.getPracticeUserLastUpdate();
+                    jb.add("practice_last_update_time", (updateTime != null) ? updateTime.getTime() : 0);
                 }
 
                 { // 出撃数, 遠征数

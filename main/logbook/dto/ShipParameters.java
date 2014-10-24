@@ -119,9 +119,9 @@ public class ShipParameters {
             param.tyku = object.getJsonArray("api_tyku").getInt(i);
             param.soku = object.getInt("api_soku");
             param.souk = object.getJsonArray("api_souk").getInt(i);
-            param.kaih = object.getJsonArray("api_kaih").getInt(i);
-            param.tais = object.getJsonArray("api_tais").getInt(i);
-            param.saku = object.getJsonArray("api_saku").getInt(i);
+            //param.kaih = object.getJsonArray("api_kaih").getInt(i);
+            //param.tais = object.getJsonArray("api_tais").getInt(i);
+            //param.saku = object.getJsonArray("api_saku").getInt(i);
             param.luck = object.getJsonArray("api_luck").getInt(i);
             ret[i] = param;
         }

@@ -2,6 +2,7 @@ package logbook.data.context;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -134,8 +135,14 @@ public final class GlobalContext {
     /** 演習リスト */
     private static PracticeUserDto[] practiceUser = new PracticeUserDto[] { null, null, null, null, null };
 
+    /** 最後に演習リストが更新された時間 */
+    private static Date practiceUserLastUpdate = null;
+
     /** 任務Map */
     private static ArrayList<QuestDto> questList = new ArrayList<QuestDto>();
+
+    /** 最後に任務情報を受け取った時間 */
+    private static Date questLastUpdate;
 
     /** 出撃中か */
     private static boolean[] isSortie = new boolean[4];
@@ -154,6 +161,9 @@ public final class GlobalContext {
 
     /** 連合艦隊 */
     private static boolean combined;
+
+    /** 情報の取得状態 0:母港情報未受信 1:正常 2:マスターデータの更新が必要 3:アカウントが変わった！   */
+    private static int state = 0;
 
     // 始めてアクセスがあった時に読み込む
     public static final boolean INIT_COMPLETE;
@@ -335,6 +345,10 @@ public final class GlobalContext {
         return practiceUser;
     }
 
+    public static Date getPracticeUserLastUpdate() {
+        return practiceUserLastUpdate;
+    }
+
     /**
      * 艦隊が遠征中かを調べます
      * 
@@ -380,6 +394,10 @@ public final class GlobalContext {
         return questList;
     }
 
+    public static Date getQuestLastUpdate() {
+        return questLastUpdate;
+    }
+
     /**
      * 出撃中かを調べます
      * @return 出撃中
@@ -413,6 +431,14 @@ public final class GlobalContext {
      */
     public static boolean isCombined() {
         return combined;
+    }
+
+    /**
+     * データ受信状態
+     * @return 0:母港情報未受信 1:正常 2:未取得のデータ有り
+     */
+    public static int getState() {
+        return state;
     }
 
     /**
@@ -590,6 +616,14 @@ public final class GlobalContext {
         case COMBINED:
             doCombined(data);
             break;
+        // 入渠開始
+        case NYUKYO_START:
+            doNyukyoStart(data);
+            break;
+        // 高速修復
+        case NYUKYO_SPEEDCHANGE:
+            doSpeedChange(data);
+            break;
         default:
             break;
         }
@@ -617,7 +651,7 @@ public final class GlobalContext {
             // ファイルパス
             File file = new File(FilenameUtils.concat(AppConfig.get().getStoreJsonPath(), fname));
 
-            FileUtils.write(file, data.getJsonObject().toString());
+            FileUtils.write(file, data.getJsonObject().toString(), Charset.forName("UTF-8"));
         } catch (IOException e) {
             LOG.warn("JSONオブジェクトを保存するに失敗しました", e);
             LOG.warn(data);
@@ -743,6 +777,34 @@ public final class GlobalContext {
     }
 
     /**
+     * 取得した情報に不完全なものがないかチェック
+     * @return　新しいstate
+     */
+    private static int checkDataState() {
+        if (state == 3) {
+            // アカウントが変わった場合はチェックするまでもない
+            return state;
+        }
+        // 所有艦娘のマスターデータが全てあるか見る
+        for (ShipDto ship : shipMap.values()) {
+            if (ship.getShipInfo().getName().length() == 0) {
+                return 2;
+            }
+        }
+        // 艦娘の装備IDが全てあるか見る
+        for (ShipDto ship : shipMap.values()) {
+            for (int itemId : ship.getItemId()) {
+                if (itemId != -1) {
+                    if (itemMap.containsKey(itemId) == false) {
+                        return 2;
+                    }
+                }
+            }
+        }
+        return 1; // 正常
+    }
+
+    /**
      * 母港を更新します
      * @param data
      */
@@ -810,6 +872,9 @@ public final class GlobalContext {
                     }
                     //addConsole("連合艦隊を更新しました");
                 }
+
+                state = checkDataState();
+
                 addConsole("母港情報を更新しました");
             }
         } catch (Exception e) {
@@ -1083,6 +1148,8 @@ public final class GlobalContext {
             // 建造ドック更新
             doKdockSub(apidata.getJsonArray("api_kdock"));
 
+            state = checkDataState();
+
             addConsole("建造(入手)情報を更新しました");
         } catch (Exception e) {
             LOG.warn("建造(入手)情報を更新しますに失敗しました", e);
@@ -1131,6 +1198,8 @@ public final class GlobalContext {
             items.loadMaterialFronJson(newMaterial);
             updateDetailedMaterial("装備開発", items, MATERIAL_DIFF.NEW_VALUE);
 
+            state = checkDataState();
+
             addConsole("装備開発情報を更新しました");
         } catch (Exception e) {
             LOG.warn("装備開発情報を更新しますに失敗しました", e);
@@ -1157,6 +1226,8 @@ public final class GlobalContext {
                     itemMap.put(id, item);
                 }
             }
+
+            state = checkDataState();
 
             addConsole("保有装備情報を更新しました");
         } catch (Exception e) {
@@ -1194,6 +1265,8 @@ public final class GlobalContext {
             }
             // 艦隊を設定
             doDeck(apidata.getJsonArray("api_deck_data"));
+
+            state = checkDataState();
 
             addConsole("保有艦娘情報３を更新しました");
         } catch (Exception e) {
@@ -1256,6 +1329,7 @@ public final class GlobalContext {
                 }
             }
             doDeck(apidata);
+
             addConsole("艦隊を更新しました");
         } catch (Exception e) {
             LOG.warn("艦隊を更新しますに失敗しました", e);
@@ -1470,7 +1544,12 @@ public final class GlobalContext {
         // 最大所有装備数
         maxSlotitem = apidata.getJsonNumber("api_max_slotitem").intValue();
         // 残り全部
+        BasicInfoDto old = basic;
         basic = new BasicInfoDto(apidata);
+        if ((old != null) && (old.getMemberId() != basic.getMemberId())) {
+            // アカウントが変わった
+            state = 3;
+        }
     }
 
     /**
@@ -1575,6 +1654,8 @@ public final class GlobalContext {
             CreateReportLogic.storeCreateMissionReport(result);
             missionResultList.add(result);
 
+            state = checkDataState();
+
             addConsole("遠征(帰還)情報を更新しました");
         } catch (Exception e) {
             LOG.warn("遠征(帰還)を更新しますに失敗しました", e);
@@ -1599,13 +1680,20 @@ public final class GlobalContext {
         }
     }
 
+    // 修理が終わった艦はHPを回復させる
+    private static void ndockFinished(int shipId) {
+        ShipDto ship = shipMap.get(shipId);
+        if (ship != null) {
+            ship.setNowhp(ship.getMaxhp());
+            ship.setDockTime(0);
+        }
+    }
+
     /**
      * 入渠を更新します
      * @param apidata
      */
     private static void doNdockSub(JsonArray apidata) {
-        ndocks = new NdockDto[] { NdockDto.EMPTY, NdockDto.EMPTY, NdockDto.EMPTY, NdockDto.EMPTY };
-
         for (int i = 0; i < apidata.size(); i++) {
             JsonObject object = (JsonObject) apidata.get(i);
             int id = object.getJsonNumber("api_ship_id").intValue();
@@ -1614,8 +1702,51 @@ public final class GlobalContext {
             Date time = null;
             if (milis > 0) {
                 time = new Date(milis);
+                ndocks[i] = new NdockDto(id, time);
             }
-            ndocks[i] = new NdockDto(id, time);
+            else if (ndocks[i].getNdocktime() != null) {
+                ndockFinished(ndocks[i].getNdockid());
+                ndocks[i] = NdockDto.EMPTY;
+            }
+        }
+    }
+
+    /**
+     * 入渠開始
+     * @param apidata
+     */
+    private static void doNyukyoStart(Data data) {
+        try {
+            int id = Integer.valueOf(data.getField("api_ship_id"));
+            boolean highspeed = data.getField("api_highspeed").equals("1");
+
+            if (highspeed) {
+                ndockFinished(id);
+            }
+
+            // 高速修復出ない場合は直後にndockが送られてくる
+            addConsole("入渠情報を更新しました");
+        } catch (Exception e) {
+            LOG.warn("入渠を更新しますに失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 入渠中に高速修復を使った
+     * @param apidata
+     */
+    private static void doSpeedChange(Data data) {
+        try {
+            int id = Integer.valueOf(data.getField("api_ndock_id"));
+
+            ndockFinished(ndocks[id - 1].getNdockid());
+            ndocks[id - 1] = NdockDto.EMPTY;
+
+            addConsole("バケツを使いました");
+        } catch (Exception e) {
+            LOG.warn("入渠を更新しますに失敗しました", e);
+            LOG.warn(data);
         }
     }
 
@@ -1632,11 +1763,13 @@ public final class GlobalContext {
             int page_count = apidata.getJsonNumber("api_page_count").intValue();
             if (page_count == 0) { // 任務が１つもない時
                 questList.clear();
+                questLastUpdate = new Date();
             }
             else if ((disp_page > page_count) || apidata.isNull("api_list")) {
                 // 表示ページが全体ページ数より後ろの場合は任務情報が何も送られてこない
             }
             else {
+                Date now = new Date();
                 // 足りない要素を足す
                 for (int i = questList.size(); i < (page_count * items_per_page); ++i) {
                     questList.add(null);
@@ -1652,6 +1785,7 @@ public final class GlobalContext {
                         // 任務を作成
                         int index = ((disp_page - 1) * items_per_page) + (pos - 1);
                         QuestDto quest = new QuestDto();
+                        quest.setTime(now);
                         quest.setNo(questobject.getInt("api_no"));
                         quest.setPage(disp_page);
                         quest.setPos(pos++);
@@ -1676,6 +1810,16 @@ public final class GlobalContext {
                     for (int i = questList.size() - 1; i >= (((disp_page - 1) * items_per_page) + (pos - 1)); --i) {
                         questList.remove(i);
                     }
+                }
+                // 全て揃った？
+                if (questList.contains(null) == false) {
+                    Date updateTime = now;
+                    for (QuestDto quest : questList) {
+                        if (updateTime.after(quest.getTime())) {
+                            updateTime = quest.getTime();
+                        }
+                    }
+                    questLastUpdate = updateTime;
                 }
             }
             addConsole("任務を更新しました");
@@ -1865,6 +2009,7 @@ public final class GlobalContext {
                     // stateだけ更新
                     practiceUser[i].setState(dto.getState());
             }
+            practiceUserLastUpdate = new Date();
             addConsole("演習情報を更新しました");
         } catch (Exception e) {
             LOG.warn("演習情報更新に失敗しました", e);

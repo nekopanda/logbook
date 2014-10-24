@@ -678,7 +678,7 @@ public final class ConfigDialog extends Dialog {
 
         final Text prowlAPIKey = new Text(compositePushNotify, SWT.BORDER);
         GridData gdprowlAPIKey = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
-        gdprowlAPIKey.widthHint = 220;
+        gdprowlAPIKey.widthHint = 200;
         prowlAPIKey.setLayoutData(gdprowlAPIKey);
         prowlAPIKey.setText(AppConfig.get().getProwlAPIKey());
 
@@ -693,13 +693,13 @@ public final class ConfigDialog extends Dialog {
 
         final Text nmaAPIKey = new Text(compositePushNotify, SWT.BORDER);
         GridData gdnmaAPIKey = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
-        gdnmaAPIKey.widthHint = 220;
+        gdnmaAPIKey.widthHint = 200;
         nmaAPIKey.setLayoutData(gdnmaAPIKey);
         nmaAPIKey.setText(AppConfig.get().getNMAAPIKey());
 
         final Button imkayac = new Button(compositePushNotify, SWT.CHECK);
         imkayac.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-        imkayac.setText("ImKayac によるPush通知");
+        imkayac.setText("ImKayac によるPush通知(秘密鍵優先)");
         imkayac.setSelection(AppConfig.get().getNotifyImKayac());
 
         Label label14 = new Label(compositePushNotify, SWT.NONE);
@@ -708,7 +708,7 @@ public final class ConfigDialog extends Dialog {
 
         final Text imkayacUserName = new Text(compositePushNotify, SWT.BORDER);
         GridData gdimkayacUserName = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
-        gdimkayacUserName.widthHint = 220;
+        gdimkayacUserName.widthHint = 200;
         imkayacUserName.setLayoutData(gdimkayacUserName);
         imkayacUserName.setText(AppConfig.get().getImKayacUserName());
 
@@ -718,7 +718,7 @@ public final class ConfigDialog extends Dialog {
 
         final Text imkayacPasswd = new Text(compositePushNotify, SWT.PASSWORD | SWT.BORDER);
         GridData gdimkayacPasswd = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
-        gdimkayacPasswd.widthHint = 220;
+        gdimkayacPasswd.widthHint = 200;
         imkayacPasswd.setLayoutData(gdimkayacPasswd);
         imkayacPasswd.setText(AppConfig.get().getImKayacPasswd());
 
@@ -728,17 +728,43 @@ public final class ConfigDialog extends Dialog {
 
         final Text imkayacPrivateKey = new Text(compositePushNotify, SWT.BORDER);
         GridData gdimkayacPrivateKey = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
-        gdimkayacPrivateKey.widthHint = 220;
+        gdimkayacPrivateKey.widthHint = 200;
         imkayacPrivateKey.setLayoutData(gdimkayacUserName);
         imkayacPrivateKey.setText(AppConfig.get().getImKayacPrivateKey());
 
-        Label label17 = new Label(compositePushNotify, SWT.NONE);
-        label17.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 3, 1));
-        label17.setText("パスワードと秘密鍵の両方が設定されていると\n秘密鍵が優先されます。");
+        final Button pushNotifyMission = new Button(compositePushNotify, SWT.CHECK);
+        pushNotifyMission.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        pushNotifyMission.setText("遠征帰投を通知");
+        pushNotifyMission.setSelection(AppConfig.get().getPushMission());
 
-        Button TestNotifyBtn = new Button(compositePushNotify, SWT.NONE);
-        TestNotifyBtn.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 3, 1));
-        TestNotifyBtn.addSelectionListener(new SelectionAdapter() {
+        final Combo pushPriorityMissionCombo = new Combo(compositePushNotify, SWT.READ_ONLY);
+        GridData gdpushPriorityMissionCombo = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
+        pushPriorityMissionCombo.setLayoutData(gdpushPriorityMissionCombo);
+        pushPriorityMissionCombo.add("Priority: Very Low");
+        pushPriorityMissionCombo.add("Priority: Moderate");
+        pushPriorityMissionCombo.add("Priority: Normal");
+        pushPriorityMissionCombo.add("Priority: High");
+        pushPriorityMissionCombo.add("Priority: Emergency");
+        pushPriorityMissionCombo.select(AppConfig.get().getPushPriorityMission() + 2);
+
+        final Button pushNotifyNdock = new Button(compositePushNotify, SWT.CHECK);
+        pushNotifyNdock.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        pushNotifyNdock.setText("入渠完了を通知");
+        pushNotifyNdock.setSelection(AppConfig.get().getPushNdock());
+
+        final Combo pushPriorityNdockCombo = new Combo(compositePushNotify, SWT.READ_ONLY);
+        GridData gdpushPriorityNdockCombo = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
+        pushPriorityNdockCombo.setLayoutData(gdpushPriorityNdockCombo);
+        pushPriorityNdockCombo.add("Priority: Very Low");
+        pushPriorityNdockCombo.add("Priority: Moderate");
+        pushPriorityNdockCombo.add("Priority: Normal");
+        pushPriorityNdockCombo.add("Priority: High");
+        pushPriorityNdockCombo.add("Priority: Emergency");
+        pushPriorityNdockCombo.select(AppConfig.get().getPushPriorityNdock() + 2);
+
+        Button TestNotifyMissionBtn = new Button(compositePushNotify, SWT.NONE);
+        TestNotifyMissionBtn.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 2, 1));
+        TestNotifyMissionBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 AppConfig.get().setNotifyProwl(prowl.getSelection());
@@ -749,10 +775,40 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setImKayacUserName(imkayacUserName.getText());
                 AppConfig.get().setImKayacPasswd(imkayacPasswd.getText());
                 AppConfig.get().setImKayacPrivateKey(imkayacPrivateKey.getText());
-                PushNotify.add("第二艦隊（通知テスト）がまもなく帰投します");
+                AppConfig.get().setPushMission(pushNotifyMission.getSelection());
+                AppConfig.get().setPushNdock(pushNotifyNdock.getSelection());
+                AppConfig.get().setPushPriorityMission(pushPriorityMissionCombo.getSelectionIndex() - 2);
+                AppConfig.get().setPushPriorityNdock(pushPriorityNdockCombo.getSelectionIndex() - 2);
+                if (AppConfig.get().getPushMission()) {
+                    PushNotify.add("通知テスト艦隊(テスト遠征)がまもなく帰投します", "遠征", AppConfig.get().getPushPriorityMission());
+                }
             }
         });
-        TestNotifyBtn.setText("テスト通知");
+        TestNotifyMissionBtn.setText("テスト通知(遠征)");
+
+        Button TestNotifyNdockBtn = new Button(compositePushNotify, SWT.NONE);
+        TestNotifyNdockBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        TestNotifyNdockBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                AppConfig.get().setNotifyProwl(prowl.getSelection());
+                AppConfig.get().setProwlAPIKey(prowlAPIKey.getText());
+                AppConfig.get().setNotifyNMA(nma.getSelection());
+                AppConfig.get().setNMAAPIKey(nmaAPIKey.getText());
+                AppConfig.get().setNotifyImKayac(imkayac.getSelection());
+                AppConfig.get().setImKayacUserName(imkayacUserName.getText());
+                AppConfig.get().setImKayacPasswd(imkayacPasswd.getText());
+                AppConfig.get().setImKayacPrivateKey(imkayacPrivateKey.getText());
+                AppConfig.get().setPushMission(pushNotifyMission.getSelection());
+                AppConfig.get().setPushNdock(pushNotifyNdock.getSelection());
+                AppConfig.get().setPushPriorityMission(pushPriorityMissionCombo.getSelectionIndex() - 2);
+                AppConfig.get().setPushPriorityNdock(pushPriorityNdockCombo.getSelectionIndex() - 2);
+                if (AppConfig.get().getPushNdock()) {
+                    PushNotify.add("通知テスト改(Lv99)がまもなくお風呂からあがります", "入渠", AppConfig.get().getPushPriorityNdock());
+                }
+            }
+        });
+        TestNotifyNdockBtn.setText("テスト通知(入渠)");
 
         final Button databaseLogButton = new Button(compositeProxy, SWT.CHECK);
         databaseLogButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
@@ -889,6 +945,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setProxyHost(proxyHostText.getText());
                 AppConfig.get().setProxyPort(proxyPortSpinner.getSelection());
                 AppConfig.get().setSendDatabase(sendDatabaseButton.getSelection());
+                AppConfig.get().setDatabaseSendLog(databaseLogButton.getSelection());
                 AppConfig.get().setAccessKey(accessKeyText.getText());
                 // push notify
                 AppConfig.get().setNotifyProwl(prowl.getSelection());
@@ -899,7 +956,10 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setImKayacUserName(imkayacUserName.getText());
                 AppConfig.get().setImKayacPasswd(imkayacPasswd.getText());
                 AppConfig.get().setImKayacPrivateKey(imkayacPrivateKey.getText());
-                AppConfig.get().setDatabaseSendLog(databaseLogButton.getSelection());
+                AppConfig.get().setPushMission(pushNotifyMission.getSelection());
+                AppConfig.get().setPushNdock(pushNotifyNdock.getSelection());
+                AppConfig.get().setPushPriorityMission(pushPriorityMissionCombo.getSelectionIndex() - 2);
+                AppConfig.get().setPushPriorityNdock(pushPriorityNdockCombo.getSelectionIndex() - 2);
 
                 // development
                 AppConfig.get().setStoreJson(btnJson.getSelection());
