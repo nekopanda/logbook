@@ -522,6 +522,14 @@ public final class GlobalContext {
         case POWERUP:
             doPowerup(data);
             break;
+        // 艦娘ロック操作
+        case LOCK_SHIP:
+            doLockShip(data);
+            break;
+        // 装備ロック操作
+        case LOCK_SLOTITEM:
+            doLockSlotitem(data);
+            break;
         // 海戦
         case BATTLE:
             doBattle(data, BattlePhaseKind.BATTLE);
@@ -1450,6 +1458,52 @@ public final class GlobalContext {
             addConsole("近代化改修しました");
         } catch (Exception e) {
             LOG.warn("近代化改修しますに失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 艦娘ロックを更新する
+     * 
+     * @param data
+     */
+    private static void doLockShip(Data data) {
+        try {
+            JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+            int shipId = Integer.valueOf(data.getField("api_ship_id"));
+            boolean locked = apidata.getInt("api_locked") != 0;
+
+            ShipDto dto = shipMap.get(shipId);
+            if (dto != null) {
+                dto.setLocked(locked);
+            }
+
+            addConsole("艦娘ロックを更新しました");
+        } catch (Exception e) {
+            LOG.warn("艦娘ロックを更新するに失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 装備ロックを更新する
+     * 
+     * @param data
+     */
+    private static void doLockSlotitem(Data data) {
+        try {
+            JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+            int slotitemId = Integer.valueOf(data.getField("api_slotitem_id"));
+            boolean locked = apidata.getInt("api_locked") != 0;
+
+            ItemDto dto = itemMap.get(slotitemId);
+            if (dto != null) {
+                dto.setLocked(locked);
+            }
+
+            addConsole("装備ロックを更新しました");
+        } catch (Exception e) {
+            LOG.warn("装備ロックを更新するに失敗しました", e);
             LOG.warn(data);
         }
     }

@@ -41,7 +41,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
 
     /** 鍵付き */
     @Tag(13)
-    private final boolean locked;
+    private boolean locked;
 
     /** 艦隊ID */
     @Tag(14)
@@ -250,6 +250,12 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
      */
     public boolean getLocked() {
         return this.locked;
+    }
+
+    /**
+     */
+    public void setLocked(boolean locked) {
+        this.locked = locked;
     }
 
     /**

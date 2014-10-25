@@ -65,6 +65,10 @@ public enum DataType {
     DESTROY_ITEM2("/kcsapi/api_req_kousyou/destroyitem2"),
     /** 近代化改修 */
     POWERUP("/kcsapi/api_req_kaisou/powerup"),
+    /** 艦娘のロック操作 */
+    LOCK_SHIP("/kcsapi/api_req_hensei/lock"),
+    /** 装備ロック操作 */
+    LOCK_SLOTITEM("/kcsapi/api_req_kaisou/lock"),
     /** 出撃 */
     START("/kcsapi/api_req_map/start"),
     /** 進撃 */
