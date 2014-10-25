@@ -69,6 +69,8 @@ public enum DataType {
     LOCK_SHIP("/kcsapi/api_req_hensei/lock"),
     /** 装備ロック操作 */
     LOCK_SLOTITEM("/kcsapi/api_req_kaisou/lock"),
+    /** 装備改修 */
+    REMODEL_SLOT("/kcsapi/api_req_kousyou/remodel_slot"),
     /** 出撃 */
     START("/kcsapi/api_req_map/start"),
     /** 進撃 */

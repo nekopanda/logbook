@@ -530,6 +530,10 @@ public final class GlobalContext {
         case LOCK_SLOTITEM:
             doLockSlotitem(data);
             break;
+        // 装備改修
+        case REMODEL_SLOT:
+            doRemodelSlot(data);
+            break;
         // 海戦
         case BATTLE:
             doBattle(data, BattlePhaseKind.BATTLE);
@@ -2054,6 +2058,25 @@ public final class GlobalContext {
             addConsole("連合艦隊情報を更新しました");
         } catch (Exception e) {
             LOG.warn("連合艦隊情報更新に失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 装備改修
+     */
+    private static void doRemodelSlot(Data data) {
+        try {
+            JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+            if (apidata != null) {
+                if (apidata.getInt("api_remodel_flag") != 0) {
+                    // 改修したアイテムを更新
+                    addSlotitem(apidata.getJsonObject("api_after_slot"));
+                }
+            }
+            addConsole("装備改修を更新しました");
+        } catch (Exception e) {
+            LOG.warn("装備改修更新に失敗しました", e);
             LOG.warn(data);
         }
     }
