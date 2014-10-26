@@ -15,7 +15,7 @@ import logbook.dto.BattleAtackDto;
 import logbook.dto.BattleExDto;
 import logbook.dto.BattleExDto.Phase;
 import logbook.dto.BattleResultDto;
-import logbook.dto.ItemInfoDto;
+import logbook.dto.ItemDto;
 import logbook.dto.ShipBaseDto;
 import logbook.dto.ShipDto;
 
@@ -274,20 +274,20 @@ public class BattleHtmlGenerator extends HTMLGenerator {
             this.begin("tr", null);
             SHIP ship = ships.get(i);
             this.inline("td", String.valueOf(i + 1) + "." + ship.getFriendlyName(), null);
-            List<ItemInfoDto> items = ship.getItem();
+            List<ItemDto> items = ship.getItem2();
             for (int c = 0; c < 5; ++c) {
                 String onSlot = "";
                 String itemName = "";
                 int[] onSlots = ship.getOnSlot(); // 現在の艦載機搭載数
                 int[] maxeq = ship.getShipInfo().getMaxeq(); // 艦載機最大搭載数
                 if (c < items.size()) {
-                    ItemInfoDto item = items.get(c);
+                    ItemDto item = items.get(c);
                     if (item != null) {
                         if (item.isPlane()) {
                             String max = (maxeq == null) ? "?" : String.valueOf(maxeq[c]);
                             onSlot = String.valueOf(onSlots[c]) + "/" + max;
                         }
-                        itemName += item.getName();
+                        itemName += item.getFriendlyName();
                     }
                 }
                 this.inline("td", itemName, null);

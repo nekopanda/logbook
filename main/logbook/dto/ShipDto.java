@@ -1,15 +1,11 @@
 package logbook.dto;
 
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
-import java.util.Map;
-import java.util.Set;
 
 import javax.json.JsonObject;
 
 import logbook.constants.AppConstants;
-import logbook.data.context.GlobalContext;
 import logbook.internal.ExpTable;
 import logbook.internal.Ship;
 import logbook.util.JsonUtils;
@@ -141,87 +137,6 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
         if (this.cond < 49) {
             this.condClearTime.add(Calendar.MINUTE, Math.max(49 - this.cond, 3));
         }
-    }
-
-    /**
-     * ItemDto を ItemInfoDto に変換するラッパー
-     * @author Nekopanda
-     */
-    private static class ItemInfoMapWrapper implements Map<Integer, ItemInfoDto> {
-        private final Map<Integer, ItemDto> itemMap;
-
-        ItemInfoMapWrapper(Map<Integer, ItemDto> itemMap) {
-            this.itemMap = itemMap;
-        }
-
-        @Override
-        public void clear() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public boolean containsKey(Object arg0) {
-            return this.itemMap.containsKey(arg0);
-        }
-
-        @Override
-        public boolean containsValue(Object arg0) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Set<java.util.Map.Entry<Integer, ItemInfoDto>> entrySet() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public ItemInfoDto get(Object arg0) {
-            ItemDto dto = this.itemMap.get(arg0);
-            if (dto != null) {
-                return dto.getInfo();
-            }
-            return null;
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return this.itemMap.isEmpty();
-        }
-
-        @Override
-        public Set<Integer> keySet() {
-            return this.itemMap.keySet();
-        }
-
-        @Override
-        public ItemInfoDto put(Integer arg0, ItemInfoDto arg1) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void putAll(Map<? extends Integer, ? extends ItemInfoDto> arg0) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public ItemInfoDto remove(Object arg0) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public int size() {
-            return this.itemMap.size();
-        }
-
-        @Override
-        public Collection<ItemInfoDto> values() {
-            throw new UnsupportedOperationException();
-        }
-    }
-
-    @Override
-    protected Map<Integer, ItemInfoDto> getItemMap() {
-        return new ItemInfoMapWrapper(GlobalContext.getItemMap());
     }
 
     /**

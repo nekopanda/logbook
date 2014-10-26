@@ -549,18 +549,21 @@ public final class CreateReportLogic {
             }
 
             // 艦載機数
-            List<String> slotString = ship.getSlot();
+            List<ItemDto> slotItems = ship.getItem2();
+            String[] slotNames = new String[4];
             HpString[] onSlotString = new HpString[4];
-            if (ship.canEquipPlane()) { // 飛行機を装備できる場合だけ
-                List<ItemInfoDto> slotItem = ship.getItem();
-                int[] onSlot = ship.getOnSlot();
-                int[] maxEq = shipInfo.getMaxeq();
-                int slotNum = ship.getSlotNum();
-                for (int i = 0; i < slotNum; ++i) {
-                    ItemInfoDto item = slotItem.get(i);
+            int[] onSlot = ship.getOnSlot();
+            int[] maxEq = shipInfo.getMaxeq();
+            int slotNum = ship.getSlotNum();
+            for (int i = 0; i < slotNum; ++i) {
+                ItemDto item = slotItems.get(i);
+                if (ship.canEquipPlane()) { // 飛行機を装備できる場合だけ
                     int cur = ((item != null) && item.isPlane()) ? onSlot[i] : 0;
                     int max = maxEq != null ? maxEq[i] : 0;
                     onSlotString[i] = new HpString(cur, max);
+                }
+                if (item != null) {
+                    slotNames[i] = item.getFriendlyName();
                 }
             }
 
@@ -592,13 +595,13 @@ public final class CreateReportLogic {
                     ship.getExp(),
                     ship.getSeiku(),
                     new SakutekiString(ship),
-                    slotString.get(0),
+                    slotNames[0],
                     onSlotString[0],
-                    slotString.get(1),
+                    slotNames[1],
                     onSlotString[1],
-                    slotString.get(2),
+                    slotNames[2],
                     onSlotString[2],
-                    slotString.get(3),
+                    slotNames[3],
                     onSlotString[3],
                     ship.getMaxhp(),
                     ship.getFuelMax(),

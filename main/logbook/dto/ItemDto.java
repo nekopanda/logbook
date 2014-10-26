@@ -179,6 +179,17 @@ public class ItemDto extends AbstractDto {
         return this.info.getName();
     }
 
+    /**
+     * 表示名を取得
+     * @return
+     */
+    public String getFriendlyName() {
+        if (this.level > 0) {
+            return this.info.getName() + "★+" + this.level;
+        }
+        return this.info.getName();
+    }
+
     public ShipParameters getParam() {
         return this.info.getParam();
     }

@@ -148,7 +148,7 @@ public class AppConstants {
     public static final File ENEMY_DATA_FILE = new File("./config/KCRDB-enemyid.csv");
 
     /** 出撃ログ表示用CSSファイル */
-    public static final File BATTLE_LOG_CSS_FILE = new File("./config/battle-log.css");
+    public static final File BATTLE_LOG_CSS_FILE = new File("./templates/battle-log.css");
 
     /** 保有資材:燃料 */
     public static final int MATERIAL_FUEL = 1;

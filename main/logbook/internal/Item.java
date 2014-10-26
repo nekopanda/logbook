@@ -13,6 +13,9 @@ import logbook.dto.ItemInfoDto;
  */
 public class Item {
 
+    public static final ItemInfoDto UNKNOWN = new ItemInfoDto(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "<UNKNOWN>", 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0);
+
     /**
      * アイテムプリセット値
      */
