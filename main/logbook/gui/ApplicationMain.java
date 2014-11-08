@@ -34,7 +34,6 @@ import logbook.internal.EnemyData;
 import logbook.internal.MasterData;
 import logbook.server.proxy.DatabaseClient;
 import logbook.server.proxy.ProxyServer;
-import logbook.server.web.WebServer;
 import logbook.thread.ThreadManager;
 import logbook.thread.ThreadStateObserver;
 import logbook.util.SwtUtils;
@@ -122,7 +121,6 @@ public final class ApplicationMain extends WindowBase {
                 SWTResourceManager.dispose();
                 // プロキシサーバーをシャットダウンする
                 ProxyServer.end();
-                WebServer.end();
                 DatabaseClient.end();
 
                 // 設定を書き込みます

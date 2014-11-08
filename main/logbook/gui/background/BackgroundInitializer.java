@@ -10,7 +10,6 @@ import logbook.internal.Item;
 import logbook.internal.MasterData;
 import logbook.internal.Ship;
 import logbook.server.proxy.ProxyServer;
-import logbook.server.web.WebServer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,9 +43,6 @@ public final class BackgroundInitializer extends Thread {
         try {
             // プロキシサーバーを開始する
             ProxyServer.start(AppConfig.get().getListenPort());
-
-            // Webサーバーを開始する
-            WebServer.start(AppConfig.get().getListenPort() + 1);
 
         } catch (Exception e) {
             LOG.warn("サーバ起動に失敗しました", e);
