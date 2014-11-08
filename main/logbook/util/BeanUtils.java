@@ -2,14 +2,10 @@ package logbook.util;
 
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import javax.annotation.CheckForNull;
 
@@ -40,10 +36,13 @@ public final class BeanUtils {
                 throw new IOException("Directory '" + parent + "' could not be created");
             }
         }
-        try (OutputStream out = new BufferedOutputStream(new FileOutputStream(file))) {
-            XMLEncoder encoder = new XMLEncoder(out);
+        File backup = new File(file.getAbsolutePath() + ".backup");
+        if ((file.exists() && (file.length() > 0)) && (!backup.exists() || backup.delete())) {
+            // ファイルが存在してかつサイズが0を超える場合、バックアップを削除した後、ファイルをバックアップにリネームする
+            file.renameTo(backup);
+        }
+        try (XMLEncoder encoder = new XMLEncoder(new FileOutputStream(file))) {
             encoder.writeObject(obj);
-            encoder.close();
         }
     }
 
@@ -59,15 +58,20 @@ public final class BeanUtils {
      */
     @CheckForNull
     public static <T> T readObject(File file, Class<T> clazz) {
-        if (!file.canRead()) {
-            return null;
+        File target = file;
+
+        if (!target.canRead() || (target.length() <= 0)) {
+            // ファイルが読み込めないまたはサイズがゼロの場合バックアップファイルを読み込む
+            target = new File(file.getAbsolutePath() + ".backup");
+            if (!target.canRead()) {
+                // バックアップファイルも読めない場合nullを返す
+                return null;
+            }
         }
-        try (InputStream in = new BufferedInputStream(new FileInputStream(file))) {
-            try (XMLDecoder decoder = new XMLDecoder(in)) {
-                Object obj = decoder.readObject();
-                if (clazz.isInstance(obj)) {
-                    return (T) obj;
-                }
+        try (XMLDecoder decoder = new XMLDecoder(new FileInputStream(target))) {
+            Object obj = decoder.readObject();
+            if (clazz.isInstance(obj)) {
+                return (T) obj;
             }
             return null;
         } catch (Exception e) {
