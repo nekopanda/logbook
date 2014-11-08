@@ -16,6 +16,7 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
 
 import logbook.config.AppConfig;
+import logbook.constants.AppConstants;
 import logbook.gui.logic.LayoutLogic;
 import logbook.util.AwtUtils;
 
@@ -289,9 +290,9 @@ public final class CaptureDialog extends Dialog {
         /** Jpeg品質 */
         private static final float QUALITY = 0.9f;
         /** 日付フォーマット(ファイル名) */
-        private final SimpleDateFormat fileNameFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss.SSS");
+        private final SimpleDateFormat fileNameFormat = new SimpleDateFormat(AppConstants.DATE_LONG_FORMAT);
         /** 日付フォーマット(ディレクトリ名) */
-        private final SimpleDateFormat dirNameFormat = new SimpleDateFormat("yyyy-MM-dd");
+        private final SimpleDateFormat dirNameFormat = new SimpleDateFormat(AppConstants.DATE_DAYS_FORMAT);
         /** キャプチャ範囲 */
         private final Rectangle rectangle;
         /** トリム範囲 */
