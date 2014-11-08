@@ -45,7 +45,7 @@ public final class DockDto extends AbstractDto {
 
     /**
      * 艦娘を艦隊に追加します
-     * 
+     * 艦娘の艦隊所属情報も更新します
      * @param ship
      */
     public void addShip(ShipDto ship) {
@@ -54,23 +54,30 @@ public final class DockDto extends AbstractDto {
 
     /**
      * 艦隊から艦娘を削除します
-     * 
      * @param ship
      */
     public void removeShip(ShipDto ship) {
-        this.ships.remove(ship);
+        int index = this.ships.indexOf(ship);
+        if (index != -1) {
+            this.ships.remove(index);
+        }
     }
 
     /**
      * 艦隊の艦娘を入れ替えます
-     * 
-     * @param oldShip
+     * @param index
      * @param newShip
      */
-    public void replaceShip(ShipDto oldShip, ShipDto newShip) {
-        int index = this.ships.indexOf(oldShip);
-        if (index != -1) {
-            this.ships.set(index, newShip);
+    public void setShip(int index, ShipDto newShip) {
+        this.ships.set(index, newShip);
+    }
+
+    /**
+     * 旗艦以外を外します
+     */
+    public void removeExceptFlagship() {
+        while (this.ships.size() > 1) {
+            this.ships.remove(this.ships.size() - 1);
         }
     }
 
@@ -104,6 +111,19 @@ public final class DockDto extends AbstractDto {
      */
     public void setUpdate(boolean update) {
         this.update = update;
+    }
+
+    public void removeFleetIdFromShips() {
+        for (int i = 0; i < this.ships.size(); i++) {
+            this.ships.get(i).setFleetid("");
+        }
+    }
+
+    public void updateFleetIdOfShips() {
+        for (int i = 0; i < this.ships.size(); i++) {
+            this.ships.get(i).setFleetid(this.id);
+            this.ships.get(i).setFleetpos(i);
+        }
     }
 
     /**

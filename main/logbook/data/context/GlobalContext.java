@@ -726,46 +726,72 @@ public final class GlobalContext {
             if (dockdto != null) {
                 List<ShipDto> ships = dockdto.getShips();
 
-                DockDto newdock = new DockDto(dockdto.getId(), dockdto.getName());
                 if (shipidx == -1) {
-                    for (int i = 1; i < ships.size(); i++) {
-                        // 艦隊IDを外す
+                    // 旗艦以外解除
+                    for (int i = 1; i < ships.size(); ++i) {
                         ships.get(i).setFleetid("");
                     }
-                    // 旗艦以外解除
-                    newdock.addShip(ships.get(0));
+                    dockdto.removeExceptFlagship();
                 } else {
                     // 入れ替えまたは外す
-                    // 入れ替え後の艦娘(外す場合はnull)
+                    // 入れ替え前の艦娘(いない場合はnull)
+                    ShipDto cship = (shipidx < ships.size()) ? ships.get(shipidx) : null;
+                    // 入れる艦娘(外す場合はnull)
                     ShipDto rship = shipMap.get(shipid);
-                    ShipDto[] shiparray = new ShipDto[7];
+                    // 入れる艦娘の現在の所属艦隊(ない場合はnull)
+                    DockDto rdock = (rship != null) ? dock.get(rship.getFleetid()) : null;
+                    int rdockPos = (rship != null) ? rship.getFleetpos() : 0;
 
-                    for (int i = 0; i < ships.size(); i++) {
-                        // 艦隊IDを一旦全部外す
-                        ships.get(i).setFleetid("");
-                        shiparray[i] = ships.get(i);
+                    // 艦隊IDを一旦全部外す
+                    dockdto.removeFleetIdFromShips();
+                    if (rdock != null) {
+                        rdock.removeFleetIdFromShips();
                     }
-                    for (int i = 0; i < ships.size(); i++) {
-                        if (rship == ships.get(i)) {
-                            shiparray[i] = shiparray[shipidx];
+
+                    // 入れる艦娘の前の位置を処理
+                    if (rdock != null) {
+                        // この場合 rship != null は既知
+                        if (cship != null) {
+                            // 入れ替え
+                            rdock.setShip(rdockPos, cship);
+                        }
+                        else {
+                            // 取る
+                            rdock.removeShip(rship);
                         }
                     }
-                    shiparray[shipidx] = rship;
-                    for (int i = 0; i < shiparray.length; ++i) {
-                        ShipDto shipdto = shiparray[i];
-                        if (shipdto != null) {
-                            shipdto.setFleetid(fleetid);
-                            shipdto.setFleetpos(i);
-                            newdock.addShip(shipdto);
-                        }
+
+                    // 入れる位置を処理
+                    if (rship == null) {
+                        // 取る
+                        dockdto.removeShip(cship);
+                    }
+                    else if (cship != null) {
+                        // rship != null && cship != null
+                        // 入れ替え
+                        dockdto.setShip(shipidx, rship);
+                    }
+                    else {
+                        // rship != null && cship == null
+                        // 入れる
+                        dockdto.addShip(rship);
+                    }
+
+                    // 艦隊IDを付け直す
+                    dockdto.updateFleetIdOfShips();
+                    dockdto.setUpdate(true);
+                    if (rdock != null) {
+                        rdock.updateFleetIdOfShips();
+                        rdock.setUpdate(true);
                     }
                 }
-                if ("1".equals(fleetid)) {
+                DockDto firstdock = dock.get("1");
+                if (firstdock != null) {
                     // 秘書艦を再設定
-                    setSecretary(newdock.getShips().get(0));
+                    setSecretary(firstdock.getShips().get(0));
                 }
-                dock.put(fleetid, newdock);
             }
+            addConsole("編成を更新しました");
         } catch (Exception e) {
             LOG.warn("編成を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1452,9 +1478,9 @@ public final class GlobalContext {
             if (fleetid != null) {
                 DockDto dockdto = dock.get(fleetid);
                 if (dockdto != null) {
-                    dockdto.replaceShip(oldShip, ship);
                     ship.setFleetid(fleetid);
                     ship.setFleetpos(oldShip.getFleetpos());
+                    dockdto.setShip(ship.getFleetpos(), ship);
                 }
             }
             shipMap.put(id, ship);

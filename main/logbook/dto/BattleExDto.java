@@ -10,6 +10,7 @@ import java.util.List;
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
+import javax.json.JsonValue;
 
 import logbook.data.context.GlobalContext;
 import logbook.internal.EnemyData;
@@ -221,13 +222,18 @@ public class BattleExDto extends AbstractDto {
             JsonNumber support_flag = object.getJsonNumber("api_support_flag");
             if ((support_flag != null) && (support_flag.intValue() != 0)) {
                 JsonObject support = object.getJsonObject("api_support_info");
-                if (support != null) {
-                    JsonObject support_hourai = support.getJsonObject("api_support_hourai");
-                    if (support_hourai != null) {
-                        JsonArray edam = support_hourai.getJsonArray("api_damage");
-                        if (edam != null) {
-                            this.support = BattleAtackDto.makeSupport(edam);
-                        }
+                JsonValue support_hourai = support.get("api_support_hourai");
+                JsonValue support_air = support.get("api_support_airatack");
+                if ((support_hourai != null) && (support_hourai != JsonValue.NULL)) {
+                    JsonArray edam = ((JsonObject) support_hourai).getJsonArray("api_damage");
+                    if (edam != null) {
+                        this.support = BattleAtackDto.makeSupport(edam);
+                    }
+                }
+                else if ((support_air != null) && (support_air != JsonValue.NULL)) {
+                    JsonValue stage3 = ((JsonObject) support_air).get("api_stage3");
+                    if ((stage3 != null) && (stage3 != JsonValue.NULL)) {
+                        this.support = BattleAtackDto.makeSupport(((JsonObject) stage3).getJsonArray("api_edam"));
                     }
                 }
                 this.supportType = toSupport(support_flag.intValue());
