@@ -14,6 +14,7 @@ import java.util.List;
 import javax.annotation.CheckForNull;
 
 import logbook.config.AppConfig;
+import logbook.constants.AppConstants;
 import logbook.dto.AbstractDto;
 
 import org.apache.commons.io.LineIterator;
@@ -23,6 +24,10 @@ import org.apache.commons.io.LineIterator;
  *
  */
 public class ResourceLog extends AbstractDto {
+    public static final int RESOURCE_FUEL = 0;
+    public static final int RESOURCE_AMMO = 1;
+    public static final int RESOURCE_METAL = 2;
+    public static final int RESOURCE_BAUXITE = 3;
 
     public long[] time;
 
@@ -43,7 +48,7 @@ public class ResourceLog extends AbstractDto {
     @CheckForNull
     public static ResourceLog getInstance(File file) throws IOException {
         // 日付フォーマット
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat format = new SimpleDateFormat(AppConstants.DATE_FORMAT);
 
         List<SortableLog> logs = new ArrayList<>();
         // データを読み込む
@@ -99,13 +104,13 @@ public class ResourceLog extends AbstractDto {
     /**
      * 資材ログの行
      */
-    private static final class SortableLog implements Comparable<SortableLog> {
+    public static final class SortableLog implements Comparable<SortableLog> {
 
-        long time;
-        int fuel;
-        int ammo;
-        int metal;
-        int bauxite;
+        public long time;
+        public int fuel;
+        public int ammo;
+        public int metal;
+        public int bauxite;
 
         public SortableLog(long time, int fuel, int ammo, int metal, int bauxite) {
             this.time = time;

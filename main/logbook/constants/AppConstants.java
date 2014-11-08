@@ -24,8 +24,11 @@ public class AppConstants {
     /** 日付書式 */
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-    /** 日付書式 */
+    /** 日付書式(時刻のみ) */
     public static final String DATE_SHORT_FORMAT = "HH:mm:ss";
+
+    /** 日付書式(日付のみ) */
+    public static final String DATE_DAYS_FORMAT = "yyyy-MM-dd";
 
     /** 疲労赤色 */
     public static final int COND_RED = 19;
