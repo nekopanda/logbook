@@ -30,6 +30,9 @@ public class AppConstants {
     /** 日付書式(日付のみ) */
     public static final String DATE_DAYS_FORMAT = "yyyy-MM-dd";
 
+    /** 日付書式(ミリ秒を含む) */
+    public static final String DATE_LONG_FORMAT = "yyyy-MM-dd HH-mm-ss.SSS";
+
     /** 疲労赤色 */
     public static final int COND_RED = 19;
 
