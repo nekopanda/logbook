@@ -3,21 +3,21 @@
 	<classpathentry kind="src" path="main"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/commons/commons-io-2.4.jar"/>
-	<classpathentry kind="lib" path="lib/commons/commons-lang3-3.1.jar"/>
-	<classpathentry kind="lib" path="lib/commons/commons-logging-1.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/server/jetty-client-9.0.5.v20130815.jar"/>
-	<classpathentry kind="lib" path="lib/server/jetty-http-9.0.5.v20130815.jar"/>
-	<classpathentry kind="lib" path="lib/server/jetty-io-9.0.5.v20130815.jar"/>
-	<classpathentry kind="lib" path="lib/server/jetty-proxy-9.0.5.v20130815.jar"/>
-	<classpathentry kind="lib" path="lib/server/jetty-server-9.0.5.v20130815.jar"/>
-	<classpathentry kind="lib" path="lib/server/jetty-servlet-9.0.5.v20130815.jar"/>
-	<classpathentry kind="lib" path="lib/server/jetty-util-9.0.5.v20130815.jar"/>
-	<classpathentry kind="lib" path="lib/server/servlet-api-3.0.jar"/>
-	<classpathentry kind="lib" path="lib/util/javax.json-1.0.jar"/>
-	<classpathentry kind="lib" path="lib/gui/swt.jar" sourcepath="lib/gui/swt-source.jar"/>
+	<classpathentry kind="lib" path="lib/annotation.jar"/>
+	<classpathentry kind="lib" path="lib/commons-io-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang3-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/javax.json-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-client-9.0.5.v20130815.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-http-9.0.5.v20130815.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-io-9.0.5.v20130815.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-proxy-9.0.5.v20130815.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-server-9.0.5.v20130815.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-servlet-9.0.5.v20130815.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-util-9.0.5.v20130815.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-api-2.0-beta8.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-core-2.0-beta8.jar"/>
-	<classpathentry kind="lib" path="lib/annotation.jar"/>
+	<classpathentry kind="lib" path="lib/servlet-api-3.0.jar"/>
+	<classpathentry kind="lib" path="lib/swt.jar" sourcepath="lib/sources/swt-source.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
