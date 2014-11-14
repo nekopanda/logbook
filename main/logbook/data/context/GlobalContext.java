@@ -1463,6 +1463,7 @@ public final class GlobalContext {
                         if (dockdto != null) {
                             dockdto.removeShip(ship);
                             dockdto.setUpdate(true);
+                            dockdto.updateFleetIdOfShips();
                         }
                     }
                 }
