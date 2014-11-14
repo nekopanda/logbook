@@ -566,6 +566,9 @@ public final class GlobalContext {
         case COMBINED_BATTLE_SP_MIDNIGHT:
             doBattle(data, BattlePhaseKind.COMBINED_SP_MIDNIGHT);
             break;
+        case COMBINED_BATTLE_WATER:
+            doBattle(data, BattlePhaseKind.COMBINED_BATTLE_WATER);
+            break;
         // 海戦結果
         case BATTLE_RESULT:
             doBattleresult(data);
@@ -859,6 +862,7 @@ public final class GlobalContext {
                 if (apidata.containsKey("api_combined_flag")) {
                     switch (apidata.getJsonNumber("api_combined_flag").intValue()) {
                     case 1:
+                    case 2:
                         combined = true;
                         break;
                     default:

@@ -248,18 +248,16 @@ public class BattleExDto extends AbstractDto {
                 this.air2 = new AirBattleDto(kouku2, isCombined);
 
             // 開幕
-            this.opening = BattleAtackDto.makeRaigeki(object.get("api_opening_atack"), isCombined);
+            this.opening = BattleAtackDto.makeRaigeki(object.get("api_opening_atack"), kind.isOpeningSecond());
 
             // 砲撃
-            this.hougeki = BattleAtackDto.makeHougeki(object.get("api_hougeki"), (isCombined && this.isNight)); // 夜戦
-            this.hougeki1 = BattleAtackDto.makeHougeki(object.get("api_hougeki1"), isCombined);
+            this.hougeki = BattleAtackDto.makeHougeki(object.get("api_hougeki"), kind.isHougekiSecond()); // 夜戦
+            this.hougeki1 = BattleAtackDto.makeHougeki(object.get("api_hougeki1"), kind.isHougeki1Second());
+            this.hougeki2 = BattleAtackDto.makeHougeki(object.get("api_hougeki2"), kind.isHougeki2Second());
+            this.hougeki3 = BattleAtackDto.makeHougeki(object.get("api_hougeki3"), kind.isHougeki3Second());
 
             // 雷撃
-            this.raigeki = BattleAtackDto.makeRaigeki(object.get("api_raigeki"), isCombined);
-
-            // 砲撃（連合艦隊用）
-            this.hougeki2 = BattleAtackDto.makeHougeki(object.get("api_hougeki2"), false);
-            this.hougeki3 = BattleAtackDto.makeHougeki(object.get("api_hougeki3"), false);
+            this.raigeki = BattleAtackDto.makeRaigeki(object.get("api_raigeki"), kind.isRaigekiSecond());
 
             // ダメージを反映 //
 
