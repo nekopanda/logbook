@@ -421,6 +421,10 @@ public final class GlobalContext {
             case COMBINED_BATTLE:
                 doBattle(data);
                 break;
+            // 海戦
+            case COMBINED_BATTLE_WATER:
+                doBattle(data);
+                break;
             // 海戦結果
             case BATTLE_RESULT:
                 doBattleresult(data);

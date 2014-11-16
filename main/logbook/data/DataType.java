@@ -43,6 +43,8 @@ public enum DataType {
     COMBINED_AIR_BATTLE("/kcsapi/api_req_combined_battle/airbattle"),
     /** 戦闘 */
     COMBINED_BATTLE("/kcsapi/api_req_combined_battle/battle"),
+    /** 戦闘 */
+    COMBINED_BATTLE_WATER("/kcsapi/api_req_combined_battle/battle_water"),
     /** 戦闘結果 */
     BATTLE_RESULT("/kcsapi/api_req_sortie/battleresult"),
     /** 戦闘結果(連合艦隊) */
