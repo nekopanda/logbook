@@ -393,15 +393,17 @@ public final class CreateReportLogic {
         for (ShipDto ship : GlobalContext.getShipMap().values()) {
             for (ItemInfoDto item : ship.getItem()) {
                 if (item != null) {
-                    Map<ShipDto, Integer> shipMap = itemCountMap.get(item.getId()).shipMap;
-                    Integer count = shipMap.get(ship);
-                    if (count == null) {
-                        count = 1;
-                    }
-                    else {
-                        count++;
-                    }
-                    shipMap.put(ship, count);
+                	ItemInfo info = itemCountMap.get(item.getId());
+                	if(info != null) {
+	                    Integer count = info.shipMap.get(ship);
+	                    if (count == null) {
+	                        count = 1;
+	                    }
+	                    else {
+	                        count++;
+	                    }
+	                    info.shipMap.put(ship, count);
+                	}
                 }
             }
         }
