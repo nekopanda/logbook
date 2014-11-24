@@ -227,14 +227,14 @@ public final class CaptureDialog extends WindowBase {
                 Thread.sleep(WAIT);
                 // ディスプレイに対してGraphics Contextを取得する(フルスクリーンキャプチャ)
                 GC gc = new GC(display);
-                Image image = new Image(display, display.getBounds());
-                gc.copyArea(image, 0, 0);
+                Rectangle rect = display.getBounds();
+                Image image = new Image(display, rect);
+                gc.copyArea(image, rect.x, rect.y);
                 gc.dispose();
 
                 try {
                     // 範囲を取得する
-                    Rectangle rectangle = new FullScreenDialog(CaptureDialog.this.shell, image,
-                            CaptureDialog.this.shell.getMonitor())
+                    Rectangle rectangle = new FullScreenDialog(CaptureDialog.this.shell, image, display)
                             .open();
 
                     if ((rectangle != null) && (rectangle.width > 1) && (rectangle.height > 1)) {

@@ -19,7 +19,6 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
@@ -33,7 +32,7 @@ public final class FullScreenDialog extends Dialog {
     private ScreenCanvas canvas;
 
     private final Image image;
-    private final Monitor monitor;
+    private final Display monitor;
 
     /**
      * Create the dialog.
@@ -41,7 +40,7 @@ public final class FullScreenDialog extends Dialog {
      * @param parent
      * @param image 矩形選択の背景画像
      */
-    public FullScreenDialog(Shell parent, Image image, Monitor monitor) {
+    public FullScreenDialog(Shell parent, Image image, Display monitor) {
         super(parent, SWT.NO_TRIM);
         this.setText("矩形選択");
 
@@ -106,7 +105,7 @@ public final class FullScreenDialog extends Dialog {
     private static final class ScreenCanvas extends Canvas implements PaintListener, MouseListener, MouseMoveListener {
 
         private final Image image;
-        private final Monitor monitor;
+        private final Display monitor;
 
         private final Color white = SWTResourceManager.getColor(new RGB(255, 255, 255));
         private final Color black = SWTResourceManager.getColor(new RGB(0, 0, 0));
@@ -118,7 +117,7 @@ public final class FullScreenDialog extends Dialog {
         private int x2;
         private int y2;
 
-        public ScreenCanvas(Shell shell, Image image, Monitor monitor) {
+        public ScreenCanvas(Shell shell, Image image, Display monitor) {
             super(shell, SWT.NO_BACKGROUND);
             this.image = image;
             this.monitor = monitor;
@@ -134,11 +133,11 @@ public final class FullScreenDialog extends Dialog {
             Rectangle m = this.monitor.getBounds();
 
             GC gc = e.gc;
-            gc.drawImage(this.image, m.x, m.y, m.width, m.height, 0, 0, m.width, m.height);
+            gc.drawImage(this.image, 0, 0, m.width, m.height, 0, 0, m.width, m.height);
             gc.setFont(this.largefont);
             gc.setForeground(this.black);
             gc.setBackground(this.white);
-            gc.drawString("キャプチャする領域をマウスでドラッグして下さい。 [Esc]キーでキャンセル", 2, 2);
+            gc.drawString("キャプチャする領域をマウスでドラッグして下さい。 [Esc]キーでキャンセル", -m.x + 2, -m.y + 2);
         }
 
         @Override
