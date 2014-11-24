@@ -263,9 +263,12 @@ public final class ApplicationMain extends WindowBase {
             LOG.fatal("メインスレッドが異常終了しました", e);
         } catch (Exception e) {
             LOG.fatal("メインスレッドが異常終了しました", e);
+        } finally {
+            // リソースを開放する
+            SWTResourceManager.dispose();
+            // プロキシサーバーをシャットダウンする
+            ProxyServer.end();
         }
-        // 
-        new Thread(new ShutdownHookThread()).start();
     }
 
     /**

@@ -185,6 +185,14 @@ public class BattleResultDto extends AbstractDto {
     }
 
     /**
+     * ボスマスを取得します。
+     * @return ボスマス
+     */
+    public boolean isBoss() {
+        return this.boss;
+    }
+
+    /**
      * 敵艦隊名を取得します。
      * @return 敵艦隊名
      */
