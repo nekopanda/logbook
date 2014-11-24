@@ -57,9 +57,6 @@ public class MapCellDto implements Comparable<MapCellDto> {
             }
         }
         if (this.enemyId != -1) {
-            if (this.isBoss()) {
-                ret += " (ボス)";
-            }
             ret += " e_id:" + this.enemyId;
         }
         return ret;

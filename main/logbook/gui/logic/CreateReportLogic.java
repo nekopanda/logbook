@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -171,15 +172,13 @@ public final class CreateReportLogic {
         List<BattleResultDto> results = BattleResultServer.get().getFilteredList(filter);
         List<Comparable[]> body = new ArrayList<Comparable[]>();
 
-        SimpleDateFormat format = new SimpleDateFormat(AppConstants.DATE_FORMAT);
-
         for (int i = 0; i < results.size(); i++) {
             BattleResultDto item = results.get(i);
             body.add(new Comparable[] {
                     new TableRowHeader(i + 1, item),
                     new DateTimeString(item.getBattleDate()), item.getQuestName(),
                     item.getMapCell(), item.getMapCell().isBoss() ? "ボス" : "",
-					item.getRank(), item.getEnemyName(), item.getDropType(),
+                    item.getRank(), item.getEnemyName(), item.getDropType(),
                     item.getDropName(), item.isHasTaiha() ? "あり" : "",
                     item.getFlagShip(), item.getFlagShipCombined(),
                     item.getMvp(), item.getMvpCombined() });
@@ -398,17 +397,17 @@ public final class CreateReportLogic {
         for (ShipDto ship : GlobalContext.getShipMap().values()) {
             for (ItemInfoDto item : ship.getItem()) {
                 if (item != null) {
-                	ItemInfo info = itemCountMap.get(item.getId());
-                	if(info != null) {
-	                    Integer count = info.shipMap.get(ship);
-	                    if (count == null) {
-	                        count = 1;
-	                    }
-	                    else {
-	                        count++;
-	                    }
-	                    info.shipMap.put(ship, count);
-                	}
+                    ItemInfo info = itemCountMap.get(item.getId());
+                    if (info != null) {
+                        Integer count = info.shipMap.get(ship);
+                        if (count == null) {
+                            count = 1;
+                        }
+                        else {
+                            count++;
+                        }
+                        info.shipMap.put(ship, count);
+                    }
                 }
             }
         }

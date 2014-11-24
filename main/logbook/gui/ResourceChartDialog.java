@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -46,7 +45,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
@@ -88,7 +86,7 @@ public final class ResourceChartDialog extends WindowBase {
     /** 資材テーブル */
     private Table table;
     /** 資材テーブルのヘッダ */
-    private final String[] header = Arrays.copyOfRange(CreateReportLogic.getMaterialHeader(), 1, 6);
+    private final String[] header = new String[] { "日付", "燃料", "弾薬", "鋼材", "ボーキ" };
     /** 資材テーブルのボディ */
     private final List<String[]> body = new ArrayList<>();
 
@@ -127,7 +125,6 @@ public final class ResourceChartDialog extends WindowBase {
         this.shell = this.getShell();
         this.shell.setMinimumSize(450, 300);
         this.shell.setSize(800, 650);
-        this.shell.setText(this.getText());
         GridLayout glShell = new GridLayout(1, false);
         glShell.verticalSpacing = 2;
         glShell.marginWidth = 2;

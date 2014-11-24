@@ -189,7 +189,7 @@ public class BattleResultDto extends AbstractDto {
      * @return ボスマス
      */
     public boolean isBoss() {
-        return this.boss;
+        return this.mapCell.isBoss();
     }
 
     /**
