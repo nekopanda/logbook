@@ -519,6 +519,7 @@ public final class AsyncExecApplicationMain extends Thread {
                     if (!dock.getName().equals(dockname[i])) {
                         dockname[i] = dock.getName();
                     }
+
                     tabComposite.updateFleet(dock, (i < 2) ? combinedFleetBadlyDamaed : false);
                     tabItem.setText(dock.getName());
                     dock.setUpdate(false);

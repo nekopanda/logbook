@@ -14,6 +14,7 @@ import logbook.dto.AirBattleDto;
 import logbook.dto.BattleAtackDto;
 import logbook.dto.BattleExDto;
 import logbook.dto.BattleExDto.Phase;
+import logbook.dto.BattlePhaseKind;
 import logbook.dto.BattleResultDto;
 import logbook.dto.ItemDto;
 import logbook.dto.ShipBaseDto;
@@ -726,15 +727,15 @@ public class BattleHtmlGenerator extends HTMLGenerator {
             this.genHougekiTableContent(hougekiList.get(i), friendShips, enemyShips, friendHp, enemyHp);
             this.end(); // table
 
-            if (battle.isCombined() && (i == 0)) {
-                // 連合艦隊の場合はここで雷撃
+            if ((phase.getKind() == BattlePhaseKind.COMBINED_BATTLE) && (i == 0)) {
+                // 空母機動部隊の昼戦の場合はここで雷撃
                 this.genRaigekiBattle(phase.getRaigeki(), "雷撃戦",
                         friendShips, enemyShips, friendHp, enemyHp);
             }
         }
 
-        // 連合艦隊でない時の雷撃
-        if (battle.isCombined() == false) {
+        // 空母機動部隊の昼戦以外の雷撃
+        if (phase.getKind() != BattlePhaseKind.COMBINED_BATTLE) {
             this.genRaigekiBattle(phase.getRaigeki(), "雷撃戦",
                     friendShips, enemyShips, friendHp, enemyHp);
         }

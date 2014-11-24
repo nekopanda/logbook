@@ -116,6 +116,9 @@ public class AppConstants {
     /** 轟沈の色 */
     public static final RGB SUNK_SHIP_COLOR = new RGB(77, 166, 223);
 
+    /** 退避の色 */
+    public static final RGB ESCAPED_SHIP_COLOR = new RGB(178, 178, 178);
+
     /** 敗北の色 */
     public static final RGB LOSE_BATTLE_COLOR = new RGB(230, 10, 20);
 

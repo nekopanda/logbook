@@ -24,15 +24,21 @@ public final class DockDto extends AbstractDto {
     @Tag(3)
     private final List<ShipDto> ships = new ArrayList<ShipDto>();
 
+    @Tag(4)
+    private boolean[] escaped = null;
+
     /** 更新フラグ */
     private transient boolean update;
 
     /**
      * コンストラクター
      */
-    public DockDto(String id, String name) {
+    public DockDto(String id, String name, DockDto oldDock) {
         this.id = id;
         this.name = name;
+        if (oldDock != null) {
+            this.escaped = oldDock.getEscaped();
+        }
     }
 
     /**
@@ -131,11 +137,29 @@ public final class DockDto extends AbstractDto {
      * @return 大破艦がいるか？
      */
     public boolean isBadlyDamaged() {
-        for (ShipDto ship : this.ships) {
+        for (int i = 0; i < this.ships.size(); ++i) {
+            if ((this.escaped != null) && this.escaped[i]) {
+                continue; // 退避した艦はカウントしない
+            }
+            ShipDto ship = this.ships.get(i);
             if (ship.isBadlyDamage()) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * @return escaped
+     */
+    public boolean[] getEscaped() {
+        return this.escaped;
+    }
+
+    /**
+     * @param escaped セットする escaped
+     */
+    public void setEscaped(boolean[] escaped) {
+        this.escaped = escaped;
     }
 }

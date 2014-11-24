@@ -123,7 +123,7 @@ public final class GlobalContext {
             DeckMissionDto.EMPTY };
 
     /** ドック */
-    private static Map<String, DockDto> dock = new HashMap<String, DockDto>();
+    private static Map<String, DockDto> dock = new TreeMap<String, DockDto>();
 
     /** 入渠リスト */
     private static NdockDto[] ndocks = new NdockDto[] { NdockDto.EMPTY, NdockDto.EMPTY, NdockDto.EMPTY,
@@ -601,6 +601,10 @@ public final class GlobalContext {
         case COMBINED_BATTLE_RESULT:
             doBattleresult(data);
             break;
+        // 退避した
+        case COMBINED_BATTLE_GOBACK_PORT:
+            doBattleGobackPort(data);
+            break;
         // 演習
         case PRACTICE_BATTLE:
             doBattle(data, BattlePhaseKind.PRACTICE_BATTLE);
@@ -834,11 +838,20 @@ public final class GlobalContext {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
             if (apidata != null) {
                 // 出撃中ではない
+                boolean endSortie = false;
                 for (int i = 0; i < isSortie.length; ++i) {
                     if (isSortie[i]) {
-                        ApplicationMain.main.endSortie();
-                        break;
+                        DockDto sortieDock = dock.get(Integer.toString(i + 1));
+                        if (sortieDock != null) {
+                            // 退避情報をクリア
+                            sortieDock.setEscaped(null);
+                            sortieDock.setUpdate(true);
+                        }
+                        endSortie = true;
                     }
+                }
+                if (endSortie) {
+                    ApplicationMain.main.endSortie();
                 }
                 Arrays.fill(isSortie, false);
 
@@ -1042,6 +1055,36 @@ public final class GlobalContext {
             // 出撃を更新
             isStart = false;
             addUpdateLog("海戦結果を更新しました");
+        } catch (Exception e) {
+            LOG.warn("海戦結果を更新しますに失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 海戦情報を更新します
+     * @param data
+     */
+    private static void doBattleGobackPort(Data data) {
+        try {
+            if (battle != null) {
+                int[] escapeInfo = battle.getEscapeInfo();
+                if ((battle.getEscaped() != null) && (escapeInfo != null)) {
+                    // 退避を選択したので退避した艦を追加しておく
+                    boolean[] escaped = battle.getEscaped().clone();
+                    escaped[escapeInfo[0]] = true;
+                    escaped[escapeInfo[1]] = true;
+                    for (int i = 0; i < 2; ++i) {
+                        battle.getFriends().get(i).setEscaped(
+                                Arrays.copyOfRange(escaped, i * 6, (i + 1) * 6));
+                    }
+
+                    // 更新
+                    battle.getDock().setUpdate(true);
+                    battle.getDockCombined().setUpdate(true);
+                }
+            }
+
         } catch (Exception e) {
             LOG.warn("海戦結果を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1347,7 +1390,7 @@ public final class GlobalContext {
      * @param apidata
      */
     private static void doDeck(JsonArray apidata) {
-        dock.clear();
+        Map<String, DockDto> newDocks = new TreeMap<String, DockDto>();
         for (int i = 0; i < apidata.size(); i++) {
             JsonObject jsonObject = (JsonObject) apidata.get(i);
             int fleetid = jsonObject.getInt("api_id");
@@ -1355,9 +1398,9 @@ public final class GlobalContext {
             String name = jsonObject.getString("api_name");
             JsonArray apiship = jsonObject.getJsonArray("api_ship");
 
-            DockDto dockdto = new DockDto(fleetidstr, name);
+            DockDto dockdto = new DockDto(fleetidstr, name, dock.get(fleetidstr));
             List<Integer> shipIds = new ArrayList<Integer>();
-            dock.put(fleetidstr, dockdto);
+            newDocks.put(fleetidstr, dockdto);
 
             for (int j = 0; j < apiship.size(); j++) {
                 int shipId = apiship.getInt(j);
@@ -1387,6 +1430,7 @@ public final class GlobalContext {
                 deckMissions[i - 1] = new DeckMissionDto(name, section, time, fleetid, shipIds);
             }
         }
+        dock = newDocks;
     }
 
     /**

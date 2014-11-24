@@ -26,7 +26,9 @@ public enum DamageRate {
             SWTResourceManager.getColor(SWT.COLOR_WHITE)),
     GOTIN("轟沈", 5,
             SWTResourceManager.getColor(AppConstants.SUNK_SHIP_COLOR),
-            SWTResourceManager.getColor(SWT.COLOR_WHITE));
+            SWTResourceManager.getColor(SWT.COLOR_WHITE)),
+    ESCAPED("退避", -1,
+            SWTResourceManager.getColor(AppConstants.ESCAPED_SHIP_COLOR), null);
 
     private final String str;
     private final int level;

@@ -119,7 +119,7 @@ public class TestDataFeeder extends WindowBase {
         btn3.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                TestDataFeeder.this.nextUntil(DataType.COMBINED_AIR_BATTLE);
+                TestDataFeeder.this.nextUntil(DataType.COMBINED_BATTLE_WATER);
             }
         });
 

@@ -265,6 +265,7 @@ public class FleetComposite extends Composite {
      *
      * @param dock
      * @param combinedFleetbadlyDamaed 連合艦隊の他の艦隊の艦が大破している
+     * @param escaped 退避したか（連合艦隊でない場合 or 情報がない場合はnull可）
      */
     public void updateFleet(DockDto dock, boolean combinedFleetBadlyDamaed) {
         if ((this.dock == dock) && !this.dock.isUpdate()) {
@@ -282,6 +283,7 @@ public class FleetComposite extends Composite {
         this.message.setText("");
 
         List<ShipDto> ships = dock.getShips();
+        boolean[] escaped = dock.getEscaped();
         for (int i = ships.size(); i < MAXCHARA; i++) {
             this.iconLabels[i].setImage(null);
             this.nameLabels[i].setText("");
@@ -342,7 +344,13 @@ public class FleetComposite extends Composite {
             }
 
             // 体力メッセージ
-            if (ship.isBadlyDamage()) {
+            boolean isEscaped = ((escaped != null) && escaped[i]);
+            if (isEscaped) {
+                this.hpmsgLabels[i].setText("退避");
+                this.hpmsgLabels[i].setBackground(SWTResourceManager.getColor(AppConstants.ESCAPED_SHIP_COLOR));
+                this.hpmsgLabels[i].setForeground(null);
+            }
+            else if (ship.isBadlyDamage()) {
                 if (AppConfig.get().isFatalBybadlyDamage()) {
                     // 大破で致命的アイコン
                     this.state.set(FATAL);
