@@ -268,6 +268,7 @@ public final class ApplicationMain extends WindowBase {
             SWTResourceManager.dispose();
             // プロキシサーバーをシャットダウンする
             ProxyServer.end();
+            DatabaseClient.end();
         }
     }
 
