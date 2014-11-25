@@ -177,7 +177,7 @@ public final class CreateReportLogic {
             body.add(new Comparable[] {
                     new TableRowHeader(i + 1, item),
                     new DateTimeString(item.getBattleDate()), item.getQuestName(),
-                    item.getMapCell(), item.getMapCell().isBoss() ? "ボス" : "",
+                    item.getMapCell(), item.isBoss() ? "ボス" : "",
                     item.getRank(), item.getEnemyName(), item.getDropType(),
                     item.getDropName(), item.isHasTaiha() ? "あり" : "",
                     item.getFlagShip(), item.getFlagShipCombined(),
