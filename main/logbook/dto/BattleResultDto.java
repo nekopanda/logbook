@@ -47,13 +47,13 @@ public final class BattleResultDto extends AbstractDto {
      * @param cell マップ上のマス
      * @param battle 戦闘詳細
      */
-    public BattleResultDto(JsonObject object, int mapCellNo, int mapBossCellNo, BattleDto battle) {
+    public BattleResultDto(JsonObject object, int mapCellNo, int mapBossCellNo, int eventId, BattleDto battle) {
 
         this.battleDate = Calendar.getInstance().getTime();
         this.questName = object.getString("api_quest_name");
         this.rank = object.getString("api_win_rank");
         this.mapCellNo = mapCellNo;
-        this.boss = mapCellNo == mapBossCellNo;
+        this.boss = (mapCellNo == mapBossCellNo) || (eventId == 5);
         this.enemyName = object.getJsonObject("api_enemy_info").getString("api_deck_name");
         this.dropFlag = object.containsKey("api_get_ship");
         if (this.dropFlag) {

@@ -125,6 +125,9 @@ public final class GlobalContext {
     /** 今いるマップ上のボスNo */
     private static int mapBossCellNo;
 
+    /** イベント ID */
+    private static int eventId;
+
     /** ログキュー */
     private static Queue<String> consoleQueue = new ArrayBlockingQueue<String>(10);
 
@@ -694,7 +697,7 @@ public final class GlobalContext {
         try {
             if (battle != null) {
                 JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
-                BattleResultDto dto = new BattleResultDto(apidata, mapCellNo, mapBossCellNo, battle);
+                BattleResultDto dto = new BattleResultDto(apidata, mapCellNo, mapBossCellNo, eventId, battle);
                 battleResultList.add(dto);
                 CreateReportLogic.storeBattleResultReport(dto);
 
@@ -1330,6 +1333,7 @@ public final class GlobalContext {
 
             mapCellNo = obj.getJsonNumber("api_no").intValue();
             mapBossCellNo = obj.getJsonNumber("api_bosscell_no").intValue();
+            eventId = obj.getJsonNumber("api_event_id").intValue();
 
             addConsole("出撃を更新しました");
         } catch (Exception e) {
@@ -1349,6 +1353,7 @@ public final class GlobalContext {
 
             mapCellNo = obj.getJsonNumber("api_no").intValue();
             mapBossCellNo = obj.getJsonNumber("api_bosscell_no").intValue();
+            eventId = obj.getJsonNumber("api_event_id").intValue();
 
             addConsole("進撃を更新しました");
         } catch (Exception e) {
