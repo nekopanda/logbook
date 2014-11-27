@@ -479,6 +479,7 @@ public final class CreateReportLogic {
                         raisou += item.getRaig();
                         taiku += item.getTyku();
                         soukou += item.getSouk();
+                        kaihi += item.getHouk();
                         taisen += item.getTais();
                         sakuteki += item.getSaku();
                         lucky += item.getLuck();
