@@ -1,7 +1,9 @@
 package logbook.gui;
 
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -14,6 +16,7 @@ import logbook.gui.listener.TableToCsvSaveAdapter;
 import logbook.gui.logic.TableItemCreator;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -354,7 +357,7 @@ public abstract class AbstractTableDialog extends Dialog {
     protected class TableComparator implements Comparator<String[]> {
 
         /** ソート設定済みフラグ */
-        private boolean confflg = false;
+        private boolean confflg;
         /** 列位置 */
         private int index;
         /** 昇順・降順フラグ */
@@ -362,23 +365,35 @@ public abstract class AbstractTableDialog extends Dialog {
 
         @Override
         public final int compare(String[] o1, String[] o2) {
-            if (StringUtils.isEmpty(o1[this.index]) && StringUtils.isEmpty(o2[this.index])) {
+            String t1 = o1[this.index];
+            String t2 = o2[this.index];
+            if (StringUtils.isEmpty(t1) && StringUtils.isEmpty(t2)) {
                 return 0;
             }
-            if (StringUtils.isEmpty(o1[this.index])) {
+            if (StringUtils.isEmpty(t1)) {
                 return 1;
             }
-            if (StringUtils.isEmpty(o2[this.index])) {
+            if (StringUtils.isEmpty(t2)) {
                 return -1;
             }
-            int length = Math.max(o1[this.index].length(), o2[this.index].length());
-            String o1str = StringUtils.leftPad(o1[this.index], length, '0');
-            String o2str = StringUtils.leftPad(o2[this.index], length, '0');
-            if (!this.order) {
-                return o2str.compareTo(o1str);
-            } else {
-                return o1str.compareTo(o2str);
+            if (StringUtils.isNumeric(t1) && StringUtils.isNumeric(t2)) {
+                // 数値文字列の場合
+                Long o1l = Long.valueOf(t1);
+                Long o2l = Long.valueOf(t2);
+                return this.compareTo(o1l, o2l, this.order);
+            } else if (t1.matches("(?:\\d+時間)?(?:\\d+分)?(?:\\d+秒)?")) {
+                try {
+                    // 時刻文字列の場合
+                    // SimpleDateFormatは24時間超えるような時刻でも正しく?パースしてくれる
+                    Date o1date = DateUtils.parseDate(t1, "ss秒", "mm分ss秒", "HH時間mm分");
+                    Date o2date = DateUtils.parseDate(t2, "ss秒", "mm分ss秒", "HH時間mm分");
+                    return this.compareTo(o1date, o2date, this.order);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
+            // 文字列の場合
+            return this.compareTo(t1, t2, this.order);
         }
 
         /**
@@ -405,6 +420,22 @@ public abstract class AbstractTableDialog extends Dialog {
          */
         public final boolean getHasSetConfig() {
             return this.confflg;
+        }
+
+        /**
+         * 比較する
+         * 
+         * @param o1
+         * @param o2
+         * @param order
+         * @return
+         */
+        private <T extends Comparable<? super T>> int compareTo(T o1, T o2, boolean order) {
+            if (this.order) {
+                return o1.compareTo(o2);
+            } else {
+                return o2.compareTo(o1);
+            }
         }
     }
 

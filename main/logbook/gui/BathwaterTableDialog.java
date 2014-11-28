@@ -168,13 +168,7 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (e.getSource() instanceof TableColumn) {
-                    TableColumn column = (TableColumn) e.getSource();
-                    if ("時間".equals(column.getText())) {
-                        // "時間"がクリックされた場合
-                        BathwaterTableDialog.this.sortTableItems(0, column);
-                    } else {
-                        BathwaterTableDialog.this.sortTableItems(column);
-                    }
+                    BathwaterTableDialog.this.sortTableItems((TableColumn) e.getSource());
                 }
             }
         };
