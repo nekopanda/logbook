@@ -131,6 +131,10 @@ public final class CreateReportLogic {
             if (this.docks.contains(ship)) {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.NDOCK_COLOR));
             }
+            // Lv1の艦娘をグレー色にする
+            if ("1".equals(text[7])) {
+                item.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GRAY));
+            }
 
             item.setText(text);
             return item;
