@@ -172,7 +172,7 @@ public abstract class AbstractTableDialog extends Dialog {
         this.shell.setRedraw(false);
         TableColumn sortColumn = this.table.getSortColumn();
         int topindex = this.table.getTopIndex();
-        int selection = this.table.getSelectionIndex();
+        int[] selection = this.table.getSelectionIndices();
         this.table.setSortColumn(null);
         this.disposeTableBody();
         this.updateTableBody();
