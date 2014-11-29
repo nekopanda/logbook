@@ -125,11 +125,15 @@ public final class ShipTable extends AbstractTableDialog {
                 public void widgetSelected(SelectionEvent e) {
                     TableItem[] tableItems = ShipTable.this.table.getSelection();
                     if (tableItems.length > 0) {
+                        List<ShipDto> ships = new ArrayList<>();
                         List<String> name = new ArrayList<>();
                         for (int i = 0; i < tableItems.length; i++) {
                             long id = Long.parseLong(tableItems[i].getText(1));
                             ShipDto ship = GlobalContext.getShipMap().get(id);
-                            name.add(ship.getName());
+                            if (ship != null) {
+                                ships.add(ship);
+                                name.add(ship.getName());
+                            }
                         }
                         MessageBox box = new MessageBox(ShipTable.this.shell, SWT.YES | SWT.NO
                                 | SWT.ICON_QUESTION);
@@ -137,10 +141,9 @@ public final class ShipTable extends AbstractTableDialog {
                         box.setMessage("「" + StringUtils.join(name, ",") + "」をグループに追加しますか？");
 
                         if (box.open() == SWT.YES) {
-                            for (int i = 0; i < tableItems.length; i++) {
-                                long id = Long.parseLong(tableItems[i].getText(1));
-                                ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
-                                bean.getShips().add(id);
+                            ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
+                            for (ShipDto ship : ships) {
+                                bean.getShips().add(ship.getId());
                             }
                         }
                     }
@@ -161,11 +164,15 @@ public final class ShipTable extends AbstractTableDialog {
                 public void widgetSelected(SelectionEvent e) {
                     TableItem[] tableItems = ShipTable.this.table.getSelection();
                     if (tableItems.length > 0) {
+                        List<ShipDto> ships = new ArrayList<>();
                         List<String> name = new ArrayList<>();
                         for (int i = 0; i < tableItems.length; i++) {
                             long id = Long.parseLong(tableItems[i].getText(1));
                             ShipDto ship = GlobalContext.getShipMap().get(id);
-                            name.add(ship.getName());
+                            if (ship != null) {
+                                ships.add(ship);
+                                name.add(ship.getName());
+                            }
                         }
                         MessageBox box = new MessageBox(ShipTable.this.shell, SWT.YES | SWT.NO
                                 | SWT.ICON_QUESTION);
@@ -173,10 +180,9 @@ public final class ShipTable extends AbstractTableDialog {
                         box.setMessage("「" + StringUtils.join(name, ",") + "」をグループから除去しますか？");
 
                         if (box.open() == SWT.YES) {
-                            for (int i = 0; i < tableItems.length; i++) {
-                                long id = Long.parseLong(tableItems[i].getText(1));
-                                ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
-                                bean.getShips().remove(id);
+                            ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
+                            for (ShipDto ship : ships) {
+                                bean.getShips().remove(ship.getId());
                             }
                         }
                     }
