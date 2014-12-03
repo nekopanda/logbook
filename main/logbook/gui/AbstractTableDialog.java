@@ -381,12 +381,12 @@ public abstract class AbstractTableDialog extends Dialog {
                 Long o1l = Long.valueOf(t1);
                 Long o2l = Long.valueOf(t2);
                 return this.compareTo(o1l, o2l, this.order);
-            } else if (t1.matches("(?:\\d+時間)?(?:\\d+分)?(?:\\d+秒)?")) {
+            } else if (t1.matches("(?:\\d+日)?(?:\\d+時間)?(?:\\d+分)?(?:\\d+秒)?")) {
                 try {
                     // 時刻文字列の場合
                     // SimpleDateFormatは24時間超えるような時刻でも正しく?パースしてくれる
-                    Date o1date = DateUtils.parseDate(t1, "ss秒", "mm分ss秒", "HH時間mm分");
-                    Date o2date = DateUtils.parseDate(t2, "ss秒", "mm分ss秒", "HH時間mm分");
+                    Date o1date = DateUtils.parseDate(t1, "ss秒", "mm分ss秒", "HH時間mm分", "dd日HH時間mm分");
+                    Date o2date = DateUtils.parseDate(t2, "ss秒", "mm分ss秒", "HH時間mm分", "dd日HH時間mm分");
                     return this.compareTo(o1date, o2date, this.order);
                 } catch (ParseException e) {
                     e.printStackTrace();
