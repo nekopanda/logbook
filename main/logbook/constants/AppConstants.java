@@ -3,6 +3,7 @@ package logbook.constants;
 import java.io.File;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.TimeZone;
 
 import org.eclipse.swt.graphics.RGB;
 
@@ -32,6 +33,9 @@ public class AppConstants {
 
     /** 日付書式(ミリ秒を含む) */
     public static final String DATE_LONG_FORMAT = "yyyy-MM-dd HH-mm-ss.SSS";
+
+    /** タイムゾーン(任務が更新される05:00JSTに0:00になるタイムゾーン) */
+    public static final TimeZone TIME_ZONE_MISSION = TimeZone.getTimeZone("GMT+04:00");
 
     /** 疲労赤色 */
     public static final int COND_RED = 19;

@@ -16,7 +16,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TimeZone;
 
 import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
@@ -291,7 +290,7 @@ public final class ResourceChartDialog extends Dialog {
     private static void createTableBody(ResourceLog log, List<String[]> body) {
 
         SimpleDateFormat format = new SimpleDateFormat(AppConstants.DATE_DAYS_FORMAT);
-        format.setTimeZone(TimeZone.getTimeZone("GMT+4:00"));
+        format.setTimeZone(AppConstants.TIME_ZONE_MISSION);
 
         Map<String, SortableLog> resourceofday = new LinkedHashMap<>();
         for (int i = 0; i < log.time.length; i++) {
