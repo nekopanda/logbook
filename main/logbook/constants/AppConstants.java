@@ -13,6 +13,9 @@ import org.eclipse.swt.graphics.RGB;
  */
 public class AppConstants {
 
+    /**　アプリケーション名 */
+    public static final String NAME = "航海日誌";
+
     /** バージョン */
     public static final String VERSION = "0.7.2";
 

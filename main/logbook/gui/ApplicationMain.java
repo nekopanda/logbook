@@ -161,6 +161,8 @@ public final class ApplicationMain {
      */
     public static void main(String[] args) {
         try {
+            // グループ化のためのアプリケーションID (Windows 7以降)
+            Display.setAppName(AppConstants.NAME);
             // 設定読み込み
             AppConfig.load();
             ShipConfig.load();
@@ -206,11 +208,11 @@ public final class ApplicationMain {
     public void createContents() {
         final Display display = Display.getDefault();
         int shellStyle = SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE;
-        if (AppConfig.get().isOnTop()) {
+        if (AppConfig.get().isOnTop() && !"gtk".equals(SWT.getPlatform())) {
             shellStyle |= SWT.ON_TOP;
         }
         this.shell = new Shell(shellStyle);
-        this.shell.setText("航海日誌 " + AppConstants.VERSION);
+        this.shell.setText(AppConstants.NAME + AppConstants.VERSION);
         this.shell.setAlpha(AppConfig.get().getAlpha());
         GridLayout glShell = new GridLayout(1, false);
         glShell.horizontalSpacing = 1;
