@@ -203,7 +203,7 @@ public final class ResourceChartDialog extends Dialog {
         });
 
         // 資材ログ読み込み
-        File report = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), "資材ログ.csv"));
+        File report = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), AppConstants.LOG_RESOURCE));
         try {
             this.log = ResourceLog.getInstance(report);
         } catch (IOException e) {

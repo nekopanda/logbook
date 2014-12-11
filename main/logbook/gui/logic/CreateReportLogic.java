@@ -917,7 +917,7 @@ public final class CreateReportLogic {
         try {
             List<BattleResultDto> dtoList = Collections.singletonList(dto);
 
-            File report = getStoreFile("海戦・ドロップ報告書.csv", "海戦・ドロップ報告書_alternativefile.csv");
+            File report = getStoreFile(AppConstants.LOG_BATTLE_RESULT, AppConstants.LOG_BATTLE_RESULT_ALT);
 
             CreateReportLogic.writeCsvStripFirstColumn(report,
                     CreateReportLogic.getBattleResultStoreHeader(),
@@ -936,7 +936,7 @@ public final class CreateReportLogic {
         try {
             List<GetShipDto> dtoList = Collections.singletonList(dto);
 
-            File report = getStoreFile("建造報告書.csv", "建造報告書_alternativefile.csv");
+            File report = getStoreFile(AppConstants.LOG_CREATE_SHIP, AppConstants.LOG_CREATE_SHIP_ALT);
 
             CreateReportLogic.writeCsvStripFirstColumn(report,
                     CreateReportLogic.getCreateShipHeader(),
@@ -955,7 +955,7 @@ public final class CreateReportLogic {
         try {
             List<CreateItemDto> dtoList = Collections.singletonList(dto);
 
-            File report = getStoreFile("開発報告書.csv", "開発報告書_alternativefile.csv");
+            File report = getStoreFile(AppConstants.LOG_CREATE_ITEM, AppConstants.LOG_CREATE_ITEM_ALT);
 
             CreateReportLogic.writeCsvStripFirstColumn(report,
                     CreateReportLogic.getCreateItemHeader(),
@@ -974,7 +974,7 @@ public final class CreateReportLogic {
         try {
             List<MissionResultDto> dtoList = Collections.singletonList(dto);
 
-            File report = getStoreFile("遠征報告書.csv", "遠征報告書_alternativefile.csv");
+            File report = getStoreFile(AppConstants.LOG_MISSION, AppConstants.LOG_MISSION_ALT);
 
             CreateReportLogic.writeCsvStripFirstColumn(report,
                     CreateReportLogic.getCreateMissionResultHeader(),
@@ -993,7 +993,7 @@ public final class CreateReportLogic {
         try {
             List<MaterialDto> dtoList = Collections.singletonList(material);
 
-            File report = getStoreFile("資材ログ.csv", "資材ログ_alternativefile.csv");
+            File report = getStoreFile(AppConstants.LOG_RESOURCE, AppConstants.LOG_RESOURCE_ALT);
 
             CreateReportLogic.writeCsvStripFirstColumn(report,
                     CreateReportLogic.getMaterialHeader(),

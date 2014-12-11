@@ -355,4 +355,34 @@ public class AppConstants {
 
     /** メッセージ  艦隊合計Lv:{0} */
     public static final String MESSAGE_TOTAL_LV = "艦隊合計Lv:{0}。";
+
+    /** 海戦・ドロップ報告書.csv */
+    public static final String LOG_BATTLE_RESULT = "海戦・ドロップ報告書.csv";
+
+    /** 海戦・ドロップ報告書_alternativefile.csv */
+    public static final String LOG_BATTLE_RESULT_ALT = "海戦・ドロップ報告書_alternativefile.csv";
+
+    /** 建造報告書.csv */
+    public static final String LOG_CREATE_SHIP = "建造報告書.csv";
+
+    /** 建造報告書_alternativefile.csv */
+    public static final String LOG_CREATE_SHIP_ALT = "建造報告書_alternativefile.csv";
+
+    /** 開発報告書.csv */
+    public static final String LOG_CREATE_ITEM = "開発報告書.csv";
+
+    /** 開発報告書_alternativefile.csv */
+    public static final String LOG_CREATE_ITEM_ALT = "開発報告書_alternativefile.csv";
+
+    /** 遠征報告書.csv */
+    public static final String LOG_MISSION = "遠征報告書.csv";
+
+    /** 遠征報告書.csv */
+    public static final String LOG_MISSION_ALT = "遠征報告書_alternativefile.csv";
+
+    /** 資材ログ.csv */
+    public static final String LOG_RESOURCE = "資材ログ.csv";
+
+    /** 資材ログ_alternativefile.csv */
+    public static final String LOG_RESOURCE_ALT = "資材ログ_alternativefile.csv";
 }
