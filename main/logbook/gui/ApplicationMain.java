@@ -245,6 +245,8 @@ public final class ApplicationMain extends WindowBase {
      */
     public static void main(String[] args) {
         try {
+            // グループ化のためのアプリケーションID (Windows 7以降)
+            Display.setAppName(AppConstants.NAME);
             // 設定読み込み
             sysPrint("起動");
             AppConfig.load();
@@ -495,10 +497,6 @@ public final class ApplicationMain extends WindowBase {
         calcpracticeexp.setAccelerator(SWT.CTRL + 'V');
         this.calcPracticeExpWindow = new CalcPracticeExpDialog(this.dummyHolder, calcpracticeexp);
 
-        // その他-グループエディター
-        MenuItem shipgroup = new MenuItem(etcmenu, SWT.CHECK);
-        shipgroup.setText("グループエディター(&G)");
-        this.shipFilterGroupWindow = new ShipFilterGroupDialog(this.dummyHolder, shipgroup);
         // その他-資材チャート
         MenuItem resourceChart = new MenuItem(etcmenu, SWT.NONE);
         resourceChart.setText("資材チャート(&R)");
@@ -508,6 +506,22 @@ public final class ApplicationMain extends WindowBase {
                 new ResourceChartDialog(ApplicationMain.this.dummyHolder).open();
             }
         });
+        // コマンド-出撃統計
+        MenuItem battleCounter = new MenuItem(etcmenu, SWT.NONE);
+        battleCounter.setText("出撃統計(&A)\tCtrl+A");
+        battleCounter.setAccelerator(SWT.CTRL + 'A');
+        battleCounter.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                new BattleAggDialog(ApplicationMain.this.shell).open();
+            }
+        });
+        // セパレータ
+        new MenuItem(etcmenu, SWT.SEPARATOR);
+        // その他-グループエディター
+        MenuItem shipgroup = new MenuItem(etcmenu, SWT.CHECK);
+        shipgroup.setText("グループエディター(&G)");
+        this.shipFilterGroupWindow = new ShipFilterGroupDialog(this.dummyHolder, shipgroup);
         // その他-自動プロキシ構成スクリプトファイル生成
         MenuItem pack = new MenuItem(etcmenu, SWT.NONE);
         pack.setText("自動プロキシ構成スクリプト");
@@ -532,8 +546,6 @@ public final class ApplicationMain extends WindowBase {
                 ApplicationMain.this.moveWindowsIntoDisplay();
             }
         });
-        // セパレータ
-        new MenuItem(etcmenu, SWT.SEPARATOR);
         // その他-設定
         MenuItem config = new MenuItem(etcmenu, SWT.NONE);
         config.setText("設定(&P)");
@@ -545,7 +557,7 @@ public final class ApplicationMain extends WindowBase {
         });
         // その他-バージョン情報
         MenuItem version = new MenuItem(etcmenu, SWT.NONE);
-        version.setText("バージョン情報(&A)");
+        version.setText("バージョン情報(&V)");
         version.addSelectionListener(new HelpEventListener(this));
 
         // テスト用

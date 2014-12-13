@@ -3,6 +3,7 @@ package logbook.gui;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -667,7 +668,7 @@ public abstract class AbstractTableDialog extends WindowBase {
     protected class TableComparator implements Comparator<Comparable[]> {
 
         /** ソート設定済みフラグ */
-        private boolean confflg = false;
+        private boolean confflg;
         /** 列位置 */
         private int index;
         /** 昇順・降順フラグ */
@@ -716,6 +717,22 @@ public abstract class AbstractTableDialog extends WindowBase {
          */
         public final boolean getHasSetConfig() {
             return this.confflg;
+        }
+
+        /**
+         * 比較する
+         * 
+         * @param o1
+         * @param o2
+         * @param order
+         * @return
+         */
+        private <T extends Comparable<? super T>> int compareTo(T o1, T o2, boolean order) {
+            if (this.order) {
+                return o1.compareTo(o2);
+            } else {
+                return o2.compareTo(o1);
+            }
         }
     }
 
