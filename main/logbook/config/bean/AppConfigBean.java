@@ -8,7 +8,6 @@ import logbook.dto.ShipFilterDto;
 
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.Rectangle;
 
 /**
  * アプリケーションの設定
@@ -225,8 +224,8 @@ public final class AppConfigBean {
     /** 縮小表示の時は他のウィンドウを閉じる */
     private boolean closeWhenMinimized = true;
 
-    /** キャプチャ範囲 */
-    private Rectangle captureRect = null;
+    /** キャプチャ範囲 [x,y,width,height] */
+    private int[] captureRect = null;
 
     /**
      * ポート番号を取得します。
@@ -1285,14 +1284,14 @@ public final class AppConfigBean {
     /**
      * @return captureRect
      */
-    public Rectangle getCaptureRect() {
+    public int[] getCaptureRect() {
         return this.captureRect;
     }
 
     /**
      * @param captureRect セットする captureRect
      */
-    public void setCaptureRect(Rectangle captureRect) {
+    public void setCaptureRect(int[] captureRect) {
         this.captureRect = captureRect;
     }
 }

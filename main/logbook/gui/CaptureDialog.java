@@ -191,9 +191,21 @@ public final class CaptureDialog extends WindowBase {
         }
 
         // 設定を反映
-        this.setCaptureRect(AppConfig.get().getCaptureRect());
+        this.setCaptureRect(intToRect(AppConfig.get().getCaptureRect()));
 
         this.shell.pack();
+    }
+
+    private static Rectangle intToRect(int[] intRect) {
+        if (intRect == null)
+            return null;
+        return new Rectangle(intRect[0], intRect[1], intRect[2], intRect[3]);
+    }
+
+    private static int[] rectToInt(Rectangle rect) {
+        if (rect == null)
+            return null;
+        return new int[] { rect.x, rect.y, rect.width, rect.height };
     }
 
     /**
@@ -216,7 +228,7 @@ public final class CaptureDialog extends WindowBase {
     private void setCaptureRect(Rectangle rectangle) {
         if ((rectangle != null) && (rectangle.width > 1) && (rectangle.height > 1)) {
             this.rectangle = rectangle;
-            AppConfig.get().setCaptureRect(rectangle);
+            AppConfig.get().setCaptureRect(rectToInt(rectangle));
             this.text.setText("(" + rectangle.x + "," + rectangle.y + ")-("
                     + (rectangle.x + rectangle.width) + "," + (rectangle.y + rectangle.height) + ")");
             this.capture.setEnabled(true);
