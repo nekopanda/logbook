@@ -588,7 +588,7 @@ public class FleetComposite extends Composite {
             this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_COND, this.clearDate), null);
         }
         // 索敵 計算
-        SakutekiString fleetStatus = new SakutekiString(ships);
+        SakutekiString fleetStatus = new SakutekiString(ships, GlobalContext.hqLevel());
         // 制空
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_SEIKU, seiku), null);
         // 索敵

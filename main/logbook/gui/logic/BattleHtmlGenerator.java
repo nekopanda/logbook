@@ -116,7 +116,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
      */
     private <SHIP extends ShipBaseDto>
             void genParmeters(String tableTitle,
-                    List<SHIP> ships, int[][] hp, String[] phaseName)
+                    List<SHIP> ships, int[][] hp, String[] phaseName, int hqLv)
     {
         if (ships.size() == 0) {
             return;
@@ -226,7 +226,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
 
         this.begin("tr", null);
 
-        SakutekiString totalSakuteki = new SakutekiString(ships);
+        SakutekiString totalSakuteki = new SakutekiString(ships, hqLv);
         this.inline("td", "", null);
         this.inline("td", "合計", null);
         this.inline("td", "", null);
@@ -889,12 +889,12 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         String[] phaseName = (battle.getPhase1().isNight() ?
                 new String[] { "夜戦後", "昼戦後" } : new String[] { "昼戦後", "夜戦後" });
         this.genParmeters(battle.getDock().getName(),
-                battle.getDock().getShips(), hpList[0], phaseName);
+                battle.getDock().getShips(), hpList[0], phaseName, battle.getHqLv());
         if (battle.isCombined()) {
             this.genParmeters(battle.getDockCombined().getName(),
-                    battle.getDockCombined().getShips(), hpList[1], phaseName);
+                    battle.getDockCombined().getShips(), hpList[1], phaseName, battle.getHqLv());
         }
-        this.genParmeters(battle.getEnemyName(), battle.getEnemy(), hpList[2], phaseName);
+        this.genParmeters(battle.getEnemyName(), battle.getEnemy(), hpList[2], phaseName, 0);
 
         // 装備を生成 //
         this.genSlotitemTable(battle.getDock().getShips());
