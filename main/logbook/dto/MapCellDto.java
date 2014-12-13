@@ -78,6 +78,15 @@ public class MapCellDto implements Comparable<MapCellDto> {
         return this.toString(true, true);
     }
 
+    public String getAreaString() {
+        String ret = this.map[0] + "-" + this.map[1];
+        MasterData.MapInfoDto mapInfo = MasterData.getMapInfo(this.map[0], this.map[1]);
+        if (mapInfo != null) {
+            ret += " (" + mapInfo.getName() + ")";
+        }
+        return ret;
+    }
+
     @Override
     public int compareTo(MapCellDto arg0) {
         int ret = 0;
@@ -85,6 +94,11 @@ public class MapCellDto implements Comparable<MapCellDto> {
             ret = Integer.compare(this.map[i], arg0.map[i]);
         }
         return ret;
+    }
+
+    /** @return area * 10 + no */
+    public int getAreaId() {
+        return (this.map[0] * 10) + this.map[1];
     }
 
     /**

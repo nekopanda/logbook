@@ -3,27 +3,25 @@
  */
 package logbook.gui;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import logbook.config.AppConfig;
-import logbook.constants.AppConstants;
 import logbook.dto.BattleAggDetailsDto;
 import logbook.dto.BattleAggUnitDto;
+import logbook.dto.BattleResultDto;
+import logbook.dto.MapCellDto;
+import logbook.dto.ResultRank;
 import logbook.gui.listener.TreeKeyShortcutAdapter;
 import logbook.gui.listener.TreeToClipboardAdapter;
 import logbook.internal.BattleAggDate;
 import logbook.internal.BattleAggUnit;
+import logbook.internal.BattleResultServer;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -43,6 +41,8 @@ import org.eclipse.swt.widgets.TreeItem;
  *
  */
 public class BattleAggDialog extends Dialog {
+    /** ロガー */
+    private static final Logger LOG = LogManager.getLogger(BattleAggDialog.class);
 
     /** ヘッダー */
     private final String[] header = this.getTableHeader();
@@ -206,11 +206,11 @@ public class BattleAggDialog extends Dialog {
                     Integer.toString(total.getBossB()), Integer.toString(total.getBossC()),
                     Integer.toString(total.getBossD()) });
             // 海域毎
-            for (Entry<String, BattleAggDetailsDto> areaEntry : dto.getAreaDetails()) {
+            for (Entry<Integer, BattleAggDetailsDto> areaEntry : dto.getAreaDetails()) {
                 BattleAggDetailsDto area = areaEntry.getValue();
 
                 TreeItem sub = new TreeItem(root, SWT.NONE);
-                sub.setText(new String[] { areaEntry.getKey(), Integer.toString(area.getWin()),
+                sub.setText(new String[] { area.getAreaName(), Integer.toString(area.getWin()),
                         Integer.toString(area.getS()), Integer.toString(area.getA()), Integer.toString(area.getB()),
                         Integer.toString(area.getC()), Integer.toString(area.getD()) });
                 // ボス
@@ -233,8 +233,6 @@ public class BattleAggDialog extends Dialog {
      */
     private Map<BattleAggUnit, BattleAggUnitDto> load() {
         Map<BattleAggUnit, BattleAggUnitDto> aggMap = new EnumMap<>(BattleAggUnit.class);
-        // 日付書式
-        SimpleDateFormat format = new SimpleDateFormat(AppConstants.DATE_FORMAT);
         // 今日
         Calendar today = BattleAggDate.TODAY.get();
         // 先週
@@ -243,52 +241,31 @@ public class BattleAggDialog extends Dialog {
         Calendar lastMonth = BattleAggDate.LAST_MONTH.get();
 
         // 海戦・ドロップ報告書読み込み
-        File report = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), AppConstants.LOG_BATTLE_RESULT));
         try {
-            LineIterator ite = new LineIterator(
-                    new InputStreamReader(new FileInputStream(report), AppConstants.CHARSET));
-            try {
-                // ヘッダーを読み飛ばす
-                if (ite.hasNext()) {
-                    ite.next();
-                }
-                while (ite.hasNext()) {
-                    try {
-                        String line = ite.next();
-                        String[] cols = line.split(",", -1);
-                        // 日付
-                        Calendar date = DateUtils.toCalendar(format.parse(cols[0]));
-                        date.setTimeZone(AppConstants.TIME_ZONE_MISSION);
-                        date.setFirstDayOfWeek(Calendar.MONDAY);
-                        // 海域
-                        String area = cols[1];
-                        // ランク
-                        String rank = cols[4];
-                        // ボス
-                        boolean isBoss = "ボス".equals(cols[3]);
+            for (BattleResultDto dto : BattleResultServer.get().getList()) {
+                Calendar date = DateUtils.toCalendar(dto.getBattleDate());
+                MapCellDto mapCell = dto.getMapCell();
+                ResultRank rank = dto.getRank();
+                // 演習はスキップ
+                if (mapCell == null)
+                    continue;
 
-                        // デイリー集計
-                        this.agg(BattleAggUnit.DAILY, aggMap, today, Calendar.DAY_OF_YEAR, date, area, rank, isBoss);
-                        // ウィークリー集計
-                        this.agg(BattleAggUnit.WEEKLY, aggMap, today, Calendar.WEEK_OF_YEAR, date, area, rank, isBoss);
-                        // マンスリー集計
-                        this.agg(BattleAggUnit.MONTHLY, aggMap, today, Calendar.MONTH, date, area, rank, isBoss);
-                        // 先週の集計
-                        this.agg(BattleAggUnit.LAST_WEEK, aggMap, lastWeek, Calendar.WEEK_OF_YEAR, date, area,
-                                rank, isBoss);
-                        // 先月の集計
-                        this.agg(BattleAggUnit.LAST_MONTH, aggMap, lastMonth, Calendar.MONTH, date, area, rank,
-                                isBoss);
-
-                    } catch (Exception e) {
-                        continue;
-                    }
-                }
-            } finally {
-                ite.close();
+                // デイリー集計
+                this.agg(BattleAggUnit.DAILY, aggMap, today, Calendar.DAY_OF_YEAR, date, mapCell, rank);
+                // ウィークリー集計
+                this.agg(BattleAggUnit.WEEKLY, aggMap, today, Calendar.WEEK_OF_YEAR, date, mapCell, rank);
+                // マンスリー集計
+                this.agg(BattleAggUnit.MONTHLY, aggMap, today, Calendar.MONTH, date, mapCell, rank);
+                // 先週の集計
+                this.agg(BattleAggUnit.LAST_WEEK, aggMap, lastWeek, Calendar.WEEK_OF_YEAR, date, mapCell,
+                        rank);
+                // 先月の集計
+                this.agg(BattleAggUnit.LAST_MONTH, aggMap, lastMonth, Calendar.MONTH, date, mapCell, rank);
             }
 
         } catch (Exception e) {
+            ApplicationMain.main.printMessage("出撃統計作成に失敗しました");
+            LOG.warn("出撃統計作成に失敗", e);
         }
         return aggMap;
     }
@@ -306,14 +283,14 @@ public class BattleAggDialog extends Dialog {
      * @param isBoss ボス
      */
     private void agg(BattleAggUnit unit, Map<BattleAggUnit, BattleAggUnitDto> to, Calendar std, int field,
-            Calendar target, String area, String rank, boolean isBoss) {
+            Calendar target, MapCellDto area, ResultRank rank) {
         if (std.get(field) == target.get(field)) {
             BattleAggUnitDto aggUnit = to.get(unit);
             if (aggUnit == null) {
                 aggUnit = new BattleAggUnitDto();
                 to.put(unit, aggUnit);
             }
-            aggUnit.add(area, rank, isBoss);
+            aggUnit.add(area, rank);
         }
     }
 
