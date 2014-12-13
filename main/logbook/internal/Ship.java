@@ -278,7 +278,7 @@ public class Ship {
             this.put("259", new ShipInfoDto("菊月改", "駆逐艦", "きくづき", 0, 15, 15));
             this.put("260", new ShipInfoDto("三日月改", "駆逐艦", "みかづき", 0, 15, 15));
             this.put("261", new ShipInfoDto("望月改", "駆逐艦", "もちづき", 0, 15, 15));
-            this.put("262", new ShipInfoDto("古鷹改", "重巡洋艦", "ふるたか", 0, 55, 35));
+            this.put("262", new ShipInfoDto("古鷹改", "重巡洋艦", "ふるたか", 65, 55, 35));
             this.put("263", new ShipInfoDto("加古改", "重巡洋艦", "かこ", 0, 55, 35));
             this.put("264", new ShipInfoDto("青葉改", "重巡洋艦", "あおば", 0, 55, 35));
             this.put("265", new ShipInfoDto("妙高改", "重巡洋艦", "みょうこう", 70, 70, 40));
@@ -303,7 +303,7 @@ public class Ship {
             this.put("284", new ShipInfoDto("隼鷹改", "軽空母", "じゅんよう", 80, 45, 45));
             this.put("285", new ShipInfoDto("鳳翔改", "軽空母", "ほうしょう", 0, 30, 30));
             this.put("286", new ShipInfoDto("扶桑改", "航空戦艦", "ふそう", 80, 105, 95));
-            this.put("287", new ShipInfoDto("山城改", "航空戦艦", "やましろ", 0, 105, 95));
+            this.put("287", new ShipInfoDto("山城改", "航空戦艦", "やましろ", 80, 105, 95));
             this.put("288", new ShipInfoDto("翔鶴改", "正規空母", "しょうかく", 0, 70, 65));
             this.put("289", new ShipInfoDto("鬼怒改", "軽巡洋艦", "きぬ", 0, 35, 25));
             this.put("290", new ShipInfoDto("阿武隈改", "軽巡洋艦", "あぶくま", 0, 35, 25));
@@ -428,11 +428,11 @@ public class Ship {
             this.put("409", new ShipInfoDto("早霜", "駆逐艦", "はやしも", 30, 20, 15));
             this.put("410", new ShipInfoDto("清霜", "駆逐艦", "きよしも", 30, 20, 15));
             this.put("411", new ShipInfoDto("扶桑改二", "航空戦艦", "ふそう", 0, 140, 105));
-            this.put("412", ShipInfoDto.EMPTY);
+            this.put("412", new ShipInfoDto("山城改二", "航空戦艦", "やましろ", 0, 140, 105));
             this.put("413", new ShipInfoDto("朝雲", "駆逐艦", "あさぐも", 35, 20, 15));
             this.put("414", ShipInfoDto.EMPTY);
             this.put("415", new ShipInfoDto("野分", "駆逐艦", "のわき", 35, 20, 15));
-            this.put("416", ShipInfoDto.EMPTY);
+            this.put("416", new ShipInfoDto("古鷹改二", "重巡洋艦", "ふるたか", 0, 65, 35));
             this.put("417", ShipInfoDto.EMPTY);
             this.put("418", ShipInfoDto.EMPTY);
             this.put("419", ShipInfoDto.EMPTY);
