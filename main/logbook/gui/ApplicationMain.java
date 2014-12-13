@@ -1,6 +1,9 @@
 package logbook.gui;
 
 import java.awt.Desktop;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -31,6 +34,7 @@ import logbook.gui.logic.Sound;
 import logbook.gui.widgets.FleetComposite;
 import logbook.internal.BattleResultServer;
 import logbook.internal.EnemyData;
+import logbook.internal.Item;
 import logbook.internal.MasterData;
 import logbook.server.proxy.DatabaseClient;
 import logbook.server.proxy.ProxyServer;
@@ -552,6 +556,22 @@ public final class ApplicationMain extends WindowBase {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     new TestDataFeeder(ApplicationMain.this).open();
+                }
+            });
+
+            MenuItem itemcsvout = new MenuItem(etcmenu, SWT.NONE);
+            itemcsvout.setText("装備アイテムをCSVダンプ");
+            itemcsvout.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    try {
+                        OutputStreamWriter fw = new OutputStreamWriter(
+                                new FileOutputStream("itemInfo.csv"), AppConstants.CHARSET);
+                        Item.dumpCSV(fw);
+                        fw.close();
+                    } catch (IOException e1) {
+                        logPrint("書き込み失敗: " + e1.getMessage());
+                    }
                 }
             });
         }

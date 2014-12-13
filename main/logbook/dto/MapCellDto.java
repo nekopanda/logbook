@@ -47,7 +47,7 @@ public class MapCellDto implements Comparable<MapCellDto> {
         this.enemyData = EnemyData.get(this.enemyId);
     }
 
-    private String toString(boolean detailed) {
+    private String toString(boolean detailed, boolean withBoss) {
         String ret = "マップ:" + this.map[0] + "-" + this.map[1] + " セル:" + this.map[2];
         if (detailed) {
             MasterData.MapInfoDto mapInfo = MasterData.getMapInfo(this.map[0], this.map[1]);
@@ -57,6 +57,9 @@ public class MapCellDto implements Comparable<MapCellDto> {
             }
         }
         if (this.enemyId != -1) {
+            if (withBoss && this.isBoss()) {
+                ret += " (ボス)";
+            }
             ret += " e_id:" + this.enemyId;
         }
         return ret;
@@ -64,11 +67,15 @@ public class MapCellDto implements Comparable<MapCellDto> {
 
     @Override
     public String toString() {
-        return this.toString(false);
+        return this.toString(false, true);
+    }
+
+    public String getReportString() {
+        return this.toString(false, false);
     }
 
     public String detailedString() {
-        return this.toString(true);
+        return this.toString(true, true);
     }
 
     @Override

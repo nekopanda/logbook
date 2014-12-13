@@ -190,6 +190,9 @@ public final class CaptureDialog extends WindowBase {
             c.setData("disable-drag-move", true);
         }
 
+        // 設定を反映
+        this.setCaptureRect(AppConfig.get().getCaptureRect());
+
         this.shell.pack();
     }
 
@@ -207,6 +210,16 @@ public final class CaptureDialog extends WindowBase {
             return "開 始";
         } else {
             return "キャプチャ";
+        }
+    }
+
+    private void setCaptureRect(Rectangle rectangle) {
+        if ((rectangle != null) && (rectangle.width > 1) && (rectangle.height > 1)) {
+            this.rectangle = rectangle;
+            AppConfig.get().setCaptureRect(rectangle);
+            this.text.setText("(" + rectangle.x + "," + rectangle.y + ")-("
+                    + (rectangle.x + rectangle.width) + "," + (rectangle.y + rectangle.height) + ")");
+            this.capture.setEnabled(true);
         }
     }
 
@@ -238,12 +251,7 @@ public final class CaptureDialog extends WindowBase {
                     Rectangle rectangle = new FullScreenDialog(CaptureDialog.this.shell, image, display)
                             .open();
 
-                    if ((rectangle != null) && (rectangle.width > 1) && (rectangle.height > 1)) {
-                        CaptureDialog.this.rectangle = rectangle;
-                        CaptureDialog.this.text.setText("(" + rectangle.x + "," + rectangle.y + ")-("
-                                + (rectangle.x + rectangle.width) + "," + (rectangle.y + rectangle.height) + ")");
-                        CaptureDialog.this.capture.setEnabled(true);
-                    }
+                    CaptureDialog.this.setCaptureRect(rectangle);
                 } finally {
                     image.dispose();
                 }
