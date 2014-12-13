@@ -145,9 +145,11 @@ public final class CreateReportLogic {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.NDOCK_COLOR));
             }
             // Lv1の艦娘をグレー色にする
-            if ("1".equals(text[7])) {
+            /* ちょっとこれをやる意味がよく分からないのでコメントアウト
+            if (ship.getLv() == 1) {
                 item.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GRAY));
             }
+            */
 
             item.setText(toStringArray(text));
 
@@ -1240,7 +1242,7 @@ public final class CreateReportLogic {
             if (material != null) {
                 List<MaterialDto> dtoList = Collections.singletonList(material);
 
-            File report = getStoreFile(AppConstants.LOG_RESOURCE, AppConstants.LOG_RESOURCE_ALT);
+                File report = getStoreFile(AppConstants.LOG_RESOURCE, AppConstants.LOG_RESOURCE_ALT);
 
                 CreateReportLogic.writeCsvStripFirstColumn(report,
                         CreateReportLogic.getMaterialHeader(),
