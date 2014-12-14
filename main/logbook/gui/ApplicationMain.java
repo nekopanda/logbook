@@ -121,11 +121,8 @@ public final class ApplicationMain extends WindowBase {
         @Override
         public void run() {
             try {
-                // リソースを開放する
-                SWTResourceManager.dispose();
-                // プロキシサーバーをシャットダウンする
-                ProxyServer.end();
-                DatabaseClient.end();
+                // スレッドを終了する
+                endThread();
 
                 // 設定を書き込みます
                 AppConfig.store();
@@ -179,6 +176,8 @@ public final class ApplicationMain extends WindowBase {
     private CalcExpDialog calcExpWindow;
     /** 演習経験値計算 */
     private CalcPracticeExpDialog calcPracticeExpWindow;
+    /** 出撃統計 */
+    private BattleAggDialog battleCounterWindow;
     /** グループエディター */
     private ShipFilterGroupDialog shipFilterGroupWindow;
     /** ツール */
@@ -270,11 +269,7 @@ public final class ApplicationMain extends WindowBase {
         } catch (Exception e) {
             LOG.fatal("メインスレッドが異常終了しました", e);
         } finally {
-            // リソースを開放する
-            SWTResourceManager.dispose();
-            // プロキシサーバーをシャットダウンする
-            ProxyServer.end();
-            DatabaseClient.end();
+            endThread();
         }
     }
 
@@ -507,15 +502,10 @@ public final class ApplicationMain extends WindowBase {
             }
         });
         // コマンド-出撃統計
-        MenuItem battleCounter = new MenuItem(etcmenu, SWT.NONE);
+        MenuItem battleCounter = new MenuItem(etcmenu, SWT.CHECK);
         battleCounter.setText("出撃統計(&A)\tCtrl+A");
         battleCounter.setAccelerator(SWT.CTRL + 'A');
-        battleCounter.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                new BattleAggDialog(ApplicationMain.this.shell).open();
-            }
-        });
+        this.battleCounterWindow = new BattleAggDialog(this.dummyHolder, battleCounter);
         // セパレータ
         new MenuItem(etcmenu, SWT.SEPARATOR);
         // その他-グループエディター
@@ -982,6 +972,7 @@ public final class ApplicationMain extends WindowBase {
                 this.battleShipWindow,
                 this.calcExpWindow,
                 this.calcPracticeExpWindow,
+                this.battleCounterWindow,
                 this.shipFilterGroupWindow,
                 this.launcherWindow
         };
@@ -1034,6 +1025,14 @@ public final class ApplicationMain extends WindowBase {
         ThreadManager.regist(new ThreadStateObserver(this.shell));
 
         ThreadManager.start();
+    }
+
+    private static void endThread() {
+        // リソースを開放する
+        SWTResourceManager.dispose();
+        // プロキシサーバーをシャットダウンする
+        ProxyServer.end();
+        DatabaseClient.end();
     }
 
     private void updateCheck() {

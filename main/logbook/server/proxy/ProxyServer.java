@@ -58,6 +58,7 @@ public final class ProxyServer {
             if (server != null) {
                 server.stop();
                 server.join();
+                server = null;
             }
         } catch (Exception e) {
             e.printStackTrace();
