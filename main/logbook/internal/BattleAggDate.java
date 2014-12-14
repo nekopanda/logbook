@@ -1,6 +1,7 @@
 package logbook.internal;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import logbook.constants.AppConstants;
 
@@ -59,10 +60,15 @@ public enum BattleAggDate {
      * @return 現在時刻
      */
     private static Calendar now() {
+        return fromDate(new Date());
+    }
+
+    public static Calendar fromDate(Date date) {
         // 日々の任務の更新は05:00
         Calendar cal = Calendar.getInstance(AppConstants.TIME_ZONE_MISSION);
         // 週次の任務の更新は月曜
         cal.setFirstDayOfWeek(Calendar.MONDAY);
+        cal.setTime(date);
         return cal;
     }
 }

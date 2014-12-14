@@ -27,7 +27,6 @@ import logbook.internal.BattleAggDate;
 import logbook.internal.BattleAggUnit;
 import logbook.internal.BattleResultServer;
 
-import org.apache.commons.lang3.time.DateUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
@@ -273,7 +272,7 @@ public class BattleAggDialog extends WindowBase {
         // 海戦・ドロップ報告書読み込み
         try {
             for (BattleResultDto dto : BattleResultServer.get().getList()) {
-                Calendar date = DateUtils.toCalendar(dto.getBattleDate());
+                Calendar date = BattleAggDate.fromDate(dto.getBattleDate());
                 MapCellDto mapCell = dto.getMapCell();
                 ResultRank rank = dto.getRank();
                 // 演習はスキップ
@@ -314,7 +313,11 @@ public class BattleAggDialog extends WindowBase {
      */
     private void agg(BattleAggUnit unit, Map<BattleAggUnit, BattleAggUnitDto> to, Calendar std, int field,
             Calendar target, MapCellDto area, ResultRank rank) {
-        if (std.get(field) == target.get(field)) {
+        int stdn = std.get(field);
+        int tarn = target.get(field);
+        //if (std.get(field) == target.get(field))
+        if (stdn == tarn)
+        {
             BattleAggUnitDto aggUnit = to.get(unit);
             if (aggUnit == null) {
                 aggUnit = new BattleAggUnitDto();
