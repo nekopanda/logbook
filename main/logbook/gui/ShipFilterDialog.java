@@ -1,8 +1,11 @@
 package logbook.gui;
 
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import logbook.config.ShipGroupConfig;
+import logbook.config.bean.ShipGroupBean;
 import logbook.data.context.GlobalContext;
 import logbook.dto.ItemDto;
 import logbook.dto.ShipFilterDto;
@@ -17,19 +20,29 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 /**
  * 所有艦娘一覧で使用するフィルターダイアログ
  * 
  */
-public final class ShipFilterDialog extends Composite {
+public final class ShipFilterDialog extends WindowBase {
+
+    private Shell shell;
 
     private final ShipTable shipTable;
+
+    private final ShipFilterDto filter;
+
+    /** グループ一覧 */
+    private final List<ShipGroupBean> groups = ShipGroupConfig.get().getGroup();
 
     /** 名前 */
     private Text nametext;
@@ -70,6 +83,10 @@ public final class ShipFilterDialog extends Composite {
     private Button submarineTender;
     /** 全て選択 */
     private Button selectall;
+    /** グループ */
+    private Button group;
+    /** グループ選択 */
+    private Combo groupcombo;
     /** 装備 */
     private Button item;
     /** 装備 */
@@ -90,25 +107,68 @@ public final class ShipFilterDialog extends Composite {
      * @param shipTable 呼び出し元
      * @param filter 初期値
      */
-    public ShipFilterDialog(ShipTable shipTable, Composite parent) {
-        super(parent, SWT.NONE);
+    public ShipFilterDialog(ShipTable shipTable, ShipFilterDto filter) {
+        super.createContents(shipTable, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
         this.shipTable = shipTable;
+        this.filter = filter;
+    }
+
+    /**
+     * Open the dialog.
+     * @return the result
+     */
+    @Override
+    public void open() {
+        this.createContents();
+        this.registerEvents();
+        this.shell.open();
+        this.shell.layout();
+        Display display = this.shell.getDisplay();
+        while (!this.shell.isDisposed()) {
+            if (!display.readAndDispatch()) {
+                display.sleep();
+            }
+        }
     }
 
     /**
      * Create contents of the dialog.
      */
     private void createContents() {
-        GridLayout glShell = new GridLayout(3, false);
-        glShell.verticalSpacing = 0;
-        glShell.horizontalSpacing = 0;
-        glShell.marginHeight = 0;
-        glShell.marginWidth = 0;
-        this.setLayout(glShell);
+        this.shell = this.getShell();
+        this.shell.setText("フィルター");
+        GridLayout glShell = new GridLayout(1, false);
+        glShell.verticalSpacing = 2;
+        glShell.horizontalSpacing = 2;
+        glShell.marginHeight = 2;
+        glShell.marginWidth = 2;
+        this.shell.setLayout(glShell);
 
         SelectionListener listener = new ApplyFilterSelectionAdapter();
 
-        Group shiptypegroup = new Group(this, SWT.NONE);
+        Composite composite = new Composite(this.shell, SWT.NONE);
+        composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        GridLayout glComposite = new GridLayout(1, false);
+        glComposite.verticalSpacing = 2;
+        glComposite.horizontalSpacing = 2;
+        glComposite.marginHeight = 2;
+        glComposite.marginWidth = 2;
+        composite.setLayout(glComposite);
+
+        Group namegroup = new Group(composite, SWT.NONE);
+        namegroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        namegroup.setLayout(new RowLayout());
+        namegroup.setText("フリーワード検索(半角SPでAND検索)");
+
+        this.nametext = new Text(namegroup, SWT.BORDER);
+        this.nametext.setLayoutData(new RowData(180, SWT.DEFAULT));
+        this.nametext.addModifyListener(new ApplyFilterModifyAdapter());
+
+        this.regexp = new Button(namegroup, SWT.CHECK);
+        this.regexp.setText("正規表現");
+        this.regexp.addSelectionListener(listener);
+
+        Group shiptypegroup = new Group(composite, SWT.NONE);
         shiptypegroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         GridLayout glShiptypegroup = new GridLayout(3, false);
         glShiptypegroup.verticalSpacing = 2;
@@ -203,7 +263,7 @@ public final class ShipFilterDialog extends Composite {
         this.selectall.setSelection(true);
         this.selectall.addSelectionListener(new SelectAllSelectionAdapter());
 
-        Group etcgroup = new Group(this, SWT.NONE);
+        Group etcgroup = new Group(composite, SWT.NONE);
         etcgroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         GridLayout glEtcgroup = new GridLayout(2, false);
         glEtcgroup.horizontalSpacing = 2;
@@ -212,10 +272,35 @@ public final class ShipFilterDialog extends Composite {
         etcgroup.setLayout(glEtcgroup);
         etcgroup.setText("その他");
 
+        this.group = new Button(etcgroup, SWT.CHECK);
+        this.group.setText("グループ");
+        this.group.setSelection(false);
+        this.group.addSelectionListener(listener);
+
+        this.groupcombo = new Combo(etcgroup, SWT.READ_ONLY);
+        this.groupcombo.setEnabled(false);
+        this.groupcombo.addSelectionListener(listener);
+        for (ShipGroupBean groupBean : this.groups) {
+            this.groupcombo.add(groupBean.getName());
+        }
+        this.group.addSelectionListener(new CheckAdapter(this.group, this.groupcombo));
+
         this.item = new Button(etcgroup, SWT.CHECK);
         this.item.setText("装備");
         this.item.setSelection(false);
         this.item.addSelectionListener(listener);
+
+        this.itemcombo = new Combo(etcgroup, SWT.READ_ONLY);
+        this.itemcombo.setEnabled(false);
+        this.itemcombo.addSelectionListener(listener);
+        Set<String> items = new TreeSet<String>();
+        for (ItemDto entry : GlobalContext.getItemMap().values()) {
+            items.add(entry.getName());
+        }
+        for (String name : items) {
+            this.itemcombo.add(name);
+        }
+        this.item.addSelectionListener(new CheckAdapter(this.item, this.itemcombo));
 
         this.onfleet = new Button(etcgroup, SWT.CHECK);
         this.onfleet.setText("艦隊に所属");
@@ -237,83 +322,81 @@ public final class ShipFilterDialog extends Composite {
         this.notlocked.setSelection(true);
         this.notlocked.addSelectionListener(listener);
 
-        Group namegroup = new Group(this, SWT.NONE);
-        namegroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        namegroup.setLayout(new GridLayout(2, false));
-        namegroup.setText("フリーワード検索(半角SPでAND検索)");
-
-        this.nametext = new Text(namegroup, SWT.BORDER);
-        this.nametext.setLayoutData(new RowData(180, SWT.DEFAULT));
-        this.nametext.addModifyListener(new ApplyFilterModifyAdapter());
-
-        this.regexp = new Button(namegroup, SWT.CHECK);
-        this.regexp.setText("正規表現");
-        this.regexp.addSelectionListener(listener);
-
-        this.itemcombo = new Combo(namegroup, SWT.READ_ONLY);
-        this.itemcombo.setEnabled(false);
-        this.itemcombo.addSelectionListener(listener);
-        Set<String> items = new TreeSet<String>();
-        for (ItemDto entry : GlobalContext.getItemMap().values()) {
-            items.add(entry.getName());
-        }
-        for (String name : items) {
-            this.itemcombo.add(name);
-        }
-        this.item.addSelectionListener(new CheckAdapter(this.item, this.itemcombo));
-
         // 初期値を復元する
-        ShipFilterDto filter = this.shipTable.getFilter();
-        if (filter != null) {
+        if (this.filter != null) {
             // 名前
-            if (!StringUtils.isEmpty(filter.nametext)) {
-                this.nametext.setText(filter.nametext);
+            if (!StringUtils.isEmpty(this.filter.nametext)) {
+                this.nametext.setText(this.filter.nametext);
             }
             // 名前.正規表現を使用する
-            this.regexp.setSelection(filter.regexp);
+            this.regexp.setSelection(this.filter.regexp);
 
             // 艦種.駆逐艦
-            this.destroyer.setSelection(filter.destroyer);
+            this.destroyer.setSelection(this.filter.destroyer);
             // 艦種.軽巡洋艦
-            this.lightCruiser.setSelection(filter.lightCruiser);
+            this.lightCruiser.setSelection(this.filter.lightCruiser);
             // 艦種.重雷装巡洋艦
-            this.torpedoCruiser.setSelection(filter.torpedoCruiser);
+            this.torpedoCruiser.setSelection(this.filter.torpedoCruiser);
             // 艦種.重巡洋艦
-            this.heavyCruiser.setSelection(filter.heavyCruiser);
+            this.heavyCruiser.setSelection(this.filter.heavyCruiser);
             // 艦種.航空巡洋艦
-            this.flyingDeckCruiser.setSelection(filter.flyingDeckCruiser);
+            this.flyingDeckCruiser.setSelection(this.filter.flyingDeckCruiser);
             // 艦種.水上機母艦
-            this.seaplaneTender.setSelection(filter.seaplaneTender);
+            this.seaplaneTender.setSelection(this.filter.seaplaneTender);
             // 艦種.軽空母
-            this.escortCarrier.setSelection(filter.escortCarrier);
+            this.escortCarrier.setSelection(this.filter.escortCarrier);
             // 艦種.正規空母
-            this.carrier.setSelection(filter.carrier);
+            this.carrier.setSelection(this.filter.carrier);
             // 艦種.戦艦
-            this.battleship.setSelection(filter.battleship);
+            this.battleship.setSelection(this.filter.battleship);
             // 艦種.航空戦艦
-            this.flyingDeckBattleship.setSelection(filter.flyingDeckBattleship);
+            this.flyingDeckBattleship.setSelection(this.filter.flyingDeckBattleship);
             // 艦種.潜水艦
-            this.submarine.setSelection(filter.submarine);
+            this.submarine.setSelection(this.filter.submarine);
             // 艦種.潜水空母
-            this.carrierSubmarine.setSelection(filter.carrierSubmarine);
+            this.carrierSubmarine.setSelection(this.filter.carrierSubmarine);
             // 艦種.揚陸艦
-            this.landingship.setSelection(filter.landingship);
+            this.landingship.setSelection(this.filter.landingship);
             // 艦種.装甲空母
-            this.armoredcarrier.setSelection(filter.armoredcarrier);
+            this.armoredcarrier.setSelection(this.filter.armoredcarrier);
             // 艦種.工作艦
-            this.repairship.setSelection(filter.repairship);
+            this.repairship.setSelection(this.filter.repairship);
             // 艦種.潜水母艦
-            this.submarineTender.setSelection(filter.submarineTender);
+            this.submarineTender.setSelection(this.filter.submarineTender);
 
+            if (this.filter.group != null) {
+                // グループ
+                int idx = this.groups.indexOf(this.filter.group);
+                if (idx != -1) {
+                    this.group.setSelection(true);
+                    this.groupcombo.setEnabled(true);
+                    this.groupcombo.select(idx);
+                }
+            }
+            if (!StringUtils.isEmpty(this.filter.itemname)) {
+                // 装備
+                this.item.setSelection(true);
+                this.itemcombo.setEnabled(true);
+                int index = 0;
+                for (String name : items) {
+                    if (this.filter.itemname.equals(name)) {
+                        this.itemcombo.select(index);
+                        break;
+                    }
+                    index++;
+                }
+            }
             // 艦隊に所属
-            this.onfleet.setSelection(filter.onfleet);
+            this.onfleet.setSelection(this.filter.onfleet);
             // 艦隊に非所属
-            this.notonfleet.setSelection(filter.notonfleet);
+            this.notonfleet.setSelection(this.filter.notonfleet);
             // 鍵付き
-            this.locked.setSelection(filter.locked);
+            this.locked.setSelection(this.filter.locked);
             // 鍵付きではない
-            this.notlocked.setSelection(filter.notlocked);
+            this.notlocked.setSelection(this.filter.notlocked);
         }
+
+        this.shell.pack();
     }
 
     /**
@@ -342,6 +425,20 @@ public final class ShipFilterDialog extends Composite {
         filter.repairship = this.repairship.getSelection();
         filter.submarineTender = this.submarineTender.getSelection();
         filter.group = null;
+        if (ShipFilterDialog.this.group.getSelection()) {
+            int idx = ShipFilterDialog.this.groupcombo.getSelectionIndex();
+            if ((idx >= 0) && (idx < this.groups.size())) {
+                filter.group = this.groups.get(idx);
+            }
+        }
+        if (ShipFilterDialog.this.item.getSelection()) {
+            if (ShipFilterDialog.this.itemcombo.getSelectionIndex() >= 0) {
+                filter.itemname = this.itemcombo.getItem(ShipFilterDialog.this.itemcombo
+                        .getSelectionIndex());
+            }
+        } else {
+            filter.itemname = null;
+        }
         filter.onfleet = this.onfleet.getSelection();
         filter.notonfleet = this.notonfleet.getSelection();
         filter.locked = this.locked.getSelection();

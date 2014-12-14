@@ -88,25 +88,37 @@ public final class BackgroundInitializer extends Thread {
 
         try {
             // その他の報告書を読み込む
-            final List<CreateItemDto> createItemList = CreateReportLogic.loadCreateItemReport();
-            final List<GetShipDto> createShipList = CreateReportLogic.loadCreateShipReport();
-            final List<MissionResultDto> missionResultList = CreateReportLogic.loadMissionReport();
-            ApplicationMain.print("バックグラウンド初期化完了");
+            final List<GetShipDto> createShipList = AppConfig.get().isLoadCreateShipLog() ?
+                    CreateReportLogic.loadCreateShipReport() : null;
+            if (createShipList != null) {
+                ApplicationMain.logPrint("建造ログ読み込み完了(" + createShipList.size() + "件)");
+            }
+
+            final List<CreateItemDto> createItemList = AppConfig.get().isLoadCreateItemLog() ?
+                    CreateReportLogic.loadCreateItemReport() : null;
+            if (createItemList != null) {
+                ApplicationMain.logPrint("開発ログ読み込み完了(" + createItemList.size() + "件)");
+            }
+
+            final List<MissionResultDto> missionResultList = AppConfig.get().isLoadMissionLog() ?
+                    CreateReportLogic.loadMissionReport() : null;
+            if (missionResultList != null) {
+                ApplicationMain.logPrint("遠征ログ読み込み完了(" + missionResultList.size() + "件)");
+            }
+
+            ApplicationMain.logPrint("バックグラウンド初期化完了");
 
             this.display.asyncExec(new Runnable() {
                 @Override
                 public void run() {
                     if (createItemList != null) {
                         GlobalContext.addCreateItemList(createItemList);
-                        BackgroundInitializer.this.main.printMessage("開発ログ読み込み完了(" + createItemList.size() + "件)");
                     }
                     if (createShipList != null) {
                         GlobalContext.addGetshipList(createShipList);
-                        BackgroundInitializer.this.main.printMessage("建造ログ読み込み完了(" + createShipList.size() + "件)");
                     }
                     if (missionResultList != null) {
                         GlobalContext.addMissionResultList(missionResultList);
-                        BackgroundInitializer.this.main.printMessage("遠征ログ読み込み完了(" + missionResultList.size() + "件)");
                     }
                 }
             });

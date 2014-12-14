@@ -227,6 +227,15 @@ public final class AppConfigBean {
     /** キャプチャ範囲 [x,y,width,height] */
     private int[] captureRect = null;
 
+    /** 開発報告書を読み込むか */
+    private boolean loadCreateItemLog = true;
+
+    /** 建造報告書を読みこむか */
+    private boolean loadCreateShipLog = true;
+
+    /** 遠征報告書を読みこむか */
+    private boolean loadMissionLog = true;
+
     /**
      * ポート番号を取得します。
      * @return ポート番号
@@ -1293,5 +1302,47 @@ public final class AppConfigBean {
      */
     public void setCaptureRect(int[] captureRect) {
         this.captureRect = captureRect;
+    }
+
+    /**
+     * @return loadCreateItemLog
+     */
+    public boolean isLoadCreateItemLog() {
+        return this.loadCreateItemLog;
+    }
+
+    /**
+     * @param loadCreateItemLog セットする loadCreateItemLog
+     */
+    public void setLoadCreateItemLog(boolean loadCreateItemLog) {
+        this.loadCreateItemLog = loadCreateItemLog;
+    }
+
+    /**
+     * @return loadCreateShipLog
+     */
+    public boolean isLoadCreateShipLog() {
+        return this.loadCreateShipLog;
+    }
+
+    /**
+     * @param loadCreateShipLog セットする loadCreateShipLog
+     */
+    public void setLoadCreateShipLog(boolean loadCreateShipLog) {
+        this.loadCreateShipLog = loadCreateShipLog;
+    }
+
+    /**
+     * @return loadMissionLog
+     */
+    public boolean isLoadMissionLog() {
+        return this.loadMissionLog;
+    }
+
+    /**
+     * @param loadMissionLog セットする loadMissionLog
+     */
+    public void setLoadMissionLog(boolean loadMissionLog) {
+        this.loadMissionLog = loadMissionLog;
     }
 }

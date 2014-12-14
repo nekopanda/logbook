@@ -49,6 +49,8 @@ public final class ShipFilterDto extends AbstractDto {
     public transient ShipGroupBean group;
     /** Beanで保存するときにグループはIDで参照したいので */
     public int groupId = 0;
+    /** 装備 */
+    public String itemname;
     /** 艦隊に所属 */
     public boolean onfleet = true;
     /** 艦隊に非所属 */
