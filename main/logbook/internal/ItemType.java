@@ -43,6 +43,7 @@ public class ItemType {
             this.put(27, "照明弾");
             this.put(28, "司令部施設");
             this.put(29, "航空要員");
+            this.put(30, "高射装置");
         }
     };
 

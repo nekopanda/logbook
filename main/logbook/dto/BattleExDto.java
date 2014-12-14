@@ -117,6 +117,10 @@ public class BattleExDto extends AbstractDto {
     @Tag(26)
     private int mvpCombined;
 
+    /** 提督Lv */
+    @Tag(27)
+    private int hqLv;
+
     /////////////////////////////////////////////////
 
     public static class Phase {
@@ -797,6 +801,7 @@ public class BattleExDto extends AbstractDto {
         if (JsonUtils.hasKey(object, "api_mvp_combined")) {
             this.mvpCombined = object.getInt("api_mvp_combined");
         }
+        this.hqLv = object.getInt("api_member_lv");
     }
 
     private static String toFormation(int f) {
@@ -1129,5 +1134,12 @@ public class BattleExDto extends AbstractDto {
      */
     public int getMvpCombined() {
         return this.mvpCombined;
+    }
+
+    /**
+     * @return hqLv
+     */
+    public int getHqLv() {
+        return this.hqLv;
     }
 }

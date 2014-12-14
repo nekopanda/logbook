@@ -224,6 +224,9 @@ public final class AppConfigBean {
     /** 縮小表示の時は他のウィンドウを閉じる */
     private boolean closeWhenMinimized = true;
 
+    /** キャプチャ範囲 [x,y,width,height] */
+    private int[] captureRect = null;
+
     /**
      * ポート番号を取得します。
      * @return ポート番号
@@ -1276,5 +1279,19 @@ public final class AppConfigBean {
      */
     public void setDatabaseSendLog(boolean databaseSendLog) {
         this.databaseSendLog = databaseSendLog;
+    }
+
+    /**
+     * @return captureRect
+     */
+    public int[] getCaptureRect() {
+        return this.captureRect;
+    }
+
+    /**
+     * @param captureRect セットする captureRect
+     */
+    public void setCaptureRect(int[] captureRect) {
+        this.captureRect = captureRect;
     }
 }

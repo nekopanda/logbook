@@ -9,11 +9,17 @@ import java.io.IOException;
 
 import javax.annotation.CheckForNull;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * JavaBeanのutilです
  *
  */
 public final class BeanUtils {
+
+    /** ロガー */
+    private static final Logger LOG = LogManager.getLogger(BeanUtils.class);
 
     /**
      * JavaBeanオブジェクトをXML形式でファイルに書き込みます
@@ -62,6 +68,7 @@ public final class BeanUtils {
 
         if (!target.canRead() || (target.length() <= 0)) {
             // ファイルが読み込めないまたはサイズがゼロの場合バックアップファイルを読み込む
+            LOG.warn("次のファイルをバックアップから読み込みます: " + file.getName());
             target = new File(file.getAbsolutePath() + ".backup");
             if (!target.canRead()) {
                 // バックアップファイルも読めない場合nullを返す

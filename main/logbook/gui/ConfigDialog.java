@@ -330,8 +330,10 @@ public final class ConfigDialog extends Dialog {
         sakutekiMethodLabel.setText("索敵表示形式");
         final Combo sakutekiCombo = new Combo(compositeFleetTab, SWT.READ_ONLY);
         sakutekiCombo.add("A.艦隊素の索敵値 + 装備の索敵値");
-        sakutekiCombo.add("B.右の計算結果(偵察機×2 + 電探 + √(装備込みの艦隊索敵値-偵察機-電探))");
-        sakutekiCombo.add("C.装備込みの艦隊索敵値(Bの計算結果)");
+        sakutekiCombo.add("B.2-5秋計算式(艦隊素の索敵分 + 装備分 + 提督Lv分)");
+        sakutekiCombo.add("C.装備込みの艦隊索敵値合計(2-5秋計算式)");
+        sakutekiCombo.add("D.右の計算結果(偵察機×2 + 電探 + √(装備込みの艦隊索敵値-偵察機-電探))");
+        sakutekiCombo.add("E.装備込みの艦隊索敵値(Dの計算結果)");
         sakutekiCombo.select(AppConfig.get().getSakutekiMethod());
 
         // 通知

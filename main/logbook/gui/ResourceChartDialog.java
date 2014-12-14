@@ -15,7 +15,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TimeZone;
 
 import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
@@ -204,7 +203,7 @@ public final class ResourceChartDialog extends WindowBase {
         });
 
         // 資材ログ読み込み
-        File report = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), "資材ログ.csv"));
+        File report = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), AppConstants.LOG_RESOURCE));
         try {
             this.log = ResourceLog.getInstance(report);
         } catch (IOException e) {
@@ -300,7 +299,7 @@ public final class ResourceChartDialog extends WindowBase {
     private static void createTableBody(ResourceLog log, List<String[]> body) {
 
         SimpleDateFormat format = new SimpleDateFormat(AppConstants.DATE_DAYS_FORMAT);
-        format.setTimeZone(TimeZone.getTimeZone("GMT+4:00"));
+        format.setTimeZone(AppConstants.TIME_ZONE_MISSION);
 
         Map<String, SortableLog> resourceofday = new LinkedHashMap<>();
         for (int i = 0; i < log.time.length; i++) {

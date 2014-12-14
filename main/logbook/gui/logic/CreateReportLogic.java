@@ -151,6 +151,12 @@ public final class CreateReportLogic {
             if (this.docks.contains(ship.getId())) {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.NDOCK_COLOR));
             }
+            // Lv1の艦娘をグレー色にする
+            /* ちょっとこれをやる意味がよく分からないのでコメントアウト
+            if (ship.getLv() == 1) {
+                item.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GRAY));
+            }
+            */
 
             item.setText(toStringArray(text));
 
@@ -184,7 +190,7 @@ public final class CreateReportLogic {
             body.add(new Comparable[] {
                     new TableRowHeader(i + 1, item),
                     new DateTimeString(item.getBattleDate()), item.getQuestName(),
-                    item.getMapCell(), item.getMapCell().isBoss() ? "ボス" : "",
+                    item.getMapCell().getReportString(), item.isBoss() ? "ボス" : "",
                     item.getRank(), item.getEnemyName(), item.getDropType(),
                     item.getDropName(), item.isHasTaiha() ? "あり" : "",
                     item.getFlagShip(), item.getFlagShipCombined(),
@@ -288,7 +294,7 @@ public final class CreateReportLogic {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
         for (int i = 0; i < ships.size(); i++) {
             GetShipDto ship = ships.get(i);
-            body.add(new Comparable[] { Integer.toString(i + 1),
+            body.add(new Comparable[] { i + 1,
                     new DateTimeString(ship.getGetDate()), ship.getBuildType(),
                     ship.getName(), ship.getType(), ship.getFuel(), ship.getAmmo(), ship.getMetal(), ship.getBauxite(),
                     ship.getResearchMaterials(), ship.getFreeDock(), ship.getSecretary(), ship.getHqLevel() });
@@ -339,7 +345,7 @@ public final class CreateReportLogic {
                 name = item.getName();
                 type = item.getType();
             }
-            body.add(new Comparable[] { Integer.toString(i + 1),
+            body.add(new Comparable[] { i + 1,
                     new DateTimeString(item.getCreateDate()), name, type,
                     item.getFuel(), item.getAmmo(), item.getMetal(), item.getBauxite(), item.getSecretary(),
                     item.getHqLevel() });
@@ -1240,7 +1246,7 @@ public final class CreateReportLogic {
         try {
             List<BattleExDto> dtoList = Collections.singletonList(dto);
 
-            File report = getStoreFile("海戦・ドロップ報告書.csv", "海戦・ドロップ報告書_alternativefile.csv");
+            File report = getStoreFile(AppConstants.LOG_BATTLE_RESULT, AppConstants.LOG_BATTLE_RESULT_ALT);
 
             CreateReportLogic.writeCsvStripFirstColumn(report,
                     CreateReportLogic.getBattleResultStoreHeader(),
@@ -1259,7 +1265,7 @@ public final class CreateReportLogic {
         try {
             List<GetShipDto> dtoList = Collections.singletonList(dto);
 
-            File report = getStoreFile("建造報告書.csv", "建造報告書_alternativefile.csv");
+            File report = getStoreFile(AppConstants.LOG_CREATE_SHIP, AppConstants.LOG_CREATE_SHIP_ALT);
 
             CreateReportLogic.writeCsvStripFirstColumn(report,
                     CreateReportLogic.getCreateShipHeader(),
@@ -1299,7 +1305,7 @@ public final class CreateReportLogic {
         try {
             List<CreateItemDto> dtoList = Collections.singletonList(dto);
 
-            File report = getStoreFile("開発報告書.csv", "開発報告書_alternativefile.csv");
+            File report = getStoreFile(AppConstants.LOG_CREATE_ITEM, AppConstants.LOG_CREATE_ITEM_ALT);
 
             CreateReportLogic.writeCsvStripFirstColumn(report,
                     CreateReportLogic.getCreateItemHeader(),
@@ -1339,7 +1345,7 @@ public final class CreateReportLogic {
         try {
             List<MissionResultDto> dtoList = Collections.singletonList(dto);
 
-            File report = getStoreFile("遠征報告書.csv", "遠征報告書_alternativefile.csv");
+            File report = getStoreFile(AppConstants.LOG_MISSION, AppConstants.LOG_MISSION_ALT);
 
             CreateReportLogic.writeCsvStripFirstColumn(report,
                     CreateReportLogic.getMissionResultHeader(),
@@ -1380,7 +1386,7 @@ public final class CreateReportLogic {
             if (material != null) {
                 List<MaterialDto> dtoList = Collections.singletonList(material);
 
-                File report = getStoreFile("資材ログ.csv", "資材ログ_alternativefile.csv");
+                File report = getStoreFile(AppConstants.LOG_RESOURCE, AppConstants.LOG_RESOURCE_ALT);
 
                 CreateReportLogic.writeCsvStripFirstColumn(report,
                         CreateReportLogic.getMaterialHeader(),

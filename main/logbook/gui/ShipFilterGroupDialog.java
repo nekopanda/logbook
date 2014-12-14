@@ -615,7 +615,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
 
     @Override
     public void groupShipChanged(ShipGroupBean group) {
-        if (this.property.getShipGroupBean() == group) {
+        if ((this.property != null) && (this.property.getShipGroupBean() == group)) {
             this.reloadTable();
         }
     }
