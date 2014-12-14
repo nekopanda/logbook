@@ -25,11 +25,17 @@ public class ResourceItemDto {
     public ResourceItemDto() {
     }
 
+    public void loadBaseMaterialsFromString(String[] data, int offset) {
+        for (int i = 0; i < 4; ++i) {
+            this.baseMaterials[i] = Integer.valueOf(data[i + offset]);
+        }
+    }
+
     public void loadBaseMaterialsFromField(Data data) {
-        this.baseMaterials[0] = Integer.parseInt(data.getField("api_item1"));
-        this.baseMaterials[1] = Integer.parseInt(data.getField("api_item2"));
-        this.baseMaterials[2] = Integer.parseInt(data.getField("api_item3"));
-        this.baseMaterials[3] = Integer.parseInt(data.getField("api_item4"));
+        this.baseMaterials[0] = Integer.valueOf(data.getField("api_item1"));
+        this.baseMaterials[1] = Integer.valueOf(data.getField("api_item2"));
+        this.baseMaterials[2] = Integer.valueOf(data.getField("api_item3"));
+        this.baseMaterials[3] = Integer.valueOf(data.getField("api_item4"));
     }
 
     /** JSONの配列で表された資源を読み取る。長さ4 と　長さ7 に対応 */
@@ -110,20 +116,40 @@ public class ResourceItemDto {
                 new UseItemDto(AppConstants.USEITEM_RESEARCH, amount));
     }
 
+    public void setItem(int id, int amount) {
+        this.items.put(id, new UseItemDto(id, amount));
+    }
+
     public int getFuel() {
         return this.baseMaterials[0];
+    }
+
+    public void setFuel(int fuel) {
+        this.baseMaterials[0] = fuel;
     }
 
     public int getAmmo() {
         return this.baseMaterials[1];
     }
 
+    public void setAmmo(int ammo) {
+        this.baseMaterials[1] = ammo;
+    }
+
     public int getMetal() {
         return this.baseMaterials[2];
     }
 
+    public void setMetal(int metal) {
+        this.baseMaterials[2] = metal;
+    }
+
     public int getBauxite() {
         return this.baseMaterials[3];
+    }
+
+    public void setBauxite(int bauxite) {
+        this.baseMaterials[3] = bauxite;
     }
 
     public int getBurners() {

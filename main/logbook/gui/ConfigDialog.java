@@ -96,7 +96,7 @@ public final class ConfigDialog extends Dialog {
         systemroot.setText("一般");
         systemroot.setData("system");
         TreeItem maintab = new TreeItem(systemroot, SWT.NONE);
-        maintab.setText("メインタブ");
+        maintab.setText("一般2");
         maintab.setData("maintab");
         TreeItem fleettab = new TreeItem(systemroot, SWT.NONE);
         fleettab.setText("艦隊タブ");
@@ -159,19 +159,6 @@ public final class ConfigDialog extends Dialog {
         soundlevel.setLayoutData(gdSoundlevel);
         soundlevel.setText(Integer.toString((int) (AppConfig.get().getSoundLevel() * 100)));
         new Label(compositeSystem, SWT.NONE);
-
-        /*
-        Label label7 = new Label(compositeSystem, SWT.NONE);
-        label7.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        label7.setText("透明度*");
-
-        final Text alpha = new Text(compositeSystem, SWT.BORDER);
-        GridData gdAlpha = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
-        gdAlpha.widthHint = 90;
-        alpha.setLayoutData(gdAlpha);
-        alpha.setText(Integer.toString(AppConfig.get().getAlpha()));
-        new Label(compositeSystem, SWT.NONE);
-        */
 
         Label label8 = new Label(compositeSystem, SWT.NONE);
         label8.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -253,6 +240,21 @@ public final class ConfigDialog extends Dialog {
         printSunkLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         printSunkLog.setText("艦娘の轟沈をログに表示（ダメコン未対応）");
         printSunkLog.setSelection(AppConfig.get().isPrintSunkLog());
+
+        final Button loadCreateShipLog = new Button(compositeMainTab, SWT.CHECK);
+        loadCreateShipLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        loadCreateShipLog.setText("建造報告書を読み込む*");
+        loadCreateShipLog.setSelection(AppConfig.get().isLoadCreateShipLog());
+
+        final Button loadCreateItemLog = new Button(compositeMainTab, SWT.CHECK);
+        loadCreateItemLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        loadCreateItemLog.setText("開発報告書を読み込む*");
+        loadCreateItemLog.setSelection(AppConfig.get().isLoadCreateItemLog());
+
+        final Button loadMissionLog = new Button(compositeMainTab, SWT.CHECK);
+        loadMissionLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        loadMissionLog.setText("遠征報告書を読み込む*");
+        loadMissionLog.setSelection(AppConfig.get().isLoadMissionLog());
 
         // 艦隊タブ タブ
         Composite compositeFleetTab = new Composite(this.composite, SWT.NONE);
@@ -908,6 +910,9 @@ public final class ConfigDialog extends Dialog {
                 // maintab
                 AppConfig.get().setPrintSortieLog(printSortieLog.getSelection());
                 AppConfig.get().setPrintSunkLog(printSunkLog.getSelection());
+                AppConfig.get().setLoadCreateItemLog(loadCreateItemLog.getSelection());
+                AppConfig.get().setLoadCreateShipLog(loadCreateShipLog.getSelection());
+                AppConfig.get().setLoadMissionLog(loadMissionLog.getSelection());
                 // fleettab
                 AppConfig.get().setDisplayCount(displaycount.getSelection());
                 AppConfig.get().setDefaultSea(seacombo.getItem(seacombo.getSelectionIndex()));

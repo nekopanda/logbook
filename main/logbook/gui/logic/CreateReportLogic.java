@@ -7,12 +7,16 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +49,7 @@ import logbook.dto.ShipParameters;
 import logbook.dto.UseItemDto;
 import logbook.internal.BattleResultFilter;
 import logbook.internal.BattleResultServer;
+import logbook.internal.MasterData;
 import logbook.internal.Ship;
 import logbook.util.ReportUtils;
 
@@ -59,6 +64,8 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.wb.swt.SWTResourceManager;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 /**
  * 各種報告書を作成します
@@ -295,6 +302,24 @@ public final class CreateReportLogic {
         return body;
     }
 
+    public static List<GetShipDto> getCreateShip(List<String[]> resultlist) {
+        List<GetShipDto> dtolist = new ArrayList<GetShipDto>();
+        for (String[] record : resultlist) {
+            if (record.length >= 12) {
+                Date date = readDate(record[0]);
+                if (date != null) {
+                    ResourceItemDto res = new ResourceItemDto();
+                    res.loadBaseMaterialsFromString(record, 4);
+                    res.setResearchMaterials(Integer.valueOf(record[7]));
+                    GetShipDto dto = new GetShipDto(date, record[1], record[2], record[3],
+                            res, record[10], Integer.valueOf(record[11]), Integer.valueOf(record[9]));
+                    dtolist.add(dto);
+                }
+            }
+        }
+        return dtolist;
+    }
+
     /**
      * 開発報告書のヘッダー
      * 
@@ -326,6 +351,24 @@ public final class CreateReportLogic {
                     item.getHqLevel() });
         }
         return body;
+    }
+
+    public static List<CreateItemDto> getCreateItem(List<String[]> resultlist) {
+        List<CreateItemDto> dtolist = new ArrayList<CreateItemDto>();
+        for (String[] record : resultlist) {
+            if (record.length >= 9) {
+                Date date = readDate(record[0]);
+                if (date != null) {
+                    ResourceItemDto res = new ResourceItemDto();
+                    res.loadBaseMaterialsFromString(record, 3);
+                    boolean createFlag = !record[1].equals("失敗");
+                    CreateItemDto dto = new CreateItemDto(date, createFlag, record[1], record[2], res,
+                            record[7], Integer.valueOf(record[8]));
+                    dtolist.add(dto);
+                }
+            }
+        }
+        return dtolist;
     }
 
     /**
@@ -733,7 +776,7 @@ public final class CreateReportLogic {
      * 
      * @return ヘッダー
      */
-    public static String[] getCreateMissionResultHeader() {
+    public static String[] getMissionResultHeader() {
         return new String[] { "No.", "日付", "結果", "遠征", "燃料", "弾薬", "鋼材", "ボーキ", "アイテム1", "個数", "アイテム2", "個数" };
     }
 
@@ -750,7 +793,7 @@ public final class CreateReportLogic {
 
             String[] itemName = new String[] { "", "" };
             String[] itemCount = new String[] { "", "" };
-            ResourceItemDto resItems = result.getItems();
+            ResourceItemDto resItems = result.getResources();
             if (resItems != null) {
                 Map<Integer, UseItemDto> items = resItems.getItems();
                 int index = 0;
@@ -778,6 +821,44 @@ public final class CreateReportLogic {
             });
         }
         return body;
+    }
+
+    public static List<MissionResultDto> getMissionResult(List<String[]> resultlist) {
+        List<MissionResultDto> dtolist = new ArrayList<MissionResultDto>();
+
+        // アイテム名->IDへのマッピングを作成
+        Map<String, Integer> itemNameMap = new HashMap<>();
+        Map<Integer, MasterData.UseItemInfoDto> itemIdMap = MasterData.getInstance().getUseItem();
+        for (MasterData.UseItemInfoDto item : itemIdMap.values()) {
+            itemNameMap.put(item.getName(), item.getId());
+        }
+
+        for (String[] record : resultlist) {
+            if (record.length >= 11) {
+                Date date = readDate(record[0]);
+                if (date != null) {
+                    ResourceItemDto res = new ResourceItemDto();
+                    if (record[3].length() > 0) { // 失敗の時はない
+                        res.loadBaseMaterialsFromString(record, 3);
+                        // アイテムを復元
+                        for (int i = 0; i < 2; ++i) {
+                            String name = record[(i * 2) + 7];
+                            String count = record[(i * 2) + 8];
+                            if (name.length() > 0) {
+                                Integer id = itemNameMap.get(name);
+                                if (id == null) {
+                                    id = AppConstants.USEITEM_UNKNOWN;
+                                }
+                                res.setItem(id, Integer.valueOf(count));
+                            }
+                        }
+                    }
+                    MissionResultDto dto = new MissionResultDto(date, record[1], record[2], res);
+                    dtolist.add(dto);
+                }
+            }
+        }
+        return dtolist;
     }
 
     /**
@@ -1195,6 +1276,27 @@ public final class CreateReportLogic {
     }
 
     /**
+     * 建造報告書を読み込む
+     * 
+     * @return 建造報告
+     */
+    public static List<GetShipDto> loadCreateShipReport() {
+        List<GetShipDto> dtoList = null;
+        try {
+            File file = new File("建造報告書.csv");
+            if (file.exists()) {
+                CSVReader reader = new CSVReader(new InputStreamReader(
+                        new FileInputStream(file), AppConstants.CHARSET));
+                dtoList = getCreateShip(reader.readAll());
+                reader.close();
+            }
+        } catch (Exception e) {
+            LOG.warn("建造報告書の読み込みに失敗しました", e);
+        }
+        return dtoList;
+    }
+
+    /**
      * 開発報告書を書き込む
      * 
      * @param dto 開発報告
@@ -1214,22 +1316,64 @@ public final class CreateReportLogic {
     }
 
     /**
+     * 開発報告書を読み込む
+     * 
+     * @return 開発報告
+     */
+    public static List<CreateItemDto> loadCreateItemReport() {
+        List<CreateItemDto> dtoList = null;
+        try {
+            File file = new File("開発報告書.csv");
+            if (file.exists()) {
+                CSVReader reader = new CSVReader(new InputStreamReader(
+                        new FileInputStream(file), AppConstants.CHARSET));
+                dtoList = getCreateItem(reader.readAll());
+                reader.close();
+            }
+        } catch (Exception e) {
+            LOG.warn("開発報告書の読み込みに失敗しました", e);
+        }
+        return dtoList;
+    }
+
+    /**
      * 遠征報告書を書き込む
      * 
      * @param dto 遠征結果
      */
-    public static void storeCreateMissionReport(MissionResultDto dto) {
+    public static void storeMissionReport(MissionResultDto dto) {
         try {
             List<MissionResultDto> dtoList = Collections.singletonList(dto);
 
             File report = getStoreFile(AppConstants.LOG_MISSION, AppConstants.LOG_MISSION_ALT);
 
             CreateReportLogic.writeCsvStripFirstColumn(report,
-                    CreateReportLogic.getCreateMissionResultHeader(),
+                    CreateReportLogic.getMissionResultHeader(),
                     CreateReportLogic.getMissionResultBody(dtoList), true);
         } catch (IOException e) {
             LOG.warn("報告書の保存に失敗しました", e);
         }
+    }
+
+    /**
+     * 遠征報告書を読み込む
+     * 
+     * @return 遠征報告
+     */
+    public static List<MissionResultDto> loadMissionReport() {
+        List<MissionResultDto> dtoList = null;
+        try {
+            File file = new File("遠征報告書.csv");
+            if (file.exists()) {
+                CSVReader reader = new CSVReader(new InputStreamReader(
+                        new FileInputStream(file), AppConstants.CHARSET));
+                dtoList = getMissionResult(reader.readAll());
+                reader.close();
+            }
+        } catch (Exception e) {
+            LOG.warn("遠征報告書の読み込みに失敗しました", e);
+        }
+        return dtoList;
     }
 
     /**
@@ -1329,4 +1473,20 @@ public final class CreateReportLogic {
         }
         alt_report.delete();
     }
-}
+
+    private static SimpleDateFormat[] dateFormats = new SimpleDateFormat[] {
+            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"), // オリジナルの記録フォーマット
+            new SimpleDateFormat("yyyy/MM/dd HH:mm") // Excelで保存した時のフォーマット
+    };
+
+    public static Date readDate(String str) {
+        ParsePosition pos = new ParsePosition(0);
+        Date date = null;
+        for (DateFormat format : dateFormats) {
+            date = format.parse(str, pos);
+            if (date != null) {
+                break;
+            }
+        }
+        return date;
+    }}

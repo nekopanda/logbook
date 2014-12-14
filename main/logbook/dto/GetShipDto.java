@@ -2,7 +2,6 @@ package logbook.dto;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 /**
  * 建造した艦娘を表します
@@ -12,11 +11,26 @@ public final class GetShipDto extends AbstractDto {
     /** 日付 */
     private final Date getDate;
 
+    /** 種類(大型艦建造:1, 通常艦建造:0) */
+    private final boolean oogata;
+
     /** 建造した艦娘 */
-    private final ShipDto ship;
+    private String name;
+    private int shipId;
+    private String type;
 
     /** 投入資源 */
-    private final ResourceDto resources;
+    private final ResourceItemDto resources;
+
+    /** 秘書艦 */
+    private final String secretly;
+    private final int secretlyId;
+
+    /** 司令部Lv */
+    private final int hqLevel;
+
+    /** 空きドック */
+    private int freeDock;
 
     /**
      * コンストラクター
@@ -24,11 +38,33 @@ public final class GetShipDto extends AbstractDto {
      * @param object 艦娘情報
      * @param resources 投入資源
      */
-    public GetShipDto(ShipDto ship, ResourceDto resources) {
-
+    public GetShipDto(boolean oogata, ResourceItemDto resources, ShipDto secretly, int hqLevel,
+            int freeDock) {
         this.getDate = Calendar.getInstance().getTime();
-        this.ship = ship;
-        this.resources = resources != null ? resources : new ResourceDto(0, 0, 0, 0, 0, 0, null, 0);
+        this.oogata = oogata;
+        this.name = null;
+        this.shipId = -1;
+        this.type = null;
+        this.resources = resources;
+        this.secretly = secretly.getFriendlyName();
+        this.secretlyId = secretly.getId();
+        this.hqLevel = hqLevel;
+        this.freeDock = freeDock;
+    }
+
+    public GetShipDto(Date date, String buildType, String name, String type, ResourceItemDto resources,
+            String secretly, int hqLevel, int freeDock) {
+
+        this.getDate = date;
+        this.oogata = buildType.equals("大型建造");
+        this.name = name;
+        this.shipId = -1;
+        this.type = type;
+        this.resources = resources;
+        this.secretly = secretly;
+        this.secretlyId = -1;
+        this.hqLevel = hqLevel;
+        this.freeDock = freeDock;
     }
 
     /**
@@ -38,124 +74,45 @@ public final class GetShipDto extends AbstractDto {
         return this.getDate;
     }
 
+    public void setShip(ShipDto ship) {
+        this.name = ship.getName();
+        this.shipId = ship.getId();
+        this.type = ship.getType();
+    }
+
     /**
-     * @return 艦娘個人を識別するID
+     * @return oogata
      */
-    public int getId() {
-        return this.ship.getId();
+    public boolean isOogata() {
+        return this.oogata;
     }
 
     /**
      * @return 名前
      */
     public String getName() {
-        return this.ship.getName();
+        return this.name;
+    }
+
+    /**
+     * @return shipId
+     */
+    public int getShipId() {
+        return this.shipId;
     }
 
     /**
      * @return 艦種
      */
     public String getType() {
-        return this.ship.getType();
-    }
-
-    /**
-     * @return Lv
-     */
-    public int getLv() {
-        return this.ship.getLv();
-    }
-
-    /**
-     * @return 経験値
-     */
-    public int getExp() {
-        return this.ship.getExp();
-    }
-
-    /**
-     * @return HP
-     */
-    public int getNowhp() {
-        return this.ship.getNowhp();
-    }
-
-    /**
-     * @return MaxHP
-     */
-    public int getMaxhp() {
-        return this.ship.getMaxhp();
-    }
-
-    /**
-     * @return 装備
-     */
-    public List<String> getSlot() {
-        return this.ship.getSlot();
-    }
-
-    /**
-     * @return 火力
-     */
-    public int getKaryoku() {
-        return this.ship.getKaryoku();
-    }
-
-    /**
-     * @return 雷装
-     */
-    public int getRaisou() {
-        return this.ship.getRaisou();
-    }
-
-    /**
-     * @return 対空
-     */
-    public int getTaiku() {
-        return this.ship.getTaiku();
-    }
-
-    /**
-     * @return 装甲
-     */
-    public int getSoukou() {
-        return this.ship.getSoukou();
-    }
-
-    /**
-     * @return 回避
-     */
-    public int getKaihi() {
-        return this.ship.getKaihi();
-    }
-
-    /**
-     * @return 対潜
-     */
-    public int getTaisen() {
-        return this.ship.getTaisen();
-    }
-
-    /**
-     * @return 索敵
-     */
-    public int getSakuteki() {
-        return this.ship.getSakuteki();
-    }
-
-    /**
-     * @return 運
-     */
-    public int getLucky() {
-        return this.ship.getLucky();
+        return this.type;
     }
 
     /**
      * @return 建造種類
      */
     public String getBuildType() {
-        Integer type = this.resources.getType();
-        if (type == 1) {
+        if (this.oogata) {
             return "大型艦建造";
         }
         return "通常艦建造";
@@ -193,31 +150,41 @@ public final class GetShipDto extends AbstractDto {
      * @return 開発資材
      */
     public Integer getResearchMaterials() {
-        return this.resources.getResearchMaterials();
+        return this.resources.getResearch();
     }
 
     /**
      * @return 空きドック
      */
     public int getFreeDock() {
-        return this.resources.getFreeDock();
+        return this.freeDock;
+    }
+
+    /**
+     * @param freeDock 空きドック
+     */
+    public void setFreeDock(int freeDock) {
+        this.freeDock = freeDock;
     }
 
     /**
      * @return 秘書艦
      */
     public String getSecretary() {
-        ShipDto ship = this.resources.getSecretary();
-        if (ship != null) {
-            return ship.getName() + "(Lv" + ship.getLv() + ")";
-        }
-        return "";
+        return this.secretly;
+    }
+
+    /**
+     * @return secretlyId
+     */
+    public int getSecretlyId() {
+        return this.secretlyId;
     }
 
     /**
      * @return 司令部Lv
      */
     public int getHqLevel() {
-        return this.resources.getHqLevel();
+        return this.hqLevel;
     }
 }

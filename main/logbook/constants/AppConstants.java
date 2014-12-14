@@ -187,6 +187,7 @@ public class AppConstants {
     /** 報告書のオンメモリ記憶数 */
     public static final int MAX_LOG_SIZE = 5000;
 
+    public static final int USEITEM_UNKNOWN = -1;
     public static final int USEITEM_BUCKET = 1;
     public static final int USEITEM_BURNER = 2;
     public static final int USEITEM_RESEARCH = 3;

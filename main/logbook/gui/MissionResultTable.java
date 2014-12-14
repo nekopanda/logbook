@@ -41,7 +41,7 @@ public final class MissionResultTable extends AbstractTableDialog {
 
     @Override
     protected String[] getTableHeader() {
-        return CreateReportLogic.getCreateMissionResultHeader();
+        return CreateReportLogic.getMissionResultHeader();
     }
 
     @Override

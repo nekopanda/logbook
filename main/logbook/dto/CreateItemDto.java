@@ -23,7 +23,13 @@ public final class CreateItemDto extends AbstractDto {
     private String type;
 
     /** 投入資源 */
-    private final ResourceDto resources;
+    private final ResourceItemDto resources;
+
+    /** 秘書艦 */
+    private final String secretly;
+
+    /** 司令部Lv */
+    private final int hqLevel;
 
     /**
      * コンストラクター
@@ -31,11 +37,24 @@ public final class CreateItemDto extends AbstractDto {
      * @param object JSON Object
      * @param resources 投入資源
      */
-    public CreateItemDto(JsonObject object, ResourceDto resources) {
+    public CreateItemDto(JsonObject object, ResourceItemDto resources, ShipDto recretly, int hqLevel) {
 
         this.createDate = Calendar.getInstance().getTime();
         this.createFlag = object.getJsonNumber("api_create_flag").longValue() != 0;
-        this.resources = resources != null ? resources : new ResourceDto(0, 0, 0, 0, null, 0);
+        this.resources = resources;
+        this.secretly = recretly.getFriendlyName();
+        this.hqLevel = hqLevel;
+    }
+
+    public CreateItemDto(Date date, boolean createFlag, String name, String type, ResourceItemDto resources,
+            String secretly, int hqLevel) {
+        this.createDate = date;
+        this.createFlag = createFlag;
+        this.name = name;
+        this.type = type;
+        this.resources = resources;
+        this.secretly = secretly;
+        this.hqLevel = hqLevel;
     }
 
     /**
@@ -112,17 +131,13 @@ public final class CreateItemDto extends AbstractDto {
      * @return 秘書艦
      */
     public String getSecretary() {
-        ShipDto ship = this.resources.getSecretary();
-        if (ship != null) {
-            return ship.getName() + "(Lv" + ship.getLv() + ")";
-        }
-        return "";
+        return this.secretly;
     }
 
     /**
      * @return 司令部Lv
      */
     public int getHqLevel() {
-        return this.resources.getHqLevel();
+        return this.hqLevel;
     }
 }
