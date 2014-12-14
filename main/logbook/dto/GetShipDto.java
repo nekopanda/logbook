@@ -56,7 +56,7 @@ public final class GetShipDto extends AbstractDto {
             String secretly, int hqLevel, int freeDock) {
 
         this.getDate = date;
-        this.oogata = buildType.equals("大型建造");
+        this.oogata = buildType.startsWith("大型");
         this.name = name;
         this.shipId = -1;
         this.type = type;
