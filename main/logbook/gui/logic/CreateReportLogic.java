@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,6 +32,7 @@ import logbook.dto.DockDto;
 import logbook.dto.EnemyShipDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
+import logbook.dto.ItemInfoDto;
 import logbook.dto.LostEntityDto;
 import logbook.dto.MaterialDto;
 import logbook.dto.MissionResultDto;
@@ -142,6 +144,12 @@ public final class CreateReportLogic {
             if (this.docks.contains(ship.getId())) {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.NDOCK_COLOR));
             }
+            // Lv1の艦娘をグレー色にする
+            /* ちょっとこれをやる意味がよく分からないのでコメントアウト
+            if (ship.getLv() == 1) {
+                item.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GRAY));
+            }
+            */
 
             item.setText(toStringArray(text));
 
@@ -158,7 +166,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getBattleResultHeader() {
-        return new String[] { "No.", "日付", "海域", "マス", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘",
+        return new String[] { "No.", "日付", "海域", "マス", "ボス", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘",
                 "大破艦", "旗艦", "旗艦(第二艦隊)", "MVP", "MVP(第二艦隊)" };
     }
 
@@ -175,7 +183,8 @@ public final class CreateReportLogic {
             body.add(new Comparable[] {
                     new TableRowHeader(i + 1, item),
                     new DateTimeString(item.getBattleDate()), item.getQuestName(),
-                    item.getMapCell(), item.getRank(), item.getEnemyName(), item.getDropType(),
+                    item.getMapCell().getReportString(), item.isBoss() ? "ボス" : "",
+                    item.getRank(), item.getEnemyName(), item.getDropType(),
                     item.getDropName(), item.isHasTaiha() ? "あり" : "",
                     item.getFlagShip(), item.getFlagShipCombined(),
                     item.getMvp(), item.getMvpCombined() });
@@ -212,6 +221,8 @@ public final class CreateReportLogic {
      */
     public static List<Comparable[]> getBattleResultStoreBody(List<BattleExDto> results) {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
+
+        SimpleDateFormat format = new SimpleDateFormat(AppConstants.DATE_FORMAT);
 
         for (int i = 0; i < results.size(); i++) {
             BattleExDto battle = results.get(i);
@@ -276,7 +287,7 @@ public final class CreateReportLogic {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
         for (int i = 0; i < ships.size(); i++) {
             GetShipDto ship = ships.get(i);
-            body.add(new Comparable[] { Integer.toString(i + 1),
+            body.add(new Comparable[] { i + 1,
                     new DateTimeString(ship.getGetDate()), ship.getBuildType(),
                     ship.getName(), ship.getType(), ship.getFuel(), ship.getAmmo(), ship.getMetal(), ship.getBauxite(),
                     ship.getResearchMaterials(), ship.getFreeDock(), ship.getSecretary(), ship.getHqLevel() });
@@ -309,7 +320,7 @@ public final class CreateReportLogic {
                 name = item.getName();
                 type = item.getType();
             }
-            body.add(new Comparable[] { Integer.toString(i + 1),
+            body.add(new Comparable[] { i + 1,
                     new DateTimeString(item.getCreateDate()), name, type,
                     item.getFuel(), item.getAmmo(), item.getMetal(), item.getBauxite(), item.getSecretary(),
                     item.getHqLevel() });
@@ -323,16 +334,19 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getItemListHeader() {
-        return new String[] { "No.", "名称", "種別", "個数", "火力", "命中", "射程", "運", "回避", "爆装", "雷装", "索敵", "対潜", "対空", "装甲",
+        return new String[] { "No.", "名称", "種別", "個数", "施錠", "改修",
+                "火力", "命中", "射程", "運", "回避", "爆装", "雷装", "索敵", "対潜", "対空", "装甲",
                 "装備してる艦娘" };
     }
 
     private static class ItemInfo {
-        public ItemDto item;
-        public int count = 1;
+        public ItemInfoDto item;
+        public int count = 0;
+        public int locked = 0;
+        public int maxLevel = 0;
         public Map<ShipDto, Integer> shipMap = new TreeMap<>();
 
-        public ItemInfo(ItemDto item) {
+        public ItemInfo(ItemInfoDto item) {
             this.item = item;
         }
 
@@ -369,32 +383,37 @@ public final class CreateReportLogic {
      * @return 内容
      */
     public static List<Comparable[]> getItemListBody() {
-        Map<ItemDto, ItemInfo> itemCountMap = new HashMap<ItemDto, ItemInfo>();
+        Map<Integer, ItemInfo> itemCountMap = new HashMap<Integer, ItemInfo>();
 
         // 装備の個数を計算
         for (ItemDto item : GlobalContext.getItemMap().values()) {
-            ItemInfo info = itemCountMap.get(item);
+            ItemInfo info = itemCountMap.get(item.getSlotitemId());
             if (info == null) {
-                info = new ItemInfo(item);
-                itemCountMap.put(item, info);
-            } else {
-                info.count++;
+                info = new ItemInfo(item.getInfo());
+                itemCountMap.put(item.getSlotitemId(), info);
             }
+            info.count++;
+            if (item.isLocked()) {
+                info.locked++;
+            }
+            info.maxLevel = Math.max(info.maxLevel, item.getLevel());
         }
 
         // 艦娘が持っている個数を計算
         for (ShipDto ship : GlobalContext.getShipMap().values()) {
-            for (ItemDto item : ship.getItem()) {
+            for (ItemInfoDto item : ship.getItem()) {
                 if (item != null) {
-                    Map<ShipDto, Integer> shipMap = itemCountMap.get(item).shipMap;
-                    Integer count = shipMap.get(ship);
-                    if (count == null) {
-                        count = 1;
+                    ItemInfo info = itemCountMap.get(item.getId());
+                    if (info != null) {
+                        Integer count = info.shipMap.get(ship);
+                        if (count == null) {
+                            count = 1;
+                        }
+                        else {
+                            count++;
+                        }
+                        info.shipMap.put(ship, count);
                     }
-                    else {
-                        count++;
-                    }
-                    shipMap.put(ship, count);
                 }
             }
         }
@@ -411,10 +430,12 @@ public final class CreateReportLogic {
 
         int count = 0;
         for (ItemInfo itemInfo : countitems) {
-            ItemDto item = itemInfo.item;
+            ItemInfoDto item = itemInfo.item;
             ShipParameters param = item.getParam();
+            String level = (itemInfo.maxLevel != 0) ? "★+" + itemInfo.maxLevel : null;
             count++;
-            body.add(new Comparable[] { count, item.getName(), item.getTypeName(), itemInfo.count, param.getHoug(),
+            body.add(new Comparable[] { count, item.getName(), item.getTypeName(), itemInfo.count,
+                    itemInfo.locked, level, param.getHoug(),
                     param.getHoum(), param.getLeng(), param.getLuck(), param.getHouk(), param.getBaku(),
                     param.getRaig(), param.getSaku(), param.getTais(), param.getTyku(), param.getSouk(),
                     itemInfo.toString()
@@ -540,18 +561,21 @@ public final class CreateReportLogic {
             }
 
             // 艦載機数
-            List<String> slotString = ship.getSlot();
+            List<ItemDto> slotItems = ship.getItem2();
+            String[] slotNames = new String[4];
             HpString[] onSlotString = new HpString[4];
-            if (ship.canEquipPlane()) { // 飛行機を装備できる場合だけ
-                List<ItemDto> slotItem = ship.getItem();
-                int[] onSlot = ship.getOnSlot();
-                int[] maxEq = shipInfo.getMaxeq();
-                int slotNum = ship.getSlotNum();
-                for (int i = 0; i < slotNum; ++i) {
-                    ItemDto item = slotItem.get(i);
+            int[] onSlot = ship.getOnSlot();
+            int[] maxEq = shipInfo.getMaxeq();
+            int slotNum = ship.getSlotNum();
+            for (int i = 0; i < slotNum; ++i) {
+                ItemDto item = slotItems.get(i);
+                if (ship.canEquipPlane()) { // 飛行機を装備できる場合だけ
                     int cur = ((item != null) && item.isPlane()) ? onSlot[i] : 0;
                     int max = maxEq != null ? maxEq[i] : 0;
                     onSlotString[i] = new HpString(cur, max);
+                }
+                if (item != null) {
+                    slotNames[i] = item.getFriendlyName();
                 }
             }
 
@@ -583,13 +607,13 @@ public final class CreateReportLogic {
                     ship.getExp(),
                     ship.getSeiku(),
                     new SakutekiString(ship),
-                    slotString.get(0),
+                    slotNames[0],
                     onSlotString[0],
-                    slotString.get(1),
+                    slotNames[1],
                     onSlotString[1],
-                    slotString.get(2),
+                    slotNames[2],
                     onSlotString[2],
-                    slotString.get(3),
+                    slotNames[3],
                     onSlotString[3],
                     ship.getMaxhp(),
                     ship.getFuelMax(),
@@ -944,7 +968,7 @@ public final class CreateReportLogic {
             // 艦種
             String type = ship.getType();
             // 装備
-            List<ItemDto> item = ship.getItem();
+            List<ItemInfoDto> item = ship.getItem();
 
             // テキストが入力されている場合処理する
             if (filter.regexp) {
@@ -964,7 +988,7 @@ public final class CreateReportLogic {
                     // 艦種で検索
                     find = find ? find : pattern.matcher(type).find();
                     // 装備で検索
-                    for (ItemDto itemDto : item) {
+                    for (ItemInfoDto itemDto : item) {
                         if ((itemDto == null) || (itemDto.getName() == null)) {
                             find = find ? find : false;
                         } else {
@@ -987,7 +1011,7 @@ public final class CreateReportLogic {
                     // 艦種で検索
                     find = find ? find : type.indexOf(words[i]) != -1;
                     // 装備で検索
-                    for (ItemDto itemDto : item) {
+                    for (ItemInfoDto itemDto : item) {
                         if ((itemDto == null) || (itemDto.getName() == null)) {
                             find = find ? find : false;
                         } else {
@@ -1091,9 +1115,9 @@ public final class CreateReportLogic {
         }
         // 装備でフィルタ
         if (!StringUtils.isEmpty(filter.itemname)) {
-            List<ItemDto> item = ship.getItem();
+            List<ItemInfoDto> item = ship.getItem();
             boolean hit = false;
-            for (ItemDto itemDto : item) {
+            for (ItemInfoDto itemDto : item) {
                 if (itemDto != null) {
                     if (filter.itemname.equals(itemDto.getName())) {
                         hit = true;
@@ -1141,7 +1165,7 @@ public final class CreateReportLogic {
         try {
             List<BattleExDto> dtoList = Collections.singletonList(dto);
 
-            File report = getStoreFile("海戦・ドロップ報告書.csv", "海戦・ドロップ報告書_alternativefile.csv");
+            File report = getStoreFile(AppConstants.LOG_BATTLE_RESULT, AppConstants.LOG_BATTLE_RESULT_ALT);
 
             CreateReportLogic.writeCsvStripFirstColumn(report,
                     CreateReportLogic.getBattleResultStoreHeader(),
@@ -1160,7 +1184,7 @@ public final class CreateReportLogic {
         try {
             List<GetShipDto> dtoList = Collections.singletonList(dto);
 
-            File report = getStoreFile("建造報告書.csv", "建造報告書_alternativefile.csv");
+            File report = getStoreFile(AppConstants.LOG_CREATE_SHIP, AppConstants.LOG_CREATE_SHIP_ALT);
 
             CreateReportLogic.writeCsvStripFirstColumn(report,
                     CreateReportLogic.getCreateShipHeader(),
@@ -1179,7 +1203,7 @@ public final class CreateReportLogic {
         try {
             List<CreateItemDto> dtoList = Collections.singletonList(dto);
 
-            File report = getStoreFile("開発報告書.csv", "開発報告書_alternativefile.csv");
+            File report = getStoreFile(AppConstants.LOG_CREATE_ITEM, AppConstants.LOG_CREATE_ITEM_ALT);
 
             CreateReportLogic.writeCsvStripFirstColumn(report,
                     CreateReportLogic.getCreateItemHeader(),
@@ -1198,7 +1222,7 @@ public final class CreateReportLogic {
         try {
             List<MissionResultDto> dtoList = Collections.singletonList(dto);
 
-            File report = getStoreFile("遠征報告書.csv", "遠征報告書_alternativefile.csv");
+            File report = getStoreFile(AppConstants.LOG_MISSION, AppConstants.LOG_MISSION_ALT);
 
             CreateReportLogic.writeCsvStripFirstColumn(report,
                     CreateReportLogic.getCreateMissionResultHeader(),
@@ -1218,7 +1242,7 @@ public final class CreateReportLogic {
             if (material != null) {
                 List<MaterialDto> dtoList = Collections.singletonList(material);
 
-                File report = getStoreFile("資材ログ.csv", "資材ログ_alternativefile.csv");
+                File report = getStoreFile(AppConstants.LOG_RESOURCE, AppConstants.LOG_RESOURCE_ALT);
 
                 CreateReportLogic.writeCsvStripFirstColumn(report,
                         CreateReportLogic.getMaterialHeader(),

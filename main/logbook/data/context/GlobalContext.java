@@ -7,12 +7,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
@@ -38,6 +38,7 @@ import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
+import logbook.dto.ItemInfoDto;
 import logbook.dto.KdockDto;
 import logbook.dto.LostEntityDto;
 import logbook.dto.MapCellDto;
@@ -190,12 +191,13 @@ public final class GlobalContext {
      * 装備を復元する
      * @param map
      */
-    public static void setItemMap(Map<Integer, Integer> map) {
-        for (Entry<Integer, Integer> entry : map.entrySet()) {
-            Integer id = entry.getValue();
-            ItemDto item = Item.get(id);
-            if (item != null) {
-                itemMap.put(entry.getKey(), item);
+    public static void setItemMap(Collection<ItemDto> items) {
+        for (ItemDto item : items) {
+            int id = item.getSlotitemId();
+            ItemInfoDto info = Item.get(id);
+            if (info != null) {
+                item.setInfo(info);
+                itemMap.put(item.getId(), item);
             }
         }
     }
@@ -520,6 +522,18 @@ public final class GlobalContext {
         case POWERUP:
             doPowerup(data);
             break;
+        // 艦娘ロック操作
+        case LOCK_SHIP:
+            doLockShip(data);
+            break;
+        // 装備ロック操作
+        case LOCK_SLOTITEM:
+            doLockSlotitem(data);
+            break;
+        // 装備改修
+        case REMODEL_SLOT:
+            doRemodelSlot(data);
+            break;
         // 海戦
         case BATTLE:
             doBattle(data, BattlePhaseKind.BATTLE);
@@ -551,6 +565,9 @@ public final class GlobalContext {
         // 海戦
         case COMBINED_BATTLE_SP_MIDNIGHT:
             doBattle(data, BattlePhaseKind.COMBINED_SP_MIDNIGHT);
+            break;
+        case COMBINED_BATTLE_WATER:
+            doBattle(data, BattlePhaseKind.COMBINED_BATTLE_WATER);
             break;
         // 海戦結果
         case BATTLE_RESULT:
@@ -712,96 +729,76 @@ public final class GlobalContext {
             if (dockdto != null) {
                 List<ShipDto> ships = dockdto.getShips();
 
-                DockDto newdock = new DockDto(dockdto.getId(), dockdto.getName());
                 if (shipidx == -1) {
-                    for (int i = 1; i < ships.size(); i++) {
-                        // 艦隊IDを外す
+                    // 旗艦以外解除
+                    for (int i = 1; i < ships.size(); ++i) {
                         ships.get(i).setFleetid("");
                     }
-                    // 旗艦以外解除
-                    newdock.addShip(ships.get(0));
+                    dockdto.removeExceptFlagship();
                 } else {
                     // 入れ替えまたは外す
-                    // 入れ替え後の艦娘(外す場合はnull)
+                    // 入れ替え前の艦娘(いない場合はnull)
+                    ShipDto cship = (shipidx < ships.size()) ? ships.get(shipidx) : null;
+                    // 入れる艦娘(外す場合はnull)
                     ShipDto rship = shipMap.get(shipid);
-                    ShipDto[] shiparray = new ShipDto[7];
+                    // 入れる艦娘の現在の所属艦隊(ない場合はnull)
+                    DockDto rdock = (rship != null) ? dock.get(rship.getFleetid()) : null;
+                    int rdockPos = (rship != null) ? rship.getFleetpos() : 0;
 
-                    for (int i = 0; i < ships.size(); i++) {
-                        // 艦隊IDを一旦全部外す
-                        ships.get(i).setFleetid("");
-                        shiparray[i] = ships.get(i);
+                    // 艦隊IDを一旦全部外す
+                    dockdto.removeFleetIdFromShips();
+                    if (rdock != null) {
+                        rdock.removeFleetIdFromShips();
                     }
-                    for (int i = 0; i < ships.size(); i++) {
-                        if (rship == ships.get(i)) {
-                            shiparray[i] = shiparray[shipidx];
+
+                    // 入れる艦娘の前の位置を処理
+                    if (rdock != null) {
+                        // この場合 rship != null は既知
+                        if (cship != null) {
+                            // 入れ替え
+                            rdock.setShip(rdockPos, cship);
+                        }
+                        else {
+                            // 取る
+                            rdock.removeShip(rship);
                         }
                     }
-                    shiparray[shipidx] = rship;
-                    for (int i = 0; i < shiparray.length; ++i) {
-                        ShipDto shipdto = shiparray[i];
-                        if (shipdto != null) {
-                            shipdto.setFleetid(fleetid);
-                            shipdto.setFleetpos(i);
-                            newdock.addShip(shipdto);
-                        }
+
+                    // 入れる位置を処理
+                    if (rship == null) {
+                        // 取る
+                        dockdto.removeShip(cship);
+                    }
+                    else if (cship != null) {
+                        // rship != null && cship != null
+                        // 入れ替え
+                        dockdto.setShip(shipidx, rship);
+                    }
+                    else {
+                        // rship != null && cship == null
+                        // 入れる
+                        dockdto.addShip(rship);
+                    }
+
+                    // 艦隊IDを付け直す
+                    dockdto.updateFleetIdOfShips();
+                    dockdto.setUpdate(true);
+                    if (rdock != null) {
+                        rdock.updateFleetIdOfShips();
+                        rdock.setUpdate(true);
                     }
                 }
-                if ("1".equals(fleetid)) {
+                DockDto firstdock = dock.get("1");
+                if (firstdock != null) {
                     // 秘書艦を再設定
-                    setSecretary(newdock.getShips().get(0));
+                    setSecretary(firstdock.getShips().get(0));
                 }
-                dock.put(fleetid, newdock);
             }
+            addConsole("編成を更新しました");
         } catch (Exception e) {
             LOG.warn("編成を更新しますに失敗しました", e);
             LOG.warn(data);
         }
-    }
-
-    /**
-     * ダメージ計算があっているか検証します
-     * @param dockShips 更新されたShipDto
-     * @param nowhp ダメージ計算結果
-     */
-    private static void checkBattleDamage(List<ShipDto> dockShips, int[] nowhp) {
-        for (int i = 0; i < dockShips.size(); ++i) {
-            ShipDto new_ship = shipMap.get(dockShips.get(i).getId());
-            if (new_ship == null)
-                continue; // 轟沈した！
-            if (new_ship.getNowhp() != nowhp[i]) {
-                LOG.warn("ダメージ計算ミスが発生しています。" + new_ship.getName() + "の現在のHPは" + new_ship.getNowhp()
-                        + "ですが、ダメージ計算では" + nowhp[i] + "と計算されていました。");
-                addConsole("ダメージ計算ミス発生！（詳細はログ）");
-            }
-        }
-    }
-
-    /**
-     * 取得した情報に不完全なものがないかチェック
-     * @return　新しいstate
-     */
-    private static int checkDataState() {
-        if (state == 3) {
-            // アカウントが変わった場合はチェックするまでもない
-            return state;
-        }
-        // 所有艦娘のマスターデータが全てあるか見る
-        for (ShipDto ship : shipMap.values()) {
-            if (ship.getShipInfo().getName().length() == 0) {
-                return 2;
-            }
-        }
-        // 艦娘の装備IDが全てあるか見る
-        for (ShipDto ship : shipMap.values()) {
-            for (int itemId : ship.getItemId()) {
-                if (itemId != -1) {
-                    if (itemMap.containsKey(itemId) == false) {
-                        return 2;
-                    }
-                }
-            }
-        }
-        return 1; // 正常
     }
 
     /**
@@ -865,6 +862,7 @@ public final class GlobalContext {
                 if (apidata.containsKey("api_combined_flag")) {
                     switch (apidata.getJsonNumber("api_combined_flag").intValue()) {
                     case 1:
+                    case 2:
                         combined = true;
                         break;
                     default:
@@ -1120,13 +1118,7 @@ public final class GlobalContext {
             if ((slotitem != null) && (slotitem != JsonValue.NULL)) {
                 JsonArray slotitemArray = (JsonArray) slotitem;
                 for (int i = 0; i < slotitemArray.size(); i++) {
-                    JsonObject object = (JsonObject) slotitemArray.get(i);
-                    int typeid = object.getInt("api_slotitem_id");
-                    int id = object.getJsonNumber("api_id").intValue();
-                    ItemDto item = Item.get(typeid);
-                    if (item != null) {
-                        itemMap.put(id, item);
-                    }
+                    addSlotitem((JsonObject) slotitemArray.get(i));
                 }
             }
             // 艦娘を追加します
@@ -1176,13 +1168,8 @@ public final class GlobalContext {
 
             CreateItemDto createitem = new CreateItemDto(apidata, resources);
             if (createitem.isCreateFlag()) {
-                JsonObject object = apidata.getJsonObject("api_slot_item");
-                int typeid = object.getJsonNumber("api_slotitem_id").intValue();
-                int id = object.getInt("api_id");
-                ItemDto item = Item.get(typeid);
+                ItemDto item = addSlotitem(apidata.getJsonObject("api_slot_item"));
                 if (item != null) {
-                    itemMap.put(id, item);
-
                     createitem.setName(item.getName());
                     createitem.setType(item.getTypeName());
                     createItemList.add(createitem);
@@ -1219,12 +1206,7 @@ public final class GlobalContext {
             itemMap.clear();
             for (int i = 0; i < apidata.size(); i++) {
                 JsonObject object = (JsonObject) apidata.get(i);
-                int typeid = object.getJsonNumber("api_slotitem_id").intValue();
-                int id = object.getInt("api_id");
-                ItemDto item = Item.get(typeid);
-                if (item != null) {
-                    itemMap.put(id, item);
-                }
+                addSlotitem(object);
             }
 
             state = checkDataState();
@@ -1485,6 +1467,7 @@ public final class GlobalContext {
                         if (dockdto != null) {
                             dockdto.removeShip(ship);
                             dockdto.setUpdate(true);
+                            dockdto.updateFleetIdOfShips();
                         }
                     }
                 }
@@ -1500,9 +1483,9 @@ public final class GlobalContext {
             if (fleetid != null) {
                 DockDto dockdto = dock.get(fleetid);
                 if (dockdto != null) {
-                    dockdto.replaceShip(oldShip, ship);
                     ship.setFleetid(fleetid);
                     ship.setFleetpos(oldShip.getFleetpos());
+                    dockdto.setShip(ship.getFleetpos(), ship);
                 }
             }
             shipMap.put(id, ship);
@@ -1510,6 +1493,52 @@ public final class GlobalContext {
             addConsole("近代化改修しました");
         } catch (Exception e) {
             LOG.warn("近代化改修しますに失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 艦娘ロックを更新する
+     * 
+     * @param data
+     */
+    private static void doLockShip(Data data) {
+        try {
+            JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+            int shipId = Integer.valueOf(data.getField("api_ship_id"));
+            boolean locked = apidata.getInt("api_locked") != 0;
+
+            ShipDto dto = shipMap.get(shipId);
+            if (dto != null) {
+                dto.setLocked(locked);
+            }
+
+            addConsole("艦娘ロックを更新しました");
+        } catch (Exception e) {
+            LOG.warn("艦娘ロックを更新するに失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 装備ロックを更新する
+     * 
+     * @param data
+     */
+    private static void doLockSlotitem(Data data) {
+        try {
+            JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+            int slotitemId = Integer.valueOf(data.getField("api_slotitem_id"));
+            boolean locked = apidata.getInt("api_locked") != 0;
+
+            ItemDto dto = itemMap.get(slotitemId);
+            if (dto != null) {
+                dto.setLocked(locked);
+            }
+
+            addConsole("装備ロックを更新しました");
+        } catch (Exception e) {
+            LOG.warn("装備ロックを更新するに失敗しました", e);
             LOG.warn(data);
         }
     }
@@ -1930,7 +1959,7 @@ public final class GlobalContext {
                 JsonArray apiMstSlotitem = obj.getJsonArray("api_mst_slotitem");
                 for (int i = 0; i < apiMstSlotitem.size(); i++) {
                     JsonObject object = (JsonObject) apiMstSlotitem.get(i);
-                    ItemDto item = new ItemDto(object);
+                    ItemInfoDto item = new ItemInfoDto(object);
                     int id = object.getJsonNumber("api_id").intValue();
                     Item.set(id, item);
                 }
@@ -2062,6 +2091,85 @@ public final class GlobalContext {
             LOG.warn("連合艦隊情報更新に失敗しました", e);
             LOG.warn(data);
         }
+    }
+
+    /**
+     * 装備改修
+     */
+    private static void doRemodelSlot(Data data) {
+        try {
+            JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+            if (apidata != null) {
+                if (apidata.getInt("api_remodel_flag") != 0) {
+                    // 改修したアイテムを更新
+                    addSlotitem(apidata.getJsonObject("api_after_slot"));
+                }
+            }
+            addConsole("装備改修を更新しました");
+        } catch (Exception e) {
+            LOG.warn("装備改修更新に失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    // 補助メソッド //
+
+    /**
+     * ダメージ計算があっているか検証します
+     * @param dockShips 更新されたShipDto
+     * @param nowhp ダメージ計算結果
+     */
+    private static void checkBattleDamage(List<ShipDto> dockShips, int[] nowhp) {
+        for (int i = 0; i < dockShips.size(); ++i) {
+            ShipDto new_ship = shipMap.get(dockShips.get(i).getId());
+            if (new_ship == null)
+                continue; // 轟沈した！
+            if (new_ship.getNowhp() != nowhp[i]) {
+                LOG.warn("ダメージ計算ミスが発生しています。" + new_ship.getName() + "の現在のHPは" + new_ship.getNowhp()
+                        + "ですが、ダメージ計算では" + nowhp[i] + "と計算されていました。");
+                addConsole("ダメージ計算ミス発生！（詳細はログ）");
+            }
+        }
+    }
+
+    /**
+     * 取得した情報に不完全なものがないかチェック
+     * @return　新しいstate
+     */
+    private static int checkDataState() {
+        if (state == 3) {
+            // アカウントが変わった場合はチェックするまでもない
+            return state;
+        }
+        // 所有艦娘のマスターデータが全てあるか見る
+        for (ShipDto ship : shipMap.values()) {
+            if (ship.getShipInfo().getName().length() == 0) {
+                return 2;
+            }
+        }
+        // 艦娘の装備IDが全てあるか見る
+        for (ShipDto ship : shipMap.values()) {
+            for (int itemId : ship.getItemId()) {
+                if (itemId != -1) {
+                    if (itemMap.containsKey(itemId) == false) {
+                        return 2;
+                    }
+                }
+            }
+        }
+        return 1; // 正常
+    }
+
+    /** 装備アイテムをitemMapに追加 */
+    private static ItemDto addSlotitem(JsonObject object) {
+        int slotitemId = object.getInt("api_slotitem_id");
+        ItemInfoDto info = Item.get(slotitemId);
+        if (info != null) {
+            ItemDto dto = new ItemDto(info, object);
+            itemMap.put(dto.getId(), dto);
+            return dto;
+        }
+        return null;
     }
 
     private static void updateDetailedMaterial(String ev, ResourceItemDto res, MATERIAL_DIFF diff) {

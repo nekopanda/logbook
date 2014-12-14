@@ -8,7 +8,7 @@ import java.util.List;
 import logbook.dto.BattleExDto;
 import logbook.dto.DockDto;
 import logbook.dto.EnemyShipDto;
-import logbook.dto.ItemDto;
+import logbook.dto.ItemInfoDto;
 import logbook.dto.ShipDto;
 import logbook.internal.EnemyData;
 
@@ -55,14 +55,14 @@ public class BattleShipWindow extends BattleWindowBase {
             this.friendLabels[newIndex].setFont(this.getBoldFont());
             ShipDto ship = this.getFriendShips()[newIndex];
             if (ship != null) {
-                List<ItemDto> slots = ship.getItem();
+                List<ItemInfoDto> slots = ship.getItem();
                 int[] onSlots = ship.getOnSlot(); // 現在の艦載機搭載数
                 int[] maxeq = ship.getShipInfo().getMaxeq(); // 艦載機最大搭載数
                 for (int i = 0; i < 4; ++i) {
                     if (i < slots.size()) {
                         String onSlot = "";
                         String itemName = "";
-                        ItemDto item = slots.get(i);
+                        ItemInfoDto item = slots.get(i);
                         if (item != null) {
                             if (item.isPlane()) {
                                 String max = (maxeq == null) ? "?" : String.valueOf(maxeq[i]);
@@ -100,13 +100,13 @@ public class BattleShipWindow extends BattleWindowBase {
                 this.enemyLabels[newIndex].setFont(this.getBoldFont());
                 EnemyShipDto ship = this.getBattle().getEnemy().get(newIndex);
                 if (ship != null) {
-                    List<ItemDto> slots = ship.getItem();
+                    List<ItemInfoDto> slots = ship.getItem();
                     int[] maxeq = ship.getShipInfo().getMaxeq(); // 艦載機最大搭載数
                     for (int i = 0; i < 5; ++i) {
                         if (i < slots.size()) {
                             String onSlot = "";
                             String itemName = "";
-                            ItemDto item = slots.get(i);
+                            ItemInfoDto item = slots.get(i);
                             if (item != null) {
                                 if (item.isPlane()) {
                                     onSlot = (maxeq == null) ? "?" : String.valueOf(maxeq[i]);

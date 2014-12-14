@@ -129,7 +129,7 @@ public class ShipParameters {
     }
 
     /** 艦娘用 (現在値, MAX, 装備による上昇分) */
-    public static ShipParameters[] fromShip(JsonObject object, List<ItemDto> slotitem, ShipInfoDto masterShip) {
+    public static ShipParameters[] fromShip(JsonObject object, List<ItemInfoDto> slotitem, ShipInfoDto masterShip) {
         ShipParameters[] ret = new ShipParameters[3];
         for (int i = 0; i < 2; ++i) {
             ShipParameters param = new ShipParameters();
@@ -154,7 +154,7 @@ public class ShipParameters {
 
         // 装備の上昇分を計算
         ShipParameters slotParam = new ShipParameters();
-        for (ItemDto item : slotitem) {
+        for (ItemInfoDto item : slotitem) {
             if (item != null) {
                 slotParam.add(item.getParam());
             }
@@ -165,12 +165,12 @@ public class ShipParameters {
     }
 
     /** 敵艦用 (装備込, 装備による上昇分) */
-    public static ShipParameters[] fromBaseAndSlotItem(ShipParameters base, List<ItemDto> slotitem) {
+    public static ShipParameters[] fromBaseAndSlotItem(ShipParameters base, List<ItemInfoDto> slotitem) {
         ShipParameters slotParam = new ShipParameters();
         ShipParameters total = new ShipParameters();
 
         // 装備の上昇分を計算
-        for (ItemDto item : slotitem) {
+        for (ItemInfoDto item : slotitem) {
             if (item != null) {
                 slotParam.add(item.getParam());
             }

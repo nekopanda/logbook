@@ -176,7 +176,7 @@ public class TestDataFeeder extends WindowBase {
             try {
                 Data data = new TestData(filepath);
                 GlobalContext.updateContext(data);
-            } catch (ParseException | IOException e) {
+            } catch (ParseException | IOException | IllegalArgumentException e) {
                 e.printStackTrace();
             }
         }
@@ -209,7 +209,7 @@ public class TestDataFeeder extends WindowBase {
                 if (data.getDataType() == type) {
                     break;
                 }
-            } catch (ParseException | IOException e) {
+            } catch (ParseException | IOException | IllegalArgumentException e) {
                 e.printStackTrace();
             }
         }
@@ -222,7 +222,7 @@ public class TestDataFeeder extends WindowBase {
                 Data data = new TestData(filepath);
                 GlobalContext.updateContext(data);
                 this.updateLabel();
-            } catch (ParseException | IOException e) {
+            } catch (ParseException | IOException | IllegalArgumentException e) {
                 e.printStackTrace();
             }
         }

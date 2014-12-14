@@ -210,6 +210,10 @@ public class BattleResultServer {
         return this.resultList.size();
     }
 
+    public BattleResultDto[] getList() {
+        return this.resultList.toArray(new BattleResultDto[this.resultList.size()]);
+    }
+
     public List<BattleResultDto> getFilteredList(BattleResultFilter filter) {
         List<BattleResultDto> list = new ArrayList<BattleResultDto>();
         for (BattleResult result : this.resultList) {

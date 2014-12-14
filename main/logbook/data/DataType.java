@@ -47,6 +47,8 @@ public enum DataType {
     COMBINED_BATTLE_MIDNIGHT("/kcsapi/api_req_combined_battle/midnight_battle"),
     /** 戦闘 */
     COMBINED_BATTLE_SP_MIDNIGHT("/kcsapi/api_req_combined_battle/sp_midnight"),
+    /** 戦闘 */
+    COMBINED_BATTLE_WATER("/kcsapi/api_req_combined_battle/battle_water"),
     /** 戦闘結果 */
     BATTLE_RESULT("/kcsapi/api_req_sortie/battleresult"),
     /** 戦闘結果(連合艦隊) */
@@ -65,6 +67,12 @@ public enum DataType {
     DESTROY_ITEM2("/kcsapi/api_req_kousyou/destroyitem2"),
     /** 近代化改修 */
     POWERUP("/kcsapi/api_req_kaisou/powerup"),
+    /** 艦娘のロック操作 */
+    LOCK_SHIP("/kcsapi/api_req_hensei/lock"),
+    /** 装備ロック操作 */
+    LOCK_SLOTITEM("/kcsapi/api_req_kaisou/lock"),
+    /** 装備改修 */
+    REMODEL_SLOT("/kcsapi/api_req_kousyou/remodel_slot"),
     /** 出撃 */
     START("/kcsapi/api_req_map/start"),
     /** 進撃 */

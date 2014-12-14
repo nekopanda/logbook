@@ -209,7 +209,7 @@ public class BattleWindow extends BattleWindowBase {
     private MVPShip[] computeMVP(int[] ydam, List<ShipDto> ships) {
         MVPShip[] sortArray = new MVPShip[ships.size()];
         for (int i = 0; i < ships.size(); ++i) {
-            sortArray[i] = new MVPShip(ships.get(i), this.yDamages[i]);
+            sortArray[i] = new MVPShip(ships.get(i), ydam[i]);
         }
         Arrays.sort(sortArray, new Comparator<MVPShip>() {
             @Override

@@ -1,9 +1,9 @@
 package logbook.config;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
@@ -25,11 +25,8 @@ public class ItemConfig {
      * 設定ファイルに書き込みます
      */
     public static void store() throws IOException {
-        Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-        for (Entry<Integer, ItemDto> entry : GlobalContext.getItemMap().entrySet()) {
-            map.put(entry.getKey(), entry.getValue().getId());
-        }
-        BeanUtils.writeObject(AppConstants.ITEM_CONFIG_FILE, map);
+        List<ItemDto> tmp = new ArrayList<ItemDto>(GlobalContext.getItemMap().values());
+        BeanUtils.writeObject(AppConstants.ITEM_CONFIG_FILE, tmp);
     }
 
     /**
@@ -40,9 +37,9 @@ public class ItemConfig {
      */
     public static void load() {
         try {
-            Map<Integer, Integer> map = BeanUtils.readObject(AppConstants.ITEM_CONFIG_FILE, Map.class);
-            if ((map != null) && (map.size() > 0)) {
-                GlobalContext.setItemMap(map);
+            Collection<ItemDto> list = BeanUtils.readObject(AppConstants.ITEM_CONFIG_FILE, Collection.class);
+            if ((list != null) && (list.size() > 0)) {
+                GlobalContext.setItemMap(list);
             }
         } catch (Exception e) {
             LOG.warn("艦娘のIDと名前の紐付けを設定ファイルから読み込みますに失敗しました", e);

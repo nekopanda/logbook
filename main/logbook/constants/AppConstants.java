@@ -3,6 +3,7 @@ package logbook.constants;
 import java.io.File;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.TimeZone;
 
 import org.eclipse.swt.graphics.RGB;
 
@@ -12,8 +13,11 @@ import org.eclipse.swt.graphics.RGB;
  */
 public class AppConstants {
 
+    /**　アプリケーション名 */
+    public static final String NAME = "航海日誌";
+
     /** バージョン */
-    public static final String VERSION = "1.2.0";
+    public static final String VERSION = "1.3.0";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://nekopanda.blog.jp/");
@@ -25,11 +29,20 @@ public class AppConstants {
     /** 日付書式 */
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-    /** 日付書式 */
+    /** 日付書式(時刻のみ) */
     public static final String DATE_SHORT_FORMAT = "HH:mm:ss";
 
+    /** 日付書式(日付のみ) */
+    public static final String DATE_DAYS_FORMAT = "yyyy-MM-dd";
+
+    /** 日付書式(ミリ秒を含む) */
+    public static final String DATE_LONG_FORMAT = "yyyy-MM-dd HH-mm-ss.SSS";
+
+    /** タイムゾーン(任務が更新される05:00JSTに0:00になるタイムゾーン) */
+    public static final TimeZone TIME_ZONE_MISSION = TimeZone.getTimeZone("GMT+04:00");
+
     /** 戦闘ログファイルの名前 */
-    public static final String BATTLE_LOGFILE_DATE_FORMAT = "yyyy-MM-dd";
+    public static final String BATTLE_LOGFILE_DATE_FORMAT = DATE_DAYS_FORMAT;
 
     /** 疲労赤色 */
     public static final int COND_RED = 20;
@@ -148,7 +161,7 @@ public class AppConstants {
     public static final File ENEMY_DATA_FILE = new File("./config/KCRDB-enemyid.csv");
 
     /** 出撃ログ表示用CSSファイル */
-    public static final File BATTLE_LOG_CSS_FILE = new File("./config/battle-log.css");
+    public static final File BATTLE_LOG_CSS_FILE = new File("./templates/battle-log.css");
 
     /** 保有資材:燃料 */
     public static final int MATERIAL_FUEL = 1;
@@ -432,4 +445,35 @@ public class AppConstants {
     public static final String MESSAGE_TOTAL_DAIHATSU = "大発:{0} (+{1}%)";
 
     /** タイトルバーに表示するデフォルトテキスト */
-    public static final String TITLEBAR_TEXT = "航海日誌拡張版 " + VERSION;}
+    public static final String TITLEBAR_TEXT = "航海日誌拡張版 " + VERSION;
+
+    /** 海戦・ドロップ報告書.csv */
+    public static final String LOG_BATTLE_RESULT = "海戦・ドロップ報告書.csv";
+
+    /** 海戦・ドロップ報告書_alternativefile.csv */
+    public static final String LOG_BATTLE_RESULT_ALT = "海戦・ドロップ報告書_alternativefile.csv";
+
+    /** 建造報告書.csv */
+    public static final String LOG_CREATE_SHIP = "建造報告書.csv";
+
+    /** 建造報告書_alternativefile.csv */
+    public static final String LOG_CREATE_SHIP_ALT = "建造報告書_alternativefile.csv";
+
+    /** 開発報告書.csv */
+    public static final String LOG_CREATE_ITEM = "開発報告書.csv";
+
+    /** 開発報告書_alternativefile.csv */
+    public static final String LOG_CREATE_ITEM_ALT = "開発報告書_alternativefile.csv";
+
+    /** 遠征報告書.csv */
+    public static final String LOG_MISSION = "遠征報告書.csv";
+
+    /** 遠征報告書.csv */
+    public static final String LOG_MISSION_ALT = "遠征報告書_alternativefile.csv";
+
+    /** 資材ログ.csv */
+    public static final String LOG_RESOURCE = "資材ログ.csv";
+
+    /** 資材ログ_alternativefile.csv */
+    public static final String LOG_RESOURCE_ALT = "資材ログ_alternativefile.csv";
+}

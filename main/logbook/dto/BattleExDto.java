@@ -10,6 +10,7 @@ import java.util.List;
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
+import javax.json.JsonValue;
 
 import logbook.data.context.GlobalContext;
 import logbook.internal.EnemyData;
@@ -116,6 +117,10 @@ public class BattleExDto extends AbstractDto {
     @Tag(26)
     private int mvpCombined;
 
+    /** 提督Lv */
+    @Tag(27)
+    private int hqLv;
+
     /////////////////////////////////////////////////
 
     public static class Phase {
@@ -221,13 +226,18 @@ public class BattleExDto extends AbstractDto {
             JsonNumber support_flag = object.getJsonNumber("api_support_flag");
             if ((support_flag != null) && (support_flag.intValue() != 0)) {
                 JsonObject support = object.getJsonObject("api_support_info");
-                if (support != null) {
-                    JsonObject support_hourai = support.getJsonObject("api_support_hourai");
-                    if (support_hourai != null) {
-                        JsonArray edam = support_hourai.getJsonArray("api_damage");
-                        if (edam != null) {
-                            this.support = BattleAtackDto.makeSupport(edam);
-                        }
+                JsonValue support_hourai = support.get("api_support_hourai");
+                JsonValue support_air = support.get("api_support_airatack");
+                if ((support_hourai != null) && (support_hourai != JsonValue.NULL)) {
+                    JsonArray edam = ((JsonObject) support_hourai).getJsonArray("api_damage");
+                    if (edam != null) {
+                        this.support = BattleAtackDto.makeSupport(edam);
+                    }
+                }
+                else if ((support_air != null) && (support_air != JsonValue.NULL)) {
+                    JsonValue stage3 = ((JsonObject) support_air).get("api_stage3");
+                    if ((stage3 != null) && (stage3 != JsonValue.NULL)) {
+                        this.support = BattleAtackDto.makeSupport(((JsonObject) stage3).getJsonArray("api_edam"));
                     }
                 }
                 this.supportType = toSupport(support_flag.intValue());
@@ -242,18 +252,16 @@ public class BattleExDto extends AbstractDto {
                 this.air2 = new AirBattleDto(kouku2, isCombined);
 
             // 開幕
-            this.opening = BattleAtackDto.makeRaigeki(object.get("api_opening_atack"), isCombined);
+            this.opening = BattleAtackDto.makeRaigeki(object.get("api_opening_atack"), kind.isOpeningSecond());
 
             // 砲撃
-            this.hougeki = BattleAtackDto.makeHougeki(object.get("api_hougeki"), (isCombined && this.isNight)); // 夜戦
-            this.hougeki1 = BattleAtackDto.makeHougeki(object.get("api_hougeki1"), isCombined);
+            this.hougeki = BattleAtackDto.makeHougeki(object.get("api_hougeki"), kind.isHougekiSecond()); // 夜戦
+            this.hougeki1 = BattleAtackDto.makeHougeki(object.get("api_hougeki1"), kind.isHougeki1Second());
+            this.hougeki2 = BattleAtackDto.makeHougeki(object.get("api_hougeki2"), kind.isHougeki2Second());
+            this.hougeki3 = BattleAtackDto.makeHougeki(object.get("api_hougeki3"), kind.isHougeki3Second());
 
             // 雷撃
-            this.raigeki = BattleAtackDto.makeRaigeki(object.get("api_raigeki"), isCombined);
-
-            // 砲撃（連合艦隊用）
-            this.hougeki2 = BattleAtackDto.makeHougeki(object.get("api_hougeki2"), false);
-            this.hougeki3 = BattleAtackDto.makeHougeki(object.get("api_hougeki3"), false);
+            this.raigeki = BattleAtackDto.makeRaigeki(object.get("api_raigeki"), kind.isRaigekiSecond());
 
             // ダメージを反映 //
 
@@ -793,6 +801,7 @@ public class BattleExDto extends AbstractDto {
         if (JsonUtils.hasKey(object, "api_mvp_combined")) {
             this.mvpCombined = object.getInt("api_mvp_combined");
         }
+        this.hqLv = object.getInt("api_member_lv");
     }
 
     private static String toFormation(int f) {
@@ -1125,5 +1134,12 @@ public class BattleExDto extends AbstractDto {
      */
     public int getMvpCombined() {
         return this.mvpCombined;
+    }
+
+    /**
+     * @return hqLv
+     */
+    public int getHqLv() {
+        return this.hqLv;
     }
 }

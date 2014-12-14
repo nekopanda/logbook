@@ -11,7 +11,7 @@ import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.dto.DockDto;
-import logbook.dto.ItemDto;
+import logbook.dto.ItemInfoDto;
 import logbook.dto.ShipDto;
 import logbook.gui.ApplicationMain;
 import logbook.gui.logic.SakutekiString;
@@ -405,10 +405,10 @@ public class FleetComposite extends Composite {
             }
 
             // ステータス.ダメコン
-            List<ItemDto> item = ship.getItem();
+            List<ItemInfoDto> item = ship.getItem();
             int dmgcsty = 0;
             int dmgcstm = 0;
-            for (ItemDto itemDto : item) {
+            for (ItemInfoDto itemDto : item) {
                 if (itemDto != null) {
                     if (itemDto.getName().equals("応急修理要員")) {
                         dmgcsty++;
@@ -588,7 +588,7 @@ public class FleetComposite extends Composite {
             this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_COND, this.clearDate), null);
         }
         // 索敵 計算
-        SakutekiString fleetStatus = new SakutekiString(ships);
+        SakutekiString fleetStatus = new SakutekiString(ships, GlobalContext.hqLevel());
         // 制空
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_SEIKU, seiku), null);
         // 索敵
@@ -644,9 +644,9 @@ public class FleetComposite extends Composite {
                         sb.append(shipDto.getName());
                         sb.append("(" + shipDto.getLv() + ")");
                         sb.append(" : ");
-                        List<ItemDto> items = shipDto.getItem();
+                        List<ItemInfoDto> items = shipDto.getItem();
                         List<String> names = new ArrayList<String>();
-                        for (ItemDto itemDto : items) {
+                        for (ItemInfoDto itemDto : items) {
                             if (itemDto != null) {
                                 names.add(itemDto.getName());
                             }

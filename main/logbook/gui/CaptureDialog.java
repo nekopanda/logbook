@@ -16,6 +16,7 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
 
 import logbook.config.AppConfig;
+import logbook.constants.AppConstants;
 import logbook.gui.logic.LayoutLogic;
 import logbook.util.AwtUtils;
 
@@ -189,7 +190,22 @@ public final class CaptureDialog extends WindowBase {
             c.setData("disable-drag-move", true);
         }
 
+        // 設定を反映
+        this.setCaptureRect(intToRect(AppConfig.get().getCaptureRect()));
+
         this.shell.pack();
+    }
+
+    private static Rectangle intToRect(int[] intRect) {
+        if (intRect == null)
+            return null;
+        return new Rectangle(intRect[0], intRect[1], intRect[2], intRect[3]);
+    }
+
+    private static int[] rectToInt(Rectangle rect) {
+        if (rect == null)
+            return null;
+        return new int[] { rect.x, rect.y, rect.width, rect.height };
     }
 
     /**
@@ -206,6 +222,16 @@ public final class CaptureDialog extends WindowBase {
             return "開 始";
         } else {
             return "キャプチャ";
+        }
+    }
+
+    private void setCaptureRect(Rectangle rectangle) {
+        if ((rectangle != null) && (rectangle.width > 1) && (rectangle.height > 1)) {
+            this.rectangle = rectangle;
+            AppConfig.get().setCaptureRect(rectToInt(rectangle));
+            this.text.setText("(" + rectangle.x + "," + rectangle.y + ")-("
+                    + (rectangle.x + rectangle.width) + "," + (rectangle.y + rectangle.height) + ")");
+            this.capture.setEnabled(true);
         }
     }
 
@@ -227,22 +253,17 @@ public final class CaptureDialog extends WindowBase {
                 Thread.sleep(WAIT);
                 // ディスプレイに対してGraphics Contextを取得する(フルスクリーンキャプチャ)
                 GC gc = new GC(display);
-                Image image = new Image(display, display.getBounds());
-                gc.copyArea(image, 0, 0);
+                Rectangle rect = display.getBounds();
+                Image image = new Image(display, rect);
+                gc.copyArea(image, rect.x, rect.y);
                 gc.dispose();
 
                 try {
                     // 範囲を取得する
-                    Rectangle rectangle = new FullScreenDialog(CaptureDialog.this.shell, image,
-                            CaptureDialog.this.shell.getMonitor())
+                    Rectangle rectangle = new FullScreenDialog(CaptureDialog.this.shell, image, display)
                             .open();
 
-                    if ((rectangle != null) && (rectangle.width > 1) && (rectangle.height > 1)) {
-                        CaptureDialog.this.rectangle = rectangle;
-                        CaptureDialog.this.text.setText("(" + rectangle.x + "," + rectangle.y + ")-("
-                                + (rectangle.x + rectangle.width) + "," + (rectangle.y + rectangle.height) + ")");
-                        CaptureDialog.this.capture.setEnabled(true);
-                    }
+                    CaptureDialog.this.setCaptureRect(rectangle);
                 } finally {
                     image.dispose();
                 }
@@ -310,9 +331,9 @@ public final class CaptureDialog extends WindowBase {
         /** Jpeg品質 */
         private static final float QUALITY = 0.9f;
         /** 日付フォーマット(ファイル名) */
-        private final SimpleDateFormat fileNameFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss.SSS");
+        private final SimpleDateFormat fileNameFormat = new SimpleDateFormat(AppConstants.DATE_LONG_FORMAT);
         /** 日付フォーマット(ディレクトリ名) */
-        private final SimpleDateFormat dirNameFormat = new SimpleDateFormat("yyyy-MM-dd");
+        private final SimpleDateFormat dirNameFormat = new SimpleDateFormat(AppConstants.DATE_DAYS_FORMAT);
         /** キャプチャ範囲 */
         private final Rectangle rectangle;
         /** トリム範囲 */

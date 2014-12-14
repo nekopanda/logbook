@@ -1,6 +1,9 @@
 package logbook.gui;
 
 import java.awt.Desktop;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -31,10 +34,10 @@ import logbook.gui.logic.Sound;
 import logbook.gui.widgets.FleetComposite;
 import logbook.internal.BattleResultServer;
 import logbook.internal.EnemyData;
+import logbook.internal.Item;
 import logbook.internal.MasterData;
 import logbook.server.proxy.DatabaseClient;
 import logbook.server.proxy.ProxyServer;
-import logbook.server.web.WebServer;
 import logbook.thread.ThreadManager;
 import logbook.thread.ThreadStateObserver;
 import logbook.util.SwtUtils;
@@ -122,7 +125,6 @@ public final class ApplicationMain extends WindowBase {
                 SWTResourceManager.dispose();
                 // プロキシサーバーをシャットダウンする
                 ProxyServer.end();
-                WebServer.end();
                 DatabaseClient.end();
 
                 // 設定を書き込みます
@@ -243,6 +245,8 @@ public final class ApplicationMain extends WindowBase {
      */
     public static void main(String[] args) {
         try {
+            // グループ化のためのアプリケーションID (Windows 7以降)
+            Display.setAppName(AppConstants.NAME);
             // 設定読み込み
             sysPrint("起動");
             AppConfig.load();
@@ -265,9 +269,13 @@ public final class ApplicationMain extends WindowBase {
             LOG.fatal("メインスレッドが異常終了しました", e);
         } catch (Exception e) {
             LOG.fatal("メインスレッドが異常終了しました", e);
+        } finally {
+            // リソースを開放する
+            SWTResourceManager.dispose();
+            // プロキシサーバーをシャットダウンする
+            ProxyServer.end();
+            DatabaseClient.end();
         }
-        // 
-        new Thread(new ShutdownHookThread()).start();
     }
 
     /**
@@ -489,10 +497,6 @@ public final class ApplicationMain extends WindowBase {
         calcpracticeexp.setAccelerator(SWT.CTRL + 'V');
         this.calcPracticeExpWindow = new CalcPracticeExpDialog(this.dummyHolder, calcpracticeexp);
 
-        // その他-グループエディター
-        MenuItem shipgroup = new MenuItem(etcmenu, SWT.CHECK);
-        shipgroup.setText("グループエディター(&G)");
-        this.shipFilterGroupWindow = new ShipFilterGroupDialog(this.dummyHolder, shipgroup);
         // その他-資材チャート
         MenuItem resourceChart = new MenuItem(etcmenu, SWT.NONE);
         resourceChart.setText("資材チャート(&R)");
@@ -502,6 +506,22 @@ public final class ApplicationMain extends WindowBase {
                 new ResourceChartDialog(ApplicationMain.this.dummyHolder).open();
             }
         });
+        // コマンド-出撃統計
+        MenuItem battleCounter = new MenuItem(etcmenu, SWT.NONE);
+        battleCounter.setText("出撃統計(&A)\tCtrl+A");
+        battleCounter.setAccelerator(SWT.CTRL + 'A');
+        battleCounter.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                new BattleAggDialog(ApplicationMain.this.shell).open();
+            }
+        });
+        // セパレータ
+        new MenuItem(etcmenu, SWT.SEPARATOR);
+        // その他-グループエディター
+        MenuItem shipgroup = new MenuItem(etcmenu, SWT.CHECK);
+        shipgroup.setText("グループエディター(&G)");
+        this.shipFilterGroupWindow = new ShipFilterGroupDialog(this.dummyHolder, shipgroup);
         // その他-自動プロキシ構成スクリプトファイル生成
         MenuItem pack = new MenuItem(etcmenu, SWT.NONE);
         pack.setText("自動プロキシ構成スクリプト");
@@ -526,8 +546,6 @@ public final class ApplicationMain extends WindowBase {
                 ApplicationMain.this.moveWindowsIntoDisplay();
             }
         });
-        // セパレータ
-        new MenuItem(etcmenu, SWT.SEPARATOR);
         // その他-設定
         MenuItem config = new MenuItem(etcmenu, SWT.NONE);
         config.setText("設定(&P)");
@@ -539,7 +557,7 @@ public final class ApplicationMain extends WindowBase {
         });
         // その他-バージョン情報
         MenuItem version = new MenuItem(etcmenu, SWT.NONE);
-        version.setText("バージョン情報(&A)");
+        version.setText("バージョン情報(&V)");
         version.addSelectionListener(new HelpEventListener(this));
 
         // テスト用
@@ -550,6 +568,22 @@ public final class ApplicationMain extends WindowBase {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     new TestDataFeeder(ApplicationMain.this).open();
+                }
+            });
+
+            MenuItem itemcsvout = new MenuItem(etcmenu, SWT.NONE);
+            itemcsvout.setText("装備アイテムをCSVダンプ");
+            itemcsvout.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    try {
+                        OutputStreamWriter fw = new OutputStreamWriter(
+                                new FileOutputStream("itemInfo.csv"), AppConstants.CHARSET);
+                        Item.dumpCSV(fw);
+                        fw.close();
+                    } catch (IOException e1) {
+                        logPrint("書き込み失敗: " + e1.getMessage());
+                    }
                 }
             });
         }
