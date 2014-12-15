@@ -190,7 +190,8 @@ public final class CreateReportLogic {
             body.add(new Comparable[] {
                     new TableRowHeader(i + 1, item),
                     new DateTimeString(item.getBattleDate()), item.getQuestName(),
-                    item.getMapCell().getReportString(), item.isBoss() ? "ボス" : "",
+                    (item.getMapCell() != null) ? item.getMapCell().getReportString() : null,
+                    item.isBoss() ? "ボス" : "",
                     item.getRank(), item.getEnemyName(), item.getDropType(),
                     item.getDropName(), item.isHasTaiha() ? "あり" : "",
                     item.getFlagShip(), item.getFlagShipCombined(),
@@ -1489,4 +1490,5 @@ public final class CreateReportLogic {
             }
         }
         return date;
-    }}
+    }
+}
