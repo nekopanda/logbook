@@ -305,15 +305,23 @@ public final class CreateReportLogic {
 
     public static List<GetShipDto> getCreateShip(List<String[]> resultlist) {
         List<GetShipDto> dtolist = new ArrayList<GetShipDto>();
-        for (String[] record : resultlist) {
+        int[] numericFields = new int[] { 4, 5, 6, 7, 8, 9, 11 };
+        for (int i = 0; i < resultlist.size(); ++i) {
+            String[] record = resultlist.get(i);
             if (record.length >= 12) {
                 Date date = readDate(record[0]);
                 if (date != null) {
+                    GetShipDto dto;
                     ResourceItemDto res = new ResourceItemDto();
-                    res.loadBaseMaterialsFromString(record, 4);
-                    res.setResearchMaterials(Integer.valueOf(record[7]));
-                    GetShipDto dto = new GetShipDto(date, record[1], record[2], record[3],
-                            res, record[10], Integer.valueOf(record[11]), Integer.valueOf(record[9]));
+                    if (isAllNumeric(record, numericFields)) {
+                        res.loadBaseMaterialsFromString(record, 4);
+                        res.setResearchMaterials(Integer.valueOf(record[8]));
+                        dto = new GetShipDto(date, record[1], record[2], record[3],
+                                res, record[10], Integer.valueOf(record[11]), Integer.valueOf(record[9]));
+                    }
+                    else { // 不完全なデータだが一応読みこんでおく
+                        dto = new GetShipDto(date, record[1], record[2], record[3], res, record[10], 0, 0);
+                    }
                     dtolist.add(dto);
                 }
             }
@@ -356,15 +364,23 @@ public final class CreateReportLogic {
 
     public static List<CreateItemDto> getCreateItem(List<String[]> resultlist) {
         List<CreateItemDto> dtolist = new ArrayList<CreateItemDto>();
-        for (String[] record : resultlist) {
+        int[] numericFields = new int[] { 3, 4, 5, 6, 8 };
+        for (int i = 0; i < resultlist.size(); ++i) {
+            String[] record = resultlist.get(i);
             if (record.length >= 9) {
                 Date date = readDate(record[0]);
                 if (date != null) {
+                    CreateItemDto dto;
                     ResourceItemDto res = new ResourceItemDto();
-                    res.loadBaseMaterialsFromString(record, 3);
                     boolean createFlag = !record[1].equals("失敗");
-                    CreateItemDto dto = new CreateItemDto(date, createFlag, record[1], record[2], res,
-                            record[7], Integer.valueOf(record[8]));
+                    if (isAllNumeric(record, numericFields)) {
+                        res.loadBaseMaterialsFromString(record, 3);
+                        dto = new CreateItemDto(date, createFlag, record[1], record[2], res,
+                                record[7], Integer.valueOf(record[8]));
+                    }
+                    else { // 不完全なデータだが一応読みこんでおく
+                        dto = new CreateItemDto(date, createFlag, record[1], record[2], res, record[7], 0);
+                    }
                     dtolist.add(dto);
                 }
             }
@@ -1490,5 +1506,15 @@ public final class CreateReportLogic {
             }
         }
         return date;
+    }
+
+    /** 数値に変換できるかチェック
+     *  */
+    private static boolean isAllNumeric(String[] record, int[] indeces) {
+        for (int idx : indeces) {
+            if (StringUtils.isNumeric(record[idx]) == false)
+                return false;
+        }
+        return true;
     }
 }

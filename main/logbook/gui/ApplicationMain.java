@@ -972,8 +972,8 @@ public final class ApplicationMain extends WindowBase {
                 this.battleShipWindow,
                 this.calcExpWindow,
                 this.calcPracticeExpWindow,
-                this.battleCounterWindow,
                 this.shipFilterGroupWindow,
+                this.battleCounterWindow,
                 this.launcherWindow
         };
     }
