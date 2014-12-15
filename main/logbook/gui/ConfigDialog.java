@@ -185,6 +185,31 @@ public final class ConfigDialog extends Dialog {
         });
         reportSavedirBtn.setText("選択...");
 
+        Label label82 = new Label(compositeSystem, SWT.NONE);
+        label82.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        label82.setText("出撃ログの保存先*");
+
+        final Text battlelogDir = new Text(compositeSystem, SWT.BORDER);
+        GridData gdBattlelogDir = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+        gdBattlelogDir.widthHint = 120;
+        battlelogDir.setLayoutData(gdBattlelogDir);
+        battlelogDir.setText(AppConfig.get().getBattleLogPath());
+
+        Button battleLogdirBtn = new Button(compositeSystem, SWT.NONE);
+        battleLogdirBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        battleLogdirBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                DirectoryDialog dialog = new DirectoryDialog(ConfigDialog.this.shell);
+                dialog.setMessage("保存先を指定して下さい");
+                String path = dialog.open();
+                if (path != null) {
+                    battlelogDir.setText(path);
+                }
+            }
+        });
+        battleLogdirBtn.setText("選択...");
+
         final Button hidewindow = new Button(compositeSystem, SWT.CHECK);
         hidewindow.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
         hidewindow.setText("最小化時にタスクトレイに格納");
@@ -905,6 +930,7 @@ public final class ConfigDialog extends Dialog {
                 }
                 */
                 AppConfig.get().setReportPath(reportDir.getText());
+                AppConfig.get().setBattleLogPath(battlelogDir.getText());
                 AppConfig.get().setUpdateCheck(checkUpdate.getSelection());
                 AppConfig.get().setAllowOnlyFromLocalhost(onlyFromLocalhost.getSelection());
                 // maintab
