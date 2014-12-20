@@ -29,7 +29,9 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -50,6 +52,21 @@ public class FleetComposite extends Composite {
     private static final int FATAL = 2;
     /** 1艦隊に編成できる艦娘の数 */
     private static final int MAXCHARA = 6;
+
+    /** HPゲージ幅 */
+    private static final int GAUGE_WIDTH = 50;
+    /** HPゲージ高さ */
+    private static final int GAUGE_HEIGHT = 10;
+    /** 経験値ゲージ高さ */
+    private static final int EXP_GAUGE_HEIGHT = 2;
+    /** HPゲージ最小色 */
+    private static final RGB GAUGE_EMPTY = new RGB(0xff, 0, 0);
+    /** HPゲージ中間色 */
+    private static final RGB GAUGE_HALF = new RGB(0xff, 0xd7, 0);
+    /** HPゲージ最大色 */
+    private static final RGB GAUGE_FULL = new RGB(0, 0xd7, 0);
+    /** 経験値ゲージ色 */
+    private static final RGB EXP_GAUGE = new RGB(0, 0x80, 0xff);
 
     /** タブ */
     private final CTabItem tab;
@@ -83,6 +100,8 @@ public class FleetComposite extends Composite {
     private final Label[] hpLabels = new Label[MAXCHARA];
     /** HPゲージ */
     private final Label[] hpgaugeLabels = new Label[MAXCHARA];
+    /** HPゲージイメージ */
+    private final Image[] hpgaugeImages = new Image[MAXCHARA];
     /** HPメッセージ */
     private final Label[] hpmsgLabels = new Label[MAXCHARA];
     /** コンディション */
@@ -302,6 +321,8 @@ public class FleetComposite extends Composite {
             long maxhp = ship.getMaxhp();
             // HP割合
             float hpratio = (float) nowhp / (float) maxhp;
+            // 経験値ゲージの割合
+            float expraito = ship.getExpraito();
             // 疲労
             long cond = ship.getCond();
             // 弾
@@ -501,7 +522,13 @@ public class FleetComposite extends Composite {
             // HP
             this.hpLabels[i].setText(MessageFormat.format("{0}/{1} ", nowhp, maxhp));
             // HPゲージ
-            this.hpgaugeLabels[i].setImage(this.getHpGaugeImage(hpratio));
+            Image gauge = this.getHpGaugeImage(hpratio, expraito);
+            this.hpgaugeLabels[i].setImage(gauge);
+            if (this.hpgaugeImages[i] != null) {
+                // 古いイメージを破棄
+                this.hpgaugeImages[i].dispose();
+            }
+            this.hpgaugeImages[i] = gauge;
             // コンディション
             this.condLabels[i].setText(MessageFormat.format("{0} cond.", cond));
             this.bullstLabels[i].getParent().layout();
@@ -631,12 +658,18 @@ public class FleetComposite extends Composite {
      * @param hpratio HP割合
      * @return HPゲージのイメージ
      */
-    private Image getHpGaugeImage(float hpratio) {
-        return SWTResourceManager
-                .getImage(
-                        FleetComposite.class,
-                        AppConstants.R_HPGAUGE_IMAGES[(int) Math.floor(hpratio
-                                * (AppConstants.R_HPGAUGE_IMAGES.length - 1))]);
+    private Image getHpGaugeImage(float hpratio, float expraito) {
+        Image image = new Image(Display.getDefault(), GAUGE_WIDTH, GAUGE_HEIGHT);
+        GC gc = new GC(image);
+        gc.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+        gc.fillRectangle(0, 0, GAUGE_WIDTH, GAUGE_HEIGHT);
+        gc.setBackground(SWTResourceManager.getColor(gradation(hpratio, GAUGE_EMPTY, GAUGE_HALF, GAUGE_FULL)));
+        gc.fillRectangle(0, 0, (int) (GAUGE_WIDTH * hpratio), GAUGE_HEIGHT);
+        gc.setBackground(SWTResourceManager.getColor(EXP_GAUGE));
+        gc.fillRectangle(0, GAUGE_HEIGHT - EXP_GAUGE_HEIGHT, (int) (GAUGE_WIDTH * expraito), EXP_GAUGE_HEIGHT);
+        gc.drawImage(image, 0, 0);
+        gc.dispose();
+        return image;
     }
 
     /**
@@ -700,5 +733,52 @@ public class FleetComposite extends Composite {
         super.dispose();
         this.large.dispose();
         this.small.dispose();
+        for (Image image : this.hpgaugeImages) {
+            if (image != null) {
+                image.dispose();
+            }
+        }
+    }
+
+    /**
+     * 複数の色の中間色を取得する
+     * 
+     * @param raito 割合
+     * @param rgbs 色たち
+     * @return 色
+     */
+    private static RGB gradation(float raito, RGB... rgbs) {
+        if (raito <= 0.0f) {
+            return rgbs[0];
+        }
+        if (raito >= 1.0f) {
+            return rgbs[rgbs.length - 1];
+        }
+        int length = rgbs.length - 1;
+
+        // 開始色
+        int start = (int) (length * raito);
+        // 終了色
+        int end = start + 1;
+        // 開始色と終了色の割合を算出
+        float startPer = (float) start / length;
+        float endPer = (float) end / length;
+        float subPer = (raito - startPer) / (endPer - startPer);
+        return gradation(subPer, rgbs[start], rgbs[end]);
+    }
+
+    /**
+     * 2つの色の中間色を取得する
+     * 
+     * @param raito 割合
+     * @param start 開始色
+     * @param end 終了色
+     * @return 色
+     */
+    private static RGB gradation(float raito, RGB start, RGB end) {
+        int r = (int) (start.red + ((end.red - start.red) * raito));
+        int g = (int) (start.green + ((end.green - start.green) * raito));
+        int b = (int) (start.blue + ((end.blue - start.blue) * raito));
+        return new RGB(r, g, b);
     }
 }

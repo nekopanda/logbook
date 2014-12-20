@@ -71,6 +71,9 @@ public final class ShipDto extends AbstractDto {
     /** 経験値 */
     private final long exp;
 
+    /** 経験値ゲージの割合 */
+    private final float expraito;
+
     /** HP */
     private final long nowhp;
 
@@ -168,6 +171,7 @@ public final class ShipDto extends AbstractDto {
         this.fuelmax = shipinfo.getMaxFuel();
 
         this.exp = object.getJsonArray("api_exp").getJsonNumber(0).longValue();
+        this.expraito = object.getJsonArray("api_exp").getJsonNumber(2).longValue() / 100f;
         this.nowhp = object.getJsonNumber("api_nowhp").longValue();
         this.maxhp = object.getJsonNumber("api_maxhp").longValue();
         this.slot = new ArrayList<Long>();
@@ -336,6 +340,13 @@ public final class ShipDto extends AbstractDto {
      */
     public long getExp() {
         return this.exp;
+    }
+
+    /**
+     * @return 経験値ゲージの割合
+     */
+    public float getExpraito() {
+        return this.expraito;
     }
 
     /**
