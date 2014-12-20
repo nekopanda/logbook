@@ -1,6 +1,3 @@
-/**
- * 
- */
 package logbook.gui;
 
 import java.io.File;
@@ -39,7 +36,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
 /**
- * @author noname
+ * 出撃統計
  *
  */
 public class BattleAggDialog extends Dialog {
@@ -241,6 +238,8 @@ public class BattleAggDialog extends Dialog {
         Calendar lastWeek = BattleAggDate.LAST_WEEK.get();
         // 先月
         Calendar lastMonth = BattleAggDate.LAST_MONTH.get();
+        // 読み込む最小の日付(>=)
+        Calendar min = lastMonth;
 
         // 海戦・ドロップ報告書読み込み
         File report = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), AppConstants.LOG_BATTLE_RESULT));
@@ -260,6 +259,12 @@ public class BattleAggDialog extends Dialog {
                         Calendar date = DateUtils.toCalendar(format.parse(cols[0]));
                         date.setTimeZone(AppConstants.TIME_ZONE_MISSION);
                         date.setFirstDayOfWeek(Calendar.MONDAY);
+
+                        // 読み込む最小の日付未満の場合は読み飛ばす
+                        if (min.compareTo(date) > 0) {
+                            continue;
+                        }
+
                         // 海域
                         String area = cols[1];
                         // ランク
