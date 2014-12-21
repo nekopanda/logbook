@@ -152,11 +152,13 @@ public final class ConfigDialog extends Dialog {
         label7.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
         label7.setText("透明度*");
 
-        final Text alpha = new Text(compositeSystem, SWT.BORDER);
+        final Spinner alpha = new Spinner(compositeSystem, SWT.BORDER);
         GridData gdAlpha = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
         gdAlpha.widthHint = 90;
         alpha.setLayoutData(gdAlpha);
-        alpha.setText(Integer.toString(AppConfig.get().getAlpha()));
+        alpha.setMaximum(255);
+        alpha.setMinimum(10);
+        alpha.setSelection(AppConfig.get().getAlpha());
         new Label(compositeSystem, SWT.NONE);
 
         Label label8 = new Label(compositeSystem, SWT.NONE);
@@ -620,9 +622,7 @@ public final class ConfigDialog extends Dialog {
                     float level = (float) Integer.parseInt(soundlevel.getText()) / 100;
                     AppConfig.get().setSoundLevel(level);
                 }
-                if (StringUtils.isNumeric(alpha.getText())) {
-                    AppConfig.get().setAlpha(Integer.parseInt(alpha.getText()));
-                }
+                AppConfig.get().setAlpha(alpha.getSelection());
                 AppConfig.get().setReportPath(reportDir.getText());
                 AppConfig.get().setMaterialLogInterval(materialintervalSpinner.getSelection());
                 AppConfig.get().setCheckUpdate(checkUpdate.getSelection());
