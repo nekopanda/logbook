@@ -1,8 +1,17 @@
 package logbook.gui.listener;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import logbook.data.context.GlobalContext;
+import logbook.dto.DeckMissionDto;
+import logbook.dto.NdockDto;
+import logbook.dto.ShipDto;
 import logbook.gui.BattleAggDialog;
 import logbook.gui.ResourceChartDialog;
+import logbook.gui.logic.TimeLogic;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuDetectEvent;
@@ -37,7 +46,6 @@ public final class TrayItemMenuListener implements MenuDetectListener {
             this.menu.dispose();
         }
         this.menu = new Menu(this.shell);
-
         // 装備数
         int itemCount = GlobalContext.getItemMap().size();
         // 最大保有可能 装備数
@@ -113,6 +121,46 @@ public final class TrayItemMenuListener implements MenuDetectListener {
             }
         });
         new MenuItem(this.menu, SWT.SEPARATOR);
+        // 遠征
+        MenuItem missionItem = new MenuItem(this.menu, SWT.CASCADE);
+        missionItem.setText("遠征(&M)");
+        Menu missionMenu = new Menu(missionItem);
+        missionItem.setMenu(missionMenu);
+        DeckMissionDto[] missions = GlobalContext.getDeckMissions();
+        for (DeckMissionDto missionDto : missions) {
+            if ((missionDto != null) && (missionDto.getTime() != null)) {
+                MenuItem item = new MenuItem(missionMenu, SWT.NONE);
+                String text = missionDto.getName() + " (" + missionDto.getMission() + ")";
+                long rest = getRest(Calendar.getInstance().getTime(), missionDto.getTime());
+                if (rest <= 0) {
+                    item.setText(text + "\tまもなく帰投します");
+                } else {
+                    item.setText(text + "\t" + TimeLogic.toDateRestString(rest));
+                }
+            }
+        }
+        // 入渠
+        MenuItem ndockItem = new MenuItem(this.menu, SWT.CASCADE);
+        ndockItem.setText("入渠(&M)");
+        Menu ndockMenu = new Menu(ndockItem);
+        ndockItem.setMenu(ndockMenu);
+        Map<Long, ShipDto> shipMap = GlobalContext.getShipMap();
+        NdockDto[] ndocks = GlobalContext.getNdocks();
+        for (NdockDto ndockDto : ndocks) {
+            if ((ndockDto != null) && (shipMap.get(ndockDto.getNdockid()) != null)) {
+                ShipDto ship = shipMap.get(ndockDto.getNdockid());
+                MenuItem item = new MenuItem(ndockMenu, SWT.NONE);
+                String text = ship.getName() + " (Lv" + ship.getLv() + ")";
+                long rest = getRest(Calendar.getInstance().getTime(), ndockDto.getNdocktime());
+                if (rest <= 0) {
+                    item.setText(text + "\tまもなくお風呂から上がります");
+                } else {
+                    item.setText(text + "\t" + TimeLogic.toDateRestString(rest));
+                }
+            }
+        }
+
+        new MenuItem(this.menu, SWT.SEPARATOR);
         // 設定
         MenuItem config = new MenuItem(this.menu, SWT.NONE);
         config.setText("設定(&P)");
@@ -127,5 +175,16 @@ public final class TrayItemMenuListener implements MenuDetectListener {
             }
         });
         this.menu.setVisible(true);
+    }
+
+    /**
+     * 2つの日付から残り時間を計算する
+     * 
+     * @param date1
+     * @param date2
+     * @return
+     */
+    private static long getRest(Date date1, Date date2) {
+        return TimeUnit.MILLISECONDS.toSeconds(date2.getTime() - date1.getTime());
     }
 }

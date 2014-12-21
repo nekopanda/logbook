@@ -406,7 +406,6 @@ public final class ApplicationMain {
         this.shell.addHelpListener(new HelpEventListener(this.shell));
 
         this.trayItem = this.addTrayItem(display);
-        this.setTrayMenu();
 
         // コマンドボタン
         this.commandComposite = new Composite(this.shell, SWT.NONE);
@@ -662,15 +661,10 @@ public final class ApplicationMain {
         TrayItem item = new TrayItem(tray, SWT.NONE);
         Image image = display.getSystemImage(SWT.ICON_INFORMATION);
         item.setImage(image);
+        item.setToolTipText(AppConstants.NAME + AppConstants.VERSION);
         item.addListener(SWT.Selection, new TraySelectionListener(this.shell));
+        item.addMenuDetectListener(new TrayItemMenuListener(this.getShell()));
         return item;
-    }
-
-    /**
-     * トレイアイコンにメニューを設定します
-     */
-    private void setTrayMenu() {
-        this.getTrayItem().addMenuDetectListener(new TrayItemMenuListener(this.getShell()));
     }
 
     /**
