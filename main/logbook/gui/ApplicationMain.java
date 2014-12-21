@@ -21,6 +21,7 @@ import logbook.gui.listener.ItemListReportAdapter;
 import logbook.gui.listener.MainShellAdapter;
 import logbook.gui.listener.MissionResultReportAdapter;
 import logbook.gui.listener.ShipListReportAdapter;
+import logbook.gui.listener.TrayItemMenuListener;
 import logbook.gui.listener.TraySelectionListener;
 import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.Sound;
@@ -190,16 +191,24 @@ public final class ApplicationMain {
      * Open the window.
      */
     public void open() {
-        Display display = Display.getDefault();
-        this.createContents();
-        this.shell.open();
-        this.shell.layout();
-        while (!this.shell.isDisposed()) {
-            if (!display.readAndDispatch()) {
-                display.sleep();
+        try {
+            Display display = Display.getDefault();
+            this.createContents();
+            this.shell.open();
+            this.shell.layout();
+            while (!this.shell.isDisposed()) {
+                if (!display.readAndDispatch()) {
+                    display.sleep();
+                }
+            }
+        } finally {
+            Tray tray = Display.getDefault().getSystemTray();
+            if (tray != null) {
+                for (TrayItem item : tray.getItems()) {
+                    item.dispose();
+                }
             }
         }
-        this.trayItem.dispose();
     }
 
     /**
@@ -239,11 +248,7 @@ public final class ApplicationMain {
                             | SWT.ICON_QUESTION);
                     box.setText("終了の確認");
                     box.setMessage("航海日誌を終了しますか？");
-                    if (box.open() == SWT.YES) {
-                        e.doit = true;
-                    } else {
-                        e.doit = false;
-                    }
+                    e.doit = box.open() == SWT.YES;
                 }
             }
         });
@@ -401,6 +406,7 @@ public final class ApplicationMain {
         this.shell.addHelpListener(new HelpEventListener(this.shell));
 
         this.trayItem = this.addTrayItem(display);
+        this.setTrayMenu();
 
         // コマンドボタン
         this.commandComposite = new Composite(this.shell, SWT.NONE);
@@ -658,6 +664,13 @@ public final class ApplicationMain {
         item.setImage(image);
         item.addListener(SWT.Selection, new TraySelectionListener(this.shell));
         return item;
+    }
+
+    /**
+     * トレイアイコンにメニューを設定します
+     */
+    private void setTrayMenu() {
+        this.getTrayItem().addMenuDetectListener(new TrayItemMenuListener(this.getShell()));
     }
 
     /**
