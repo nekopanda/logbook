@@ -94,7 +94,7 @@ public final class ResourceChartDialog extends WindowBase {
      * @param parent
      */
     public ResourceChartDialog(Shell parent) {
-        super.createContents(parent, SWT.SHELL_TRIM, true);
+        super.createContents(parent, SWT.SHELL_TRIM, false);
         this.getShell().setText("資材チャート");
     }
 
