@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import logbook.config.AppConfig;
+import logbook.config.ShipGroupConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.dto.BasicInfoDto;
@@ -22,6 +23,8 @@ import logbook.gui.logic.PushNotify;
 import logbook.gui.logic.Sound;
 import logbook.gui.logic.TimeLogic;
 import logbook.gui.widgets.FleetComposite;
+import logbook.internal.EnemyData;
+import logbook.internal.MasterData;
 import logbook.util.SwtUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -79,6 +82,11 @@ public final class AsyncExecApplicationMain extends Thread {
                     Display.getDefault().asyncExec(new UpdateFleetTabTask(this.main));
 
                     previousUpdateCounter = currentUpdateCounter;
+
+                    // 更新日時が実装されているファイルたちはすぐに保存
+                    ShipGroupConfig.store();
+                    MasterData.store();
+                    EnemyData.store();
                 }
 
                 // 遠征と入渠を更新する
