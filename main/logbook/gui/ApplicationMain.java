@@ -40,6 +40,7 @@ import logbook.server.proxy.DatabaseClient;
 import logbook.server.proxy.ProxyServer;
 import logbook.thread.ThreadManager;
 import logbook.thread.ThreadStateObserver;
+import logbook.util.JIntellitypeWrapper;
 import logbook.util.SwtUtils;
 
 import org.apache.logging.log4j.LogManager;
@@ -74,6 +75,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
 import org.eclipse.wb.swt.SWTResourceManager;
+
+import com.melloware.jintellitype.HotkeyListener;
 
 /**
  * メイン画面
@@ -919,6 +922,21 @@ public final class ApplicationMain extends WindowBase {
 
         this.configUpdated();
 
+        // ホットキー
+        JIntellitypeWrapper.addListener(new HotkeyListener() {
+            @Override
+            public void onHotKey(int arg0) {
+                ApplicationMain.this.display.asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (ApplicationMain.this.shell.isDisposed() == false) {
+                            ApplicationMain.this.shell.forceActive();
+                        }
+                    }
+                });
+            }
+        });
+
         sysPrint("ウィンドウ構築完了");
 
         this.startThread();
@@ -1135,6 +1153,8 @@ public final class ApplicationMain extends WindowBase {
         // プロキシサーバーをシャットダウンする
         ProxyServer.end();
         DatabaseClient.end();
+        // ホットキーを解除
+        JIntellitypeWrapper.cleanup();
     }
 
     private void updateCheck() {
@@ -1213,9 +1233,12 @@ public final class ApplicationMain extends WindowBase {
             if ((shipNames[i] == null) || (shipNames[i].length() == 0)) {
                 shipNames[i] = "艦娘一覧 " + number;
             }
-            this.shipTableWindows[i].getMenuItem().setText(shipNames[i] + "(&" + number + ")\tCtrl+" + number);
+            String menuTitle = (i == 0) ? (shipNames[i] + "(&S)\tCtrl+S")
+                    : (shipNames[i] + "(&" + number + ")\tCtrl+" + number);
+            this.shipTableWindows[i].getMenuItem().setText(menuTitle);
             this.shipTableWindows[i].windowTitleChanged();
         }
+        JIntellitypeWrapper.changeSetting(AppConfig.get().getSystemWideHotKey());
     }
 
     /**

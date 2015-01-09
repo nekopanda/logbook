@@ -29,5 +29,6 @@
 	<classpathentry kind="lib" path="lib/protostuff-runtime-1.0.7.jar"/>
 	<classpathentry kind="lib" path="lib/jetty-security-9.0.5.v20130815.jar"/>
 	<classpathentry kind="lib" path="lib/javax.json-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/jintellitype-1.3.9.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

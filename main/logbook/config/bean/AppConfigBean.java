@@ -241,6 +241,9 @@ public final class AppConfigBean {
     /** 遠征報告書を読みこむか */
     private boolean loadMissionLog = true;
 
+    /** システムワイドホットキー (Windowsのみ対応) 0:なし, 1:Ctrl+Shift+z, 2:Win+Z */
+    private int systemWideHotKey = 0;
+
     /**
      * ポート番号を取得します。
      * @return ポート番号
@@ -1363,5 +1366,19 @@ public final class AppConfigBean {
      */
     public void setLoadMissionLog(boolean loadMissionLog) {
         this.loadMissionLog = loadMissionLog;
+    }
+
+    /**
+     * @return systemWideHotKey
+     */
+    public int getSystemWideHotKey() {
+        return this.systemWideHotKey;
+    }
+
+    /**
+     * @param systemWideHotKey セットする systemWideHotKey
+     */
+    public void setSystemWideHotKey(int systemWideHotKey) {
+        this.systemWideHotKey = systemWideHotKey;
     }
 }

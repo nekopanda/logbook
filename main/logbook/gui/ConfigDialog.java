@@ -12,6 +12,7 @@ import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.PushNotify;
 import logbook.internal.EvaluateExp;
 import logbook.internal.SeaExp;
+import logbook.util.JIntellitypeWrapper;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
@@ -285,6 +286,20 @@ public final class ConfigDialog extends Dialog {
         loadMissionLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         loadMissionLog.setText("遠征報告書を読み込む*");
         loadMissionLog.setSelection(AppConfig.get().isLoadMissionLog());
+
+        final Combo systemWideShortcutKey;
+        if (JIntellitypeWrapper.getInstance() != null) {
+            final Label systemWideShortcutKeyLabel = new Label(compositeMainTab, SWT.NONE);
+            systemWideShortcutKeyLabel.setText("航海日誌をアクティブにするホットキー");
+            systemWideShortcutKey = new Combo(compositeMainTab, SWT.READ_ONLY);
+            systemWideShortcutKey.add("なし");
+            systemWideShortcutKey.add("Ctrl+Shift+Z");
+            systemWideShortcutKey.add("Ctrl+Alt+Z");
+            systemWideShortcutKey.select(AppConfig.get().getSystemWideHotKey());
+        }
+        else {
+            systemWideShortcutKey = null;
+        }
 
         // 艦隊タブ タブ
         Composite compositeFleetTab = new Composite(this.composite, SWT.NONE);
@@ -945,6 +960,9 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setLoadCreateItemLog(loadCreateItemLog.getSelection());
                 AppConfig.get().setLoadCreateShipLog(loadCreateShipLog.getSelection());
                 AppConfig.get().setLoadMissionLog(loadMissionLog.getSelection());
+                if (JIntellitypeWrapper.getInstance() != null) {
+                    AppConfig.get().setSystemWideHotKey(systemWideShortcutKey.getSelectionIndex());
+                }
                 // fleettab
                 AppConfig.get().setDisplayCount(displaycount.getSelection());
                 AppConfig.get().setDefaultSea(seacombo.getItem(seacombo.getSelectionIndex()));
