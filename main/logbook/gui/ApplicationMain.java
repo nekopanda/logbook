@@ -62,8 +62,10 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
@@ -400,8 +402,8 @@ public final class ApplicationMain extends WindowBase {
         this.dropReportWindow = new DropReportTable(this.dummyHolder, cmddrop);
         // コマンド-建造報告書
         MenuItem cmdcreateship = new MenuItem(cmdmenu, SWT.CHECK);
-        cmdcreateship.setText("建造報告書(&B)\tCtrl+B");
-        cmdcreateship.setAccelerator(SWT.CTRL + 'B');
+        cmdcreateship.setText("建造報告書(&Y)\tCtrl+Y");
+        cmdcreateship.setAccelerator(SWT.CTRL + 'Y');
         this.createShipReportWindow = new CreateShipReportTable(this.dummyHolder, cmdcreateship);
         // コマンド-開発報告書
         MenuItem cmdcreateitem = new MenuItem(cmdmenu, SWT.CHECK);
@@ -417,15 +419,20 @@ public final class ApplicationMain extends WindowBase {
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // コマンド-所有装備一覧
         MenuItem cmditemlist = new MenuItem(cmdmenu, SWT.CHECK);
-        cmditemlist.setText("所有装備一覧(&I)\tCtrl+I");
-        cmditemlist.setAccelerator(SWT.CTRL + 'I');
+        cmditemlist.setText("所有装備一覧(&X)\tCtrl+X");
+        cmditemlist.setAccelerator(SWT.CTRL + 'X');
         this.itemTableWindow = new ItemTable(this.dummyHolder, cmditemlist);
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // コマンド-所有艦娘一覧
         for (int i = 0; i < 4; ++i) {
             MenuItem cmdshiplist = new MenuItem(cmdmenu, SWT.CHECK);
-            cmdshiplist.setAccelerator(SWT.CTRL + ('1' + i));
+            if (i == 0) {
+                cmdshiplist.setAccelerator(SWT.CTRL + ('S'));
+            }
+            else {
+                cmdshiplist.setAccelerator(SWT.CTRL + ('1' + i));
+            }
             this.shipTableWindows[i] = new ShipTable(this.dummyHolder, cmdshiplist, i);
         }
 
@@ -446,8 +453,8 @@ public final class ApplicationMain extends WindowBase {
 
         // 表示-戦況ウィンドウ 
         MenuItem battleWinMenu = new MenuItem(cmdmenu, SWT.CHECK);
-        battleWinMenu.setText("戦況(&Z)\tCtrl+Z");
-        battleWinMenu.setAccelerator(SWT.CTRL + 'Z');
+        battleWinMenu.setText("戦況(&B)\tCtrl+B");
+        battleWinMenu.setAccelerator(SWT.CTRL + 'B');
         this.battleWindowLarge = new BattleWindowLarge(this.dummyHolder, battleWinMenu);
 
         // 表示-戦況ウィンドウ （小）
@@ -472,7 +479,7 @@ public final class ApplicationMain extends WindowBase {
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // 終了
         final MenuItem dispose = new MenuItem(cmdmenu, SWT.NONE);
-        dispose.setText("終了(&X)");
+        dispose.setText("終了");
         dispose.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -488,13 +495,14 @@ public final class ApplicationMain extends WindowBase {
 
         // 計算機-演習経験値計算
         MenuItem calcpracticeexp = new MenuItem(calcmenu, SWT.CHECK);
-        calcpracticeexp.setText("演習経験値計算機(&C)\tCtrl+V");
+        calcpracticeexp.setText("演習経験値計算機(&V)\tCtrl+V");
         calcpracticeexp.setAccelerator(SWT.CTRL + 'V');
         this.calcPracticeExpWindow = new CalcPracticeExpDialog(this.dummyHolder, calcpracticeexp);
 
         // その他-資材チャート
         MenuItem resourceChart = new MenuItem(etcmenu, SWT.NONE);
-        resourceChart.setText("資材チャート(&R)");
+        resourceChart.setText("資材チャート(&R)\tCtrl+R");
+        resourceChart.setAccelerator(SWT.CTRL + 'R');
         resourceChart.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -510,7 +518,8 @@ public final class ApplicationMain extends WindowBase {
         new MenuItem(etcmenu, SWT.SEPARATOR);
         // その他-グループエディター
         MenuItem shipgroup = new MenuItem(etcmenu, SWT.CHECK);
-        shipgroup.setText("グループエディター(&G)");
+        shipgroup.setText("グループエディター(&G)\tCtrl+G");
+        shipgroup.setAccelerator(SWT.CTRL + 'G');
         this.shipFilterGroupWindow = new ShipFilterGroupDialog(this.dummyHolder, shipgroup);
         // その他-自動プロキシ構成スクリプトファイル生成
         MenuItem pack = new MenuItem(etcmenu, SWT.NONE);
@@ -529,7 +538,8 @@ public final class ApplicationMain extends WindowBase {
         this.launcherWindow = new LauncherWindow(this.dummyHolder, toolwindows);
         // その他-ウィンドウをディスプレイ内に移動
         MenuItem movewindows = new MenuItem(etcmenu, SWT.NONE);
-        movewindows.setText("画面外のウィンドウを戻す");
+        movewindows.setText("画面外のウィンドウを戻す(&W)\tCtrl+W");
+        movewindows.setAccelerator(SWT.CTRL + 'W');
         movewindows.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -538,7 +548,8 @@ public final class ApplicationMain extends WindowBase {
         });
         // その他-設定
         MenuItem config = new MenuItem(etcmenu, SWT.NONE);
-        config.setText("設定(&P)");
+        config.setText("設定(&O)\tCtrl+O");
+        config.setAccelerator(SWT.CTRL + 'O');
         config.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -577,6 +588,17 @@ public final class ApplicationMain extends WindowBase {
                 }
             });
         }
+
+        // ショートカットキー
+        this.display.addFilter(SWT.KeyDown, new Listener() {
+            @Override
+            public void handleEvent(Event e) {
+                if ((e.stateMask & (SWT.CTRL | SWT.SHIFT)) == (SWT.CTRL | SWT.SHIFT))
+                {
+                    ApplicationMain.this.shortcutKeyPushed(e.keyCode);
+                }
+            }
+        });
 
         // シェルイベント
         this.shell.addShellListener(new MainShellAdapter());
@@ -903,6 +925,85 @@ public final class ApplicationMain extends WindowBase {
         this.updateCheck();
     }
 
+    private void shortcutKeyPushed(int keyCode) {
+        switch (keyCode) {
+        case 'd':
+            this.activate(this.dropReportWindow);
+            break;
+        case 'y':
+            this.activate(this.createShipReportWindow);
+            break;
+        case 'e':
+            this.activate(this.createItemReportWindow);
+            break;
+        case 't':
+            this.activate(this.missionResultWindow);
+            break;
+        case 'x':
+            this.activate(this.itemTableWindow);
+            break;
+        case '1':
+            this.activate(this.shipTableWindows[0]);
+            break;
+        case 's':
+            this.activate(this.shipTableWindows[0]);
+            break;
+        case '2':
+            this.activate(this.shipTableWindows[1]);
+            break;
+        case '3':
+            this.activate(this.shipTableWindows[2]);
+            break;
+        case '4':
+            this.activate(this.shipTableWindows[3]);
+            break;
+        case 'n':
+            this.activate(this.bathwaterTablwWindow);
+            break;
+        case 'q':
+            this.activate(this.questTableWindow);
+            break;
+        case 'b':
+            this.activate(this.battleWindowLarge);
+            break;
+        case 'h':
+            this.activate(this.battleWindowSmall);
+            break;
+        case 'p':
+            this.activate(this.battleShipWindow);
+            break;
+        case 'c':
+            this.activate(this.calcExpWindow);
+            break;
+        case 'v':
+            this.activate(this.calcPracticeExpWindow);
+            break;
+        case 'g':
+            this.activate(this.shipFilterGroupWindow);
+            break;
+        case 'a':
+            this.activate(this.battleCounterWindow);
+            break;
+        case 'z':
+            this.shell.setActive();
+            break;
+        case 'w':
+            this.moveWindowsIntoDisplay();
+            break;
+        }
+    }
+
+    private void activate(WindowBase win) {
+        if ((win.getShell() == null) || (win.getShell().isVisible() == false)) {
+            win.open();
+        }
+        win.getShell().setActive();
+        MenuItem menu = win.getMenuItem();
+        if (menu != null) {
+            menu.setSelection(true);
+        }
+    }
+
     @Override
     public void restore() {
         // メインウィンドウは常に開く
@@ -928,6 +1029,7 @@ public final class ApplicationMain extends WindowBase {
     }
 
     private void moveWindowsIntoDisplay() {
+        this.moveIntoDisplay();
         for (WindowBase window : this.getWindowList()) {
             window.moveIntoDisplay();
         }
