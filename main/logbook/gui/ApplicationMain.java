@@ -446,8 +446,8 @@ public final class ApplicationMain extends WindowBase {
 
         // 表示-戦況ウィンドウ 
         MenuItem battleWinMenu = new MenuItem(cmdmenu, SWT.CHECK);
-        battleWinMenu.setText("戦況(&W)\tCtrl+W");
-        battleWinMenu.setAccelerator(SWT.CTRL + 'W');
+        battleWinMenu.setText("戦況(&Z)\tCtrl+Z");
+        battleWinMenu.setAccelerator(SWT.CTRL + 'Z');
         this.battleWindowLarge = new BattleWindowLarge(this.dummyHolder, battleWinMenu);
 
         // 表示-戦況ウィンドウ （小）
