@@ -1300,7 +1300,7 @@ public final class CreateReportLogic {
     public static List<GetShipDto> loadCreateShipReport() {
         List<GetShipDto> dtoList = null;
         try {
-            File file = new File("建造報告書.csv");
+            File file = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), AppConstants.LOG_CREATE_SHIP));
             if (file.exists()) {
                 CSVReader reader = new CSVReader(new InputStreamReader(
                         new FileInputStream(file), AppConstants.CHARSET));
@@ -1340,7 +1340,7 @@ public final class CreateReportLogic {
     public static List<CreateItemDto> loadCreateItemReport() {
         List<CreateItemDto> dtoList = null;
         try {
-            File file = new File("開発報告書.csv");
+            File file = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), AppConstants.LOG_CREATE_ITEM));
             if (file.exists()) {
                 CSVReader reader = new CSVReader(new InputStreamReader(
                         new FileInputStream(file), AppConstants.CHARSET));
@@ -1380,7 +1380,7 @@ public final class CreateReportLogic {
     public static List<MissionResultDto> loadMissionReport() {
         List<MissionResultDto> dtoList = null;
         try {
-            File file = new File("遠征報告書.csv");
+            File file = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), AppConstants.LOG_MISSION));
             if (file.exists()) {
                 CSVReader reader = new CSVReader(new InputStreamReader(
                         new FileInputStream(file), AppConstants.CHARSET));
