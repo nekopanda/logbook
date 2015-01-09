@@ -266,6 +266,11 @@ public final class ConfigDialog extends Dialog {
         printSunkLog.setText("艦娘の轟沈をログに表示（ダメコン未対応）");
         printSunkLog.setSelection(AppConfig.get().isPrintSunkLog());
 
+        final Button printUpdateLog = new Button(compositeMainTab, SWT.CHECK);
+        printUpdateLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        printUpdateLog.setText("更新系ログを表示");
+        printUpdateLog.setSelection(AppConfig.get().isPrintUpdateLog());
+
         final Button loadCreateShipLog = new Button(compositeMainTab, SWT.CHECK);
         loadCreateShipLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         loadCreateShipLog.setText("建造報告書を読み込む*");
@@ -936,6 +941,7 @@ public final class ConfigDialog extends Dialog {
                 // maintab
                 AppConfig.get().setPrintSortieLog(printSortieLog.getSelection());
                 AppConfig.get().setPrintSunkLog(printSunkLog.getSelection());
+                AppConfig.get().setPrintUpdateLog(printUpdateLog.getSelection());
                 AppConfig.get().setLoadCreateItemLog(loadCreateItemLog.getSelection());
                 AppConfig.get().setLoadCreateShipLog(loadCreateShipLog.getSelection());
                 AppConfig.get().setLoadMissionLog(loadMissionLog.getSelection());

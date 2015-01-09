@@ -726,7 +726,7 @@ public final class GlobalContext {
                         }
                     }
                 }
-                addConsole("補給を更新しました");
+                addUpdateLog("補給を更新しました");
             }
         } catch (Exception e) {
             LOG.warn("補給を更新しますに失敗しました", e);
@@ -814,7 +814,7 @@ public final class GlobalContext {
                     setSecretary(firstdock.getShips().get(0));
                 }
             }
-            addConsole("編成を更新しました");
+            addUpdateLog("編成を更新しました");
         } catch (Exception e) {
             LOG.warn("編成を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -893,7 +893,7 @@ public final class GlobalContext {
 
                 state = checkDataState();
 
-                addConsole("母港情報を更新しました");
+                addUpdateLog("母港情報を更新しました");
             }
         } catch (Exception e) {
             LOG.warn("母港を更新しますに失敗しました", e);
@@ -1028,7 +1028,7 @@ public final class GlobalContext {
                     battleResultList.remove(0);
                 }
             }
-            addConsole("海戦結果を更新しました");
+            addUpdateLog("海戦結果を更新しました");
         } catch (Exception e) {
             LOG.warn("海戦結果を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1056,7 +1056,7 @@ public final class GlobalContext {
             // 資源に反映させてレポート
             updateDetailedMaterial("建造", res, MATERIAL_DIFF.CONSUMED);
 
-            addConsole("建造(投入資源)情報を更新しました");
+            addUpdateLog("建造(投入資源)情報を更新しました");
         } catch (Exception e) {
             LOG.warn("建造(投入資源)情報を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1091,7 +1091,7 @@ public final class GlobalContext {
             // 建造ドック更新
             doKdockSub(apidata);
 
-            addConsole("建造を更新しました");
+            addUpdateLog("建造を更新しました");
         } catch (Exception e) {
             LOG.warn("建造を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1156,7 +1156,7 @@ public final class GlobalContext {
 
             state = checkDataState();
 
-            addConsole("建造(入手)情報を更新しました");
+            addUpdateLog("建造(入手)情報を更新しました");
         } catch (Exception e) {
             LOG.warn("建造(入手)情報を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1196,7 +1196,7 @@ public final class GlobalContext {
 
             state = checkDataState();
 
-            addConsole("装備開発情報を更新しました");
+            addUpdateLog("装備開発情報を更新しました");
         } catch (Exception e) {
             LOG.warn("装備開発情報を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1220,7 +1220,7 @@ public final class GlobalContext {
 
             state = checkDataState();
 
-            addConsole("保有装備情報を更新しました");
+            addUpdateLog("保有装備情報を更新しました");
         } catch (Exception e) {
             LOG.warn("保有装備を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1259,7 +1259,7 @@ public final class GlobalContext {
 
             state = checkDataState();
 
-            addConsole("保有艦娘情報３を更新しました");
+            addUpdateLog("保有艦娘情報３を更新しました");
         } catch (Exception e) {
             LOG.warn("保有艦娘を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1298,7 +1298,7 @@ public final class GlobalContext {
 
             battle = null;
 
-            addConsole("保有艦娘情報２を更新しました");
+            addUpdateLog("保有艦娘情報２を更新しました");
         } catch (Exception e) {
             LOG.warn("保有艦娘を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1321,7 +1321,7 @@ public final class GlobalContext {
             }
             doDeck(apidata);
 
-            addConsole("艦隊を更新しました");
+            addUpdateLog("艦隊を更新しました");
         } catch (Exception e) {
             LOG.warn("艦隊を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1418,7 +1418,7 @@ public final class GlobalContext {
                 }
             }
 
-            addConsole("艦娘を解体しました");
+            addUpdateLog("艦娘を解体しました");
         } catch (Exception e) {
             LOG.warn("艦娘を解体しますに失敗しました", e);
             LOG.warn(data);
@@ -1443,7 +1443,7 @@ public final class GlobalContext {
             }
             // 記録する
             CreateReportLogic.storeLostReport(dtoList);
-            addConsole("装備を廃棄しました");
+            addUpdateLog("装備を廃棄しました");
         } catch (Exception e) {
             LOG.warn("装備を廃棄しますに失敗しました", e);
             LOG.warn(data);
@@ -1499,7 +1499,7 @@ public final class GlobalContext {
             }
             shipMap.put(id, ship);
 
-            addConsole("近代化改修しました");
+            addUpdateLog("近代化改修しました");
         } catch (Exception e) {
             LOG.warn("近代化改修しますに失敗しました", e);
             LOG.warn(data);
@@ -1522,7 +1522,7 @@ public final class GlobalContext {
                 dto.setLocked(locked);
             }
 
-            addConsole("艦娘ロックを更新しました");
+            addUpdateLog("艦娘ロックを更新しました");
         } catch (Exception e) {
             LOG.warn("艦娘ロックを更新するに失敗しました", e);
             LOG.warn(data);
@@ -1545,7 +1545,7 @@ public final class GlobalContext {
                 dto.setLocked(locked);
             }
 
-            addConsole("装備ロックを更新しました");
+            addUpdateLog("装備ロックを更新しました");
         } catch (Exception e) {
             LOG.warn("装備ロックを更新するに失敗しました", e);
             LOG.warn(data);
@@ -1562,7 +1562,7 @@ public final class GlobalContext {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
             doBasicSub(apidata);
 
-            addConsole("司令部を更新しました");
+            addUpdateLog("司令部を更新しました");
         } catch (Exception e) {
             LOG.warn("司令部を更新するに失敗しました", e);
             LOG.warn(data);
@@ -1601,7 +1601,7 @@ public final class GlobalContext {
 
             doMaterialSub(apidata);
 
-            addConsole("保有資材を更新しました");
+            addUpdateLog("保有資材を更新しました");
         } catch (Exception e) {
             LOG.warn("保有資材を更新するに失敗しました", e);
             LOG.warn(data);
@@ -1686,7 +1686,7 @@ public final class GlobalContext {
 
             state = checkDataState();
 
-            addConsole("遠征(帰還)情報を更新しました");
+            addUpdateLog("遠征(帰還)情報を更新しました");
         } catch (Exception e) {
             LOG.warn("遠征(帰還)を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1703,7 +1703,7 @@ public final class GlobalContext {
 
             doNdockSub(apidata);
 
-            addConsole("入渠情報を更新しました");
+            addUpdateLog("入渠情報を更新しました");
         } catch (Exception e) {
             LOG.warn("入渠を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1755,7 +1755,7 @@ public final class GlobalContext {
             }
 
             // 高速修復出ない場合は直後にndockが送られてくる
-            addConsole("入渠情報を更新しました");
+            addUpdateLog("入渠情報を更新しました");
         } catch (Exception e) {
             LOG.warn("入渠を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1773,7 +1773,7 @@ public final class GlobalContext {
             ndockFinished(ndocks[id - 1].getNdockid());
             ndocks[id - 1] = NdockDto.EMPTY;
 
-            addConsole("バケツを使いました");
+            addUpdateLog("バケツを使いました");
         } catch (Exception e) {
             LOG.warn("入渠を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1852,7 +1852,7 @@ public final class GlobalContext {
                     questLastUpdate = updateTime;
                 }
             }
-            addConsole("任務を更新しました");
+            addUpdateLog("任務を更新しました");
         } catch (Exception e) {
             LOG.warn("任務を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1910,7 +1910,7 @@ public final class GlobalContext {
             ApplicationMain.main.startSortie();
             ApplicationMain.main.updateMapCell(mapCellDto);
 
-            addConsole("出撃を更新しました");
+            addUpdateLog("出撃を更新しました");
             if (AppConfig.get().isPrintSortieLog())
                 addConsole("行先 " + mapCellDto.toString());
         } catch (Exception e) {
@@ -1954,7 +1954,7 @@ public final class GlobalContext {
                     String id = object.getJsonNumber("api_id").toString();
                     Ship.set(id, toShipInfoDto(object));
                 }
-                addConsole("艦娘一覧を更新しました");
+                addUpdateLog("艦娘一覧を更新しました");
 
                 // 装備一覧
                 JsonArray apiMstSlotitem = obj.getJsonArray("api_mst_slotitem");
@@ -1964,12 +1964,12 @@ public final class GlobalContext {
                     int id = object.getJsonNumber("api_id").intValue();
                     Item.set(id, item);
                 }
-                addConsole("装備一覧を更新しました");
+                addUpdateLog("装備一覧を更新しました");
 
                 MasterData.updateMaster(obj);
             }
 
-            addConsole("設定を更新しました");
+            addConsole("マスターデータを更新しました");
         } catch (Exception e) {
             LOG.warn("設定を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -2040,7 +2040,7 @@ public final class GlobalContext {
                     practiceUser[i].setState(dto.getState());
             }
             practiceUserLastUpdate = new Date();
-            addConsole("演習情報を更新しました");
+            addUpdateLog("演習情報を更新しました");
         } catch (Exception e) {
             LOG.warn("演習情報更新に失敗しました", e);
             LOG.warn(data);
@@ -2065,7 +2065,7 @@ public final class GlobalContext {
             }
 
             ApplicationMain.main.updateCalcPracticeExp(dto);
-            addConsole("演習相手艦隊情報を更新しました");
+            addUpdateLog("演習相手艦隊情報を更新しました");
         } catch (Exception e) {
             LOG.warn("演習相手艦隊情報更新に失敗しました", e);
             LOG.warn(data);
@@ -2087,7 +2087,7 @@ public final class GlobalContext {
                     dockdto.setUpdate(true);
                 }
             }
-            addConsole("連合艦隊情報を更新しました");
+            addUpdateLog("連合艦隊情報を更新しました");
         } catch (Exception e) {
             LOG.warn("連合艦隊情報更新に失敗しました", e);
             LOG.warn(data);
@@ -2106,7 +2106,7 @@ public final class GlobalContext {
                     addSlotitem(apidata.getJsonObject("api_after_slot"));
                 }
             }
-            addConsole("装備改修を更新しました");
+            addUpdateLog("装備改修を更新しました");
         } catch (Exception e) {
             LOG.warn("装備改修更新に失敗しました", e);
             LOG.warn(data);
@@ -2213,5 +2213,11 @@ public final class GlobalContext {
 
     private static void addConsole(Object message) {
         ApplicationMain.main.printMessage(message.toString());
+    }
+
+    private static void addUpdateLog(Object message) {
+        if (AppConfig.get().isPrintUpdateLog()) {
+            addConsole(message);
+        }
     }
 }

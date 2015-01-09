@@ -111,9 +111,14 @@ public final class AppConfigBean {
     /** ローカルループバックアドレスからの接続のみ受け入れる */
     private boolean allowOnlyFromLocalhost = true;
 
+    /** 戦闘結果をログ出力するか */
     private boolean printSortieLog = false;
 
+    /** 轟沈をログ出力するか */
     private boolean printSunkLog = false;
+
+    /** 更新系をログ出力するか */
+    private boolean printUpdateLog = true;
 
     /** 遠征-1分前に通知する */
     private boolean noticeDeckmission = true;
@@ -746,6 +751,20 @@ public final class AppConfigBean {
      */
     public void setPrintSunkLog(boolean printSunkLog) {
         this.printSunkLog = printSunkLog;
+    }
+
+    /**
+     * @return printUpdateLog
+     */
+    public boolean isPrintUpdateLog() {
+        return this.printUpdateLog;
+    }
+
+    /**
+     * @param printUpdateLog セットする printUpdateLog
+     */
+    public void setPrintUpdateLog(boolean printUpdateLog) {
+        this.printUpdateLog = printUpdateLog;
     }
 
     /**
