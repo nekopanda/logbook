@@ -1644,6 +1644,9 @@ public final class GlobalContext {
             case AppConstants.MATERIAL_RESEARCH:
                 dto.setResearch(entry.getInt("api_value"));
                 break;
+            case AppConstants.MATERIAL_SCREW:
+                dto.setScrew(entry.getInt("api_value"));
+                break;
             default:
                 break;
             }

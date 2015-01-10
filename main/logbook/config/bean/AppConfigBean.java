@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import logbook.constants.AppConstants;
 import logbook.dto.ShipFilterDto;
 
 import org.apache.commons.io.FilenameUtils;
@@ -175,16 +176,28 @@ public final class AppConfigBean {
     private int notifyFully = 1;
 
     /** 燃料の色 */
-    private RGB fuelColor = new RGB(0x00, 0x80, 0x00);
+    private RGB fuelColor = AppConstants.CHART_COLOR_TABLE[0];
 
     /** 弾薬の色 */
-    private RGB ammoColor = new RGB(0x66, 0x33, 0x00);
+    private RGB ammoColor = AppConstants.CHART_COLOR_TABLE[1];
 
     /** 鋼材の色 */
-    private RGB metalColor = new RGB(0x80, 0x80, 0x80);
+    private RGB metalColor = AppConstants.CHART_COLOR_TABLE[2];
 
     /** ボーキの色 */
-    private RGB bauxiteColor = new RGB(0xCC, 0x33, 0x00);
+    private RGB bauxiteColor = AppConstants.CHART_COLOR_TABLE[3];
+
+    /** バーナーの色 */
+    private RGB burnerColor = AppConstants.CHART_COLOR_TABLE[4];
+
+    /** バケツの色 */
+    private RGB bucketColor = AppConstants.CHART_COLOR_TABLE[5];
+
+    /** 開発の色 */
+    private RGB researchColor = AppConstants.CHART_COLOR_TABLE[6];
+
+    /** ネジの色 */
+    private RGB screwColor = AppConstants.CHART_COLOR_TABLE[7];
 
     /** 開発者オプション-JSONを保存する */
     private boolean storeJson;
@@ -1136,6 +1149,62 @@ public final class AppConfigBean {
      */
     public void setBauxiteColor(RGB bauxiteColor) {
         this.bauxiteColor = bauxiteColor;
+    }
+
+    /**
+     * @return burnerColor
+     */
+    public RGB getBurnerColor() {
+        return this.burnerColor;
+    }
+
+    /**
+     * @param burnerColor セットする burnerColor
+     */
+    public void setBurnerColor(RGB burnerColor) {
+        this.burnerColor = burnerColor;
+    }
+
+    /**
+     * @return bucketColor
+     */
+    public RGB getBucketColor() {
+        return this.bucketColor;
+    }
+
+    /**
+     * @param bucketColor セットする bucketColor
+     */
+    public void setBucketColor(RGB bucketColor) {
+        this.bucketColor = bucketColor;
+    }
+
+    /**
+     * @return researchColor
+     */
+    public RGB getResearchColor() {
+        return this.researchColor;
+    }
+
+    /**
+     * @param researchColor セットする researchColor
+     */
+    public void setResearchColor(RGB researchColor) {
+        this.researchColor = researchColor;
+    }
+
+    /**
+     * @return screwColor
+     */
+    public RGB getScrewColor() {
+        return this.screwColor;
+    }
+
+    /**
+     * @param screwColor セットする screwColor
+     */
+    public void setScrewColor(RGB screwColor) {
+        this.screwColor = screwColor;
     }
 
     /**

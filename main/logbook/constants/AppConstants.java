@@ -94,6 +94,17 @@ public class AppConstants {
             0
     };
 
+    public static final RGB[] CHART_COLOR_TABLE = new RGB[] {
+            new RGB(0x00, 0x80, 0x00), // 燃料
+            new RGB(0x66, 0x33, 0x00), // 弾薬
+            new RGB(0x80, 0x80, 0x80), // 鋼材
+            new RGB(0xCC, 0x33, 0x00), // ボーキ
+            new RGB(0xA5, 0x2A, 0x2A), // バーナー
+            new RGB(0xF0, 0x80, 0x80), // バケツ
+            new RGB(0x48, 0x76, 0xFF), // 開発
+            new RGB(0x00, 0xF5, 0xFF) // ネジ
+    };
+
     /** 小破の色 */
     public static final RGB SYOHA_SHIP_COLOR = new RGB(210, 255, 0);
 
@@ -184,6 +195,9 @@ public class AppConstants {
     /** 保有資材:開発資材 */
     public static final int MATERIAL_RESEARCH = 7;
 
+    /** 保有資材:ネジ */
+    public static final int MATERIAL_SCREW = 8;
+
     /** 報告書のオンメモリ記憶数 */
     public static final int MAX_LOG_SIZE = 5000;
 
@@ -191,6 +205,7 @@ public class AppConstants {
     public static final int USEITEM_BUCKET = 1;
     public static final int USEITEM_BURNER = 2;
     public static final int USEITEM_RESEARCH = 3;
+    public static final int USEITEM_SCREW = 4;
 
     /** /resources/icon/add.png */
     public static final String R_ICON_ADD = "/resources/icon/add.png";

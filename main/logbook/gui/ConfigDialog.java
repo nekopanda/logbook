@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import logbook.config.AppConfig;
+import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.PushNotify;
@@ -511,121 +512,22 @@ public final class ConfigDialog extends Dialog {
         chartGroup.setLayout(new GridLayout(3, false));
         chartGroup.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
 
-        final Label fuel = new Label(chartGroup, SWT.NONE);
-        fuel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        fuel.setText("燃料の色■");
-        fuel.setForeground(SWTResourceManager.getColor(AppConfig.get().getFuelColor()));
-
-        Button changeFuelColor = new Button(chartGroup, SWT.NONE);
-        changeFuelColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        changeFuelColor.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                ColorDialog dialog = new ColorDialog(ConfigDialog.this.shell);
-                RGB rgb = dialog.open();
-                if (rgb != null) {
-                    fuel.setForeground(SWTResourceManager.getColor(rgb));
-                }
-            }
-        });
-        changeFuelColor.setText("色の設定");
-
-        Button resetFuelColor = new Button(chartGroup, SWT.NONE);
-        resetFuelColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        resetFuelColor.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                fuel.setForeground(SWTResourceManager.getColor(new RGB(0x00, 0x80, 0x00)));
-            }
-        });
-        resetFuelColor.setText("リセット");
-
-        final Label ammo = new Label(chartGroup, SWT.NONE);
-        ammo.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        ammo.setText("弾薬の色■");
-        ammo.setForeground(SWTResourceManager.getColor(AppConfig.get().getAmmoColor()));
-
-        Button changeAmmoColor = new Button(chartGroup, SWT.NONE);
-        changeAmmoColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        changeAmmoColor.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                ColorDialog dialog = new ColorDialog(ConfigDialog.this.shell);
-                RGB rgb = dialog.open();
-                if (rgb != null) {
-                    ammo.setForeground(SWTResourceManager.getColor(rgb));
-                }
-            }
-        });
-        changeAmmoColor.setText("色の設定");
-
-        Button resetAmmoColor = new Button(chartGroup, SWT.NONE);
-        resetAmmoColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        resetAmmoColor.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                ammo.setForeground(SWTResourceManager.getColor(new RGB(0x66, 0x33, 0x00)));
-            }
-        });
-        resetAmmoColor.setText("リセット");
-
-        final Label metal = new Label(chartGroup, SWT.NONE);
-        metal.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        metal.setText("鋼材の色■");
-        metal.setForeground(SWTResourceManager.getColor(AppConfig.get().getMetalColor()));
-
-        Button changeMetalColor = new Button(chartGroup, SWT.NONE);
-        changeMetalColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        changeMetalColor.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                ColorDialog dialog = new ColorDialog(ConfigDialog.this.shell);
-                RGB rgb = dialog.open();
-                if (rgb != null) {
-                    metal.setForeground(SWTResourceManager.getColor(rgb));
-                }
-            }
-        });
-        changeMetalColor.setText("色の設定");
-
-        Button resetMetalColor = new Button(chartGroup, SWT.NONE);
-        resetMetalColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        resetMetalColor.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                metal.setForeground(SWTResourceManager.getColor(new RGB(0x80, 0x80, 0x80)));
-            }
-        });
-        resetMetalColor.setText("リセット");
-
-        final Label bauxite = new Label(chartGroup, SWT.NONE);
-        bauxite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        bauxite.setText("ボーキの色■");
-        bauxite.setForeground(SWTResourceManager.getColor(AppConfig.get().getBauxiteColor()));
-
-        Button changeBauxiteColor = new Button(chartGroup, SWT.NONE);
-        changeBauxiteColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        changeBauxiteColor.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                ColorDialog dialog = new ColorDialog(ConfigDialog.this.shell);
-                RGB rgb = dialog.open();
-                if (rgb != null) {
-                    bauxite.setForeground(SWTResourceManager.getColor(rgb));
-                }
-            }
-        });
-        changeBauxiteColor.setText("色の設定");
-
-        Button resetBauxiteColor = new Button(chartGroup, SWT.NONE);
-        resetBauxiteColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        resetBauxiteColor.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                bauxite.setForeground(SWTResourceManager.getColor(new RGB(0xCC, 0x33, 0x00)));
-            }
-        });
-        resetBauxiteColor.setText("リセット");
+        final Label fuel = this.createColorSetting(chartGroup, "燃料の色■",
+                AppConfig.get().getFuelColor(), AppConstants.CHART_COLOR_TABLE[0]);
+        final Label ammo = this.createColorSetting(chartGroup, "弾薬の色■",
+                AppConfig.get().getAmmoColor(), AppConstants.CHART_COLOR_TABLE[1]);
+        final Label metal = this.createColorSetting(chartGroup, "鋼材の色■",
+                AppConfig.get().getMetalColor(), AppConstants.CHART_COLOR_TABLE[2]);
+        final Label bauxite = this.createColorSetting(chartGroup, "ボーキの色■",
+                AppConfig.get().getBauxiteColor(), AppConstants.CHART_COLOR_TABLE[3]);
+        final Label burner = this.createColorSetting(chartGroup, "バーナーの色■",
+                AppConfig.get().getBurnerColor(), AppConstants.CHART_COLOR_TABLE[4]);
+        final Label bucket = this.createColorSetting(chartGroup, "バケツの色■",
+                AppConfig.get().getBucketColor(), AppConstants.CHART_COLOR_TABLE[5]);
+        final Label research = this.createColorSetting(chartGroup, "開発資材の色■",
+                AppConfig.get().getResearchColor(), AppConstants.CHART_COLOR_TABLE[6]);
+        final Label screw = this.createColorSetting(chartGroup, "ネジの色■",
+                AppConfig.get().getScrewColor(), AppConstants.CHART_COLOR_TABLE[6]);
 
         // ウィンドウ
         Composite compositeWindow = new Composite(this.composite, SWT.NONE);
@@ -992,6 +894,10 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setAmmoColor(ammo.getForeground().getRGB());
                 AppConfig.get().setMetalColor(metal.getForeground().getRGB());
                 AppConfig.get().setBauxiteColor(bauxite.getForeground().getRGB());
+                AppConfig.get().setBurnerColor(burner.getForeground().getRGB());
+                AppConfig.get().setBucketColor(bucket.getForeground().getRGB());
+                AppConfig.get().setResearchColor(research.getForeground().getRGB());
+                AppConfig.get().setScrewColor(screw.getForeground().getRGB());
                 // ウィンドウ
                 AppConfig.get().setOpaqueInterval(opaqueIntervalSpinner.getSelection());
                 for (int i = 0; i < 4; ++i) {
@@ -1049,6 +955,38 @@ public final class ConfigDialog extends Dialog {
         sashForm.setWeights(new int[] { 2, 5 });
         this.scrolledComposite.setContent(this.composite);
         this.scrolledComposite.setMinSize(this.composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+    }
+
+    private Label createColorSetting(Group chartGroup, String title, RGB currentColor, final RGB defaultColor) {
+        final Label label = new Label(chartGroup, SWT.NONE);
+        label.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        label.setText(title);
+        label.setForeground(SWTResourceManager.getColor(currentColor));
+
+        Button changeColor = new Button(chartGroup, SWT.NONE);
+        changeColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        changeColor.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                ColorDialog dialog = new ColorDialog(ConfigDialog.this.shell);
+                RGB rgb = dialog.open();
+                if (rgb != null) {
+                    label.setForeground(SWTResourceManager.getColor(rgb));
+                }
+            }
+        });
+        changeColor.setText("色の設定");
+
+        Button resetColor = new Button(chartGroup, SWT.NONE);
+        resetColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        resetColor.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                label.setForeground(SWTResourceManager.getColor(defaultColor));
+            }
+        });
+        resetColor.setText("リセット");
+        return label;
     }
 
     /**

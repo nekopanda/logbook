@@ -921,7 +921,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getMaterialHeader() {
-        return new String[] { "No.", "日付", "直前のイベント", "燃料", "弾薬", "鋼材", "ボーキ", "高速修復材", "高速建造材", "開発資材" };
+        return new String[] { "No.", "日付", "直前のイベント", "燃料", "弾薬", "鋼材", "ボーキ", "高速修復材", "高速建造材", "開発資材", "改修資材" };
     }
 
     /**
@@ -943,9 +943,10 @@ public final class CreateReportLogic {
                     material.getAmmo(),
                     material.getMetal(),
                     material.getBauxite(),
-                    material.getBucket(),
+                    material.getBucket(), // 間違えてバーナーとバケツを逆にしちゃったけど仕方ない・・・
                     material.getBurner(),
-                    material.getResearch()
+                    material.getResearch(),
+                    material.getScrew()
             });
         }
 
