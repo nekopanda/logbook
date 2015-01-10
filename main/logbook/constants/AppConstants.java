@@ -381,6 +381,9 @@ public class AppConstants {
     /** /resources/hpgauge/50.png */
     public static final String R_HPGAUGE_50 = "/resources/hpgauge/50.png";
 
+    /** 航海日誌のロゴ */
+    public static final String LOGO = "/resources/logo.png";
+
     /** HPゲージイメージ */
     public static final String[] R_HPGAUGE_IMAGES = { AppConstants.R_HPGAUGE_0, AppConstants.R_HPGAUGE_1,
             AppConstants.R_HPGAUGE_2, AppConstants.R_HPGAUGE_3, AppConstants.R_HPGAUGE_4, AppConstants.R_HPGAUGE_5,

@@ -176,28 +176,28 @@ public final class AppConfigBean {
     private int notifyFully = 1;
 
     /** 燃料の色 */
-    private RGB fuelColor = AppConstants.CHART_COLOR_TABLE[0];
+    private RGB fuelColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[0]);
 
     /** 弾薬の色 */
-    private RGB ammoColor = AppConstants.CHART_COLOR_TABLE[1];
+    private RGB ammoColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[1]);
 
     /** 鋼材の色 */
-    private RGB metalColor = AppConstants.CHART_COLOR_TABLE[2];
+    private RGB metalColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[2]);
 
     /** ボーキの色 */
-    private RGB bauxiteColor = AppConstants.CHART_COLOR_TABLE[3];
+    private RGB bauxiteColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[3]);
 
     /** バーナーの色 */
-    private RGB burnerColor = AppConstants.CHART_COLOR_TABLE[4];
+    private RGB burnerColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[4]);
 
     /** バケツの色 */
-    private RGB bucketColor = AppConstants.CHART_COLOR_TABLE[5];
+    private RGB bucketColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[5]);
 
     /** 開発の色 */
-    private RGB researchColor = AppConstants.CHART_COLOR_TABLE[6];
+    private RGB researchColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[6]);
 
     /** ネジの色 */
-    private RGB screwColor = AppConstants.CHART_COLOR_TABLE[7];
+    private RGB screwColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[7]);
 
     /** 開発者オプション-JSONを保存する */
     private boolean storeJson;
@@ -256,6 +256,10 @@ public final class AppConfigBean {
 
     /** システムワイドホットキー (Windowsのみ対応) 0:なし, 1:Ctrl+Shift+z, 2:Win+Z */
     private int systemWideHotKey = 0;
+
+    private static RGB cloneRGB(RGB rgb) {
+        return new RGB(rgb.red, rgb.green, rgb.blue);
+    }
 
     /**
      * ポート番号を取得します。
