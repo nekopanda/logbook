@@ -308,10 +308,10 @@ public final class ApplicationMain extends WindowBase {
      */
     public void createContents() {
         this.display = Display.getDefault();
-        this.dummyHolder = new Shell(this.display, SWT.TOOL);
         super.createContents(this.display, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
         this.shell = this.getShell();
         this.shell.setText(AppConstants.TITLEBAR_TEXT);
+        this.dummyHolder = new Shell(this.display, SWT.TOOL);
         GridLayout glShell = new GridLayout(1, false);
         glShell.horizontalSpacing = 1;
         glShell.marginTop = 0;
@@ -1033,6 +1033,7 @@ public final class ApplicationMain extends WindowBase {
     private void restoreWindows() {
         // まずはメインウィンドウを表示する
         this.setVisible(true);
+        this.shell.forceActive();
         sysPrint("メインウィンドウ表示完了");
         for (WindowBase window : this.getWindowList()) {
             window.restore();

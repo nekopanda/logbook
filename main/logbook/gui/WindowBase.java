@@ -10,6 +10,7 @@ import java.util.Set;
 
 import logbook.config.AppConfig;
 import logbook.config.bean.WindowConfigBean;
+import logbook.constants.AppConstants;
 import logbook.gui.logic.OpacityAnimation;
 import logbook.gui.logic.OpacityAnimationClient;
 import logbook.gui.logic.WindowNativeSupport;
@@ -32,6 +33,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
  * @author Nekopanda
@@ -581,6 +583,7 @@ public class WindowBase {
 
     private void createContents(boolean cascade) {
         this.shell.setData(this);
+        this.shell.setImage(SWTResourceManager.getImage(WindowBase.class, AppConstants.LOGO));
         // ウィンドウ基本メニュー
         this.alphamenu = new Menu(this.shell);
         Menu rootMenu = this.alphamenu;
