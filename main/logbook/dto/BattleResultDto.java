@@ -1,9 +1,13 @@
 package logbook.dto;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import javax.json.JsonObject;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 海戦とドロップした艦娘を表します
@@ -21,6 +25,9 @@ public final class BattleResultDto extends AbstractDto {
 
     /** マス */
     private final int mapCellNo;
+
+    /** 出撃 */
+    private final boolean start;
 
     /** ボスマス */
     private final boolean boss;
@@ -44,15 +51,20 @@ public final class BattleResultDto extends AbstractDto {
      * コンストラクター
      * 
      * @param object JSON Object
-     * @param cell マップ上のマス
-     * @param battle 戦闘詳細
+     * @param mapCellNo マップ上のマス
+     * @param mapBossCellNo　ボスマス
+     * @param eventId EventId
+     * @param isStart 出撃
+     * @param battle 戦闘
      */
-    public BattleResultDto(JsonObject object, int mapCellNo, int mapBossCellNo, int eventId, BattleDto battle) {
+    public BattleResultDto(JsonObject object, int mapCellNo, int mapBossCellNo, int eventId, boolean isStart,
+            BattleDto battle) {
 
         this.battleDate = Calendar.getInstance().getTime();
         this.questName = object.getString("api_quest_name");
         this.rank = object.getString("api_win_rank");
         this.mapCellNo = mapCellNo;
+        this.start = isStart;
         this.boss = (mapCellNo == mapBossCellNo) || (eventId == 5);
         this.enemyName = object.getJsonObject("api_enemy_info").getString("api_deck_name");
         this.dropFlag = object.containsKey("api_get_ship");
@@ -100,11 +112,37 @@ public final class BattleResultDto extends AbstractDto {
     }
 
     /**
-     * ボスマスを取得します。
+     * 出撃を取得します
+     * @return 出撃
+     */
+    public boolean isStart() {
+        return this.start;
+    }
+
+    /**
+     * ボスマスを取得します
      * @return ボスマス
      */
     public boolean isBoss() {
         return this.boss;
+    }
+
+    /**
+     * 出撃・ボステキストを取得します
+     * @return 出撃・ボステキスト
+     */
+    public String getBossText() {
+        if (this.isStart() || this.isBoss()) {
+            List<String> list = new ArrayList<>();
+            if (this.isStart()) {
+                list.add("出撃");
+            }
+            if (this.isBoss()) {
+                list.add("ボス");
+            }
+            return StringUtils.join(list, "&");
+        }
+        return "";
     }
 
     /**
