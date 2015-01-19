@@ -213,7 +213,7 @@ public class BattleAggDialog extends Dialog {
                         Integer.toString(area.getB()), Integer.toString(area.getC()), Integer.toString(area.getD()) });
                 // ボス
                 TreeItem subBoss = new TreeItem(sub, SWT.NONE);
-                subBoss.setText(new String[] { "ボス", Integer.toString(area.getStart()),
+                subBoss.setText(new String[] { "ボス", "",
                         Integer.toString(area.getBossWin()), Integer.toString(area.getBossS()),
                         Integer.toString(area.getBossA()), Integer.toString(area.getBossB()),
                         Integer.toString(area.getBossC()), Integer.toString(area.getBossD()) });
