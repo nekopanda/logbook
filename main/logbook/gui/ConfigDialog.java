@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import logbook.config.AppConfig;
+import logbook.config.bean.WindowLocationBean;
 import logbook.data.context.GlobalContext;
 import logbook.gui.logic.LayoutLogic;
 import logbook.internal.EvaluateExp;
@@ -32,6 +33,7 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
@@ -79,7 +81,7 @@ public final class ConfigDialog extends Dialog {
      */
     private void createContents() {
         this.shell = new Shell(this.getParent(), this.getStyle());
-        this.shell.setSize(550, 380);
+        this.shell.setSize(550, 400);
         this.shell.setText(this.getText());
         this.shell.setLayout(new GridLayout(1, false));
 
@@ -224,6 +226,10 @@ public final class ConfigDialog extends Dialog {
         onlyFromLocalhost.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
         onlyFromLocalhost.setText("ローカルループバックアドレスからの接続のみ受け入れる*");
         onlyFromLocalhost.setSelection(AppConfig.get().isAllowOnlyFromLocalhost());
+
+        final Button resetWindowLocation = new Button(compositeSystem, SWT.CHECK);
+        resetWindowLocation.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        resetWindowLocation.setText("サブウインドウの位置とサイズをリセット");
 
         // 艦隊タブ タブ
         Composite compositeFleetTab = new Composite(this.composite, SWT.NONE);
@@ -627,6 +633,16 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setMaterialLogInterval(materialintervalSpinner.getSelection());
                 AppConfig.get().setCheckUpdate(checkUpdate.getSelection());
                 AppConfig.get().setAllowOnlyFromLocalhost(onlyFromLocalhost.getSelection());
+                if (resetWindowLocation.getSelection()) {
+                    Map<String, WindowLocationBean> map = AppConfig.get().getWindowLocationMap();
+                    synchronized (map) {
+                        map.clear();
+                    }
+                    MessageBox box = new MessageBox(ConfigDialog.this.shell, SWT.ICON_INFORMATION | SWT.OK);
+                    box.setText("設定");
+                    box.setMessage("サブウインドウの位置とサイズがリセットされました");
+                    box.open();
+                }
                 // fleettab
                 AppConfig.get().setDisplayCount(displaycount.getSelection());
                 AppConfig.get().setDefaultSea(seacombo.getItem(seacombo.getSelectionIndex()));

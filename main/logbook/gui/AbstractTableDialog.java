@@ -10,9 +10,11 @@ import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import logbook.config.AppConfig;
+import logbook.gui.listener.SaveWindowLocationAdapter;
 import logbook.gui.listener.TableKeyShortcutAdapter;
 import logbook.gui.listener.TableToClipboardAdapter;
 import logbook.gui.listener.TableToCsvSaveAdapter;
+import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.TableItemCreator;
 
 import org.apache.commons.lang3.StringUtils;
@@ -88,6 +90,11 @@ public abstract class AbstractTableDialog extends Dialog {
         // シェルを作成
         this.shell = new Shell(this.getParent(), this.getStyle());
         this.shell.setSize(this.getSize());
+        // ウインドウ位置を復元
+        LayoutLogic.applyWindowLocation(this.getClass(), this.shell);
+        // 閉じた時にウインドウ位置を保存
+        this.shell.addShellListener(new SaveWindowLocationAdapter(this.getClass()));
+
         this.shell.setText(this.getTitle());
         this.shell.setLayout(new FillLayout());
         // メニューバー

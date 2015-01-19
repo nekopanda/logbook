@@ -22,7 +22,9 @@ import logbook.constants.AppConstants;
 import logbook.dto.chart.Resource;
 import logbook.dto.chart.ResourceLog;
 import logbook.dto.chart.ResourceLog.SortableLog;
+import logbook.gui.listener.SaveWindowLocationAdapter;
 import logbook.gui.logic.CreateReportLogic;
+import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.ResourceChart;
 import logbook.gui.logic.TableItemCreator;
 
@@ -123,6 +125,11 @@ public final class ResourceChartDialog extends Dialog {
         this.shell = new Shell(this.getParent(), this.getStyle());
         this.shell.setMinimumSize(450, 300);
         this.shell.setSize(800, 650);
+        // ウインドウ位置を復元
+        LayoutLogic.applyWindowLocation(this.getClass(), this.shell);
+        // 閉じた時にウインドウ位置を保存
+        this.shell.addShellListener(new SaveWindowLocationAdapter(this.getClass()));
+
         this.shell.setText(this.getText());
         GridLayout glShell = new GridLayout(1, false);
         glShell.verticalSpacing = 2;

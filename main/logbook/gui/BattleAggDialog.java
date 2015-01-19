@@ -13,8 +13,10 @@ import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.dto.BattleAggDetailsDto;
 import logbook.dto.BattleAggUnitDto;
+import logbook.gui.listener.SaveWindowLocationAdapter;
 import logbook.gui.listener.TreeKeyShortcutAdapter;
 import logbook.gui.listener.TreeToClipboardAdapter;
+import logbook.gui.logic.LayoutLogic;
 import logbook.internal.BattleAggDate;
 import logbook.internal.BattleAggUnit;
 
@@ -92,6 +94,11 @@ public class BattleAggDialog extends Dialog {
         // シェルを作成
         this.shell = new Shell(this.getParent(), this.getStyle());
         this.shell.setSize(this.getSize());
+        // ウインドウ位置を復元
+        LayoutLogic.applyWindowLocation(this.getClass(), this.shell);
+        // 閉じた時にウインドウ位置を保存
+        this.shell.addShellListener(new SaveWindowLocationAdapter(this.getClass()));
+
         this.shell.setText(this.getTitle());
         this.shell.setLayout(new FillLayout(SWT.HORIZONTAL));
         // メニューバー

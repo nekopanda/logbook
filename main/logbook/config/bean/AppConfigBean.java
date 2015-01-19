@@ -146,7 +146,10 @@ public final class AppConfigBean {
     private String storeJsonPath = FilenameUtils.concat(new File("").getAbsolutePath(), "json");
 
     /** テーブル列を表示する設定(キー:java.lang.Class.getName()) */
-    private Map<String, boolean[]> visibleColumnMap = new HashMap<String, boolean[]>();
+    private Map<String, boolean[]> visibleColumnMap = new HashMap<>();
+
+    /** ウインドウ位置とサイズ(キー:java.lang.Class.getName()) */
+    private Map<String, WindowLocationBean> windowLocationMap = new HashMap<>();
 
     /**
      * ポート番号を取得します。
@@ -883,4 +886,21 @@ public final class AppConfigBean {
     public void setVisibleColumnMap(Map<String, boolean[]> visibleColumnMap) {
         this.visibleColumnMap = visibleColumnMap;
     }
+
+    /**
+     * ウインドウ位置とサイズ(キー:java.lang.Class.getName())を取得します。
+     * @return ウインドウ位置とサイズ(キー:java.lang.Class.getName())
+     */
+    public Map<String, WindowLocationBean> getWindowLocationMap() {
+        return this.windowLocationMap;
+    }
+
+    /**
+     * ウインドウ位置とサイズ(キー:java.lang.Class.getName())を設定します。
+     * @param windowLocationMap ウインドウ位置とサイズ(キー:java.lang.Class.getName())
+     */
+    public void setWindowLocationMap(Map<String, WindowLocationBean> windowLocationMap) {
+        this.windowLocationMap = windowLocationMap;
+    }
+
 }
