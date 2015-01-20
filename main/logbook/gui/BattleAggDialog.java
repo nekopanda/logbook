@@ -185,7 +185,7 @@ public class BattleAggDialog extends Dialog {
      * @return String[]
      */
     private String[] getTableHeader() {
-        return new String[] { "集計", "出撃計", "勝利合計", "S勝利", "A勝利", "B勝利", "C敗北", "D敗北" };
+        return new String[] { "集計", "出撃合計", "勝利合計", "S勝利", "A勝利", "B勝利", "C敗北", "D敗北" };
     }
 
     /**
@@ -206,7 +206,7 @@ public class BattleAggDialog extends Dialog {
                     Integer.toString(total.getB()), Integer.toString(total.getC()), Integer.toString(total.getD()) });
             // ボス
             TreeItem boss = new TreeItem(root, SWT.NONE);
-            boss.setText(new String[] { "ボス", Integer.toString(total.getStart()), Integer.toString(total.getBossWin()),
+            boss.setText(new String[] { "ボス", "-", Integer.toString(total.getBossWin()),
                     Integer.toString(total.getBossS()), Integer.toString(total.getBossA()),
                     Integer.toString(total.getBossB()), Integer.toString(total.getBossC()),
                     Integer.toString(total.getBossD()) });
@@ -220,7 +220,7 @@ public class BattleAggDialog extends Dialog {
                         Integer.toString(area.getB()), Integer.toString(area.getC()), Integer.toString(area.getD()) });
                 // ボス
                 TreeItem subBoss = new TreeItem(sub, SWT.NONE);
-                subBoss.setText(new String[] { "ボス", "",
+                subBoss.setText(new String[] { "ボス", "-",
                         Integer.toString(area.getBossWin()), Integer.toString(area.getBossS()),
                         Integer.toString(area.getBossA()), Integer.toString(area.getBossB()),
                         Integer.toString(area.getBossC()), Integer.toString(area.getBossD()) });
