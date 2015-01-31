@@ -189,13 +189,19 @@ public final class CreateReportLogic {
             BattleResultDto item = results.get(i);
             body.add(new Comparable[] {
                     new TableRowHeader(i + 1, item),
-                    new DateTimeString(item.getBattleDate()), item.getQuestName(),
+                    new DateTimeString(item.getBattleDate()),
+					item.getQuestName(),
                     (item.getMapCell() != null) ? item.getMapCell().getReportString() : null,
                     item.isBoss() ? "ボス" : "",
-                    item.getRank(), item.getEnemyName(), item.getDropType(),
-                    item.getScreenDropName(), item.isHasTaiha() ? "あり" : "",
-                    item.getFlagShip(), item.getFlagShipCombined(),
-                    item.getMvp(), item.getMvpCombined() });
+                    item.getRank(),
+					item.getEnemyName(),
+					item.getDropType(),
+                    item.getScreenDropName(),
+					item.isHasTaiha() ? "あり" : "",
+                    item.getFlagShip(),
+					item.getFlagShipCombined(),
+                    item.getMvp(),
+					item.getMvpCombined() });
         }
         return body;
     }

@@ -25,6 +25,7 @@ public final class BattleAggUnitDto extends AbstractDto {
      * 
      * @param area 海域名
      * @param rank 評価
+     * @param isStart 出撃
      * @param isBoss ボス
      */
     public void add(MapCellDto area, ResultRank rank) {

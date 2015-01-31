@@ -78,6 +78,10 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     @Tag(23)
     private final int exp;
 
+    /** 経験値ゲージの割合 */
+	@Tag(30)
+    private final float expraito;
+
     /** HP */
     @Tag(24)
     private int nowhp;
@@ -128,6 +132,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
         this.fuel = object.getJsonNumber("api_fuel").intValue();
 
         this.exp = object.getJsonArray("api_exp").getJsonNumber(0).intValue();
+        this.expraito = object.getJsonArray("api_exp").getJsonNumber(2).longValue() / 100f;
         this.nowhp = this.getParam().getHP();
         this.maxhp = this.getMax().getHP();
         this.slotnum = object.getJsonNumber("api_slotnum").intValue();
@@ -300,6 +305,13 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
 
     public void setNowhp(int v) {
         this.nowhp = v;
+    }
+
+    /**
+     * @return 経験値ゲージの割合
+     */
+    public float getExpraito() {
+        return this.expraito;
     }
 
     /**

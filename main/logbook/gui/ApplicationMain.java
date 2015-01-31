@@ -285,19 +285,34 @@ public final class ApplicationMain extends WindowBase {
      */
     @Override
     public void open() {
-        Display display = Display.getDefault();
-        this.createContents();
-        this.registerEvents();
-        sysPrint("ウィンドウ表示開始...");
-        this.restoreWindows();
-        sysPrint("メッセージループに入ります...");
-        while (!this.shell.isDisposed()) {
-            if (!display.readAndDispatch()) {
-                display.sleep();
+        try {
+	        Display display = Display.getDefault();
+	        this.createContents();
+	        this.registerEvents();
+	        sysPrint("ウィンドウ表示開始...");
+	        this.restoreWindows();
+	        sysPrint("メッセージループに入ります...");
+	        while (!this.shell.isDisposed()) {
+	            if (!display.readAndDispatch()) {
+	                display.sleep();
+	
+	
+	
+	
+	
+	
+	
+	            }
+	        }
+	        this.dummyHolder.dispose();
+        } finally {
+            Tray tray = Display.getDefault().getSystemTray();
+            if (tray != null) {
+                for (TrayItem item : tray.getItems()) {
+                    item.dispose();
+                }
             }
         }
-        this.dummyHolder.dispose();
-        this.trayItem.dispose();
     }
 
     @Override
@@ -333,11 +348,7 @@ public final class ApplicationMain extends WindowBase {
                             | SWT.ICON_QUESTION);
                     box.setText("終了の確認");
                     box.setMessage("航海日誌を終了しますか？");
-                    if (box.open() == SWT.YES) {
-                        e.doit = true;
-                    } else {
-                        e.doit = false;
-                    }
+                    e.doit = box.open() == SWT.YES;
                 }
 
                 if (e.doit) {
@@ -1134,7 +1145,9 @@ public final class ApplicationMain extends WindowBase {
         TrayItem item = new TrayItem(tray, SWT.NONE);
         Image image = display.getSystemImage(SWT.ICON_INFORMATION);
         item.setImage(image);
+        item.setToolTipText(AppConstants.NAME + AppConstants.VERSION);
         item.addListener(SWT.Selection, new TraySelectionListener(this.shell));
+        item.addMenuDetectListener(new TrayItemMenuListener(this.getShell()));
         return item;
     }
 

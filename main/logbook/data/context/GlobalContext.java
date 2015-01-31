@@ -147,6 +147,9 @@ public final class GlobalContext {
     /** 出撃中か */
     private static boolean[] isSortie = new boolean[4];
 
+    /** 出撃(START)か */
+    private static boolean isStart;
+
     /**　ユーザ基本情報 */
     private static BasicInfoDto basic;
 
@@ -1035,6 +1038,8 @@ public final class GlobalContext {
                     battleResultList.remove(0);
                 }
             }
+            // 出撃を更新
+            isStart = false;
             addUpdateLog("海戦結果を更新しました");
         } catch (Exception e) {
             LOG.warn("海戦結果を更新しますに失敗しました", e);
@@ -1911,6 +1916,8 @@ public final class GlobalContext {
                     isSortie[1] = true;
                 }
             }
+            // 出撃を更新
+            isStart = true;
 
             JsonObject obj = data.getJsonObject().getJsonObject("api_data");
 

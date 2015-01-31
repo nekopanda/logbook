@@ -1579,4 +1579,21 @@ public final class AppConfigBean {
     public void setTwitterTokenSecret(String twitterTokenSecret) {
         this.twitterTokenSecret = twitterTokenSecret;
     }
+
+    /**
+     * ウインドウ位置とサイズ(キー:java.lang.Class.getName())を取得します。
+     * @return ウインドウ位置とサイズ(キー:java.lang.Class.getName())
+     */
+    public Map<String, WindowLocationBean> getWindowLocationMap() {
+        return this.windowLocationMap;
+    }
+
+    /**
+     * ウインドウ位置とサイズ(キー:java.lang.Class.getName())を設定します。
+     * @param windowLocationMap ウインドウ位置とサイズ(キー:java.lang.Class.getName())
+     */
+    public void setWindowLocationMap(Map<String, WindowLocationBean> windowLocationMap) {
+        this.windowLocationMap = windowLocationMap;
+    }
+
 }

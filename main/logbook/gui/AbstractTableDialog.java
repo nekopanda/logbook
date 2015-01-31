@@ -13,6 +13,7 @@ import logbook.config.bean.TableConfigBean;
 import logbook.gui.listener.TableKeyShortcutAdapter;
 import logbook.gui.listener.TableToClipboardAdapter;
 import logbook.gui.listener.TableToCsvSaveAdapter;
+import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.TableItemCreator;
 
 import org.eclipse.swt.SWT;

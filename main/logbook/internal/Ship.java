@@ -25,7 +25,7 @@ public class Ship {
         {
             this.put("1", new ShipInfoDto("睦月", "駆逐艦", "むつき", 20, 15, 15));
             this.put("2", new ShipInfoDto("如月", "駆逐艦", "きさらぎ", 20, 15, 15));
-            this.put("3", new ShipInfoDto("S那珂", "軽巡洋艦", "なか", 20, 25, 25));
+            this.put("3", ShipInfoDto.EMPTY);
             this.put("4", ShipInfoDto.EMPTY);
             this.put("5", ShipInfoDto.EMPTY);
             this.put("6", new ShipInfoDto("長月", "駆逐艦", "ながつき", 20, 15, 15));
@@ -215,7 +215,7 @@ public class Ship {
             this.put("190", new ShipInfoDto("初風", "駆逐艦", "はつかぜ", 20, 20, 15));
             this.put("191", new ShipInfoDto("伊19", "潜水艦", "い19", 50, 20, 10));
             this.put("192", ShipInfoDto.EMPTY);
-            this.put("193", ShipInfoDto.EMPTY);
+            this.put("193", new ShipInfoDto("足柄改二", "重巡洋艦", "あしがら", 0, 75, 45));
             this.put("194", new ShipInfoDto("羽黒改二", "重巡洋艦", "はぐろ", 0, 75, 45));
             this.put("195", new ShipInfoDto("綾波改二", "駆逐艦", "あやなみ", 0, 20, 15));
             this.put("196", new ShipInfoDto("飛龍改二", "正規空母", "ひりゅう", 0, 75, 70));
@@ -223,7 +223,7 @@ public class Ship {
             this.put("198", ShipInfoDto.EMPTY);
             this.put("199", ShipInfoDto.EMPTY);
             this.put("200", ShipInfoDto.EMPTY);
-            this.put("201", new ShipInfoDto("吹雪改", "駆逐艦", "ふぶき", 0, 20, 15));
+            this.put("201", new ShipInfoDto("吹雪改", "駆逐艦", "ふぶき", 70, 20, 15));
             this.put("202", new ShipInfoDto("白雪改", "駆逐艦", "しらゆき", 0, 20, 15));
             this.put("203", new ShipInfoDto("初雪改", "駆逐艦", "はつゆき", 0, 20, 15));
             this.put("204", new ShipInfoDto("深雪改", "駆逐艦", "みゆき", 0, 20, 15));
@@ -289,7 +289,7 @@ public class Ship {
             this.put("264", new ShipInfoDto("青葉改", "重巡洋艦", "あおば", 0, 55, 35));
             this.put("265", new ShipInfoDto("妙高改", "重巡洋艦", "みょうこう", 70, 70, 40));
             this.put("266", new ShipInfoDto("那智改", "重巡洋艦", "なち", 0, 70, 40));
-            this.put("267", new ShipInfoDto("足柄改", "重巡洋艦", "あしがら", 0, 70, 40));
+            this.put("267", new ShipInfoDto("足柄改", "重巡洋艦", "あしがら", 65, 70, 40));
             this.put("268", new ShipInfoDto("羽黒改", "重巡洋艦", "はぐろ", 65, 70, 40));
             this.put("269", new ShipInfoDto("高雄改", "重巡洋艦", "たかお", 0, 70, 40));
             this.put("270", new ShipInfoDto("愛宕改", "重巡洋艦", "あたご", 0, 70, 40));
@@ -350,7 +350,7 @@ public class Ship {
             this.put("325", new ShipInfoDto("清霜改", "駆逐艦", "きよしも", 0, 20, 15));
             this.put("326", new ShipInfoDto("初春改二", "駆逐艦", "はつはる", 0, 20, 15));
             this.put("327", new ShipInfoDto("朝雲改", "駆逐艦", "あさぐも", 0, 20, 15));
-            this.put("328", ShipInfoDto.EMPTY);
+            this.put("328", new ShipInfoDto("山雲改", "駆逐艦", "やまぐも", 0, 20, 15));
             this.put("329", new ShipInfoDto("野分改", "駆逐艦", "のわき", 0, 20, 15));
             this.put("330", new ShipInfoDto("秋月改", "駆逐艦", "あきづき", 0, 25, 20));
             this.put("331", ShipInfoDto.EMPTY);
@@ -436,7 +436,7 @@ public class Ship {
             this.put("411", new ShipInfoDto("扶桑改二", "航空戦艦", "ふそう", 0, 140, 105));
             this.put("412", new ShipInfoDto("山城改二", "航空戦艦", "やましろ", 0, 140, 105));
             this.put("413", new ShipInfoDto("朝雲", "駆逐艦", "あさぐも", 35, 20, 15));
-            this.put("414", ShipInfoDto.EMPTY);
+            this.put("414", new ShipInfoDto("山雲", "駆逐艦", "やまぐも", 35, 20, 15));
             this.put("415", new ShipInfoDto("野分", "駆逐艦", "のわき", 35, 20, 15));
             this.put("416", new ShipInfoDto("古鷹改二", "重巡洋艦", "ふるたか", 0, 65, 35));
             this.put("417", ShipInfoDto.EMPTY);
@@ -448,7 +448,7 @@ public class Ship {
             this.put("423", ShipInfoDto.EMPTY);
             this.put("424", ShipInfoDto.EMPTY);
             this.put("425", ShipInfoDto.EMPTY);
-            this.put("426", ShipInfoDto.EMPTY);
+            this.put("426", new ShipInfoDto("吹雪改二", "駆逐艦", "ふぶき", 0, 20, 15));
             this.put("427", ShipInfoDto.EMPTY);
             this.put("428", ShipInfoDto.EMPTY);
             this.put("429", ShipInfoDto.EMPTY);

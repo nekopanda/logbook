@@ -1,6 +1,3 @@
-/**
- * 
- */
 package logbook.gui;
 
 import java.util.ArrayList;
@@ -23,6 +20,7 @@ import logbook.dto.MapCellDto;
 import logbook.dto.ResultRank;
 import logbook.gui.listener.TreeKeyShortcutAdapter;
 import logbook.gui.listener.TreeToClipboardAdapter;
+import logbook.gui.logic.LayoutLogic;
 import logbook.internal.BattleAggDate;
 import logbook.internal.BattleAggUnit;
 import logbook.internal.BattleResultServer;
@@ -43,7 +41,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
 /**
- * @author noname
+ * 出撃統計
  *
  */
 public class BattleAggDialog extends WindowBase {
@@ -238,7 +236,7 @@ public class BattleAggDialog extends WindowBase {
      * @return String[]
      */
     private String[] getTableHeader() {
-        return new String[] { "集計", "勝利合計", "S勝利", "A勝利", "B勝利", "C敗北", "D敗北" };
+        return new String[] { "集計", "出撃合計", "勝利合計", "S勝利", "A勝利", "B勝利", "C敗北", "D敗北" };
     }
 
     /**
@@ -268,6 +266,8 @@ public class BattleAggDialog extends WindowBase {
         Calendar lastWeek = BattleAggDate.LAST_WEEK.get();
         // 先月
         Calendar lastMonth = BattleAggDate.LAST_MONTH.get();
+        // 読み込む最小の日付(>=)
+        Calendar min = lastMonth;
 
         // 海戦・ドロップ報告書読み込み
         try {
@@ -309,6 +309,7 @@ public class BattleAggDialog extends WindowBase {
      * @param target 集計対象の日付
      * @param area 海域
      * @param rank ランク
+     * @param isStart 出撃
      * @param isBoss ボス
      */
     private void agg(BattleAggUnit unit, Map<BattleAggUnit, BattleAggUnitDto> to, Calendar std, int field,
