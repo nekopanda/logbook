@@ -175,6 +175,18 @@ public final class AppConfigBean {
     /** 母港の空きがこれ以下で警告表示に変える */
     private int notifyFully = 1;
 
+    /** 母港の空きがこれ以下でバルーン通知 */
+    private int shipFullBalloonNotify = 5;
+
+    /** 母港の空きがこれ以下でバルーン通知 */
+    private boolean enableShipFullBalloonNotify = false;
+
+    /** 装備の空きがこれ以下でバルーン通知 */
+    private int itemFullBalloonNotify = 20;
+
+    /** 装備の空きがこれ以下でバルーン通知 */
+    private boolean enableItemFullBalloonNotify = false;
+
     /** 燃料の色 */
     private RGB fuelColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[0]);
 
@@ -1093,6 +1105,70 @@ public final class AppConfigBean {
      */
     public void setNotifyFully(int notifyFully) {
         this.notifyFully = notifyFully;
+    }
+
+    /**
+     * 母港の空きがこれ以下でバルーン通知を取得します。
+     * @return 母港の空きがこれ以下でバルーン通知
+     */
+    public int getShipFullBalloonNotify() {
+        return this.shipFullBalloonNotify;
+    }
+
+    /**
+     * 母港の空きがこれ以下でバルーン通知を設定します。
+     * @param shipFullBalloonNotify 母港の空きがこれ以下でバルーン通知
+     */
+    public void setShipFullBalloonNotify(int shipFullBalloonNotify) {
+        this.shipFullBalloonNotify = shipFullBalloonNotify;
+    }
+
+    /**
+     * 母港の空きがこれ以下でバルーン通知を取得します。
+     * @return 装備の空きがこれ以下でバルーン通知
+     */
+    public boolean isEnableShipFullBalloonNotify() {
+        return this.enableShipFullBalloonNotify;
+    }
+
+    /**
+     * 母港の空きがこれ以下でバルーン通知を設定します。
+     * @param itemFullBalloonNotify 装備の空きがこれ以下でバルーン通知
+     */
+    public void setEnableShipFullBalloonNotify(boolean enableShipFullBalloonNotify) {
+        this.enableShipFullBalloonNotify = enableShipFullBalloonNotify;
+    }
+
+    /**
+     * 装備の空きがこれ以下でバルーン通知を取得します。
+     * @return 装備の空きがこれ以下でバルーン通知
+     */
+    public int getItemFullBalloonNotify() {
+        return this.itemFullBalloonNotify;
+    }
+
+    /**
+     * 装備の空きがこれ以下でバルーン通知を設定します。
+     * @param itemFullBalloonNotify 装備の空きがこれ以下でバルーン通知
+     */
+    public void setItemFullBalloonNotify(int itemFullBalloonNotify) {
+        this.itemFullBalloonNotify = itemFullBalloonNotify;
+    }
+
+    /**
+     * 装備の空きがこれ以下でバルーン通知を取得します。
+     * @return 装備の空きがこれ以下でバルーン通知
+     */
+    public boolean isEnableItemFullBalloonNotify() {
+        return this.enableItemFullBalloonNotify;
+    }
+
+    /**
+     * 装備の空きがこれ以下でバルーン通知を設定します。
+     * @param itemFullBalloonNotify 装備の空きがこれ以下でバルーン通知
+     */
+    public void setEnableItemFullBalloonNotify(boolean enableItemFullBalloonNotify) {
+        this.enableItemFullBalloonNotify = enableItemFullBalloonNotify;
     }
 
     /**

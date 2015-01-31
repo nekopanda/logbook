@@ -431,8 +431,38 @@ public final class ConfigDialog extends Dialog {
         fullySpinner.setLayoutData(gdFullySpinner);
 
         Label fullyLabel2 = new Label(compositeNotify, SWT.NONE);
-        fullyLabel2.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        fullyLabel2.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         fullyLabel2.setText("以下で警告表示");
+
+        final Button shipFullBalloon = new Button(compositeNotify, SWT.CHECK);
+        shipFullBalloon.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        shipFullBalloon.setSelection(AppConfig.get().isEnableShipFullBalloonNotify());
+        shipFullBalloon.setText("母港の空きが");
+
+        final Spinner shipFullSpinner = new Spinner(compositeNotify, SWT.BORDER);
+        shipFullSpinner.setMaximum(Math.max(100, GlobalContext.maxChara()));
+        shipFullSpinner.setMinimum(0);
+        shipFullSpinner.setSelection(AppConfig.get().getShipFullBalloonNotify());
+        shipFullSpinner.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+
+        Label fullyLabel3 = new Label(compositeNotify, SWT.NONE);
+        fullyLabel3.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        fullyLabel3.setText("以下でバルーン通知");
+
+        final Button itemFullBalloon = new Button(compositeNotify, SWT.CHECK);
+        itemFullBalloon.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        itemFullBalloon.setSelection(AppConfig.get().isEnableItemFullBalloonNotify());
+        itemFullBalloon.setText("装備の空きが");
+
+        final Spinner itemFullSpinner = new Spinner(compositeNotify, SWT.BORDER);
+        itemFullSpinner.setMaximum(Math.max(100, GlobalContext.maxChara()));
+        itemFullSpinner.setMinimum(0);
+        itemFullSpinner.setSelection(AppConfig.get().getItemFullBalloonNotify());
+        itemFullSpinner.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+
+        Label fullyLabel4 = new Label(compositeNotify, SWT.NONE);
+        fullyLabel4.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        fullyLabel4.setText("以下でバルーン通知");
 
         // キャプチャ タブ
         Composite compositeCapture = new Composite(this.composite, SWT.NONE);
@@ -883,6 +913,10 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setUseBalloon(balloon.getSelection());
                 AppConfig.get().setUseTaskbarNotify(taskbar.getSelection());
                 AppConfig.get().setNotifyFully(fullySpinner.getSelection());
+                AppConfig.get().setEnableShipFullBalloonNotify(shipFullBalloon.getSelection());
+                AppConfig.get().setShipFullBalloonNotify(shipFullSpinner.getSelection());
+                AppConfig.get().setEnableItemFullBalloonNotify(itemFullBalloon.getSelection());
+                AppConfig.get().setItemFullBalloonNotify(itemFullSpinner.getSelection());
                 // capture
                 AppConfig.get().setCapturePath(captureDir.getText());
                 AppConfig.get().setImageFormat(imageformatCombo.getItem(imageformatCombo.getSelectionIndex()));

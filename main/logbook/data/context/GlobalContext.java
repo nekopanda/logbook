@@ -1990,18 +1990,29 @@ public final class GlobalContext {
             if (apidata != null) {
                 MasterData.updateMapInfo(apidata);
             }
+            int shipSpace = maxChara - shipMap.size();
+            int itemSpace = maxSlotitem - itemMap.size();
+            // 装備の空き枠が少ない時はバルーンを出す
+            if (AppConfig.get().isEnableItemFullBalloonNotify() &&
+                    (itemSpace <= AppConfig.get().getItemFullBalloonNotify())) {
+                ToolTip tip = new ToolTip(ApplicationMain.main.getShell(), SWT.BALLOON
+                        | SWT.ICON_ERROR);
+                tip.setText("装備の空き枠警告");
+                tip.setMessage("装備の空き枠があと" + itemSpace + "個しかありません");
+                ApplicationMain.main.getTrayItem().setToolTip(tip);
+                tip.setVisible(true);
+                Sound.randomWarningPlay();
+            }
             // 艦娘の空き枠が少ない時はバルーンを出す
-            if (AppConfig.get().isUseTaskbarNotify()) {
-                int aki = maxChara - shipMap.size();
-                if (aki <= AppConfig.get().getNotifyFully()) {
-                    ToolTip tip = new ToolTip(ApplicationMain.main.getShell(), SWT.BALLOON
-                            | SWT.ICON_ERROR);
-                    tip.setText("母港の空き警告");
-                    tip.setMessage("母港の空きがあと" + aki + "隻分しかありません");
-                    ApplicationMain.main.getTrayItem().setToolTip(tip);
-                    tip.setVisible(true);
-                    Sound.randomWarningPlay();
-                }
+            else if (AppConfig.get().isEnableShipFullBalloonNotify() &&
+                    (shipSpace <= AppConfig.get().getShipFullBalloonNotify())) {
+                ToolTip tip = new ToolTip(ApplicationMain.main.getShell(), SWT.BALLOON
+                        | SWT.ICON_ERROR);
+                tip.setText("母港の空き警告");
+                tip.setMessage("母港の空きがあと" + shipSpace + "隻分しかありません");
+                ApplicationMain.main.getTrayItem().setToolTip(tip);
+                tip.setVisible(true);
+                Sound.randomWarningPlay();
             }
         } catch (Exception e) {
             LOG.warn("マップ情報更新に失敗しました", e);
