@@ -135,4 +135,10 @@ public final class SwtUtils {
         box1.setMessage(e.getMessage());
         box1.open();
     }
+
+    public static void messageDialog(String mes, Shell parent) {
+        MessageBox box1 = new MessageBox(parent, SWT.OK | SWT.ICON_INFORMATION);
+        box1.setMessage(mes);
+        box1.open();
+    }
 }

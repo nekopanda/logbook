@@ -1,11 +1,16 @@
 package logbook.internal;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import logbook.config.ShipConfig;
 import logbook.dto.ShipInfoDto;
+import logbook.dto.ShipParameters;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 艦娘
@@ -655,5 +660,34 @@ public class Ship {
      */
     public static Set<String> keySet() {
         return SHIP.keySet();
+    }
+
+    public static void dumpCSV(OutputStreamWriter fw) throws IOException {
+        fw.write(StringUtils.join(new String[] {
+                "名前", "ID", "艦種", "速力", "耐久", "燃料", "弾薬", "火力", "雷装", "対空", "装甲", "射程", "運" },
+                ','));
+        fw.write("\n");
+
+        for (String key : Ship.keySet()) {
+            ShipInfoDto dto = Ship.get(key);
+            ShipParameters param = dto.getParam();
+            if (dto.getName().length() > 0) {
+                fw.write(StringUtils.join(new String[] {
+                        dto.getName(), // 名前
+                        Integer.toString(dto.getShipId()), // ID
+                        dto.getType(), // 
+                        Integer.toString(dto.getMax().getSoku()),
+                        Integer.toString(dto.getMax().getHP()),
+                        Integer.toString(dto.getMaxFuel()),
+                        Integer.toString(dto.getMaxBull()),
+                        Integer.toString(param.getHoug()),
+                        Integer.toString(param.getRaig()),
+                        Integer.toString(param.getTyku()),
+                        Integer.toString(param.getSouk()),
+                        Integer.toString(param.getLeng()),
+                        Integer.toString(param.getLuck()) }, ','));
+                fw.write("\n");
+            }
+        }
     }
 }

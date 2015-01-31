@@ -1,6 +1,7 @@
 package logbook.gui;
 
 import java.awt.Desktop;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -36,6 +37,7 @@ import logbook.internal.BattleResultServer;
 import logbook.internal.EnemyData;
 import logbook.internal.Item;
 import logbook.internal.MasterData;
+import logbook.internal.Ship;
 import logbook.server.proxy.DatabaseClient;
 import logbook.server.proxy.ProxyServer;
 import logbook.thread.ThreadManager;
@@ -581,10 +583,31 @@ public final class ApplicationMain extends WindowBase {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     try {
+                        File file = new File("itemInfo.csv");
                         OutputStreamWriter fw = new OutputStreamWriter(
-                                new FileOutputStream("itemInfo.csv"), AppConstants.CHARSET);
+                                new FileOutputStream(file), AppConstants.CHARSET);
                         Item.dumpCSV(fw);
                         fw.close();
+                        SwtUtils.messageDialog("以下のファイルに書き込みました\n" + file.getAbsolutePath(),
+                                ApplicationMain.this.shell);
+                    } catch (IOException e1) {
+                        logPrint("書き込み失敗: " + e1.getMessage());
+                    }
+                }
+            });
+            MenuItem shipcsvout = new MenuItem(etcmenu, SWT.NONE);
+            shipcsvout.setText("艦娘をCSVダンプ");
+            shipcsvout.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    try {
+                        File file = new File("shipInfo.csv");
+                        OutputStreamWriter fw = new OutputStreamWriter(
+                                new FileOutputStream(file), AppConstants.CHARSET);
+                        Ship.dumpCSV(fw);
+                        fw.close();
+                        SwtUtils.messageDialog("以下のファイルに書き込みました\n" + file.getAbsolutePath(),
+                                ApplicationMain.this.shell);
                     } catch (IOException e1) {
                         logPrint("書き込み失敗: " + e1.getMessage());
                     }

@@ -65,7 +65,7 @@ public class TweetDialog extends WindowBase {
      */
     private void createContents() {
         // シェル
-        super.createContents(this.parent, SWT.CLOSE | SWT.TITLE | SWT.TOOL, false);
+        super.createContents(this.parent, SWT.CLOSE | SWT.TITLE, false);
         this.getShell().setText("つぶやく");
         this.shell = this.getShell();
 
