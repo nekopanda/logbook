@@ -1284,22 +1284,22 @@ public final class CreateReportLogic {
         if (!filter.mission || !filter.notmission) {
             boolean isMission = missionSet.contains(ship.getId());
             // 遠征中
-            if (!filter.mission && !isMission) {
+            if (!filter.mission && isMission) {
                 return false;
             }
             // 遠征中ではない
-            if (filter.notmission && isMission) {
+            if (!filter.notmission && !isMission) {
                 return false;
             }
         }
         if (!filter.needbath || !filter.notneedbath) {
             boolean needBath = (ship.getDocktime() > 0) && !GlobalContext.isNdock(ship.getId());
             // 要修理
-            if (!filter.needbath && !needBath) {
+            if (!filter.needbath && needBath) {
                 return false;
             }
             // 修理の必要なし
-            if (filter.notneedbath && needBath) {
+            if (!filter.notneedbath && !needBath) {
                 return false;
             }
         }

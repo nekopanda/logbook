@@ -30,11 +30,11 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
      */
     public BathwaterTableDialog(Shell parent, MenuItem menuItem) {
         super(parent, menuItem);
+        this.filter.notneedbath = false;
     }
 
     @Override
     protected void createContents() {
-        this.filter.notneedbath = false;
 
         final MenuItem resetVisibles = new MenuItem(this.opemenu, SWT.NONE);
         resetVisibles.setText("表示・非表示をリセット");
@@ -49,11 +49,11 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
 
         final MenuItem removecheck = new MenuItem(this.opemenu, SWT.CHECK);
         removecheck.setText("遠征中の艦娘を外す");
-        removecheck.setSelection(this.filter.mission);
+        removecheck.setSelection(!this.filter.mission);
         removecheck.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                BathwaterTableDialog.this.filter.mission = removecheck.getSelection();
+                BathwaterTableDialog.this.filter.mission = !removecheck.getSelection();
                 BathwaterTableDialog.this.reloadTable();
             }
         });
