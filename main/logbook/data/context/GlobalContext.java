@@ -901,6 +901,12 @@ public final class GlobalContext {
         }
     }
 
+    /**
+     * 艦娘の現在のHPに反映＋轟沈判定
+     * @param ship
+     * @param nowhp
+     * @param sunkShips
+     */
     private static void checkShipSunk(ShipDto ship, int nowhp, List<ShipDto> sunkShips) {
         if (ship.getNowhp() > 0) { // 轟沈している艦は更新しない
             ship.setNowhp(nowhp);
@@ -920,6 +926,7 @@ public final class GlobalContext {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
             if (battle == null) {
                 battle = new BattleExDto(data.getCreateDate());
+                battle.setBasicInfo(maxChara - shipMap.size(), maxSlotitem - itemMap.size());
             }
             BattleExDto.Phase phase = battle.addPhase(apidata, phaseKind);
 

@@ -235,6 +235,9 @@ public final class AppConfigBean {
     /** マウスが離れてから元の透明度に戻るまでの時間（0.1秒単位） */
     private int opaqueInterval = 6;
 
+    /** タイトルバー以外でもドラッグ&ドロップで移動できるようにする */
+    private boolean enableMoveWithDD = true;
+
     /** 艦娘一覧ウィンドウの名前 */
     private String[] shipTableNames = new String[] {
             "所有艦娘一覧 1",
@@ -1393,6 +1396,20 @@ public final class AppConfigBean {
      */
     public void setOpaqueInterval(int opaqueInterval) {
         this.opaqueInterval = opaqueInterval;
+    }
+
+    /**
+     * @return enableMoveWithDD
+     */
+    public boolean isEnableMoveWithDD() {
+        return this.enableMoveWithDD;
+    }
+
+    /**
+     * @param enableMoveWithDD セットする enableMoveWithDD
+     */
+    public void setEnableMoveWithDD(boolean enableMoveWithDD) {
+        this.enableMoveWithDD = enableMoveWithDD;
     }
 
     /**

@@ -7,6 +7,8 @@ import javax.json.JsonObject;
 
 import logbook.constants.AppConstants;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * 海戦とドロップした艦娘を表します
  */
@@ -53,9 +55,12 @@ public class BattleResultDto extends AbstractDto {
 
     private final String flagShipCombined;
 
+    /** 母港の空きがない？ */
+    private final boolean noSpaceForShip;
+
     /**
      * コンストラクター
-     * 
+     * もう使われていない
      * @param object JSON Object
      * @param cell マップ上のマス
      * @param battle 戦闘詳細
@@ -83,6 +88,7 @@ public class BattleResultDto extends AbstractDto {
         this.mvpCombined = null;
         this.flagShip = null;
         this.flagShipCombined = null;
+        this.noSpaceForShip = false;
     }
 
     public BattleResultDto(BattleExDto dto) {
@@ -133,6 +139,8 @@ public class BattleResultDto extends AbstractDto {
         else {
             this.flagShipCombined = null;
         }
+
+        this.noSpaceForShip = (dto.getExVersion() >= 1) && (dto.getShipSpace() == 0);
     }
 
     private boolean hasTaihaInFleet(int[] nowhp, int[] maxhp) {
@@ -232,6 +240,17 @@ public class BattleResultDto extends AbstractDto {
     }
 
     /**
+     * 表示するドロップ艦名
+     * @return 艦名
+     */
+    public String getScreenDropName() {
+        if (StringUtils.isEmpty(this.dropName) && this.noSpaceForShip) {
+            return "※空きなし";
+        }
+        return this.dropName;
+    }
+
+    /**
      * 戦闘詳細を取得します。
      * @return 戦闘詳細
      */
@@ -279,5 +298,12 @@ public class BattleResultDto extends AbstractDto {
      */
     public boolean isCombined() {
         return this.isCombined;
+    }
+
+    /**
+     * @return noSpaceForShip
+     */
+    public boolean isNoSpaceForShip() {
+        return this.noSpaceForShip;
     }
 }

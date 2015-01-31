@@ -564,6 +564,11 @@ public final class ConfigDialog extends Dialog {
         this.compositeMap.put("window", compositeWindow);
         compositeWindow.setLayout(new GridLayout(3, false));
 
+        final Button enableMoveWithDD = new Button(compositeWindow, SWT.CHECK);
+        enableMoveWithDD.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 3, 1));
+        enableMoveWithDD.setSelection(AppConfig.get().isEnableMoveWithDD());
+        enableMoveWithDD.setText("タイトルバー以外でもドラッグ&&ドロップで移動できるようにする*");
+
         Label opaqueInterval = new Label(compositeWindow, SWT.NONE);
         opaqueInterval.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
         opaqueInterval.setText("マウスが離れてから元の透明度に戻るまでの時間");
@@ -934,6 +939,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setScrewColor(screw.getForeground().getRGB());
                 // ウィンドウ
                 AppConfig.get().setOpaqueInterval(opaqueIntervalSpinner.getSelection());
+                AppConfig.get().setEnableMoveWithDD(enableMoveWithDD.getSelection());
                 for (int i = 0; i < 4; ++i) {
                     AppConfig.get().getShipTableNames()[i] = shipTableNameText[i].getText();
                 }

@@ -121,6 +121,22 @@ public class BattleExDto extends AbstractDto {
     @Tag(27)
     private int hqLv;
 
+    /** 
+     * BattleExDtoのバージョン
+     * exVersion == 0 : Tag 34以降がない
+     * exVersion == 1 : Tag 36まである
+     *  */
+    @Tag(34)
+    private int exVersion = 1;
+
+    /** 母港空き（ドロップ分を含まない） */
+    @Tag(35)
+    private int shipSpace;
+
+    /** 装備空き（ドロップ分を含まない） */
+    @Tag(36)
+    private int itemSpace;
+
     /////////////////////////////////////////////////
 
     public static class Phase {
@@ -644,6 +660,11 @@ public class BattleExDto extends AbstractDto {
         this.battleDate = date;
     }
 
+    public void setBasicInfo(int shipSpace, int itemSpace) {
+        this.shipSpace = shipSpace;
+        this.itemSpace = itemSpace;
+    }
+
     public Phase addPhase(JsonObject object, BattlePhaseKind kind) {
         if (this.phaseList.size() == 0) {
             // 最初のフェーズ
@@ -1141,5 +1162,47 @@ public class BattleExDto extends AbstractDto {
      */
     public int getHqLv() {
         return this.hqLv;
+    }
+
+    /**
+     * @return exVersion
+     */
+    public int getExVersion() {
+        return this.exVersion;
+    }
+
+    /**
+     * @param exVersion セットする exVersion
+     */
+    public void setExVersion(int exVersion) {
+        this.exVersion = exVersion;
+    }
+
+    /**
+     * @return shipSpace
+     */
+    public int getShipSpace() {
+        return this.shipSpace;
+    }
+
+    /**
+     * @param shipSpace セットする shipSpace
+     */
+    public void setShipSpace(int shipSpace) {
+        this.shipSpace = shipSpace;
+    }
+
+    /**
+     * @return itemSpace
+     */
+    public int getItemSpace() {
+        return this.itemSpace;
+    }
+
+    /**
+     * @param itemSpace セットする itemSpace
+     */
+    public void setItemSpace(int itemSpace) {
+        this.itemSpace = itemSpace;
     }
 }

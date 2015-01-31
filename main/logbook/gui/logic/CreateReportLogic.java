@@ -193,7 +193,7 @@ public final class CreateReportLogic {
                     (item.getMapCell() != null) ? item.getMapCell().getReportString() : null,
                     item.isBoss() ? "ボス" : "",
                     item.getRank(), item.getEnemyName(), item.getDropType(),
-                    item.getDropName(), item.isHasTaiha() ? "あり" : "",
+                    item.getScreenDropName(), item.isHasTaiha() ? "あり" : "",
                     item.getFlagShip(), item.getFlagShipCombined(),
                     item.getMvp(), item.getMvpCombined() });
         }
@@ -265,11 +265,18 @@ public final class CreateReportLogic {
                 }
             }
 
+            String dropName = battle.getDropName();
+            if (StringUtils.isEmpty(dropName) &&
+                    (battle.getExVersion() >= 1) &&
+                    (battle.getShipSpace() == 0)) {
+                dropName = "※空きなし";
+            }
+
             body.add(new Comparable[] { Integer.toString(i + 1),
                     new DateTimeString(battle.getBattleDate()),
                     battle.getQuestName(),
                     battle.getMapCellDto().toString(), battle.getRank(), battle.getEnemyName(), battle.getDropType(),
-                    battle.getDropName(),
+                    dropName,
                     friend[0], friendHp[0], friend[1], friendHp[1], friend[2], friendHp[2], friend[3], friendHp[3],
                     friend[4], friendHp[4], friend[5], friendHp[5], enemy[0], enemyHp[0], enemy[1], enemyHp[1],
                     enemy[2], enemyHp[2], enemy[3], enemyHp[3], enemy[4], enemyHp[4], enemy[5], enemyHp[5] });

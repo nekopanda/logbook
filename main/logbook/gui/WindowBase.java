@@ -467,7 +467,7 @@ public class WindowBase {
             }
         });
         // ドラックでウィンドウ移動
-        if (this.moveWithDrag()) { // dragMoveHandler
+        if (this.moveWithDrag() && AppConfig.get().isEnableMoveWithDD()) { // dragMoveHandler
             this.dragMoveHandler = new DragMoveEventHandler(this.shell);
             this.addMouseListener(this.shell);
         }
