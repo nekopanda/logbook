@@ -529,8 +529,8 @@ public final class CreateReportLogic {
                 "燃料",//
                 "弾薬",//
                 "修理時間",//
-                "燃料",//
-                "鋼材",//
+                "修理燃料",//
+                "修理鋼材",//
                 "損傷",//
                 "HP1あたり", //
                 "Lv",
@@ -560,6 +560,35 @@ public final class CreateReportLogic {
         };
     }
 
+    public static boolean[] getBathTableDefaultVisibles() {
+        Map<String, Integer> colMap = AppConstants.BATHTABLE_COLUMN_MAP;
+        String[] header = getShipListHeader();
+        boolean[] visibles = new boolean[header.length];
+        for (int i = 0; i < visibles.length; ++i) {
+            visibles[i] = colMap.containsKey(header[i]);
+        }
+        return visibles;
+    }
+
+    public static int[] getBathTableDefaultColumnOrder() {
+        Map<String, Integer> colMap = AppConstants.BATHTABLE_COLUMN_MAP;
+        String[] header = getShipListHeader();
+        int[] order = new int[header.length];
+        int hiddenColIndex = colMap.size();
+        for (int i = 0; i < order.length; ++i) {
+            if (colMap.containsKey(header[i])) {
+                order[colMap.get(header[i])] = i;
+            }
+            else {
+                order[hiddenColIndex++] = i;
+            }
+        }
+        if (hiddenColIndex != header.length) {
+            LOG.warn("BATHTABLE_COLUMN_MAPに実際にはないカラムがあるようです");
+        }
+        return order;
+    }
+
     /**
      * 所有艦娘一覧の内容
      * 
@@ -574,7 +603,7 @@ public final class CreateReportLogic {
         for (ShipWithSortNumber shipObj : getShipWithSortNumber()) {
             ShipDto ship = shipObj.ship;
 
-            if ((filter != null) && !shipFilter(ship, filter)) {
+            if ((filter != null) && !shipFilter(ship, filter, missionSet)) {
                 continue;
             }
 
@@ -1056,7 +1085,7 @@ public final class CreateReportLogic {
      * @param filter フィルターオブジェクト
      * @return フィルタ結果
      */
-    private static boolean shipFilter(ShipDto ship, ShipFilterDto filter) {
+    private static boolean shipFilter(ShipDto ship, ShipFilterDto filter, Set<Integer> missionSet) {
         // テキストでフィルタ
         if (!StringUtils.isEmpty(filter.nametext)) {
             // 検索ワード
@@ -1249,6 +1278,28 @@ public final class CreateReportLogic {
         // 鍵付きではない
         if (!filter.notlocked) {
             if (!ship.getLocked()) {
+                return false;
+            }
+        }
+        if (!filter.mission || !filter.notmission) {
+            boolean isMission = missionSet.contains(ship.getId());
+            // 遠征中
+            if (!filter.mission && !isMission) {
+                return false;
+            }
+            // 遠征中ではない
+            if (filter.notmission && isMission) {
+                return false;
+            }
+        }
+        if (!filter.needbath || !filter.notneedbath) {
+            boolean needBath = (ship.getDocktime() > 0) && !GlobalContext.isNdock(ship.getId());
+            // 要修理
+            if (!filter.needbath && !needBath) {
+                return false;
+            }
+            // 修理の必要なし
+            if (filter.notneedbath && needBath) {
                 return false;
             }
         }

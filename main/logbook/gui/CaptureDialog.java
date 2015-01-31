@@ -457,9 +457,6 @@ public final class CaptureDialog extends WindowBase {
         }
     }
 
-    private void obtainAccessToken() {
-    }
-
     /**
      * Twitterボタンを押した時
      *

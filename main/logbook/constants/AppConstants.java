@@ -3,6 +3,8 @@ package logbook.constants;
 import java.io.File;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TimeZone;
 
 import org.eclipse.swt.graphics.RGB;
@@ -498,4 +500,23 @@ public class AppConstants {
 
     /** 資材ログ_alternativefile.csv */
     public static final String LOG_RESOURCE_ALT = "資材ログ_alternativefile.csv";
+
+    /** お風呂に入りたい艦娘一覧の初期カラム順 */
+    public static final Map<String, Integer> BATHTABLE_COLUMN_MAP = new HashMap<String, Integer>() {
+        {
+            this.put("No.", 0);
+            this.put("ID", 1);
+            this.put("艦隊", 2);
+            this.put("疲労", 3);
+            this.put("修理順", 4);
+            this.put("名前", 5);
+            this.put("Lv", 6);
+            this.put("HP", 7);
+            this.put("修理時間", 8);
+            this.put("修理燃料", 9);
+            this.put("修理鋼材", 10);
+            this.put("損傷", 11);
+            this.put("HP1あたり", 12);
+        }
+    };
 }

@@ -236,12 +236,13 @@ public class ResourceChart {
                 // スケール外データがある場合最初の要素を補完する
                 values[0] = (int) (prevalues[minidx] + ((prevalues[minidx + 1] - prevalues[minidx]) * fr));
             }
+            // データを必要な配列長に圧縮
             for (int j = minidx + 1; j < prevalues.length; j++) {
                 int idx = (int) ((log.time[j] - s) / this.notch);
                 values[idx] = prevalues[j];
             }
             boolean find = false;
-            for (int j = 0; j < (length - 1); j++) {
+            for (int j = 0; j < length; j++) {
                 // 先頭のデータがない場合0扱いにする
                 if (!find) {
                     if (values[j] >= 0) {
@@ -268,15 +269,15 @@ public class ResourceChart {
         }
         if (this.max >= this.min) { // 1つ以上有効なデータがある場合
             // 資材の最大数を1000単位にする、資材の最大数が1000未満なら1000に設定
-            this.max = (int) Math.max(normalize(this.max, 1000), 1000);
+            this.max = (int) Math.ceil((float) (this.max + 100) / 1000) * 1000;
             // 資材の最小数を0.8でかけた後1000単位にする、
-            this.min = (int) Math.max(normalize((long) (this.min * 0.8f), 1000), 0);
+            this.min = (int) Math.max(Math.floor((float) (this.min - 100) / 1000) * 1000, 0);
         }
-        if (this.max2 >= this.max2) { // 1つ以上有効なデータがある場合
+        if (this.max2 >= this.min2) { // 1つ以上有効なデータがある場合
             // 資材の最大数を100単位にする、資材の最大数が100未満なら100に設定
-            this.max2 = (int) Math.max(normalize(this.max2, 100), 100);
+            this.max2 = (int) Math.ceil((float) (this.max2 + 10) / 100) * 100;
             // 資材の最小数を0.8でかけた後100単位にする、
-            this.min2 = (int) Math.max(normalize((long) (this.min2 * 0.8f), 100), 0);
+            this.min2 = (int) Math.max(Math.floor((float) (this.min2 - 10) / 100) * 100, 0);
         }
     }
 
@@ -292,25 +293,6 @@ public class ResourceChart {
     }
 
     /**
-     * 数値を指定した間隔で刻む
-     * 
-     * @param value 数値
-     * @param notch 刻み
-     * @return
-     */
-    private static long normalize(long value, long notch) {
-        long t = value;
-        long half = notch / 2;
-        long mod = t % notch;
-        if (mod >= half) {
-            t += notch - mod;
-        } else {
-            t -= mod;
-        }
-        return t;
-    }
-
-    /**
      * 時刻を指定した間隔で刻む
      * 
      * @param time 時刻
@@ -318,6 +300,6 @@ public class ResourceChart {
      * @return
      */
     private static long normalizeTime(long time, long notch) {
-        return normalize(time + TZ_OFFSET, notch) - TZ_OFFSET;
+        return (((time + TZ_OFFSET + (notch / 2)) / notch) * notch) - TZ_OFFSET;
     }
 }

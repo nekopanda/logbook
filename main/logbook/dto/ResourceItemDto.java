@@ -38,16 +38,17 @@ public class ResourceItemDto {
         this.baseMaterials[3] = Integer.valueOf(data.getField("api_item4"));
     }
 
-    /** JSONの配列で表された資源を読み取る。長さ4 と　長さ7 に対応 */
+    /** JSONの配列で表された資源を読み取る。長さ4 と　長さ8 に対応 */
     public void loadMaterialFronJson(JsonArray data) {
         this.baseMaterials[0] = data.getInt(0);
         this.baseMaterials[1] = data.getInt(1);
         this.baseMaterials[2] = data.getInt(2);
         this.baseMaterials[3] = data.getInt(3);
-        if (data.size() >= 7) {
+        if (data.size() >= 8) {
             this.setBurners(data.getInt(4));
             this.setBuckets(data.getInt(5));
             this.setResearchMaterials(data.getInt(6));
+            this.setScrew(data.getInt(7));
         }
     }
 

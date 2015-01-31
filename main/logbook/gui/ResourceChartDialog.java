@@ -48,8 +48,10 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
@@ -92,6 +94,8 @@ public final class ResourceChartDialog extends WindowBase {
     /** 資材テーブルのボディ */
     private final List<String[]> body = new ArrayList<>();
 
+    private Image currentImage;
+
     private final Button[] enableCheckButtons = new Button[8];
 
     /**
@@ -129,6 +133,15 @@ public final class ResourceChartDialog extends WindowBase {
         this.shell = this.getShell();
         this.shell.setMinimumSize(450, 300);
         this.shell.setSize(800, 650);
+        this.shell.addListener(SWT.Dispose, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                if (ResourceChartDialog.this.currentImage != null) {
+                    ResourceChartDialog.this.currentImage.dispose();
+                    ResourceChartDialog.this.currentImage = null;
+                }
+            }
+        });
         GridLayout glShell = new GridLayout(1, false);
         glShell.verticalSpacing = 2;
         glShell.marginWidth = 2;
@@ -169,7 +182,7 @@ public final class ResourceChartDialog extends WindowBase {
         this.combo.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                ResourceChartDialog.this.canvas.redraw();
+                ResourceChartDialog.this.reloadImage();
             }
         });
 
@@ -181,7 +194,7 @@ public final class ResourceChartDialog extends WindowBase {
         SelectionListener checkboxListener = new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                ResourceChartDialog.this.canvas.redraw();
+                ResourceChartDialog.this.reloadImage();
             }
         };
         this.enableCheckButtons[0] = createCheckbox(enableCheckGroup, "燃料", checkboxListener);
@@ -213,19 +226,15 @@ public final class ResourceChartDialog extends WindowBase {
         this.canvas.addPaintListener(new PaintListener() {
             @Override
             public void paintControl(PaintEvent e) {
-                ResourceLog log = ResourceChartDialog.this.log;
-                int scale = SCALE_DAYS[ResourceChartDialog.this.combo.getSelectionIndex()];
-                String scaleText = "スケール:" + ResourceChartDialog.this.combo.getText();
-                Point size = ResourceChartDialog.this.canvas.getSize();
-                int width = size.x - 1;
-                int height = size.y - 1;
-
-                if (log != null) {
-                    Image image = createImage(log, scale, scaleText, width, height,
-                            ResourceChartDialog.this.getResourceEnabled());
-                    e.gc.drawImage(image, 0, 0);
-                    image.dispose();
+                if (ResourceChartDialog.this.currentImage != null) {
+                    e.gc.drawImage(ResourceChartDialog.this.currentImage, 0, 0);
                 }
+            }
+        });
+        this.canvas.addListener(SWT.Resize, new Listener() {
+            @Override
+            public void handleEvent(Event e) {
+                ResourceChartDialog.this.reloadImage();
             }
         });
 
@@ -245,6 +254,24 @@ public final class ResourceChartDialog extends WindowBase {
             createTableBody(this.log, this.body);
             this.setTableBody();
             this.packTableHeader();
+        }
+    }
+
+    private void reloadImage() {
+        ResourceLog log = ResourceChartDialog.this.log;
+        int scale = SCALE_DAYS[ResourceChartDialog.this.combo.getSelectionIndex()];
+        String scaleText = "スケール:" + ResourceChartDialog.this.combo.getText();
+        Point size = ResourceChartDialog.this.canvas.getSize();
+        int width = size.x - 1;
+        int height = size.y - 1;
+
+        if (log != null) {
+            if (this.currentImage != null) {
+                this.currentImage.dispose();
+            }
+            this.currentImage = createImage(log, scale, scaleText, width, height,
+                    ResourceChartDialog.this.getResourceEnabled());
+            this.canvas.redraw();
         }
     }
 

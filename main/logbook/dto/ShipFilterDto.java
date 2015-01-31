@@ -59,4 +59,12 @@ public final class ShipFilterDto extends AbstractDto {
     public boolean locked = true;
     /** 鍵付きではない */
     public boolean notlocked = true;
+    /** 遠征中 */
+    public boolean mission = true;
+    /** 遠征中ではない */
+    public boolean notmission = true;
+    /** 要修理 */
+    public boolean needbath = true;
+    /** 修理の必要なし */
+    public boolean notneedbath = true;
 }

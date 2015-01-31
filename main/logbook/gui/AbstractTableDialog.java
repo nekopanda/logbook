@@ -3,7 +3,6 @@ package logbook.gui;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -401,11 +400,16 @@ public abstract class AbstractTableDialog extends WindowBase {
         this.table.setRedraw(true);
     }
 
-    private void resetColumnOrder() {
+    protected int[] defaultColumnOrder() {
         int[] columnOrder = new int[this.header.length];
         for (int i = 0; i < this.header.length; ++i) {
             columnOrder[i] = i;
         }
+        return columnOrder;
+    }
+
+    private void resetColumnOrder() {
+        int[] columnOrder = this.defaultColumnOrder();
         if (this.config != null) {
             this.config.setColumnOrder(columnOrder);
         }

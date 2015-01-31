@@ -1463,7 +1463,7 @@ public final class AppConfigBean {
      * @return twitterToken
      */
     public String getTwitterToken() {
-        return twitterToken;
+        return this.twitterToken;
     }
 
     /**
@@ -1477,7 +1477,7 @@ public final class AppConfigBean {
      * @return twitterTokenSecret
      */
     public String getTwitterTokenSecret() {
-        return twitterTokenSecret;
+        return this.twitterTokenSecret;
     }
 
     /**
