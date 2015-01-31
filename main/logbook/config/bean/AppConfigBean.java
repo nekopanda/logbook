@@ -257,6 +257,10 @@ public final class AppConfigBean {
     /** システムワイドホットキー (Windowsのみ対応) 0:なし, 1:Ctrl+Shift+z, 2:Win+Z */
     private int systemWideHotKey = 0;
 
+    /** TwitterのAccessToken */
+    private String twitterToken;
+    private String twitterTokenSecret;
+
     private static RGB cloneRGB(RGB rgb) {
         return new RGB(rgb.red, rgb.green, rgb.blue);
     }
@@ -1453,5 +1457,33 @@ public final class AppConfigBean {
      */
     public void setSystemWideHotKey(int systemWideHotKey) {
         this.systemWideHotKey = systemWideHotKey;
+    }
+
+    /**
+     * @return twitterToken
+     */
+    public String getTwitterToken() {
+        return twitterToken;
+    }
+
+    /**
+     * @param twitterToken セットする twitterToken
+     */
+    public void setTwitterToken(String twitterToken) {
+        this.twitterToken = twitterToken;
+    }
+
+    /**
+     * @return twitterTokenSecret
+     */
+    public String getTwitterTokenSecret() {
+        return twitterTokenSecret;
+    }
+
+    /**
+     * @param twitterTokenSecret セットする twitterTokenSecret
+     */
+    public void setTwitterTokenSecret(String twitterTokenSecret) {
+        this.twitterTokenSecret = twitterTokenSecret;
     }
 }

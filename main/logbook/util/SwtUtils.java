@@ -1,9 +1,17 @@
 package logbook.util;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import javax.annotation.CheckForNull;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.GridData;
@@ -11,6 +19,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TaskBar;
 import org.eclipse.swt.widgets.TaskItem;
@@ -95,5 +104,35 @@ public final class SwtUtils {
         gd.heightHint = (int) (((heightInPoint * DPI_Y) / 72.0) * lineHeight);
         lbl.setLayoutData(gd);
         return gd;
+    }
+
+    public static Image makeImage(File file) throws IOException {
+        InputStream stream = new FileInputStream(file);
+        try {
+            Display display = Display.getCurrent();
+            ImageData data = new ImageData(stream);
+            if (data.transparentPixel > 0) {
+                return new Image(display, data, data.getTransparencyMask());
+            }
+            return new Image(display, data);
+        } finally {
+            stream.close();
+        }
+    }
+
+    public static Image scaleToFit(Image img, int width, int height) {
+        ImageData data = img.getImageData();
+        float factor = Math.min((float) width / data.width, (float) height / data.height);
+        if (factor <= 0) {
+            return null;
+        }
+        ImageData scaled = data.scaledTo((int) (data.width * factor), (int) (data.height * factor));
+        return new Image(Display.getDefault(), scaled);
+    }
+
+    public static void errorDialog(Exception e, Shell parent) {
+        MessageBox box1 = new MessageBox(parent, SWT.OK | SWT.ICON_ERROR);
+        box1.setMessage(e.getMessage());
+        box1.open();
     }
 }
