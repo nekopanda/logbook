@@ -173,7 +173,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getBattleResultHeader() {
-        return new String[] { "No.", "日付", "海域", "マス", "ボス", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘",
+        return new String[] { "No.", "日付", "海域", "マス", "出撃", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘",
                 "大破艦", "旗艦", "旗艦(第二艦隊)", "MVP", "MVP(第二艦隊)" };
     }
 
@@ -190,18 +190,18 @@ public final class CreateReportLogic {
             body.add(new Comparable[] {
                     new TableRowHeader(i + 1, item),
                     new DateTimeString(item.getBattleDate()),
-					item.getQuestName(),
+                    item.getQuestName(),
                     (item.getMapCell() != null) ? item.getMapCell().getReportString() : null,
-                    item.isBoss() ? "ボス" : "",
+                    item.getBossText(),
                     item.getRank(),
-					item.getEnemyName(),
-					item.getDropType(),
+                    item.getEnemyName(),
+                    item.getDropType(),
                     item.getScreenDropName(),
-					item.isHasTaiha() ? "あり" : "",
+                    item.isHasTaiha() ? "あり" : "",
                     item.getFlagShip(),
-					item.getFlagShipCombined(),
+                    item.getFlagShipCombined(),
                     item.getMvp(),
-					item.getMvpCombined() });
+                    item.getMvpCombined() });
         }
         return body;
     }

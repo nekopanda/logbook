@@ -28,6 +28,7 @@ import logbook.gui.background.AsyncExecUpdateCheck;
 import logbook.gui.background.BackgroundInitializer;
 import logbook.gui.listener.HelpEventListener;
 import logbook.gui.listener.MainShellAdapter;
+import logbook.gui.listener.TrayItemMenuListener;
 import logbook.gui.listener.TraySelectionListener;
 import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.PushNotify;
@@ -286,25 +287,19 @@ public final class ApplicationMain extends WindowBase {
     @Override
     public void open() {
         try {
-	        Display display = Display.getDefault();
-	        this.createContents();
-	        this.registerEvents();
-	        sysPrint("ウィンドウ表示開始...");
-	        this.restoreWindows();
-	        sysPrint("メッセージループに入ります...");
-	        while (!this.shell.isDisposed()) {
-	            if (!display.readAndDispatch()) {
-	                display.sleep();
-	
-	
-	
-	
-	
-	
-	
-	            }
-	        }
-	        this.dummyHolder.dispose();
+            Display display = Display.getDefault();
+            this.createContents();
+            this.registerEvents();
+            sysPrint("ウィンドウ表示開始...");
+            this.restoreWindows();
+            sysPrint("メッセージループに入ります...");
+            while (!this.shell.isDisposed()) {
+                if (!display.readAndDispatch()) {
+                    display.sleep();
+
+                }
+            }
+            this.dummyHolder.dispose();
         } finally {
             Tray tray = Display.getDefault().getSystemTray();
             if (tray != null) {
@@ -1147,7 +1142,7 @@ public final class ApplicationMain extends WindowBase {
         item.setImage(image);
         item.setToolTipText(AppConstants.NAME + AppConstants.VERSION);
         item.addListener(SWT.Selection, new TraySelectionListener(this.shell));
-        item.addMenuDetectListener(new TrayItemMenuListener(this.getShell()));
+        item.addMenuDetectListener(new TrayItemMenuListener());
         return item;
     }
 

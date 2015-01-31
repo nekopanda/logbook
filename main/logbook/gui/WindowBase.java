@@ -510,7 +510,7 @@ public class WindowBase {
         }
     }
 
-    private void hideWindow() {
+    public void hideWindow() {
         // 閉じる前に位置を記憶
         WindowBase.this.save();
         WindowBase.this.menuItem.setSelection(false);

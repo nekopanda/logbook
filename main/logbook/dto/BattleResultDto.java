@@ -202,7 +202,7 @@ public class BattleResultDto extends AbstractDto {
      * @return 出撃
      */
     public boolean isStart() {
-        return this.start;
+        return (this.mapCell != null) ? this.mapCell.isStart() : false;
     }
 
     /**

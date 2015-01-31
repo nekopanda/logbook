@@ -5,12 +5,15 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import logbook.config.AppConfig;
 import logbook.data.context.GlobalContext;
 import logbook.dto.DeckMissionDto;
 import logbook.dto.NdockDto;
 import logbook.dto.ShipDto;
-import logbook.gui.BattleAggDialog;
+import logbook.gui.ApplicationMain;
+import logbook.gui.ConfigDialog;
 import logbook.gui.ResourceChartDialog;
+import logbook.gui.WindowBase;
 import logbook.gui.logic.TimeLogic;
 
 import org.eclipse.swt.SWT;
@@ -27,16 +30,13 @@ import org.eclipse.swt.widgets.Shell;
  *
  */
 public final class TrayItemMenuListener implements MenuDetectListener {
-    /**　Shell */
-    private final Shell shell;
     /** メニュー */
     private Menu menu;
 
     /**
      * コンストラクター
      */
-    public TrayItemMenuListener(Shell shell) {
-        this.shell = shell;
+    public TrayItemMenuListener() {
     }
 
     @Override
@@ -45,7 +45,8 @@ public final class TrayItemMenuListener implements MenuDetectListener {
         if (this.menu != null) {
             this.menu.dispose();
         }
-        this.menu = new Menu(this.shell);
+        final Shell shell = ApplicationMain.main.getShell();
+        this.menu = new Menu(shell);
         // 装備数
         int itemCount = GlobalContext.getItemMap().size();
         // 最大保有可能 装備数
@@ -55,69 +56,83 @@ public final class TrayItemMenuListener implements MenuDetectListener {
         // 最大保有可能 艦娘数
         int shipMax = GlobalContext.maxChara();
 
-        // 所有装備一覧
-        MenuItem itemlist = new MenuItem(this.menu, SWT.NONE);
-        itemlist.setText("所有装備一覧(&I) (" + itemCount + "/" + itemMax + ")");
-        itemlist.addSelectionListener(new ItemListReportAdapter(this.shell));
-        // 所有艦娘一覧
-        MenuItem shiplist = new MenuItem(this.menu, SWT.NONE);
-        shiplist.setText("所有艦娘一覧(&S) (" + shipCount + "/" + shipMax + ")");
-        shiplist.addSelectionListener(new ShipListReportAdapter(this.shell));
-        new MenuItem(this.menu, SWT.SEPARATOR);
+        String[] shpiTableNames = AppConfig.get().getShipTableNames();
 
-        // 報告書
-        MenuItem reportItem = new MenuItem(this.menu, SWT.CASCADE);
-        reportItem.setText("報告書(&R)");
-        Menu reportMenu = new Menu(reportItem);
-        reportItem.setMenu(reportMenu);
-        // 報告書-ドロップ報告書
-        MenuItem drop = new MenuItem(reportMenu, SWT.NONE);
-        drop.setText("ドロップ報告書(&D)");
-        drop.addSelectionListener(new DropReportAdapter(this.shell));
-        // 報告書-建造報告書
-        MenuItem createship = new MenuItem(reportMenu, SWT.NONE);
-        createship.setText("建造報告書(&B)");
-        createship.addSelectionListener(new CreateShipReportAdapter(this.shell));
-        // 報告書-開発報告書
-        MenuItem createitem = new MenuItem(reportMenu, SWT.NONE);
-        createitem.setText("開発報告書(&E)");
-        createitem.addSelectionListener(new CreateItemReportAdapter(this.shell));
-        // 報告書-遠征報告書
-        MenuItem missionresult = new MenuItem(reportMenu, SWT.NONE);
-        missionresult.setText("遠征報告書(&T)");
-        missionresult.addSelectionListener(new MissionResultReportAdapter(this.shell));
+        WindowBase[] winList = ApplicationMain.main.getWindowList();
+        String[] nameList = new String[] {
+                "キャプチャ(&C)", // 0
+                "ドロップ報告書(&D)", // 1
+                "建造報告書(&Y)", // 2
+                "開発報告書(&E)", // 3
+                "遠征報告書(&T)", // 4
+                "所有装備一覧(&X) (" + itemCount + "/" + itemMax + ")", // 5
+                shpiTableNames[0] + "(&S) (" + shipCount + "/" + shipMax + ")", // 6
+                shpiTableNames[1] + "(&2)", // 7
+                shpiTableNames[2] + "(&3)", // 8
+                shpiTableNames[3] + "(&4)", // 9
+                "お風呂に入りたい艦娘(&N)", // 10
+                "任務一覧(&Q)", // 11
+                "戦況(&B)", // 12
+                "戦況-横(&H)", // 13
+                "自軍敵軍パラメータ(&P)", // 14
+                "経験値計算機(&C)", // 15
+                "演習経験値計算機(&V)", // 16
+                "グループエディタ(&G)", // 17
+                "出撃統計(&A)", // 18
+                "ロー" // 最後は自分
+        };
+        boolean[] hasSeparator = new boolean[] {
+                false,
+                true,
+                false,
+                false,
+                false,
+                true,
+                true,
+                false,
+                false,
+                false,
+                false,
+                true,
+                false,
+                false,
+                false,
+                true,
+                false,
+                false,
+                false,
+        };
 
-        // 統計
-        MenuItem calcItem = new MenuItem(this.menu, SWT.CASCADE);
-        calcItem.setText("計算機(&C)");
-        Menu calcMenu = new Menu(calcItem);
-        calcItem.setMenu(calcMenu);
-        // 経験値計算
-        MenuItem calcexp = new MenuItem(calcMenu, SWT.NONE);
-        calcexp.setText("経験値計算機(&C)");
-        calcexp.addSelectionListener(new CalcExpAdapter(this.shell));
+        for (int i = 0; i < (winList.length - 1); i++) {
+            if (hasSeparator[i]) {
+                new MenuItem(this.menu, SWT.SEPARATOR);
+            }
+            final WindowBase win = winList[i];
+            final MenuItem menuItem = new MenuItem(this.menu, SWT.PUSH);
+            menuItem.setText(nameList[i]);
+            menuItem.setSelection(win.getMenuItem().getSelection());
+            menuItem.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    boolean open = menuItem.getSelection();
+                    if (open) {
+                        win.open();
+                        win.getShell().setActive();
+                    }
+                    else {
+                        win.hideWindow();
+                    }
+                }
+            });
+        }
 
-        // 統計
-        MenuItem statItem = new MenuItem(this.menu, SWT.CASCADE);
-        statItem.setText("統計(&A)");
-        Menu statMenu = new Menu(statItem);
-        statItem.setMenu(statMenu);
         // 資材チャート
-        MenuItem resourceChart = new MenuItem(statMenu, SWT.NONE);
+        MenuItem resourceChart = new MenuItem(this.menu, SWT.NONE);
         resourceChart.setText("資材チャート(&R)");
         resourceChart.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                new ResourceChartDialog(TrayItemMenuListener.this.shell).open();
-            }
-        });
-        // 出撃統計
-        MenuItem battleCounter = new MenuItem(statMenu, SWT.NONE);
-        battleCounter.setText("出撃統計(&A)");
-        battleCounter.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                new BattleAggDialog(TrayItemMenuListener.this.shell).open();
+                new ResourceChartDialog(shell).open();
             }
         });
         new MenuItem(this.menu, SWT.SEPARATOR);
@@ -144,7 +159,7 @@ public final class TrayItemMenuListener implements MenuDetectListener {
         ndockItem.setText("入渠(&M)");
         Menu ndockMenu = new Menu(ndockItem);
         ndockItem.setMenu(ndockMenu);
-        Map<Long, ShipDto> shipMap = GlobalContext.getShipMap();
+        Map<Integer, ShipDto> shipMap = GlobalContext.getShipMap();
         NdockDto[] ndocks = GlobalContext.getNdocks();
         for (NdockDto ndockDto : ndocks) {
             if ((ndockDto != null) && (shipMap.get(ndockDto.getNdockid()) != null)) {
@@ -163,15 +178,20 @@ public final class TrayItemMenuListener implements MenuDetectListener {
         new MenuItem(this.menu, SWT.SEPARATOR);
         // 設定
         MenuItem config = new MenuItem(this.menu, SWT.NONE);
-        config.setText("設定(&P)");
-        config.addSelectionListener(new ConfigDialogAdapter(this.shell));
+        config.setText("設定(&O)");
+        config.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                new ConfigDialog(ApplicationMain.main).open();
+            }
+        });
         // 終了
         final MenuItem dispose = new MenuItem(this.menu, SWT.NONE);
-        dispose.setText("終了(&X)");
+        dispose.setText("終了");
         dispose.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                TrayItemMenuListener.this.shell.close();
+                shell.close();
             }
         });
         this.menu.setVisible(true);

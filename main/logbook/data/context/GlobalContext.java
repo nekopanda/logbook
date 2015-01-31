@@ -1921,7 +1921,7 @@ public final class GlobalContext {
 
             JsonObject obj = data.getJsonObject().getJsonObject("api_data");
 
-            mapCellDto = new MapCellDto(obj);
+            mapCellDto = new MapCellDto(obj, isStart);
             updateDetailedMaterial("出撃", null, MATERIAL_DIFF.NONE);
 
             ApplicationMain.main.startSortie();
@@ -1945,7 +1945,7 @@ public final class GlobalContext {
         try {
             JsonObject obj = data.getJsonObject().getJsonObject("api_data");
 
-            mapCellDto = new MapCellDto(obj);
+            mapCellDto = new MapCellDto(obj, isStart);
             ApplicationMain.main.updateMapCell(mapCellDto);
             if (AppConfig.get().isPrintSortieLog())
                 addConsole("行先 " + mapCellDto.toString());

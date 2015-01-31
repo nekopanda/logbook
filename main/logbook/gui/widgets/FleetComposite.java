@@ -30,14 +30,13 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolTip;
 import org.eclipse.wb.swt.SWTResourceManager;
@@ -64,9 +63,9 @@ public class FleetComposite extends Composite {
     /** HPゲージ幅 */
     private static final int GAUGE_WIDTH = 50;
     /** HPゲージ高さ */
-    private static final int GAUGE_HEIGHT = 10;
+    private static final int GAUGE_HEIGHT = 12;
     /** 経験値ゲージ高さ */
-    private static final int EXP_GAUGE_HEIGHT = 2;
+    private static final int EXP_GAUGE_HEIGHT = 4;
     /** HPゲージ最小色 */
     private static final RGB GAUGE_EMPTY = new RGB(0xff, 0, 0);
     /** HPゲージ中間色 */
@@ -775,8 +774,6 @@ public class FleetComposite extends Composite {
     @Override
     public void dispose() {
         super.dispose();
-        this.large.dispose();
-        this.small.dispose();
         for (Image image : this.hpgaugeImages) {
             if (image != null) {
                 image.dispose();

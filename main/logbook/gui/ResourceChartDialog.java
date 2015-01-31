@@ -21,9 +21,7 @@ import logbook.constants.AppConstants;
 import logbook.dto.chart.Resource;
 import logbook.dto.chart.ResourceLog;
 import logbook.dto.chart.ResourceLog.SortableLog;
-import logbook.gui.listener.SaveWindowLocationAdapter;
 import logbook.gui.logic.CreateReportLogic;
-import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.ResourceChart;
 import logbook.gui.logic.TableItemCreator;
 

@@ -664,13 +664,15 @@ public class Ship {
 
     public static void dumpCSV(OutputStreamWriter fw) throws IOException {
         fw.write(StringUtils.join(new String[] {
-                "名前", "ID", "艦種", "速力", "耐久", "燃料", "弾薬", "火力", "雷装", "対空", "装甲", "射程", "運" },
+                "名前", "ID", "艦種", "速力", "耐久", "燃料", "弾薬",
+                "火力", "火力(max)", "雷装", "雷装(max)", "対空", "対空(max)", "装甲", "装甲(max)", "射程", "運", "運(max)" },
                 ','));
         fw.write("\n");
 
         for (String key : Ship.keySet()) {
             ShipInfoDto dto = Ship.get(key);
             ShipParameters param = dto.getParam();
+            ShipParameters max = dto.getMax();
             if (dto.getName().length() > 0) {
                 fw.write(StringUtils.join(new String[] {
                         dto.getName(), // 名前
@@ -681,11 +683,16 @@ public class Ship {
                         Integer.toString(dto.getMaxFuel()),
                         Integer.toString(dto.getMaxBull()),
                         Integer.toString(param.getHoug()),
+                        Integer.toString(max.getHoug()),
                         Integer.toString(param.getRaig()),
+                        Integer.toString(max.getRaig()),
                         Integer.toString(param.getTyku()),
+                        Integer.toString(max.getTyku()),
                         Integer.toString(param.getSouk()),
+                        Integer.toString(max.getSouk()),
                         Integer.toString(param.getLeng()),
-                        Integer.toString(param.getLuck()) }, ','));
+                        Integer.toString(param.getLuck()),
+                        Integer.toString(max.getLuck()) }, ','));
                 fw.write("\n");
             }
         }

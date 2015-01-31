@@ -30,14 +30,14 @@ public final class BattleAggUnitDto extends AbstractDto {
      */
     public void add(MapCellDto area, ResultRank rank) {
         // 合算に評価を加算
-        this.total.add(rank, area.isBoss());
+        this.total.add(rank, area.isStart(), area.isBoss());
         // 海域毎に評価を加算
         BattleAggDetailsDto areaAgg = this.areaDetails.get(area.getAreaId());
         if (areaAgg == null) {
             areaAgg = new BattleAggDetailsDto(area.getAreaString());
             this.areaDetails.put(area.getAreaId(), areaAgg);
         }
-        areaAgg.add(rank, area.isBoss());
+        areaAgg.add(rank, area.isStart(), area.isBoss());
     }
 
     /**

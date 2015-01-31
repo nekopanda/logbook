@@ -20,7 +20,6 @@ import logbook.dto.MapCellDto;
 import logbook.dto.ResultRank;
 import logbook.gui.listener.TreeKeyShortcutAdapter;
 import logbook.gui.listener.TreeToClipboardAdapter;
-import logbook.gui.logic.LayoutLogic;
 import logbook.internal.BattleAggDate;
 import logbook.internal.BattleAggUnit;
 import logbook.internal.BattleResultServer;
@@ -279,6 +278,11 @@ public class BattleAggDialog extends WindowBase {
                 if (mapCell == null)
                     continue;
 
+                // 読み込む最小の日付未満の場合は読み飛ばす
+                if (min.compareTo(date) > 0) {
+                    continue;
+                }
+
                 // デイリー集計
                 this.agg(BattleAggUnit.DAILY, aggMap, today, Calendar.DAY_OF_YEAR, date, mapCell, rank);
                 // ウィークリー集計
@@ -444,13 +448,13 @@ public class BattleAggDialog extends WindowBase {
 
         private void setDto(String title, BattleAggDetailsDto area) {
             // メイン
-            this.item.setText(new String[] { title, Integer.toString(area.getWin()),
+            this.item.setText(new String[] { title, Integer.toString(area.getStart()), Integer.toString(area.getWin()),
                     Integer.toString(area.getS()), Integer.toString(area.getA()), Integer.toString(area.getB()),
                     Integer.toString(area.getC()), Integer.toString(area.getD()) });
             this.item.setData(this);
             // ボス
             this.bossItem = new TreeItem(this.item, SWT.NONE);
-            this.bossItem.setText(new String[] { "ボス", Integer.toString(area.getBossWin()),
+            this.bossItem.setText(new String[] { "ボス", "-", Integer.toString(area.getBossWin()),
                     Integer.toString(area.getBossS()), Integer.toString(area.getBossA()),
                     Integer.toString(area.getBossB()), Integer.toString(area.getBossC()),
                     Integer.toString(area.getBossD()) });
