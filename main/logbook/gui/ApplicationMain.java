@@ -55,7 +55,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
@@ -1138,9 +1137,8 @@ public final class ApplicationMain extends WindowBase {
         // トレイアイコンを追加します
         Tray tray = display.getSystemTray();
         TrayItem item = new TrayItem(tray, SWT.NONE);
-        Image image = display.getSystemImage(SWT.ICON_INFORMATION);
-        item.setImage(image);
-        item.setToolTipText(AppConstants.NAME + AppConstants.VERSION);
+        item.setImage(SWTResourceManager.getImage(WindowBase.class, AppConstants.LOGO));
+        item.setToolTipText(AppConstants.TITLEBAR_TEXT);
         item.addListener(SWT.Selection, new TraySelectionListener(this.shell));
         item.addMenuDetectListener(new TrayItemMenuListener());
         return item;

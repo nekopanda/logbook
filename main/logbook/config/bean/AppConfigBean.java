@@ -167,6 +167,9 @@ public final class AppConfigBean {
     private String defaultEvaluate = "S勝利";
 
     /** 索敵表示形式 */
+    private boolean useRecommendedSakuteki = true;
+
+    /** 索敵表示形式 */
     private int sakutekiMethod = 0;
 
     /** タスクバー通知を使用する */
@@ -1060,6 +1063,20 @@ public final class AppConfigBean {
      */
     public void setDefaultEvaluate(String defaultEvaluate) {
         this.defaultEvaluate = defaultEvaluate;
+    }
+
+    /**
+     * @return useRecommendedSakuteki
+     */
+    public boolean isUseRecommendedSakuteki() {
+        return this.useRecommendedSakuteki;
+    }
+
+    /**
+     * @param useRecommendedSakuteki セットする useRecommendedSakuteki
+     */
+    public void setUseRecommendedSakuteki(boolean useRecommendedSakuteki) {
+        this.useRecommendedSakuteki = useRecommendedSakuteki;
     }
 
     /**

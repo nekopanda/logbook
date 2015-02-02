@@ -108,7 +108,7 @@ public final class TrayItemMenuListener implements MenuDetectListener {
                 new MenuItem(this.menu, SWT.SEPARATOR);
             }
             final WindowBase win = winList[i];
-            final MenuItem menuItem = new MenuItem(this.menu, SWT.PUSH);
+            final MenuItem menuItem = new MenuItem(this.menu, SWT.CHECK);
             menuItem.setText(nameList[i]);
             menuItem.setSelection(win.getMenuItem().getSelection());
             menuItem.addSelectionListener(new SelectionAdapter() {
@@ -137,14 +137,17 @@ public final class TrayItemMenuListener implements MenuDetectListener {
         });
         new MenuItem(this.menu, SWT.SEPARATOR);
         // 遠征
-        MenuItem missionItem = new MenuItem(this.menu, SWT.CASCADE);
-        missionItem.setText("遠征(&M)");
-        Menu missionMenu = new Menu(missionItem);
-        missionItem.setMenu(missionMenu);
+        MenuItem infoItem = new MenuItem(this.menu, SWT.CASCADE);
+        infoItem.setText("遠征・入渠(&M)");
+        Menu infoMenu = new Menu(infoItem);
+        infoItem.setMenu(infoMenu);
+        MenuItem missionItem = new MenuItem(infoMenu, SWT.CASCADE);
+        missionItem.setText("遠征");
+        missionItem.setEnabled(false);
         DeckMissionDto[] missions = GlobalContext.getDeckMissions();
         for (DeckMissionDto missionDto : missions) {
+            MenuItem item = new MenuItem(infoMenu, SWT.NONE);
             if ((missionDto != null) && (missionDto.getTime() != null)) {
-                MenuItem item = new MenuItem(missionMenu, SWT.NONE);
                 String text = missionDto.getName() + " (" + missionDto.getMission() + ")";
                 long rest = getRest(Calendar.getInstance().getTime(), missionDto.getTime());
                 if (rest <= 0) {
@@ -153,18 +156,20 @@ public final class TrayItemMenuListener implements MenuDetectListener {
                     item.setText(text + "\t" + TimeLogic.toDateRestString(rest));
                 }
             }
+            else {
+                item.setText("-");
+            }
         }
         // 入渠
-        MenuItem ndockItem = new MenuItem(this.menu, SWT.CASCADE);
-        ndockItem.setText("入渠(&M)");
-        Menu ndockMenu = new Menu(ndockItem);
-        ndockItem.setMenu(ndockMenu);
+        MenuItem ndockItem = new MenuItem(infoMenu, SWT.CASCADE);
+        ndockItem.setText("入渠");
+        ndockItem.setEnabled(false);
         Map<Integer, ShipDto> shipMap = GlobalContext.getShipMap();
         NdockDto[] ndocks = GlobalContext.getNdocks();
         for (NdockDto ndockDto : ndocks) {
+            MenuItem item = new MenuItem(infoMenu, SWT.NONE);
             if ((ndockDto != null) && (shipMap.get(ndockDto.getNdockid()) != null)) {
                 ShipDto ship = shipMap.get(ndockDto.getNdockid());
-                MenuItem item = new MenuItem(ndockMenu, SWT.NONE);
                 String text = ship.getName() + " (Lv" + ship.getLv() + ")";
                 long rest = getRest(Calendar.getInstance().getTime(), ndockDto.getNdocktime());
                 if (rest <= 0) {
@@ -172,6 +177,9 @@ public final class TrayItemMenuListener implements MenuDetectListener {
                 } else {
                     item.setText(text + "\t" + TimeLogic.toDateRestString(rest));
                 }
+            }
+            else {
+                item.setText("-");
             }
         }
 

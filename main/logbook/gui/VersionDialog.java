@@ -75,7 +75,7 @@ public final class VersionDialog extends WindowBase {
         versionGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         versionGroup.setLayout(new GridLayout(2, true));
 
-        label("航海日誌 拡張版", versionGroup);
+        label(AppConstants.NAME + " " + AppConstants.SUFFIX, versionGroup);
         label(AppConstants.VERSION, versionGroup);
 
         final String updateText = "アップデートを確認中...";

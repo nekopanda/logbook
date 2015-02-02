@@ -21,6 +21,7 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -35,7 +36,6 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
@@ -375,15 +375,39 @@ public final class ConfigDialog extends Dialog {
         visibleOnReturnBathwater.setText("お風呂から上がる時に母港タブを表示");
         visibleOnReturnBathwater.setSelection(AppConfig.get().isVisibleOnReturnBathwater());
 
-        Label sakutekiMethodLabel = new Label(compositeFleetTab, SWT.NONE);
-        sakutekiMethodLabel.setText("索敵表示形式");
+        final Button useRecommendedSakuteki = new Button(compositeFleetTab, SWT.CHECK);
+        useRecommendedSakuteki.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        useRecommendedSakuteki.setText("推奨索敵計算式を使用する");
+        useRecommendedSakuteki.setSelection(AppConfig.get().isUseRecommendedSakuteki());
+
         final Combo sakutekiCombo = new Combo(compositeFleetTab, SWT.READ_ONLY);
         sakutekiCombo.add("A.艦隊素の索敵値 + 装備の索敵値");
-        sakutekiCombo.add("B.2-5秋計算式(艦隊素の索敵分 + 装備分 + 提督Lv分)");
-        sakutekiCombo.add("C.装備込みの艦隊索敵値合計(2-5秋計算式)");
-        sakutekiCombo.add("D.右の計算結果(偵察機×2 + 電探 + √(装備込みの艦隊索敵値-偵察機-電探))");
-        sakutekiCombo.add("E.装備込みの艦隊索敵値(Dの計算結果)");
+        sakutekiCombo.add("B.ほっぼアルファVer2.0.1(艦隊素の索敵分 + 装備分 + 提督Lv分)");
+        sakutekiCombo.add("C.ほっぼアルファVer2.0.1(旧:2-5式(秋))");
+        sakutekiCombo.add("D.2-5式(秋)(艦隊素の索敵分 + 装備分 + 提督Lv分)");
+        sakutekiCombo.add("E.装備込みの艦隊索敵値合計(2-5式(秋))");
+        sakutekiCombo.add("F.2-5式(旧)(偵察機×2 + 電探 + √(装備込みの艦隊索敵値-偵察機-電探))");
+        sakutekiCombo.add("G.装備込みの艦隊索敵値(2-5式(旧))");
         sakutekiCombo.select(AppConfig.get().getSakutekiMethod());
+
+        SelectionListener recommendedSakutekiListener = new SelectionAdapter() {
+            int sakutekiMethod = sakutekiCombo.getSelectionIndex();
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (useRecommendedSakuteki.getSelection()) {
+                    this.sakutekiMethod = sakutekiCombo.getSelectionIndex();
+                    sakutekiCombo.select(1);
+                    sakutekiCombo.setEnabled(false);
+                }
+                else {
+                    sakutekiCombo.setEnabled(true);
+                    sakutekiCombo.select(this.sakutekiMethod);
+                }
+            }
+        };
+        recommendedSakutekiListener.widgetSelected(null);
+        useRecommendedSakuteki.addSelectionListener(recommendedSakutekiListener);
 
         // 通知
         Composite compositeNotify = new Composite(this.composite, SWT.NONE);
@@ -912,7 +936,13 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setBalloonBybadlyDamage(balloonBybadlyDamage.getSelection());
                 AppConfig.get().setVisibleOnReturnMission(visibleOnReturnMission.getSelection());
                 AppConfig.get().setVisibleOnReturnBathwater(visibleOnReturnBathwater.getSelection());
-                AppConfig.get().setSakutekiMethod(sakutekiCombo.getSelectionIndex());
+                if (useRecommendedSakuteki.getSelection()) {
+                    AppConfig.get().setUseRecommendedSakuteki(true);
+                }
+                else {
+                    AppConfig.get().setUseRecommendedSakuteki(false);
+                    AppConfig.get().setSakutekiMethod(sakutekiCombo.getSelectionIndex());
+                }
                 // notify
                 AppConfig.get().setMissionRemind(remind.getSelection());
                 AppConfig.get().setRemindInterbal(intervalSpinner.getSelection());

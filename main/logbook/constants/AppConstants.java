@@ -18,6 +18,9 @@ public class AppConstants {
     /**　アプリケーション名 */
     public static final String NAME = "航海日誌";
 
+    /** 派生版の名前 */
+    public static final String SUFFIX = "拡張版";
+
     /** バージョン */
     public static final String VERSION = "1.3.9";
 
@@ -300,7 +303,7 @@ public class AppConstants {
     public static final String MESSAGE_TOTAL_DAIHATSU = "大発:{0} (+{1}%)";
 
     /** タイトルバーに表示するデフォルトテキスト */
-    public static final String TITLEBAR_TEXT = "航海日誌拡張版 " + VERSION;
+    public static final String TITLEBAR_TEXT = NAME + SUFFIX + " " + VERSION;
 
     /** 海戦・ドロップ報告書.csv */
     public static final String LOG_BATTLE_RESULT = "海戦・ドロップ報告書.csv";
