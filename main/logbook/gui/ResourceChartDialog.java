@@ -341,7 +341,7 @@ public final class ResourceChartDialog extends WindowBase {
         try {
             GC gc = new GC(image);
             try {
-                ResourceChart chart = new ResourceChart(log, scale, scaleText, width, height, enabled);
+                ResourceChart chart = new ResourceChart(gc, log, scale, scaleText, width, height, enabled);
                 chart.draw(gc);
             } finally {
                 gc.dispose();

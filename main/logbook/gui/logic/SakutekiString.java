@@ -197,13 +197,14 @@ public class SakutekiString implements Comparable<SakutekiString> {
         if (hqLv == 0)
             this.v3HqLv = 0;
         else
-            this.v3HqLv = Math.floor(hqLv * (-0.4));
+            this.v3HqLv = -Math.floor(hqLv * 0.4);
     }
 
     private void calc() {
         double base = Math.sqrt(this.totalSakuteki - this.teisatsuSakuteki - this.dentanSakuteki);
         this.calc25 = (this.teisatsuSakuteki * 2) + this.dentanSakuteki + base;
         this.calc25v2 = this.v2Ship + this.v2Item + this.v2HqLv;
+        this.calc25v3 += this.v3HqLv;
     }
 
     public double getValue() {
