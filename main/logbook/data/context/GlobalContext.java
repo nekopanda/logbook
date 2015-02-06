@@ -59,6 +59,7 @@ import logbook.internal.EnemyData;
 import logbook.internal.Item;
 import logbook.internal.MasterData;
 import logbook.internal.Ship;
+import logbook.util.JsonUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -2132,6 +2133,20 @@ public final class GlobalContext {
                 if (apidata.getInt("api_remodel_flag") != 0) {
                     // 改修したアイテムを更新
                     addSlotitem(apidata.getJsonObject("api_after_slot"));
+
+                    // 消費した装備アイテムを削除
+                    if (JsonUtils.hasKey(apidata, "api_use_slot_id")) {
+                        JsonArray useSlotId = apidata.getJsonArray("api_use_slot_id");
+                        for (int i = 0; i < useSlotId.size(); ++i) {
+                            itemMap.remove(useSlotId.getInt(i));
+                        }
+                    }
+
+                    // 資源に反映させてレポート
+                    JsonArray newMaterial = apidata.getJsonArray("api_after_material");
+                    ResourceItemDto items = new ResourceItemDto();
+                    items.loadMaterialFronJson(newMaterial);
+                    updateDetailedMaterial("装備改修", items, MATERIAL_DIFF.NEW_VALUE);
                 }
             }
             addUpdateLog("装備改修を更新しました");
