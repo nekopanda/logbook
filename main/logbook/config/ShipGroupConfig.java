@@ -1,11 +1,11 @@
 package logbook.config;
 
 import java.io.IOException;
-import java.util.Date;
 
 import logbook.config.bean.ShipGroupBean;
 import logbook.config.bean.ShipGroupListBean;
 import logbook.constants.AppConstants;
+import logbook.gui.ApplicationMain;
 import logbook.gui.logic.ShipGroupListener;
 import logbook.gui.logic.ShipGroupObserver;
 import logbook.util.BeanUtils;
@@ -24,24 +24,24 @@ public class ShipGroupConfig {
     /** 所有艦娘グループ */
     private static ShipGroupListBean group;
 
-    /** 最終更新日時 */
-    private static Date lastUpdateTime = new Date(0);
+    /** 変更があったか */
+    private static boolean modified = false;
 
     // 変更検出用
     private static class ChangeListener implements ShipGroupListener {
         @Override
         public void listChanged() {
-            lastUpdateTime = new Date();
+            modified = true;
         }
 
         @Override
         public void groupNameChanged(ShipGroupBean group) {
-            lastUpdateTime = new Date();
+            modified = true;
         }
 
         @Override
         public void groupShipChanged(ShipGroupBean group) {
-            lastUpdateTime = new Date();
+            modified = true;
         }
     }
 
@@ -56,14 +56,15 @@ public class ShipGroupConfig {
      * 設定ファイルに書き込みます
      */
     public static void store() throws IOException {
-        // 最終更新日時がファイル更新日時より新しい時だけ書き込む
-        if (new Date(AppConstants.GROUP_CONFIG_FILE.lastModified()).after(lastUpdateTime)) {
-            return;
+        // 変更があったときだけ書き込む
+        if (modified) {
+            if (group == null) {
+                group = new ShipGroupListBean();
+            }
+            ApplicationMain.sysPrint("グループファイル更新");
+            BeanUtils.writeObject(AppConstants.GROUP_CONFIG_FILE, group);
+            modified = false;
         }
-        if (group == null) {
-            group = new ShipGroupListBean();
-        }
-        BeanUtils.writeObject(AppConstants.GROUP_CONFIG_FILE, group);
     }
 
     /**
