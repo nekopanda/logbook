@@ -2130,25 +2130,26 @@ public final class GlobalContext {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
             if (apidata != null) {
-                if (apidata.getInt("api_remodel_flag") != 0) {
+                if (apidata.getInt("api_remodel_flag") != 0) { // 成功した時だけ
                     // 改修したアイテムを更新
                     addSlotitem(apidata.getJsonObject("api_after_slot"));
-
-                    // 消費した装備アイテムを削除
-                    if (JsonUtils.hasKey(apidata, "api_use_slot_id")) {
-                        JsonArray useSlotId = apidata.getJsonArray("api_use_slot_id");
-                        for (int i = 0; i < useSlotId.size(); ++i) {
-                            itemMap.remove(useSlotId.getInt(i));
-                        }
-                    }
-
-                    // 資源に反映させてレポート
-                    JsonArray newMaterial = apidata.getJsonArray("api_after_material");
-                    ResourceItemDto items = new ResourceItemDto();
-                    items.loadMaterialFronJson(newMaterial);
-                    updateDetailedMaterial("装備改修", items, MATERIAL_DIFF.NEW_VALUE);
                 }
+
+                // 消費した装備アイテムを削除
+                if (JsonUtils.hasKey(apidata, "api_use_slot_id")) {
+                    JsonArray useSlotId = apidata.getJsonArray("api_use_slot_id");
+                    for (int i = 0; i < useSlotId.size(); ++i) {
+                        itemMap.remove(useSlotId.getInt(i));
+                    }
+                }
+
+                // 資源に反映させてレポート
+                JsonArray newMaterial = apidata.getJsonArray("api_after_material");
+                ResourceItemDto items = new ResourceItemDto();
+                items.loadMaterialFronJson(newMaterial);
+                updateDetailedMaterial("装備改修", items, MATERIAL_DIFF.NEW_VALUE);
             }
+
             addUpdateLog("装備改修を更新しました");
         } catch (Exception e) {
             LOG.warn("装備改修更新に失敗しました", e);
