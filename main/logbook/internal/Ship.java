@@ -665,7 +665,8 @@ public class Ship {
     public static void dumpCSV(OutputStreamWriter fw) throws IOException {
         fw.write(StringUtils.join(new String[] {
                 "名前", "ID", "艦種", "速力", "耐久", "燃料", "弾薬",
-                "火力", "火力(max)", "雷装", "雷装(max)", "対空", "対空(max)", "装甲", "装甲(max)", "射程", "運", "運(max)" },
+                "火力", "火力(max)", "雷装", "雷装(max)", "対空", "対空(max)", "装甲", "装甲(max)", "射程", "運", "運(max)",
+                "搭載機数1", "搭載機数2", "搭載機数3", "搭載機数4" },
                 ','));
         fw.write("\n");
 
@@ -692,7 +693,11 @@ public class Ship {
                         Integer.toString(max.getSouk()),
                         Integer.toString(param.getLeng()),
                         Integer.toString(param.getLuck()),
-                        Integer.toString(max.getLuck()) }, ','));
+                        Integer.toString(max.getLuck()),
+                        Integer.toString(dto.getMaxeq()[0]),
+                        Integer.toString(dto.getMaxeq()[1]),
+                        Integer.toString(dto.getMaxeq()[2]),
+                        Integer.toString(dto.getMaxeq()[3]) }, ','));
                 fw.write("\n");
             }
         }
