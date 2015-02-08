@@ -148,8 +148,8 @@ public class AppConstants {
     /** /resources/icon/exclamation.png */
     public static final String R_ICON_EXCLAMATION = "/resources/icon/exclamation.png";
 
-    /** /resources/icon/folder_star.png */
-    public static final String R_ICON_FOLDER_STAR = "/resources/icon/folder_star.png";
+    /** /resources/icon/folder.png */
+    public static final String R_ICON_FOLDER = "/resources/icon/folder.png";
 
     /** /resources/icon/star.png */
     public static final String R_ICON_STAR = "/resources/icon/star.png";
