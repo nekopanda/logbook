@@ -214,6 +214,14 @@ public class MasterData {
         }
     }
 
+    public String getMissionName(int missionId) {
+        MissionDto dto = this.mission.get(missionId);
+        if (dto != null) {
+            return dto.getName();
+        }
+        return null;
+    }
+
     /**
      * @return maparea
      */
