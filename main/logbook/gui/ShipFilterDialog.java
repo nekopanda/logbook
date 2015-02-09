@@ -81,6 +81,8 @@ public final class ShipFilterDialog extends WindowBase {
     private Button repairship;
     /** 艦種.潜水母艦 */
     private Button submarineTender;
+    /** 艦種.練習巡洋艦 */
+    private Button trainingCruiser;
     /** 全て選択 */
     private Button selectall;
     /** グループ */
@@ -266,6 +268,11 @@ public final class ShipFilterDialog extends WindowBase {
         this.submarineTender.setSelection(true);
         this.submarineTender.addSelectionListener(listener);
 
+        this.trainingCruiser = new Button(shiptypegroup, SWT.CHECK);
+        this.trainingCruiser.setText("練習巡洋艦");
+        this.trainingCruiser.setSelection(true);
+        this.trainingCruiser.addSelectionListener(listener);
+
         this.selectall = new Button(shiptypegroup, SWT.CHECK);
         this.selectall.setText("全て選択");
         this.selectall.setSelection(true);
@@ -391,6 +398,8 @@ public final class ShipFilterDialog extends WindowBase {
             this.repairship.setSelection(this.filter.repairship);
             // 艦種.潜水母艦
             this.submarineTender.setSelection(this.filter.submarineTender);
+            // 艦種.練習巡洋艦 
+            this.trainingCruiser.setSelection(this.filter.trainingCruiser);
 
             if (this.filter.group != null) {
                 // グループ
@@ -457,6 +466,7 @@ public final class ShipFilterDialog extends WindowBase {
         filter.armoredcarrier = this.armoredcarrier.getSelection();
         filter.repairship = this.repairship.getSelection();
         filter.submarineTender = this.submarineTender.getSelection();
+        filter.trainingCruiser = this.trainingCruiser.getSelection();
         filter.group = null;
         if (ShipFilterDialog.this.group.getSelection()) {
             int idx = ShipFilterDialog.this.groupcombo.getSelectionIndex();
@@ -527,6 +537,7 @@ public final class ShipFilterDialog extends WindowBase {
             ShipFilterDialog.this.armoredcarrier.setSelection(select);
             ShipFilterDialog.this.repairship.setSelection(select);
             ShipFilterDialog.this.submarineTender.setSelection(select);
+            ShipFilterDialog.this.trainingCruiser.setSelection(select);
 
             ShipFilterDialog.this.shipTable.updateFilter(ShipFilterDialog.this.createFilter());
         }
