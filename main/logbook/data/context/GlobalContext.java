@@ -703,10 +703,6 @@ public final class GlobalContext {
                 BattleResultDto dto = new BattleResultDto(apidata, mapCellNo, mapBossCellNo, eventId, isStart, battle);
                 battleResultList.add(dto);
                 CreateReportLogic.storeBattleResultReport(dto);
-
-                for (int i = 0; i < (battleResultList.size() - AppConstants.MAX_LOG_SIZE); i++) {
-                    battleResultList.remove(0);
-                }
             }
             // 出撃を更新
             isStart = false;
@@ -851,9 +847,6 @@ public final class GlobalContext {
             }
             CreateReportLogic.storeCreateItemReport(createitem);
 
-            for (int i = 0; i < (createItemList.size() - AppConstants.MAX_LOG_SIZE); i++) {
-                createItemList.remove(0);
-            }
             addConsole("装備開発情報を更新しました");
         } catch (Exception e) {
             LOG.warn("装備開発情報を更新しますに失敗しました", e);
@@ -1212,9 +1205,6 @@ public final class GlobalContext {
             CreateReportLogic.storeCreateMissionReport(result);
             missionResultList.add(result);
 
-            for (int i = 0; i < (missionResultList.size() - AppConstants.MAX_LOG_SIZE); i++) {
-                missionResultList.remove(0);
-            }
             addConsole("遠征(帰還)情報を更新しました");
         } catch (Exception e) {
             LOG.warn("遠征(帰還)を更新しますに失敗しました", e);
