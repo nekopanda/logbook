@@ -352,6 +352,7 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
                             for (ShipDto ship : ships) {
                                 bean.getShips().remove(ship.getId());
                             }
+                            ShipGroupObserver.groupShipChanged(bean);
                         }
                     }
                 }
