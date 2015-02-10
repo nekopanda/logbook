@@ -1,12 +1,15 @@
 package logbook.gui;
 
+import logbook.data.context.GlobalContext;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.TableItemCreator;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 
@@ -25,6 +28,16 @@ public final class QuestTable extends AbstractTableDialog {
 
     @Override
     protected void createContents() {
+        // 任務をリセット
+        final MenuItem switchdiff = new MenuItem(this.opemenu, SWT.NONE);
+        switchdiff.setText("任務をリセット");
+        switchdiff.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                GlobalContext.getQuest().clear();
+                QuestTable.this.reloadTable();
+            }
+        });
     }
 
     @Override
