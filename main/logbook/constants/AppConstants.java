@@ -17,7 +17,7 @@ public class AppConstants {
     public static final String NAME = "航海日誌";
 
     /** バージョン */
-    public static final String VERSION = "0.7.5";
+    public static final String VERSION = "0.7.6";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("https://kancolle.sanaechan.net/");
