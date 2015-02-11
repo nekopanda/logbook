@@ -859,6 +859,11 @@ public final class CreateReportLogic {
                 return false;
             }
         }
+        if (!filter.trainingShip) {
+            if ("練習巡洋艦".equals(ship.getType())) {
+                return false;
+            }
+        }
         // グループでフィルタ
         if (filter.group != null) {
             if (!filter.group.getShips().contains(ship.getId())) {
