@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -34,6 +36,7 @@ public class EnemyData {
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(EnemyData.class);
     private static Map<Integer, EnemyData> ENEMY = new TreeMap<Integer, EnemyData>();
+    private static Date LastUpdateTime = new Date(0);
 
     // 始めてアクセスがあった時に読み込む
     public static final boolean INIT_COMPLETE;
@@ -55,6 +58,20 @@ public class EnemyData {
     @Tag(4)
     private final String formation;
 
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof EnemyData) {
+            EnemyData e = (EnemyData) o;
+            if ((e.enemyId == this.enemyId) &&
+                    e.enemyName.equals(this.enemyName) &&
+                    Arrays.equals(e.enemyShips, this.enemyShips) &&
+                    e.formation.equals(this.formation)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public EnemyData(int enemyId, String enemyName, String[] enemyShips, String formation) {
         this.enemyId = enemyId;
         this.enemyName = enemyName;
@@ -66,7 +83,13 @@ public class EnemyData {
      * 敵編成を設定します
      */
     public static void set(int id, EnemyData item) {
+        EnemyData old = ENEMY.get(id);
+        if ((old != null) && old.equals(item)) {
+            // 更新する必要なし
+            return;
+        }
         ENEMY.put(id, item);
+        LastUpdateTime = new Date();
     }
 
     /**
@@ -89,6 +112,10 @@ public class EnemyData {
     }
 
     public static void store() throws IOException {
+        // 最終更新日時がファイル更新日時より新しい時だけ書き込む
+        if (new Date(AppConstants.ENEMY_DATA_FILE.lastModified()).after(LastUpdateTime)) {
+            return;
+        }
         CSVWriter writer = new CSVWriter(new OutputStreamWriter(
                 new FileOutputStream(AppConstants.ENEMY_DATA_FILE), AppConstants.CHARSET));
         List<String> flatten = new ArrayList<String>();

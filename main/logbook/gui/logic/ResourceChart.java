@@ -23,9 +23,9 @@ public class ResourceChart {
     /** タイムゾーンオフセット */
     private static final long TZ_OFFSET = Calendar.getInstance().get(Calendar.ZONE_OFFSET);
     /** グラフエリアの左マージン */
-    private static final int LEFT_WIDTH = 70;
+    private static final int LEFT_WIDTH = 60;
     /** グラフエリアの右マージン */
-    private static final int RIGHT_WIDTH = 45;
+    private static final int RIGHT_WIDTH = 60;
     /** グラフエリアの上マージン */
     private static final int TOP_HEIGHT = 30;
     /** グラフエリアの下マージン */
@@ -44,8 +44,12 @@ public class ResourceChart {
     /** Height */
     private final int height;
 
+    private final boolean[] enabled;
+
     private int max;
     private int min;
+    private int max2;
+    private int min2;
     private long[] time = {};
     private Resource[] resources = {};
 
@@ -57,13 +61,14 @@ public class ResourceChart {
      * @param width 幅
      * @param height 高さ
      */
-    public ResourceChart(ResourceLog log, int scale, String scaleText, int width, int height) {
+    public ResourceChart(ResourceLog log, int scale, String scaleText, int width, int height, boolean[] enabled) {
         this.log = log;
         this.term = TimeUnit.DAYS.toMillis(scale);
         this.scaleText = scaleText;
         this.notch = (long) (this.term / ((double) (width - LEFT_WIDTH - RIGHT_WIDTH) / 4));
         this.width = width;
         this.height = height;
+        this.enabled = enabled;
         // データロード
         this.load();
     }
@@ -88,8 +93,10 @@ public class ResourceChart {
         // グラフエリアのラインを描く
         // 縦
         gc.drawLine(LEFT_WIDTH, TOP_HEIGHT, LEFT_WIDTH, this.height - BOTTOM_HEIGHT);
+        gc.drawLine(this.width - RIGHT_WIDTH, TOP_HEIGHT, this.width - RIGHT_WIDTH, this.height - BOTTOM_HEIGHT);
         // 横
-        gc.drawLine(LEFT_WIDTH - 5, this.height - BOTTOM_HEIGHT, this.width - RIGHT_WIDTH, this.height - BOTTOM_HEIGHT);
+        gc.drawLine(LEFT_WIDTH - 5, this.height - BOTTOM_HEIGHT,
+                (this.width - RIGHT_WIDTH) + 5, this.height - BOTTOM_HEIGHT);
 
         // 縦軸を描く
         gc.setLineWidth(1);
@@ -97,15 +104,19 @@ public class ResourceChart {
             // 軸
             gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_GRAY));
             int jh = (int) ((h * i) / 4) + TOP_HEIGHT;
-            gc.drawLine(LEFT_WIDTH - 5, jh, this.width - RIGHT_WIDTH, jh);
+            gc.drawLine(LEFT_WIDTH - 5, jh, (this.width - RIGHT_WIDTH) + 5, jh);
             //ラベルを設定
             gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-            String label = Integer.toString((int) (((float) (this.max - this.min) * (4 - i)) / 4) + this.min);
-            int labelWidth = getStringWidth(gc, label);
+            String labelLeft = Integer.toString((int) (((float) (this.max - this.min) * (4 - i)) / 4) + this.min);
+            String labelRight = Integer.toString((int) (((float) (this.max2 - this.min2) * (4 - i)) / 4) + this.min2);
+            int labelLeftWidth = getStringWidth(gc, labelLeft);
             int labelHeight = gc.getFontMetrics().getHeight();
-            int x = LEFT_WIDTH - labelWidth - 5;
-            int y = jh - (labelHeight / 2);
-            gc.drawString(label, x, y);
+            if (this.max > this.min) {
+                gc.drawString(labelLeft, LEFT_WIDTH - labelLeftWidth - 5, jh - (labelHeight / 2));
+            }
+            if (this.max2 > this.min2) {
+                gc.drawString(labelRight, (this.width - RIGHT_WIDTH) + 10, jh - (labelHeight / 2));
+            }
         }
         SimpleDateFormat format = new SimpleDateFormat("M月d日 HH:mm");
         // 横軸を描く
@@ -143,27 +154,36 @@ public class ResourceChart {
 
         // グラフを描く
         for (int i = 0; i < this.resources.length; i++) {
-            gc.setLineWidth(2);
-            gc.setForeground(SWTResourceManager.getColor(this.resources[i].color));
+            if (this.enabled[i]) {
+                gc.setLineWidth(2);
+                gc.setForeground(SWTResourceManager.getColor(this.resources[i].color));
 
-            int[] values = this.resources[i].values;
-
-            Path path = new Path(Display.getCurrent());
-
-            float x = LEFT_WIDTH;
-            float y = (h * (1 - ((float) (values[0] - this.min) / (this.max - this.min)))) + TOP_HEIGHT;
-            path.moveTo(x, y);
-
-            for (int j = 1; j < values.length; j++) {
-                // 欠損(-1)データは描かない
-                if (values[j] != -1) {
-
-                    float x1 = ((w * j) / values.length) + LEFT_WIDTH;
-                    float y1 = (h * (1 - ((float) (values[j] - this.min) / (this.max - this.min)))) + TOP_HEIGHT;
-                    path.lineTo(x1, y1);
+                int[] values = this.resources[i].values;
+                Path path = new Path(Display.getCurrent());
+                if (i < 4) {
+                    drawPath(values, this.max, this.min, w, h, path);
                 }
+                else {
+                    drawPath(values, this.max2, this.min2, w, h, path);
+                }
+                gc.drawPath(path);
             }
-            gc.drawPath(path);
+        }
+    }
+
+    private static void drawPath(int[] values, int max, int min, float w, float h, Path path) {
+        float x = LEFT_WIDTH;
+        float y = (h * (1 - ((float) (values[0] - min) / (max - min)))) + TOP_HEIGHT;
+        path.moveTo(x, y);
+
+        for (int j = 1; j < values.length; j++) {
+            // 欠損(-1)データは描かない
+            if (values[j] != -1) {
+
+                float x1 = ((w * j) / values.length) + LEFT_WIDTH;
+                float y1 = (h * (1 - ((float) (values[j] - min) / (max - min)))) + TOP_HEIGHT;
+                path.lineTo(x1, y1);
+            }
         }
     }
 
@@ -184,6 +204,10 @@ public class ResourceChart {
         this.max = Integer.MIN_VALUE;
         // データMin値
         this.min = Integer.MAX_VALUE;
+        // データMax値
+        this.max2 = Integer.MIN_VALUE;
+        // データMin値
+        this.min2 = Integer.MAX_VALUE;
         // グラフに必要なデータ配列の長さ
         int length = (int) (this.term / this.notch) + 1;
         // 時間軸
@@ -212,12 +236,13 @@ public class ResourceChart {
                 // スケール外データがある場合最初の要素を補完する
                 values[0] = (int) (prevalues[minidx] + ((prevalues[minidx + 1] - prevalues[minidx]) * fr));
             }
+            // データを必要な配列長に圧縮
             for (int j = minidx + 1; j < prevalues.length; j++) {
                 int idx = (int) ((log.time[j] - s) / this.notch);
                 values[idx] = prevalues[j];
             }
             boolean find = false;
-            for (int j = 0; j < (length - 1); j++) {
+            for (int j = 0; j < length; j++) {
                 // 先頭のデータがない場合0扱いにする
                 if (!find) {
                     if (values[j] >= 0) {
@@ -226,18 +251,34 @@ public class ResourceChart {
                         values[j] = 0;
                     }
                 }
-                if (values[j] >= 0) {
-                    // 資材最大数を設定
-                    this.max = Math.max(values[j], this.max);
-                    // 資材最小数を設定
-                    this.min = Math.min(values[j], this.min);
+                if ((values[j] >= 0) && this.enabled[i]) {
+                    if (i < 4) {
+                        // 資材最大数を設定
+                        this.max = Math.max(values[j], this.max);
+                        // 資材最小数を設定
+                        this.min = Math.min(values[j], this.min);
+                    }
+                    else {
+                        // 資材最大数を設定
+                        this.max2 = Math.max(values[j], this.max2);
+                        // 資材最小数を設定
+                        this.min2 = Math.min(values[j], this.min2);
+                    }
                 }
             }
         }
-        // 資材の最大数を1000単位にする、資材の最大数が1000未満なら1000に設定
-        this.max = (int) Math.max(normalize(this.max, 1000), 1000);
-        // 資材の最小数を0.8でかけた後1000単位にする、
-        this.min = (int) Math.max(normalize((long) (this.min * 0.8f), 1000), 0);
+        if (this.max >= this.min) { // 1つ以上有効なデータがある場合
+            // 資材の最大数を1000単位にする、資材の最大数が1000未満なら1000に設定
+            this.max = (int) Math.ceil((float) (this.max + 100) / 1000) * 1000;
+            // 資材の最小数を0.8でかけた後1000単位にする、
+            this.min = (int) Math.max(Math.floor((float) (this.min - 100) / 1000) * 1000, 0);
+        }
+        if (this.max2 >= this.min2) { // 1つ以上有効なデータがある場合
+            // 資材の最大数を100単位にする、資材の最大数が100未満なら100に設定
+            this.max2 = (int) Math.ceil((float) (this.max2 + 10) / 100) * 100;
+            // 資材の最小数を0.8でかけた後100単位にする、
+            this.min2 = (int) Math.max(Math.floor((float) (this.min2 - 10) / 100) * 100, 0);
+        }
     }
 
     /**
@@ -252,25 +293,6 @@ public class ResourceChart {
     }
 
     /**
-     * 数値を指定した間隔で刻む
-     * 
-     * @param value 数値
-     * @param notch 刻み
-     * @return
-     */
-    private static long normalize(long value, long notch) {
-        long t = value;
-        long half = notch / 2;
-        long mod = t % notch;
-        if (mod >= half) {
-            t += notch - mod;
-        } else {
-            t -= mod;
-        }
-        return t;
-    }
-
-    /**
      * 時刻を指定した間隔で刻む
      * 
      * @param time 時刻
@@ -278,6 +300,6 @@ public class ResourceChart {
      * @return
      */
     private static long normalizeTime(long time, long notch) {
-        return normalize(time + TZ_OFFSET, notch) - TZ_OFFSET;
+        return (((time + TZ_OFFSET + (notch / 2)) / notch) * notch) - TZ_OFFSET;
     }
 }

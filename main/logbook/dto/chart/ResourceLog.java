@@ -16,7 +16,6 @@ import java.util.List;
 import javax.annotation.CheckForNull;
 
 import logbook.config.AppConfig;
-import logbook.constants.AppConstants;
 import logbook.dto.AbstractDto;
 
 import org.apache.commons.io.LineIterator;
@@ -31,6 +30,10 @@ public class ResourceLog extends AbstractDto {
     public static final int RESOURCE_AMMO = 1;
     public static final int RESOURCE_METAL = 2;
     public static final int RESOURCE_BAUXITE = 3;
+    public static final int RESOURCE_BURNER = 4;
+    public static final int RESOURCE_BUCKET = 5;
+    public static final int RESOURCE_RESEARCH = 6;
+    public static final int RESOURCE_SCREW = 7;
 
     public long[] time;
 
@@ -67,7 +70,8 @@ public class ResourceLog extends AbstractDto {
             ParsePosition pos = new ParsePosition(0);
             while (ite.hasNext()) {
                 String line = ite.next();
-                // 日付,（直前のイベント,）燃料,弾薬,鋼材,ボーキ,高速修復材,高速建造材,開発資材
+                // 日付,（直前のイベント,）燃料,弾薬,鋼材,ボーキ,高速建造材,高速修復材,開発資材,ネジ
+                // 高速建造材,高速修復材が逆になっているので注意
                 String[] colums = line.split(",");
                 try {
                     pos.setIndex(0);
@@ -92,9 +96,12 @@ public class ResourceLog extends AbstractDto {
                         // 拡張版のログ
                         baseIdx = 2;
                     }
+                    int screw = (colums.length > (baseIdx + 7)) ? Integer.parseInt(colums[baseIdx + 7]) : 0;
                     logs.add(new SortableLog(date.getTime(),
                             Integer.parseInt(colums[baseIdx + 0]), Integer.parseInt(colums[baseIdx + 1]),
-                            Integer.parseInt(colums[baseIdx + 2]), Integer.parseInt(colums[baseIdx + 3])));
+                            Integer.parseInt(colums[baseIdx + 2]), Integer.parseInt(colums[baseIdx + 3]),
+                            Integer.parseInt(colums[baseIdx + 5]), Integer.parseInt(colums[baseIdx + 4]),
+                            Integer.parseInt(colums[baseIdx + 6]), screw));
 
                 } catch (Exception e) {
                     continue;
@@ -113,6 +120,10 @@ public class ResourceLog extends AbstractDto {
         int[] ammo = new int[logs.size()];
         int[] metal = new int[logs.size()];
         int[] bauxite = new int[logs.size()];
+        int[] burner = new int[logs.size()];
+        int[] bucket = new int[logs.size()];
+        int[] research = new int[logs.size()];
+        int[] screw = new int[logs.size()];
         for (int i = 0; i < logs.size(); i++) {
             SortableLog log = logs.get(i);
             time[i] = log.time;
@@ -120,12 +131,20 @@ public class ResourceLog extends AbstractDto {
             ammo[i] = log.ammo;
             metal[i] = log.metal;
             bauxite[i] = log.bauxite;
+            burner[i] = log.burner;
+            bucket[i] = log.bucket;
+            research[i] = log.research;
+            screw[i] = log.screw;
         }
         Resource[] resources = new Resource[] {
                 new Resource("燃料", AppConfig.get().getFuelColor(), fuel),
                 new Resource("弾薬", AppConfig.get().getAmmoColor(), ammo),
                 new Resource("鋼材", AppConfig.get().getMetalColor(), metal),
-                new Resource("ボーキ", AppConfig.get().getBauxiteColor(), bauxite)
+                new Resource("ボーキ", AppConfig.get().getBauxiteColor(), bauxite),
+                new Resource("バーナー", AppConfig.get().getBurnerColor(), burner),
+                new Resource("バケツ", AppConfig.get().getBucketColor(), bucket),
+                new Resource("開発", AppConfig.get().getResearchColor(), research),
+                new Resource("ネジ", AppConfig.get().getScrewColor(), screw)
         };
         return new ResourceLog(time, resources);
     }
@@ -140,13 +159,22 @@ public class ResourceLog extends AbstractDto {
         public int ammo;
         public int metal;
         public int bauxite;
+        public int burner;
+        public int bucket;
+        public int research;
+        public int screw;
 
-        public SortableLog(long time, int fuel, int ammo, int metal, int bauxite) {
+        public SortableLog(long time, int fuel, int ammo, int metal, int bauxite,
+                int burner, int bucket, int research, int screw) {
             this.time = time;
             this.fuel = fuel;
             this.ammo = ammo;
             this.metal = metal;
             this.bauxite = bauxite;
+            this.burner = burner;
+            this.bucket = bucket;
+            this.research = research;
+            this.screw = screw;
         }
 
         @Override

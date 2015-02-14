@@ -18,7 +18,10 @@ import javax.imageio.stream.ImageOutputStream;
 import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.gui.logic.LayoutLogic;
+import logbook.gui.twitter.TweetDialog;
+import logbook.gui.twitter.TwitterClient;
 import logbook.util.AwtUtils;
+import logbook.util.SwtUtils;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
@@ -44,12 +47,15 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
  * キャプチャダイアログ
  *
  */
 public final class CaptureDialog extends WindowBase {
+    /** ロガー */
+    private static final Logger LOG = LogManager.getLogger(CaptureDialog.class);
 
     private final Shell parent;
     private Shell shell;
@@ -57,14 +63,26 @@ public final class CaptureDialog extends WindowBase {
     private Composite composite;
     private Text text;
     private Button capture;
+    private Button twitter;
+    private Image twitterImage;
     private Button interval;
     private Spinner intervalms;
 
+    /** キャプチャ範囲 */
     private Rectangle rectangle;
     private Timer timer;
     private boolean isAlive;
 
     private Font font;
+
+    /** Jpeg品質 */
+    private static final float QUALITY = 0.9f;
+    /** 日付フォーマット(ファイル名) */
+    private final SimpleDateFormat fileNameFormat = new SimpleDateFormat(AppConstants.DATE_LONG_FORMAT);
+    /** 日付フォーマット(ディレクトリ名) */
+    private final SimpleDateFormat dirNameFormat = new SimpleDateFormat(AppConstants.DATE_DAYS_FORMAT);
+    /** トリム範囲 */
+    private java.awt.Rectangle trimRect;
 
     /**
      * Create the dialog.
@@ -84,6 +102,7 @@ public final class CaptureDialog extends WindowBase {
         // 初期化済みの場合
         if (this.isWindowInitialized()) {
             // リロードして表示
+            this.setCaptureRect(intToRect(AppConfig.get().getCaptureRect()));
             this.setVisible(true);
             return;
         }
@@ -139,7 +158,6 @@ public final class CaptureDialog extends WindowBase {
         this.composite = new Composite(this.shell, SWT.NONE);
         GridLayout loglayout = new GridLayout(3, false);
         this.composite.setLayout(loglayout);
-        this.composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
 
         // 周期設定
         this.interval = new Button(this.composite, SWT.CHECK);
@@ -161,15 +179,36 @@ public final class CaptureDialog extends WindowBase {
         Label label = new Label(this.composite, SWT.NONE);
         label.setText("ミリ秒");
 
-        this.capture = new Button(this.shell, SWT.NONE);
+        Composite buttonComposite = new Composite(this.shell, SWT.NONE);
+        buttonComposite.setLayout(new GridLayout(2, true));
+        buttonComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
+
+        this.capture = new Button(buttonComposite, SWT.NONE);
         this.capture.setFont(this.font);
         GridData gdCapture = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
-        gdCapture.horizontalSpan = 3;
         gdCapture.heightHint = 64;
         this.capture.setLayoutData(gdCapture);
         this.capture.setEnabled(false);
         this.capture.setText(getCaptureButtonText(false, this.interval.getSelection()));
         this.capture.addSelectionListener(new CaptureStartAdapter());
+
+        this.twitter = new Button(buttonComposite, SWT.NONE);
+        this.twitter.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
+        this.twitterImage = SWTResourceManager.getImage(WindowBase.class, AppConstants.TWITTER);
+        this.twitter.setEnabled(false);
+        this.twitter.addSelectionListener(new TwitterAdapter());
+        this.twitter.addListener(SWT.Resize, new Listener() {
+            @Override
+            public void handleEvent(Event e) {
+                Rectangle rect = CaptureDialog.this.twitter.getBounds();
+                Image scaled = SwtUtils.scaleToFit(CaptureDialog.this.twitterImage, rect.width, rect.height);
+                Image old = CaptureDialog.this.twitter.getImage();
+                CaptureDialog.this.twitter.setImage(scaled);
+                if (old != null) {
+                    old.dispose();
+                }
+            }
+        });
 
         this.shell.addListener(SWT.Dispose, new Listener() {
             @Override
@@ -228,10 +267,12 @@ public final class CaptureDialog extends WindowBase {
     private void setCaptureRect(Rectangle rectangle) {
         if ((rectangle != null) && (rectangle.width > 1) && (rectangle.height > 1)) {
             this.rectangle = rectangle;
+            this.trimRect = AwtUtils.getTrimSize(captureImage(rectangle, null));
             AppConfig.get().setCaptureRect(rectToInt(rectangle));
             this.text.setText("(" + rectangle.x + "," + rectangle.y + ")-("
                     + (rectangle.x + rectangle.width) + "," + (rectangle.y + rectangle.height) + ")");
             this.capture.setEnabled(true);
+            this.twitter.setEnabled(true);
         }
     }
 
@@ -304,11 +345,11 @@ public final class CaptureDialog extends WindowBase {
                 timer = new Timer(true);
                 if (interval) {
                     // 固定レートで周期キャプチャ
-                    timer.scheduleAtFixedRate(new CaptureTask(rectangle), 0, intervalms);
+                    timer.scheduleAtFixedRate(new CaptureTask(), 0, intervalms);
                     CaptureDialog.this.isAlive = true;
                 } else {
                     // 一回だけキャプチャ
-                    timer.schedule(new CaptureTask(rectangle), 0);
+                    timer.schedule(new CaptureTask(), 0);
                 }
 
                 CaptureDialog.this.capture.setText(getCaptureButtonText(true, interval));
@@ -321,90 +362,118 @@ public final class CaptureDialog extends WindowBase {
         }
     }
 
+    private BufferedImage captureImage() {
+        return captureImage(this.rectangle, this.trimRect);
+    }
+
+    private static BufferedImage captureImage(Rectangle rectangle, java.awt.Rectangle trimRect) {
+        // 範囲をキャプチャする
+        BufferedImage image = AwtUtils.getCapture(rectangle);
+        if (image != null) {
+            if (trimRect != null) {
+                return AwtUtils.trim(image, trimRect);
+            }
+            return image;
+        }
+        return null;
+    }
+
+    private File getSaveFile() throws IOException {
+        // 時刻からファイル名を作成
+        Date now = Calendar.getInstance().getTime();
+
+        String dir = null;
+        if (AppConfig.get().isCreateDateFolder()) {
+            dir = FilenameUtils.concat(AppConfig.get().getCapturePath(), this.dirNameFormat.format(now));
+        } else {
+            dir = AppConfig.get().getCapturePath();
+        }
+
+        String fname = FilenameUtils.concat(dir, this.fileNameFormat.format(now) + "."
+                + AppConfig.get().getImageFormat());
+        File file = new File(fname);
+
+        if (file.exists()) {
+            if (file.isDirectory()) {
+                throw new IOException("File '" + file + "' exists but is a directory");
+            }
+            if (!(file.canWrite()))
+                throw new IOException("File '" + file + "' cannot be written to");
+        } else {
+            File parent = file.getParentFile();
+            if ((parent != null) &&
+                    (!(parent.mkdirs())) && (!(parent.isDirectory()))) {
+                throw new IOException("Directory '" + parent + "' could not be created");
+            }
+        }
+        return file;
+    }
+
+    private void saveImageToFile(BufferedImage image, File file) throws IOException {
+        ImageOutputStream ios = ImageIO.createImageOutputStream(file);
+        try {
+            ImageWriter writer = ImageIO.getImageWritersByFormatName(AppConfig.get().getImageFormat())
+                    .next();
+            try {
+                ImageWriteParam iwp = writer.getDefaultWriteParam();
+                if (iwp.canWriteCompressed()) {
+                    iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                    iwp.setCompressionQuality(QUALITY);
+                }
+                writer.setOutput(ios);
+
+                writer.write(null, new IIOImage(image, null, null), iwp);
+                ApplicationMain.logPrint("キャプチャしました [" + file.getName() + "]");
+            } finally {
+                writer.dispose();
+            }
+        } finally {
+            ios.close();
+        }
+    }
+
+    private File captureAndSave() throws IOException {
+        File file = CaptureDialog.this.getSaveFile();
+        // 範囲をキャプチャする
+        BufferedImage image = CaptureDialog.this.captureImage();
+        if (image != null) {
+            CaptureDialog.this.saveImageToFile(image, file);
+        }
+        return file;
+    }
+
     /**
      * 画面キャプチャスレッド
      *
      */
-    public static final class CaptureTask extends TimerTask {
-        /** ロガー */
-        private static final Logger LOG = LogManager.getLogger(CaptureTask.class);
-        /** Jpeg品質 */
-        private static final float QUALITY = 0.9f;
-        /** 日付フォーマット(ファイル名) */
-        private final SimpleDateFormat fileNameFormat = new SimpleDateFormat(AppConstants.DATE_LONG_FORMAT);
-        /** 日付フォーマット(ディレクトリ名) */
-        private final SimpleDateFormat dirNameFormat = new SimpleDateFormat(AppConstants.DATE_DAYS_FORMAT);
-        /** キャプチャ範囲 */
-        private final Rectangle rectangle;
-        /** トリム範囲 */
-        private java.awt.Rectangle trimRect;
-
-        public CaptureTask(Rectangle rectangle) {
-            this.rectangle = rectangle;
-        }
-
+    public final class CaptureTask extends TimerTask {
         @Override
         public void run() {
             try {
-                // 時刻からファイル名を作成
-                Date now = Calendar.getInstance().getTime();
-
-                String dir = null;
-                if (AppConfig.get().isCreateDateFolder()) {
-                    dir = FilenameUtils.concat(AppConfig.get().getCapturePath(), this.dirNameFormat.format(now));
-                } else {
-                    dir = AppConfig.get().getCapturePath();
-                }
-
-                String fname = FilenameUtils.concat(dir, this.fileNameFormat.format(now) + "."
-                        + AppConfig.get().getImageFormat());
-                File file = new File(fname);
-
-                if (file.exists()) {
-                    if (file.isDirectory()) {
-                        throw new IOException("File '" + file + "' exists but is a directory");
-                    }
-                    if (!(file.canWrite()))
-                        throw new IOException("File '" + file + "' cannot be written to");
-                } else {
-                    File parent = file.getParentFile();
-                    if ((parent != null) &&
-                            (!(parent.mkdirs())) && (!(parent.isDirectory()))) {
-                        throw new IOException("Directory '" + parent + "' could not be created");
-                    }
-                }
-
-                // 範囲をキャプチャする
-                BufferedImage image = AwtUtils.getCapture(this.rectangle);
-                if (image != null) {
-
-                    ImageOutputStream ios = ImageIO.createImageOutputStream(file);
-                    try {
-                        ImageWriter writer = ImageIO.getImageWritersByFormatName(AppConfig.get().getImageFormat())
-                                .next();
-                        try {
-                            ImageWriteParam iwp = writer.getDefaultWriteParam();
-                            if (iwp.canWriteCompressed()) {
-                                iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                                iwp.setCompressionQuality(QUALITY);
-                            }
-                            writer.setOutput(ios);
-
-                            if (this.trimRect == null) {
-                                this.trimRect = AwtUtils.getTrimSize(image);
-                            }
-
-                            writer.write(null, new IIOImage(AwtUtils.trim(image, this.trimRect), null, null), iwp);
-                            ApplicationMain.logPrint("キャプチャしました [" + file.getName() + "]");
-                        } finally {
-                            writer.dispose();
-                        }
-                    } finally {
-                        ios.close();
-                    }
-                }
+                CaptureDialog.this.captureAndSave();
             } catch (Exception e) {
                 LOG.warn("キャプチャ中に例外が発生しました", e);
+            }
+        }
+    }
+
+    /**
+     * Twitterボタンを押した時
+     *
+     */
+    public final class TwitterAdapter extends SelectionAdapter {
+
+        @Override
+        public void widgetSelected(SelectionEvent ev) {
+            try {
+                File file = CaptureDialog.this.captureAndSave();
+                if (TwitterClient.getInstance().prepareAccessToken(CaptureDialog.this)) {
+                    TweetDialog tweetDialog = new TweetDialog(
+                            CaptureDialog.this, file);
+                    tweetDialog.open();
+                }
+            } catch (Exception e) {
+                LOG.warn("つぶやく途中で例外が発生しました", e);
             }
         }
     }

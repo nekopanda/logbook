@@ -99,6 +99,14 @@ public final class ShipFilterDialog extends WindowBase {
     private Button locked;
     /** 鍵付きではない */
     private Button notlocked;
+    /** 遠征中 */
+    public Button mission;
+    /** 遠征中ではない */
+    public Button notmission;
+    /** 要修理 */
+    public Button needbath;
+    /** 修理の必要なし */
+    public Button notneedbath;
 
     /**
      * Create the dialog.
@@ -322,6 +330,26 @@ public final class ShipFilterDialog extends WindowBase {
         this.notlocked.setSelection(true);
         this.notlocked.addSelectionListener(listener);
 
+        this.mission = new Button(etcgroup, SWT.CHECK);
+        this.mission.setText("遠征中");
+        this.mission.setSelection(true);
+        this.mission.addSelectionListener(listener);
+
+        this.notmission = new Button(etcgroup, SWT.CHECK);
+        this.notmission.setText("遠征中ではない");
+        this.notmission.setSelection(true);
+        this.notmission.addSelectionListener(listener);
+
+        this.needbath = new Button(etcgroup, SWT.CHECK);
+        this.needbath.setText("要修理");
+        this.needbath.setSelection(true);
+        this.needbath.addSelectionListener(listener);
+
+        this.notneedbath = new Button(etcgroup, SWT.CHECK);
+        this.notneedbath.setText("修理の必要なし");
+        this.notneedbath.setSelection(true);
+        this.notneedbath.addSelectionListener(listener);
+
         // 初期値を復元する
         if (this.filter != null) {
             // 名前
@@ -394,6 +422,11 @@ public final class ShipFilterDialog extends WindowBase {
             this.locked.setSelection(this.filter.locked);
             // 鍵付きではない
             this.notlocked.setSelection(this.filter.notlocked);
+
+            this.mission.setSelection(this.filter.mission);
+            this.notmission.setSelection(this.filter.notmission);
+            this.needbath.setSelection(this.filter.needbath);
+            this.notneedbath.setSelection(this.filter.notneedbath);
         }
 
         this.shell.pack();
@@ -443,6 +476,10 @@ public final class ShipFilterDialog extends WindowBase {
         filter.notonfleet = this.notonfleet.getSelection();
         filter.locked = this.locked.getSelection();
         filter.notlocked = this.notlocked.getSelection();
+        filter.mission = this.mission.getSelection();
+        filter.notmission = this.notmission.getSelection();
+        filter.needbath = this.needbath.getSelection();
+        filter.notneedbath = this.notneedbath.getSelection();
 
         return filter;
     }

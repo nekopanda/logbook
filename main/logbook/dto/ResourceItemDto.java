@@ -25,23 +25,30 @@ public class ResourceItemDto {
     public ResourceItemDto() {
     }
 
-    public void loadBaseMaterialsFromField(Data data) {
-        this.baseMaterials[0] = Integer.parseInt(data.getField("api_item1"));
-        this.baseMaterials[1] = Integer.parseInt(data.getField("api_item2"));
-        this.baseMaterials[2] = Integer.parseInt(data.getField("api_item3"));
-        this.baseMaterials[3] = Integer.parseInt(data.getField("api_item4"));
+    public void loadBaseMaterialsFromString(String[] data, int offset) {
+        for (int i = 0; i < 4; ++i) {
+            this.baseMaterials[i] = Integer.valueOf(data[i + offset]);
+        }
     }
 
-    /** JSONの配列で表された資源を読み取る。長さ4 と　長さ7 に対応 */
+    public void loadBaseMaterialsFromField(Data data) {
+        this.baseMaterials[0] = Integer.valueOf(data.getField("api_item1"));
+        this.baseMaterials[1] = Integer.valueOf(data.getField("api_item2"));
+        this.baseMaterials[2] = Integer.valueOf(data.getField("api_item3"));
+        this.baseMaterials[3] = Integer.valueOf(data.getField("api_item4"));
+    }
+
+    /** JSONの配列で表された資源を読み取る。長さ4 と　長さ8 に対応 */
     public void loadMaterialFronJson(JsonArray data) {
         this.baseMaterials[0] = data.getInt(0);
         this.baseMaterials[1] = data.getInt(1);
         this.baseMaterials[2] = data.getInt(2);
         this.baseMaterials[3] = data.getInt(3);
-        if (data.size() >= 7) {
+        if (data.size() >= 8) {
             this.setBurners(data.getInt(4));
             this.setBuckets(data.getInt(5));
             this.setResearchMaterials(data.getInt(6));
+            this.setScrew(data.getInt(7));
         }
     }
 
@@ -74,22 +81,26 @@ public class ResourceItemDto {
         JsonArray bounus = apidata.getJsonArray("api_bounus");
         for (int i = 0; i < bounus.size(); ++i) {
             JsonObject item = bounus.getJsonObject(i);
-            int itemId = item.getInt("api_type");
+            int itemId = item.getJsonObject("api_item").getInt("api_id");
             int itemCount = item.getInt("api_count");
             switch (itemId) {
-            case 1:
+            case 5:
                 this.items.put(AppConstants.USEITEM_BURNER,
                         new UseItemDto(AppConstants.USEITEM_BURNER, itemCount));
                 break;
-            case 2:
+            case 6:
                 this.items.put(AppConstants.USEITEM_BUCKET,
                         new UseItemDto(AppConstants.USEITEM_BUCKET, itemCount));
                 break;
-            case 3:
+            case 7:
                 this.items.put(AppConstants.USEITEM_RESEARCH,
                         new UseItemDto(AppConstants.USEITEM_RESEARCH, itemCount));
                 break;
-            default: // 1,2,3以外は知らん
+            case 8:
+                this.items.put(AppConstants.USEITEM_SCREW,
+                        new UseItemDto(AppConstants.USEITEM_SCREW, itemCount));
+                break;
+            default: // 5-8以外は知らん
                 break;
             }
         }
@@ -110,20 +121,45 @@ public class ResourceItemDto {
                 new UseItemDto(AppConstants.USEITEM_RESEARCH, amount));
     }
 
+    public void setScrew(int amount) {
+        this.items.put(AppConstants.USEITEM_SCREW,
+                new UseItemDto(AppConstants.USEITEM_SCREW, amount));
+    }
+
+    public void setItem(int id, int amount) {
+        this.items.put(id, new UseItemDto(id, amount));
+    }
+
     public int getFuel() {
         return this.baseMaterials[0];
+    }
+
+    public void setFuel(int fuel) {
+        this.baseMaterials[0] = fuel;
     }
 
     public int getAmmo() {
         return this.baseMaterials[1];
     }
 
+    public void setAmmo(int ammo) {
+        this.baseMaterials[1] = ammo;
+    }
+
     public int getMetal() {
         return this.baseMaterials[2];
     }
 
+    public void setMetal(int metal) {
+        this.baseMaterials[2] = metal;
+    }
+
     public int getBauxite() {
         return this.baseMaterials[3];
+    }
+
+    public void setBauxite(int bauxite) {
+        this.baseMaterials[3] = bauxite;
     }
 
     public int getBurners() {
@@ -142,6 +178,13 @@ public class ResourceItemDto {
 
     public int getResearch() {
         UseItemDto item = this.items.get(AppConstants.USEITEM_RESEARCH);
+        if (item == null)
+            return 0;
+        return item.getItemCount();
+    }
+
+    public int getScrew() {
+        UseItemDto item = this.items.get(AppConstants.USEITEM_SCREW);
         if (item == null)
             return 0;
         return item.getItemCount();

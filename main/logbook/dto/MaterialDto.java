@@ -35,6 +35,9 @@ public final class MaterialDto extends AbstractDto implements Cloneable {
     /** 開発資材 */
     private int research;
 
+    /** ねじ */
+    private int screw;
+
     @Override
     public MaterialDto clone() {
         try {
@@ -53,6 +56,7 @@ public final class MaterialDto extends AbstractDto implements Cloneable {
         this.burner -= res.getBurners();
         this.bucket -= res.getBuckets();
         this.research -= res.getResearch();
+        this.screw -= res.getScrew();
         return this;
     }
 
@@ -65,6 +69,7 @@ public final class MaterialDto extends AbstractDto implements Cloneable {
         this.burner += res.getBurners();
         this.bucket += res.getBuckets();
         this.research += res.getResearch();
+        this.screw += res.getScrew();
         return this;
     }
 
@@ -210,6 +215,20 @@ public final class MaterialDto extends AbstractDto implements Cloneable {
      */
     public void setResearch(int research) {
         this.research = research;
+    }
+
+    /**
+     * @return screw
+     */
+    public int getScrew() {
+        return this.screw;
+    }
+
+    /**
+     * @param screw セットする screw
+     */
+    public void setScrew(int screw) {
+        this.screw = screw;
     }
 
 }

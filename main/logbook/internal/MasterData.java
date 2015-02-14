@@ -34,6 +34,11 @@ public class MasterData {
      * 設定ファイルに書き込みます
      */
     public static void store() throws IOException {
+        // 最終更新日時がファイル更新日時より新しい時だけ書き込む
+        if (new Date(AppConstants.MASTER_DATA_CONFIG.lastModified())
+                .after(Holder.instance.lastUpdateTime)) {
+            return;
+        }
         BeanUtils.writeObject(AppConstants.MASTER_DATA_CONFIG, Holder.instance);
     }
 

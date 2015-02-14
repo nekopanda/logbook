@@ -3,11 +3,19 @@
  */
 package logbook.gui;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
+import logbook.config.AppConfig;
+import logbook.config.bean.TableConfigBean;
 import logbook.dto.BattleAggDetailsDto;
 import logbook.dto.BattleAggUnitDto;
 import logbook.dto.BattleResultDto;
@@ -19,7 +27,6 @@ import logbook.internal.BattleAggDate;
 import logbook.internal.BattleAggUnit;
 import logbook.internal.BattleResultServer;
 
-import org.apache.commons.lang3.time.DateUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
@@ -27,7 +34,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -40,18 +46,26 @@ import org.eclipse.swt.widgets.TreeItem;
  * @author noname
  *
  */
-public class BattleAggDialog extends Dialog {
+public class BattleAggDialog extends WindowBase {
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(BattleAggDialog.class);
 
     /** ヘッダー */
     private final String[] header = this.getTableHeader();
 
+    private final Shell parent;
+
+    /** タイマー */
+    protected Timer timer;
+
     /** シェル */
     private Shell shell;
 
     /** ツリーテーブル */
     private Tree tree;
+
+    /** ツリー要素マネージャ */
+    private AggTableItems treeItems;
 
     /** メニューバー */
     private Menu menubar;
@@ -61,30 +75,39 @@ public class BattleAggDialog extends Dialog {
 
     private Menu tablemenu;
 
+    protected TableConfigBean config;
+
+    protected MenuItem cyclicReloadMenuItem;
+
+    private Display display;
+
     /**
      * Create the dialog.
      * @param parent
      * @param style
      */
-    public BattleAggDialog(Shell parent) {
-        super(parent, SWT.SHELL_TRIM | SWT.MODELESS);
-        this.setText("SWT Dialog");
+    public BattleAggDialog(Shell parent, MenuItem menuItem) {
+        super(menuItem);
+        this.parent = parent;
     }
 
     /**
      * Open the dialog.
      * @return the result
      */
+    @Override
     public void open() {
-        this.createContents();
-        this.shell.open();
-        this.shell.layout();
-        Display display = this.getParent().getDisplay();
-        while (!this.shell.isDisposed()) {
-            if (!display.readAndDispatch()) {
-                display.sleep();
-            }
+        // 初期化済みの場合
+        if (this.isWindowInitialized()) {
+            // リロードして表示
+            this.reloadTable();
+            this.setVisible(true);
+            return;
         }
+
+        this.createContents();
+        this.setWindowInitialized(true);
+        this.setVisible(true);
     }
 
     /**
@@ -92,10 +115,11 @@ public class BattleAggDialog extends Dialog {
      */
     private void createContents() {
         // シェルを作成
-        this.shell = new Shell(this.getParent(), this.getStyle());
-        this.shell.setSize(this.getSize());
+        super.createContents(this.parent, SWT.SHELL_TRIM | SWT.MODELESS, true);
+        this.shell = this.getShell();
         this.shell.setText(this.getTitle());
         this.shell.setLayout(new FillLayout(SWT.HORIZONTAL));
+        this.display = this.shell.getDisplay();
         // メニューバー
         this.menubar = new Menu(this.shell, SWT.BAR);
         this.shell.setMenuBar(this.menubar);
@@ -104,6 +128,7 @@ public class BattleAggDialog extends Dialog {
         this.tree.addKeyListener(new TreeKeyShortcutAdapter(this.header, this.tree));
         this.tree.setLinesVisible(true);
         this.tree.setHeaderVisible(true);
+        this.treeItems = new AggTableItems(this.tree);
         // メニューバーのメニュー
         MenuItem operoot = new MenuItem(this.menubar, SWT.CASCADE);
         operoot.setText("操作");
@@ -113,8 +138,16 @@ public class BattleAggDialog extends Dialog {
         reload.setText("再読み込み(&R)\tF5");
         reload.setAccelerator(SWT.F5);
         reload.addSelectionListener(new TableReloadAdapter());
+        this.cyclicReloadMenuItem = new MenuItem(this.opemenu, SWT.CHECK);
+        this.cyclicReloadMenuItem.setText("定期的に再読み込み(3秒)(&A)\tCtrl+F5");
+        this.cyclicReloadMenuItem.setAccelerator(SWT.CTRL + SWT.F5);
+        this.cyclicReloadMenuItem.addSelectionListener(new CyclicReloadAdapter(this.cyclicReloadMenuItem));
+
+        // ウィンドウの基本メニューを設定
+        super.registerEvents();
+
         // テーブル右クリックメニュー
-        this.tablemenu = new Menu(this.tree);
+        this.tablemenu = this.getMenu();
         this.tree.setMenu(this.tablemenu);
         MenuItem sendclipbord = new MenuItem(this.tablemenu, SWT.NONE);
         sendclipbord.addSelectionListener(new TreeToClipboardAdapter(this.header, this.tree));
@@ -122,6 +155,12 @@ public class BattleAggDialog extends Dialog {
         MenuItem reloadtable = new MenuItem(this.tablemenu, SWT.NONE);
         reloadtable.setText("再読み込み(&R)");
         reloadtable.addSelectionListener(new TableReloadAdapter());
+
+        // 自動更新設定を反映
+        if (this.getConfig().isCyclicReload()) {
+            this.cyclicReloadMenuItem.setSelection(true);
+            this.enableCyclicReload();
+        }
 
         this.setTableHeader();
         this.reloadTable();
@@ -131,26 +170,45 @@ public class BattleAggDialog extends Dialog {
      * タイトルを返します
      * @return String
      */
-    private String getTitle() {
+    protected String getTitle() {
         return "出撃統計";
     }
 
     /**
-     * ウインドウサイズを返します
-     * @return Point
+     * ウィンドウサイズを保存・リストアするべきか？
+     * @return
      */
-    private Point getSize() {
-        return new Point(600, 350);
+    @Override
+    protected boolean shouldSaveWindowSize() {
+        return true;
     }
 
     /**
-     * テーブルボディーをクリアする
+     * ウィンドウのデフォルトサイズを取得
+     * @return Point
      */
-    private void disposeTableBody() {
-        TreeItem[] items = this.tree.getItems();
-        for (int i = 0; i < items.length; i++) {
-            items[i].dispose();
+    @Override
+    protected Point getDefaultSize() {
+        return new Point(600, 350);
+    }
+
+    protected TableConfigBean getConfig() {
+        if (this.config == null) {
+            this.config = AppConfig.get().getTableConfigMap().get(this.getWindowId());
+            if (this.config == null) {
+                this.config = new TableConfigBean();
+            }
         }
+        return this.config;
+    }
+
+    @Override
+    public void save() {
+        if (this.config != null) {
+            this.config.setCyclicReload(this.cyclicReloadMenuItem.getSelection());
+            AppConfig.get().getTableConfigMap().put(this.getWindowId(), this.config);
+        }
+        super.save();
     }
 
     /**
@@ -187,44 +245,15 @@ public class BattleAggDialog extends Dialog {
      * テーブルをリロードする
      */
     private void reloadTable() {
-        this.disposeTableBody();
-        boolean first = true;
-        Map<BattleAggUnit, BattleAggUnitDto> aggMap = this.load();
-        for (Entry<BattleAggUnit, BattleAggUnitDto> entry : aggMap.entrySet()) {
-            BattleAggUnitDto dto = entry.getValue();
-            BattleAggDetailsDto total = dto.getTotal();
-
-            TreeItem root = new TreeItem(this.tree, SWT.NONE);
-            // 合計
-            root.setText(new String[] { entry.getKey().toString(), Integer.toString(total.getWin()),
-                    Integer.toString(total.getS()), Integer.toString(total.getA()), Integer.toString(total.getB()),
-                    Integer.toString(total.getC()), Integer.toString(total.getD()) });
-            // ボス
-            TreeItem boss = new TreeItem(root, SWT.NONE);
-            boss.setText(new String[] { "ボス", Integer.toString(total.getBossWin()),
-                    Integer.toString(total.getBossS()), Integer.toString(total.getBossA()),
-                    Integer.toString(total.getBossB()), Integer.toString(total.getBossC()),
-                    Integer.toString(total.getBossD()) });
-            // 海域毎
-            for (Entry<Integer, BattleAggDetailsDto> areaEntry : dto.getAreaDetails()) {
-                BattleAggDetailsDto area = areaEntry.getValue();
-
-                TreeItem sub = new TreeItem(root, SWT.NONE);
-                sub.setText(new String[] { area.getAreaName(), Integer.toString(area.getWin()),
-                        Integer.toString(area.getS()), Integer.toString(area.getA()), Integer.toString(area.getB()),
-                        Integer.toString(area.getC()), Integer.toString(area.getD()) });
-                // ボス
-                TreeItem subBoss = new TreeItem(sub, SWT.NONE);
-                subBoss.setText(new String[] { "ボス", Integer.toString(area.getBossWin()),
-                        Integer.toString(area.getBossS()), Integer.toString(area.getBossA()),
-                        Integer.toString(area.getBossB()), Integer.toString(area.getBossC()),
-                        Integer.toString(area.getBossD()) });
-            }
-            if (first)
-                root.setExpanded(true);
-            first = false;
-        }
+        this.tree.setRedraw(false);
+        TableItemReference[] selectedItems = this.treeItems.getSelection();
+        TableItemReference topItem = this.treeItems.getTopItem();
+        this.treeItems.disposeTree();
+        this.treeItems.setData(this.load());
+        this.treeItems.setSelectedItems(selectedItems);
+        this.treeItems.setTopItem(topItem);
         this.packTableHeader();
+        this.tree.setRedraw(true);
     }
 
     /**
@@ -243,7 +272,7 @@ public class BattleAggDialog extends Dialog {
         // 海戦・ドロップ報告書読み込み
         try {
             for (BattleResultDto dto : BattleResultServer.get().getList()) {
-                Calendar date = DateUtils.toCalendar(dto.getBattleDate());
+                Calendar date = BattleAggDate.fromDate(dto.getBattleDate());
                 MapCellDto mapCell = dto.getMapCell();
                 ResultRank rank = dto.getRank();
                 // 演習はスキップ
@@ -284,7 +313,11 @@ public class BattleAggDialog extends Dialog {
      */
     private void agg(BattleAggUnit unit, Map<BattleAggUnit, BattleAggUnitDto> to, Calendar std, int field,
             Calendar target, MapCellDto area, ResultRank rank) {
-        if (std.get(field) == target.get(field)) {
+        int stdn = std.get(field);
+        int tarn = target.get(field);
+        //if (std.get(field) == target.get(field))
+        if (stdn == tarn)
+        {
             BattleAggUnitDto aggUnit = to.get(unit);
             if (aggUnit == null) {
                 aggUnit = new BattleAggUnitDto();
@@ -301,6 +334,233 @@ public class BattleAggDialog extends Dialog {
         @Override
         public void widgetSelected(SelectionEvent e) {
             BattleAggDialog.this.reloadTable();
+        }
+    }
+
+    /**
+     * TreeItemはリロードすると消えてしまうので消えない対応データを持っておく
+     */
+    protected class TableItemReference {
+        AggTableItem aggItem;
+        boolean boss;
+
+        public TableItemReference(AggTableItem aggItem, boolean boss) {
+            this.aggItem = aggItem;
+            this.boss = boss;
+        }
+    }
+
+    protected class AggTableItems {
+        private final Map<BattleAggUnit, AggTableItem> childs = new TreeMap<>();
+        private final Tree root;
+
+        public AggTableItems(Tree root) {
+            this.root = root;
+        }
+
+        public void disposeTree() {
+            // expand状態を記憶+TreeItemへの参照を削除
+            for (AggTableItem item : this.childs.values()) {
+                item.storeAndReleaseItem();
+            }
+            // テーブルをクリア
+            this.root.removeAll();
+        }
+
+        public void setData(Map<BattleAggUnit, BattleAggUnitDto> aggMap) {
+            for (Entry<BattleAggUnit, BattleAggUnitDto> entry : aggMap.entrySet()) {
+                AggTableItem aggItem = this.getChild(entry.getKey());
+                aggItem.setDto(this.root, entry.getKey().toString(), entry.getValue());
+            }
+        }
+
+        public TableItemReference[] getSelection() {
+            List<TableItemReference> list = new ArrayList<>();
+            for (TreeItem item : this.root.getSelection()) {
+                AggTableItem aggItem = (AggTableItem) item.getData();
+                list.add(aggItem.getItemReference(item));
+            }
+            return list.toArray(new TableItemReference[list.size()]);
+        }
+
+        public void setSelectedItems(TableItemReference[] items) {
+            List<TreeItem> list = new ArrayList<>();
+            for (TableItemReference item : items) {
+                TreeItem treeItem = item.aggItem.getTreeItem(item.boss);
+                if (treeItem != null) {
+                    list.add(treeItem);
+                }
+            }
+            this.root.setSelection(list.toArray(new TreeItem[list.size()]));
+        }
+
+        public TableItemReference getTopItem() {
+            TreeItem topItem = this.root.getTopItem();
+            if (topItem == null)
+                return null;
+            AggTableItem aggItem = (AggTableItem) topItem.getData();
+            return aggItem.getItemReference(topItem);
+        }
+
+        public void setTopItem(TableItemReference item) {
+            if (item == null)
+                return;
+            TreeItem treeItem = item.aggItem.getTreeItem(item.boss);
+            if (treeItem != null) {
+                this.root.setTopItem(treeItem);
+            }
+        }
+
+        private AggTableItem getChild(BattleAggUnit unit) {
+            if (this.childs.containsKey(unit)) {
+                return this.childs.get(unit);
+            }
+            AggTableItem child = new AggTableItem();
+            this.childs.put(unit, child);
+            return child;
+        }
+    }
+
+    protected class AggTableItem {
+        private final Map<Integer, AggTableItem> childs = new TreeMap<>();
+        private TreeItem item;
+        private TreeItem bossItem;
+        private boolean expanded;
+
+        public void setDto(Tree root, String key, BattleAggUnitDto dto) {
+            this.item = new TreeItem(root, SWT.NONE);
+            this.setDto(key, dto.getTotal());
+            for (Entry<Integer, BattleAggDetailsDto> areaEntry : dto.getAreaDetails()) {
+                AggTableItem aggItem = this.getChild(areaEntry.getKey());
+                aggItem.setDto(this, areaEntry.getValue());
+            }
+        }
+
+        private void setDto(AggTableItem parent, BattleAggDetailsDto area) {
+            this.item = new TreeItem(parent.item, SWT.NONE);
+            this.setDto(area.getAreaName(), area);
+        }
+
+        private void setDto(String title, BattleAggDetailsDto area) {
+            // メイン
+            this.item.setText(new String[] { title, Integer.toString(area.getWin()),
+                    Integer.toString(area.getS()), Integer.toString(area.getA()), Integer.toString(area.getB()),
+                    Integer.toString(area.getC()), Integer.toString(area.getD()) });
+            this.item.setData(this);
+            // ボス
+            this.bossItem = new TreeItem(this.item, SWT.NONE);
+            this.bossItem.setText(new String[] { "ボス", Integer.toString(area.getBossWin()),
+                    Integer.toString(area.getBossS()), Integer.toString(area.getBossA()),
+                    Integer.toString(area.getBossB()), Integer.toString(area.getBossC()),
+                    Integer.toString(area.getBossD()) });
+            this.bossItem.setData(this);
+
+            if (this.expanded) {
+                this.item.setExpanded(true);
+            }
+        }
+
+        private AggTableItem getChild(Integer areaId) {
+            if (this.childs.containsKey(areaId)) {
+                return this.childs.get(areaId);
+            }
+            AggTableItem child = new AggTableItem();
+            this.childs.put(areaId, child);
+            return child;
+        }
+
+        public TableItemReference getItemReference(TreeItem item) {
+            if (this.item == item) {
+                return new TableItemReference(this, false);
+            }
+            else if (this.bossItem == item) {
+                return new TableItemReference(this, true);
+            }
+            return null;
+        }
+
+        public TreeItem getTreeItem(boolean boss) {
+            return boss ? this.bossItem : this.item;
+        }
+
+        public void storeAndReleaseItem() {
+            for (AggTableItem item : this.childs.values()) {
+                item.storeAndReleaseItem();
+            }
+            if (this.item != null) {
+                this.expanded = this.item.getExpanded();
+                this.item = this.bossItem = null;
+            }
+        }
+    }
+
+    private void enableCyclicReload() {
+        // タイマーを作成
+        if (this.timer == null) {
+            this.timer = new Timer(true);
+            // 3秒毎に再読み込みするようにスケジュールする
+            this.timer.schedule(new CyclicReloadTask(BattleAggDialog.this), 0,
+                    TimeUnit.SECONDS.toMillis(3));
+        }
+    }
+
+    private void disableCyclicReload() {
+        // タイマーを終了
+        if (this.timer != null) {
+            this.timer.cancel();
+            this.timer = null;
+        }
+    }
+
+    /**
+     * テーブルを定期的に再読み込みする
+     */
+    protected class CyclicReloadAdapter extends SelectionAdapter {
+
+        private final MenuItem menuitem;
+
+        public CyclicReloadAdapter(MenuItem menuitem) {
+            this.menuitem = menuitem;
+        }
+
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+            if (this.menuitem.getSelection()) {
+                BattleAggDialog.this.enableCyclicReload();
+            } else {
+                BattleAggDialog.this.disableCyclicReload();
+            }
+        }
+    }
+
+    /**
+     * テーブルを定期的に再読み込みする
+     */
+    protected static class CyclicReloadTask extends TimerTask {
+
+        private final BattleAggDialog dialog;
+
+        public CyclicReloadTask(BattleAggDialog dialog) {
+            this.dialog = dialog;
+        }
+
+        @Override
+        public void run() {
+            this.dialog.display.asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    if (!CyclicReloadTask.this.dialog.shell.isDisposed()) {
+                        // 見えているときだけ処理する
+                        if (CyclicReloadTask.this.dialog.shell.isVisible()) {
+                            CyclicReloadTask.this.dialog.reloadTable();
+                        }
+                    }
+                    else {
+                        // ウインドウが消えていたらタスクをキャンセルする
+                        CyclicReloadTask.this.cancel();
+                    }
+                }
+            });
         }
     }
 }

@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import logbook.constants.AppConstants;
 import logbook.dto.ShipFilterDto;
 
 import org.apache.commons.io.FilenameUtils;
@@ -111,9 +112,14 @@ public final class AppConfigBean {
     /** ローカルループバックアドレスからの接続のみ受け入れる */
     private boolean allowOnlyFromLocalhost = true;
 
+    /** 戦闘結果をログ出力するか */
     private boolean printSortieLog = false;
 
+    /** 轟沈をログ出力するか */
     private boolean printSunkLog = false;
+
+    /** 更新系をログ出力するか */
+    private boolean printUpdateLog = true;
 
     /** 遠征-1分前に通知する */
     private boolean noticeDeckmission = true;
@@ -169,17 +175,41 @@ public final class AppConfigBean {
     /** 母港の空きがこれ以下で警告表示に変える */
     private int notifyFully = 1;
 
+    /** 母港の空きがこれ以下でバルーン通知 */
+    private int shipFullBalloonNotify = 5;
+
+    /** 母港の空きがこれ以下でバルーン通知 */
+    private boolean enableShipFullBalloonNotify = false;
+
+    /** 装備の空きがこれ以下でバルーン通知 */
+    private int itemFullBalloonNotify = 20;
+
+    /** 装備の空きがこれ以下でバルーン通知 */
+    private boolean enableItemFullBalloonNotify = false;
+
     /** 燃料の色 */
-    private RGB fuelColor = new RGB(0x00, 0x80, 0x00);
+    private RGB fuelColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[0]);
 
     /** 弾薬の色 */
-    private RGB ammoColor = new RGB(0x66, 0x33, 0x00);
+    private RGB ammoColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[1]);
 
     /** 鋼材の色 */
-    private RGB metalColor = new RGB(0x80, 0x80, 0x80);
+    private RGB metalColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[2]);
 
     /** ボーキの色 */
-    private RGB bauxiteColor = new RGB(0xCC, 0x33, 0x00);
+    private RGB bauxiteColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[3]);
+
+    /** バーナーの色 */
+    private RGB burnerColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[4]);
+
+    /** バケツの色 */
+    private RGB bucketColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[5]);
+
+    /** 開発の色 */
+    private RGB researchColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[6]);
+
+    /** ネジの色 */
+    private RGB screwColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[7]);
 
     /** 開発者オプション-JSONを保存する */
     private boolean storeJson;
@@ -226,6 +256,26 @@ public final class AppConfigBean {
 
     /** キャプチャ範囲 [x,y,width,height] */
     private int[] captureRect = null;
+
+    /** 開発報告書を読み込むか */
+    private boolean loadCreateItemLog = true;
+
+    /** 建造報告書を読みこむか */
+    private boolean loadCreateShipLog = true;
+
+    /** 遠征報告書を読みこむか */
+    private boolean loadMissionLog = true;
+
+    /** システムワイドホットキー (Windowsのみ対応) 0:なし, 1:Ctrl+Shift+z, 2:Win+Z */
+    private int systemWideHotKey = 0;
+
+    /** TwitterのAccessToken */
+    private String twitterToken;
+    private String twitterTokenSecret;
+
+    private static RGB cloneRGB(RGB rgb) {
+        return new RGB(rgb.red, rgb.green, rgb.blue);
+    }
 
     /**
      * ポート番号を取得します。
@@ -740,6 +790,20 @@ public final class AppConfigBean {
     }
 
     /**
+     * @return printUpdateLog
+     */
+    public boolean isPrintUpdateLog() {
+        return this.printUpdateLog;
+    }
+
+    /**
+     * @param printUpdateLog セットする printUpdateLog
+     */
+    public void setPrintUpdateLog(boolean printUpdateLog) {
+        this.printUpdateLog = printUpdateLog;
+    }
+
+    /**
      * 遠征-1分前に通知するを取得します。
      * @return 遠征-1分前に通知する
      */
@@ -1044,6 +1108,70 @@ public final class AppConfigBean {
     }
 
     /**
+     * 母港の空きがこれ以下でバルーン通知を取得します。
+     * @return 母港の空きがこれ以下でバルーン通知
+     */
+    public int getShipFullBalloonNotify() {
+        return this.shipFullBalloonNotify;
+    }
+
+    /**
+     * 母港の空きがこれ以下でバルーン通知を設定します。
+     * @param shipFullBalloonNotify 母港の空きがこれ以下でバルーン通知
+     */
+    public void setShipFullBalloonNotify(int shipFullBalloonNotify) {
+        this.shipFullBalloonNotify = shipFullBalloonNotify;
+    }
+
+    /**
+     * 母港の空きがこれ以下でバルーン通知を取得します。
+     * @return 装備の空きがこれ以下でバルーン通知
+     */
+    public boolean isEnableShipFullBalloonNotify() {
+        return this.enableShipFullBalloonNotify;
+    }
+
+    /**
+     * 母港の空きがこれ以下でバルーン通知を設定します。
+     * @param itemFullBalloonNotify 装備の空きがこれ以下でバルーン通知
+     */
+    public void setEnableShipFullBalloonNotify(boolean enableShipFullBalloonNotify) {
+        this.enableShipFullBalloonNotify = enableShipFullBalloonNotify;
+    }
+
+    /**
+     * 装備の空きがこれ以下でバルーン通知を取得します。
+     * @return 装備の空きがこれ以下でバルーン通知
+     */
+    public int getItemFullBalloonNotify() {
+        return this.itemFullBalloonNotify;
+    }
+
+    /**
+     * 装備の空きがこれ以下でバルーン通知を設定します。
+     * @param itemFullBalloonNotify 装備の空きがこれ以下でバルーン通知
+     */
+    public void setItemFullBalloonNotify(int itemFullBalloonNotify) {
+        this.itemFullBalloonNotify = itemFullBalloonNotify;
+    }
+
+    /**
+     * 装備の空きがこれ以下でバルーン通知を取得します。
+     * @return 装備の空きがこれ以下でバルーン通知
+     */
+    public boolean isEnableItemFullBalloonNotify() {
+        return this.enableItemFullBalloonNotify;
+    }
+
+    /**
+     * 装備の空きがこれ以下でバルーン通知を設定します。
+     * @param itemFullBalloonNotify 装備の空きがこれ以下でバルーン通知
+     */
+    public void setEnableItemFullBalloonNotify(boolean enableItemFullBalloonNotify) {
+        this.enableItemFullBalloonNotify = enableItemFullBalloonNotify;
+    }
+
+    /**
      * 燃料の色を取得します。
      * @return 燃料の色
      */
@@ -1105,6 +1233,62 @@ public final class AppConfigBean {
      */
     public void setBauxiteColor(RGB bauxiteColor) {
         this.bauxiteColor = bauxiteColor;
+    }
+
+    /**
+     * @return burnerColor
+     */
+    public RGB getBurnerColor() {
+        return this.burnerColor;
+    }
+
+    /**
+     * @param burnerColor セットする burnerColor
+     */
+    public void setBurnerColor(RGB burnerColor) {
+        this.burnerColor = burnerColor;
+    }
+
+    /**
+     * @return bucketColor
+     */
+    public RGB getBucketColor() {
+        return this.bucketColor;
+    }
+
+    /**
+     * @param bucketColor セットする bucketColor
+     */
+    public void setBucketColor(RGB bucketColor) {
+        this.bucketColor = bucketColor;
+    }
+
+    /**
+     * @return researchColor
+     */
+    public RGB getResearchColor() {
+        return this.researchColor;
+    }
+
+    /**
+     * @param researchColor セットする researchColor
+     */
+    public void setResearchColor(RGB researchColor) {
+        this.researchColor = researchColor;
+    }
+
+    /**
+     * @return screwColor
+     */
+    public RGB getScrewColor() {
+        return this.screwColor;
+    }
+
+    /**
+     * @param screwColor セットする screwColor
+     */
+    public void setScrewColor(RGB screwColor) {
+        this.screwColor = screwColor;
     }
 
     /**
@@ -1293,5 +1477,89 @@ public final class AppConfigBean {
      */
     public void setCaptureRect(int[] captureRect) {
         this.captureRect = captureRect;
+    }
+
+    /**
+     * @return loadCreateItemLog
+     */
+    public boolean isLoadCreateItemLog() {
+        return this.loadCreateItemLog;
+    }
+
+    /**
+     * @param loadCreateItemLog セットする loadCreateItemLog
+     */
+    public void setLoadCreateItemLog(boolean loadCreateItemLog) {
+        this.loadCreateItemLog = loadCreateItemLog;
+    }
+
+    /**
+     * @return loadCreateShipLog
+     */
+    public boolean isLoadCreateShipLog() {
+        return this.loadCreateShipLog;
+    }
+
+    /**
+     * @param loadCreateShipLog セットする loadCreateShipLog
+     */
+    public void setLoadCreateShipLog(boolean loadCreateShipLog) {
+        this.loadCreateShipLog = loadCreateShipLog;
+    }
+
+    /**
+     * @return loadMissionLog
+     */
+    public boolean isLoadMissionLog() {
+        return this.loadMissionLog;
+    }
+
+    /**
+     * @param loadMissionLog セットする loadMissionLog
+     */
+    public void setLoadMissionLog(boolean loadMissionLog) {
+        this.loadMissionLog = loadMissionLog;
+    }
+
+    /**
+     * @return systemWideHotKey
+     */
+    public int getSystemWideHotKey() {
+        return this.systemWideHotKey;
+    }
+
+    /**
+     * @param systemWideHotKey セットする systemWideHotKey
+     */
+    public void setSystemWideHotKey(int systemWideHotKey) {
+        this.systemWideHotKey = systemWideHotKey;
+    }
+
+    /**
+     * @return twitterToken
+     */
+    public String getTwitterToken() {
+        return this.twitterToken;
+    }
+
+    /**
+     * @param twitterToken セットする twitterToken
+     */
+    public void setTwitterToken(String twitterToken) {
+        this.twitterToken = twitterToken;
+    }
+
+    /**
+     * @return twitterTokenSecret
+     */
+    public String getTwitterTokenSecret() {
+        return this.twitterTokenSecret;
+    }
+
+    /**
+     * @param twitterTokenSecret セットする twitterTokenSecret
+     */
+    public void setTwitterTokenSecret(String twitterTokenSecret) {
+        this.twitterTokenSecret = twitterTokenSecret;
     }
 }

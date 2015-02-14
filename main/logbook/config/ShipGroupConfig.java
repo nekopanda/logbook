@@ -1,9 +1,13 @@
 package logbook.config;
 
 import java.io.IOException;
+import java.util.Date;
 
+import logbook.config.bean.ShipGroupBean;
 import logbook.config.bean.ShipGroupListBean;
 import logbook.constants.AppConstants;
+import logbook.gui.logic.ShipGroupListener;
+import logbook.gui.logic.ShipGroupObserver;
 import logbook.util.BeanUtils;
 
 import org.apache.logging.log4j.LogManager;
@@ -20,15 +24,42 @@ public class ShipGroupConfig {
     /** 所有艦娘グループ */
     private static ShipGroupListBean group;
 
+    /** 最終更新日時 */
+    private static Date lastUpdateTime = new Date(0);
+
+    // 変更検出用
+    private static class ChangeListener implements ShipGroupListener {
+        @Override
+        public void listChanged() {
+            lastUpdateTime = new Date();
+        }
+
+        @Override
+        public void groupNameChanged(ShipGroupBean group) {
+            lastUpdateTime = new Date();
+        }
+
+        @Override
+        public void groupShipChanged(ShipGroupBean group) {
+            lastUpdateTime = new Date();
+        }
+    }
+
     // 始めてアクセスした時に読み込む
     static {
         load();
+        // 変更を検知する
+        ShipGroupObserver.addListener(new ChangeListener());
     }
 
     /**
      * 設定ファイルに書き込みます
      */
     public static void store() throws IOException {
+        // 最終更新日時がファイル更新日時より新しい時だけ書き込む
+        if (new Date(AppConstants.GROUP_CONFIG_FILE.lastModified()).after(lastUpdateTime)) {
+            return;
+        }
         if (group == null) {
             group = new ShipGroupListBean();
         }

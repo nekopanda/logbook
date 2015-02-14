@@ -5,6 +5,7 @@ package logbook.dto;
 
 import javax.json.JsonArray;
 
+import logbook.constants.AppConstants;
 import logbook.internal.MasterData;
 
 /**
@@ -62,6 +63,9 @@ public class UseItemDto {
      * @return
      */
     public String getItemName() {
+        if (this.useItemId == AppConstants.USEITEM_UNKNOWN) {
+            return "<UNKNOWN>";
+        }
         MasterData.UseItemInfoDto useItemDto = MasterData.getUseItem(this.useItemId);
         if (useItemDto != null) {
             return useItemDto.getName();

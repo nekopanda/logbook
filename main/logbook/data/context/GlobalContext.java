@@ -48,7 +48,6 @@ import logbook.dto.NdockDto;
 import logbook.dto.PracticeUserDetailDto;
 import logbook.dto.PracticeUserDto;
 import logbook.dto.QuestDto;
-import logbook.dto.ResourceDto;
 import logbook.dto.ResourceItemDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
@@ -89,7 +88,7 @@ public final class GlobalContext {
     private static List<GetShipDto> getShipList = new ArrayList<GetShipDto>();
 
     /** 建造(投入資源) */
-    private static Map<String, ResourceDto> getShipResource = new HashMap<String, ResourceDto>();
+    private static Map<String, GetShipDto> getShipResource = new HashMap<String, GetShipDto>();
 
     /** 開発 */
     private static List<CreateItemDto> createItemList = new ArrayList<CreateItemDto>();
@@ -245,10 +244,24 @@ public final class GlobalContext {
     }
 
     /**
+     * @param list 建造艦娘List
+     */
+    public static void addGetshipList(List<GetShipDto> list) {
+        getShipList.addAll(list);
+    }
+
+    /**
      * @return 開発アイテムList
      */
     public static List<CreateItemDto> getCreateItemList() {
         return createItemList;
+    }
+
+    /**
+     * @param list 開発アイテムList
+     */
+    public static void addCreateItemList(List<CreateItemDto> list) {
+        createItemList.addAll(list);
     }
 
     /**
@@ -270,6 +283,13 @@ public final class GlobalContext {
      */
     public static List<MissionResultDto> getMissionResultList() {
         return missionResultList;
+    }
+
+    /**
+     * @param list 遠征結果
+     */
+    public static void addMissionResultList(List<MissionResultDto> list) {
+        missionResultList.addAll(list);
     }
 
     /**
@@ -706,7 +726,7 @@ public final class GlobalContext {
                         }
                     }
                 }
-                addConsole("補給を更新しました");
+                addUpdateLog("補給を更新しました");
             }
         } catch (Exception e) {
             LOG.warn("補給を更新しますに失敗しました", e);
@@ -794,7 +814,7 @@ public final class GlobalContext {
                     setSecretary(firstdock.getShips().get(0));
                 }
             }
-            addConsole("編成を更新しました");
+            addUpdateLog("編成を更新しました");
         } catch (Exception e) {
             LOG.warn("編成を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -873,7 +893,7 @@ public final class GlobalContext {
 
                 state = checkDataState();
 
-                addConsole("母港情報を更新しました");
+                addUpdateLog("母港情報を更新しました");
             }
         } catch (Exception e) {
             LOG.warn("母港を更新しますに失敗しました", e);
@@ -1008,7 +1028,7 @@ public final class GlobalContext {
                     battleResultList.remove(0);
                 }
             }
-            addConsole("海戦結果を更新しました");
+            addUpdateLog("海戦結果を更新しました");
         } catch (Exception e) {
             LOG.warn("海戦結果を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1023,26 +1043,20 @@ public final class GlobalContext {
         try {
             String kdockid = data.getField("api_kdock_id");
             // 投入資源
-            ResourceDto resource = new ResourceDto(
-                    Integer.parseInt(data.getField("api_large_flag")),
-                    Integer.parseInt(data.getField("api_item1")),
-                    Integer.parseInt(data.getField("api_item2")),
-                    Integer.parseInt(data.getField("api_item3")),
-                    Integer.parseInt(data.getField("api_item4")),
-                    Integer.parseInt(data.getField("api_item5")),
-                    secretary, hqLevel
-                    );
+            ResourceItemDto res = new ResourceItemDto();
+            res.loadBaseMaterialsFromField(data);
+            res.setResearchMaterials(Integer.parseInt(data.getField("api_item5")));
+            GetShipDto resource = new GetShipDto(
+                    Integer.parseInt(data.getField("api_large_flag")) == 1,
+                    res, secretary, hqLevel, -1);
             lastBuildKdock = kdockid;
             getShipResource.put(kdockid, resource);
             KdockConfig.store(kdockid, resource);
 
             // 資源に反映させてレポート
-            ResourceItemDto items = new ResourceItemDto();
-            items.loadBaseMaterialsFromField(data);
-            items.setResearchMaterials(Integer.parseInt(data.getField("api_item5")));
-            updateDetailedMaterial("建造", items, MATERIAL_DIFF.CONSUMED);
+            updateDetailedMaterial("建造", res, MATERIAL_DIFF.CONSUMED);
 
-            addConsole("建造(投入資源)情報を更新しました");
+            addUpdateLog("建造(投入資源)情報を更新しました");
         } catch (Exception e) {
             LOG.warn("建造(投入資源)情報を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1059,7 +1073,7 @@ public final class GlobalContext {
 
             // 建造ドックの空きをカウントします
             if (lastBuildKdock != null) {
-                ResourceDto resource = getShipResource.get(lastBuildKdock);
+                GetShipDto resource = getShipResource.get(lastBuildKdock);
                 if (resource != null) {
                     int freecount = 0;
                     for (int i = 0; i < apidata.size(); i++) {
@@ -1077,7 +1091,7 @@ public final class GlobalContext {
             // 建造ドック更新
             doKdockSub(apidata);
 
-            addConsole("建造を更新しました");
+            addUpdateLog("建造を更新しました");
         } catch (Exception e) {
             LOG.warn("建造を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1126,11 +1140,11 @@ public final class GlobalContext {
             ShipDto ship = new ShipDto(apiShip);
             shipMap.put(Integer.valueOf(ship.getId()), ship);
             // 投入資源を取得する
-            ResourceDto resource = getShipResource.get(dock);
-            if (resource == null) {
-                resource = KdockConfig.load(dock);
+            GetShipDto dto = getShipResource.get(dock);
+            if (dto == null) {
+                dto = KdockConfig.load(dock);
             }
-            GetShipDto dto = new GetShipDto(ship, resource);
+            dto.setShip(ship);
             getShipList.add(dto);
             CreateReportLogic.storeCreateShipReport(dto);
             // 投入資源を除去する
@@ -1142,7 +1156,7 @@ public final class GlobalContext {
 
             state = checkDataState();
 
-            addConsole("建造(入手)情報を更新しました");
+            addUpdateLog("建造(入手)情報を更新しました");
         } catch (Exception e) {
             LOG.warn("建造(入手)情報を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1159,14 +1173,9 @@ public final class GlobalContext {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
 
             // 投入資源
-            ResourceDto resources = new ResourceDto(
-                    Integer.parseInt(data.getField("api_item1")),
-                    Integer.parseInt(data.getField("api_item2")),
-                    Integer.parseInt(data.getField("api_item3")),
-                    Integer.parseInt(data.getField("api_item4")),
-                    secretary, hqLevel);
-
-            CreateItemDto createitem = new CreateItemDto(apidata, resources);
+            ResourceItemDto res = new ResourceItemDto();
+            res.loadBaseMaterialsFromField(data);
+            CreateItemDto createitem = new CreateItemDto(apidata, res, secretary, hqLevel);
             if (createitem.isCreateFlag()) {
                 ItemDto item = addSlotitem(apidata.getJsonObject("api_slot_item"));
                 if (item != null) {
@@ -1187,7 +1196,7 @@ public final class GlobalContext {
 
             state = checkDataState();
 
-            addConsole("装備開発情報を更新しました");
+            addUpdateLog("装備開発情報を更新しました");
         } catch (Exception e) {
             LOG.warn("装備開発情報を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1211,7 +1220,7 @@ public final class GlobalContext {
 
             state = checkDataState();
 
-            addConsole("保有装備情報を更新しました");
+            addUpdateLog("保有装備情報を更新しました");
         } catch (Exception e) {
             LOG.warn("保有装備を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1250,7 +1259,7 @@ public final class GlobalContext {
 
             state = checkDataState();
 
-            addConsole("保有艦娘情報３を更新しました");
+            addUpdateLog("保有艦娘情報３を更新しました");
         } catch (Exception e) {
             LOG.warn("保有艦娘を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1289,7 +1298,7 @@ public final class GlobalContext {
 
             battle = null;
 
-            addConsole("保有艦娘情報２を更新しました");
+            addUpdateLog("保有艦娘情報２を更新しました");
         } catch (Exception e) {
             LOG.warn("保有艦娘を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1312,7 +1321,7 @@ public final class GlobalContext {
             }
             doDeck(apidata);
 
-            addConsole("艦隊を更新しました");
+            addUpdateLog("艦隊を更新しました");
         } catch (Exception e) {
             LOG.warn("艦隊を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1409,7 +1418,7 @@ public final class GlobalContext {
                 }
             }
 
-            addConsole("艦娘を解体しました");
+            addUpdateLog("艦娘を解体しました");
         } catch (Exception e) {
             LOG.warn("艦娘を解体しますに失敗しました", e);
             LOG.warn(data);
@@ -1434,7 +1443,7 @@ public final class GlobalContext {
             }
             // 記録する
             CreateReportLogic.storeLostReport(dtoList);
-            addConsole("装備を廃棄しました");
+            addUpdateLog("装備を廃棄しました");
         } catch (Exception e) {
             LOG.warn("装備を廃棄しますに失敗しました", e);
             LOG.warn(data);
@@ -1490,7 +1499,7 @@ public final class GlobalContext {
             }
             shipMap.put(id, ship);
 
-            addConsole("近代化改修しました");
+            addUpdateLog("近代化改修しました");
         } catch (Exception e) {
             LOG.warn("近代化改修しますに失敗しました", e);
             LOG.warn(data);
@@ -1513,7 +1522,7 @@ public final class GlobalContext {
                 dto.setLocked(locked);
             }
 
-            addConsole("艦娘ロックを更新しました");
+            addUpdateLog("艦娘ロックを更新しました");
         } catch (Exception e) {
             LOG.warn("艦娘ロックを更新するに失敗しました", e);
             LOG.warn(data);
@@ -1536,7 +1545,7 @@ public final class GlobalContext {
                 dto.setLocked(locked);
             }
 
-            addConsole("装備ロックを更新しました");
+            addUpdateLog("装備ロックを更新しました");
         } catch (Exception e) {
             LOG.warn("装備ロックを更新するに失敗しました", e);
             LOG.warn(data);
@@ -1553,7 +1562,7 @@ public final class GlobalContext {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
             doBasicSub(apidata);
 
-            addConsole("司令部を更新しました");
+            addUpdateLog("司令部を更新しました");
         } catch (Exception e) {
             LOG.warn("司令部を更新するに失敗しました", e);
             LOG.warn(data);
@@ -1592,7 +1601,7 @@ public final class GlobalContext {
 
             doMaterialSub(apidata);
 
-            addConsole("保有資材を更新しました");
+            addUpdateLog("保有資材を更新しました");
         } catch (Exception e) {
             LOG.warn("保有資材を更新するに失敗しました", e);
             LOG.warn(data);
@@ -1635,6 +1644,9 @@ public final class GlobalContext {
             case AppConstants.MATERIAL_RESEARCH:
                 dto.setResearch(entry.getInt("api_value"));
                 break;
+            case AppConstants.MATERIAL_SCREW:
+                dto.setScrew(entry.getInt("api_value"));
+                break;
             default:
                 break;
             }
@@ -1660,32 +1672,24 @@ public final class GlobalContext {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
 
-            MissionResultDto result = new MissionResultDto();
-
             int clearResult = apidata.getJsonNumber("api_clear_result").intValue();
-            result.setClearResult(clearResult);
-            result.setQuestName(apidata.getString("api_quest_name"));
+            String questName = apidata.getString("api_quest_name");
+            ResourceItemDto res = new ResourceItemDto();
 
             if (clearResult != 0) {
-                JsonArray getMaterial = apidata.getJsonArray("api_get_material");
-                result.setFuel(getMaterial.getInt(0));
-                result.setAmmo(getMaterial.getInt(1));
-                result.setMetal(getMaterial.getInt(2));
-                result.setBauxite(getMaterial.getInt(3));
-
                 // 資源に反映させてレポート
-                ResourceItemDto items = new ResourceItemDto();
-                items.loadMissionResult(apidata);
-                result.setItems(items);
-                updateDetailedMaterial("遠征帰還", items, MATERIAL_DIFF.OBTAINED);
+                res.loadMissionResult(apidata);
+                updateDetailedMaterial("遠征帰還", res, MATERIAL_DIFF.OBTAINED);
             }
 
-            CreateReportLogic.storeCreateMissionReport(result);
+            MissionResultDto result = new MissionResultDto(clearResult, questName, res);
+
+            CreateReportLogic.storeMissionReport(result);
             missionResultList.add(result);
 
             state = checkDataState();
 
-            addConsole("遠征(帰還)情報を更新しました");
+            addUpdateLog("遠征(帰還)情報を更新しました");
         } catch (Exception e) {
             LOG.warn("遠征(帰還)を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1702,7 +1706,7 @@ public final class GlobalContext {
 
             doNdockSub(apidata);
 
-            addConsole("入渠情報を更新しました");
+            addUpdateLog("入渠情報を更新しました");
         } catch (Exception e) {
             LOG.warn("入渠を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1754,7 +1758,7 @@ public final class GlobalContext {
             }
 
             // 高速修復出ない場合は直後にndockが送られてくる
-            addConsole("入渠情報を更新しました");
+            addUpdateLog("入渠情報を更新しました");
         } catch (Exception e) {
             LOG.warn("入渠を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1772,7 +1776,7 @@ public final class GlobalContext {
             ndockFinished(ndocks[id - 1].getNdockid());
             ndocks[id - 1] = NdockDto.EMPTY;
 
-            addConsole("バケツを使いました");
+            addUpdateLog("バケツを使いました");
         } catch (Exception e) {
             LOG.warn("入渠を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1851,7 +1855,7 @@ public final class GlobalContext {
                     questLastUpdate = updateTime;
                 }
             }
-            addConsole("任務を更新しました");
+            addUpdateLog("任務を更新しました");
         } catch (Exception e) {
             LOG.warn("任務を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1909,7 +1913,7 @@ public final class GlobalContext {
             ApplicationMain.main.startSortie();
             ApplicationMain.main.updateMapCell(mapCellDto);
 
-            addConsole("出撃を更新しました");
+            addUpdateLog("出撃を更新しました");
             if (AppConfig.get().isPrintSortieLog())
                 addConsole("行先 " + mapCellDto.toString());
         } catch (Exception e) {
@@ -1953,7 +1957,7 @@ public final class GlobalContext {
                     String id = object.getJsonNumber("api_id").toString();
                     Ship.set(id, toShipInfoDto(object));
                 }
-                addConsole("艦娘一覧を更新しました");
+                addUpdateLog("艦娘一覧を更新しました");
 
                 // 装備一覧
                 JsonArray apiMstSlotitem = obj.getJsonArray("api_mst_slotitem");
@@ -1963,12 +1967,12 @@ public final class GlobalContext {
                     int id = object.getJsonNumber("api_id").intValue();
                     Item.set(id, item);
                 }
-                addConsole("装備一覧を更新しました");
+                addUpdateLog("装備一覧を更新しました");
 
                 MasterData.updateMaster(obj);
             }
 
-            addConsole("設定を更新しました");
+            addConsole("マスターデータを更新しました");
         } catch (Exception e) {
             LOG.warn("設定を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1986,18 +1990,29 @@ public final class GlobalContext {
             if (apidata != null) {
                 MasterData.updateMapInfo(apidata);
             }
+            int shipSpace = maxChara - shipMap.size();
+            int itemSpace = maxSlotitem - itemMap.size();
+            // 装備の空き枠が少ない時はバルーンを出す
+            if (AppConfig.get().isEnableItemFullBalloonNotify() &&
+                    (itemSpace <= AppConfig.get().getItemFullBalloonNotify())) {
+                ToolTip tip = new ToolTip(ApplicationMain.main.getShell(), SWT.BALLOON
+                        | SWT.ICON_ERROR);
+                tip.setText("装備の空き枠警告");
+                tip.setMessage("装備の空き枠があと" + itemSpace + "個しかありません");
+                ApplicationMain.main.getTrayItem().setToolTip(tip);
+                tip.setVisible(true);
+                Sound.randomWarningPlay();
+            }
             // 艦娘の空き枠が少ない時はバルーンを出す
-            if (AppConfig.get().isUseTaskbarNotify()) {
-                int aki = maxChara - shipMap.size();
-                if (aki <= AppConfig.get().getNotifyFully()) {
-                    ToolTip tip = new ToolTip(ApplicationMain.main.getShell(), SWT.BALLOON
-                            | SWT.ICON_ERROR);
-                    tip.setText("母港の空き警告");
-                    tip.setMessage("母港の空きがあと" + aki + "隻分しかありません");
-                    ApplicationMain.main.getTrayItem().setToolTip(tip);
-                    tip.setVisible(true);
-                    Sound.randomWarningPlay();
-                }
+            else if (AppConfig.get().isEnableShipFullBalloonNotify() &&
+                    (shipSpace <= AppConfig.get().getShipFullBalloonNotify())) {
+                ToolTip tip = new ToolTip(ApplicationMain.main.getShell(), SWT.BALLOON
+                        | SWT.ICON_ERROR);
+                tip.setText("母港の空き警告");
+                tip.setMessage("母港の空きがあと" + shipSpace + "隻分しかありません");
+                ApplicationMain.main.getTrayItem().setToolTip(tip);
+                tip.setVisible(true);
+                Sound.randomWarningPlay();
             }
         } catch (Exception e) {
             LOG.warn("マップ情報更新に失敗しました", e);
@@ -2039,7 +2054,7 @@ public final class GlobalContext {
                     practiceUser[i].setState(dto.getState());
             }
             practiceUserLastUpdate = new Date();
-            addConsole("演習情報を更新しました");
+            addUpdateLog("演習情報を更新しました");
         } catch (Exception e) {
             LOG.warn("演習情報更新に失敗しました", e);
             LOG.warn(data);
@@ -2064,7 +2079,7 @@ public final class GlobalContext {
             }
 
             ApplicationMain.main.updateCalcPracticeExp(dto);
-            addConsole("演習相手艦隊情報を更新しました");
+            addUpdateLog("演習相手艦隊情報を更新しました");
         } catch (Exception e) {
             LOG.warn("演習相手艦隊情報更新に失敗しました", e);
             LOG.warn(data);
@@ -2086,7 +2101,7 @@ public final class GlobalContext {
                     dockdto.setUpdate(true);
                 }
             }
-            addConsole("連合艦隊情報を更新しました");
+            addUpdateLog("連合艦隊情報を更新しました");
         } catch (Exception e) {
             LOG.warn("連合艦隊情報更新に失敗しました", e);
             LOG.warn(data);
@@ -2105,7 +2120,7 @@ public final class GlobalContext {
                     addSlotitem(apidata.getJsonObject("api_after_slot"));
                 }
             }
-            addConsole("装備改修を更新しました");
+            addUpdateLog("装備改修を更新しました");
         } catch (Exception e) {
             LOG.warn("装備改修更新に失敗しました", e);
             LOG.warn(data);
@@ -2212,5 +2227,11 @@ public final class GlobalContext {
 
     private static void addConsole(Object message) {
         ApplicationMain.main.printMessage(message.toString());
+    }
+
+    private static void addUpdateLog(Object message) {
+        if (AppConfig.get().isPrintUpdateLog()) {
+            addConsole(message);
+        }
     }
 }

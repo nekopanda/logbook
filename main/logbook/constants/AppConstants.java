@@ -3,6 +3,8 @@ package logbook.constants;
 import java.io.File;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TimeZone;
 
 import org.eclipse.swt.graphics.RGB;
@@ -17,7 +19,7 @@ public class AppConstants {
     public static final String NAME = "航海日誌";
 
     /** バージョン */
-    public static final String VERSION = "1.3.0";
+    public static final String VERSION = "1.4.0";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://nekopanda.blog.jp/");
@@ -92,6 +94,17 @@ public class AppConstants {
             30,
             20,
             0
+    };
+
+    public static final RGB[] CHART_COLOR_TABLE = new RGB[] {
+            new RGB(0x00, 0x80, 0x00), // 燃料
+            new RGB(0x66, 0x33, 0x00), // 弾薬
+            new RGB(0x80, 0x80, 0x80), // 鋼材
+            new RGB(0xCC, 0x33, 0x00), // ボーキ
+            new RGB(0xA5, 0x2A, 0x2A), // バーナー
+            new RGB(0xF0, 0x80, 0x80), // バケツ
+            new RGB(0x48, 0x76, 0xFF), // 開発
+            new RGB(0x00, 0xF5, 0xFF) // ネジ
     };
 
     /** 小破の色 */
@@ -184,12 +197,17 @@ public class AppConstants {
     /** 保有資材:開発資材 */
     public static final int MATERIAL_RESEARCH = 7;
 
+    /** 保有資材:ネジ */
+    public static final int MATERIAL_SCREW = 8;
+
     /** 報告書のオンメモリ記憶数 */
     public static final int MAX_LOG_SIZE = 5000;
 
+    public static final int USEITEM_UNKNOWN = -1;
     public static final int USEITEM_BUCKET = 1;
     public static final int USEITEM_BURNER = 2;
     public static final int USEITEM_RESEARCH = 3;
+    public static final int USEITEM_SCREW = 4;
 
     /** /resources/icon/add.png */
     public static final String R_ICON_ADD = "/resources/icon/add.png";
@@ -365,6 +383,12 @@ public class AppConstants {
     /** /resources/hpgauge/50.png */
     public static final String R_HPGAUGE_50 = "/resources/hpgauge/50.png";
 
+    /** 航海日誌のロゴ */
+    public static final String LOGO = "/resources/logo.png";
+
+    /** Twitterのロゴ */
+    public static final String TWITTER = "/resources/twitter.png";
+
     /** HPゲージイメージ */
     public static final String[] R_HPGAUGE_IMAGES = { AppConstants.R_HPGAUGE_0, AppConstants.R_HPGAUGE_1,
             AppConstants.R_HPGAUGE_2, AppConstants.R_HPGAUGE_3, AppConstants.R_HPGAUGE_4, AppConstants.R_HPGAUGE_5,
@@ -476,4 +500,22 @@ public class AppConstants {
 
     /** 資材ログ_alternativefile.csv */
     public static final String LOG_RESOURCE_ALT = "資材ログ_alternativefile.csv";
-}
+
+    /** お風呂に入りたい艦娘一覧の初期カラム順 */
+    public static final Map<String, Integer> BATHTABLE_COLUMN_MAP = new HashMap<String, Integer>() {
+        {
+            this.put("No.", 0);
+            this.put("ID", 1);
+            this.put("艦隊", 2);
+            this.put("疲労", 3);
+            this.put("修理順", 4);
+            this.put("名前", 5);
+            this.put("Lv", 6);
+            this.put("HP", 7);
+            this.put("修理時間", 8);
+            this.put("修理燃料", 9);
+            this.put("修理鋼材", 10);
+            this.put("損傷", 11);
+            this.put("HP1あたり", 12);
+        }
+    };}

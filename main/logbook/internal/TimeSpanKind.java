@@ -12,6 +12,7 @@ import java.util.Date;
 public enum TimeSpanKind {
     LAST_HOUR(1, "直近1時間"),
     LAST_6HOURS(6, "直近6時間"),
+    LAST_12HOURS(12, "直近12時間"),
     LAST_24HOURS(24, "直近24時間"),
     LAST_3DAYS(24 * 3, "直近3日間"),
     LAST_7DAYS(24 * 7, "直近7日間"),

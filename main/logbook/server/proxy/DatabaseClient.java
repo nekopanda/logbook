@@ -81,6 +81,7 @@ public class DatabaseClient extends Thread {
             instance.interrupt();
             try {
                 instance.join();
+                instance = null;
             } catch (InterruptedException e) {
                 LOG.fatal("DatabaseClientスレッド終了時に何かのエラー", e);
             }
