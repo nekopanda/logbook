@@ -1,9 +1,11 @@
 package logbook.gui.logic;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import logbook.dto.chart.Resource;
@@ -189,9 +191,15 @@ public class ResourceChart {
         // 時間軸
         this.time = new long[length];
         // グラフデータ(資材)
-        this.resources = new Resource[log.resources.length];
+        List<Resource> resourceList = new ArrayList<Resource>();
         for (int i = 0; i < log.resources.length; i++) {
-            this.resources[i] = new Resource(log.resources[i].name, log.resources[i].color, new int[length]);
+            if (log.resources[i].color != null) {
+                resourceList.add(log.resources[i]);
+            }
+        }
+        this.resources = new Resource[resourceList.size()];
+        for (int i = 0; i < resourceList.size(); i++) {
+            this.resources[i] = new Resource(resourceList.get(i).name, resourceList.get(i).color, new int[length]);
         }
         // 時間を用意する
         for (int i = 0; i < this.time.length; i++) {
@@ -202,7 +210,7 @@ public class ResourceChart {
         long s = log.time[maxidx] - this.term;
         for (int i = 0; i < this.resources.length; i++) {
             // 補正前のデータ
-            int[] prevalues = log.resources[i].values;
+            int[] prevalues = resourceList.get(i).values;
             // 補正されたスケールで指定した範囲のデータ
             int[] values = this.resources[i].values;
             // 初期値は-1(欠損)

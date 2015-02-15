@@ -28,6 +28,9 @@ public class ResourceLog extends AbstractDto {
     public static final int RESOURCE_AMMO = 1;
     public static final int RESOURCE_METAL = 2;
     public static final int RESOURCE_BAUXITE = 3;
+    public static final int RESOURCE_BUCKET = 4;
+    public static final int RESOURCE_BURNER = 5;
+    public static final int RESOURCE_RESEARCH = 6;
 
     public long[] time;
 
@@ -64,8 +67,16 @@ public class ResourceLog extends AbstractDto {
                 String[] colums = line.split(",");
                 try {
                     Date date = format.parse(colums[0]);
-                    logs.add(new SortableLog(date.getTime(), Integer.parseInt(colums[1]), Integer.parseInt(colums[2]),
-                            Integer.parseInt(colums[3]), Integer.parseInt(colums[4])));
+                    SortableLog log = new SortableLog();
+                    log.time = date.getTime();
+                    log.fuel = Integer.parseInt(colums[1]);
+                    log.ammo = Integer.parseInt(colums[2]);
+                    log.metal = Integer.parseInt(colums[3]);
+                    log.bauxite = Integer.parseInt(colums[4]);
+                    log.bucket = Integer.parseInt(colums[5]);
+                    log.burner = Integer.parseInt(colums[6]);
+                    log.research = Integer.parseInt(colums[7]);
+                    logs.add(log);
 
                 } catch (Exception e) {
                     continue;
@@ -84,6 +95,9 @@ public class ResourceLog extends AbstractDto {
         int[] ammo = new int[logs.size()];
         int[] metal = new int[logs.size()];
         int[] bauxite = new int[logs.size()];
+        int[] bucket = new int[logs.size()];
+        int[] burner = new int[logs.size()];
+        int[] research = new int[logs.size()];
         for (int i = 0; i < logs.size(); i++) {
             SortableLog log = logs.get(i);
             time[i] = log.time;
@@ -91,12 +105,18 @@ public class ResourceLog extends AbstractDto {
             ammo[i] = log.ammo;
             metal[i] = log.metal;
             bauxite[i] = log.bauxite;
+            bucket[i] = log.bucket;
+            burner[i] = log.burner;
+            research[i] = log.research;
         }
         Resource[] resources = new Resource[] {
                 new Resource("燃料", AppConfig.get().getFuelColor(), fuel),
                 new Resource("弾薬", AppConfig.get().getAmmoColor(), ammo),
                 new Resource("鋼材", AppConfig.get().getMetalColor(), metal),
-                new Resource("ボーキ", AppConfig.get().getBauxiteColor(), bauxite)
+                new Resource("ボーキ", AppConfig.get().getBauxiteColor(), bauxite),
+                new Resource("高速修復剤", null, bucket),
+                new Resource("高速建造剤", null, burner),
+                new Resource("開発資材", null, research)
         };
         return new ResourceLog(time, resources);
     }
@@ -111,14 +131,9 @@ public class ResourceLog extends AbstractDto {
         public int ammo;
         public int metal;
         public int bauxite;
-
-        public SortableLog(long time, int fuel, int ammo, int metal, int bauxite) {
-            this.time = time;
-            this.fuel = fuel;
-            this.ammo = ammo;
-            this.metal = metal;
-            this.bauxite = bauxite;
-        }
+        public int bucket;
+        public int burner;
+        public int research;
 
         @Override
         public int compareTo(SortableLog o) {
