@@ -734,7 +734,7 @@ public final class GlobalContext {
                         }
                     }
                 }
-                addUpdateLog("補給を更新しました");
+                addUpdateLog("補給しました");
             }
         } catch (Exception e) {
             LOG.warn("補給を更新しますに失敗しました", e);
@@ -1062,7 +1062,7 @@ public final class GlobalContext {
     }
 
     /**
-     * 海戦情報を更新します
+     * 護衛退避情報を更新します
      * @param data
      */
     private static void doBattleGobackPort(Data data) {
@@ -1084,9 +1084,9 @@ public final class GlobalContext {
                     battle.getDockCombined().setUpdate(true);
                 }
             }
-
+            addConsole("護衛退避しました");
         } catch (Exception e) {
-            LOG.warn("海戦結果を更新しますに失敗しました", e);
+            LOG.warn("護衛退避を更新しますに失敗しました", e);
             LOG.warn(data);
         }
     }
@@ -1939,6 +1939,7 @@ public final class GlobalContext {
             items.loadQuestClear(apidata);
             updateDetailedMaterial("任務をクリア", items, MATERIAL_DIFF.OBTAINED);
 
+            addUpdateLog("任務をクリアしました");
         } catch (Exception e) {
             LOG.warn("消化した任務を除去しますに失敗しました", e);
             LOG.warn(data);
@@ -1972,7 +1973,7 @@ public final class GlobalContext {
             ApplicationMain.main.startSortie();
             ApplicationMain.main.updateMapCell(mapCellDto);
 
-            addUpdateLog("出撃を更新しました");
+            addUpdateLog("出撃しました");
             if (AppConfig.get().isPrintSortieLog())
                 addConsole("行先 " + mapCellDto.toString());
         } catch (Exception e) {
@@ -2194,7 +2195,7 @@ public final class GlobalContext {
                 updateDetailedMaterial("装備改修", items, MATERIAL_DIFF.NEW_VALUE);
             }
 
-            addUpdateLog("装備改修を更新しました");
+            addUpdateLog("装備改修情報を更新しました");
         } catch (Exception e) {
             LOG.warn("装備改修更新に失敗しました", e);
             LOG.warn(data);
