@@ -84,6 +84,7 @@ public class BattleFilterDialog extends WindowBase {
             });
             this.setWindowInitialized(true);
         }
+        this.updateContents();
         if (this.getShell().getVisible() == false) {
             this.getShell().pack();
             this.setVisible(true);
@@ -110,27 +111,15 @@ public class BattleFilterDialog extends WindowBase {
         };
 
         // マップ
-        this.mapList = BattleResultServer.get().getMapList();
         this.mapCombo = new CheckAndCombo(shell, "マップ", 1);
-        for (IntegerPair mapno : this.mapList) {
-            this.mapCombo.combo.add(mapno.toString());
-        }
         this.mapCombo.initState(listener);
 
         // セル
-        this.cellList = BattleResultServer.get().getCellList();
         this.cellCombo = new CheckAndCombo(shell, "マス", 1);
-        for (Integer cellno : this.cellList) {
-            this.cellCombo.combo.add(String.valueOf(cellno));
-        }
         this.cellCombo.initState(listener);
 
         // ドロップ艦
-        this.shipList = BattleResultServer.get().getDropShipList();
         this.shipCombo = new CheckAndCombo(shell, "ドロップ", 1);
-        for (String shipName : this.shipList) {
-            this.shipCombo.combo.add(shipName);
-        }
         this.shipCombo.initState(listener);
 
         // ランク
@@ -208,6 +197,18 @@ public class BattleFilterDialog extends WindowBase {
 
         this.updateCalenderVisible();
         shell.pack();
+    }
+
+    private void updateContents() {
+        // マップ
+        this.mapList = BattleResultServer.get().getMapList();
+        this.mapCombo.updateContents(this.mapList);
+        // セル
+        this.cellList = BattleResultServer.get().getCellList();
+        this.cellCombo.updateContents(this.cellList);
+        // ドロップ艦
+        this.shipList = BattleResultServer.get().getDropShipList();
+        this.shipCombo.updateContents(this.shipList);
     }
 
     private static Calendar toCalendar(Date date) {
@@ -305,6 +306,15 @@ public class BattleFilterDialog extends WindowBase {
             this.button.addSelectionListener(listener);
             this.combo.addSelectionListener(listener);
             this.combo.select(0);
+        }
+
+        public void updateContents(List<?> items) {
+            int prevSelection = this.combo.getSelectionIndex();
+            this.combo.removeAll();
+            for (Object item : items) {
+                this.combo.add(item.toString());
+            }
+            this.combo.select(prevSelection);
         }
     }
 
