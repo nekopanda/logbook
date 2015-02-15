@@ -13,6 +13,7 @@ import logbook.config.bean.WindowConfigBean;
 import logbook.constants.AppConstants;
 import logbook.gui.logic.OpacityAnimation;
 import logbook.gui.logic.OpacityAnimationClient;
+import logbook.gui.logic.WindowListener;
 import logbook.gui.logic.WindowNativeSupport;
 
 import org.eclipse.swt.SWT;
@@ -84,6 +85,9 @@ public class WindowBase {
     private WindowConfigBean config;
     private boolean shareOpacitySetting = false;
     private int opacityIndex = 0;
+
+    // イベントリスナ
+    private final List<WindowListener> windowListeners = new ArrayList<>();
 
     private static interface EventProc {
         void proc(WindowBase window);
@@ -382,6 +386,14 @@ public class WindowBase {
                 }
             });
         }
+    }
+
+    public void addWindowListener(WindowListener listener) {
+        this.windowListeners.add(listener);
+    }
+
+    public void removeWindowListener(WindowListener listener) {
+        this.windowListeners.remove(listener);
     }
 
     public static void setDataToAllChild(Control c, String key, Object data) {
@@ -807,6 +819,15 @@ public class WindowBase {
             }
             this.dbgprint("setVisible alpha=" + this.shell.getAlpha());
             this.shell.setVisible(visible);
+            // イベント発行
+            for (WindowListener listener : this.windowListeners) {
+                if (visible) {
+                    listener.windowShown();
+                }
+                else {
+                    listener.windowHidden();
+                }
+            }
         }
     }
 
