@@ -666,7 +666,9 @@ public final class ShipDto extends AbstractDto {
             if (-1 != itemid) {
                 Map<Long, ItemDto> itemMap = GlobalContext.getItemMap();
                 ItemDto item = itemMap.get(itemid);
-                accuracy += item.getHoum();
+                if (item != null) {
+                    accuracy += item.getHoum();
+                }
             }
         }
         return accuracy;
@@ -686,8 +688,10 @@ public final class ShipDto extends AbstractDto {
             for (Long itemid : this.slot) {
                 if (-1 != itemid) {
                     ItemDto item = itemMap.get(itemid);
-                    rai += item.getRaig();
-                    baku += item.getBaku();
+                    if (item != null) {
+                        rai += item.getRaig();
+                        baku += item.getBaku();
+                    }
                 }
             }
             return Math.round(((this.getKaryoku() + rai) * 1.5d) + (baku * 2) + 55);
@@ -718,9 +722,11 @@ public final class ShipDto extends AbstractDto {
         for (Long itemid : this.slot) {
             if (-1 != itemid) {
                 ItemDto item = itemMap.get(itemid);
-                int taisen = item.getTais();
-                taisenShip -= taisen;
-                taisenItem += taisen;
+                if (item != null) {
+                    int taisen = item.getTais();
+                    taisenShip -= taisen;
+                    taisenItem += taisen;
+                }
             }
         }
         return Math.round(Math.floor(taisenShip / 5d) + (taisenItem * 2) + 25);
