@@ -509,10 +509,14 @@ public class FleetComposite extends Composite {
             // 艦娘の状態アイコンを更新
             if (shipstatus.get(FATAL)) {
                 this.iconLabels[i].setImage(SWTResourceManager.getImage(FleetComposite.class,
-                        AppConstants.R_ICON_EXCLAMATION));
+                        AppConfig.get().isMonoIcon()
+                                ? AppConstants.R_ICON_EXCLAMATION_MONO
+                                : AppConstants.R_ICON_EXCLAMATION));
             } else if (shipstatus.get(WARN)) {
-                this.iconLabels[i].setImage(SWTResourceManager
-                        .getImage(FleetComposite.class, AppConstants.R_ICON_ERROR));
+                this.iconLabels[i].setImage(SWTResourceManager.getImage(FleetComposite.class,
+                        AppConfig.get().isMonoIcon()
+                                ? AppConstants.R_ICON_ERROR_MONO
+                                : AppConstants.R_ICON_ERROR));
             } else {
                 this.iconLabels[i].setImage(null);
             }
@@ -610,9 +614,15 @@ public class FleetComposite extends Composite {
      */
     private void updateTabIcon() {
         if (this.state.get(FATAL)) {
-            this.tab.setImage(SWTResourceManager.getImage(FleetComposite.class, AppConstants.R_ICON_EXCLAMATION));
+            this.tab.setImage(SWTResourceManager.getImage(FleetComposite.class,
+                    AppConfig.get().isMonoIcon()
+                            ? AppConstants.R_ICON_EXCLAMATION_MONO
+                            : AppConstants.R_ICON_EXCLAMATION));
         } else if (this.state.get(WARN)) {
-            this.tab.setImage(SWTResourceManager.getImage(FleetComposite.class, AppConstants.R_ICON_ERROR));
+            this.tab.setImage(SWTResourceManager.getImage(FleetComposite.class,
+                    AppConfig.get().isMonoIcon()
+                            ? AppConstants.R_ICON_ERROR_MONO
+                            : AppConstants.R_ICON_ERROR));
         } else {
             this.tab.setImage(null);
         }

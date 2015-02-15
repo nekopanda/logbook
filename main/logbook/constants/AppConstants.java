@@ -148,8 +148,14 @@ public class AppConstants {
     /** /resources/icon/error.png */
     public static final String R_ICON_ERROR = "/resources/icon/error.png";
 
+    /** /resources/icon/error_mono.png */
+    public static final String R_ICON_ERROR_MONO = "/resources/icon/error_mono.png";
+
     /** /resources/icon/exclamation.png */
     public static final String R_ICON_EXCLAMATION = "/resources/icon/exclamation.png";
+
+    /** /resources/icon/exclamation_mono.png */
+    public static final String R_ICON_EXCLAMATION_MONO = "/resources/icon/exclamation_mono.png";
 
     /** /resources/icon/folder.png */
     public static final String R_ICON_FOLDER = "/resources/icon/folder.png";

@@ -303,6 +303,11 @@ public final class ConfigDialog extends Dialog {
         visibleOnReturnBathwater.setText("お風呂から上がる時に母港タブを表示");
         visibleOnReturnBathwater.setSelection(AppConfig.get().isVisibleOnReturnBathwater());
 
+        final Button useMonoIcon = new Button(compositeFleetTab, SWT.CHECK);
+        useMonoIcon.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        useMonoIcon.setText("モノクロアイコンを使用");
+        useMonoIcon.setSelection(AppConfig.get().isMonoIcon());
+
         // 通知
         Composite compositeNotify = new Composite(this.composite, SWT.NONE);
         this.compositeMap.put("notify", compositeNotify);
@@ -654,6 +659,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setBalloonBybadlyDamage(balloonBybadlyDamage.getSelection());
                 AppConfig.get().setVisibleOnReturnMission(visibleOnReturnMission.getSelection());
                 AppConfig.get().setVisibleOnReturnBathwater(visibleOnReturnBathwater.getSelection());
+                AppConfig.get().setMonoIcon(useMonoIcon.getSelection());
                 // notify
                 AppConfig.get().setMissionRemind(remind.getSelection());
                 AppConfig.get().setRemindInterbal(intervalSpinner.getSelection());

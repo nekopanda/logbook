@@ -112,6 +112,9 @@ public final class AppConfigBean {
     /** お風呂から上がる時に母港タブを表示 */
     private boolean visibleOnReturnBathwater = true;
 
+    /** モノクロアイコンを使用する */
+    private boolean monoIcon;
+
     /** 回数を表示 */
     private boolean displayCount;
 
@@ -693,6 +696,22 @@ public final class AppConfigBean {
      */
     public void setVisibleOnReturnBathwater(boolean visibleOnReturnBathwater) {
         this.visibleOnReturnBathwater = visibleOnReturnBathwater;
+    }
+
+    /**
+     * モノクロアイコンを使用するを取得します。
+     * @return モノクロアイコンを使用する
+     */
+    public boolean isMonoIcon() {
+        return this.monoIcon;
+    }
+
+    /**
+     * モノクロアイコンを使用するを設定します。
+     * @param monoIcon モノクロアイコンを使用する
+     */
+    public void setMonoIcon(boolean monoIcon) {
+        this.monoIcon = monoIcon;
     }
 
     /**
