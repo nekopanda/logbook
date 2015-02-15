@@ -119,6 +119,8 @@ public final class CreateReportLogic {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
             } else if (cond <= AppConstants.COND_ORANGE) {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
+            } else if ((cond >= AppConstants.COND_DARK_GREEN) && (cond < AppConstants.COND_GREEN)) {
+                item.setForeground(SWTResourceManager.getColor(AppConstants.COND_DARK_GREEN_COLOR));
             } else if (cond >= AppConstants.COND_GREEN) {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.COND_GREEN_COLOR));
             }

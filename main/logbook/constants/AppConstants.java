@@ -46,8 +46,11 @@ public class AppConstants {
     /** 疲労オレンジ色 */
     public static final int COND_ORANGE = 29;
 
+    /** 疲労緑色(偽) */
+    public static final int COND_DARK_GREEN = 50;
+
     /** 疲労緑色 */
-    public static final int COND_GREEN = 50;
+    public static final int COND_GREEN = 53;
 
     /** 遠征色 */
     public static final RGB MISSION_COLOR = new RGB(102, 51, 255);
@@ -60,6 +63,9 @@ public class AppConstants {
 
     /** 疲労オレンジ色 */
     public static final RGB COND_ORANGE_COLOR = new RGB(255, 140, 0);
+
+    /** 疲労緑色(偽) */
+    public static final RGB COND_DARK_GREEN_COLOR = new RGB(0, 60, 0);
 
     /** 疲労緑色 */
     public static final RGB COND_GREEN_COLOR = new RGB(0, 128, 0);

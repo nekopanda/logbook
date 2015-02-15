@@ -493,8 +493,12 @@ public class FleetComposite extends Composite {
                 }
                 this.condLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
                 this.condstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
-            } else if (cond >= AppConstants.COND_GREEN) {
+            } else if ((cond >= AppConstants.COND_DARK_GREEN) && (cond < AppConstants.COND_GREEN)) {
                 // 疲労50以上
+                this.condLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_DARK_GREEN_COLOR));
+                this.condstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_DARK_GREEN_COLOR));
+            } else if (cond >= AppConstants.COND_GREEN) {
+                // 疲労53以上
                 this.condLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_GREEN_COLOR));
                 this.condstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_GREEN_COLOR));
             } else {
