@@ -1473,18 +1473,17 @@ public final class ApplicationMain extends WindowBase {
 
     private List<DockDto> getSortieDocks() {
         boolean[] isSortie = GlobalContext.getIsSortie();
+        if (GlobalContext.isCombined() && isSortie[0]) {
+            // 連合艦隊
+            return Arrays.asList(new DockDto[] {
+                    GlobalContext.getDock("1"),
+                    GlobalContext.getDock("2")
+            });
+        }
         for (int i = 0; i < 4; i++) {
             if (isSortie[i]) {
                 DockDto dock = GlobalContext.getDock(Integer.toString(i + 1));
-                if (GlobalContext.isCombined()) {
-                    return Arrays.asList(new DockDto[] {
-                            dock,
-                            GlobalContext.getDock("2")
-                    });
-                }
-                else {
-                    return Arrays.asList(new DockDto[] { dock });
-                }
+                return Arrays.asList(new DockDto[] { dock });
             }
         }
         return null;
