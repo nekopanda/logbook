@@ -723,7 +723,7 @@ public final class ShipDto extends AbstractDto {
                 taisenItem += taisen;
             }
         }
-        return Math.round(Math.floor(taisenShip / 2d) + (taisenItem * 2) + 25);
+        return Math.round(Math.floor(taisenShip / 5d) + (taisenItem * 2) + 25);
     }
 
     /**
