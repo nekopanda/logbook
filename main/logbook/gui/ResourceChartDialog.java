@@ -76,6 +76,7 @@ public final class ResourceChartDialog extends WindowBase {
     private static final String DIFF_FORMAT = "{0,number,0}({1,number,+0;-0})";
 
     /** シェル */
+    private final Shell parent;
     private Shell shell;
     /** メニューバー */
     private Menu menubar;
@@ -102,9 +103,9 @@ public final class ResourceChartDialog extends WindowBase {
      * Create the dialog.
      * @param parent
      */
-    public ResourceChartDialog(Shell parent) {
-        super.createContents(parent, SWT.SHELL_TRIM, false);
-        this.getShell().setText("資材チャート");
+    public ResourceChartDialog(Shell parent, MenuItem menuItem) {
+        super(menuItem);
+        this.parent = parent;
     }
 
     /**
@@ -130,6 +131,8 @@ public final class ResourceChartDialog extends WindowBase {
      * Create contents of the dialog.
      */
     private void createContents() {
+        super.createContents(this.parent, SWT.SHELL_TRIM, false);
+        this.getShell().setText("資材チャート");
         this.shell = this.getShell();
         this.shell.setMinimumSize(450, 300);
         this.shell.setSize(800, 650);

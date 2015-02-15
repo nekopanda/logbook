@@ -187,6 +187,8 @@ public final class ApplicationMain extends WindowBase {
     private BattleAggDialog battleCounterWindow;
     /** グループエディター */
     private ShipFilterGroupDialog shipFilterGroupWindow;
+    /** グループエディター */
+    private ResourceChartDialog resourceChartWindow;
     /** ツール */
     private LauncherWindow launcherWindow;
 
@@ -510,15 +512,11 @@ public final class ApplicationMain extends WindowBase {
         this.calcPracticeExpWindow = new CalcPracticeExpDialog(this.dummyHolder, calcpracticeexp);
 
         // その他-資材チャート
-        MenuItem resourceChart = new MenuItem(etcmenu, SWT.NONE);
+        MenuItem resourceChart = new MenuItem(etcmenu, SWT.CHECK);
         resourceChart.setText("資材チャート(&R)\tCtrl+R");
         resourceChart.setAccelerator(SWT.CTRL + 'R');
-        resourceChart.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                new ResourceChartDialog(ApplicationMain.this.dummyHolder).open();
-            }
-        });
+        this.resourceChartWindow = new ResourceChartDialog(this.dummyHolder, resourceChart);
+
         // コマンド-出撃統計
         MenuItem battleCounter = new MenuItem(etcmenu, SWT.CHECK);
         battleCounter.setText("出撃統計(&A)\tCtrl+A");
@@ -1030,6 +1028,9 @@ public final class ApplicationMain extends WindowBase {
         case 'a':
             this.activate(this.battleCounterWindow);
             break;
+        case 'r':
+            this.activate(this.resourceChartWindow);
+            break;
         case 'z':
             this.shell.setActive();
             break;
@@ -1122,6 +1123,7 @@ public final class ApplicationMain extends WindowBase {
                 this.calcExpWindow,
                 this.calcPracticeExpWindow,
                 this.shipFilterGroupWindow,
+                this.resourceChartWindow,
                 this.battleCounterWindow,
                 this.launcherWindow
         };

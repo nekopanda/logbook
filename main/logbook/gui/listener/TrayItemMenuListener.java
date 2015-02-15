@@ -12,7 +12,6 @@ import logbook.dto.NdockDto;
 import logbook.dto.ShipDto;
 import logbook.gui.ApplicationMain;
 import logbook.gui.ConfigDialog;
-import logbook.gui.ResourceChartDialog;
 import logbook.gui.WindowBase;
 import logbook.gui.logic.TimeLogic;
 
@@ -78,7 +77,8 @@ public final class TrayItemMenuListener implements MenuDetectListener {
                 "経験値計算機(&C)", // 15
                 "演習経験値計算機(&V)", // 16
                 "グループエディタ(&G)", // 17
-                "出撃統計(&A)", // 18
+                "資材チャート(&R)", // 18
+                "出撃統計(&A)", // 19
                 "ロー" // 最後は自分
         };
         boolean[] hasSeparator = new boolean[] {
@@ -98,6 +98,7 @@ public final class TrayItemMenuListener implements MenuDetectListener {
                 false,
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,
@@ -126,15 +127,6 @@ public final class TrayItemMenuListener implements MenuDetectListener {
             });
         }
 
-        // 資材チャート
-        MenuItem resourceChart = new MenuItem(this.menu, SWT.NONE);
-        resourceChart.setText("資材チャート(&R)");
-        resourceChart.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                new ResourceChartDialog(shell).open();
-            }
-        });
         new MenuItem(this.menu, SWT.SEPARATOR);
         // 遠征
         MenuItem infoItem = new MenuItem(this.menu, SWT.CASCADE);

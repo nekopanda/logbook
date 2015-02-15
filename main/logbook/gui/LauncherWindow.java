@@ -83,6 +83,7 @@ public class LauncherWindow extends WindowBase {
                 "経験",
                 "演習",
                 "グル",
+                "資材",
                 "統計",
                 "ロー" // 最後は自分
         };
