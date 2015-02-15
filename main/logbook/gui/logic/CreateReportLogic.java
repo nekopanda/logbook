@@ -136,6 +136,8 @@ public final class CreateReportLogic {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
             } else if (cond <= AppConstants.COND_ORANGE) {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
+            } else if ((cond >= AppConstants.COND_DARK_GREEN) && (cond < AppConstants.COND_GREEN)) {
+                item.setForeground(SWTResourceManager.getColor(AppConstants.COND_DARK_GREEN_COLOR));
             } else if (cond >= AppConstants.COND_GREEN) {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.COND_GREEN_COLOR));
             }
@@ -569,7 +571,7 @@ public final class CreateReportLogic {
                 "回避",
                 "対潜",
                 "索敵",
-                "運"
+                "運", "装備命中", "砲撃戦火力", "雷撃戦火力", "対潜火力", "夜戦火力"
         };
     }
 
@@ -727,7 +729,12 @@ public final class CreateReportLogic {
                     param.getKaihi(),
                     param.getTaisen(),
                     param.getSakuteki(),
-                    param.getLucky()
+                    param.getLucky(),
+                    ship.getAccuracy(),
+                    ship.getHougekiPower(),
+                    ship.getRaigekiPower(),
+                    ship.getTaisenPower(),
+                    ship.getYasenPower()
             });
         }
         return body;

@@ -55,8 +55,11 @@ public class AppConstants {
     /** 疲労オレンジ色 */
     public static final int COND_ORANGE = 30;
 
+    /** 疲労緑色(偽) */
+    public static final int COND_DARK_GREEN = 50;
+
     /** 疲労緑色 */
-    public static final int COND_GREEN = 50;
+    public static final int COND_GREEN = 53;
 
     /** 疲労緑色 */
     public static final int COND_YELLOW = 75;
@@ -72,6 +75,9 @@ public class AppConstants {
 
     /** 疲労オレンジ色 */
     public static final RGB COND_ORANGE_COLOR = new RGB(255, 140, 0);
+
+    /** 疲労緑色(偽) */
+    public static final RGB COND_DARK_GREEN_COLOR = new RGB(0, 60, 0);
 
     /** 疲労緑色 */
     public static final RGB COND_GREEN_COLOR = new RGB(0, 128, 0);
@@ -206,9 +212,6 @@ public class AppConstants {
     /** 保有資材:ネジ */
     public static final int MATERIAL_SCREW = 8;
 
-    /** 報告書のオンメモリ記憶数 */
-    public static final int MAX_LOG_SIZE = 5000;
-
     public static final int USEITEM_UNKNOWN = -1;
     public static final int USEITEM_BUCKET = 1;
     public static final int USEITEM_BURNER = 2;
@@ -224,11 +227,17 @@ public class AppConstants {
     /** /resources/icon/error.png */
     public static final String R_ICON_ERROR = "/resources/icon/error.png";
 
+    /** /resources/icon/error_mono.png */
+    public static final String R_ICON_ERROR_MONO = "/resources/icon/error_mono.png";
+
     /** /resources/icon/exclamation.png */
     public static final String R_ICON_EXCLAMATION = "/resources/icon/exclamation.png";
 
-    /** /resources/icon/folder_star.png */
-    public static final String R_ICON_FOLDER_STAR = "/resources/icon/folder_star.png";
+    /** /resources/icon/exclamation_mono.png */
+    public static final String R_ICON_EXCLAMATION_MONO = "/resources/icon/exclamation_mono.png";
+
+    /** /resources/icon/folder.png */
+    public static final String R_ICON_FOLDER = "/resources/icon/folder.png";
 
     /** /resources/icon/star.png */
     public static final String R_ICON_STAR = "/resources/icon/star.png";

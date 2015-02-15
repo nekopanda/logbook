@@ -375,6 +375,11 @@ public final class ConfigDialog extends Dialog {
         visibleOnReturnBathwater.setText("お風呂から上がる時に母港タブを表示");
         visibleOnReturnBathwater.setSelection(AppConfig.get().isVisibleOnReturnBathwater());
 
+        final Button useMonoIcon = new Button(compositeFleetTab, SWT.CHECK);
+        useMonoIcon.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        useMonoIcon.setText("モノクロアイコンを使用");
+        useMonoIcon.setSelection(AppConfig.get().isMonoIcon());
+
         final Button useRecommendedSakuteki = new Button(compositeFleetTab, SWT.CHECK);
         useRecommendedSakuteki.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         useRecommendedSakuteki.setText("推奨索敵計算式を使用する");
@@ -936,6 +941,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setBalloonBybadlyDamage(balloonBybadlyDamage.getSelection());
                 AppConfig.get().setVisibleOnReturnMission(visibleOnReturnMission.getSelection());
                 AppConfig.get().setVisibleOnReturnBathwater(visibleOnReturnBathwater.getSelection());
+                AppConfig.get().setMonoIcon(useMonoIcon.getSelection());
                 if (useRecommendedSakuteki.getSelection()) {
                     AppConfig.get().setUseRecommendedSakuteki(true);
                 }

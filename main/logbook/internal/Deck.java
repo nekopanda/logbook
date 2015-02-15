@@ -45,7 +45,7 @@ public final class Deck {
             this.put(29, "潜水艦派遣演習");
             this.put(30, "潜水艦派遣作戦");
             this.put(31, "海外艦との接触");
-            this.put(32, "<UNKNOWN>");
+            this.put(32, "遠洋練習航海");
             this.put(33, "前衛支援任務");
             this.put(34, "艦隊決戦支援任務");
             this.put(35, "ＭＯ作戦");
@@ -124,6 +124,8 @@ public final class Deck {
             this.put(108, "<UNKNOWN>");
             this.put(109, "前衛支援任務");
             this.put(110, "艦隊決戦支援任務");
+            this.put(141, "前衛支援任務");
+            this.put(142, "艦隊決戦支援任務");
         }
     };
 

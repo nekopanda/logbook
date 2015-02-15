@@ -496,8 +496,12 @@ public class FleetComposite extends Composite {
                 }
                 this.condLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
                 this.condstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
-            } else if (cond >= AppConstants.COND_GREEN) {
+            } else if ((cond >= AppConstants.COND_DARK_GREEN) && (cond < AppConstants.COND_GREEN)) {
                 // 疲労50以上
+                this.condLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_DARK_GREEN_COLOR));
+                this.condstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_DARK_GREEN_COLOR));
+            } else if (cond >= AppConstants.COND_GREEN) {
+                // 疲労53以上
                 this.condLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_GREEN_COLOR));
                 this.condstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_GREEN_COLOR));
             } else {
@@ -508,10 +512,14 @@ public class FleetComposite extends Composite {
             // 艦娘の状態アイコンを更新
             if (shipstatus.get(FATAL)) {
                 this.iconLabels[i].setImage(SWTResourceManager.getImage(FleetComposite.class,
-                        AppConstants.R_ICON_EXCLAMATION));
+                        AppConfig.get().isMonoIcon()
+                                ? AppConstants.R_ICON_EXCLAMATION_MONO
+                                : AppConstants.R_ICON_EXCLAMATION));
             } else if (shipstatus.get(WARN)) {
-                this.iconLabels[i].setImage(SWTResourceManager
-                        .getImage(FleetComposite.class, AppConstants.R_ICON_ERROR));
+                this.iconLabels[i].setImage(SWTResourceManager.getImage(FleetComposite.class,
+                        AppConfig.get().isMonoIcon()
+                                ? AppConstants.R_ICON_ERROR_MONO
+                                : AppConstants.R_ICON_ERROR));
             } else {
                 this.iconLabels[i].setImage(null);
             }
@@ -657,9 +665,15 @@ public class FleetComposite extends Composite {
      */
     private void updateTabIcon() {
         if (this.state.get(FATAL)) {
-            this.tab.setImage(SWTResourceManager.getImage(FleetComposite.class, AppConstants.R_ICON_EXCLAMATION));
+            this.tab.setImage(SWTResourceManager.getImage(FleetComposite.class,
+                    AppConfig.get().isMonoIcon()
+                            ? AppConstants.R_ICON_EXCLAMATION_MONO
+                            : AppConstants.R_ICON_EXCLAMATION));
         } else if (this.state.get(WARN)) {
-            this.tab.setImage(SWTResourceManager.getImage(FleetComposite.class, AppConstants.R_ICON_ERROR));
+            this.tab.setImage(SWTResourceManager.getImage(FleetComposite.class,
+                    AppConfig.get().isMonoIcon()
+                            ? AppConstants.R_ICON_ERROR_MONO
+                            : AppConstants.R_ICON_ERROR));
         } else {
             this.tab.setImage(null);
         }
