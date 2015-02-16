@@ -9,9 +9,11 @@ import logbook.config.bean.ShipGroupBean;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipFilterDto;
 import logbook.gui.logic.CreateReportLogic;
+import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.ShipGroupListener;
 import logbook.gui.logic.ShipGroupObserver;
 import logbook.gui.logic.TableItemCreator;
+import logbook.gui.widgets.ShipFilterComposite;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
@@ -22,6 +24,8 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -47,10 +51,11 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
     /** フィルター */
     private ShipFilterDto filter = null;
 
-    private MenuItem groupFilterCascade;
+    private ShipFilterComposite filterCompo;
+
+    private MenuItem filterMenu;
     private MenuItem addGroupCascade;
     private MenuItem removeGroupCascade;
-    private final List<MenuItem> currentGroupItems = new ArrayList<MenuItem>();
 
     /**
      * @param parent
@@ -58,6 +63,21 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
     public ShipTable(Shell parent, MenuItem menuItem, int index) {
         super(parent, menuItem);
         this.index = index;
+    }
+
+    /**
+     * Open the dialog.
+     */
+    @Override
+    public void open() {
+        if (this.isWindowInitialized()) {
+            // フィルタパネルの内容を更新しておく
+            this.filterCompo.setRedraw(false);
+            this.filterCompo.updateContents(this.filter);
+            this.filterCompo.layout();
+            this.filterCompo.setRedraw(true);
+        }
+        super.open();
     }
 
     /**
@@ -71,16 +91,42 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
     }
 
     @Override
+    protected void createContentsBefore() {
+        GridLayout shellLayout = new GridLayout(1, false);
+        shellLayout.verticalSpacing = 1;
+        shellLayout.marginWidth = 1;
+        shellLayout.marginHeight = 1;
+        shellLayout.marginBottom = 1;
+        shellLayout.horizontalSpacing = 1;
+        this.shell.setLayout(shellLayout);
+
+        this.filterCompo = new ShipFilterComposite(this);
+        this.filterCompo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+    }
+
+    @Override
     protected void createContents() {
+        this.table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         // メニューバーに追加する
         // フィルターメニュー
-        final MenuItem filter = new MenuItem(this.opemenu, SWT.PUSH);
-        filter.setText("フィルター(&F)\tCtrl+F");
-        filter.setAccelerator(SWT.CTRL + 'F');
-        filter.addSelectionListener(new SelectionAdapter() {
+        this.filterMenu = new MenuItem(this.opemenu, SWT.CHECK);
+        this.filterMenu.setText("フィルターパネル(&D)\tCtrl+D");
+        this.filterMenu.setAccelerator(SWT.CTRL + 'D');
+        this.filterMenu.setSelection(true);
+        this.filterMenu.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                new ShipFilterDialog(ShipTable.this, ShipTable.this.filter).open();
+                ShipTable.this.filterMenuSelected();
+            }
+        });
+        // 検索（キーボードショートカットのため）
+        MenuItem searchMenu = new MenuItem(this.opemenu, SWT.NONE);
+        searchMenu.setText("検索(&F)\tCtrl+F");
+        searchMenu.setAccelerator(SWT.CTRL + 'F');
+        searchMenu.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                ShipTable.this.focusOnSearchBox();
             }
         });
         // セパレータ
@@ -98,19 +144,8 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
         });
         // セパレータ
         new MenuItem(this.tablemenu, SWT.SEPARATOR);
-        // 右クリックメニューに追加する
-        final MenuItem filtertable = new MenuItem(this.tablemenu, SWT.NONE);
-        filtertable.setText("フィルター(&F)");
-        filtertable.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                new ShipFilterDialog(ShipTable.this, ShipTable.this.filter).open();
-            }
-        });
 
         // グループメニュー作成
-        this.groupFilterCascade = new MenuItem(this.tablemenu, SWT.CASCADE);
-        this.groupFilterCascade.setText("グループフィルター(&G)");
         this.addGroupCascade = new MenuItem(this.tablemenu, SWT.CASCADE);
         this.addGroupCascade.setText("選択した艦娘をグループに追加(&A)");
         this.removeGroupCascade = new MenuItem(this.tablemenu, SWT.CASCADE);
@@ -159,6 +194,7 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
                 }
             }
         }
+        this.filterCompo.updateContents(this.filter);
         this.listChanged();
 
         ShipGroupObserver.addListener(this);
@@ -171,6 +207,20 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
 
         // ウィンドウタイトルを設定
         this.shell.setText(this.getTitle());
+    }
+
+    private void focusOnSearchBox() {
+        if (this.filterMenu.getSelection() == false) {
+            // まずは表示する
+            this.filterMenu.setSelection(true);
+            this.filterMenuSelected();
+        }
+        this.filterCompo.getSearchCombo().setFocus();
+    }
+
+    private void filterMenuSelected() {
+        LayoutLogic.hide(this.filterCompo, !this.filterMenu.getSelection());
+        this.getShell().layout();
     }
 
     @Override
@@ -243,28 +293,6 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
         return menu;
     }
 
-    private void groupWidgetSelected(SelectionEvent e) {
-        MenuItem selectedItem = (MenuItem) e.widget;
-        boolean selection = selectedItem.getSelection();
-        if (selection) {
-            ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
-            ShipFilterDto filter = this.getFilter();
-            filter.group = bean;
-            filter.groupId = bean.getId();
-            // これだけ残してあとはオフる
-            for (MenuItem item : this.currentGroupItems) {
-                if (selectedItem != item) {
-                    item.setSelection(false);
-                }
-            }
-        }
-        else {
-            this.filter.group = null;
-            this.filter.groupId = 0;
-        }
-        ShipTable.this.updateFilter(this.filter);
-    }
-
     private List<ShipDto> getSelection() {
         List<ShipDto> ships = new ArrayList<>();
         TableItem[] tableItems = ShipTable.this.table.getSelection();
@@ -278,24 +306,6 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
     @Override
     public void listChanged() {
         List<ShipGroupBean> groups = ShipGroupConfig.get().getGroup();
-
-        Menu groupFilterMenu = recreateCascadeMenu(this.groupFilterCascade);
-        this.currentGroupItems.clear();
-        for (ShipGroupBean groupBean : groups) {
-            final MenuItem groupItem = new MenuItem(groupFilterMenu, SWT.CHECK);
-            groupItem.setText(groupBean.getName());
-            groupItem.setData(groupBean);
-            groupItem.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    ShipTable.this.groupWidgetSelected(e);
-                }
-            });
-            if (this.filter.group == groupBean) {
-                groupItem.setSelection(true);
-            }
-            this.currentGroupItems.add(groupItem);
-        }
 
         Menu addGroupMenu = recreateCascadeMenu(this.addGroupCascade);
         for (ShipGroupBean groupBean : groups) {
@@ -385,6 +395,5 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
         if (this.filter.group == group) {
             this.reloadTable();
         }
-
     }
 }

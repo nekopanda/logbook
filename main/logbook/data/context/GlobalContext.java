@@ -58,7 +58,9 @@ import logbook.internal.BattleResultServer;
 import logbook.internal.EnemyData;
 import logbook.internal.Item;
 import logbook.internal.MasterData;
+import logbook.internal.MasterData.ShipTypeDto;
 import logbook.internal.Ship;
+import logbook.internal.ShipStyle;
 import logbook.util.JsonUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -2026,6 +2028,11 @@ public final class GlobalContext {
                 addUpdateLog("装備一覧を更新しました");
 
                 MasterData.updateMaster(obj);
+
+                // 艦種
+                for (ShipTypeDto dto : MasterData.getInstance().getStype()) {
+                    ShipStyle.set(dto.getId(), dto.getName());
+                }
             }
 
             addConsole("マスターデータを更新しました");

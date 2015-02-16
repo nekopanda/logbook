@@ -2,7 +2,6 @@ package logbook.dto;
 
 import javax.json.JsonObject;
 
-import logbook.internal.MasterData;
 import logbook.internal.ShipStyle;
 import logbook.util.JsonUtils;
 
@@ -97,13 +96,7 @@ public final class ShipInfoDto extends AbstractDto {
         this.name = object.getString("api_name");
         this.shipId = object.getJsonNumber("api_id").intValue();
         this.stype = object.getJsonNumber("api_stype").intValue();
-        MasterData.ShipTypeDto shipType = MasterData.getShipType(this.stype);
-        if (shipType != null) {
-            this.type = shipType.getName();
-        }
-        else { // マスターデータがない時はこっちから取ってくる
-            this.type = ShipStyle.get(String.valueOf(this.stype));
-        }
+        this.type = ShipStyle.get(this.stype);
         this.flagship = object.getString("api_yomi");
         if ("-".equals(this.flagship)) {
             this.flagship = "";

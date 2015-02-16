@@ -1180,90 +1180,10 @@ public final class CreateReportLogic {
             }
         }
         // 艦種でフィルタ
-        if (!filter.destroyer) {
-            if ("駆逐艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.lightCruiser) {
-            if ("軽巡洋艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.torpedoCruiser) {
-            if ("重雷装巡洋艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.heavyCruiser) {
-            if ("重巡洋艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.flyingDeckCruiser) {
-            if ("航空巡洋艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.seaplaneTender) {
-            if ("水上機母艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.escortCarrier) {
-            if ("軽空母".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.carrier) {
-            if ("正規空母".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.battleship) {
-            if ("戦艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.flyingDeckBattleship) {
-            if ("航空戦艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.submarine) {
-            if ("潜水艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.carrierSubmarine) {
-            if ("潜水空母".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.landingship) {
-            if ("揚陸艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.armoredcarrier) {
-            if ("装甲空母".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.repairship) {
-            if ("工作艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.submarineTender) {
-            if ("潜水母艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.trainingCruiser) {
-            if ("練習巡洋艦".equals(ship.getType())) {
-                return false;
-            }
+        if (filter.typeEnabled && (filter.enabledType != null) &&
+                (filter.enabledType[ship.getStype()] == false))
+        {
+            return false;
         }
         // グループでフィルタ
         if (filter.group != null) {
