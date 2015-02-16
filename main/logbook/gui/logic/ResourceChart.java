@@ -23,13 +23,13 @@ public class ResourceChart {
     /** タイムゾーンオフセット */
     private static final long TZ_OFFSET = Calendar.getInstance().get(Calendar.ZONE_OFFSET);
     /** グラフエリアの左マージン */
-    private static final int LEFT_WIDTH = 60;
+    private final int LEFT_WIDTH;
     /** グラフエリアの右マージン */
-    private static final int RIGHT_WIDTH = 60;
+    private final int RIGHT_WIDTH;
     /** グラフエリアの上マージン */
-    private static final int TOP_HEIGHT = 30;
+    private final int TOP_HEIGHT;
     /** グラフエリアの下マージン */
-    private static final int BOTTOM_HEIGHT = 30;
+    private final int BOTTOM_HEIGHT;
 
     /** 資材ログ */
     private final ResourceLog log;
@@ -61,11 +61,17 @@ public class ResourceChart {
      * @param width 幅
      * @param height 高さ
      */
-    public ResourceChart(ResourceLog log, int scale, String scaleText, int width, int height, boolean[] enabled) {
+    public ResourceChart(GC gc, ResourceLog log, int scale, String scaleText, int width, int height, boolean[] enabled) {
+        int labelHeight = gc.getFontMetrics().getHeight();
+        this.LEFT_WIDTH = getStringWidth(gc, "100000") + 10;
+        this.RIGHT_WIDTH = getStringWidth(gc, "1000") + 15;
+        this.TOP_HEIGHT = labelHeight + 10;
+        this.BOTTOM_HEIGHT = labelHeight + 10;
+
         this.log = log;
         this.term = TimeUnit.DAYS.toMillis(scale);
         this.scaleText = scaleText;
-        this.notch = (long) (this.term / ((double) (width - LEFT_WIDTH - RIGHT_WIDTH) / 4));
+        this.notch = (long) (this.term / ((double) (width - this.LEFT_WIDTH - this.RIGHT_WIDTH) / 4));
         this.width = width;
         this.height = height;
         this.enabled = enabled;
@@ -81,9 +87,9 @@ public class ResourceChart {
     public void draw(GC gc) {
 
         // グラフエリアの幅
-        float w = this.width - LEFT_WIDTH - RIGHT_WIDTH;
+        float w = this.width - this.LEFT_WIDTH - this.RIGHT_WIDTH;
         // グラフエリアの高さ
-        float h = this.height - TOP_HEIGHT - BOTTOM_HEIGHT;
+        float h = this.height - this.TOP_HEIGHT - this.BOTTOM_HEIGHT;
         // お絵かき開始
         gc.setAntialias(SWT.ON);
         gc.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
@@ -92,19 +98,20 @@ public class ResourceChart {
         gc.setLineWidth(2);
         // グラフエリアのラインを描く
         // 縦
-        gc.drawLine(LEFT_WIDTH, TOP_HEIGHT, LEFT_WIDTH, this.height - BOTTOM_HEIGHT);
-        gc.drawLine(this.width - RIGHT_WIDTH, TOP_HEIGHT, this.width - RIGHT_WIDTH, this.height - BOTTOM_HEIGHT);
+        gc.drawLine(this.LEFT_WIDTH, this.TOP_HEIGHT, this.LEFT_WIDTH, this.height - this.BOTTOM_HEIGHT);
+        gc.drawLine(this.width - this.RIGHT_WIDTH, this.TOP_HEIGHT, this.width - this.RIGHT_WIDTH, this.height
+                - this.BOTTOM_HEIGHT);
         // 横
-        gc.drawLine(LEFT_WIDTH - 5, this.height - BOTTOM_HEIGHT,
-                (this.width - RIGHT_WIDTH) + 5, this.height - BOTTOM_HEIGHT);
+        gc.drawLine(this.LEFT_WIDTH - 5, this.height - this.BOTTOM_HEIGHT,
+                (this.width - this.RIGHT_WIDTH) + 5, this.height - this.BOTTOM_HEIGHT);
 
         // 縦軸を描く
         gc.setLineWidth(1);
         for (int i = 0; i < 5; i++) {
             // 軸
             gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_GRAY));
-            int jh = (int) ((h * i) / 4) + TOP_HEIGHT;
-            gc.drawLine(LEFT_WIDTH - 5, jh, (this.width - RIGHT_WIDTH) + 5, jh);
+            int jh = (int) ((h * i) / 4) + this.TOP_HEIGHT;
+            gc.drawLine(this.LEFT_WIDTH - 5, jh, (this.width - this.RIGHT_WIDTH) + 5, jh);
             //ラベルを設定
             gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
             String labelLeft = Integer.toString((int) (((float) (this.max - this.min) * (4 - i)) / 4) + this.min);
@@ -112,10 +119,10 @@ public class ResourceChart {
             int labelLeftWidth = getStringWidth(gc, labelLeft);
             int labelHeight = gc.getFontMetrics().getHeight();
             if (this.max > this.min) {
-                gc.drawString(labelLeft, LEFT_WIDTH - labelLeftWidth - 5, jh - (labelHeight / 2));
+                gc.drawString(labelLeft, this.LEFT_WIDTH - labelLeftWidth - 5, jh - (labelHeight / 2));
             }
             if (this.max2 > this.min2) {
-                gc.drawString(labelRight, (this.width - RIGHT_WIDTH) + 10, jh - (labelHeight / 2));
+                gc.drawString(labelRight, (this.width - this.RIGHT_WIDTH) + 10, jh - (labelHeight / 2));
             }
         }
         SimpleDateFormat format = new SimpleDateFormat("M月d日 HH:mm");
@@ -127,12 +134,12 @@ public class ResourceChart {
             int idx = (int) (((float) (this.time.length - 1) * i) / 4);
             String label = format.format(new Date(normalizeTime(this.time[idx], TimeUnit.MINUTES.toMillis(10))));
             int labelWidth = getStringWidth(gc, label);
-            int x = ((int) ((w * i) / 4) + LEFT_WIDTH) - (labelWidth / 2);
-            int y = (this.height - BOTTOM_HEIGHT) + 6;
+            int x = ((int) ((w * i) / 4) + this.LEFT_WIDTH) - (labelWidth / 2);
+            int y = (this.height - this.BOTTOM_HEIGHT) + 6;
             gc.drawText(label, x, y, true);
         }
         // 判例を描く
-        int hx = LEFT_WIDTH;
+        int hx = this.LEFT_WIDTH;
         int hy = 5;
         for (int i = 0; i < this.resources.length; i++) {
             gc.setLineWidth(3);
@@ -147,7 +154,7 @@ public class ResourceChart {
             hx += labelWidth + 2;
         }
         // スケールテキストを描く
-        int sx = this.width - RIGHT_WIDTH - getStringWidth(gc, this.scaleText);
+        int sx = this.width - this.RIGHT_WIDTH - getStringWidth(gc, this.scaleText);
         int sy = 5;
         gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
         gc.drawText(this.scaleText, sx, sy, true);
@@ -161,27 +168,27 @@ public class ResourceChart {
                 int[] values = this.resources[i].values;
                 Path path = new Path(Display.getCurrent());
                 if (i < 4) {
-                    drawPath(values, this.max, this.min, w, h, path);
+                    this.drawPath(values, this.max, this.min, w, h, path);
                 }
                 else {
-                    drawPath(values, this.max2, this.min2, w, h, path);
+                    this.drawPath(values, this.max2, this.min2, w, h, path);
                 }
                 gc.drawPath(path);
             }
         }
     }
 
-    private static void drawPath(int[] values, int max, int min, float w, float h, Path path) {
-        float x = LEFT_WIDTH;
-        float y = (h * (1 - ((float) (values[0] - min) / (max - min)))) + TOP_HEIGHT;
+    private void drawPath(int[] values, int max, int min, float w, float h, Path path) {
+        float x = this.LEFT_WIDTH;
+        float y = (h * (1 - ((float) (values[0] - min) / (max - min)))) + this.TOP_HEIGHT;
         path.moveTo(x, y);
 
         for (int j = 1; j < values.length; j++) {
             // 欠損(-1)データは描かない
             if (values[j] != -1) {
 
-                float x1 = ((w * j) / values.length) + LEFT_WIDTH;
-                float y1 = (h * (1 - ((float) (values[j] - min) / (max - min)))) + TOP_HEIGHT;
+                float x1 = ((w * j) / values.length) + this.LEFT_WIDTH;
+                float y1 = (h * (1 - ((float) (values[j] - min) / (max - min)))) + this.TOP_HEIGHT;
                 path.lineTo(x1, y1);
             }
         }

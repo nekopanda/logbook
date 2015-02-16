@@ -293,10 +293,13 @@ public final class AsyncExecApplicationMain extends Thread {
 
             BasicInfoDto basicDto = GlobalContext.getBasicInfo();
             if (AppConfig.get().isNameOnTitlebar() && (basicDto != null)) {
-                this.main.getShell().setText(basicDto.getNickname() + " - 航海日誌");
+                String titlebarText = basicDto.getNickname() + " - 航海日誌";
+                this.main.getShell().setText(titlebarText);
+                this.main.getTrayItem().setText(titlebarText);
             }
             else {
                 this.main.getShell().setText(AppConstants.TITLEBAR_TEXT);
+                this.main.getTrayItem().setText(AppConstants.TITLEBAR_TEXT);
             }
 
             Label[] deckNameLabels = { this.main.getDeck1name(), this.main.getDeck2name(), this.main.getDeck3name() };
@@ -516,6 +519,7 @@ public final class AsyncExecApplicationMain extends Thread {
                     if (!dock.getName().equals(dockname[i])) {
                         dockname[i] = dock.getName();
                     }
+
                     tabComposite.updateFleet(dock, (i < 2) ? combinedFleetBadlyDamaed : false);
                     tabItem.setText(dock.getName());
                     dock.setUpdate(false);

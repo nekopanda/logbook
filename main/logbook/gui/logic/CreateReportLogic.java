@@ -173,7 +173,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getBattleResultHeader() {
-        return new String[] { "No.", "日付", "海域", "マス", "ボス", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘",
+        return new String[] { "No.", "日付", "海域", "マス", "出撃", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘",
                 "大破艦", "旗艦", "旗艦(第二艦隊)", "MVP", "MVP(第二艦隊)" };
     }
 
@@ -189,13 +189,19 @@ public final class CreateReportLogic {
             BattleResultDto item = results.get(i);
             body.add(new Comparable[] {
                     new TableRowHeader(i + 1, item),
-                    new DateTimeString(item.getBattleDate()), item.getQuestName(),
+                    new DateTimeString(item.getBattleDate()),
+                    item.getQuestName(),
                     (item.getMapCell() != null) ? item.getMapCell().getReportString() : null,
-                    item.isBoss() ? "ボス" : "",
-                    item.getRank(), item.getEnemyName(), item.getDropType(),
-                    item.getDropName(), item.isHasTaiha() ? "あり" : "",
-                    item.getFlagShip(), item.getFlagShipCombined(),
-                    item.getMvp(), item.getMvpCombined() });
+                    item.getBossText(),
+                    item.getRank(),
+                    item.getEnemyName(),
+                    item.getDropType(),
+                    item.getScreenDropName(),
+                    item.isHasTaiha() ? "あり" : "",
+                    item.getFlagShip(),
+                    item.getFlagShipCombined(),
+                    item.getMvp(),
+                    item.getMvpCombined() });
         }
         return body;
     }
@@ -265,11 +271,18 @@ public final class CreateReportLogic {
                 }
             }
 
+            String dropName = battle.getDropName();
+            if (StringUtils.isEmpty(dropName) &&
+                    (battle.getExVersion() >= 1) &&
+                    (battle.getShipSpace() == 0)) {
+                dropName = "※空きなし";
+            }
+
             body.add(new Comparable[] { Integer.toString(i + 1),
                     new DateTimeString(battle.getBattleDate()),
                     battle.getQuestName(),
                     battle.getMapCellDto().toString(), battle.getRank(), battle.getEnemyName(), battle.getDropType(),
-                    battle.getDropName(),
+                    dropName,
                     friend[0], friendHp[0], friend[1], friendHp[1], friend[2], friendHp[2], friend[3], friendHp[3],
                     friend[4], friendHp[4], friend[5], friendHp[5], enemy[0], enemyHp[0], enemy[1], enemyHp[1],
                     enemy[2], enemyHp[2], enemy[3], enemyHp[3], enemy[4], enemyHp[4], enemy[5], enemyHp[5] });
@@ -1232,6 +1245,11 @@ public final class CreateReportLogic {
         }
         if (!filter.submarineTender) {
             if ("潜水母艦".equals(ship.getType())) {
+                return false;
+            }
+        }
+        if (!filter.trainingCruiser) {
+            if ("練習巡洋艦".equals(ship.getType())) {
                 return false;
             }
         }

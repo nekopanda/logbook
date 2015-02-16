@@ -30,8 +30,10 @@ public class MapCellDto implements Comparable<MapCellDto> {
     private int bosscellNo;
     @Tag(5)
     private EnemyData enemyData;
+    @Tag(10)
+    private boolean start;
 
-    public MapCellDto(JsonObject object) {
+    public MapCellDto(JsonObject object, boolean start) {
         this.map[0] = object.getInt("api_maparea_id");
         this.map[1] = object.getInt("api_mapinfo_no");
         this.map[2] = object.getInt("api_no");
@@ -45,6 +47,7 @@ public class MapCellDto implements Comparable<MapCellDto> {
         this.colorNo = object.getInt("api_color_no");
         this.bosscellNo = object.getInt("api_bosscell_no");
         this.enemyData = EnemyData.get(this.enemyId);
+        this.start = start;
     }
 
     private String toString(boolean detailed, boolean withBoss) {
@@ -173,6 +176,20 @@ public class MapCellDto implements Comparable<MapCellDto> {
      */
     public void setEnemyData(EnemyData enemyData) {
         this.enemyData = enemyData;
+    }
+
+    /**
+     * @return start
+     */
+    public boolean isStart() {
+        return this.start;
+    }
+
+    /**
+     * @param start セットする start
+     */
+    public void setStart(boolean start) {
+        this.start = start;
     }
 
 }

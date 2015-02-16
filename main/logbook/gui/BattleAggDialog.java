@@ -1,6 +1,3 @@
-/**
- * 
- */
 package logbook.gui;
 
 import java.util.ArrayList;
@@ -43,7 +40,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
 /**
- * @author noname
+ * 出撃統計
  *
  */
 public class BattleAggDialog extends WindowBase {
@@ -238,7 +235,7 @@ public class BattleAggDialog extends WindowBase {
      * @return String[]
      */
     private String[] getTableHeader() {
-        return new String[] { "集計", "勝利合計", "S勝利", "A勝利", "B勝利", "C敗北", "D敗北" };
+        return new String[] { "集計", "出撃合計", "勝利合計", "S勝利", "A勝利", "B勝利", "C敗北", "D敗北" };
     }
 
     /**
@@ -268,6 +265,8 @@ public class BattleAggDialog extends WindowBase {
         Calendar lastWeek = BattleAggDate.LAST_WEEK.get();
         // 先月
         Calendar lastMonth = BattleAggDate.LAST_MONTH.get();
+        // 読み込む最小の日付(>=)
+        Calendar min = lastMonth;
 
         // 海戦・ドロップ報告書読み込み
         try {
@@ -278,6 +277,11 @@ public class BattleAggDialog extends WindowBase {
                 // 演習はスキップ
                 if (mapCell == null)
                     continue;
+
+                // 読み込む最小の日付未満の場合は読み飛ばす
+                if (min.compareTo(date) > 0) {
+                    continue;
+                }
 
                 // デイリー集計
                 this.agg(BattleAggUnit.DAILY, aggMap, today, Calendar.DAY_OF_YEAR, date, mapCell, rank);
@@ -309,6 +313,7 @@ public class BattleAggDialog extends WindowBase {
      * @param target 集計対象の日付
      * @param area 海域
      * @param rank ランク
+     * @param isStart 出撃
      * @param isBoss ボス
      */
     private void agg(BattleAggUnit unit, Map<BattleAggUnit, BattleAggUnitDto> to, Calendar std, int field,
@@ -443,13 +448,13 @@ public class BattleAggDialog extends WindowBase {
 
         private void setDto(String title, BattleAggDetailsDto area) {
             // メイン
-            this.item.setText(new String[] { title, Integer.toString(area.getWin()),
+            this.item.setText(new String[] { title, Integer.toString(area.getStart()), Integer.toString(area.getWin()),
                     Integer.toString(area.getS()), Integer.toString(area.getA()), Integer.toString(area.getB()),
                     Integer.toString(area.getC()), Integer.toString(area.getD()) });
             this.item.setData(this);
             // ボス
             this.bossItem = new TreeItem(this.item, SWT.NONE);
-            this.bossItem.setText(new String[] { "ボス", Integer.toString(area.getBossWin()),
+            this.bossItem.setText(new String[] { "ボス", "-", Integer.toString(area.getBossWin()),
                     Integer.toString(area.getBossS()), Integer.toString(area.getBossA()),
                     Integer.toString(area.getBossB()), Integer.toString(area.getBossC()),
                     Integer.toString(area.getBossD()) });

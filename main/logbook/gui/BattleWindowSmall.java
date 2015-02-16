@@ -12,6 +12,7 @@ import logbook.dto.EnemyShipDto;
 import logbook.dto.ResultRank;
 import logbook.dto.ShipDto;
 import logbook.gui.logic.DamageRate;
+import logbook.gui.logic.LayoutLogic;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -135,6 +136,7 @@ public class BattleWindowSmall extends BattleWindow {
 
         for (int i = 0; i < 2; ++i) {
             this.currentCompo = this.infoCompo[i] = new Composite(this.getShell(), SWT.NONE);
+            this.infoCompo[i].setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1));
 
             this.infoCompo[i].setLayout(this.makeGridLayout(3));
 
@@ -154,14 +156,16 @@ public class BattleWindowSmall extends BattleWindow {
                 this.infoLabels[i][6] = this.addLabel("Stage1");
                 this.infoLabels[i][4] = this.infoLabels[i][5] = this.infoLabels[i][6];
             }
+            LayoutLogic.hide(this.infoLabels[i][6], true);
 
             this.infoLabels[i][7] = this.addLabel("Stage2");
+            LayoutLogic.hide(this.infoLabels[i][7], true);
             this.infoLabels[i][8] = this.addLabel("000→000");
             this.infoLabels[i][9] = this.addLabel("000→000");
-            this.beginCombined();
+            //this.beginCombined();
             this.infoLabels[i][10] = this.addLabel("000→000");
             this.infoLabels[i][11] = this.addLabel("000→000");
-            this.endCombined();
+            //this.endCombined();
         }
 
         // 結果表示領域
@@ -206,9 +210,11 @@ public class BattleWindowSmall extends BattleWindow {
 
     private void printDock(DockDto dock, int base) {
         List<ShipDto> ships = dock.getShips();
+        boolean[] escaped = dock.getEscaped();
         for (int i = 0; i < ships.size(); ++i) {
             ShipDto ship = ships.get(i);
-            printFriendHp(this.friendHpLabels, base + i, ship.getNowhp(), ship.getMaxhp(), ship);
+            printFriendHp(this.friendHpLabels, base + i,
+                    ship.getNowhp(), ship.getMaxhp(), ship, (escaped != null) && escaped[i]);
         }
     }
 
@@ -237,22 +243,33 @@ public class BattleWindowSmall extends BattleWindow {
         this.title.setText(this.getMapCellDto().toString());
     }
 
-    private static void setLabelColor(Label label, int nowhp, int maxhp) {
-        DamageRate rate = DamageRate.fromHP(nowhp, maxhp);
+    private static void setLabelColor(Label label, DamageRate rate) {
         label.setBackground(rate.getBackground());
         label.setForeground(rate.getForeground());
     }
 
-    private static void printFriendHp(Label[][] labels, int index, int nowhp, int maxhp, ShipDto ship) {
-        printHp(labels[0][index], nowhp, maxhp);
+    private static void setLabelColor(Label label, int nowhp, int maxhp) {
+        setLabelColor(label, DamageRate.fromHP(nowhp, maxhp));
+    }
+
+    private static void printFriendHp(Label[][] labels, int index, int nowhp, int maxhp, ShipDto ship, boolean escaped) {
         labels[0][index].setToolTipText(ship.getDetailedString());
-        setLabelColor(labels[0][index], nowhp, maxhp);
+        if (escaped) {
+            setLabelColor(labels[0][index], DamageRate.ESCAPED);
+        }
+        else {
+            printHp(labels[0][index], nowhp, maxhp);
+            setLabelColor(labels[0][index], nowhp, maxhp);
+        }
     }
 
     private static void printHp(
-            Label[][] labels, int base1, int base2, int[] dam, int[] nowhp, int[] maxhp)
+            Label[][] labels, int base1, int base2, int[] dam, int[] nowhp, int[] maxhp, boolean[] escaped)
     {
         for (int i = 0; i < nowhp.length; ++i) {
+            if ((escaped != null) && escaped[i]) {
+                continue;
+            }
             labels[base1 + 0][base2 + i].setText(String.valueOf(dam[base2 + i]));
             labels[base1 + 1][base2 + i].setText(String.valueOf(nowhp[i]));
             setLabelColor(labels[base1 + 1][base2 + i], nowhp[i], maxhp[i]);
@@ -303,12 +320,15 @@ public class BattleWindowSmall extends BattleWindow {
         };
         int[][] friendStartHp = new int[][] { battle.getStartFriendHp(), battle.getStartFriendHpCombined() };
         int[][] friendMaxHp = new int[][] { battle.getMaxFriendHp(), battle.getMaxFriendHpCombined() };
+        List<DockDto> docks = this.getDocks();
         for (int i = 0; i < friendStartHp.length; ++i) {
             int[] startHp = friendStartHp[i];
             int[] maxHp = friendMaxHp[i];
             if (startHp != null) {
+                boolean[] dockEscaped = docks.get(i).getEscaped();
                 for (int c = 0; c < startHp.length; ++c) {
-                    printFriendHp(this.friendHpLabels, (i * 6) + c, startHp[c], maxHp[c], ships[i].get(c));
+                    printFriendHp(this.friendHpLabels, (i * 6) + c,
+                            startHp[c], maxHp[c], ships[i].get(c), (dockEscaped != null) && dockEscaped[c]);
                 }
             }
         }
@@ -326,12 +346,13 @@ public class BattleWindowSmall extends BattleWindow {
         }
 
         // 昼戦後HP
-        printHp(this.friendHpLabels, 1, 0, this.friendDamages[last], lastPhase.getNowFriendHp(), friendMaxHp[0]);
+        printHp(this.friendHpLabels, 1, 0, this.friendDamages[last],
+                lastPhase.getNowFriendHp(), friendMaxHp[0], docks.get(0).getEscaped());
         if (battle.isCombined()) {
-            printHp(this.friendHpLabels, 1, 6, this.friendDamages[last], lastPhase.getNowFriendHpCombined(),
-                    friendMaxHp[1]);
+            printHp(this.friendHpLabels, 1, 6, this.friendDamages[last],
+                    lastPhase.getNowFriendHpCombined(), friendMaxHp[1], docks.get(1).getEscaped());
         }
-        printHp(this.enemyHpLabels, 1, 0, this.enemyDamages[last], lastPhase.getNowEnemyHp(), maxEnemyHp);
+        printHp(this.enemyHpLabels, 1, 0, this.enemyDamages[last], lastPhase.getNowEnemyHp(), maxEnemyHp, null);
 
         ResultRank rank = lastPhase.getEstimatedRank();
         if ((rank == ResultRank.C) || (rank == ResultRank.D) || (rank == ResultRank.E)) {

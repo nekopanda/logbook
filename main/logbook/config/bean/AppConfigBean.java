@@ -167,6 +167,9 @@ public final class AppConfigBean {
     private String defaultEvaluate = "S勝利";
 
     /** 索敵表示形式 */
+    private boolean useRecommendedSakuteki = true;
+
+    /** 索敵表示形式 */
     private int sakutekiMethod = 0;
 
     /** タスクバー通知を使用する */
@@ -234,6 +237,9 @@ public final class AppConfigBean {
 
     /** マウスが離れてから元の透明度に戻るまでの時間（0.1秒単位） */
     private int opaqueInterval = 6;
+
+    /** タイトルバー以外でもドラッグ&ドロップで移動できるようにする */
+    private boolean enableMoveWithDD = true;
 
     /** 艦娘一覧ウィンドウの名前 */
     private String[] shipTableNames = new String[] {
@@ -1060,6 +1066,20 @@ public final class AppConfigBean {
     }
 
     /**
+     * @return useRecommendedSakuteki
+     */
+    public boolean isUseRecommendedSakuteki() {
+        return this.useRecommendedSakuteki;
+    }
+
+    /**
+     * @param useRecommendedSakuteki セットする useRecommendedSakuteki
+     */
+    public void setUseRecommendedSakuteki(boolean useRecommendedSakuteki) {
+        this.useRecommendedSakuteki = useRecommendedSakuteki;
+    }
+
+    /**
      * 索敵値の表示形式を取得します。
      * @return 索敵値の表示形式
      */
@@ -1396,6 +1416,20 @@ public final class AppConfigBean {
     }
 
     /**
+     * @return enableMoveWithDD
+     */
+    public boolean isEnableMoveWithDD() {
+        return this.enableMoveWithDD;
+    }
+
+    /**
+     * @param enableMoveWithDD セットする enableMoveWithDD
+     */
+    public void setEnableMoveWithDD(boolean enableMoveWithDD) {
+        this.enableMoveWithDD = enableMoveWithDD;
+    }
+
+    /**
      * @return shipTableNames
      */
     public String[] getShipTableNames() {
@@ -1562,4 +1596,5 @@ public final class AppConfigBean {
     public void setTwitterTokenSecret(String twitterTokenSecret) {
         this.twitterTokenSecret = twitterTokenSecret;
     }
+
 }

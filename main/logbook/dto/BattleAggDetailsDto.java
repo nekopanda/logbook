@@ -5,7 +5,8 @@ package logbook.dto;
  */
 public final class BattleAggDetailsDto extends AbstractDto {
     private final String areaName;
-
+    /** 出撃 */
+    private int start;
     /** S勝利 */
     private int s;
     /** A勝利 */
@@ -35,10 +36,14 @@ public final class BattleAggDetailsDto extends AbstractDto {
     /**
      * 統計に加算します
      * 
-     * @param isBoss ボスマス
+     * @param isStart 出撃
+     * @param isBoss ボス
      * @param rank ランク
      */
-    public void add(ResultRank rank, boolean isBoss) {
+    public void add(ResultRank rank, boolean isStart, boolean isBoss) {
+        if (isStart) {
+            this.start++;
+        }
         switch (rank) {
         case PERFECT:
         case S:
@@ -70,6 +75,13 @@ public final class BattleAggDetailsDto extends AbstractDto {
             // ?
             break;
         }
+    }
+
+    /**
+     * @return 出撃
+     */
+    public int getStart() {
+        return this.start;
     }
 
     /**

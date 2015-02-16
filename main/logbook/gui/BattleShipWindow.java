@@ -73,6 +73,10 @@ public class BattleShipWindow extends BattleWindowBase {
                         setLabelText(this.friendDetail[0][i], String.valueOf(i + 1) + ":" + itemName);
                         this.friendDetail[1][i].setText(onSlot);
                     }
+                    else {
+                        setLabelText(this.friendDetail[0][i], "");
+                        this.friendDetail[1][i].setText("");
+                    }
                 }
             }
         }
@@ -115,6 +119,10 @@ public class BattleShipWindow extends BattleWindowBase {
                             }
                             setLabelText(this.enemyDetail[0][i], String.valueOf(i + 1) + ":" + itemName);
                             this.enemyDetail[1][i].setText(onSlot);
+                        }
+                        else {
+                            setLabelText(this.enemyDetail[0][i], "");
+                            this.enemyDetail[1][i].setText("");
                         }
                     }
                 }

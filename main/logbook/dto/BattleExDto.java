@@ -4,6 +4,7 @@
 package logbook.dto;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -120,6 +121,29 @@ public class BattleExDto extends AbstractDto {
     /** 提督Lv */
     @Tag(27)
     private int hqLv;
+
+    /** 
+     * BattleExDtoのバージョン
+     * exVersion == 0 : Tag 34以降がない
+     * exVersion == 1 : Tag 36まである
+     *  */
+    @Tag(34)
+    private int exVersion = 1;
+
+    /** 母港空き（ドロップ分を含まない） */
+    @Tag(35)
+    private int shipSpace;
+
+    /** 装備空き（ドロップ分を含まない） */
+    @Tag(36)
+    private int itemSpace;
+
+    /** 連合艦隊における退避意見 [退避する艦(0-11), 護衛艦(0-11)] */
+    @Tag(37)
+    private int[] escapeInfo;
+
+    @Tag(38)
+    private boolean[] escaped;
 
     /////////////////////////////////////////////////
 
@@ -644,6 +668,11 @@ public class BattleExDto extends AbstractDto {
         this.battleDate = date;
     }
 
+    public void setBasicInfo(int shipSpace, int itemSpace) {
+        this.shipSpace = shipSpace;
+        this.itemSpace = itemSpace;
+    }
+
     public Phase addPhase(JsonObject object, BattlePhaseKind kind) {
         if (this.phaseList.size() == 0) {
             // 最初のフェーズ
@@ -757,6 +786,22 @@ public class BattleExDto extends AbstractDto {
                         this.friendGaugeMax += this.startFriendHpCombined[i - 1] = hp;
                     }
                 }
+
+                // 退避
+                this.escaped = new boolean[12];
+                if (JsonUtils.hasKey(object, "api_escape_idx")) {
+                    for (JsonValue jsonShip : object.getJsonArray("api_escape_idx")) {
+                        this.escaped[((JsonNumber) jsonShip).intValue() - 1] = true;
+                    }
+                }
+                if (JsonUtils.hasKey(object, "api_escape_idx_combined")) {
+                    for (JsonValue jsonShip : object.getJsonArray("api_escape_idx_combined")) {
+                        this.escaped[(((JsonNumber) jsonShip).intValue() - 1) + 6] = true;
+                    }
+                }
+                for (int i = 0; i < 2; ++i) {
+                    this.friends.get(i).setEscaped(Arrays.copyOfRange(this.escaped, i * 6, (i + 1) * 6));
+                }
             }
         }
 
@@ -802,6 +847,13 @@ public class BattleExDto extends AbstractDto {
             this.mvpCombined = object.getInt("api_mvp_combined");
         }
         this.hqLv = object.getInt("api_member_lv");
+        if (JsonUtils.hasKey(object, "api_escape")) {
+            JsonObject jsonEscape = object.getJsonObject("api_escape");
+            this.escapeInfo = new int[] {
+                    jsonEscape.getJsonArray("api_escape_idx").getInt(0) - 1,
+                    jsonEscape.getJsonArray("api_tow_idx").getInt(0) - 1
+            };
+        }
     }
 
     private static String toFormation(int f) {
@@ -1141,5 +1193,61 @@ public class BattleExDto extends AbstractDto {
      */
     public int getHqLv() {
         return this.hqLv;
+    }
+
+    /**
+     * @return exVersion
+     */
+    public int getExVersion() {
+        return this.exVersion;
+    }
+
+    /**
+     * @param exVersion セットする exVersion
+     */
+    public void setExVersion(int exVersion) {
+        this.exVersion = exVersion;
+    }
+
+    /**
+     * @return shipSpace
+     */
+    public int getShipSpace() {
+        return this.shipSpace;
+    }
+
+    /**
+     * @param shipSpace セットする shipSpace
+     */
+    public void setShipSpace(int shipSpace) {
+        this.shipSpace = shipSpace;
+    }
+
+    /**
+     * @return itemSpace
+     */
+    public int getItemSpace() {
+        return this.itemSpace;
+    }
+
+    /**
+     * @param itemSpace セットする itemSpace
+     */
+    public void setItemSpace(int itemSpace) {
+        this.itemSpace = itemSpace;
+    }
+
+    /**
+     * @return escapeInfo
+     */
+    public int[] getEscapeInfo() {
+        return this.escapeInfo;
+    }
+
+    /**
+     * @return escaped
+     */
+    public boolean[] getEscaped() {
+        return this.escaped;
     }
 }

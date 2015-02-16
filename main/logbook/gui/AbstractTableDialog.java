@@ -122,6 +122,13 @@ public abstract class AbstractTableDialog extends WindowBase {
         this.table.addKeyListener(new TableKeyShortcutAdapter(this.header, this.table));
         this.table.setLinesVisible(true);
         this.table.setHeaderVisible(true);
+        this.table.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                AbstractTableDialog.this.shell.setText(AbstractTableDialog.this.getTitle());
+            }
+        });
         // メニューバーのメニュー
         MenuItem fileroot = new MenuItem(this.menubar, SWT.CASCADE);
         fileroot.setText("ファイル");
@@ -444,6 +451,10 @@ public abstract class AbstractTableDialog extends WindowBase {
         if ((this.body != null) && (this.table != null)) {
             if (this.table.getItemCount() != this.body.size()) {
                 title += " " + this.body.size() + "件中" + this.table.getItemCount() + "件のみ表示";
+            }
+            int selectionCount = this.table.getSelectionCount();
+            if (selectionCount > 1) {
+                title += " " + selectionCount + "件選択中";
             }
         }
         return title;

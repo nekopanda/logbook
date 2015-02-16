@@ -1,11 +1,15 @@
 package logbook.dto;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import javax.json.JsonObject;
 
 import logbook.constants.AppConstants;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 海戦とドロップした艦娘を表します
@@ -53,12 +57,18 @@ public class BattleResultDto extends AbstractDto {
 
     private final String flagShipCombined;
 
+    /** 母港の空きがない？ */
+    private final boolean noSpaceForShip;
+
     /**
      * コンストラクター
-     * 
+     * もう使われていない
      * @param object JSON Object
-     * @param cell マップ上のマス
-     * @param battle 戦闘詳細
+     * @param mapCellNo マップ上のマス
+     * @param mapBossCellNo　ボスマス
+     * @param eventId EventId
+     * @param isStart 出撃
+     * @param battle 戦闘
      */
     public BattleResultDto(JsonObject object, MapCellDto mapCell, BattleDto battle) {
 
@@ -83,6 +93,7 @@ public class BattleResultDto extends AbstractDto {
         this.mvpCombined = null;
         this.flagShip = null;
         this.flagShipCombined = null;
+        this.noSpaceForShip = false;
     }
 
     public BattleResultDto(BattleExDto dto) {
@@ -133,6 +144,8 @@ public class BattleResultDto extends AbstractDto {
         else {
             this.flagShipCombined = null;
         }
+
+        this.noSpaceForShip = (dto.getExVersion() >= 1) && (dto.getShipSpace() == 0);
     }
 
     private boolean hasTaihaInFleet(int[] nowhp, int[] maxhp) {
@@ -185,11 +198,37 @@ public class BattleResultDto extends AbstractDto {
     }
 
     /**
-     * ボスマスを取得します。
+     * 出撃を取得します
+     * @return 出撃
+     */
+    public boolean isStart() {
+        return (this.mapCell != null) ? this.mapCell.isStart() : false;
+    }
+
+    /**
+     * ボスマスを取得します
      * @return ボスマス
      */
     public boolean isBoss() {
         return (this.mapCell != null) ? this.mapCell.isBoss() : false;
+    }
+
+    /**
+     * 出撃・ボステキストを取得します
+     * @return 出撃・ボステキスト
+     */
+    public String getBossText() {
+        if (this.isStart() || this.isBoss()) {
+            List<String> list = new ArrayList<>();
+            if (this.isStart()) {
+                list.add("出撃");
+            }
+            if (this.isBoss()) {
+                list.add("ボス");
+            }
+            return StringUtils.join(list, "&");
+        }
+        return "";
     }
 
     /**
@@ -228,6 +267,17 @@ public class BattleResultDto extends AbstractDto {
      * @return 艦名
      */
     public String getDropName() {
+        return this.dropName;
+    }
+
+    /**
+     * 表示するドロップ艦名
+     * @return 艦名
+     */
+    public String getScreenDropName() {
+        if (StringUtils.isEmpty(this.dropName) && this.noSpaceForShip) {
+            return "※空きなし";
+        }
         return this.dropName;
     }
 
@@ -279,5 +329,12 @@ public class BattleResultDto extends AbstractDto {
      */
     public boolean isCombined() {
         return this.isCombined;
+    }
+
+    /**
+     * @return noSpaceForShip
+     */
+    public boolean isNoSpaceForShip() {
+        return this.noSpaceForShip;
     }
 }

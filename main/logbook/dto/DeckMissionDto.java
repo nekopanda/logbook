@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import logbook.internal.Deck;
+import logbook.internal.MasterData;
 
 /**
  * 遠征を表します
@@ -49,7 +50,11 @@ public final class DeckMissionDto extends AbstractDto {
     public DeckMissionDto(String name, int missionId, Date time, int fleetid, List<Integer> ships) {
         this.name = name;
         this.missionId = missionId;
-        this.mission = Deck.get(missionId);
+        String missionName = MasterData.getInstance().getMissionName(missionId);
+        if (missionName == null) {
+            missionName = Deck.get(missionId);
+        }
+        this.mission = missionName;
         this.time = time;
         this.fleetid = fleetid;
         this.ships = ships;

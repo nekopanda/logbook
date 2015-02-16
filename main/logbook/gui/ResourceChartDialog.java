@@ -76,6 +76,7 @@ public final class ResourceChartDialog extends WindowBase {
     private static final String DIFF_FORMAT = "{0,number,0}({1,number,+0;-0})";
 
     /** シェル */
+    private final Shell parent;
     private Shell shell;
     /** メニューバー */
     private Menu menubar;
@@ -92,7 +93,9 @@ public final class ResourceChartDialog extends WindowBase {
     /** 資材テーブルのヘッダ */
     private final String[] header = new String[] { "日付", "燃料", "弾薬", "鋼材", "ボーキ", "バーナー", "バケツ", "開発資材", "ネジ" };
     /** 資材テーブルのボディ */
-    private final List<String[]> body = new ArrayList<>();
+    private List<String[]> body = new ArrayList<>();
+    /** 最後に読み込んだ時間 */
+    private Date lastLoadDate = new Date(0);
 
     private Image currentImage;
 
@@ -102,9 +105,9 @@ public final class ResourceChartDialog extends WindowBase {
      * Create the dialog.
      * @param parent
      */
-    public ResourceChartDialog(Shell parent) {
-        super.createContents(parent, SWT.SHELL_TRIM, false);
-        this.getShell().setText("資材チャート");
+    public ResourceChartDialog(Shell parent, MenuItem menuItem) {
+        super(menuItem);
+        this.parent = parent;
     }
 
     /**
@@ -116,6 +119,13 @@ public final class ResourceChartDialog extends WindowBase {
         // 初期化済みの場合
         if (this.isWindowInitialized()) {
             // リロードして表示
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(this.lastLoadDate);
+            cal.add(Calendar.MINUTE, 1);
+            if (new Date().after(cal.getTime())) {
+                // 最後に読み込んでから1分以上経過していたら再読み込み
+                this.updateContents();
+            }
             this.setVisible(true);
             return;
         }
@@ -130,6 +140,8 @@ public final class ResourceChartDialog extends WindowBase {
      * Create contents of the dialog.
      */
     private void createContents() {
+        super.createContents(this.parent, SWT.SHELL_TRIM, false);
+        this.getShell().setText("資材チャート");
         this.shell = this.getShell();
         this.shell.setMinimumSize(450, 300);
         this.shell.setSize(800, 650);
@@ -238,38 +250,42 @@ public final class ResourceChartDialog extends WindowBase {
             }
         });
 
-        // 資材ログ読み込み
-        File report = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), AppConstants.LOG_RESOURCE));
-        try {
-            this.log = ResourceLog.getInstance(report);
-        } catch (IOException e) {
-            this.log = null;
-        }
-
         // 画像ファイルとして保存のリスナー
         save.addSelectionListener(new SaveImageAdapter());
         // 資材テーブルを表示する
         this.setTableHeader();
-        if (this.log != null) {
-            createTableBody(this.log, this.body);
-            this.setTableBody();
-            this.packTableHeader();
+        // データを読み込んで表示
+        this.updateContents();
+    }
+
+    private void updateContents() {
+        File report = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), AppConstants.LOG_RESOURCE));
+        try {
+            this.log = ResourceLog.getInstance(report);
+            if (this.log != null) {
+                this.body = createTableBody(this.log);
+                this.reloadImage();
+                this.setTableBody();
+                this.packTableHeader();
+                this.lastLoadDate = new Date();
+            }
+        } catch (IOException e) {
+            this.log = null;
         }
     }
 
     private void reloadImage() {
-        ResourceLog log = ResourceChartDialog.this.log;
         int scale = SCALE_DAYS[ResourceChartDialog.this.combo.getSelectionIndex()];
         String scaleText = "スケール:" + ResourceChartDialog.this.combo.getText();
         Point size = ResourceChartDialog.this.canvas.getSize();
         int width = size.x - 1;
         int height = size.y - 1;
 
-        if (log != null) {
+        if (this.log != null) {
             if (this.currentImage != null) {
                 this.currentImage.dispose();
             }
-            this.currentImage = createImage(log, scale, scaleText, width, height,
+            this.currentImage = createImage(this.log, scale, scaleText, width, height,
                     ResourceChartDialog.this.getResourceEnabled());
             this.canvas.redraw();
         }
@@ -308,6 +324,7 @@ public final class ResourceChartDialog extends WindowBase {
      * テーブルボディーをセットする
      */
     private void setTableBody() {
+        this.table.removeAll();
         TableItemCreator creator = CreateReportLogic.DEFAULT_TABLE_ITEM_CREATOR;
         creator.init();
         for (int i = 0; i < this.body.size(); i++) {
@@ -341,7 +358,7 @@ public final class ResourceChartDialog extends WindowBase {
         try {
             GC gc = new GC(image);
             try {
-                ResourceChart chart = new ResourceChart(log, scale, scaleText, width, height, enabled);
+                ResourceChart chart = new ResourceChart(gc, log, scale, scaleText, width, height, enabled);
                 chart.draw(gc);
             } finally {
                 gc.dispose();
@@ -359,7 +376,8 @@ public final class ResourceChartDialog extends WindowBase {
      * @param log 資材ログ
      * @param body テーブルボディ
      */
-    private static void createTableBody(ResourceLog log, List<String[]> body) {
+    private static List<String[]> createTableBody(ResourceLog log) {
+        List<String[]> body = new ArrayList<>();
 
         SimpleDateFormat format = new SimpleDateFormat(AppConstants.DATE_DAYS_FORMAT);
         format.setTimeZone(AppConstants.TIME_ZONE_MISSION);
@@ -427,6 +445,7 @@ public final class ResourceChartDialog extends WindowBase {
             body.add(line);
         }
         Collections.reverse(body);
+        return body;
     }
 
     private boolean[] getResourceEnabled() {

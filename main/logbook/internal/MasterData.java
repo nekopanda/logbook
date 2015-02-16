@@ -17,6 +17,7 @@ import javax.json.JsonValue;
 
 import logbook.constants.AppConstants;
 import logbook.dto.UseItemDto;
+import logbook.gui.ApplicationMain;
 import logbook.util.BeanUtils;
 
 /**
@@ -29,17 +30,23 @@ public class MasterData {
         public static MasterData instance = null;
     }
 
+    /** 変更があったか */
+    private static boolean modified = false;
+
     /**
      * 
      * 設定ファイルに書き込みます
      */
     public static void store() throws IOException {
-        // 最終更新日時がファイル更新日時より新しい時だけ書き込む
-        if (new Date(AppConstants.MASTER_DATA_CONFIG.lastModified())
-                .after(Holder.instance.lastUpdateTime)) {
+        if (Holder.instance == null) {
             return;
         }
-        BeanUtils.writeObject(AppConstants.MASTER_DATA_CONFIG, Holder.instance);
+        // 最終更新日時がファイル更新日時より新しい時だけ書き込む
+        if (modified) {
+            ApplicationMain.sysPrint("マスターファイル更新");
+            BeanUtils.writeObject(AppConstants.MASTER_DATA_CONFIG, Holder.instance);
+            modified = false;
+        }
     }
 
     private static void load() {
@@ -174,6 +181,7 @@ public class MasterData {
 
         this.masterUpdateTime = new Date();
         this.lastUpdateTime = new Date();
+        modified = true;
     }
 
     private void doMapInfo(JsonArray json_mapinfo) {
@@ -186,6 +194,7 @@ public class MasterData {
             if (newState.equals(this.mapState) == false) {
                 this.mapState = newState;
                 this.lastUpdateTime = new Date();
+                modified = true;
             }
         }
     }
@@ -200,8 +209,17 @@ public class MasterData {
             if (newState.equals(this.missionState) == false) {
                 this.missionState = newState;
                 this.lastUpdateTime = new Date();
+                modified = true;
             }
         }
+    }
+
+    public String getMissionName(int missionId) {
+        MissionDto dto = this.mission.get(missionId);
+        if (dto != null) {
+            return dto.getName();
+        }
+        return null;
     }
 
     /**

@@ -28,6 +28,7 @@ import logbook.gui.background.AsyncExecUpdateCheck;
 import logbook.gui.background.BackgroundInitializer;
 import logbook.gui.listener.HelpEventListener;
 import logbook.gui.listener.MainShellAdapter;
+import logbook.gui.listener.TrayItemMenuListener;
 import logbook.gui.listener.TraySelectionListener;
 import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.PushNotify;
@@ -54,7 +55,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
@@ -187,6 +187,8 @@ public final class ApplicationMain extends WindowBase {
     private BattleAggDialog battleCounterWindow;
     /** グループエディター */
     private ShipFilterGroupDialog shipFilterGroupWindow;
+    /** グループエディター */
+    private ResourceChartDialog resourceChartWindow;
     /** ツール */
     private LauncherWindow launcherWindow;
 
@@ -285,19 +287,28 @@ public final class ApplicationMain extends WindowBase {
      */
     @Override
     public void open() {
-        Display display = Display.getDefault();
-        this.createContents();
-        this.registerEvents();
-        sysPrint("ウィンドウ表示開始...");
-        this.restoreWindows();
-        sysPrint("メッセージループに入ります...");
-        while (!this.shell.isDisposed()) {
-            if (!display.readAndDispatch()) {
-                display.sleep();
+        try {
+            Display display = Display.getDefault();
+            this.createContents();
+            this.registerEvents();
+            sysPrint("ウィンドウ表示開始...");
+            this.restoreWindows();
+            sysPrint("メッセージループに入ります...");
+            while (!this.shell.isDisposed()) {
+                if (!display.readAndDispatch()) {
+                    display.sleep();
+
+                }
+            }
+            this.dummyHolder.dispose();
+        } finally {
+            Tray tray = Display.getDefault().getSystemTray();
+            if (tray != null) {
+                for (TrayItem item : tray.getItems()) {
+                    item.dispose();
+                }
             }
         }
-        this.dummyHolder.dispose();
-        this.trayItem.dispose();
     }
 
     @Override
@@ -333,11 +344,7 @@ public final class ApplicationMain extends WindowBase {
                             | SWT.ICON_QUESTION);
                     box.setText("終了の確認");
                     box.setMessage("航海日誌を終了しますか？");
-                    if (box.open() == SWT.YES) {
-                        e.doit = true;
-                    } else {
-                        e.doit = false;
-                    }
+                    e.doit = box.open() == SWT.YES;
                 }
 
                 if (e.doit) {
@@ -505,15 +512,11 @@ public final class ApplicationMain extends WindowBase {
         this.calcPracticeExpWindow = new CalcPracticeExpDialog(this.dummyHolder, calcpracticeexp);
 
         // その他-資材チャート
-        MenuItem resourceChart = new MenuItem(etcmenu, SWT.NONE);
+        MenuItem resourceChart = new MenuItem(etcmenu, SWT.CHECK);
         resourceChart.setText("資材チャート(&R)\tCtrl+R");
         resourceChart.setAccelerator(SWT.CTRL + 'R');
-        resourceChart.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                new ResourceChartDialog(ApplicationMain.this.dummyHolder).open();
-            }
-        });
+        this.resourceChartWindow = new ResourceChartDialog(this.dummyHolder, resourceChart);
+
         // コマンド-出撃統計
         MenuItem battleCounter = new MenuItem(etcmenu, SWT.CHECK);
         battleCounter.setText("出撃統計(&A)\tCtrl+A");
@@ -1025,6 +1028,9 @@ public final class ApplicationMain extends WindowBase {
         case 'a':
             this.activate(this.battleCounterWindow);
             break;
+        case 'r':
+            this.activate(this.resourceChartWindow);
+            break;
         case 'z':
             this.shell.setActive();
             break;
@@ -1117,6 +1123,7 @@ public final class ApplicationMain extends WindowBase {
                 this.calcExpWindow,
                 this.calcPracticeExpWindow,
                 this.shipFilterGroupWindow,
+                this.resourceChartWindow,
                 this.battleCounterWindow,
                 this.launcherWindow
         };
@@ -1132,9 +1139,10 @@ public final class ApplicationMain extends WindowBase {
         // トレイアイコンを追加します
         Tray tray = display.getSystemTray();
         TrayItem item = new TrayItem(tray, SWT.NONE);
-        Image image = display.getSystemImage(SWT.ICON_INFORMATION);
-        item.setImage(image);
+        item.setImage(SWTResourceManager.getImage(WindowBase.class, AppConstants.LOGO));
+        item.setToolTipText(AppConstants.TITLEBAR_TEXT);
         item.addListener(SWT.Selection, new TraySelectionListener(this.shell));
+        item.addMenuDetectListener(new TrayItemMenuListener());
         return item;
     }
 
@@ -1467,18 +1475,17 @@ public final class ApplicationMain extends WindowBase {
 
     private List<DockDto> getSortieDocks() {
         boolean[] isSortie = GlobalContext.getIsSortie();
+        if (GlobalContext.isCombined() && isSortie[0]) {
+            // 連合艦隊
+            return Arrays.asList(new DockDto[] {
+                    GlobalContext.getDock("1"),
+                    GlobalContext.getDock("2")
+            });
+        }
         for (int i = 0; i < 4; i++) {
             if (isSortie[i]) {
                 DockDto dock = GlobalContext.getDock(Integer.toString(i + 1));
-                if (GlobalContext.isCombined()) {
-                    return Arrays.asList(new DockDto[] {
-                            dock,
-                            GlobalContext.getDock("2")
-                    });
-                }
-                else {
-                    return Arrays.asList(new DockDto[] { dock });
-                }
+                return Arrays.asList(new DockDto[] { dock });
             }
         }
         return null;
