@@ -679,8 +679,14 @@ public class Ship {
             ShipParameters param = dto.getParam();
             ShipParameters max = dto.getMax();
             if (dto.getName().length() > 0) {
+                String name = dto.getName();
+                if (dto.getMaxBull() == 0) { // 敵
+                    if (!StringUtils.isEmpty(dto.getFlagship())) {
+                        name += " " + dto.getFlagship();
+                    }
+                }
                 fw.write(StringUtils.join(new String[] {
-                        dto.getName(), // 名前
+                        name, // 名前
                         Integer.toString(dto.getShipId()), // ID
                         dto.getType(), // 
                         Integer.toString(dto.getMax().getSoku()),
