@@ -54,6 +54,8 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
     private ShipFilterComposite filterCompo;
 
     private MenuItem filterMenu;
+    private MenuItem switchdiff;
+    private MenuItem switchdiff2;
     private MenuItem addGroupCascade;
     private MenuItem removeGroupCascade;
 
@@ -106,6 +108,13 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
 
     @Override
     protected void createContents() {
+        SelectionListener switchDiffListener = new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                ShipTable.this.switchSpecDiff((MenuItem) e.getSource());
+            }
+        };
+
         this.table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         // メニューバーに追加する
         // フィルターメニュー
@@ -119,6 +128,7 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
                 ShipTable.this.filterMenuSelected();
             }
         });
+
         // 検索（キーボードショートカットのため）
         MenuItem searchMenu = new MenuItem(this.opemenu, SWT.NONE);
         searchMenu.setText("検索(&F)\tCtrl+F");
@@ -129,19 +139,25 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
                 ShipTable.this.focusOnSearchBox();
             }
         });
+
         // セパレータ
         new MenuItem(this.opemenu, SWT.SEPARATOR);
+
         // 成長の余地を表示メニュー
-        final MenuItem switchdiff = new MenuItem(this.opemenu, SWT.CHECK);
-        switchdiff.setText("成長の余地を表示");
-        switchdiff.setSelection(this.specdiff);
-        switchdiff.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                ShipTable.this.specdiff = switchdiff.getSelection();
-                ShipTable.this.reloadTable();
-            }
-        });
+        this.switchdiff = new MenuItem(this.opemenu, SWT.CHECK);
+        this.switchdiff.setText("成長の余地を表示");
+        this.switchdiff.setSelection(this.specdiff);
+        this.switchdiff.addSelectionListener(switchDiffListener);
+
+        // セパレータ
+        new MenuItem(this.tablemenu, SWT.SEPARATOR);
+
+        // 成長の余地を表示メニュー
+        this.switchdiff2 = new MenuItem(this.tablemenu, SWT.CHECK);
+        this.switchdiff2.setText("成長の余地を表示");
+        this.switchdiff2.setSelection(this.specdiff);
+        this.switchdiff2.addSelectionListener(switchDiffListener);
+
         // セパレータ
         new MenuItem(this.tablemenu, SWT.SEPARATOR);
 
@@ -207,6 +223,13 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
 
         // ウィンドウタイトルを設定
         this.shell.setText(this.getTitle());
+    }
+
+    private void switchSpecDiff(MenuItem source) {
+        this.specdiff = source.getSelection();
+        this.switchdiff.setSelection(this.specdiff);
+        this.switchdiff2.setSelection(this.specdiff);
+        this.reloadTable();
     }
 
     private void focusOnSearchBox() {
