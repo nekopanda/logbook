@@ -124,7 +124,7 @@ public final class ResourceChartDialog extends WindowBase {
             cal.add(Calendar.MINUTE, 1);
             if (new Date().after(cal.getTime())) {
                 // 最後に読み込んでから1分以上経過していたら再読み込み
-                this.loadLogFile();
+                this.updateContents();
             }
             this.setVisible(true);
             return;
@@ -250,26 +250,23 @@ public final class ResourceChartDialog extends WindowBase {
             }
         });
 
-        // 資材ログ読み込み
-        this.loadLogFile();
-
         // 画像ファイルとして保存のリスナー
         save.addSelectionListener(new SaveImageAdapter());
         // 資材テーブルを表示する
         this.setTableHeader();
-        if (this.log != null) {
-            this.setTableBody();
-            this.packTableHeader();
-        }
+        // データを読み込んで表示
+        this.updateContents();
     }
 
-    // 資材ログ読み込み
-    private void loadLogFile() {
+    private void updateContents() {
         File report = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), AppConstants.LOG_RESOURCE));
         try {
             this.log = ResourceLog.getInstance(report);
             if (this.log != null) {
                 this.body = createTableBody(this.log);
+                this.reloadImage();
+                this.setTableBody();
+                this.packTableHeader();
                 this.lastLoadDate = new Date();
             }
         } catch (IOException e) {
@@ -327,6 +324,7 @@ public final class ResourceChartDialog extends WindowBase {
      * テーブルボディーをセットする
      */
     private void setTableBody() {
+        this.table.removeAll();
         TableItemCreator creator = CreateReportLogic.DEFAULT_TABLE_ITEM_CREATOR;
         creator.init();
         for (int i = 0; i < this.body.size(); i++) {
