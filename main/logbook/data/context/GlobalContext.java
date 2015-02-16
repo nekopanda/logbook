@@ -1047,10 +1047,6 @@ public final class GlobalContext {
                 if (!battle.getRank().equals(lastPhase.getEstimatedRank())) {
                     LOG.info("戦闘結果判定ミス: 正解ランク:" + battle.getRank() + " " + lastPhase.getRankCalcInfo(battle));
                 }
-
-                for (int i = 0; i < (battleResultList.size() - AppConstants.MAX_LOG_SIZE); i++) {
-                    battleResultList.remove(0);
-                }
             }
             // 出撃を更新
             isStart = false;
