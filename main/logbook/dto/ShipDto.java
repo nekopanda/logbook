@@ -416,7 +416,9 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
             if (-1 != itemid) {
                 Map<Integer, ItemDto> itemMap = GlobalContext.getItemMap();
                 ItemDto item = itemMap.get(itemid);
-                accuracy += item.getParam().getHoum();
+                if (item != null) {
+                    accuracy += item.getParam().getHoum();
+                }
             }
         }
         return accuracy;
@@ -440,8 +442,10 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
             for (int itemid : this.slot) {
                 if (-1 != itemid) {
                     ItemDto item = itemMap.get(itemid);
-                    rai += item.getParam().getRaig();
-                    baku += item.getParam().getBaku();
+                    if (item != null) {
+                        rai += item.getParam().getRaig();
+                        baku += item.getParam().getBaku();
+                    }
                 }
             }
             return (int) Math.round(((this.getKaryoku() + rai) * 1.5d) + (baku * 2) + 55);
@@ -472,9 +476,11 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
         for (int itemid : this.slot) {
             if (-1 != itemid) {
                 ItemDto item = itemMap.get(itemid);
-                int taisen = item.getParam().getTais();
-                taisenShip -= taisen;
-                taisenItem += taisen;
+                if (item != null) {
+                    int taisen = item.getParam().getTais();
+                    taisenShip -= taisen;
+                    taisenItem += taisen;
+                }
             }
         }
         return (int) Math.round(Math.floor(taisenShip / 5d) + (taisenItem * 2) + 25);
