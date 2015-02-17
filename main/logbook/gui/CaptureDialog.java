@@ -64,7 +64,6 @@ public final class CaptureDialog extends WindowBase {
     private Text text;
     private Button capture;
     private Button twitter;
-    private Image twitterImage;
     private Button interval;
     private Spinner intervalms;
 
@@ -194,21 +193,9 @@ public final class CaptureDialog extends WindowBase {
 
         this.twitter = new Button(buttonComposite, SWT.NONE);
         this.twitter.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
-        this.twitterImage = SWTResourceManager.getImage(WindowBase.class, AppConstants.TWITTER);
         this.twitter.setEnabled(false);
         this.twitter.addSelectionListener(new TwitterAdapter());
-        this.twitter.addListener(SWT.Resize, new Listener() {
-            @Override
-            public void handleEvent(Event e) {
-                Rectangle rect = CaptureDialog.this.twitter.getBounds();
-                Image scaled = SwtUtils.scaleToFit(CaptureDialog.this.twitterImage, rect.width, rect.height);
-                Image old = CaptureDialog.this.twitter.getImage();
-                CaptureDialog.this.twitter.setImage(scaled);
-                if (old != null) {
-                    old.dispose();
-                }
-            }
-        });
+        SwtUtils.setButtonImage(this.twitter, SWTResourceManager.getImage(WindowBase.class, AppConstants.TWITTER));
 
         this.shell.addListener(SWT.Dispose, new Listener() {
             @Override

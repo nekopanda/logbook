@@ -7,21 +7,22 @@ import logbook.config.bean.ShipGroupBean;
  */
 public final class ShipFilterDto extends AbstractDto {
 
+    /** 0:グループ, 1:艦種, 2:その他 */
+    public int mode;
+
     /** 名前 */
     public String nametext;
     /** 名前.正規表現を使用する */
     public boolean regexp;
 
-    public boolean typeEnabled = false;
-
+    /** 艦種 */
     public boolean[] enabledType = null;
 
     /** グループ */
     public transient ShipGroupBean group;
     /** Beanで保存するときにグループはIDで参照したいので */
     public int groupId = 0;
-    /** 装備 */
-    public String itemname;
+
     /** 艦隊に所属 */
     public boolean onfleet = true;
     /** 艦隊に非所属 */

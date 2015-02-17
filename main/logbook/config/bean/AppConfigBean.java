@@ -257,6 +257,11 @@ public final class AppConfigBean {
             null, null, null, null
     };
 
+    /** 艦娘一覧ウィンドウのフィルタパネル表示・非表示 */
+    private boolean[] shipTablePanelVisibles = new boolean[] {
+            true, true, true, true
+    };
+
     /** 保存したJSONを読み込ませてテストするためのウィンドウメニューを表示するかどうか */
     private boolean enableTestWindow = false;
 
@@ -1614,6 +1619,20 @@ public final class AppConfigBean {
      */
     public void setTwitterTokenSecret(String twitterTokenSecret) {
         this.twitterTokenSecret = twitterTokenSecret;
+    }
+
+    /**
+     * @return shipTablePanelVisibles
+     */
+    public boolean[] getShipTablePanelVisibles() {
+        return this.shipTablePanelVisibles;
+    }
+
+    /**
+     * @param shipTablePanelVisibles セットする shipTablePanelVisibles
+     */
+    public void setShipTablePanelVisibles(boolean[] shipTablePanelVisibles) {
+        this.shipTablePanelVisibles = shipTablePanelVisibles;
     }
 
 }

@@ -1111,146 +1111,136 @@ public final class CreateReportLogic {
      * @return フィルタ結果
      */
     private static boolean shipFilter(ShipDto ship, ShipFilterDto filter, Set<Integer> missionSet) {
-        // テキストでフィルタ
-        if (!StringUtils.isEmpty(filter.nametext)) {
-            // 検索ワード
-            String[] words = StringUtils.split(filter.nametext, " ");
-            // 検索対象
-            // 名前
-            String name = ship.getName();
-            // 艦種
-            String type = ship.getType();
-            // 装備
-            List<ItemInfoDto> item = ship.getItem();
+        if (filter.mode == 2) {
+            // テキストでフィルタ
+            if (!StringUtils.isEmpty(filter.nametext)) {
+                // 検索ワード
+                String[] words = StringUtils.split(filter.nametext, " ");
+                // 検索対象
+                // 名前
+                String name = ship.getName();
+                // 艦種
+                String type = ship.getType();
+                // 装備
+                List<ItemInfoDto> item = ship.getItem();
 
-            // テキストが入力されている場合処理する
-            if (filter.regexp) {
-                // 正規表現で検索
-                for (int i = 0; i < words.length; i++) {
-                    Pattern pattern;
-                    try {
-                        pattern = Pattern.compile(words[i]);
-                    } catch (PatternSyntaxException e) {
-                        // 無効な正規表現はfalseを返す
-                        return false;
-                    }
-                    boolean find = false;
+                // テキストが入力されている場合処理する
+                if (filter.regexp) {
+                    // 正規表現で検索
+                    for (int i = 0; i < words.length; i++) {
+                        Pattern pattern;
+                        try {
+                            pattern = Pattern.compile(words[i]);
+                        } catch (PatternSyntaxException e) {
+                            // 無効な正規表現はfalseを返す
+                            return false;
+                        }
+                        boolean find = false;
 
-                    // 名前で検索
-                    find = find ? find : pattern.matcher(name).find();
-                    // 艦種で検索
-                    find = find ? find : pattern.matcher(type).find();
-                    // 装備で検索
-                    for (ItemInfoDto itemDto : item) {
-                        if ((itemDto == null) || (itemDto.getName() == null)) {
-                            find = find ? find : false;
-                        } else {
-                            find = find ? find : pattern.matcher(itemDto.getName()).find();
+                        // 名前で検索
+                        find = find ? find : pattern.matcher(name).find();
+                        // 艦種で検索
+                        find = find ? find : pattern.matcher(type).find();
+                        // 装備で検索
+                        for (ItemInfoDto itemDto : item) {
+                            if ((itemDto == null) || (itemDto.getName() == null)) {
+                                find = find ? find : false;
+                            } else {
+                                find = find ? find : pattern.matcher(itemDto.getName()).find();
+                            }
+                        }
+
+                        if (!find) {
+                            // どれにもマッチしない場合
+                            return false;
                         }
                     }
+                } else {
+                    // 部分一致で検索する
+                    for (int i = 0; i < words.length; i++) {
+                        boolean find = false;
 
-                    if (!find) {
-                        // どれにもマッチしない場合
-                        return false;
-                    }
-                }
-            } else {
-                // 部分一致で検索する
-                for (int i = 0; i < words.length; i++) {
-                    boolean find = false;
+                        // 名前で検索
+                        find = find ? find : name.indexOf(words[i]) != -1;
+                        // 艦種で検索
+                        find = find ? find : type.indexOf(words[i]) != -1;
+                        // 装備で検索
+                        for (ItemInfoDto itemDto : item) {
+                            if ((itemDto == null) || (itemDto.getName() == null)) {
+                                find = find ? find : false;
+                            } else {
+                                find = find ? find : itemDto.getName().indexOf(words[i]) != -1;
+                            }
+                        }
 
-                    // 名前で検索
-                    find = find ? find : name.indexOf(words[i]) != -1;
-                    // 艦種で検索
-                    find = find ? find : type.indexOf(words[i]) != -1;
-                    // 装備で検索
-                    for (ItemInfoDto itemDto : item) {
-                        if ((itemDto == null) || (itemDto.getName() == null)) {
-                            find = find ? find : false;
-                        } else {
-                            find = find ? find : itemDto.getName().indexOf(words[i]) != -1;
+                        if (!find) {
+                            // どれにもマッチしない場合
+                            return false;
                         }
                     }
-
-                    if (!find) {
-                        // どれにもマッチしない場合
-                        return false;
-                    }
+                }
+            }
+            // 艦隊に所属
+            if (!filter.onfleet) {
+                if (!StringUtils.isEmpty(ship.getFleetid())) {
+                    return false;
+                }
+            }
+            // 艦隊に非所属
+            if (!filter.notonfleet) {
+                if (StringUtils.isEmpty(ship.getFleetid())) {
+                    return false;
+                }
+            }
+            // 鍵付き
+            if (!filter.locked) {
+                if (ship.getLocked()) {
+                    return false;
+                }
+            }
+            // 鍵付きではない
+            if (!filter.notlocked) {
+                if (!ship.getLocked()) {
+                    return false;
+                }
+            }
+            if (!filter.mission || !filter.notmission) {
+                boolean isMission = missionSet.contains(ship.getId());
+                // 遠征中
+                if (!filter.mission && isMission) {
+                    return false;
+                }
+                // 遠征中ではない
+                if (!filter.notmission && !isMission) {
+                    return false;
+                }
+            }
+            if (!filter.needbath || !filter.notneedbath) {
+                boolean needBath = (ship.getDocktime() > 0) && !GlobalContext.isNdock(ship.getId());
+                // 要修理
+                if (!filter.needbath && needBath) {
+                    return false;
+                }
+                // 修理の必要なし
+                if (!filter.notneedbath && !needBath) {
+                    return false;
                 }
             }
         }
-        // 艦種でフィルタ
-        if (filter.typeEnabled && (filter.enabledType != null) &&
-                (filter.enabledType[ship.getStype()] == false))
-        {
-            return false;
-        }
-        // グループでフィルタ
-        if (filter.group != null) {
-            if (!filter.group.getShips().contains(ship.getId())) {
+        else if (filter.mode == 1) {
+            // 艦種でフィルタ
+            if ((filter.enabledType != null) &&
+                    (filter.enabledType[ship.getStype()] == false))
+            {
                 return false;
             }
         }
-        // 装備でフィルタ
-        if (!StringUtils.isEmpty(filter.itemname)) {
-            List<ItemInfoDto> item = ship.getItem();
-            boolean hit = false;
-            for (ItemInfoDto itemDto : item) {
-                if (itemDto != null) {
-                    if (filter.itemname.equals(itemDto.getName())) {
-                        hit = true;
-                        break;
-                    }
+        else {
+            // グループでフィルタ
+            if (filter.group != null) {
+                if (!filter.group.getShips().contains(ship.getId())) {
+                    return false;
                 }
-            }
-            if (!hit) {
-                return false;
-            }
-        }
-        // 艦隊に所属
-        if (!filter.onfleet) {
-            if (!StringUtils.isEmpty(ship.getFleetid())) {
-                return false;
-            }
-        }
-        // 艦隊に非所属
-        if (!filter.notonfleet) {
-            if (StringUtils.isEmpty(ship.getFleetid())) {
-                return false;
-            }
-        }
-        // 鍵付き
-        if (!filter.locked) {
-            if (ship.getLocked()) {
-                return false;
-            }
-        }
-        // 鍵付きではない
-        if (!filter.notlocked) {
-            if (!ship.getLocked()) {
-                return false;
-            }
-        }
-        if (!filter.mission || !filter.notmission) {
-            boolean isMission = missionSet.contains(ship.getId());
-            // 遠征中
-            if (!filter.mission && isMission) {
-                return false;
-            }
-            // 遠征中ではない
-            if (!filter.notmission && !isMission) {
-                return false;
-            }
-        }
-        if (!filter.needbath || !filter.notneedbath) {
-            boolean needBath = (ship.getDocktime() > 0) && !GlobalContext.isNdock(ship.getId());
-            // 要修理
-            if (!filter.needbath && needBath) {
-                return false;
-            }
-            // 修理の必要なし
-            if (!filter.notneedbath && !needBath) {
-                return false;
             }
         }
         return true;
