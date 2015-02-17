@@ -56,8 +56,10 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
     private MenuItem filterMenu;
     private MenuItem switchdiff;
     private MenuItem switchdiff2;
+    private int groupMenuPos;
     private MenuItem addGroupCascade;
     private MenuItem removeGroupCascade;
+    private final List<MenuItem> currentGroupItems = new ArrayList<MenuItem>();
 
     /**
      * @param parent
@@ -121,13 +123,14 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
         this.filterMenu = new MenuItem(this.opemenu, SWT.CHECK);
         this.filterMenu.setText("フィルターパネル(&D)\tCtrl+D");
         this.filterMenu.setAccelerator(SWT.CTRL + 'D');
-        this.filterMenu.setSelection(true);
         this.filterMenu.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 ShipTable.this.filterMenuSelected();
             }
         });
+        // デフォルト非表示
+        LayoutLogic.hide(this.filterCompo, !this.filterMenu.getSelection());
 
         // 検索（キーボードショートカットのため）
         MenuItem searchMenu = new MenuItem(this.opemenu, SWT.NONE);
@@ -162,6 +165,11 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
         new MenuItem(this.tablemenu, SWT.SEPARATOR);
 
         // グループメニュー作成
+        this.groupMenuPos = this.tablemenu.getItemCount();
+
+        // セパレータ
+        new MenuItem(this.tablemenu, SWT.SEPARATOR);
+
         this.addGroupCascade = new MenuItem(this.tablemenu, SWT.CASCADE);
         this.addGroupCascade.setText("選択した艦娘をグループに追加(&A)");
         this.removeGroupCascade = new MenuItem(this.tablemenu, SWT.CASCADE);
@@ -316,6 +324,28 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
         return menu;
     }
 
+    private void groupWidgetSelected(SelectionEvent e) {
+        MenuItem selectedItem = (MenuItem) e.widget;
+        boolean selection = selectedItem.getSelection();
+        if (selection) {
+            ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
+            ShipFilterDto filter = this.getFilter();
+            filter.group = bean;
+            filter.groupId = bean.getId();
+            // これだけ残してあとはオフる
+            for (MenuItem item : this.currentGroupItems) {
+                if (selectedItem != item) {
+                    item.setSelection(false);
+                }
+            }
+        }
+        else {
+            this.filter.group = null;
+            this.filter.groupId = 0;
+        }
+        ShipTable.this.updateFilter(this.filter);
+    }
+
     private List<ShipDto> getSelection() {
         List<ShipDto> ships = new ArrayList<>();
         TableItem[] tableItems = ShipTable.this.table.getSelection();
@@ -329,6 +359,35 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
     @Override
     public void listChanged() {
         List<ShipGroupBean> groups = ShipGroupConfig.get().getGroup();
+
+        for (MenuItem groupItem : this.currentGroupItems) {
+            groupItem.dispose();
+        }
+        this.currentGroupItems.clear();
+        if (groups.size() > 0) {
+            int insertPos = this.groupMenuPos;
+            for (ShipGroupBean groupBean : groups) {
+                final MenuItem groupItem = new MenuItem(this.tablemenu, SWT.CHECK, insertPos++);
+                groupItem.setText(groupBean.getName());
+                groupItem.setData(groupBean);
+                groupItem.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        ShipTable.this.groupWidgetSelected(e);
+                    }
+                });
+                if (this.filter.group == groupBean) {
+                    groupItem.setSelection(true);
+                }
+                this.currentGroupItems.add(groupItem);
+            }
+        }
+        else {
+            final MenuItem groupItem = new MenuItem(this.tablemenu, SWT.NONE, this.groupMenuPos);
+            groupItem.setText("グループがありません");
+            groupItem.setEnabled(false);
+            this.currentGroupItems.add(groupItem);
+        }
 
         Menu addGroupMenu = recreateCascadeMenu(this.addGroupCascade);
         for (ShipGroupBean groupBean : groups) {

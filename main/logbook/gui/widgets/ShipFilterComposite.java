@@ -109,10 +109,10 @@ public final class ShipFilterComposite extends Composite {
 
         this.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         GridLayout glComposite = new GridLayout(2, false);
-        glComposite.verticalSpacing = 2;
-        glComposite.horizontalSpacing = 2;
-        glComposite.marginHeight = 2;
-        glComposite.marginWidth = 2;
+        glComposite.verticalSpacing = 0;
+        glComposite.horizontalSpacing = 0;
+        glComposite.marginHeight = 0;
+        glComposite.marginWidth = 0;
         this.setLayout(glComposite);
 
         this.groupGroup = new Group(this, SWT.NONE);
@@ -133,14 +133,19 @@ public final class ShipFilterComposite extends Composite {
         this.shiptypegroup.setLayout(new RowLayout(SWT.HORIZONTAL));
         this.shiptypegroup.setText("艦種");
 
+        this.selectall = new Button(this.shiptypegroup, SWT.CHECK);
+        this.selectall.setText("全て選択");
+        this.selectall.addSelectionListener(new SelectAllSelectionAdapter());
+
         ///////////////////////////////////
 
         Group etcgroup = new Group(this, SWT.NONE);
         etcgroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
         GridLayout glEtcgroup = new GridLayout(3, false);
-        glEtcgroup.horizontalSpacing = 2;
-        glEtcgroup.marginHeight = 2;
-        glEtcgroup.marginWidth = 2;
+        glEtcgroup.verticalSpacing = 0;
+        glEtcgroup.horizontalSpacing = 0;
+        glEtcgroup.marginHeight = 0;
+        glEtcgroup.marginWidth = 0;
         etcgroup.setLayout(glEtcgroup);
         etcgroup.setText("その他");
 
@@ -285,11 +290,6 @@ public final class ShipFilterComposite extends Composite {
      * 艦種ボタンを削除して再作成
      */
     private void recreateShipTypeButtonos() {
-        if (this.selectall != null) {
-            this.selectall.setMenu(null);
-            this.selectall.dispose();
-            this.selectall = null;
-        }
         for (Button button : this.shipTypeButtons.values()) {
             button.setMenu(null);
             button.dispose();
@@ -314,10 +314,6 @@ public final class ShipFilterComposite extends Composite {
             this.shipTypeButtons.put(key, button);
             this.maxTypeId = Math.max(key, this.maxTypeId);
         }
-        this.selectall = new Button(this.shiptypegroup, SWT.CHECK);
-        this.selectall.setText("全て選択");
-        this.selectall.setSelection(true);
-        this.selectall.addSelectionListener(new SelectAllSelectionAdapter());
         this.shiptypegroup.layout();
     }
 
@@ -351,13 +347,18 @@ public final class ShipFilterComposite extends Composite {
         this.regexp.setSelection(filter.regexp);
 
         // 艦種設定
+        boolean allselected = true;
         if (filter.enabledType != null) {
             for (int i = 0; i < filter.enabledType.length; ++i) {
                 if (this.shipTypeButtons.containsKey(i)) {
+                    if (filter.enabledType[i] == false) {
+                        allselected = false;
+                    }
                     this.shipTypeButtons.get(i).setSelection(filter.enabledType[i]);
                 }
             }
         }
+        this.selectall.setSelection(allselected);
         if (filter.typeEnabled) {
             selectedGroupButton = this.groupShipTypeButton;
         }
@@ -486,6 +487,10 @@ public final class ShipFilterComposite extends Composite {
     private final class ApplyFilterSelectionAdapter extends SelectionAdapter {
         @Override
         public void widgetSelected(SelectionEvent e) {
+            Button button = (Button) e.getSource();
+            if (button.getSelection() == false) {
+                ShipFilterComposite.this.selectall.setSelection(false);
+            }
             if (ShipFilterComposite.this.changeEnabled)
                 ShipFilterComposite.this.shipTable.updateFilter(ShipFilterComposite.this.createFilter());
         }
