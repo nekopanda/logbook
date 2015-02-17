@@ -541,13 +541,13 @@ public class WindowBase {
      * @param newValue
      */
     protected void showTitlebarChanged(boolean showTitlebar) {
-        if (this.moveWithDrag()) {
-            this.showTitlebarItem.setSelection(showTitlebar);
-            if (this.showTitlebar != showTitlebar) {
-                this.showTitlebar = showTitlebar;
-                nativeService.toggleTitlebar(this.getShell(), showTitlebar);
-            }
+        //if (this.moveWithDrag()) {
+        this.showTitlebarItem.setSelection(showTitlebar);
+        if (this.showTitlebar != showTitlebar) {
+            this.showTitlebar = showTitlebar;
+            nativeService.toggleTitlebar(this.getShell(), showTitlebar);
         }
+        //}
     }
 
     private boolean isMouseHovering() {
@@ -617,17 +617,17 @@ public class WindowBase {
                 }
             });
 
-            if (this.moveWithDrag()) {
-                // タイトルバーを表示にする
-                this.showTitlebarItem = new MenuItem(rootMenu, SWT.CHECK);
-                this.showTitlebarItem.setText("タイトルバーを表示する");
-                this.showTitlebarItem.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent paramSelectionEvent) {
-                        WindowBase.this.treeNode.showTitlebarChanged(WindowBase.this);
-                    }
-                });
-            }
+            //if (this.moveWithDrag()) {
+            // タイトルバーを表示にする
+            this.showTitlebarItem = new MenuItem(rootMenu, SWT.CHECK);
+            this.showTitlebarItem.setText("タイトルバーを表示する");
+            this.showTitlebarItem.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent paramSelectionEvent) {
+                    WindowBase.this.treeNode.showTitlebarChanged(WindowBase.this);
+                }
+            });
+            //}
         }
 
         // マウスで不透明化
@@ -716,9 +716,9 @@ public class WindowBase {
         // 最前面に表示
         if (nativeService.isTopMostAvailable()) {
             this.topMostChanged(this.config.isTopMost());
-            if (this.moveWithDrag()) {
-                this.showTitlebarChanged(this.config.isShowTitlebar());
-            }
+            //if (this.moveWithDrag()) {
+            this.showTitlebarChanged(this.config.isShowTitlebar());
+            //}
         }
         // 透過設定
         boolean changeAnimation = (this.shareOpacitySetting != this.config.isShareOpacitySetting());
@@ -865,9 +865,9 @@ public class WindowBase {
                 // 最前面に表示
                 if (nativeService.isTopMostAvailable()) {
                     this.config.setTopMost(this.topMostItem.getSelection());
-                    if (this.moveWithDrag()) {
-                        this.config.setShowTitlebar(this.showTitlebarItem.getSelection());
-                    }
+                    //if (this.moveWithDrag()) {
+                    this.config.setShowTitlebar(this.showTitlebarItem.getSelection());
+                    //}
                 }
                 this.config.setMouseHoveringAware(this.treeNode.getMouseHoverAware());
                 this.config.setShareOpacitySetting(this.shareOpacitySetting);

@@ -144,8 +144,15 @@ public final class ShipFilterComposite extends Composite {
         this.typeCompo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
         this.typeCompo.setLayout(SwtUtils.makeGridLayout(1, 0, 0, 0, 0));
 
-        this.selectall = new Button(this.typeCompo, SWT.CHECK);
-        this.selectall.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1));
+        // 艦種カテゴリボタン
+        this.typeCheckCompo = new Composite(this.typeCompo, SWT.NONE);
+        this.typeCheckCompo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+        RowLayout rlTypeCheck = new RowLayout(SWT.HORIZONTAL);
+        rlTypeCheck.spacing = 1;
+        rlTypeCheck.marginBottom = rlTypeCheck.marginRight = rlTypeCheck.marginTop = 0;
+        this.typeCheckCompo.setLayout(rlTypeCheck);
+
+        this.selectall = new Button(this.typeCheckCompo, SWT.CHECK);
         this.selectall.setText("全て選択");
         this.selectall.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -158,11 +165,6 @@ public final class ShipFilterComposite extends Composite {
                     ShipFilterComposite.this.shipTable.updateFilter(ShipFilterComposite.this.createFilter());
             }
         });
-
-        // 艦種カテゴリボタン
-        this.typeCheckCompo = new Composite(this.typeCompo, SWT.NONE);
-        this.typeCheckCompo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
-        this.typeCheckCompo.setLayout(new RowLayout(SWT.HORIZONTAL));
 
         Composite typeSelectorCompo = new Composite(this.typeCompo, SWT.NONE);
         typeSelectorCompo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
@@ -192,7 +194,7 @@ public final class ShipFilterComposite extends Composite {
 
         Composite etcgroup = new Composite(this.etcCompo, SWT.NONE);
         etcgroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
-        etcgroup.setLayout(SwtUtils.makeGridLayout(3, 0, 0, 0, 0));
+        etcgroup.setLayout(SwtUtils.makeGridLayout(3, 0, 0, 3, 0));
 
         this.lockedAny = new Button(etcgroup, SWT.RADIO);
         this.lockedAny.setText("すべて");
