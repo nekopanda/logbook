@@ -52,12 +52,15 @@ public final class ShipFilterComposite extends Composite {
     /** 変更イベントを発生させるか？ */
     private boolean changeEnabled = false;
     private boolean panelVisible = true;
-    private int currentSelection;
-
-    private Composite contentCompo;
+    private boolean etcVisible = true;
+    private boolean groupMode = true;
 
     private Menu switchMenu;
-    private MenuItem[] switchMenuItem;
+    private MenuItem groupMenuItem;
+    private MenuItem typeMenuItem;
+    private MenuItem etcMenuItem;
+
+    private Composite switchCompo;
 
     private Composite groupCompo;
     private Button groupAllButton;
@@ -112,8 +115,9 @@ public final class ShipFilterComposite extends Composite {
         SelectionListener listener = new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                if (ShipFilterComposite.this.changeEnabled)
-                    ShipFilterComposite.this.shipTable.updateFilter(ShipFilterComposite.this.createFilter());
+                if (ShipFilterComposite.this.changeEnabled) {
+                    ShipFilterComposite.this.shipTable.updateFilter(ShipFilterComposite.this.createFilter(), true);
+                }
             }
         };
         SelectionListener groupListener = new SelectionAdapter() {
@@ -126,12 +130,12 @@ public final class ShipFilterComposite extends Composite {
         this.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         this.setLayout(SwtUtils.makeGridLayout(2, 0, 0, 0, 0));
 
-        this.contentCompo = new Composite(this, SWT.NONE);
-        this.contentCompo.setLayout(SwtUtils.makeGridLayout(1, 0, 0, 0, 0));
-        this.contentCompo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+        this.switchCompo = new Composite(this, SWT.NONE);
+        this.switchCompo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+        this.switchCompo.setLayout(SwtUtils.makeGridLayout(1, 0, 0, 0, 0));
 
         // グループタブ
-        this.groupCompo = new Composite(this.contentCompo, SWT.NONE);
+        this.groupCompo = new Composite(this.switchCompo, SWT.NONE);
         this.groupCompo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
         this.groupCompo.setLayout(new RowLayout(SWT.HORIZONTAL));
 
@@ -140,7 +144,7 @@ public final class ShipFilterComposite extends Composite {
         this.groupAllButton.addSelectionListener(groupListener);
 
         // 艦種タブ
-        this.typeCompo = new Composite(this.contentCompo, SWT.NONE);
+        this.typeCompo = new Composite(this.switchCompo, SWT.NONE);
         this.typeCompo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
         this.typeCompo.setLayout(SwtUtils.makeGridLayout(1, 0, 0, 0, 0));
 
@@ -161,8 +165,9 @@ public final class ShipFilterComposite extends Composite {
                 for (Button button : ShipFilterComposite.this.typeButtons.values()) {
                     button.setSelection(select);
                 }
-                if (ShipFilterComposite.this.changeEnabled)
-                    ShipFilterComposite.this.shipTable.updateFilter(ShipFilterComposite.this.createFilter());
+                if (ShipFilterComposite.this.changeEnabled) {
+                    ShipFilterComposite.this.shipTable.updateFilter(ShipFilterComposite.this.createFilter(), true);
+                }
             }
         });
 
@@ -185,11 +190,31 @@ public final class ShipFilterComposite extends Composite {
             button.addSelectionListener(categoryListener);
         }
 
-        ///////////////////////////////////
+        //------------------
 
-        // その他タブ
-        this.etcCompo = new Composite(this.contentCompo, SWT.NONE);
-        this.etcCompo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+        SelectionListener arrowButtonListener = new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                ShipFilterComposite.this.setGroupMode(!ShipFilterComposite.this.groupMode);
+                //ShipFilterComposite.this.shipTable.getFilterMenu().setGroupMode(ShipFilterComposite.this.groupMode);
+                ShipFilterComposite.this.shipTable.updateFilter(ShipFilterComposite.this.createFilter(), true);
+                ShipFilterComposite.this.shipTable.getShell().layout();
+            }
+        };
+
+        Button btnRight = new Button(this, SWT.NONE);
+        GridData gdBtnRight = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
+        gdBtnRight.widthHint = 24;
+        gdBtnRight.heightHint = 24;
+        btnRight.setLayoutData(gdBtnRight);
+        btnRight.addSelectionListener(arrowButtonListener);
+        SwtUtils.setButtonImage(btnRight, SWTResourceManager.getImage(WindowBase.class, AppConstants.R_ICON_RIGHT));
+
+        //------------------
+
+        // その他パネル
+        this.etcCompo = new Composite(this, SWT.NONE);
+        this.etcCompo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
         this.etcCompo.setLayout(SwtUtils.makeGridLayout(2, 0, 0, 0, 0));
 
         Composite etcgroup = new Composite(this.etcCompo, SWT.NONE);
@@ -234,7 +259,7 @@ public final class ShipFilterComposite extends Composite {
             @Override
             public void modifyText(ModifyEvent e) {
                 if (ShipFilterComposite.this.changeEnabled)
-                    ShipFilterComposite.this.shipTable.updateFilter(ShipFilterComposite.this.createFilter());
+                    ShipFilterComposite.this.shipTable.updateFilter(ShipFilterComposite.this.createFilter(), false);
             }
         });
         this.nametext.addSelectionListener(new SelectionAdapter() {
@@ -251,58 +276,46 @@ public final class ShipFilterComposite extends Composite {
         this.regexp.setText("正規表現");
         this.regexp.addSelectionListener(listener);
 
-        //------------------
-
-        Composite subCompo = new Composite(this, SWT.NONE);
-        RowLayout subCompoLayout = new RowLayout(SWT.HORIZONTAL);
-        subCompoLayout.wrap = false;
-        subCompoLayout.spacing = 1;
-        subCompoLayout.marginBottom = subCompoLayout.marginRight = subCompoLayout.marginTop = 0;
-        subCompo.setLayout(subCompoLayout);
-        subCompo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1));
-
-        SelectionListener arrowButtonListener = new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                Button button = (Button) e.getSource();
-                ShipFilterComposite.this.setSelection(
-                        (ShipFilterComposite.this.currentSelection + (Integer) button.getData()) % 3);
-                ShipFilterComposite.this.shipTable.getShell().layout();
-            }
-        };
-        Button btnLeft = new Button(subCompo, SWT.NONE);
-        btnLeft.addSelectionListener(arrowButtonListener);
-        btnLeft.setData(2);
-        SwtUtils.setButtonImage(btnLeft, SWTResourceManager.getImage(WindowBase.class, AppConstants.R_ICON_LEFT));
-        btnLeft.setLayoutData(new RowData(18, 18));
-
-        Button btnRight = new Button(subCompo, SWT.NONE);
-        btnRight.addSelectionListener(arrowButtonListener);
-        btnRight.setData(1);
-        SwtUtils.setButtonImage(btnRight, SWTResourceManager.getImage(WindowBase.class, AppConstants.R_ICON_RIGHT));
-        btnRight.setLayoutData(new RowData(18, 18));
-
-        //------------------
+        //-----------------------------
 
         this.switchMenu = new Menu(this);
-        final MenuItem[] switchMenuItem = this.switchMenuItem = new MenuItem[3];
-        String[] menuText = new String[] { "グループ", "艦種", "その他" };
-        for (int i = 0; i < 3; ++i) {
-            final int id = i;
-            final MenuItem item = switchMenuItem[i] = new MenuItem(this.switchMenu, SWT.CHECK);
-            item.setText(menuText[i]);
-            item.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    ShipFilterComposite.this.setSelection(id);
-                    ShipFilterComposite.this.shipTable.getShell().layout();
-                }
-            });
-        }
+
+        SelectionListener switchSelectionListener = new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                ShipFilterComposite.this.switchMenuSelected(e);
+            }
+        };
+
+        this.groupMenuItem = new MenuItem(this.switchMenu, SWT.CHECK);
+        this.groupMenuItem.setText("グループ");
+        this.groupMenuItem.setSelection(true);
+        this.groupMenuItem.addSelectionListener(switchSelectionListener);
+
+        this.typeMenuItem = new MenuItem(this.switchMenu, SWT.CHECK);
+        this.typeMenuItem.setText("艦種");
+        this.typeMenuItem.addSelectionListener(switchSelectionListener);
+
+        // セパレータ
+        new MenuItem(this.switchMenu, SWT.SEPARATOR);
+
+        this.etcMenuItem = new MenuItem(this.switchMenu, SWT.CHECK);
+        this.etcMenuItem.setText("その他");
+        this.etcMenuItem.setSelection(true);
+        this.etcMenuItem.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                ShipFilterComposite.this.setPanelVisible(
+                        ShipFilterComposite.this.panelVisible,
+                        ShipFilterComposite.this.etcMenuItem.getSelection());
+                ShipFilterComposite.this.shipTable.getShell().layout();
+            }
+        });
+
         setMenu(this, this.switchMenu);
         this.setData("disable-window-menu", new Object());
 
-        this.switchPanel(0);
+        this.switchPanel();
 
         final ShipGroupListener shipGroupListner = new ShipGroupListener() {
             @Override
@@ -344,7 +357,11 @@ public final class ShipFilterComposite extends Composite {
      * 現在のデータでパネル表示内容を更新
      * @param filter
      */
-    public void updateContents(ShipFilterDto filter, boolean panelVisible) {
+    public void updateContents(ShipFilterDto filter) {
+        this.updateContents(filter, this.panelVisible, this.etcVisible);
+    }
+
+    public void updateContents(ShipFilterDto filter, boolean panelVisible, boolean etcVisible) {
         this.changeEnabled = false;
         Set<String> items = new TreeSet<String>();
         for (ItemDto entry : GlobalContext.getItemMap().values()) {
@@ -357,40 +374,45 @@ public final class ShipFilterComposite extends Composite {
         this.recreateGroupButtons();
         this.recreateShipTypeButtonos();
         this.applyFilter(filter);
-        this.setPanelVisible(panelVisible);
+        this.setPanelVisible(panelVisible, etcVisible);
         this.changeEnabled = true;
     }
 
-    private Composite[] getPanels() {
-        return new Composite[] { this.groupCompo, this.typeCompo, this.etcCompo };
-    }
-
-    private void switchPanel(int panel) {
-        Composite[] panels = this.getPanels();
-        for (int i = 0; i < 3; ++i) {
-            LayoutLogic.hide(panels[i], i != panel);
+    private void switchMenuSelected(SelectionEvent e) {
+        MenuItem selectedItem = (MenuItem) e.widget;
+        if (selectedItem.getSelection() == false) {
+            // OFFにはできない
+            selectedItem.setSelection(true);
         }
-    }
-
-    public int getSelection() {
-        return this.currentSelection;
-    }
-
-    public void setSelection(int panel) {
-        if ((panel < 0) || (panel >= 3)) {
-            throw new IllegalArgumentException("Panel IDが不正です");
-        }
-        if (this.currentSelection != panel) {
-            for (int i = 0; i < 3; ++i) {
-                this.switchMenuItem[i].setSelection(panel == i);
-            }
-            if (this.panelVisible) {
-                this.switchPanel(panel);
-                this.contentCompo.layout();
-            }
-            this.currentSelection = panel;
+        else {
+            this.setGroupMode(selectedItem == this.groupMenuItem);
+            //this.shipTable.getFilterMenu().setGroupMode(this.groupMode);
             if (this.changeEnabled) {
-                this.shipTable.updateFilter(this.createFilter());
+                this.shipTable.updateFilter(this.createFilter(), true);
+                this.shipTable.getShell().layout();
+            }
+        }
+    }
+
+    private void switchPanel() {
+        LayoutLogic.hide(this.groupCompo, !this.groupMode);
+        LayoutLogic.hide(this.typeCompo, this.groupMode);
+        LayoutLogic.hide(this.etcCompo, !this.etcVisible);
+    }
+
+    public boolean isGroupMode() {
+        return this.groupMode;
+    }
+
+    public void setGroupMode(boolean groupMode) {
+        if (this.groupMode != groupMode) {
+            this.groupMode = groupMode;
+            this.groupMenuItem.setSelection(groupMode);
+            this.typeMenuItem.setSelection(!groupMode);
+            if (this.panelVisible) {
+                this.switchPanel();
+                //this.switchCompo.layout();
+                this.layout();
             }
         }
     }
@@ -399,13 +421,20 @@ public final class ShipFilterComposite extends Composite {
         return this.panelVisible;
     }
 
-    public void setPanelVisible(boolean visible) {
-        if (this.panelVisible != visible) {
-            LayoutLogic.hide(this, !visible);
-            if (visible) {
-                this.switchPanel(this.currentSelection);
+    public boolean getEtcVisible() {
+        return this.etcVisible;
+    }
+
+    public void setPanelVisible(boolean panelVisible, boolean etcVisible) {
+        if ((this.etcVisible != etcVisible) || (this.panelVisible != panelVisible)) {
+            this.etcVisible = etcVisible;
+            this.panelVisible = panelVisible;
+            this.etcMenuItem.setSelection(etcVisible);
+            LayoutLogic.hide(this, !panelVisible);
+            if (panelVisible) {
+                this.switchPanel();
+                this.layout();
             }
-            this.panelVisible = visible;
         }
     }
 
@@ -440,7 +469,7 @@ public final class ShipFilterComposite extends Composite {
         this.typeCompo.setRedraw(true);
 
         if (this.changeEnabled)
-            this.shipTable.updateFilter(this.createFilter());
+            this.shipTable.updateFilter(this.createFilter(), true);
     }
 
     /**
@@ -490,7 +519,7 @@ public final class ShipFilterComposite extends Composite {
                     ShipFilterComposite.this.selectall.setSelection(false);
                 }
                 if (ShipFilterComposite.this.changeEnabled)
-                    ShipFilterComposite.this.shipTable.updateFilter(ShipFilterComposite.this.createFilter());
+                    ShipFilterComposite.this.shipTable.updateFilter(ShipFilterComposite.this.createFilter(), true);
             }
         };
         for (Map.Entry<Integer, String> entry : ShipStyle.getMap().entrySet()) {
@@ -520,7 +549,7 @@ public final class ShipFilterComposite extends Composite {
      * グループや艦種などが作られている必要がある
      * @param filter
      */
-    private void applyFilter(ShipFilterDto filter) {
+    public void applyFilter(ShipFilterDto filter) {
         // 選択状態を初期化
         this.groupAllButton.setSelection(false);
         for (Button button : this.groupButtons) {
@@ -561,8 +590,8 @@ public final class ShipFilterComposite extends Composite {
             if (idx != -1) {
                 selectedGroupButton = this.groupButtons.get(idx);
             }
-            this.selectedGroup = filter.group;
         }
+        this.selectedGroup = filter.group;
         selectedGroupButton.setSelection(true);
 
         // 鍵付き？
@@ -583,7 +612,7 @@ public final class ShipFilterComposite extends Composite {
         this.needBath.setSelection(!filter.notneedbath);
 
         // タブ選択
-        this.setSelection(filter.mode);
+        this.setGroupMode(filter.groupMode);
     }
 
     public Combo getSearchCombo() {
@@ -597,7 +626,7 @@ public final class ShipFilterComposite extends Composite {
             if (button != this.groupAllButton) {
                 this.selectedGroup = (ShipGroupBean) data;
             }
-            this.shipTable.updateFilter(this.createFilter());
+            this.shipTable.updateFilter(this.createFilter(), true);
         }
     }
 
@@ -606,7 +635,7 @@ public final class ShipFilterComposite extends Composite {
      * 
      * @return フィルター
      */
-    private ShipFilterDto createFilter() {
+    public ShipFilterDto createFilter() {
         ShipFilterDto filter = this.shipTable.getFilter();
         filter.nametext = this.nametext.getText();
         filter.regexp = this.regexp.getSelection();
@@ -636,7 +665,7 @@ public final class ShipFilterComposite extends Composite {
         filter.notmission = true;
         filter.needbath = true;
         filter.notneedbath = !this.needBath.getSelection();
-        filter.mode = this.currentSelection;
+        filter.groupMode = this.groupMode;
 
         return filter;
     }

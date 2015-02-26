@@ -1,11 +1,11 @@
 package logbook.gui;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import logbook.config.AppConfig;
 import logbook.config.ShipGroupConfig;
+import logbook.config.bean.ShipFilterPanelConfigBean;
 import logbook.config.bean.ShipGroupBean;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipFilterDto;
@@ -53,11 +53,11 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
 
     private ShipFilterComposite filterCompo;
 
-    private MenuItem filterMenu;
     private MenuItem switchdiff;
     private MenuItem switchdiff2;
     private MenuItem addGroupCascade;
     private MenuItem removeGroupCascade;
+    private FilterMenu filterMenu;
 
     /**
      * @param parent
@@ -75,7 +75,7 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
         if (this.isWindowInitialized()) {
             // フィルタパネルの内容を更新しておく
             this.filterCompo.setRedraw(false);
-            this.filterCompo.updateContents(this.filter, this.filterCompo.getVisible());
+            this.filterCompo.updateContents(this.filter);
             this.filterCompo.layout();
             this.filterCompo.setRedraw(true);
         }
@@ -86,10 +86,17 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
      * フィルターを設定する
      * @param filter フィルター
      */
-    public void updateFilter(ShipFilterDto filter) {
+    public void updateFilter(ShipFilterDto filter, boolean applyToMenu) {
         this.filter = filter;
         this.reloadTable();
         this.shell.setText(this.getTitle());
+        if (applyToMenu) {
+            this.filterMenu.applyFilter(filter);
+        }
+    }
+
+    public void updateFilter(ShipFilterDto filter) {
+        this.updateFilter(filter, false);
     }
 
     @Override
@@ -117,31 +124,7 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
 
         this.table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         // メニューバーに追加する
-        // フィルターメニュー
-        this.filterMenu = new MenuItem(this.opemenu, SWT.CHECK);
-        this.filterMenu.setText("フィルターパネル(&D)\tCtrl+D");
-        this.filterMenu.setAccelerator(SWT.CTRL + 'D');
-        this.filterMenu.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                ShipTable.this.filterMenuSelected();
-                ShipTable.this.getShell().layout();
-            }
-        });
-
-        // 検索（キーボードショートカットのため）
-        MenuItem searchMenu = new MenuItem(this.opemenu, SWT.NONE);
-        searchMenu.setText("検索(&F)\tCtrl+F");
-        searchMenu.setAccelerator(SWT.CTRL + 'F');
-        searchMenu.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                ShipTable.this.focusOnSearchBox();
-            }
-        });
-
-        // セパレータ
-        new MenuItem(this.opemenu, SWT.SEPARATOR);
+        this.filterMenu = new FilterMenu(this.menubar);
 
         // 成長の余地を表示メニュー
         this.switchdiff = new MenuItem(this.opemenu, SWT.CHECK);
@@ -209,14 +192,11 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
                 }
             }
         }
-        boolean[] panelVisibles = AppConfig.get().getShipTablePanelVisibles();
-        boolean panelVisible = false;
-        if ((panelVisibles != null) && (panelVisibles.length > this.index)) {
-            panelVisible = panelVisibles[this.index];
-        }
-        this.filterCompo.updateContents(this.filter, panelVisible);
-        this.filterMenu.setSelection(panelVisible);
         this.listChanged();
+        ShipFilterPanelConfigBean panelConfig = this.getPanelConfig();
+        this.filterCompo.updateContents(this.filter, panelConfig.panelVisible, panelConfig.etcVisible);
+        this.filterMenu.applyFilter(this.filter);
+        this.filterMenu.setPanelVisible(panelConfig.panelVisible, panelConfig.etcVisible);
 
         ShipGroupObserver.addListener(this);
         this.table.addListener(SWT.Dispose, new Listener() {
@@ -227,7 +207,20 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
         });
 
         // ウィンドウタイトルを設定
+        this.reloadTable();
         this.shell.setText(this.getTitle());
+    }
+
+    private ShipFilterPanelConfigBean getPanelConfig() {
+        ShipFilterPanelConfigBean[] panelConfigs = AppConfig.get().getShipTablePanelVisibles();
+        if ((panelConfigs == null) || (panelConfigs.length < 4)) {
+            panelConfigs = new ShipFilterPanelConfigBean[4];
+            AppConfig.get().setShipTablePanelVisibles(panelConfigs);
+        }
+        if (panelConfigs[this.index] == null) {
+            panelConfigs[this.index] = new ShipFilterPanelConfigBean();
+        }
+        return panelConfigs[this.index];
     }
 
     private void switchSpecDiff(MenuItem source) {
@@ -239,26 +232,20 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
 
     private void focusOnSearchBox() {
         if ((this.filterCompo.getPanelVisible() == false) ||
-                (this.filterCompo.getSelection() != 2))
+                (this.filterCompo.getEtcVisible() == false))
         {
-            this.filterMenu.setSelection(true);
-            this.filterCompo.setSelection(2);
-            this.filterCompo.setPanelVisible(true);
+            this.filterMenu.setPanelVisible(true, true);
+            this.filterCompo.setPanelVisible(true, true);
             this.getShell().layout();
         }
         this.filterCompo.getSearchCombo().setFocus();
-    }
-
-    private void filterMenuSelected() {
-        this.filterCompo.setPanelVisible(this.filterMenu.getSelection());
-        this.getShell().layout();
     }
 
     @Override
     protected String getTitleMain() {
         String name = AppConfig.get().getShipTableNames()[this.index];
         if ((this.filter != null) &&
-                (this.filter.mode == 0) &&
+                (this.filter.groupMode) &&
                 (this.filter.group != null))
         {
             return name + " (" + this.filter.group.getName() + ")";
@@ -339,6 +326,8 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
 
     @Override
     public void listChanged() {
+        this.filterMenu.updateGroupList();
+
         List<ShipGroupBean> groups = ShipGroupConfig.get().getGroup();
 
         Menu addGroupMenu = recreateCascadeMenu(this.addGroupCascade);
@@ -408,17 +397,12 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
     public void save() {
         if (this.filter != null) {
             ShipFilterDto[] shipFilters = AppConfig.get().getShipFilters();
-            boolean[] panelVisibles = AppConfig.get().getShipTablePanelVisibles();
-            if ((shipFilters == null) || (shipFilters.length != 4)) {
-                shipFilters = new ShipFilterDto[4];
-            }
-            if ((panelVisibles == null) || (panelVisibles.length != 4)) {
-                panelVisibles = new boolean[4];
-                Arrays.fill(panelVisibles, true);
-            }
             shipFilters[this.index] = this.filter;
-            panelVisibles[this.index] = this.filterCompo.getVisible();
             AppConfig.get().setShipFilters(shipFilters);
+
+            ShipFilterPanelConfigBean panelConfig = this.getPanelConfig();
+            panelConfig.panelVisible = this.filterCompo.getPanelVisible();
+            panelConfig.etcVisible = this.filterCompo.getEtcVisible();
         }
         super.save();
     }
@@ -434,6 +418,196 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
     public void groupShipChanged(ShipGroupBean group) {
         if (this.filter.group == group) {
             this.reloadTable();
+        }
+    }
+
+    public FilterMenu getFilterMenu() {
+        return this.filterMenu;
+    }
+
+    public class FilterMenu {
+        private final MenuItem filterRoot;
+        private final Menu filterMenu;
+        private final MenuItem panelVisible;
+        private final MenuItem groupMenuItem;
+        private final MenuItem typeMenuItem;
+        private final MenuItem etcMenuItem;
+
+        private final int groupMenuPos;
+        private final List<MenuItem> groupItems = new ArrayList<MenuItem>();
+
+        public FilterMenu(Menu menubar) {
+            this.filterRoot = new MenuItem(menubar, SWT.CASCADE);
+            this.filterRoot.setText("フィルタ");
+            this.filterMenu = new Menu(this.filterRoot);
+            this.filterRoot.setMenu(this.filterMenu);
+
+            // フィルターメニュー
+            this.panelVisible = new MenuItem(this.filterMenu, SWT.CHECK);
+            this.panelVisible.setText("フィルターパネル(&D)\tCtrl+D");
+            this.panelVisible.setAccelerator(SWT.CTRL + 'D');
+            this.panelVisible.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    FilterMenu.this.panelVisibleChanged();
+                }
+            });
+
+            // 検索（キーボードショートカットのため）
+            MenuItem searchMenu = new MenuItem(this.filterMenu, SWT.NONE);
+            searchMenu.setText("検索(&F)\tCtrl+F");
+            searchMenu.setAccelerator(SWT.CTRL + 'F');
+            searchMenu.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    ShipTable.this.focusOnSearchBox();
+                }
+            });
+
+            // セパレータ
+            new MenuItem(this.filterMenu, SWT.SEPARATOR);
+
+            SelectionListener switchSelectionListener = new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    FilterMenu.this.switchMenuSelected(e);
+                }
+            };
+
+            this.groupMenuItem = new MenuItem(this.filterMenu, SWT.CHECK);
+            this.groupMenuItem.setText("グループ(&G)\tCtrl+G");
+            this.groupMenuItem.setAccelerator(SWT.CTRL + 'G');
+            this.groupMenuItem.addSelectionListener(switchSelectionListener);
+
+            this.typeMenuItem = new MenuItem(this.filterMenu, SWT.CHECK);
+            this.typeMenuItem.setText("艦種(&T)\tCtrl+T");
+            this.typeMenuItem.setAccelerator(SWT.CTRL + 'T');
+            this.typeMenuItem.addSelectionListener(switchSelectionListener);
+
+            // セパレータ
+            new MenuItem(this.filterMenu, SWT.SEPARATOR);
+
+            this.etcMenuItem = new MenuItem(this.filterMenu, SWT.CHECK);
+            this.etcMenuItem.setText("その他(&E)\tCtrl+E");
+            this.etcMenuItem.setAccelerator(SWT.CTRL + 'E');
+            this.etcMenuItem.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    ShipTable.this.filterCompo.setPanelVisible(
+                            FilterMenu.this.panelVisible.getSelection(),
+                            FilterMenu.this.etcMenuItem.getSelection());
+                    ShipTable.this.getShell().layout();
+                }
+            });
+
+            // セパレータ
+            new MenuItem(this.filterMenu, SWT.SEPARATOR);
+            this.groupMenuPos = this.filterMenu.getItemCount();
+        }
+
+        private void panelVisibleChanged() {
+            ShipTable.this.filterCompo.setPanelVisible(
+                    this.panelVisible.getSelection(), this.etcMenuItem.getSelection());
+            ShipTable.this.getShell().layout();
+        }
+
+        private void switchMenuSelected(SelectionEvent e) {
+            MenuItem selectedItem = (MenuItem) e.widget;
+            if (selectedItem.getSelection() == false) {
+                // OFFにはできない
+                selectedItem.setSelection(true);
+            }
+            else {
+                ShipTable.this.filterCompo.setGroupMode(selectedItem == this.groupMenuItem);
+                ShipTable.this.updateFilter(ShipTable.this.filterCompo.createFilter(), true);
+                ShipTable.this.getShell().layout();
+            }
+        }
+
+        public void setPanelVisible(boolean panelVisible, boolean etcVisible) {
+            this.panelVisible.setSelection(panelVisible);
+            this.etcMenuItem.setSelection(etcVisible);
+        }
+
+        private void setGroupMode(boolean group) {
+            this.groupMenuItem.setSelection(group);
+            this.typeMenuItem.setSelection(!group);
+        }
+
+        private void groupWidgetSelected(SelectionEvent e) {
+            MenuItem selectedItem = (MenuItem) e.widget;
+            boolean selection = selectedItem.getSelection();
+            ShipFilterDto filter = ShipTable.this.filter;
+            filter.groupMode = true;
+            if (selection) {
+                ShipGroupBean bean = (ShipGroupBean) e.widget.getData();
+                filter.group = bean;
+                filter.groupId = bean.getId();
+                // これだけ残してあとはオフる
+                for (MenuItem item : this.groupItems) {
+                    if (selectedItem != item) {
+                        item.setSelection(false);
+                    }
+                }
+            }
+            else {
+                filter.group = null;
+                filter.groupId = 0;
+            }
+            ShipTable.this.updateFilter(filter);
+            ShipTable.this.filterCompo.applyFilter(filter);
+            this.setGroupMode(true);
+            ShipTable.this.getShell().layout();
+        }
+
+        public void updateGroupList() {
+            List<ShipGroupBean> groups = ShipGroupConfig.get().getGroup();
+
+            for (MenuItem groupItem : this.groupItems) {
+                groupItem.dispose();
+            }
+            this.groupItems.clear();
+            if (groups.size() > 0) {
+                int insertPos = this.groupMenuPos;
+                for (ShipGroupBean groupBean : groups) {
+                    final MenuItem groupItem = new MenuItem(this.filterMenu, SWT.CHECK, insertPos++);
+                    groupItem.setText(groupBean.getName());
+                    groupItem.setData(groupBean);
+                    groupItem.addSelectionListener(new SelectionAdapter() {
+                        @Override
+                        public void widgetSelected(SelectionEvent e) {
+                            FilterMenu.this.groupWidgetSelected(e);
+                        }
+                    });
+                    if (ShipTable.this.filter.group == groupBean) {
+                        groupItem.setSelection(true);
+                    }
+                    this.groupItems.add(groupItem);
+                }
+            }
+            else {
+                final MenuItem groupItem = new MenuItem(this.filterMenu, SWT.NONE, this.groupMenuPos);
+                groupItem.setText("グループがありません");
+                groupItem.setEnabled(false);
+                this.groupItems.add(groupItem);
+            }
+        }
+
+        public void applyFilter(ShipFilterDto filter) {
+
+            // グループ
+            for (MenuItem item : this.groupItems) {
+                item.setSelection(false);
+            }
+            if ((filter.group != null) && filter.groupMode) {
+                int idx = ShipGroupConfig.get().getGroup().indexOf(filter.group);
+                if (idx != -1) {
+                    this.groupItems.get(idx).setSelection(true);
+                }
+            }
+
+            // モード
+            this.setGroupMode(filter.groupMode);
         }
     }
 }

@@ -258,9 +258,7 @@ public final class AppConfigBean {
     };
 
     /** 艦娘一覧ウィンドウのフィルタパネル表示・非表示 */
-    private boolean[] shipTablePanelVisibles = new boolean[] {
-            true, true, true, true
-    };
+    private ShipFilterPanelConfigBean[] shipTablePanelVisibles = new ShipFilterPanelConfigBean[4];
 
     /** 保存したJSONを読み込ませてテストするためのウィンドウメニューを表示するかどうか */
     private boolean enableTestWindow = false;
@@ -1624,14 +1622,14 @@ public final class AppConfigBean {
     /**
      * @return shipTablePanelVisibles
      */
-    public boolean[] getShipTablePanelVisibles() {
+    public ShipFilterPanelConfigBean[] getShipTablePanelVisibles() {
         return this.shipTablePanelVisibles;
     }
 
     /**
      * @param shipTablePanelVisibles セットする shipTablePanelVisibles
      */
-    public void setShipTablePanelVisibles(boolean[] shipTablePanelVisibles) {
+    public void setShipTablePanelVisibles(ShipFilterPanelConfigBean[] shipTablePanelVisibles) {
         this.shipTablePanelVisibles = shipTablePanelVisibles;
     }
 

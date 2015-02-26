@@ -31,7 +31,7 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
     public BathwaterTableDialog(Shell parent, MenuItem menuItem) {
         super(parent, menuItem);
         this.filter.notneedbath = false;
-        this.filter.mode = 2;
+        this.filter.groupMode = true;
     }
 
     @Override

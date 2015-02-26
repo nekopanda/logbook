@@ -7,8 +7,8 @@ import logbook.config.bean.ShipGroupBean;
  */
 public final class ShipFilterDto extends AbstractDto {
 
-    /** 0:グループ, 1:艦種, 2:その他 */
-    public int mode;
+    /** true:グループ, false:艦種 */
+    public boolean groupMode;
 
     /** 名前 */
     public String nametext;
