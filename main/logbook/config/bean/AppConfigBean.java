@@ -244,6 +244,9 @@ public final class AppConfigBean {
     /** タイトルバー以外でもドラッグ&ドロップで移動できるようにする */
     private boolean enableMoveWithDD = true;
 
+    /** ツールウィンドウのボタンをトグル方式にする */
+    private boolean toggleToolButton = true;
+
     /** 艦娘一覧ウィンドウの名前 */
     private String[] shipTableNames = new String[] {
             "所有艦娘一覧 1",
@@ -1631,6 +1634,20 @@ public final class AppConfigBean {
      */
     public void setShipTablePanelVisibles(ShipFilterPanelConfigBean[] shipTablePanelVisibles) {
         this.shipTablePanelVisibles = shipTablePanelVisibles;
+    }
+
+    /**
+     * @return toggleToolButton
+     */
+    public boolean isToggleToolButton() {
+        return this.toggleToolButton;
+    }
+
+    /**
+     * @param toggleToolButton セットする toggleToolButton
+     */
+    public void setToggleToolButton(boolean toggleToolButton) {
+        this.toggleToolButton = toggleToolButton;
     }
 
 }

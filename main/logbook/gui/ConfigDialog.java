@@ -85,7 +85,7 @@ public final class ConfigDialog extends Dialog {
      */
     private void createContents() {
         this.shell = new Shell(this.getParent(), this.getStyle());
-        this.shell.setSize(550, 400);
+        this.shell.setSize(600, 400);
         this.shell.setText(this.getText());
         this.shell.setLayout(new GridLayout(1, false));
 
@@ -259,32 +259,42 @@ public final class ConfigDialog extends Dialog {
         this.compositeMap.put("maintab", compositeMainTab);
         compositeMainTab.setLayout(new GridLayout(1, false));
 
-        final Button printSortieLog = new Button(compositeMainTab, SWT.CHECK);
+        Group logGroup = new Group(compositeMainTab, SWT.NONE);
+        logGroup.setText("母港タブのログ");
+        logGroup.setLayout(new GridLayout(1, false));
+        logGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        final Button printSortieLog = new Button(logGroup, SWT.CHECK);
         printSortieLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         printSortieLog.setText("マップや勝利判定をログに表示");
         printSortieLog.setSelection(AppConfig.get().isPrintSortieLog());
 
-        final Button printSunkLog = new Button(compositeMainTab, SWT.CHECK);
+        final Button printSunkLog = new Button(logGroup, SWT.CHECK);
         printSunkLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         printSunkLog.setText("艦娘の轟沈をログに表示（ダメコン未対応）");
         printSunkLog.setSelection(AppConfig.get().isPrintSunkLog());
 
-        final Button printUpdateLog = new Button(compositeMainTab, SWT.CHECK);
+        final Button printUpdateLog = new Button(logGroup, SWT.CHECK);
         printUpdateLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         printUpdateLog.setText("更新系ログを表示");
         printUpdateLog.setSelection(AppConfig.get().isPrintUpdateLog());
 
-        final Button loadCreateShipLog = new Button(compositeMainTab, SWT.CHECK);
+        Group loadReportGroup = new Group(compositeMainTab, SWT.NONE);
+        loadReportGroup.setText("報告書読み込み（起動時にCSVファイルを全て読み込みます）");
+        loadReportGroup.setLayout(new GridLayout(1, false));
+        loadReportGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        final Button loadCreateShipLog = new Button(loadReportGroup, SWT.CHECK);
         loadCreateShipLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         loadCreateShipLog.setText("建造報告書を読み込む*");
         loadCreateShipLog.setSelection(AppConfig.get().isLoadCreateShipLog());
 
-        final Button loadCreateItemLog = new Button(compositeMainTab, SWT.CHECK);
+        final Button loadCreateItemLog = new Button(loadReportGroup, SWT.CHECK);
         loadCreateItemLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         loadCreateItemLog.setText("開発報告書を読み込む*");
         loadCreateItemLog.setSelection(AppConfig.get().isLoadCreateItemLog());
 
-        final Button loadMissionLog = new Button(compositeMainTab, SWT.CHECK);
+        final Button loadMissionLog = new Button(loadReportGroup, SWT.CHECK);
         loadMissionLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         loadMissionLog.setText("遠征報告書を読み込む*");
         loadMissionLog.setSelection(AppConfig.get().isLoadMissionLog());
@@ -380,12 +390,17 @@ public final class ConfigDialog extends Dialog {
         useMonoIcon.setText("モノクロアイコンを使用");
         useMonoIcon.setSelection(AppConfig.get().isMonoIcon());
 
-        final Button useRecommendedSakuteki = new Button(compositeFleetTab, SWT.CHECK);
+        Group sakutekiGroup = new Group(compositeFleetTab, SWT.NONE);
+        sakutekiGroup.setText("索敵計算式");
+        sakutekiGroup.setLayout(new GridLayout(1, false));
+        sakutekiGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        final Button useRecommendedSakuteki = new Button(sakutekiGroup, SWT.CHECK);
         useRecommendedSakuteki.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        useRecommendedSakuteki.setText("推奨索敵計算式を使用する");
+        useRecommendedSakuteki.setText("推奨計算式を使用する");
         useRecommendedSakuteki.setSelection(AppConfig.get().isUseRecommendedSakuteki());
 
-        final Combo sakutekiCombo = new Combo(compositeFleetTab, SWT.READ_ONLY);
+        final Combo sakutekiCombo = new Combo(sakutekiGroup, SWT.READ_ONLY);
         sakutekiCombo.add("A.艦隊素の索敵値 + 装備の索敵値");
         sakutekiCombo.add("B.ほっぼアルファVer2.0.1(艦隊素の索敵分 + 装備分 + 提督Lv分)");
         sakutekiCombo.add("C.ほっぼアルファVer2.0.1(旧:2-5式(秋))");
@@ -595,17 +610,27 @@ public final class ConfigDialog extends Dialog {
         compositeWindow.setLayout(new GridLayout(3, false));
 
         final Button enableMoveWithDD = new Button(compositeWindow, SWT.CHECK);
-        enableMoveWithDD.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 3, 1));
+        enableMoveWithDD.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
         enableMoveWithDD.setSelection(AppConfig.get().isEnableMoveWithDD());
         enableMoveWithDD.setText("タイトルバー以外でもドラッグ&&ドロップで移動できるようにする*");
 
-        Label opaqueInterval = new Label(compositeWindow, SWT.NONE);
-        opaqueInterval.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-        opaqueInterval.setText("マウスが離れてから元の透明度に戻るまでの時間");
+        final Button toggleToolButton = new Button(compositeWindow, SWT.CHECK);
+        toggleToolButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        toggleToolButton.setSelection(AppConfig.get().isToggleToolButton());
+        toggleToolButton.setText("ツールウィンドウのボタンをトグル方式にする");
 
-        new Label(compositeWindow, SWT.NONE);
+        Group opaqueIntervalGroup = new Group(compositeWindow, SWT.NONE);
+        opaqueIntervalGroup.setText("マウスが離れてから元の透明度に戻るまでの時間");
+        opaqueIntervalGroup.setLayout(new GridLayout(2, false));
+        opaqueIntervalGroup.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 3, 1));
 
-        final Spinner opaqueIntervalSpinner = new Spinner(compositeWindow, SWT.BORDER);
+        //Label opaqueInterval = new Label(compositeWindow, SWT.NONE);
+        //opaqueInterval.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        //opaqueInterval.setText("マウスが離れてから元の透明度に戻るまでの時間");
+
+        //new Label(compositeWindow, SWT.NONE);
+
+        final Spinner opaqueIntervalSpinner = new Spinner(opaqueIntervalGroup, SWT.BORDER);
         opaqueIntervalSpinner.setMaximum(60 * 60 * 10);
         opaqueIntervalSpinner.setMinimum(0);
         opaqueIntervalSpinner.setSelection(AppConfig.get().getOpaqueInterval());
@@ -613,21 +638,26 @@ public final class ConfigDialog extends Dialog {
         gdopaqueIntervalSpinner.widthHint = 65;
         opaqueIntervalSpinner.setLayoutData(gdopaqueIntervalSpinner);
 
-        Label opaqueIntervalSuffix = new Label(compositeWindow, SWT.NONE);
+        Label opaqueIntervalSuffix = new Label(opaqueIntervalGroup, SWT.NONE);
         opaqueIntervalSuffix.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         opaqueIntervalSuffix.setText("x0.1秒");
 
-        Label shipTableName = new Label(compositeWindow, SWT.NONE);
-        shipTableName.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-        shipTableName.setText("艦娘一覧ウィンドウの名前設定");
+        Group shipTableNameGroup = new Group(compositeWindow, SWT.NONE);
+        shipTableNameGroup.setText("艦娘一覧ウィンドウの名前設定");
+        shipTableNameGroup.setLayout(new GridLayout(3, false));
+        shipTableNameGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+
+        //Label shipTableName = new Label(compositeWindow, SWT.NONE);
+        //shipTableName.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        //shipTableName.setText("艦娘一覧ウィンドウの名前設定");
 
         final Text[] shipTableNameText = new Text[4];
         for (int i = 0; i < 4; ++i) {
-            Label shipTableLabel = new Label(compositeWindow, SWT.NONE);
+            Label shipTableLabel = new Label(shipTableNameGroup, SWT.NONE);
             shipTableLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
             shipTableLabel.setText(String.valueOf(i + 1) + ": ");
-            shipTableNameText[i] = new Text(compositeWindow, SWT.BORDER);
-            shipTableNameText[i].setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
+            shipTableNameText[i] = new Text(shipTableNameGroup, SWT.BORDER);
+            shipTableNameText[i].setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
             shipTableNameText[i].setText(AppConfig.get().getShipTableNames()[i]);
         }
 
@@ -977,6 +1007,7 @@ public final class ConfigDialog extends Dialog {
                 // ウィンドウ
                 AppConfig.get().setOpaqueInterval(opaqueIntervalSpinner.getSelection());
                 AppConfig.get().setEnableMoveWithDD(enableMoveWithDD.getSelection());
+                AppConfig.get().setToggleToolButton(toggleToolButton.getSelection());
                 for (int i = 0; i < 4; ++i) {
                     AppConfig.get().getShipTableNames()[i] = shipTableNameText[i].getText();
                 }
