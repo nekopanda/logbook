@@ -305,9 +305,10 @@ public final class ShipFilterComposite extends Composite {
         this.etcMenuItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                ShipFilterComposite.this.setPanelVisible(
-                        ShipFilterComposite.this.panelVisible,
-                        ShipFilterComposite.this.etcMenuItem.getSelection());
+                boolean panelVisible = ShipFilterComposite.this.panelVisible;
+                boolean etcVisible = ShipFilterComposite.this.etcMenuItem.getSelection();
+                ShipFilterComposite.this.setPanelVisible(panelVisible, etcVisible);
+                ShipFilterComposite.this.shipTable.getFilterMenu().setPanelVisible(panelVisible, etcVisible);
                 ShipFilterComposite.this.shipTable.getShell().layout();
             }
         });
