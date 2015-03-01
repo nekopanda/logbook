@@ -576,7 +576,8 @@ public final class CreateReportLogic {
                 "砲撃戦火力",
                 "雷撃戦火力",
                 "対潜火力",
-                "夜戦火力"
+                "夜戦火力",
+                "改造可能"
         };
     }
 
@@ -688,6 +689,9 @@ public final class CreateReportLogic {
                 }
             }
 
+            boolean canRemodel = (ship.getShipInfo().getAfterlv() > 0)
+                    && (ship.getLv() >= ship.getShipInfo().getAfterlv());
+
             body.add(new Comparable[] {
                     new TableRowHeader(count, ship),
                     ship.getId(),
@@ -739,7 +743,8 @@ public final class CreateReportLogic {
                     ship.getHougekiPower(),
                     ship.getRaigekiPower(),
                     ship.getTaisenPower(),
-                    ship.getYasenPower()
+                    ship.getYasenPower(),
+                    canRemodel ? "可能" : null,
             });
         }
         return body;
