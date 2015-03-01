@@ -850,7 +850,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         }
         this.begin("tr", null);
         this.inline("td", "ドロップ", null);
-        this.inline("td", detail.isDropFlag() ? detail.getDropName() : "なし", null);
+        this.inline("td", (detail.isDropShip() || detail.isDropItem()) ? detail.getDropName() : "なし", null);
         this.end(); // tr
         this.end(); // table
     }

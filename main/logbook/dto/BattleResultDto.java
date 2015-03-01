@@ -8,6 +8,7 @@ import java.util.List;
 import javax.json.JsonObject;
 
 import logbook.constants.AppConstants;
+import logbook.internal.UseItem;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,7 +33,10 @@ public class BattleResultDto extends AbstractDto {
     private final String enemyName;
 
     /** ドロップフラグ */
-    private final boolean dropFlag;
+    private final boolean dropShip;
+
+    /** ドロップフラグ */
+    private final boolean dropItem;
 
     /** 艦種 */
     private final String dropType;
@@ -77,10 +81,17 @@ public class BattleResultDto extends AbstractDto {
         this.rank = ResultRank.fromRank(object.getString("api_win_rank"));
         this.mapCell = mapCell;
         this.enemyName = object.getJsonObject("api_enemy_info").getString("api_deck_name");
-        this.dropFlag = object.containsKey("api_get_ship");
-        if (this.dropFlag) {
-            this.dropType = object.getJsonObject("api_get_ship").getString("api_ship_type");
-            this.dropName = object.getJsonObject("api_get_ship").getString("api_ship_name");
+        this.dropShip = object.containsKey("api_get_ship");
+        this.dropItem = object.containsKey("api_get_useitem");
+        if (this.dropShip || this.dropItem) {
+            if (this.dropShip) {
+                this.dropType = object.getJsonObject("api_get_ship").getString("api_ship_type");
+                this.dropName = object.getJsonObject("api_get_ship").getString("api_ship_name");
+            } else {
+                String name = UseItem.get(object.getJsonObject("api_get_ship").getInt("api_useitem_id"));
+                this.dropType = "アイテム";
+                this.dropName = StringUtils.defaultString(name);
+            }
         } else {
             this.dropType = "";
             this.dropName = "";
@@ -102,7 +113,8 @@ public class BattleResultDto extends AbstractDto {
         this.rank = dto.getRank();
         this.mapCell = dto.getMapCellDto();
         this.enemyName = dto.getEnemyName();
-        this.dropFlag = dto.getDropName().length() > 0;
+        this.dropShip = dto.isDropShip();
+        this.dropItem = dto.isDropItem();
         this.dropType = dto.getDropType();
         this.dropName = dto.getDropName();
         this.battle = null;
@@ -243,8 +255,16 @@ public class BattleResultDto extends AbstractDto {
      * ドロップフラグを取得します。
      * @return ドロップフラグ
      */
-    public boolean isDropFlag() {
-        return this.dropFlag;
+    public boolean isDropShip() {
+        return this.dropShip;
+    }
+
+    /**
+     * ドロップフラグを取得します。
+     * @return ドロップフラグ
+     */
+    public boolean isDropItem() {
+        return this.dropItem;
     }
 
     /**

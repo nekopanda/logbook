@@ -156,7 +156,7 @@ public class BattleResultServer {
             String dropName = battle.getDropName();
             int[] map = battle.getMapCell().getMap();
 
-            if (battle.isDropFlag()) {
+            if (battle.isDropShip() || battle.isDropItem()) {
                 this.dropShipList.add(dropName);
             }
             this.mapList.add(new IntegerPair(map[0], map[1], "-"));
