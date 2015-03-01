@@ -346,7 +346,8 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
      * @return 次のレベルまでの経験値
      */
     public Integer getNext() {
-        Integer nextLvExp = ExpTable.get().get(this.lv + 1);
+        Integer nextLvExp = ExpTable.get().get(
+                Math.min(ExpTable.MAX_LEVEL, this.lv + 1));
         if (nextLvExp != null) {
             return nextLvExp - this.exp;
         }
