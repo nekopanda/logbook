@@ -2,8 +2,12 @@ package logbook.config;
 
 import java.io.IOException;
 
+import logbook.config.bean.ShipGroupBean;
 import logbook.config.bean.ShipGroupListBean;
 import logbook.constants.AppConstants;
+import logbook.gui.ApplicationMain;
+import logbook.gui.logic.ShipGroupListener;
+import logbook.gui.logic.ShipGroupObserver;
 import logbook.util.BeanUtils;
 
 import org.apache.logging.log4j.LogManager;
@@ -20,19 +24,47 @@ public class ShipGroupConfig {
     /** 所有艦娘グループ */
     private static ShipGroupListBean group;
 
+    /** 変更があったか */
+    private static boolean modified = false;
+
+    // 変更検出用
+    private static class ChangeListener implements ShipGroupListener {
+        @Override
+        public void listChanged() {
+            modified = true;
+        }
+
+        @Override
+        public void groupNameChanged(ShipGroupBean group) {
+            modified = true;
+        }
+
+        @Override
+        public void groupShipChanged(ShipGroupBean group) {
+            modified = true;
+        }
+    }
+
     // 始めてアクセスした時に読み込む
     static {
         load();
+        // 変更を検知する
+        ShipGroupObserver.addListener(new ChangeListener());
     }
 
     /**
      * 設定ファイルに書き込みます
      */
     public static void store() throws IOException {
-        if (group == null) {
-            group = new ShipGroupListBean();
+        // 変更があったときだけ書き込む
+        if (modified) {
+            if (group == null) {
+                group = new ShipGroupListBean();
+            }
+            ApplicationMain.sysPrint("グループファイル更新");
+            BeanUtils.writeObject(AppConstants.GROUP_CONFIG_FILE, group);
+            modified = false;
         }
-        BeanUtils.writeObject(AppConstants.GROUP_CONFIG_FILE, group);
     }
 
     /**

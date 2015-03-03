@@ -36,7 +36,7 @@ import org.xml.sax.InputSource;
 public final class PushNotify {
 
     /** 通知処理のキュー*/
-    private static Queue<String> notifyQueue = new ArrayBlockingQueue<String>(10);
+    private static Queue<String[]> notifyQueue = new ArrayBlockingQueue<String[]>(10);
 
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(PushNotify.class);
@@ -44,10 +44,12 @@ public final class PushNotify {
     /**
      * 通知メッセージを処理待ちキューに入れます
      * 
-     * @param string メッセージ
+     * @param String メッセージ
+     * @param Sgring イベント名
+     * @param int    priority
      */
-    public static void add(String notifymsg) {
-        notifyQueue.offer(notifymsg);
+    public static void add(String notifymsg, String eventname, int priority) {
+        notifyQueue.offer(new String[] { notifymsg, eventname, String.valueOf(priority) });
     }
 
     /**
@@ -55,7 +57,7 @@ public final class PushNotify {
      * 
      * @param String 通知メッセージ
      */
-    public static void push(String msg) {
+    public static void push(String[] msg) {
 
         if (AppConfig.get().getNotifyProwl()) {
             pushProwl(msg);
@@ -75,16 +77,16 @@ public final class PushNotify {
      * 
      * @param String 通知メッセージ
      */
-    private static void pushProwl(String msg) {
+    private static void pushProwl(String[] msg) {
 
         StringBuilder postdata = new StringBuilder();
         String result = null;
 
         addPOSTData(postdata, "apikey", AppConfig.get().getProwlAPIKey());
         addPOSTData(postdata, "application", AppConstants.PUSH_NOTIFY_APPNAME);
-        addPOSTData(postdata, "event", AppConstants.PUSH_NOTIFY_EVENT);
-        addPOSTData(postdata, "priority", AppConstants.PUSH_NOTIFY_PRIORITY);
-        addPOSTData(postdata, "description", msg);
+        addPOSTData(postdata, "description", msg[0]);
+        addPOSTData(postdata, "event", msg[1]);
+        addPOSTData(postdata, "priority", msg[2]);
 
         try {
             result = HttpPOSTRequest(AppConstants.PUSH_NOTIFY_PROWL_URI, postdata);
@@ -115,16 +117,16 @@ public final class PushNotify {
      * 
      * @param String 通知メッセージ
      */
-    private static void pushNMA(String msg) {
+    private static void pushNMA(String msg[]) {
 
         StringBuilder postdata = new StringBuilder();
         String result = null;
 
         addPOSTData(postdata, "apikey", AppConfig.get().getNMAAPIKey());
         addPOSTData(postdata, "application", AppConstants.PUSH_NOTIFY_APPNAME);
-        addPOSTData(postdata, "priority", AppConstants.PUSH_NOTIFY_PRIORITY);
-        addPOSTData(postdata, "event", AppConstants.PUSH_NOTIFY_EVENT);
-        addPOSTData(postdata, "description", msg);
+        addPOSTData(postdata, "description", msg[0]);
+        addPOSTData(postdata, "event", msg[1]);
+        addPOSTData(postdata, "priority", msg[2]);
 
         try {
             result = HttpPOSTRequest(AppConstants.PUSH_NOTIFY_NMA_URI, postdata);
@@ -155,7 +157,7 @@ public final class PushNotify {
      * 
      * @param String 通知メッセージ
      */
-    private static void pushImKayac(String msg) {
+    private static void pushImKayac(String msg[]) {
 
         StringBuilder postdata = new StringBuilder();
         String result = null;
@@ -163,7 +165,7 @@ public final class PushNotify {
         try {
             if (AppConfig.get().getImKayacPrivateKey() != "") {
                 MessageDigest md = MessageDigest.getInstance("SHA-1");
-                String sigstr = msg + AppConfig.get().getImKayacPrivateKey();
+                String sigstr = msg[0] + AppConfig.get().getImKayacPrivateKey();
                 StringBuffer buffer = new StringBuffer();
                 md.update(sigstr.getBytes("UTF-8"));
                 byte[] digest = md.digest();
@@ -177,11 +179,11 @@ public final class PushNotify {
                 }
                 String sig = buffer.toString();
                 addPOSTData(postdata, "sig", sig);
-                addPOSTData(postdata, "message", msg);
+                addPOSTData(postdata, "message", msg[0]);
                 result = HttpPOSTRequest(AppConstants.PUSH_NOTIFY_IMKAYAC_URI + AppConfig.get().getImKayacUserName(),
                         postdata);
             } else {
-                addPOSTData(postdata, "message", msg);
+                addPOSTData(postdata, "message", msg[0]);
                 addPOSTData(postdata, "password", AppConfig.get().getImKayacPasswd());
                 result = HttpPOSTRequest(AppConstants.PUSH_NOTIFY_IMKAYAC_URI + AppConfig.get().getImKayacUserName(),
                         postdata);
@@ -291,7 +293,7 @@ public final class PushNotify {
         public void run() {
             try {
                 while (true) {
-                    String msg = notifyQueue.poll();
+                    String msg[] = notifyQueue.poll();
                     if (msg != null) {
                         push(msg);
                     }

@@ -4,16 +4,21 @@
 package logbook.dto;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
+import javax.json.JsonValue;
 
 import logbook.data.context.GlobalContext;
 import logbook.internal.EnemyData;
+import logbook.internal.UseItem;
 import logbook.util.JsonUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.dyuproject.protostuff.Tag;
 
@@ -99,7 +104,11 @@ public class BattleExDto extends AbstractDto {
 
     /** ドロップフラグ */
     @Tag(22)
-    private boolean dropFlag;
+    private boolean dropShip;
+
+    /** ドロップフラグ */
+    @Tag(39)
+    private boolean dropItem;
 
     /** 艦種 */
     @Tag(23)
@@ -115,6 +124,33 @@ public class BattleExDto extends AbstractDto {
 
     @Tag(26)
     private int mvpCombined;
+
+    /** 提督Lv */
+    @Tag(27)
+    private int hqLv;
+
+    /** 
+     * BattleExDtoのバージョン
+     * exVersion == 0 : Tag 34以降がない
+     * exVersion == 1 : Tag 36まである
+     *  */
+    @Tag(34)
+    private int exVersion = 1;
+
+    /** 母港空き（ドロップ分を含まない） */
+    @Tag(35)
+    private int shipSpace;
+
+    /** 装備空き（ドロップ分を含まない） */
+    @Tag(36)
+    private int itemSpace;
+
+    /** 連合艦隊における退避意見 [退避する艦(0-11), 護衛艦(0-11)] */
+    @Tag(37)
+    private int[] escapeInfo;
+
+    @Tag(38)
+    private boolean[] escaped;
 
     /////////////////////////////////////////////////
 
@@ -221,13 +257,18 @@ public class BattleExDto extends AbstractDto {
             JsonNumber support_flag = object.getJsonNumber("api_support_flag");
             if ((support_flag != null) && (support_flag.intValue() != 0)) {
                 JsonObject support = object.getJsonObject("api_support_info");
-                if (support != null) {
-                    JsonObject support_hourai = support.getJsonObject("api_support_hourai");
-                    if (support_hourai != null) {
-                        JsonArray edam = support_hourai.getJsonArray("api_damage");
-                        if (edam != null) {
-                            this.support = BattleAtackDto.makeSupport(edam);
-                        }
+                JsonValue support_hourai = support.get("api_support_hourai");
+                JsonValue support_air = support.get("api_support_airatack");
+                if ((support_hourai != null) && (support_hourai != JsonValue.NULL)) {
+                    JsonArray edam = ((JsonObject) support_hourai).getJsonArray("api_damage");
+                    if (edam != null) {
+                        this.support = BattleAtackDto.makeSupport(edam);
+                    }
+                }
+                else if ((support_air != null) && (support_air != JsonValue.NULL)) {
+                    JsonValue stage3 = ((JsonObject) support_air).get("api_stage3");
+                    if ((stage3 != null) && (stage3 != JsonValue.NULL)) {
+                        this.support = BattleAtackDto.makeSupport(((JsonObject) stage3).getJsonArray("api_edam"));
                     }
                 }
                 this.supportType = toSupport(support_flag.intValue());
@@ -242,18 +283,16 @@ public class BattleExDto extends AbstractDto {
                 this.air2 = new AirBattleDto(kouku2, isCombined);
 
             // 開幕
-            this.opening = BattleAtackDto.makeRaigeki(object.get("api_opening_atack"), isCombined);
+            this.opening = BattleAtackDto.makeRaigeki(object.get("api_opening_atack"), kind.isOpeningSecond());
 
             // 砲撃
-            this.hougeki = BattleAtackDto.makeHougeki(object.get("api_hougeki"), (isCombined && this.isNight)); // 夜戦
-            this.hougeki1 = BattleAtackDto.makeHougeki(object.get("api_hougeki1"), isCombined);
+            this.hougeki = BattleAtackDto.makeHougeki(object.get("api_hougeki"), kind.isHougekiSecond()); // 夜戦
+            this.hougeki1 = BattleAtackDto.makeHougeki(object.get("api_hougeki1"), kind.isHougeki1Second());
+            this.hougeki2 = BattleAtackDto.makeHougeki(object.get("api_hougeki2"), kind.isHougeki2Second());
+            this.hougeki3 = BattleAtackDto.makeHougeki(object.get("api_hougeki3"), kind.isHougeki3Second());
 
             // 雷撃
-            this.raigeki = BattleAtackDto.makeRaigeki(object.get("api_raigeki"), isCombined);
-
-            // 砲撃（連合艦隊用）
-            this.hougeki2 = BattleAtackDto.makeHougeki(object.get("api_hougeki2"), false);
-            this.hougeki3 = BattleAtackDto.makeHougeki(object.get("api_hougeki3"), false);
+            this.raigeki = BattleAtackDto.makeRaigeki(object.get("api_raigeki"), kind.isRaigekiSecond());
 
             // ダメージを反映 //
 
@@ -636,6 +675,11 @@ public class BattleExDto extends AbstractDto {
         this.battleDate = date;
     }
 
+    public void setBasicInfo(int shipSpace, int itemSpace) {
+        this.shipSpace = shipSpace;
+        this.itemSpace = itemSpace;
+    }
+
     public Phase addPhase(JsonObject object, BattlePhaseKind kind) {
         if (this.phaseList.size() == 0) {
             // 最初のフェーズ
@@ -749,6 +793,22 @@ public class BattleExDto extends AbstractDto {
                         this.friendGaugeMax += this.startFriendHpCombined[i - 1] = hp;
                     }
                 }
+
+                // 退避
+                this.escaped = new boolean[12];
+                if (JsonUtils.hasKey(object, "api_escape_idx")) {
+                    for (JsonValue jsonShip : object.getJsonArray("api_escape_idx")) {
+                        this.escaped[((JsonNumber) jsonShip).intValue() - 1] = true;
+                    }
+                }
+                if (JsonUtils.hasKey(object, "api_escape_idx_combined")) {
+                    for (JsonValue jsonShip : object.getJsonArray("api_escape_idx_combined")) {
+                        this.escaped[(((JsonNumber) jsonShip).intValue() - 1) + 6] = true;
+                    }
+                }
+                for (int i = 0; i < 2; ++i) {
+                    this.friends.get(i).setEscaped(Arrays.copyOfRange(this.escaped, i * 6, (i + 1) * 6));
+                }
             }
         }
 
@@ -781,10 +841,17 @@ public class BattleExDto extends AbstractDto {
         }
         this.mapCellDto = mapInfo;
         this.enemyName = object.getJsonObject("api_enemy_info").getString("api_deck_name");
-        this.dropFlag = object.containsKey("api_get_ship");
-        if (this.isDropFlag()) {
-            this.dropType = object.getJsonObject("api_get_ship").getString("api_ship_type");
-            this.dropName = object.getJsonObject("api_get_ship").getString("api_ship_name");
+        this.dropShip = object.containsKey("api_get_ship");
+        this.dropItem = object.containsKey("api_get_useitem");
+        if (this.dropShip || this.dropItem) {
+            if (this.dropShip) {
+                this.dropType = object.getJsonObject("api_get_ship").getString("api_ship_type");
+                this.dropName = object.getJsonObject("api_get_ship").getString("api_ship_name");
+            } else {
+                String name = UseItem.get(object.getJsonObject("api_get_useitem").getInt("api_useitem_id"));
+                this.dropType = "アイテム";
+                this.dropName = StringUtils.defaultString(name);
+            }
         } else {
             this.dropType = "";
             this.dropName = "";
@@ -792,6 +859,14 @@ public class BattleExDto extends AbstractDto {
         this.mvp = object.getInt("api_mvp");
         if (JsonUtils.hasKey(object, "api_mvp_combined")) {
             this.mvpCombined = object.getInt("api_mvp_combined");
+        }
+        this.hqLv = object.getInt("api_member_lv");
+        if (JsonUtils.hasKey(object, "api_escape")) {
+            JsonObject jsonEscape = object.getJsonObject("api_escape");
+            this.escapeInfo = new int[] {
+                    jsonEscape.getJsonArray("api_escape_idx").getInt(0) - 1,
+                    jsonEscape.getJsonArray("api_tow_idx").getInt(0) - 1
+            };
         }
     }
 
@@ -1086,10 +1161,17 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
-     * @return dropFlag
+     * @return dropShip
      */
-    public boolean isDropFlag() {
-        return this.dropFlag;
+    public boolean isDropShip() {
+        return this.dropShip;
+    }
+
+    /**
+     * @return dropItem
+     */
+    public boolean isDropItem() {
+        return this.dropItem;
     }
 
     /**
@@ -1125,5 +1207,68 @@ public class BattleExDto extends AbstractDto {
      */
     public int getMvpCombined() {
         return this.mvpCombined;
+    }
+
+    /**
+     * @return hqLv
+     */
+    public int getHqLv() {
+        return this.hqLv;
+    }
+
+    /**
+     * @return exVersion
+     */
+    public int getExVersion() {
+        return this.exVersion;
+    }
+
+    /**
+     * @param exVersion セットする exVersion
+     */
+    public void setExVersion(int exVersion) {
+        this.exVersion = exVersion;
+    }
+
+    /**
+     * @return shipSpace
+     */
+    public int getShipSpace() {
+        return this.shipSpace;
+    }
+
+    /**
+     * @param shipSpace セットする shipSpace
+     */
+    public void setShipSpace(int shipSpace) {
+        this.shipSpace = shipSpace;
+    }
+
+    /**
+     * @return itemSpace
+     */
+    public int getItemSpace() {
+        return this.itemSpace;
+    }
+
+    /**
+     * @param itemSpace セットする itemSpace
+     */
+    public void setItemSpace(int itemSpace) {
+        this.itemSpace = itemSpace;
+    }
+
+    /**
+     * @return escapeInfo
+     */
+    public int[] getEscapeInfo() {
+        return this.escapeInfo;
+    }
+
+    /**
+     * @return escaped
+     */
+    public boolean[] getEscaped() {
+        return this.escaped;
     }
 }

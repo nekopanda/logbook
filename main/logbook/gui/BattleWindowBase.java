@@ -111,11 +111,13 @@ public class BattleWindowBase extends WindowBase {
                         BattleWindowBase.this.getShell().setSize(winSize);
                     }
 
+                    BattleWindowBase.this.clearText();
                     BattleWindowBase.this.updateData(false);
                 }
             });
         }
         else {
+            this.clearText();
             this.updateData(false);
             this.setVisible(true);
         }

@@ -1,156 +1,84 @@
+/**
+ * 
+ */
 package logbook.dto;
 
-import javax.json.JsonObject;
+import java.beans.Transient;
 
-import logbook.constants.AppConstants;
-import logbook.internal.ItemType;
-import logbook.util.JsonUtils;
+import javax.json.JsonObject;
 
 import com.dyuproject.protostuff.Tag;
 
 /**
- * 装備を表します
+ * @author Nekopanda
  *
  */
-public final class ItemDto extends AbstractDto {
+public class ItemDto extends AbstractDto {
 
+    /** 本体情報（永続化はIDのみで十分なので戻したときはリンクを張り直す） */
     @Tag(1)
-    private int id;
-    /**
-     * [0]: 大分類（砲、魚雷、艦載機、...）
-     * [1]: 種別(夜戦判定)（主砲、副砲、魚雷、...）
-     * [2]: 装備可能艦種別分類
-     * [3]: 表示用の分類
-     */
-    @Tag(2)
-    private int[] type = new int[4];
-    @Tag(3)
-    private String name;
-    @Tag(4)
-    private ShipParameters param;
+    private transient ItemInfoDto info;
 
-    /**
-     * コンストラクター
-     */
+    @Tag(2)
+    private int slotitemId;
+
+    @Tag(3)
+    private int id;
+
+    @Tag(4)
+    private boolean locked;
+
+    @Tag(5)
+    private int level;
+
     public ItemDto() {
     }
 
-    /**
-     * コンストラクター
-     * 
-     * @param object JSON Object
-     */
-    public ItemDto(JsonObject object) {
-        this.id = object.getJsonNumber("api_id").intValue();
-        this.type = JsonUtils.getIntArray(object, "api_type");
-        this.name = object.getString("api_name");
-        this.param = ShipParameters.fromMasterItem(object);
-    }
-
-    /**
-     * コンストラクター
-     * 
-     * @param id
-     * @param type2
-     * @param type3
-     * @param atap
-     * @param bakk
-     * @param baku
-     * @param houg
-     * @param houk
-     * @param houm
-     * @param leng
-     * @param luck
-     * @param name
-     * @param raig
-     * @param raik
-     * @param raim
-     * @param rare
-     * @param sakb
-     * @param saku
-     * @param soku
-     * @param souk
-     * @param taik
-     * @param tais
-     * @param tyku
-     */
-    public ItemDto(int id, int type2, int type3, int atap, int bakk, int baku, int houg, int houk, int houm,
-            int leng, int luck, String name, int raig, int raik, int raim, int rare, int sakb, int saku,
-            int soku, int souk, int taik, int tais, int tyku) {
-        this.id = id;
-        this.type[2] = type2;
-        this.type[3] = type3;
-        this.name = name;
-        this.param = new ShipParameters(taik, houg, houm, raig, baku, tyku, souk,
-                houk, tais, saku, luck, soku, leng);
-    }
-
-    public boolean isPlane() {
-        for (int i = 0; i < AppConstants.PLANE_ITEM_TYPES.length; ++i) {
-            if (this.type[2] == AppConstants.PLANE_ITEM_TYPES[i]) {
-                return true;
-            }
+    public ItemDto(ItemInfoDto info, JsonObject object) {
+        this.info = info;
+        this.slotitemId = info.getId();
+        this.id = object.getInt("api_id");
+        if (object.containsKey("api_locked")) {
+            this.locked = object.getInt("api_locked") != 0;
+            this.level = object.getInt("api_level");
         }
-        return false;
+        else {
+            this.locked = false;
+            this.level = 0;
+        }
     }
 
     /**
-     * @return 表示分類名
+     * @return info
      */
-    public String getTypeName() {
-        return ItemType.get(this.type[3]);
+    // java beans はメソッドで認識するのでここに付ける必要がある
+    @Transient
+    public ItemInfoDto getInfo() {
+        return this.info;
     }
 
     /**
-     * typeを設定します。
-     * @param type type
+     * @param info セットする info
      */
-    public void setType(int[] type) {
-        this.type = type;
+    public void setInfo(ItemInfoDto info) {
+        this.info = info;
     }
 
     /**
-     * typeを取得します。
-     * @return type
+     * @return slotitemId
      */
-    public int[] getType() {
-        return this.type;
+    public int getSlotitemId() {
+        return this.slotitemId;
     }
 
     /**
-     * type0を取得します。
-     * @return type0
+     * @param slotitemId セットする slotitemId
      */
-    public int getType0() {
-        return this.type[0];
+    public void setSlotitemId(int slotitemId) {
+        this.slotitemId = slotitemId;
     }
 
     /**
-     * type1を取得します。
-     * @return type1
-     */
-    public int getType1() {
-        return this.type[1];
-    }
-
-    /**
-     * type2を取得します。
-     * @return type2
-     */
-    public int getType2() {
-        return this.type[2];
-    }
-
-    /**
-     * type3を取得します。
-     * @return type3
-     */
-    public int getType3() {
-        return this.type[3];
-    }
-
-    /**
-     * idを取得します。
      * @return id
      */
     public int getId() {
@@ -158,11 +86,89 @@ public final class ItemDto extends AbstractDto {
     }
 
     /**
-     * idを設定します。
-     * @param id id
+     * @param id セットする id
      */
     public void setId(int id) {
         this.id = id;
+    }
+
+    /**
+     * @return locked
+     */
+    public boolean isLocked() {
+        return this.locked;
+    }
+
+    /**
+     * @param locked セットする locked
+     */
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
+
+    /**
+     * @return level
+     */
+    public int getLevel() {
+        return this.level;
+    }
+
+    /**
+     * @param level セットする level
+     */
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public boolean isPlane() {
+        return this.info.isPlane();
+    }
+
+    /**
+     * @return 表示分類名
+     */
+    public String getTypeName() {
+        return this.info.getTypeName();
+    }
+
+    /**
+     * typeを取得します。
+     * @return type
+     */
+    public int[] getType() {
+        return this.info.getType();
+    }
+
+    /**
+     * type0を取得します。
+     * @return type0
+     */
+    public int getType0() {
+        return this.info.getType0();
+    }
+
+    /**
+     * type1を取得します。
+     * @return type1
+     */
+    public int getType1() {
+        return this.info.getType1();
+    }
+
+    /**
+     * type2を取得します。
+     * @return type2
+     */
+    public int getType2() {
+        return this.info.getType2();
+    }
+
+    /**
+     * type3を取得します。
+     * @return type3
+     */
+    public int getType3() {
+        return this.info.getType3();
     }
 
     /**
@@ -170,41 +176,21 @@ public final class ItemDto extends AbstractDto {
      * @return name
      */
     public String getName() {
-        return this.name;
+        return this.info.getName();
     }
 
     /**
-     * nameを設定します。
-     * @param name name
+     * 表示名を取得
+     * @return
      */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public int hashCode() {
-        return this.name.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if ((obj != null) && (obj instanceof ItemDto)) {
-            return this.name.equals(((ItemDto) obj).getName());
+    public String getFriendlyName() {
+        if (this.level > 0) {
+            return this.info.getName() + "★+" + this.level;
         }
-        return false;
+        return this.info.getName();
     }
 
-    /**
-     * @return param
-     */
     public ShipParameters getParam() {
-        return this.param;
-    }
-
-    /**
-     * @param param セットする param
-     */
-    public void setParam(ShipParameters param) {
-        this.param = param;
+        return this.info.getParam();
     }
 }

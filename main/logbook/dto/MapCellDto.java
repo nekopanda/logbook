@@ -30,8 +30,10 @@ public class MapCellDto implements Comparable<MapCellDto> {
     private int bosscellNo;
     @Tag(5)
     private EnemyData enemyData;
+    @Tag(10)
+    private boolean start;
 
-    public MapCellDto(JsonObject object) {
+    public MapCellDto(JsonObject object, boolean start) {
         this.map[0] = object.getInt("api_maparea_id");
         this.map[1] = object.getInt("api_mapinfo_no");
         this.map[2] = object.getInt("api_no");
@@ -45,9 +47,10 @@ public class MapCellDto implements Comparable<MapCellDto> {
         this.colorNo = object.getInt("api_color_no");
         this.bosscellNo = object.getInt("api_bosscell_no");
         this.enemyData = EnemyData.get(this.enemyId);
+        this.start = start;
     }
 
-    private String toString(boolean detailed) {
+    private String toString(boolean detailed, boolean withBoss) {
         String ret = "マップ:" + this.map[0] + "-" + this.map[1] + " セル:" + this.map[2];
         if (detailed) {
             MasterData.MapInfoDto mapInfo = MasterData.getMapInfo(this.map[0], this.map[1]);
@@ -57,7 +60,7 @@ public class MapCellDto implements Comparable<MapCellDto> {
             }
         }
         if (this.enemyId != -1) {
-            if (this.isBoss()) {
+            if (withBoss && this.isBoss()) {
                 ret += " (ボス)";
             }
             ret += " e_id:" + this.enemyId;
@@ -67,11 +70,24 @@ public class MapCellDto implements Comparable<MapCellDto> {
 
     @Override
     public String toString() {
-        return this.toString(false);
+        return this.toString(false, true);
+    }
+
+    public String getReportString() {
+        return this.toString(false, false);
     }
 
     public String detailedString() {
-        return this.toString(true);
+        return this.toString(true, true);
+    }
+
+    public String getAreaString() {
+        String ret = this.map[0] + "-" + this.map[1];
+        MasterData.MapInfoDto mapInfo = MasterData.getMapInfo(this.map[0], this.map[1]);
+        if (mapInfo != null) {
+            ret += " (" + mapInfo.getName() + ")";
+        }
+        return ret;
     }
 
     @Override
@@ -81,6 +97,11 @@ public class MapCellDto implements Comparable<MapCellDto> {
             ret = Integer.compare(this.map[i], arg0.map[i]);
         }
         return ret;
+    }
+
+    /** @return area * 10 + no */
+    public int getAreaId() {
+        return (this.map[0] * 10) + this.map[1];
     }
 
     /**
@@ -155,6 +176,20 @@ public class MapCellDto implements Comparable<MapCellDto> {
      */
     public void setEnemyData(EnemyData enemyData) {
         this.enemyData = enemyData;
+    }
+
+    /**
+     * @return start
+     */
+    public boolean isStart() {
+        return this.start;
+    }
+
+    /**
+     * @param start セットする start
+     */
+    public void setStart(boolean start) {
+        this.start = start;
     }
 
 }

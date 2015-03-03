@@ -30,6 +30,10 @@ public class TableConfigBean {
 
     private SortKey[] sortKeys;
 
+    private String[] headerNames;
+
+    private boolean cyclicReload;
+
     /**
      * @return visibleColumn
      */
@@ -84,5 +88,33 @@ public class TableConfigBean {
      */
     public void setColumnOrder(int[] columnOrder) {
         this.columnOrder = columnOrder;
+    }
+
+    /**
+     * @return cyclicReload
+     */
+    public boolean isCyclicReload() {
+        return this.cyclicReload;
+    }
+
+    /**
+     * @param cyclicReload セットする cyclicReload
+     */
+    public void setCyclicReload(boolean cyclicReload) {
+        this.cyclicReload = cyclicReload;
+    }
+
+    /**
+     * @return headerNames
+     */
+    public String[] getHeaderNames() {
+        return this.headerNames;
+    }
+
+    /**
+     * @param headerNames セットする headerNames
+     */
+    public void setHeaderNames(String[] headerNames) {
+        this.headerNames = headerNames;
     }
 }

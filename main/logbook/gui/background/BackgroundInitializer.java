@@ -1,16 +1,21 @@
 package logbook.gui.background;
 
+import java.util.List;
+
 import logbook.config.AppConfig;
 import logbook.config.ShipGroupConfig;
 import logbook.data.context.GlobalContext;
+import logbook.dto.CreateItemDto;
+import logbook.dto.GetShipDto;
+import logbook.dto.MissionResultDto;
 import logbook.gui.ApplicationMain;
+import logbook.gui.logic.CreateReportLogic;
 import logbook.internal.BattleResultServer;
 import logbook.internal.EnemyData;
 import logbook.internal.Item;
 import logbook.internal.MasterData;
 import logbook.internal.Ship;
 import logbook.server.proxy.ProxyServer;
-import logbook.server.web.WebServer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,17 +30,15 @@ public final class BackgroundInitializer extends Thread {
     private static final Logger LOG = LogManager.getLogger(BackgroundInitializer.class);
 
     private final Display display;
-    private final ApplicationMain main;
 
     /**
      * コンストラクター
      * 
      * @param shell
      */
-    public BackgroundInitializer(Shell shell, ApplicationMain main) {
+    public BackgroundInitializer(Shell shell) {
         this.display = shell.getDisplay();
-        this.main = main;
-        this.setName("logbook_async_load_battle_log");
+        this.setName("logbook_async_initializer");
     }
 
     @Override
@@ -44,9 +47,6 @@ public final class BackgroundInitializer extends Thread {
         try {
             // プロキシサーバーを開始する
             ProxyServer.start(AppConfig.get().getListenPort());
-
-            // Webサーバーを開始する
-            WebServer.start(AppConfig.get().getListenPort() + 1);
 
         } catch (Exception e) {
             LOG.warn("サーバ起動に失敗しました", e);
@@ -71,17 +71,65 @@ public final class BackgroundInitializer extends Thread {
         ApplicationMain.sysPrint("設定ファイル読み込み完了");
 
         try {
+            // 遠征ログ
+            final List<MissionResultDto> missionResultList = AppConfig.get().isLoadMissionLog() ?
+                    CreateReportLogic.loadMissionReport() : null;
+            if (missionResultList != null) {
+                this.display.asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        GlobalContext.addMissionResultList(missionResultList);
+                        ApplicationMain.logPrint("遠征ログ読み込み完了(" + missionResultList.size() + "件)");
+                    }
+                });
+            }
+        } catch (Exception e) {
+            LOG.warn("遠征ログ読み込みでエラー", e);
+        }
+
+        try {
+            // 建造ログ
+            final List<GetShipDto> createShipList = AppConfig.get().isLoadCreateShipLog() ?
+                    CreateReportLogic.loadCreateShipReport() : null;
+            if (createShipList != null) {
+                this.display.asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        GlobalContext.addGetshipList(createShipList);
+                        ApplicationMain.logPrint("建造ログ読み込み完了(" + createShipList.size() + "件)");
+                    }
+                });
+            }
+        } catch (Exception e) {
+            LOG.warn("建造ログ読み込みでエラー", e);
+        }
+
+        try {
+            // 開発ログ
+            final List<CreateItemDto> createItemList = AppConfig.get().isLoadCreateItemLog() ?
+                    CreateReportLogic.loadCreateItemReport() : null;
+            if (createItemList != null) {
+                this.display.asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        GlobalContext.addCreateItemList(createItemList);
+                        ApplicationMain.logPrint("開発ログ読み込み完了(" + createItemList.size() + "件)");
+                    }
+                });
+            }
+        } catch (Exception e) {
+            LOG.warn("開発ログ読み込みでエラー", e);
+        }
+
+        try {
             // 出撃ログファイル読み込み
             final int numLogRecord = BattleResultServer.get().size();
-            ApplicationMain.sysPrint("バックグラウンド初期化完了");
-            this.display.asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    BackgroundInitializer.this.main.printMessage("出撃ログ読み込み完了(" + numLogRecord + "件)");
-                }
-            });
+            ApplicationMain.sysPrint("出撃ログ読み込み完了");
+            ApplicationMain.logPrint("出撃ログ読み込み完了(" + numLogRecord + "件)");
         } catch (Exception e) {
             LOG.warn("出撃ログの読み込みに失敗しました (" + AppConfig.get().getBattleLogPath() + ")", e);
         }
+
+        ApplicationMain.logPrint("バックグラウンド初期化完了");
     }
 }

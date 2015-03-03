@@ -3,6 +3,10 @@ package logbook.constants;
 import java.io.File;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.TreeMap;
 
 import org.eclipse.swt.graphics.RGB;
 
@@ -12,8 +16,14 @@ import org.eclipse.swt.graphics.RGB;
  */
 public class AppConstants {
 
+    /**　アプリケーション名 */
+    public static final String NAME = "航海日誌";
+
+    /** 派生版の名前 */
+    public static final String SUFFIX = "拡張版";
+
     /** バージョン */
-    public static final String VERSION = "1.1.6";
+    public static final String VERSION = "1.5.6";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://nekopanda.blog.jp/");
@@ -25,11 +35,20 @@ public class AppConstants {
     /** 日付書式 */
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-    /** 日付書式 */
+    /** 日付書式(時刻のみ) */
     public static final String DATE_SHORT_FORMAT = "HH:mm:ss";
 
+    /** 日付書式(日付のみ) */
+    public static final String DATE_DAYS_FORMAT = "yyyy-MM-dd";
+
+    /** 日付書式(ミリ秒を含む) */
+    public static final String DATE_LONG_FORMAT = "yyyy-MM-dd HH-mm-ss.SSS";
+
+    /** タイムゾーン(任務が更新される05:00JSTに0:00になるタイムゾーン) */
+    public static final TimeZone TIME_ZONE_MISSION = TimeZone.getTimeZone("GMT+04:00");
+
     /** 戦闘ログファイルの名前 */
-    public static final String BATTLE_LOGFILE_DATE_FORMAT = "yyyy-MM-dd";
+    public static final String BATTLE_LOGFILE_DATE_FORMAT = DATE_DAYS_FORMAT;
 
     /** 疲労赤色 */
     public static final int COND_RED = 20;
@@ -37,8 +56,11 @@ public class AppConstants {
     /** 疲労オレンジ色 */
     public static final int COND_ORANGE = 30;
 
+    /** 疲労緑色(偽) */
+    public static final int COND_DARK_GREEN = 50;
+
     /** 疲労緑色 */
-    public static final int COND_GREEN = 50;
+    public static final int COND_GREEN = 53;
 
     /** 疲労緑色 */
     public static final int COND_YELLOW = 75;
@@ -54,6 +76,9 @@ public class AppConstants {
 
     /** 疲労オレンジ色 */
     public static final RGB COND_ORANGE_COLOR = new RGB(255, 140, 0);
+
+    /** 疲労緑色(偽) */
+    public static final RGB COND_DARK_GREEN_COLOR = new RGB(0, 60, 0);
 
     /** 疲労緑色 */
     public static final RGB COND_GREEN_COLOR = new RGB(0, 128, 0);
@@ -81,11 +106,25 @@ public class AppConstants {
             0
     };
 
+    public static final RGB[] CHART_COLOR_TABLE = new RGB[] {
+            new RGB(0x00, 0x80, 0x00), // 燃料
+            new RGB(0x66, 0x33, 0x00), // 弾薬
+            new RGB(0x80, 0x80, 0x80), // 鋼材
+            new RGB(0xCC, 0x33, 0x00), // ボーキ
+            new RGB(0xA5, 0x2A, 0x2A), // バーナー
+            new RGB(0xF0, 0x80, 0x80), // バケツ
+            new RGB(0x48, 0x76, 0xFF), // 開発
+            new RGB(0x00, 0xF5, 0xFF) // ネジ
+    };
+
     /** 小破の色 */
     public static final RGB SYOHA_SHIP_COLOR = new RGB(210, 255, 0);
 
     /** 轟沈の色 */
     public static final RGB SUNK_SHIP_COLOR = new RGB(77, 166, 223);
+
+    /** 退避の色 */
+    public static final RGB ESCAPED_SHIP_COLOR = new RGB(178, 178, 178);
 
     /** 敗北の色 */
     public static final RGB LOSE_BATTLE_COLOR = new RGB(230, 10, 20);
@@ -148,7 +187,7 @@ public class AppConstants {
     public static final File ENEMY_DATA_FILE = new File("./config/KCRDB-enemyid.csv");
 
     /** 出撃ログ表示用CSSファイル */
-    public static final File BATTLE_LOG_CSS_FILE = new File("./config/battle-log.css");
+    public static final File BATTLE_LOG_CSS_FILE = new File("./templates/battle-log.css");
 
     /** 保有資材:燃料 */
     public static final int MATERIAL_FUEL = 1;
@@ -171,12 +210,14 @@ public class AppConstants {
     /** 保有資材:開発資材 */
     public static final int MATERIAL_RESEARCH = 7;
 
-    /** 報告書のオンメモリ記憶数 */
-    public static final int MAX_LOG_SIZE = 5000;
+    /** 保有資材:ネジ */
+    public static final int MATERIAL_SCREW = 8;
 
+    public static final int USEITEM_UNKNOWN = -1;
     public static final int USEITEM_BUCKET = 1;
     public static final int USEITEM_BURNER = 2;
     public static final int USEITEM_RESEARCH = 3;
+    public static final int USEITEM_SCREW = 4;
 
     /** /resources/icon/add.png */
     public static final String R_ICON_ADD = "/resources/icon/add.png";
@@ -187,11 +228,17 @@ public class AppConstants {
     /** /resources/icon/error.png */
     public static final String R_ICON_ERROR = "/resources/icon/error.png";
 
+    /** /resources/icon/error_mono.png */
+    public static final String R_ICON_ERROR_MONO = "/resources/icon/error_mono.png";
+
     /** /resources/icon/exclamation.png */
     public static final String R_ICON_EXCLAMATION = "/resources/icon/exclamation.png";
 
-    /** /resources/icon/folder_star.png */
-    public static final String R_ICON_FOLDER_STAR = "/resources/icon/folder_star.png";
+    /** /resources/icon/exclamation_mono.png */
+    public static final String R_ICON_EXCLAMATION_MONO = "/resources/icon/exclamation_mono.png";
+
+    /** /resources/icon/folder.png */
+    public static final String R_ICON_FOLDER = "/resources/icon/folder.png";
 
     /** /resources/icon/star.png */
     public static final String R_ICON_STAR = "/resources/icon/star.png";
@@ -199,174 +246,17 @@ public class AppConstants {
     /** /resources/icon/heart.png */
     public static final String R_ICON_LOCKED = "/resources/icon/heart.png";
 
-    /** /resources/hpgauge/0.png */
-    public static final String R_HPGAUGE_0 = "/resources/hpgauge/0.png";
+    /** /resources/icon/arrow-left.png */
+    public static final String R_ICON_LEFT = "/resources/icon/arrow-left.png";
 
-    /** /resources/hpgauge/1.png */
-    public static final String R_HPGAUGE_1 = "/resources/hpgauge/1.png";
+    /** /resources/icon/arrow-right.png */
+    public static final String R_ICON_RIGHT = "/resources/icon/arrow-right.png";
 
-    /** /resources/hpgauge/2.png */
-    public static final String R_HPGAUGE_2 = "/resources/hpgauge/2.png";
+    /** 航海日誌のロゴ */
+    public static final String LOGO = "/resources/logo.png";
 
-    /** /resources/hpgauge/3.png */
-    public static final String R_HPGAUGE_3 = "/resources/hpgauge/3.png";
-
-    /** /resources/hpgauge/4.png */
-    public static final String R_HPGAUGE_4 = "/resources/hpgauge/4.png";
-
-    /** /resources/hpgauge/5.png */
-    public static final String R_HPGAUGE_5 = "/resources/hpgauge/5.png";
-
-    /** /resources/hpgauge/6.png */
-    public static final String R_HPGAUGE_6 = "/resources/hpgauge/6.png";
-
-    /** /resources/hpgauge/7.png */
-    public static final String R_HPGAUGE_7 = "/resources/hpgauge/7.png";
-
-    /** /resources/hpgauge/8.png */
-    public static final String R_HPGAUGE_8 = "/resources/hpgauge/8.png";
-
-    /** /resources/hpgauge/9.png */
-    public static final String R_HPGAUGE_9 = "/resources/hpgauge/9.png";
-
-    /** /resources/hpgauge/10.png */
-    public static final String R_HPGAUGE_10 = "/resources/hpgauge/10.png";
-
-    /** /resources/hpgauge/11.png */
-    public static final String R_HPGAUGE_11 = "/resources/hpgauge/11.png";
-
-    /** /resources/hpgauge/12.png */
-    public static final String R_HPGAUGE_12 = "/resources/hpgauge/12.png";
-
-    /** /resources/hpgauge/13.png */
-    public static final String R_HPGAUGE_13 = "/resources/hpgauge/13.png";
-
-    /** /resources/hpgauge/14.png */
-    public static final String R_HPGAUGE_14 = "/resources/hpgauge/14.png";
-
-    /** /resources/hpgauge/15.png */
-    public static final String R_HPGAUGE_15 = "/resources/hpgauge/15.png";
-
-    /** /resources/hpgauge/16.png */
-    public static final String R_HPGAUGE_16 = "/resources/hpgauge/16.png";
-
-    /** /resources/hpgauge/17.png */
-    public static final String R_HPGAUGE_17 = "/resources/hpgauge/17.png";
-
-    /** /resources/hpgauge/18.png */
-    public static final String R_HPGAUGE_18 = "/resources/hpgauge/18.png";
-
-    /** /resources/hpgauge/19.png */
-    public static final String R_HPGAUGE_19 = "/resources/hpgauge/19.png";
-
-    /** /resources/hpgauge/20.png */
-    public static final String R_HPGAUGE_20 = "/resources/hpgauge/20.png";
-
-    /** /resources/hpgauge/21.png */
-    public static final String R_HPGAUGE_21 = "/resources/hpgauge/21.png";
-
-    /** /resources/hpgauge/22.png */
-    public static final String R_HPGAUGE_22 = "/resources/hpgauge/22.png";
-
-    /** /resources/hpgauge/23.png */
-    public static final String R_HPGAUGE_23 = "/resources/hpgauge/23.png";
-
-    /** /resources/hpgauge/24.png */
-    public static final String R_HPGAUGE_24 = "/resources/hpgauge/24.png";
-
-    /** /resources/hpgauge/25.png */
-    public static final String R_HPGAUGE_25 = "/resources/hpgauge/25.png";
-
-    /** /resources/hpgauge/26.png */
-    public static final String R_HPGAUGE_26 = "/resources/hpgauge/26.png";
-
-    /** /resources/hpgauge/27.png */
-    public static final String R_HPGAUGE_27 = "/resources/hpgauge/27.png";
-
-    /** /resources/hpgauge/28.png */
-    public static final String R_HPGAUGE_28 = "/resources/hpgauge/28.png";
-
-    /** /resources/hpgauge/29.png */
-    public static final String R_HPGAUGE_29 = "/resources/hpgauge/29.png";
-
-    /** /resources/hpgauge/30.png */
-    public static final String R_HPGAUGE_30 = "/resources/hpgauge/30.png";
-
-    /** /resources/hpgauge/31.png */
-    public static final String R_HPGAUGE_31 = "/resources/hpgauge/31.png";
-
-    /** /resources/hpgauge/32.png */
-    public static final String R_HPGAUGE_32 = "/resources/hpgauge/32.png";
-
-    /** /resources/hpgauge/33.png */
-    public static final String R_HPGAUGE_33 = "/resources/hpgauge/33.png";
-
-    /** /resources/hpgauge/34.png */
-    public static final String R_HPGAUGE_34 = "/resources/hpgauge/34.png";
-
-    /** /resources/hpgauge/35.png */
-    public static final String R_HPGAUGE_35 = "/resources/hpgauge/35.png";
-
-    /** /resources/hpgauge/36.png */
-    public static final String R_HPGAUGE_36 = "/resources/hpgauge/36.png";
-
-    /** /resources/hpgauge/37.png */
-    public static final String R_HPGAUGE_37 = "/resources/hpgauge/37.png";
-
-    /** /resources/hpgauge/38.png */
-    public static final String R_HPGAUGE_38 = "/resources/hpgauge/38.png";
-
-    /** /resources/hpgauge/39.png */
-    public static final String R_HPGAUGE_39 = "/resources/hpgauge/39.png";
-
-    /** /resources/hpgauge/40.png */
-    public static final String R_HPGAUGE_40 = "/resources/hpgauge/40.png";
-
-    /** /resources/hpgauge/41.png */
-    public static final String R_HPGAUGE_41 = "/resources/hpgauge/41.png";
-
-    /** /resources/hpgauge/42.png */
-    public static final String R_HPGAUGE_42 = "/resources/hpgauge/42.png";
-
-    /** /resources/hpgauge/43.png */
-    public static final String R_HPGAUGE_43 = "/resources/hpgauge/43.png";
-
-    /** /resources/hpgauge/44.png */
-    public static final String R_HPGAUGE_44 = "/resources/hpgauge/44.png";
-
-    /** /resources/hpgauge/45.png */
-    public static final String R_HPGAUGE_45 = "/resources/hpgauge/45.png";
-
-    /** /resources/hpgauge/46.png */
-    public static final String R_HPGAUGE_46 = "/resources/hpgauge/46.png";
-
-    /** /resources/hpgauge/47.png */
-    public static final String R_HPGAUGE_47 = "/resources/hpgauge/47.png";
-
-    /** /resources/hpgauge/48.png */
-    public static final String R_HPGAUGE_48 = "/resources/hpgauge/48.png";
-
-    /** /resources/hpgauge/49.png */
-    public static final String R_HPGAUGE_49 = "/resources/hpgauge/49.png";
-
-    /** /resources/hpgauge/50.png */
-    public static final String R_HPGAUGE_50 = "/resources/hpgauge/50.png";
-
-    /** HPゲージイメージ */
-    public static final String[] R_HPGAUGE_IMAGES = { AppConstants.R_HPGAUGE_0, AppConstants.R_HPGAUGE_1,
-            AppConstants.R_HPGAUGE_2, AppConstants.R_HPGAUGE_3, AppConstants.R_HPGAUGE_4, AppConstants.R_HPGAUGE_5,
-            AppConstants.R_HPGAUGE_6, AppConstants.R_HPGAUGE_7, AppConstants.R_HPGAUGE_8, AppConstants.R_HPGAUGE_9,
-            AppConstants.R_HPGAUGE_10, AppConstants.R_HPGAUGE_11, AppConstants.R_HPGAUGE_12, AppConstants.R_HPGAUGE_13,
-            AppConstants.R_HPGAUGE_14, AppConstants.R_HPGAUGE_15, AppConstants.R_HPGAUGE_16, AppConstants.R_HPGAUGE_17,
-            AppConstants.R_HPGAUGE_18, AppConstants.R_HPGAUGE_19, AppConstants.R_HPGAUGE_20, AppConstants.R_HPGAUGE_21,
-            AppConstants.R_HPGAUGE_22, AppConstants.R_HPGAUGE_23, AppConstants.R_HPGAUGE_24, AppConstants.R_HPGAUGE_25,
-            AppConstants.R_HPGAUGE_26, AppConstants.R_HPGAUGE_27, AppConstants.R_HPGAUGE_28, AppConstants.R_HPGAUGE_29,
-            AppConstants.R_HPGAUGE_30, AppConstants.R_HPGAUGE_31, AppConstants.R_HPGAUGE_32, AppConstants.R_HPGAUGE_33,
-            AppConstants.R_HPGAUGE_34, AppConstants.R_HPGAUGE_35, AppConstants.R_HPGAUGE_36, AppConstants.R_HPGAUGE_37,
-            AppConstants.R_HPGAUGE_38, AppConstants.R_HPGAUGE_39, AppConstants.R_HPGAUGE_40, AppConstants.R_HPGAUGE_41,
-            AppConstants.R_HPGAUGE_42, AppConstants.R_HPGAUGE_43, AppConstants.R_HPGAUGE_44, AppConstants.R_HPGAUGE_45,
-            AppConstants.R_HPGAUGE_46, AppConstants.R_HPGAUGE_47, AppConstants.R_HPGAUGE_48, AppConstants.R_HPGAUGE_49,
-            AppConstants.R_HPGAUGE_50 };
+    /** Twitterのロゴ */
+    public static final String TWITTER = "/resources/twitter.png";
 
     /** 艦隊タブの艦娘ラベルに設定するツールチップテキスト */
     public static final String TOOLTIP_FLEETTAB_SHIP = "HP:{0}/{1} 燃料:{2}/{3} 弾:{4}/{5}\nNext:{6}exp";
@@ -416,12 +306,6 @@ public class AppConstants {
     /** Push 通知のアプリケーション名*/
     public static final String PUSH_NOTIFY_APPNAME = "航海日誌";
 
-    /** Push 通知のイベント名 */
-    public static final String PUSH_NOTIFY_EVENT = "遠征・入渠";
-
-    /** Push通知の priority (-2: verylow, -1: moderate, 0: normal, 1: high, 2: emergency */
-    public static final String PUSH_NOTIFY_PRIORITY = "0";
-
     /** Prowl のアクセス先 URI */
     public static final String PUSH_NOTIFY_PROWL_URI = "https://api.prowlapp.com/publicapi/add";
 
@@ -438,5 +322,88 @@ public class AppConstants {
     public static final String MESSAGE_TOTAL_DAIHATSU = "大発:{0} (+{1}%)";
 
     /** タイトルバーに表示するデフォルトテキスト */
-    public static final String TITLEBAR_TEXT = "航海日誌拡張版 " + VERSION;
+    public static final String TITLEBAR_TEXT = NAME + SUFFIX + " " + VERSION;
+
+    /** 海戦・ドロップ報告書.csv */
+    public static final String LOG_BATTLE_RESULT = "海戦・ドロップ報告書.csv";
+
+    /** 海戦・ドロップ報告書_alternativefile.csv */
+    public static final String LOG_BATTLE_RESULT_ALT = "海戦・ドロップ報告書_alternativefile.csv";
+
+    /** 建造報告書.csv */
+    public static final String LOG_CREATE_SHIP = "建造報告書.csv";
+
+    /** 建造報告書_alternativefile.csv */
+    public static final String LOG_CREATE_SHIP_ALT = "建造報告書_alternativefile.csv";
+
+    /** 開発報告書.csv */
+    public static final String LOG_CREATE_ITEM = "開発報告書.csv";
+
+    /** 開発報告書_alternativefile.csv */
+    public static final String LOG_CREATE_ITEM_ALT = "開発報告書_alternativefile.csv";
+
+    /** 遠征報告書.csv */
+    public static final String LOG_MISSION = "遠征報告書.csv";
+
+    /** 遠征報告書.csv */
+    public static final String LOG_MISSION_ALT = "遠征報告書_alternativefile.csv";
+
+    /** 資材ログ.csv */
+    public static final String LOG_RESOURCE = "資材ログ.csv";
+
+    /** 資材ログ_alternativefile.csv */
+    public static final String LOG_RESOURCE_ALT = "資材ログ_alternativefile.csv";
+
+    /** お風呂に入りたい艦娘一覧の初期カラム順 */
+    public static final Map<String, Integer> BATHTABLE_COLUMN_MAP = new HashMap<String, Integer>() {
+        {
+            this.put("No.", 0);
+            this.put("ID", 1);
+            this.put("艦隊", 2);
+            this.put("疲労", 3);
+            this.put("修理順", 4);
+            this.put("名前", 5);
+            this.put("Lv", 6);
+            this.put("HP", 7);
+            this.put("修理時間", 8);
+            this.put("修理燃料", 9);
+            this.put("修理鋼材", 10);
+            this.put("損傷", 11);
+            this.put("HP1あたり", 12);
+        }
+    };
+
+    /** 艦種に関する表示情報 */
+    public static final Map<Integer, String> SHIP_TYPE_INFO = new TreeMap<Integer, String>() {
+        {
+            this.put(1, "#"); // "#"は非表示
+            this.put(8, "巡洋戦艦");
+            this.put(12, "#");
+            this.put(15, "#");
+        }
+    };
+
+    public static final String[] SHIP_CATEGORY_NAMES = new String[] {
+            "駆逐艦",
+            "軽巡",
+            "雷巡",
+            "重巡",
+            "航巡",
+            "戦艦・航戦",
+            "空母",
+            "潜水艦",
+            "その他"
+    };
+
+    public static final int[][] SHIP_CATEGORY_TYPES = new int[][] {
+            new int[] { 2 }, // 駆逐艦
+            new int[] { 3 }, // 軽巡洋艦
+            new int[] { 4 }, // 重雷装巡洋艦
+            new int[] { 5 }, // 重巡洋艦
+            new int[] { 6 }, // 航空巡洋艦
+            new int[] { 8, 9, 10 }, // 戦艦
+            new int[] { 7, 11, 16, 18 }, // 空母
+            new int[] { 13, 14 }, // 潜水艦
+            new int[] { 1, 12, 15, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30 }, // その他
+    };
 }

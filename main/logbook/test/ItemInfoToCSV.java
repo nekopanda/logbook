@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 import logbook.config.ItemMasterConfig;
-import logbook.dto.ItemDto;
+import logbook.dto.ItemInfoDto;
 import logbook.dto.ShipParameters;
 import logbook.internal.Item;
 
@@ -34,7 +34,7 @@ public class ItemInfoToCSV {
         fw.write("\n");
 
         for (Integer key : Item.keySet()) {
-            ItemDto dto = Item.get(key);
+            ItemInfoDto dto = Item.get(key);
             ShipParameters param = dto.getParam();
             if (dto.getName().length() > 0) {
                 fw.write(StringUtils.join(new String[] {

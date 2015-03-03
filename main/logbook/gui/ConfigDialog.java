@@ -7,11 +7,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import logbook.config.AppConfig;
+import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.PushNotify;
 import logbook.internal.EvaluateExp;
 import logbook.internal.SeaExp;
+import logbook.util.JIntellitypeWrapper;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
@@ -19,6 +21,7 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -82,7 +85,7 @@ public final class ConfigDialog extends Dialog {
      */
     private void createContents() {
         this.shell = new Shell(this.getParent(), this.getStyle());
-        this.shell.setSize(550, 380);
+        this.shell.setSize(600, 400);
         this.shell.setText(this.getText());
         this.shell.setLayout(new GridLayout(1, false));
 
@@ -96,7 +99,7 @@ public final class ConfigDialog extends Dialog {
         systemroot.setText("一般");
         systemroot.setData("system");
         TreeItem maintab = new TreeItem(systemroot, SWT.NONE);
-        maintab.setText("メインタブ");
+        maintab.setText("一般2");
         maintab.setData("maintab");
         TreeItem fleettab = new TreeItem(systemroot, SWT.NONE);
         fleettab.setText("艦隊タブ");
@@ -160,19 +163,6 @@ public final class ConfigDialog extends Dialog {
         soundlevel.setText(Integer.toString((int) (AppConfig.get().getSoundLevel() * 100)));
         new Label(compositeSystem, SWT.NONE);
 
-        /*
-        Label label7 = new Label(compositeSystem, SWT.NONE);
-        label7.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        label7.setText("透明度*");
-
-        final Text alpha = new Text(compositeSystem, SWT.BORDER);
-        GridData gdAlpha = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
-        gdAlpha.widthHint = 90;
-        alpha.setLayoutData(gdAlpha);
-        alpha.setText(Integer.toString(AppConfig.get().getAlpha()));
-        new Label(compositeSystem, SWT.NONE);
-        */
-
         Label label8 = new Label(compositeSystem, SWT.NONE);
         label8.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
         label8.setText("報告書の保存先");
@@ -197,6 +187,31 @@ public final class ConfigDialog extends Dialog {
             }
         });
         reportSavedirBtn.setText("選択...");
+
+        Label label82 = new Label(compositeSystem, SWT.NONE);
+        label82.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        label82.setText("出撃ログの保存先*");
+
+        final Text battlelogDir = new Text(compositeSystem, SWT.BORDER);
+        GridData gdBattlelogDir = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+        gdBattlelogDir.widthHint = 120;
+        battlelogDir.setLayoutData(gdBattlelogDir);
+        battlelogDir.setText(AppConfig.get().getBattleLogPath());
+
+        Button battleLogdirBtn = new Button(compositeSystem, SWT.NONE);
+        battleLogdirBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        battleLogdirBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                DirectoryDialog dialog = new DirectoryDialog(ConfigDialog.this.shell);
+                dialog.setMessage("保存先を指定して下さい");
+                String path = dialog.open();
+                if (path != null) {
+                    battlelogDir.setText(path);
+                }
+            }
+        });
+        battleLogdirBtn.setText("選択...");
 
         final Button hidewindow = new Button(compositeSystem, SWT.CHECK);
         hidewindow.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
@@ -244,15 +259,59 @@ public final class ConfigDialog extends Dialog {
         this.compositeMap.put("maintab", compositeMainTab);
         compositeMainTab.setLayout(new GridLayout(1, false));
 
-        final Button printSortieLog = new Button(compositeMainTab, SWT.CHECK);
+        Group logGroup = new Group(compositeMainTab, SWT.NONE);
+        logGroup.setText("母港タブのログ");
+        logGroup.setLayout(new GridLayout(1, false));
+        logGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        final Button printSortieLog = new Button(logGroup, SWT.CHECK);
         printSortieLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         printSortieLog.setText("マップや勝利判定をログに表示");
         printSortieLog.setSelection(AppConfig.get().isPrintSortieLog());
 
-        final Button printSunkLog = new Button(compositeMainTab, SWT.CHECK);
+        final Button printSunkLog = new Button(logGroup, SWT.CHECK);
         printSunkLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         printSunkLog.setText("艦娘の轟沈をログに表示（ダメコン未対応）");
         printSunkLog.setSelection(AppConfig.get().isPrintSunkLog());
+
+        final Button printUpdateLog = new Button(logGroup, SWT.CHECK);
+        printUpdateLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        printUpdateLog.setText("更新系ログを表示");
+        printUpdateLog.setSelection(AppConfig.get().isPrintUpdateLog());
+
+        Group loadReportGroup = new Group(compositeMainTab, SWT.NONE);
+        loadReportGroup.setText("報告書読み込み（起動時にCSVファイルを全て読み込みます）");
+        loadReportGroup.setLayout(new GridLayout(1, false));
+        loadReportGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        final Button loadCreateShipLog = new Button(loadReportGroup, SWT.CHECK);
+        loadCreateShipLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        loadCreateShipLog.setText("建造報告書を読み込む*");
+        loadCreateShipLog.setSelection(AppConfig.get().isLoadCreateShipLog());
+
+        final Button loadCreateItemLog = new Button(loadReportGroup, SWT.CHECK);
+        loadCreateItemLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        loadCreateItemLog.setText("開発報告書を読み込む*");
+        loadCreateItemLog.setSelection(AppConfig.get().isLoadCreateItemLog());
+
+        final Button loadMissionLog = new Button(loadReportGroup, SWT.CHECK);
+        loadMissionLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        loadMissionLog.setText("遠征報告書を読み込む*");
+        loadMissionLog.setSelection(AppConfig.get().isLoadMissionLog());
+
+        final Combo systemWideShortcutKey;
+        if (JIntellitypeWrapper.getInstance() != null) {
+            final Label systemWideShortcutKeyLabel = new Label(compositeMainTab, SWT.NONE);
+            systemWideShortcutKeyLabel.setText("航海日誌をアクティブにするホットキー");
+            systemWideShortcutKey = new Combo(compositeMainTab, SWT.READ_ONLY);
+            systemWideShortcutKey.add("なし");
+            systemWideShortcutKey.add("Ctrl+Shift+Z");
+            systemWideShortcutKey.add("Ctrl+Alt+Z");
+            systemWideShortcutKey.select(AppConfig.get().getSystemWideHotKey());
+        }
+        else {
+            systemWideShortcutKey = null;
+        }
 
         // 艦隊タブ タブ
         Composite compositeFleetTab = new Composite(this.composite, SWT.NONE);
@@ -326,13 +385,49 @@ public final class ConfigDialog extends Dialog {
         visibleOnReturnBathwater.setText("お風呂から上がる時に母港タブを表示");
         visibleOnReturnBathwater.setSelection(AppConfig.get().isVisibleOnReturnBathwater());
 
-        Label sakutekiMethodLabel = new Label(compositeFleetTab, SWT.NONE);
-        sakutekiMethodLabel.setText("索敵表示形式");
-        final Combo sakutekiCombo = new Combo(compositeFleetTab, SWT.READ_ONLY);
+        final Button useMonoIcon = new Button(compositeFleetTab, SWT.CHECK);
+        useMonoIcon.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        useMonoIcon.setText("モノクロアイコンを使用");
+        useMonoIcon.setSelection(AppConfig.get().isMonoIcon());
+
+        Group sakutekiGroup = new Group(compositeFleetTab, SWT.NONE);
+        sakutekiGroup.setText("索敵計算式");
+        sakutekiGroup.setLayout(new GridLayout(1, false));
+        sakutekiGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        final Button useRecommendedSakuteki = new Button(sakutekiGroup, SWT.CHECK);
+        useRecommendedSakuteki.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        useRecommendedSakuteki.setText("推奨計算式を使用する");
+        useRecommendedSakuteki.setSelection(AppConfig.get().isUseRecommendedSakuteki());
+
+        final Combo sakutekiCombo = new Combo(sakutekiGroup, SWT.READ_ONLY);
         sakutekiCombo.add("A.艦隊素の索敵値 + 装備の索敵値");
-        sakutekiCombo.add("B.右の計算結果(偵察機×2 + 電探 + √(装備込みの艦隊索敵値-偵察機-電探))");
-        sakutekiCombo.add("C.装備込みの艦隊索敵値(Bの計算結果)");
+        sakutekiCombo.add("B.ほっぼアルファVer2.0.1(艦隊素の索敵分 + 装備分 + 提督Lv分)");
+        sakutekiCombo.add("C.ほっぼアルファVer2.0.1(旧:2-5式(秋))");
+        sakutekiCombo.add("D.2-5式(秋)(艦隊素の索敵分 + 装備分 + 提督Lv分)");
+        sakutekiCombo.add("E.装備込みの艦隊索敵値合計(2-5式(秋))");
+        sakutekiCombo.add("F.2-5式(旧)(偵察機×2 + 電探 + √(装備込みの艦隊索敵値-偵察機-電探))");
+        sakutekiCombo.add("G.装備込みの艦隊索敵値(2-5式(旧))");
         sakutekiCombo.select(AppConfig.get().getSakutekiMethod());
+
+        SelectionListener recommendedSakutekiListener = new SelectionAdapter() {
+            int sakutekiMethod = sakutekiCombo.getSelectionIndex();
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (useRecommendedSakuteki.getSelection()) {
+                    this.sakutekiMethod = sakutekiCombo.getSelectionIndex();
+                    sakutekiCombo.select(1);
+                    sakutekiCombo.setEnabled(false);
+                }
+                else {
+                    sakutekiCombo.setEnabled(true);
+                    sakutekiCombo.select(this.sakutekiMethod);
+                }
+            }
+        };
+        recommendedSakutekiListener.widgetSelected(null);
+        useRecommendedSakuteki.addSelectionListener(recommendedSakutekiListener);
 
         // 通知
         Composite compositeNotify = new Composite(this.composite, SWT.NONE);
@@ -381,8 +476,38 @@ public final class ConfigDialog extends Dialog {
         fullySpinner.setLayoutData(gdFullySpinner);
 
         Label fullyLabel2 = new Label(compositeNotify, SWT.NONE);
-        fullyLabel2.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        fullyLabel2.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         fullyLabel2.setText("以下で警告表示");
+
+        final Button shipFullBalloon = new Button(compositeNotify, SWT.CHECK);
+        shipFullBalloon.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        shipFullBalloon.setSelection(AppConfig.get().isEnableShipFullBalloonNotify());
+        shipFullBalloon.setText("母港の空きが");
+
+        final Spinner shipFullSpinner = new Spinner(compositeNotify, SWT.BORDER);
+        shipFullSpinner.setMaximum(Math.max(100, GlobalContext.maxChara()));
+        shipFullSpinner.setMinimum(0);
+        shipFullSpinner.setSelection(AppConfig.get().getShipFullBalloonNotify());
+        shipFullSpinner.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+
+        Label fullyLabel3 = new Label(compositeNotify, SWT.NONE);
+        fullyLabel3.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        fullyLabel3.setText("以下でバルーン通知");
+
+        final Button itemFullBalloon = new Button(compositeNotify, SWT.CHECK);
+        itemFullBalloon.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        itemFullBalloon.setSelection(AppConfig.get().isEnableItemFullBalloonNotify());
+        itemFullBalloon.setText("装備の空きが");
+
+        final Spinner itemFullSpinner = new Spinner(compositeNotify, SWT.BORDER);
+        itemFullSpinner.setMaximum(Math.max(100, GlobalContext.maxChara()));
+        itemFullSpinner.setMinimum(0);
+        itemFullSpinner.setSelection(AppConfig.get().getItemFullBalloonNotify());
+        itemFullSpinner.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+
+        Label fullyLabel4 = new Label(compositeNotify, SWT.NONE);
+        fullyLabel4.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        fullyLabel4.setText("以下でバルーン通知");
 
         // キャプチャ タブ
         Composite compositeCapture = new Composite(this.composite, SWT.NONE);
@@ -462,134 +587,50 @@ public final class ConfigDialog extends Dialog {
         chartGroup.setLayout(new GridLayout(3, false));
         chartGroup.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
 
-        final Label fuel = new Label(chartGroup, SWT.NONE);
-        fuel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        fuel.setText("燃料の色■");
-        fuel.setForeground(SWTResourceManager.getColor(AppConfig.get().getFuelColor()));
-
-        Button changeFuelColor = new Button(chartGroup, SWT.NONE);
-        changeFuelColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        changeFuelColor.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                ColorDialog dialog = new ColorDialog(ConfigDialog.this.shell);
-                RGB rgb = dialog.open();
-                if (rgb != null) {
-                    fuel.setForeground(SWTResourceManager.getColor(rgb));
-                }
-            }
-        });
-        changeFuelColor.setText("色の設定");
-
-        Button resetFuelColor = new Button(chartGroup, SWT.NONE);
-        resetFuelColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        resetFuelColor.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                fuel.setForeground(SWTResourceManager.getColor(new RGB(0x00, 0x80, 0x00)));
-            }
-        });
-        resetFuelColor.setText("リセット");
-
-        final Label ammo = new Label(chartGroup, SWT.NONE);
-        ammo.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        ammo.setText("弾薬の色■");
-        ammo.setForeground(SWTResourceManager.getColor(AppConfig.get().getAmmoColor()));
-
-        Button changeAmmoColor = new Button(chartGroup, SWT.NONE);
-        changeAmmoColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        changeAmmoColor.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                ColorDialog dialog = new ColorDialog(ConfigDialog.this.shell);
-                RGB rgb = dialog.open();
-                if (rgb != null) {
-                    ammo.setForeground(SWTResourceManager.getColor(rgb));
-                }
-            }
-        });
-        changeAmmoColor.setText("色の設定");
-
-        Button resetAmmoColor = new Button(chartGroup, SWT.NONE);
-        resetAmmoColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        resetAmmoColor.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                ammo.setForeground(SWTResourceManager.getColor(new RGB(0x66, 0x33, 0x00)));
-            }
-        });
-        resetAmmoColor.setText("リセット");
-
-        final Label metal = new Label(chartGroup, SWT.NONE);
-        metal.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        metal.setText("鋼材の色■");
-        metal.setForeground(SWTResourceManager.getColor(AppConfig.get().getMetalColor()));
-
-        Button changeMetalColor = new Button(chartGroup, SWT.NONE);
-        changeMetalColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        changeMetalColor.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                ColorDialog dialog = new ColorDialog(ConfigDialog.this.shell);
-                RGB rgb = dialog.open();
-                if (rgb != null) {
-                    metal.setForeground(SWTResourceManager.getColor(rgb));
-                }
-            }
-        });
-        changeMetalColor.setText("色の設定");
-
-        Button resetMetalColor = new Button(chartGroup, SWT.NONE);
-        resetMetalColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        resetMetalColor.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                metal.setForeground(SWTResourceManager.getColor(new RGB(0x80, 0x80, 0x80)));
-            }
-        });
-        resetMetalColor.setText("リセット");
-
-        final Label bauxite = new Label(chartGroup, SWT.NONE);
-        bauxite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        bauxite.setText("ボーキの色■");
-        bauxite.setForeground(SWTResourceManager.getColor(AppConfig.get().getBauxiteColor()));
-
-        Button changeBauxiteColor = new Button(chartGroup, SWT.NONE);
-        changeBauxiteColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        changeBauxiteColor.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                ColorDialog dialog = new ColorDialog(ConfigDialog.this.shell);
-                RGB rgb = dialog.open();
-                if (rgb != null) {
-                    bauxite.setForeground(SWTResourceManager.getColor(rgb));
-                }
-            }
-        });
-        changeBauxiteColor.setText("色の設定");
-
-        Button resetBauxiteColor = new Button(chartGroup, SWT.NONE);
-        resetBauxiteColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        resetBauxiteColor.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                bauxite.setForeground(SWTResourceManager.getColor(new RGB(0xCC, 0x33, 0x00)));
-            }
-        });
-        resetBauxiteColor.setText("リセット");
+        final Label fuel = this.createColorSetting(chartGroup, "燃料の色■",
+                AppConfig.get().getFuelColor(), AppConstants.CHART_COLOR_TABLE[0]);
+        final Label ammo = this.createColorSetting(chartGroup, "弾薬の色■",
+                AppConfig.get().getAmmoColor(), AppConstants.CHART_COLOR_TABLE[1]);
+        final Label metal = this.createColorSetting(chartGroup, "鋼材の色■",
+                AppConfig.get().getMetalColor(), AppConstants.CHART_COLOR_TABLE[2]);
+        final Label bauxite = this.createColorSetting(chartGroup, "ボーキの色■",
+                AppConfig.get().getBauxiteColor(), AppConstants.CHART_COLOR_TABLE[3]);
+        final Label burner = this.createColorSetting(chartGroup, "バーナーの色■",
+                AppConfig.get().getBurnerColor(), AppConstants.CHART_COLOR_TABLE[4]);
+        final Label bucket = this.createColorSetting(chartGroup, "バケツの色■",
+                AppConfig.get().getBucketColor(), AppConstants.CHART_COLOR_TABLE[5]);
+        final Label research = this.createColorSetting(chartGroup, "開発資材の色■",
+                AppConfig.get().getResearchColor(), AppConstants.CHART_COLOR_TABLE[6]);
+        final Label screw = this.createColorSetting(chartGroup, "ネジの色■",
+                AppConfig.get().getScrewColor(), AppConstants.CHART_COLOR_TABLE[6]);
 
         // ウィンドウ
         Composite compositeWindow = new Composite(this.composite, SWT.NONE);
         this.compositeMap.put("window", compositeWindow);
         compositeWindow.setLayout(new GridLayout(3, false));
 
-        Label opaqueInterval = new Label(compositeWindow, SWT.NONE);
-        opaqueInterval.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-        opaqueInterval.setText("マウスが離れてから元の透明度に戻るまでの時間");
+        final Button enableMoveWithDD = new Button(compositeWindow, SWT.CHECK);
+        enableMoveWithDD.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        enableMoveWithDD.setSelection(AppConfig.get().isEnableMoveWithDD());
+        enableMoveWithDD.setText("タイトルバー以外でもドラッグ&&ドロップで移動できるようにする*");
 
-        new Label(compositeWindow, SWT.NONE);
+        final Button toggleToolButton = new Button(compositeWindow, SWT.CHECK);
+        toggleToolButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        toggleToolButton.setSelection(AppConfig.get().isToggleToolButton());
+        toggleToolButton.setText("ツールウィンドウのボタンをトグル方式にする");
 
-        final Spinner opaqueIntervalSpinner = new Spinner(compositeWindow, SWT.BORDER);
+        Group opaqueIntervalGroup = new Group(compositeWindow, SWT.NONE);
+        opaqueIntervalGroup.setText("マウスが離れてから元の透明度に戻るまでの時間");
+        opaqueIntervalGroup.setLayout(new GridLayout(2, false));
+        opaqueIntervalGroup.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 3, 1));
+
+        //Label opaqueInterval = new Label(compositeWindow, SWT.NONE);
+        //opaqueInterval.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        //opaqueInterval.setText("マウスが離れてから元の透明度に戻るまでの時間");
+
+        //new Label(compositeWindow, SWT.NONE);
+
+        final Spinner opaqueIntervalSpinner = new Spinner(opaqueIntervalGroup, SWT.BORDER);
         opaqueIntervalSpinner.setMaximum(60 * 60 * 10);
         opaqueIntervalSpinner.setMinimum(0);
         opaqueIntervalSpinner.setSelection(AppConfig.get().getOpaqueInterval());
@@ -597,21 +638,26 @@ public final class ConfigDialog extends Dialog {
         gdopaqueIntervalSpinner.widthHint = 65;
         opaqueIntervalSpinner.setLayoutData(gdopaqueIntervalSpinner);
 
-        Label opaqueIntervalSuffix = new Label(compositeWindow, SWT.NONE);
+        Label opaqueIntervalSuffix = new Label(opaqueIntervalGroup, SWT.NONE);
         opaqueIntervalSuffix.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         opaqueIntervalSuffix.setText("x0.1秒");
 
-        Label shipTableName = new Label(compositeWindow, SWT.NONE);
-        shipTableName.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-        shipTableName.setText("艦娘一覧ウィンドウの名前設定");
+        Group shipTableNameGroup = new Group(compositeWindow, SWT.NONE);
+        shipTableNameGroup.setText("艦娘一覧ウィンドウの名前設定");
+        shipTableNameGroup.setLayout(new GridLayout(3, false));
+        shipTableNameGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+
+        //Label shipTableName = new Label(compositeWindow, SWT.NONE);
+        //shipTableName.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        //shipTableName.setText("艦娘一覧ウィンドウの名前設定");
 
         final Text[] shipTableNameText = new Text[4];
         for (int i = 0; i < 4; ++i) {
-            Label shipTableLabel = new Label(compositeWindow, SWT.NONE);
+            Label shipTableLabel = new Label(shipTableNameGroup, SWT.NONE);
             shipTableLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
             shipTableLabel.setText(String.valueOf(i + 1) + ": ");
-            shipTableNameText[i] = new Text(compositeWindow, SWT.BORDER);
-            shipTableNameText[i].setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
+            shipTableNameText[i] = new Text(shipTableNameGroup, SWT.BORDER);
+            shipTableNameText[i].setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
             shipTableNameText[i].setText(AppConfig.get().getShipTableNames()[i]);
         }
 
@@ -678,7 +724,7 @@ public final class ConfigDialog extends Dialog {
 
         final Text prowlAPIKey = new Text(compositePushNotify, SWT.BORDER);
         GridData gdprowlAPIKey = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
-        gdprowlAPIKey.widthHint = 220;
+        gdprowlAPIKey.widthHint = 200;
         prowlAPIKey.setLayoutData(gdprowlAPIKey);
         prowlAPIKey.setText(AppConfig.get().getProwlAPIKey());
 
@@ -693,13 +739,13 @@ public final class ConfigDialog extends Dialog {
 
         final Text nmaAPIKey = new Text(compositePushNotify, SWT.BORDER);
         GridData gdnmaAPIKey = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
-        gdnmaAPIKey.widthHint = 220;
+        gdnmaAPIKey.widthHint = 200;
         nmaAPIKey.setLayoutData(gdnmaAPIKey);
         nmaAPIKey.setText(AppConfig.get().getNMAAPIKey());
 
         final Button imkayac = new Button(compositePushNotify, SWT.CHECK);
         imkayac.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-        imkayac.setText("ImKayac によるPush通知");
+        imkayac.setText("ImKayac によるPush通知(秘密鍵優先)");
         imkayac.setSelection(AppConfig.get().getNotifyImKayac());
 
         Label label14 = new Label(compositePushNotify, SWT.NONE);
@@ -708,7 +754,7 @@ public final class ConfigDialog extends Dialog {
 
         final Text imkayacUserName = new Text(compositePushNotify, SWT.BORDER);
         GridData gdimkayacUserName = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
-        gdimkayacUserName.widthHint = 220;
+        gdimkayacUserName.widthHint = 200;
         imkayacUserName.setLayoutData(gdimkayacUserName);
         imkayacUserName.setText(AppConfig.get().getImKayacUserName());
 
@@ -718,7 +764,7 @@ public final class ConfigDialog extends Dialog {
 
         final Text imkayacPasswd = new Text(compositePushNotify, SWT.PASSWORD | SWT.BORDER);
         GridData gdimkayacPasswd = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
-        gdimkayacPasswd.widthHint = 220;
+        gdimkayacPasswd.widthHint = 200;
         imkayacPasswd.setLayoutData(gdimkayacPasswd);
         imkayacPasswd.setText(AppConfig.get().getImKayacPasswd());
 
@@ -728,17 +774,43 @@ public final class ConfigDialog extends Dialog {
 
         final Text imkayacPrivateKey = new Text(compositePushNotify, SWT.BORDER);
         GridData gdimkayacPrivateKey = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
-        gdimkayacPrivateKey.widthHint = 220;
+        gdimkayacPrivateKey.widthHint = 200;
         imkayacPrivateKey.setLayoutData(gdimkayacUserName);
         imkayacPrivateKey.setText(AppConfig.get().getImKayacPrivateKey());
 
-        Label label17 = new Label(compositePushNotify, SWT.NONE);
-        label17.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 3, 1));
-        label17.setText("パスワードと秘密鍵の両方が設定されていると\n秘密鍵が優先されます。");
+        final Button pushNotifyMission = new Button(compositePushNotify, SWT.CHECK);
+        pushNotifyMission.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        pushNotifyMission.setText("遠征帰投を通知");
+        pushNotifyMission.setSelection(AppConfig.get().getPushMission());
 
-        Button TestNotifyBtn = new Button(compositePushNotify, SWT.NONE);
-        TestNotifyBtn.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 3, 1));
-        TestNotifyBtn.addSelectionListener(new SelectionAdapter() {
+        final Combo pushPriorityMissionCombo = new Combo(compositePushNotify, SWT.READ_ONLY);
+        GridData gdpushPriorityMissionCombo = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
+        pushPriorityMissionCombo.setLayoutData(gdpushPriorityMissionCombo);
+        pushPriorityMissionCombo.add("Priority: Very Low");
+        pushPriorityMissionCombo.add("Priority: Moderate");
+        pushPriorityMissionCombo.add("Priority: Normal");
+        pushPriorityMissionCombo.add("Priority: High");
+        pushPriorityMissionCombo.add("Priority: Emergency");
+        pushPriorityMissionCombo.select(AppConfig.get().getPushPriorityMission() + 2);
+
+        final Button pushNotifyNdock = new Button(compositePushNotify, SWT.CHECK);
+        pushNotifyNdock.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        pushNotifyNdock.setText("入渠完了を通知");
+        pushNotifyNdock.setSelection(AppConfig.get().getPushNdock());
+
+        final Combo pushPriorityNdockCombo = new Combo(compositePushNotify, SWT.READ_ONLY);
+        GridData gdpushPriorityNdockCombo = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
+        pushPriorityNdockCombo.setLayoutData(gdpushPriorityNdockCombo);
+        pushPriorityNdockCombo.add("Priority: Very Low");
+        pushPriorityNdockCombo.add("Priority: Moderate");
+        pushPriorityNdockCombo.add("Priority: Normal");
+        pushPriorityNdockCombo.add("Priority: High");
+        pushPriorityNdockCombo.add("Priority: Emergency");
+        pushPriorityNdockCombo.select(AppConfig.get().getPushPriorityNdock() + 2);
+
+        Button TestNotifyMissionBtn = new Button(compositePushNotify, SWT.NONE);
+        TestNotifyMissionBtn.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 2, 1));
+        TestNotifyMissionBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 AppConfig.get().setNotifyProwl(prowl.getSelection());
@@ -749,10 +821,40 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setImKayacUserName(imkayacUserName.getText());
                 AppConfig.get().setImKayacPasswd(imkayacPasswd.getText());
                 AppConfig.get().setImKayacPrivateKey(imkayacPrivateKey.getText());
-                PushNotify.add("第二艦隊（通知テスト）がまもなく帰投します");
+                AppConfig.get().setPushMission(pushNotifyMission.getSelection());
+                AppConfig.get().setPushNdock(pushNotifyNdock.getSelection());
+                AppConfig.get().setPushPriorityMission(pushPriorityMissionCombo.getSelectionIndex() - 2);
+                AppConfig.get().setPushPriorityNdock(pushPriorityNdockCombo.getSelectionIndex() - 2);
+                if (AppConfig.get().getPushMission()) {
+                    PushNotify.add("通知テスト艦隊(テスト遠征)がまもなく帰投します", "遠征", AppConfig.get().getPushPriorityMission());
+                }
             }
         });
-        TestNotifyBtn.setText("テスト通知");
+        TestNotifyMissionBtn.setText("テスト通知(遠征)");
+
+        Button TestNotifyNdockBtn = new Button(compositePushNotify, SWT.NONE);
+        TestNotifyNdockBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        TestNotifyNdockBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                AppConfig.get().setNotifyProwl(prowl.getSelection());
+                AppConfig.get().setProwlAPIKey(prowlAPIKey.getText());
+                AppConfig.get().setNotifyNMA(nma.getSelection());
+                AppConfig.get().setNMAAPIKey(nmaAPIKey.getText());
+                AppConfig.get().setNotifyImKayac(imkayac.getSelection());
+                AppConfig.get().setImKayacUserName(imkayacUserName.getText());
+                AppConfig.get().setImKayacPasswd(imkayacPasswd.getText());
+                AppConfig.get().setImKayacPrivateKey(imkayacPrivateKey.getText());
+                AppConfig.get().setPushMission(pushNotifyMission.getSelection());
+                AppConfig.get().setPushNdock(pushNotifyNdock.getSelection());
+                AppConfig.get().setPushPriorityMission(pushPriorityMissionCombo.getSelectionIndex() - 2);
+                AppConfig.get().setPushPriorityNdock(pushPriorityNdockCombo.getSelectionIndex() - 2);
+                if (AppConfig.get().getPushNdock()) {
+                    PushNotify.add("通知テスト改(Lv99)がまもなくお風呂からあがります", "入渠", AppConfig.get().getPushPriorityNdock());
+                }
+            }
+        });
+        TestNotifyNdockBtn.setText("テスト通知(入渠)");
 
         final Button databaseLogButton = new Button(compositeProxy, SWT.CHECK);
         databaseLogButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
@@ -845,11 +947,19 @@ public final class ConfigDialog extends Dialog {
                 }
                 */
                 AppConfig.get().setReportPath(reportDir.getText());
+                AppConfig.get().setBattleLogPath(battlelogDir.getText());
                 AppConfig.get().setUpdateCheck(checkUpdate.getSelection());
                 AppConfig.get().setAllowOnlyFromLocalhost(onlyFromLocalhost.getSelection());
                 // maintab
                 AppConfig.get().setPrintSortieLog(printSortieLog.getSelection());
                 AppConfig.get().setPrintSunkLog(printSunkLog.getSelection());
+                AppConfig.get().setPrintUpdateLog(printUpdateLog.getSelection());
+                AppConfig.get().setLoadCreateItemLog(loadCreateItemLog.getSelection());
+                AppConfig.get().setLoadCreateShipLog(loadCreateShipLog.getSelection());
+                AppConfig.get().setLoadMissionLog(loadMissionLog.getSelection());
+                if (JIntellitypeWrapper.getInstance() != null) {
+                    AppConfig.get().setSystemWideHotKey(systemWideShortcutKey.getSelectionIndex());
+                }
                 // fleettab
                 AppConfig.get().setDisplayCount(displaycount.getSelection());
                 AppConfig.get().setDefaultSea(seacombo.getItem(seacombo.getSelectionIndex()));
@@ -861,13 +971,24 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setBalloonBybadlyDamage(balloonBybadlyDamage.getSelection());
                 AppConfig.get().setVisibleOnReturnMission(visibleOnReturnMission.getSelection());
                 AppConfig.get().setVisibleOnReturnBathwater(visibleOnReturnBathwater.getSelection());
-                AppConfig.get().setSakutekiMethod(sakutekiCombo.getSelectionIndex());
+                AppConfig.get().setMonoIcon(useMonoIcon.getSelection());
+                if (useRecommendedSakuteki.getSelection()) {
+                    AppConfig.get().setUseRecommendedSakuteki(true);
+                }
+                else {
+                    AppConfig.get().setUseRecommendedSakuteki(false);
+                    AppConfig.get().setSakutekiMethod(sakutekiCombo.getSelectionIndex());
+                }
                 // notify
                 AppConfig.get().setMissionRemind(remind.getSelection());
                 AppConfig.get().setRemindInterbal(intervalSpinner.getSelection());
                 AppConfig.get().setUseBalloon(balloon.getSelection());
                 AppConfig.get().setUseTaskbarNotify(taskbar.getSelection());
                 AppConfig.get().setNotifyFully(fullySpinner.getSelection());
+                AppConfig.get().setEnableShipFullBalloonNotify(shipFullBalloon.getSelection());
+                AppConfig.get().setShipFullBalloonNotify(shipFullSpinner.getSelection());
+                AppConfig.get().setEnableItemFullBalloonNotify(itemFullBalloon.getSelection());
+                AppConfig.get().setItemFullBalloonNotify(itemFullSpinner.getSelection());
                 // capture
                 AppConfig.get().setCapturePath(captureDir.getText());
                 AppConfig.get().setImageFormat(imageformatCombo.getItem(imageformatCombo.getSelectionIndex()));
@@ -879,8 +1000,14 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setAmmoColor(ammo.getForeground().getRGB());
                 AppConfig.get().setMetalColor(metal.getForeground().getRGB());
                 AppConfig.get().setBauxiteColor(bauxite.getForeground().getRGB());
+                AppConfig.get().setBurnerColor(burner.getForeground().getRGB());
+                AppConfig.get().setBucketColor(bucket.getForeground().getRGB());
+                AppConfig.get().setResearchColor(research.getForeground().getRGB());
+                AppConfig.get().setScrewColor(screw.getForeground().getRGB());
                 // ウィンドウ
                 AppConfig.get().setOpaqueInterval(opaqueIntervalSpinner.getSelection());
+                AppConfig.get().setEnableMoveWithDD(enableMoveWithDD.getSelection());
+                AppConfig.get().setToggleToolButton(toggleToolButton.getSelection());
                 for (int i = 0; i < 4; ++i) {
                     AppConfig.get().getShipTableNames()[i] = shipTableNameText[i].getText();
                 }
@@ -889,6 +1016,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setProxyHost(proxyHostText.getText());
                 AppConfig.get().setProxyPort(proxyPortSpinner.getSelection());
                 AppConfig.get().setSendDatabase(sendDatabaseButton.getSelection());
+                AppConfig.get().setDatabaseSendLog(databaseLogButton.getSelection());
                 AppConfig.get().setAccessKey(accessKeyText.getText());
                 // push notify
                 AppConfig.get().setNotifyProwl(prowl.getSelection());
@@ -899,7 +1027,10 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setImKayacUserName(imkayacUserName.getText());
                 AppConfig.get().setImKayacPasswd(imkayacPasswd.getText());
                 AppConfig.get().setImKayacPrivateKey(imkayacPrivateKey.getText());
-                AppConfig.get().setDatabaseSendLog(databaseLogButton.getSelection());
+                AppConfig.get().setPushMission(pushNotifyMission.getSelection());
+                AppConfig.get().setPushNdock(pushNotifyNdock.getSelection());
+                AppConfig.get().setPushPriorityMission(pushPriorityMissionCombo.getSelectionIndex() - 2);
+                AppConfig.get().setPushPriorityNdock(pushPriorityNdockCombo.getSelectionIndex() - 2);
 
                 // development
                 AppConfig.get().setStoreJson(btnJson.getSelection());
@@ -932,6 +1063,38 @@ public final class ConfigDialog extends Dialog {
         sashForm.setWeights(new int[] { 2, 5 });
         this.scrolledComposite.setContent(this.composite);
         this.scrolledComposite.setMinSize(this.composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+    }
+
+    private Label createColorSetting(Group chartGroup, String title, RGB currentColor, final RGB defaultColor) {
+        final Label label = new Label(chartGroup, SWT.NONE);
+        label.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        label.setText(title);
+        label.setForeground(SWTResourceManager.getColor(currentColor));
+
+        Button changeColor = new Button(chartGroup, SWT.NONE);
+        changeColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        changeColor.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                ColorDialog dialog = new ColorDialog(ConfigDialog.this.shell);
+                RGB rgb = dialog.open();
+                if (rgb != null) {
+                    label.setForeground(SWTResourceManager.getColor(rgb));
+                }
+            }
+        });
+        changeColor.setText("色の設定");
+
+        Button resetColor = new Button(chartGroup, SWT.NONE);
+        resetColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        resetColor.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                label.setForeground(SWTResourceManager.getColor(defaultColor));
+            }
+        });
+        resetColor.setText("リセット");
+        return label;
     }
 
     /**

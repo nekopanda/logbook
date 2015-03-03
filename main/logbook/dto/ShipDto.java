@@ -2,10 +2,12 @@ package logbook.dto;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
 
 import javax.json.JsonObject;
 
 import logbook.constants.AppConstants;
+import logbook.data.context.GlobalContext;
 import logbook.internal.ExpTable;
 import logbook.internal.Ship;
 import logbook.util.JsonUtils;
@@ -37,7 +39,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
 
     /** 鍵付き */
     @Tag(13)
-    private final boolean locked;
+    private boolean locked;
 
     /** 艦隊ID */
     @Tag(14)
@@ -56,7 +58,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
 
     /** 入渠時間 */
     @Tag(18)
-    private final long docktime;
+    private long docktime;
 
     /** 修復資材 燃料 */
     @Tag(19)
@@ -77,6 +79,10 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     /** 経験値 */
     @Tag(23)
     private final int exp;
+
+    /** 経験値ゲージの割合 */
+    @Tag(30)
+    private final float expraito;
 
     /** HP */
     @Tag(24)
@@ -128,6 +134,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
         this.fuel = object.getJsonNumber("api_fuel").intValue();
 
         this.exp = object.getJsonArray("api_exp").getJsonNumber(0).intValue();
+        this.expraito = object.getJsonArray("api_exp").getJsonNumber(2).longValue() / 100f;
         this.nowhp = this.getParam().getHP();
         this.maxhp = this.getMax().getHP();
         this.slotnum = object.getJsonNumber("api_slotnum").intValue();
@@ -165,6 +172,12 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
      */
     public boolean getLocked() {
         return this.locked;
+    }
+
+    /**
+     */
+    public void setLocked(boolean locked) {
+        this.locked = locked;
     }
 
     /**
@@ -237,6 +250,13 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
+     * 入渠時間をセット
+     */
+    public void setDockTime(long docktime) {
+        this.docktime = docktime;
+    }
+
+    /**
      * @return 修復資材 燃料
      */
     public int getDockfuel() {
@@ -290,6 +310,13 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
+     * @return 経験値ゲージの割合
+     */
+    public float getExpraito() {
+        return this.expraito;
+    }
+
+    /**
      * @return HP
      */
     public int getNowhp() {
@@ -319,7 +346,8 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
      * @return 次のレベルまでの経験値
      */
     public Integer getNext() {
-        Integer nextLvExp = ExpTable.get().get(this.lv + 1);
+        Integer nextLvExp = ExpTable.get().get(
+                Math.min(ExpTable.MAX_LEVEL, this.lv + 1));
         if (nextLvExp != null) {
             return nextLvExp - this.exp;
         }
@@ -376,5 +404,95 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     @Override
     public int compareTo(ShipDto o) {
         return Integer.compare(this.id, o.id);
+    }
+
+    /**
+     * 装備で加算された命中
+     * 
+     * @return 装備の命中
+     */
+    public int getAccuracy() {
+        int accuracy = 0;
+        for (int itemid : this.slot) {
+            if (-1 != itemid) {
+                Map<Integer, ItemDto> itemMap = GlobalContext.getItemMap();
+                ItemDto item = itemMap.get(itemid);
+                if (item != null) {
+                    accuracy += item.getParam().getHoum();
+                }
+            }
+        }
+        return accuracy;
+    }
+
+    /**
+     * 砲撃戦火力
+     * 
+     * @return 砲撃戦火力
+     */
+    public int getHougekiPower() {
+        switch (this.getStype()) {
+        case 7: // 軽空母
+        case 11: // 正規空母
+        case 16: // 水上機母艦
+        case 18: // 装甲空母
+            // (火力 + 雷装) × 1.5 + 爆装 × 2 + 55
+            int rai = 0;
+            int baku = 0;
+            Map<Integer, ItemDto> itemMap = GlobalContext.getItemMap();
+            for (int itemid : this.slot) {
+                if (-1 != itemid) {
+                    ItemDto item = itemMap.get(itemid);
+                    if (item != null) {
+                        rai += item.getParam().getRaig();
+                        baku += item.getParam().getBaku();
+                    }
+                }
+            }
+            return (int) Math.round(((this.getKaryoku() + rai) * 1.5d) + (baku * 2) + 55);
+        default:
+            return this.getKaryoku() + 5;
+        }
+    }
+
+    /**
+     * 雷撃戦火力
+     * 
+     * @return 雷撃戦火力
+     */
+    public int getRaigekiPower() {
+        return this.getRaisou() + 5;
+    }
+
+    /**
+     * 対潜火力
+     * 
+     * @return 対潜火力
+     */
+    public int getTaisenPower() {
+        // [ 艦船の対潜 ÷ 5 ] + 装備の対潜 × 2 + 25
+        int taisenShip = this.getTaisen();
+        int taisenItem = 0;
+        Map<Integer, ItemDto> itemMap = GlobalContext.getItemMap();
+        for (int itemid : this.slot) {
+            if (-1 != itemid) {
+                ItemDto item = itemMap.get(itemid);
+                if (item != null) {
+                    int taisen = item.getParam().getTais();
+                    taisenShip -= taisen;
+                    taisenItem += taisen;
+                }
+            }
+        }
+        return (int) Math.round(Math.floor(taisenShip / 5d) + (taisenItem * 2) + 25);
+    }
+
+    /**
+     * 夜戦火力
+     * 
+     * @return 夜戦火力
+     */
+    public int getYasenPower() {
+        return this.getKaryoku() + this.getRaisou();
     }
 }

@@ -83,6 +83,8 @@ public abstract class AbstractTableDialog extends WindowBase {
 
     protected TableConfigBean config;
 
+    protected MenuItem cyclicReloadMenuItem;
+
     private Display display;
 
     /**
@@ -120,6 +122,13 @@ public abstract class AbstractTableDialog extends WindowBase {
         this.table.addKeyListener(new TableKeyShortcutAdapter(this.header, this.table));
         this.table.setLinesVisible(true);
         this.table.setHeaderVisible(true);
+        this.table.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                AbstractTableDialog.this.shell.setText(AbstractTableDialog.this.getTitle());
+            }
+        });
         // メニューバーのメニュー
         MenuItem fileroot = new MenuItem(this.menubar, SWT.CASCADE);
         fileroot.setText("ファイル");
@@ -142,10 +151,10 @@ public abstract class AbstractTableDialog extends WindowBase {
         reload.setAccelerator(SWT.F5);
         reload.addSelectionListener(new TableReloadAdapter());
 
-        MenuItem cyclicReload = new MenuItem(this.opemenu, SWT.CHECK);
-        cyclicReload.setText("定期的に再読み込み(3秒)(&A)\tCtrl+F5");
-        cyclicReload.setAccelerator(SWT.CTRL + SWT.F5);
-        cyclicReload.addSelectionListener(new CyclicReloadAdapter(cyclicReload));
+        this.cyclicReloadMenuItem = new MenuItem(this.opemenu, SWT.CHECK);
+        this.cyclicReloadMenuItem.setText("定期的に再読み込み(3秒)(&A)\tCtrl+F5");
+        this.cyclicReloadMenuItem.setAccelerator(SWT.CTRL + SWT.F5);
+        this.cyclicReloadMenuItem.addSelectionListener(new CyclicReloadAdapter(this.cyclicReloadMenuItem));
 
         MenuItem selectVisible = new MenuItem(this.opemenu, SWT.NONE);
         selectVisible.setText("列の表示・非表示(&V)");
@@ -177,7 +186,10 @@ public abstract class AbstractTableDialog extends WindowBase {
                 box.setMessage("表示されているすべての列の幅が現在の表示データを使って自動調整されます。よろしいですか？");
                 if (box.open() == SWT.YES) {
                     AbstractTableDialog.this.table.setRedraw(false);
+                    // ソートマーカーを取ってから列幅を調整する
+                    AbstractTableDialog.this.table.setSortColumn(null);
                     AbstractTableDialog.this.restoreColumnWidth(true);
+                    AbstractTableDialog.this.setSortDirectionToHeader();
                     AbstractTableDialog.this.table.setRedraw(true);
                 }
             }
@@ -257,9 +269,7 @@ public abstract class AbstractTableDialog extends WindowBase {
                 AbstractTableDialog.this.headermenu.dispose();
                 AbstractTableDialog.this.tablemenu.dispose();
                 // タイマーの終了
-                if (AbstractTableDialog.this.timer != null) {
-                    AbstractTableDialog.this.timer.cancel();
-                }
+                AbstractTableDialog.this.disableCyclicReload();
             }
         });
 
@@ -271,6 +281,12 @@ public abstract class AbstractTableDialog extends WindowBase {
                     this.orderflgs[key.index] = key.order;
                 }
             }
+        }
+
+        // 自動更新設定を反映
+        if (this.getConfig().isCyclicReload()) {
+            this.cyclicReloadMenuItem.setSelection(true);
+            this.enableCyclicReload();
         }
 
         this.display = this.shell.getDisplay();
@@ -391,11 +407,16 @@ public abstract class AbstractTableDialog extends WindowBase {
         this.table.setRedraw(true);
     }
 
-    private void resetColumnOrder() {
+    protected int[] defaultColumnOrder() {
         int[] columnOrder = new int[this.header.length];
         for (int i = 0; i < this.header.length; ++i) {
             columnOrder[i] = i;
         }
+        return columnOrder;
+    }
+
+    private void resetColumnOrder() {
+        int[] columnOrder = this.defaultColumnOrder();
         if (this.config != null) {
             this.config.setColumnOrder(columnOrder);
         }
@@ -406,21 +427,52 @@ public abstract class AbstractTableDialog extends WindowBase {
         if (this.config == null) {
             this.config = AppConfig.get().getTableConfigMap().get(this.getWindowId());
 
-            // 列の表示・非表示設定のサイズがカラム数と異なっている場合は破棄する
             if (this.config != null) {
-                if (this.config.getVisibleColumn() == null) {
+                if (this.config.getColumnWidth() == null) { // 互換性維持
+                    this.config.setColumnWidth(new int[this.header.length]);
+                }
+                if ((this.config.getVisibleColumn() == null) ||
+                        (this.config.getColumnOrder() == null)) {
                     this.config = null;
                 }
-                else if (this.config.getVisibleColumn().length != this.header.length) {
-                    this.config = null;
+                else {
+                    int oldLength = this.config.getVisibleColumn().length;
+                    if (oldLength != this.header.length) {
+                        // 列の表示・非表示設定のサイズがカラム数と異なっている場合は長さを新しくする
+                        boolean[] visibles = new boolean[this.header.length];
+                        Arrays.fill(visibles, true);
+                        int[] columnWidth = new int[this.header.length];
+                        int[] columnOrder = new int[this.header.length];
+                        for (int i = 0; i < this.header.length; ++i) {
+                            columnOrder[i] = i;
+                        }
+                        int copyLength = Math.min(oldLength, this.header.length);
+                        System.arraycopy(this.config.getVisibleColumn(), 0, visibles, 0, copyLength);
+                        System.arraycopy(this.config.getColumnWidth(), 0, columnWidth, 0, copyLength);
+                        System.arraycopy(this.config.getColumnOrder(), 0, columnOrder, 0, copyLength);
+                        this.config.setVisibleColumn(visibles);
+                        this.config.setColumnWidth(columnWidth);
+                        this.config.setColumnOrder(columnOrder);
+
+                        // sortOrderをチェック
+                        TableConfigBean.SortKey[] sortKeys = this.config.getSortKeys();
+                        for (int i = 0; i < sortKeys.length; ++i) {
+                            if (sortKeys[i] != null) {
+                                if (sortKeys[i].index >= this.header.length) {
+                                    // 超えてる
+                                    sortKeys[i] = null;
+                                }
+                            }
+                        }
+                        this.config.setSortKeys(sortKeys);
+                    }
                 }
             }
             if (this.config == null) {
                 this.config = this.getDefaultTableConfig();
             }
-            if (this.config.getColumnWidth() == null) { // 互換性維持
-                this.config.setColumnWidth(new int[this.header.length]);
-            }
+
+            // 古い設定がある場合はできるだけ持ってくる
         }
         return this.config;
     }
@@ -430,6 +482,10 @@ public abstract class AbstractTableDialog extends WindowBase {
         if ((this.body != null) && (this.table != null)) {
             if (this.table.getItemCount() != this.body.size()) {
                 title += " " + this.body.size() + "件中" + this.table.getItemCount() + "件のみ表示";
+            }
+            int selectionCount = this.table.getSelectionCount();
+            if (selectionCount > 1) {
+                title += " " + selectionCount + "件選択中";
             }
         }
         return title;
@@ -450,6 +506,9 @@ public abstract class AbstractTableDialog extends WindowBase {
                 }
             }
             this.config.setColumnWidth(widths);
+            this.config.setCyclicReload(this.cyclicReloadMenuItem.getSelection());
+            // 将来の互換性維持のため
+            this.config.setHeaderNames(this.header);
 
             AppConfig.get().getTableConfigMap().put(this.getWindowId(), this.config);
         }
@@ -633,13 +692,31 @@ public abstract class AbstractTableDialog extends WindowBase {
         }
     }
 
+    private void enableCyclicReload() {
+        // タイマーを作成
+        if (this.timer == null) {
+            this.timer = new Timer(true);
+            // 3秒毎に再読み込みするようにスケジュールする
+            this.timer.schedule(new CyclicReloadTask(AbstractTableDialog.this), 0,
+                    TimeUnit.SECONDS.toMillis(3));
+        }
+    }
+
+    private void disableCyclicReload() {
+        // タイマーを終了
+        if (this.timer != null) {
+            this.timer.cancel();
+            this.timer = null;
+        }
+    }
+
     /**
      * テーブルをソートする{@link java.util.Comparator}です。
      */
     protected class TableComparator implements Comparator<Comparable[]> {
 
         /** ソート設定済みフラグ */
-        private boolean confflg = false;
+        private boolean confflg;
         /** 列位置 */
         private int index;
         /** 昇順・降順フラグ */
@@ -689,6 +766,22 @@ public abstract class AbstractTableDialog extends WindowBase {
         public final boolean getHasSetConfig() {
             return this.confflg;
         }
+
+        /**
+         * 比較する
+         * 
+         * @param o1
+         * @param o2
+         * @param order
+         * @return
+         */
+        private <T extends Comparable<? super T>> int compareTo(T o1, T o2, boolean order) {
+            if (this.order) {
+                return o1.compareTo(o2);
+            } else {
+                return o2.compareTo(o1);
+            }
+        }
     }
 
     /**
@@ -725,19 +818,9 @@ public abstract class AbstractTableDialog extends WindowBase {
         @Override
         public void widgetSelected(SelectionEvent e) {
             if (this.menuitem.getSelection()) {
-                // タイマーを作成
-                if (AbstractTableDialog.this.timer == null) {
-                    AbstractTableDialog.this.timer = new Timer(true);
-                }
-                // 3秒毎に再読み込みするようにスケジュールする
-                AbstractTableDialog.this.timer.schedule(new CyclicReloadTask(AbstractTableDialog.this), 0,
-                        TimeUnit.SECONDS.toMillis(3));
+                AbstractTableDialog.this.enableCyclicReload();
             } else {
-                // タイマーを終了
-                if (AbstractTableDialog.this.timer != null) {
-                    AbstractTableDialog.this.timer.cancel();
-                    AbstractTableDialog.this.timer = null;
-                }
+                AbstractTableDialog.this.disableCyclicReload();
             }
         }
     }

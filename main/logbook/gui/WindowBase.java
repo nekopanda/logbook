@@ -10,8 +10,10 @@ import java.util.Set;
 
 import logbook.config.AppConfig;
 import logbook.config.bean.WindowConfigBean;
+import logbook.constants.AppConstants;
 import logbook.gui.logic.OpacityAnimation;
 import logbook.gui.logic.OpacityAnimationClient;
+import logbook.gui.logic.WindowListener;
 import logbook.gui.logic.WindowNativeSupport;
 
 import org.eclipse.swt.SWT;
@@ -32,6 +34,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
  * @author Nekopanda
@@ -82,6 +85,9 @@ public class WindowBase {
     private WindowConfigBean config;
     private boolean shareOpacitySetting = false;
     private int opacityIndex = 0;
+
+    // イベントリスナ
+    private final List<WindowListener> windowListeners = new ArrayList<>();
 
     private static interface EventProc {
         void proc(WindowBase window);
@@ -382,6 +388,14 @@ public class WindowBase {
         }
     }
 
+    public void addWindowListener(WindowListener listener) {
+        this.windowListeners.add(listener);
+    }
+
+    public void removeWindowListener(WindowListener listener) {
+        this.windowListeners.remove(listener);
+    }
+
     public static void setDataToAllChild(Control c, String key, Object data) {
         c.setData(key, data);
         if (c instanceof Composite) {
@@ -465,7 +479,7 @@ public class WindowBase {
             }
         });
         // ドラックでウィンドウ移動
-        if (this.moveWithDrag()) { // dragMoveHandler
+        if (this.moveWithDrag() && AppConfig.get().isEnableMoveWithDD()) { // dragMoveHandler
             this.dragMoveHandler = new DragMoveEventHandler(this.shell);
             this.addMouseListener(this.shell);
         }
@@ -508,7 +522,7 @@ public class WindowBase {
         }
     }
 
-    private void hideWindow() {
+    public void hideWindow() {
         // 閉じる前に位置を記憶
         WindowBase.this.save();
         WindowBase.this.menuItem.setSelection(false);
@@ -527,13 +541,13 @@ public class WindowBase {
      * @param newValue
      */
     protected void showTitlebarChanged(boolean showTitlebar) {
-        if (this.moveWithDrag()) {
-            this.showTitlebarItem.setSelection(showTitlebar);
-            if (this.showTitlebar != showTitlebar) {
-                this.showTitlebar = showTitlebar;
-                nativeService.toggleTitlebar(this.getShell(), showTitlebar);
-            }
+        //if (this.moveWithDrag()) {
+        this.showTitlebarItem.setSelection(showTitlebar);
+        if (this.showTitlebar != showTitlebar) {
+            this.showTitlebar = showTitlebar;
+            nativeService.toggleTitlebar(this.getShell(), showTitlebar);
         }
+        //}
     }
 
     private boolean isMouseHovering() {
@@ -581,6 +595,7 @@ public class WindowBase {
 
     private void createContents(boolean cascade) {
         this.shell.setData(this);
+        this.shell.setImage(SWTResourceManager.getImage(WindowBase.class, AppConstants.LOGO));
         // ウィンドウ基本メニュー
         this.alphamenu = new Menu(this.shell);
         Menu rootMenu = this.alphamenu;
@@ -602,17 +617,17 @@ public class WindowBase {
                 }
             });
 
-            if (this.moveWithDrag()) {
-                // タイトルバーを表示にする
-                this.showTitlebarItem = new MenuItem(rootMenu, SWT.CHECK);
-                this.showTitlebarItem.setText("タイトルバーを表示する");
-                this.showTitlebarItem.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent paramSelectionEvent) {
-                        WindowBase.this.treeNode.showTitlebarChanged(WindowBase.this);
-                    }
-                });
-            }
+            //if (this.moveWithDrag()) {
+            // タイトルバーを表示にする
+            this.showTitlebarItem = new MenuItem(rootMenu, SWT.CHECK);
+            this.showTitlebarItem.setText("タイトルバーを表示する");
+            this.showTitlebarItem.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent paramSelectionEvent) {
+                    WindowBase.this.treeNode.showTitlebarChanged(WindowBase.this);
+                }
+            });
+            //}
         }
 
         // マウスで不透明化
@@ -701,9 +716,9 @@ public class WindowBase {
         // 最前面に表示
         if (nativeService.isTopMostAvailable()) {
             this.topMostChanged(this.config.isTopMost());
-            if (this.moveWithDrag()) {
-                this.showTitlebarChanged(this.config.isShowTitlebar());
-            }
+            //if (this.moveWithDrag()) {
+            this.showTitlebarChanged(this.config.isShowTitlebar());
+            //}
         }
         // 透過設定
         boolean changeAnimation = (this.shareOpacitySetting != this.config.isShareOpacitySetting());
@@ -804,6 +819,15 @@ public class WindowBase {
             }
             this.dbgprint("setVisible alpha=" + this.shell.getAlpha());
             this.shell.setVisible(visible);
+            // イベント発行
+            for (WindowListener listener : this.windowListeners) {
+                if (visible) {
+                    listener.windowShown();
+                }
+                else {
+                    listener.windowHidden();
+                }
+            }
         }
     }
 
@@ -841,9 +865,9 @@ public class WindowBase {
                 // 最前面に表示
                 if (nativeService.isTopMostAvailable()) {
                     this.config.setTopMost(this.topMostItem.getSelection());
-                    if (this.moveWithDrag()) {
-                        this.config.setShowTitlebar(this.showTitlebarItem.getSelection());
-                    }
+                    //if (this.moveWithDrag()) {
+                    this.config.setShowTitlebar(this.showTitlebarItem.getSelection());
+                    //}
                 }
                 this.config.setMouseHoveringAware(this.treeNode.getMouseHoverAware());
                 this.config.setShareOpacitySetting(this.shareOpacitySetting);

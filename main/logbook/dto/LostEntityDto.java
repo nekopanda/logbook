@@ -38,10 +38,10 @@ public class LostEntityDto {
         LostEntityDto lostShipDto = new LostEntityDto(lostShip, eventCaused);
         List<LostEntityDto> list = new ArrayList<LostEntityDto>();
         list.add(lostShipDto);
-        List<ItemDto> itemList = lostShip.getItem();
+        List<ItemInfoDto> itemList = lostShip.getItem();
         int[] itemIdList = lostShip.getItemId();
         for (int i = 0; i < itemList.size(); ++i) {
-            ItemDto itemDto = itemList.get(i);
+            ItemInfoDto itemDto = itemList.get(i);
             Integer itemId = itemIdList[i];
             if (itemDto != null) {
                 list.add(new LostEntityDto(itemId, itemDto.getName(), lostShipDto.getEventCaused()));

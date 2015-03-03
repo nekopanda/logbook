@@ -24,15 +24,21 @@ public final class DockDto extends AbstractDto {
     @Tag(3)
     private final List<ShipDto> ships = new ArrayList<ShipDto>();
 
+    @Tag(4)
+    private boolean[] escaped = null;
+
     /** 更新フラグ */
     private transient boolean update;
 
     /**
      * コンストラクター
      */
-    public DockDto(String id, String name) {
+    public DockDto(String id, String name, DockDto oldDock) {
         this.id = id;
         this.name = name;
+        if (oldDock != null) {
+            this.escaped = oldDock.getEscaped();
+        }
     }
 
     /**
@@ -45,7 +51,7 @@ public final class DockDto extends AbstractDto {
 
     /**
      * 艦娘を艦隊に追加します
-     * 
+     * 艦娘の艦隊所属情報も更新します
      * @param ship
      */
     public void addShip(ShipDto ship) {
@@ -54,23 +60,30 @@ public final class DockDto extends AbstractDto {
 
     /**
      * 艦隊から艦娘を削除します
-     * 
      * @param ship
      */
     public void removeShip(ShipDto ship) {
-        this.ships.remove(ship);
+        int index = this.ships.indexOf(ship);
+        if (index != -1) {
+            this.ships.remove(index);
+        }
     }
 
     /**
      * 艦隊の艦娘を入れ替えます
-     * 
-     * @param oldShip
+     * @param index
      * @param newShip
      */
-    public void replaceShip(ShipDto oldShip, ShipDto newShip) {
-        int index = this.ships.indexOf(oldShip);
-        if (index != -1) {
-            this.ships.set(index, newShip);
+    public void setShip(int index, ShipDto newShip) {
+        this.ships.set(index, newShip);
+    }
+
+    /**
+     * 旗艦以外を外します
+     */
+    public void removeExceptFlagship() {
+        while (this.ships.size() > 1) {
+            this.ships.remove(this.ships.size() - 1);
         }
     }
 
@@ -106,16 +119,47 @@ public final class DockDto extends AbstractDto {
         this.update = update;
     }
 
+    public void removeFleetIdFromShips() {
+        for (int i = 0; i < this.ships.size(); i++) {
+            this.ships.get(i).setFleetid("");
+        }
+    }
+
+    public void updateFleetIdOfShips() {
+        for (int i = 0; i < this.ships.size(); i++) {
+            this.ships.get(i).setFleetid(this.id);
+            this.ships.get(i).setFleetpos(i);
+        }
+    }
+
     /**
      * 大破艦がいるか？を取得します
      * @return 大破艦がいるか？
      */
     public boolean isBadlyDamaged() {
-        for (ShipDto ship : this.ships) {
+        for (int i = 0; i < this.ships.size(); ++i) {
+            if ((this.escaped != null) && this.escaped[i]) {
+                continue; // 退避した艦はカウントしない
+            }
+            ShipDto ship = this.ships.get(i);
             if (ship.isBadlyDamage()) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * @return escaped
+     */
+    public boolean[] getEscaped() {
+        return this.escaped;
+    }
+
+    /**
+     * @param escaped セットする escaped
+     */
+    public void setEscaped(boolean[] escaped) {
+        this.escaped = escaped;
     }
 }

@@ -7,11 +7,16 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +36,7 @@ import logbook.dto.DockDto;
 import logbook.dto.EnemyShipDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
+import logbook.dto.ItemInfoDto;
 import logbook.dto.LostEntityDto;
 import logbook.dto.MaterialDto;
 import logbook.dto.MissionResultDto;
@@ -43,6 +49,7 @@ import logbook.dto.ShipParameters;
 import logbook.dto.UseItemDto;
 import logbook.internal.BattleResultFilter;
 import logbook.internal.BattleResultServer;
+import logbook.internal.MasterData;
 import logbook.internal.Ship;
 import logbook.util.ReportUtils;
 
@@ -57,6 +64,8 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.wb.swt.SWTResourceManager;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 /**
  * 各種報告書を作成します
@@ -127,6 +136,8 @@ public final class CreateReportLogic {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
             } else if (cond <= AppConstants.COND_ORANGE) {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
+            } else if ((cond >= AppConstants.COND_DARK_GREEN) && (cond < AppConstants.COND_GREEN)) {
+                item.setForeground(SWTResourceManager.getColor(AppConstants.COND_DARK_GREEN_COLOR));
             } else if (cond >= AppConstants.COND_GREEN) {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.COND_GREEN_COLOR));
             }
@@ -142,6 +153,12 @@ public final class CreateReportLogic {
             if (this.docks.contains(ship.getId())) {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.NDOCK_COLOR));
             }
+            // Lv1の艦娘をグレー色にする
+            /* ちょっとこれをやる意味がよく分からないのでコメントアウト
+            if (ship.getLv() == 1) {
+                item.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GRAY));
+            }
+            */
 
             item.setText(toStringArray(text));
 
@@ -158,7 +175,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getBattleResultHeader() {
-        return new String[] { "No.", "日付", "海域", "マス", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘",
+        return new String[] { "No.", "日付", "海域", "マス", "出撃", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘",
                 "大破艦", "旗艦", "旗艦(第二艦隊)", "MVP", "MVP(第二艦隊)" };
     }
 
@@ -174,11 +191,19 @@ public final class CreateReportLogic {
             BattleResultDto item = results.get(i);
             body.add(new Comparable[] {
                     new TableRowHeader(i + 1, item),
-                    new DateTimeString(item.getBattleDate()), item.getQuestName(),
-                    item.getMapCell(), item.getRank(), item.getEnemyName(), item.getDropType(),
-                    item.getDropName(), item.isHasTaiha() ? "あり" : "",
-                    item.getFlagShip(), item.getFlagShipCombined(),
-                    item.getMvp(), item.getMvpCombined() });
+                    new DateTimeString(item.getBattleDate()),
+                    item.getQuestName(),
+                    (item.getMapCell() != null) ? item.getMapCell().getReportString() : null,
+                    item.getBossText(),
+                    item.getRank(),
+                    item.getEnemyName(),
+                    item.getDropType(),
+                    item.getScreenDropName(),
+                    item.isHasTaiha() ? "あり" : "",
+                    item.getFlagShip(),
+                    item.getFlagShipCombined(),
+                    item.getMvp(),
+                    item.getMvpCombined() });
         }
         return body;
     }
@@ -213,6 +238,8 @@ public final class CreateReportLogic {
     public static List<Comparable[]> getBattleResultStoreBody(List<BattleExDto> results) {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
 
+        SimpleDateFormat format = new SimpleDateFormat(AppConstants.DATE_FORMAT);
+
         for (int i = 0; i < results.size(); i++) {
             BattleExDto battle = results.get(i);
             String[] friend = new String[6];
@@ -246,11 +273,18 @@ public final class CreateReportLogic {
                 }
             }
 
+            String dropName = battle.getDropName();
+            if (StringUtils.isEmpty(dropName) &&
+                    (battle.getExVersion() >= 1) &&
+                    (battle.getShipSpace() == 0)) {
+                dropName = "※空きなし";
+            }
+
             body.add(new Comparable[] { Integer.toString(i + 1),
                     new DateTimeString(battle.getBattleDate()),
                     battle.getQuestName(),
                     battle.getMapCellDto().toString(), battle.getRank(), battle.getEnemyName(), battle.getDropType(),
-                    battle.getDropName(),
+                    dropName,
                     friend[0], friendHp[0], friend[1], friendHp[1], friend[2], friendHp[2], friend[3], friendHp[3],
                     friend[4], friendHp[4], friend[5], friendHp[5], enemy[0], enemyHp[0], enemy[1], enemyHp[1],
                     enemy[2], enemyHp[2], enemy[3], enemyHp[3], enemy[4], enemyHp[4], enemy[5], enemyHp[5] });
@@ -276,12 +310,38 @@ public final class CreateReportLogic {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
         for (int i = 0; i < ships.size(); i++) {
             GetShipDto ship = ships.get(i);
-            body.add(new Comparable[] { Integer.toString(i + 1),
+            body.add(new Comparable[] { i + 1,
                     new DateTimeString(ship.getGetDate()), ship.getBuildType(),
                     ship.getName(), ship.getType(), ship.getFuel(), ship.getAmmo(), ship.getMetal(), ship.getBauxite(),
                     ship.getResearchMaterials(), ship.getFreeDock(), ship.getSecretary(), ship.getHqLevel() });
         }
         return body;
+    }
+
+    public static List<GetShipDto> getCreateShip(List<String[]> resultlist) {
+        List<GetShipDto> dtolist = new ArrayList<GetShipDto>();
+        int[] numericFields = new int[] { 4, 5, 6, 7, 8, 9, 11 };
+        for (int i = 0; i < resultlist.size(); ++i) {
+            String[] record = resultlist.get(i);
+            if (record.length >= 12) {
+                Date date = readDate(record[0]);
+                if (date != null) {
+                    GetShipDto dto;
+                    ResourceItemDto res = new ResourceItemDto();
+                    if (isAllNumeric(record, numericFields)) {
+                        res.loadBaseMaterialsFromString(record, 4);
+                        res.setResearchMaterials(Integer.valueOf(record[8]));
+                        dto = new GetShipDto(date, record[1], record[2], record[3],
+                                res, record[10], Integer.valueOf(record[11]), Integer.valueOf(record[9]));
+                    }
+                    else { // 不完全なデータだが一応読みこんでおく
+                        dto = new GetShipDto(date, record[1], record[2], record[3], res, record[10], 0, 0);
+                    }
+                    dtolist.add(dto);
+                }
+            }
+        }
+        return dtolist;
     }
 
     /**
@@ -309,12 +369,38 @@ public final class CreateReportLogic {
                 name = item.getName();
                 type = item.getType();
             }
-            body.add(new Comparable[] { Integer.toString(i + 1),
+            body.add(new Comparable[] { i + 1,
                     new DateTimeString(item.getCreateDate()), name, type,
                     item.getFuel(), item.getAmmo(), item.getMetal(), item.getBauxite(), item.getSecretary(),
                     item.getHqLevel() });
         }
         return body;
+    }
+
+    public static List<CreateItemDto> getCreateItem(List<String[]> resultlist) {
+        List<CreateItemDto> dtolist = new ArrayList<CreateItemDto>();
+        int[] numericFields = new int[] { 3, 4, 5, 6, 8 };
+        for (int i = 0; i < resultlist.size(); ++i) {
+            String[] record = resultlist.get(i);
+            if (record.length >= 9) {
+                Date date = readDate(record[0]);
+                if (date != null) {
+                    CreateItemDto dto;
+                    ResourceItemDto res = new ResourceItemDto();
+                    boolean createFlag = !record[1].equals("失敗");
+                    if (isAllNumeric(record, numericFields)) {
+                        res.loadBaseMaterialsFromString(record, 3);
+                        dto = new CreateItemDto(date, createFlag, record[1], record[2], res,
+                                record[7], Integer.valueOf(record[8]));
+                    }
+                    else { // 不完全なデータだが一応読みこんでおく
+                        dto = new CreateItemDto(date, createFlag, record[1], record[2], res, record[7], 0);
+                    }
+                    dtolist.add(dto);
+                }
+            }
+        }
+        return dtolist;
     }
 
     /**
@@ -323,16 +409,19 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getItemListHeader() {
-        return new String[] { "No.", "名称", "種別", "個数", "火力", "命中", "射程", "運", "回避", "爆装", "雷装", "索敵", "対潜", "対空", "装甲",
+        return new String[] { "No.", "名称", "種別", "個数", "施錠", "改修",
+                "火力", "命中", "射程", "運", "回避", "爆装", "雷装", "索敵", "対潜", "対空", "装甲",
                 "装備してる艦娘" };
     }
 
     private static class ItemInfo {
-        public ItemDto item;
-        public int count = 1;
+        public ItemInfoDto item;
+        public int count = 0;
+        public int locked = 0;
+        public int maxLevel = 0;
         public Map<ShipDto, Integer> shipMap = new TreeMap<>();
 
-        public ItemInfo(ItemDto item) {
+        public ItemInfo(ItemInfoDto item) {
             this.item = item;
         }
 
@@ -369,32 +458,37 @@ public final class CreateReportLogic {
      * @return 内容
      */
     public static List<Comparable[]> getItemListBody() {
-        Map<ItemDto, ItemInfo> itemCountMap = new HashMap<ItemDto, ItemInfo>();
+        Map<Integer, ItemInfo> itemCountMap = new HashMap<Integer, ItemInfo>();
 
         // 装備の個数を計算
         for (ItemDto item : GlobalContext.getItemMap().values()) {
-            ItemInfo info = itemCountMap.get(item);
+            ItemInfo info = itemCountMap.get(item.getSlotitemId());
             if (info == null) {
-                info = new ItemInfo(item);
-                itemCountMap.put(item, info);
-            } else {
-                info.count++;
+                info = new ItemInfo(item.getInfo());
+                itemCountMap.put(item.getSlotitemId(), info);
             }
+            info.count++;
+            if (item.isLocked()) {
+                info.locked++;
+            }
+            info.maxLevel = Math.max(info.maxLevel, item.getLevel());
         }
 
         // 艦娘が持っている個数を計算
         for (ShipDto ship : GlobalContext.getShipMap().values()) {
-            for (ItemDto item : ship.getItem()) {
+            for (ItemInfoDto item : ship.getItem()) {
                 if (item != null) {
-                    Map<ShipDto, Integer> shipMap = itemCountMap.get(item).shipMap;
-                    Integer count = shipMap.get(ship);
-                    if (count == null) {
-                        count = 1;
+                    ItemInfo info = itemCountMap.get(item.getId());
+                    if (info != null) {
+                        Integer count = info.shipMap.get(ship);
+                        if (count == null) {
+                            count = 1;
+                        }
+                        else {
+                            count++;
+                        }
+                        info.shipMap.put(ship, count);
                     }
-                    else {
-                        count++;
-                    }
-                    shipMap.put(ship, count);
                 }
             }
         }
@@ -411,10 +505,12 @@ public final class CreateReportLogic {
 
         int count = 0;
         for (ItemInfo itemInfo : countitems) {
-            ItemDto item = itemInfo.item;
+            ItemInfoDto item = itemInfo.item;
             ShipParameters param = item.getParam();
+            String level = (itemInfo.maxLevel != 0) ? "★+" + itemInfo.maxLevel : null;
             count++;
-            body.add(new Comparable[] { count, item.getName(), item.getTypeName(), itemInfo.count, param.getHoug(),
+            body.add(new Comparable[] { count, item.getName(), item.getTypeName(), itemInfo.count,
+                    itemInfo.locked, level, param.getHoug(),
                     param.getHoum(), param.getLeng(), param.getLuck(), param.getHouk(), param.getBaku(),
                     param.getRaig(), param.getSaku(), param.getTais(), param.getTyku(), param.getSouk(),
                     itemInfo.toString()
@@ -448,8 +544,8 @@ public final class CreateReportLogic {
                 "燃料",//
                 "弾薬",//
                 "修理時間",//
-                "燃料",//
-                "鋼材",//
+                "修理燃料",//
+                "修理鋼材",//
                 "損傷",//
                 "HP1あたり", //
                 "Lv",
@@ -475,8 +571,43 @@ public final class CreateReportLogic {
                 "回避",
                 "対潜",
                 "索敵",
-                "運"
+                "運",
+                "装備命中",
+                "砲撃戦火力",
+                "雷撃戦火力",
+                "対潜火力",
+                "夜戦火力",
+                "改造可能"
         };
+    }
+
+    public static boolean[] getBathTableDefaultVisibles() {
+        Map<String, Integer> colMap = AppConstants.BATHTABLE_COLUMN_MAP;
+        String[] header = getShipListHeader();
+        boolean[] visibles = new boolean[header.length];
+        for (int i = 0; i < visibles.length; ++i) {
+            visibles[i] = colMap.containsKey(header[i]);
+        }
+        return visibles;
+    }
+
+    public static int[] getBathTableDefaultColumnOrder() {
+        Map<String, Integer> colMap = AppConstants.BATHTABLE_COLUMN_MAP;
+        String[] header = getShipListHeader();
+        int[] order = new int[header.length];
+        int hiddenColIndex = colMap.size();
+        for (int i = 0; i < order.length; ++i) {
+            if (colMap.containsKey(header[i])) {
+                order[colMap.get(header[i])] = i;
+            }
+            else {
+                order[hiddenColIndex++] = i;
+            }
+        }
+        if (hiddenColIndex != header.length) {
+            LOG.warn("BATHTABLE_COLUMN_MAPに実際にはないカラムがあるようです");
+        }
+        return order;
     }
 
     /**
@@ -493,7 +624,7 @@ public final class CreateReportLogic {
         for (ShipWithSortNumber shipObj : getShipWithSortNumber()) {
             ShipDto ship = shipObj.ship;
 
-            if ((filter != null) && !shipFilter(ship, filter)) {
+            if ((filter != null) && !shipFilter(ship, filter, missionSet)) {
                 continue;
             }
 
@@ -540,20 +671,26 @@ public final class CreateReportLogic {
             }
 
             // 艦載機数
-            List<String> slotString = ship.getSlot();
+            List<ItemDto> slotItems = ship.getItem2();
+            String[] slotNames = new String[4];
             HpString[] onSlotString = new HpString[4];
-            if (ship.canEquipPlane()) { // 飛行機を装備できる場合だけ
-                List<ItemDto> slotItem = ship.getItem();
-                int[] onSlot = ship.getOnSlot();
-                int[] maxEq = shipInfo.getMaxeq();
-                int slotNum = ship.getSlotNum();
-                for (int i = 0; i < slotNum; ++i) {
-                    ItemDto item = slotItem.get(i);
+            int[] onSlot = ship.getOnSlot();
+            int[] maxEq = shipInfo.getMaxeq();
+            int slotNum = ship.getSlotNum();
+            for (int i = 0; i < slotNum; ++i) {
+                ItemDto item = slotItems.get(i);
+                if (ship.canEquipPlane()) { // 飛行機を装備できる場合だけ
                     int cur = ((item != null) && item.isPlane()) ? onSlot[i] : 0;
                     int max = maxEq != null ? maxEq[i] : 0;
                     onSlotString[i] = new HpString(cur, max);
                 }
+                if (item != null) {
+                    slotNames[i] = item.getFriendlyName();
+                }
             }
+
+            boolean canRemodel = (ship.getShipInfo().getAfterlv() > 0)
+                    && (ship.getLv() >= ship.getShipInfo().getAfterlv());
 
             body.add(new Comparable[] {
                     new TableRowHeader(count, ship),
@@ -583,13 +720,13 @@ public final class CreateReportLogic {
                     ship.getExp(),
                     ship.getSeiku(),
                     new SakutekiString(ship),
-                    slotString.get(0),
+                    slotNames[0],
                     onSlotString[0],
-                    slotString.get(1),
+                    slotNames[1],
                     onSlotString[1],
-                    slotString.get(2),
+                    slotNames[2],
                     onSlotString[2],
-                    slotString.get(3),
+                    slotNames[3],
                     onSlotString[3],
                     ship.getMaxhp(),
                     ship.getFuelMax(),
@@ -601,7 +738,13 @@ public final class CreateReportLogic {
                     param.getKaihi(),
                     param.getTaisen(),
                     param.getSakuteki(),
-                    param.getLucky()
+                    param.getLucky(),
+                    ship.getAccuracy(),
+                    ship.getHougekiPower(),
+                    ship.getRaigekiPower(),
+                    ship.getTaisenPower(),
+                    ship.getYasenPower(),
+                    canRemodel ? "可能" : null,
             });
         }
         return body;
@@ -709,7 +852,7 @@ public final class CreateReportLogic {
      * 
      * @return ヘッダー
      */
-    public static String[] getCreateMissionResultHeader() {
+    public static String[] getMissionResultHeader() {
         return new String[] { "No.", "日付", "結果", "遠征", "燃料", "弾薬", "鋼材", "ボーキ", "アイテム1", "個数", "アイテム2", "個数" };
     }
 
@@ -726,7 +869,7 @@ public final class CreateReportLogic {
 
             String[] itemName = new String[] { "", "" };
             String[] itemCount = new String[] { "", "" };
-            ResourceItemDto resItems = result.getItems();
+            ResourceItemDto resItems = result.getResources();
             if (resItems != null) {
                 Map<Integer, UseItemDto> items = resItems.getItems();
                 int index = 0;
@@ -754,6 +897,44 @@ public final class CreateReportLogic {
             });
         }
         return body;
+    }
+
+    public static List<MissionResultDto> getMissionResult(List<String[]> resultlist) {
+        List<MissionResultDto> dtolist = new ArrayList<MissionResultDto>();
+
+        // アイテム名->IDへのマッピングを作成
+        Map<String, Integer> itemNameMap = new HashMap<>();
+        Map<Integer, MasterData.UseItemInfoDto> itemIdMap = MasterData.getInstance().getUseItem();
+        for (MasterData.UseItemInfoDto item : itemIdMap.values()) {
+            itemNameMap.put(item.getName(), item.getId());
+        }
+
+        for (String[] record : resultlist) {
+            if (record.length >= 11) {
+                Date date = readDate(record[0]);
+                if (date != null) {
+                    ResourceItemDto res = new ResourceItemDto();
+                    if (record[3].length() > 0) { // 失敗の時はない
+                        res.loadBaseMaterialsFromString(record, 3);
+                        // アイテムを復元
+                        for (int i = 0; i < 2; ++i) {
+                            String name = record[(i * 2) + 7];
+                            String count = record[(i * 2) + 8];
+                            if (name.length() > 0) {
+                                Integer id = itemNameMap.get(name);
+                                if (id == null) {
+                                    id = AppConstants.USEITEM_UNKNOWN;
+                                }
+                                res.setItem(id, Integer.valueOf(count));
+                            }
+                        }
+                    }
+                    MissionResultDto dto = new MissionResultDto(date, record[1], record[2], res);
+                    dtolist.add(dto);
+                }
+            }
+        }
+        return dtolist;
     }
 
     /**
@@ -799,7 +980,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getMaterialHeader() {
-        return new String[] { "No.", "日付", "直前のイベント", "燃料", "弾薬", "鋼材", "ボーキ", "高速修復材", "高速建造材", "開発資材" };
+        return new String[] { "No.", "日付", "直前のイベント", "燃料", "弾薬", "鋼材", "ボーキ", "高速修復材", "高速建造材", "開発資材", "改修資材" };
     }
 
     /**
@@ -821,9 +1002,10 @@ public final class CreateReportLogic {
                     material.getAmmo(),
                     material.getMetal(),
                     material.getBauxite(),
-                    material.getBucket(),
+                    material.getBucket(), // 間違えてバーナーとバケツを逆にしちゃったけど仕方ない・・・
                     material.getBurner(),
-                    material.getResearch()
+                    material.getResearch(),
+                    material.getScrew()
             });
         }
 
@@ -933,7 +1115,7 @@ public final class CreateReportLogic {
      * @param filter フィルターオブジェクト
      * @return フィルタ結果
      */
-    private static boolean shipFilter(ShipDto ship, ShipFilterDto filter) {
+    private static boolean shipFilter(ShipDto ship, ShipFilterDto filter, Set<Integer> missionSet) {
         // テキストでフィルタ
         if (!StringUtils.isEmpty(filter.nametext)) {
             // 検索ワード
@@ -944,7 +1126,7 @@ public final class CreateReportLogic {
             // 艦種
             String type = ship.getType();
             // 装備
-            List<ItemDto> item = ship.getItem();
+            List<ItemInfoDto> item = ship.getItem();
 
             // テキストが入力されている場合処理する
             if (filter.regexp) {
@@ -964,7 +1146,7 @@ public final class CreateReportLogic {
                     // 艦種で検索
                     find = find ? find : pattern.matcher(type).find();
                     // 装備で検索
-                    for (ItemDto itemDto : item) {
+                    for (ItemInfoDto itemDto : item) {
                         if ((itemDto == null) || (itemDto.getName() == null)) {
                             find = find ? find : false;
                         } else {
@@ -987,7 +1169,7 @@ public final class CreateReportLogic {
                     // 艦種で検索
                     find = find ? find : type.indexOf(words[i]) != -1;
                     // 装備で検索
-                    for (ItemDto itemDto : item) {
+                    for (ItemInfoDto itemDto : item) {
                         if ((itemDto == null) || (itemDto.getName() == null)) {
                             find = find ? find : false;
                         } else {
@@ -1000,109 +1182,6 @@ public final class CreateReportLogic {
                         return false;
                     }
                 }
-            }
-        }
-        // 艦種でフィルタ
-        if (!filter.destroyer) {
-            if ("駆逐艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.lightCruiser) {
-            if ("軽巡洋艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.torpedoCruiser) {
-            if ("重雷装巡洋艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.heavyCruiser) {
-            if ("重巡洋艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.flyingDeckCruiser) {
-            if ("航空巡洋艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.seaplaneTender) {
-            if ("水上機母艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.escortCarrier) {
-            if ("軽空母".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.carrier) {
-            if ("正規空母".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.battleship) {
-            if ("戦艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.flyingDeckBattleship) {
-            if ("航空戦艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.submarine) {
-            if ("潜水艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.carrierSubmarine) {
-            if ("潜水空母".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.landingship) {
-            if ("揚陸艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.armoredcarrier) {
-            if ("装甲空母".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.repairship) {
-            if ("工作艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.submarineTender) {
-            if ("潜水母艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        // グループでフィルタ
-        if (filter.group != null) {
-            if (!filter.group.getShips().contains(ship.getId())) {
-                return false;
-            }
-        }
-        // 装備でフィルタ
-        if (!StringUtils.isEmpty(filter.itemname)) {
-            List<ItemDto> item = ship.getItem();
-            boolean hit = false;
-            for (ItemDto itemDto : item) {
-                if (itemDto != null) {
-                    if (filter.itemname.equals(itemDto.getName())) {
-                        hit = true;
-                        break;
-                    }
-                }
-            }
-            if (!hit) {
-                return false;
             }
         }
         // 艦隊に所属
@@ -1129,6 +1208,45 @@ public final class CreateReportLogic {
                 return false;
             }
         }
+        if (!filter.mission || !filter.notmission) {
+            boolean isMission = missionSet.contains(ship.getId());
+            // 遠征中
+            if (!filter.mission && isMission) {
+                return false;
+            }
+            // 遠征中ではない
+            if (!filter.notmission && !isMission) {
+                return false;
+            }
+        }
+        if (!filter.needbath || !filter.notneedbath) {
+            boolean needBath = (ship.getDocktime() > 0) && !GlobalContext.isNdock(ship.getId());
+            // 要修理
+            if (!filter.needbath && needBath) {
+                return false;
+            }
+            // 修理の必要なし
+            if (!filter.notneedbath && !needBath) {
+                return false;
+            }
+        }
+
+        if (filter.groupMode == false) {
+            // 艦種でフィルタ
+            if ((filter.enabledType != null) &&
+                    (filter.enabledType[ship.getStype()] == false))
+            {
+                return false;
+            }
+        }
+        else {
+            // グループでフィルタ
+            if (filter.group != null) {
+                if (!filter.group.getShips().contains(ship.getId())) {
+                    return false;
+                }
+            }
+        }
         return true;
     }
 
@@ -1141,7 +1259,7 @@ public final class CreateReportLogic {
         try {
             List<BattleExDto> dtoList = Collections.singletonList(dto);
 
-            File report = getStoreFile("海戦・ドロップ報告書.csv", "海戦・ドロップ報告書_alternativefile.csv");
+            File report = getStoreFile(AppConstants.LOG_BATTLE_RESULT, AppConstants.LOG_BATTLE_RESULT_ALT);
 
             CreateReportLogic.writeCsvStripFirstColumn(report,
                     CreateReportLogic.getBattleResultStoreHeader(),
@@ -1160,7 +1278,7 @@ public final class CreateReportLogic {
         try {
             List<GetShipDto> dtoList = Collections.singletonList(dto);
 
-            File report = getStoreFile("建造報告書.csv", "建造報告書_alternativefile.csv");
+            File report = getStoreFile(AppConstants.LOG_CREATE_SHIP, AppConstants.LOG_CREATE_SHIP_ALT);
 
             CreateReportLogic.writeCsvStripFirstColumn(report,
                     CreateReportLogic.getCreateShipHeader(),
@@ -1168,6 +1286,27 @@ public final class CreateReportLogic {
         } catch (IOException e) {
             LOG.warn("報告書の保存に失敗しました", e);
         }
+    }
+
+    /**
+     * 建造報告書を読み込む
+     * 
+     * @return 建造報告
+     */
+    public static List<GetShipDto> loadCreateShipReport() {
+        List<GetShipDto> dtoList = null;
+        try {
+            File file = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), AppConstants.LOG_CREATE_SHIP));
+            if (file.exists()) {
+                CSVReader reader = new CSVReader(new InputStreamReader(
+                        new FileInputStream(file), AppConstants.CHARSET));
+                dtoList = getCreateShip(reader.readAll());
+                reader.close();
+            }
+        } catch (Exception e) {
+            LOG.warn("建造報告書の読み込みに失敗しました", e);
+        }
+        return dtoList;
     }
 
     /**
@@ -1179,7 +1318,7 @@ public final class CreateReportLogic {
         try {
             List<CreateItemDto> dtoList = Collections.singletonList(dto);
 
-            File report = getStoreFile("開発報告書.csv", "開発報告書_alternativefile.csv");
+            File report = getStoreFile(AppConstants.LOG_CREATE_ITEM, AppConstants.LOG_CREATE_ITEM_ALT);
 
             CreateReportLogic.writeCsvStripFirstColumn(report,
                     CreateReportLogic.getCreateItemHeader(),
@@ -1190,22 +1329,64 @@ public final class CreateReportLogic {
     }
 
     /**
+     * 開発報告書を読み込む
+     * 
+     * @return 開発報告
+     */
+    public static List<CreateItemDto> loadCreateItemReport() {
+        List<CreateItemDto> dtoList = null;
+        try {
+            File file = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), AppConstants.LOG_CREATE_ITEM));
+            if (file.exists()) {
+                CSVReader reader = new CSVReader(new InputStreamReader(
+                        new FileInputStream(file), AppConstants.CHARSET));
+                dtoList = getCreateItem(reader.readAll());
+                reader.close();
+            }
+        } catch (Exception e) {
+            LOG.warn("開発報告書の読み込みに失敗しました", e);
+        }
+        return dtoList;
+    }
+
+    /**
      * 遠征報告書を書き込む
      * 
      * @param dto 遠征結果
      */
-    public static void storeCreateMissionReport(MissionResultDto dto) {
+    public static void storeMissionReport(MissionResultDto dto) {
         try {
             List<MissionResultDto> dtoList = Collections.singletonList(dto);
 
-            File report = getStoreFile("遠征報告書.csv", "遠征報告書_alternativefile.csv");
+            File report = getStoreFile(AppConstants.LOG_MISSION, AppConstants.LOG_MISSION_ALT);
 
             CreateReportLogic.writeCsvStripFirstColumn(report,
-                    CreateReportLogic.getCreateMissionResultHeader(),
+                    CreateReportLogic.getMissionResultHeader(),
                     CreateReportLogic.getMissionResultBody(dtoList), true);
         } catch (IOException e) {
             LOG.warn("報告書の保存に失敗しました", e);
         }
+    }
+
+    /**
+     * 遠征報告書を読み込む
+     * 
+     * @return 遠征報告
+     */
+    public static List<MissionResultDto> loadMissionReport() {
+        List<MissionResultDto> dtoList = null;
+        try {
+            File file = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), AppConstants.LOG_MISSION));
+            if (file.exists()) {
+                CSVReader reader = new CSVReader(new InputStreamReader(
+                        new FileInputStream(file), AppConstants.CHARSET));
+                dtoList = getMissionResult(reader.readAll());
+                reader.close();
+            }
+        } catch (Exception e) {
+            LOG.warn("遠征報告書の読み込みに失敗しました", e);
+        }
+        return dtoList;
     }
 
     /**
@@ -1218,7 +1399,7 @@ public final class CreateReportLogic {
             if (material != null) {
                 List<MaterialDto> dtoList = Collections.singletonList(material);
 
-                File report = getStoreFile("資材ログ.csv", "資材ログ_alternativefile.csv");
+                File report = getStoreFile(AppConstants.LOG_RESOURCE, AppConstants.LOG_RESOURCE_ALT);
 
                 CreateReportLogic.writeCsvStripFirstColumn(report,
                         CreateReportLogic.getMaterialHeader(),
@@ -1304,5 +1485,32 @@ public final class CreateReportLogic {
             alt_stream.close();
         }
         alt_report.delete();
+    }
+
+    private static SimpleDateFormat[] dateFormats = new SimpleDateFormat[] {
+            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"), // オリジナルの記録フォーマット
+            new SimpleDateFormat("yyyy/MM/dd HH:mm") // Excelで保存した時のフォーマット
+    };
+
+    public static Date readDate(String str) {
+        ParsePosition pos = new ParsePosition(0);
+        Date date = null;
+        for (DateFormat format : dateFormats) {
+            date = format.parse(str, pos);
+            if (date != null) {
+                break;
+            }
+        }
+        return date;
+    }
+
+    /** 数値に変換できるかチェック
+     *  */
+    private static boolean isAllNumeric(String[] record, int[] indeces) {
+        for (int idx : indeces) {
+            if (StringUtils.isNumeric(record[idx]) == false)
+                return false;
+        }
+        return true;
     }
 }

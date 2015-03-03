@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import logbook.constants.AppConstants;
-import logbook.dto.ItemDto;
+import logbook.dto.ItemInfoDto;
 import logbook.internal.Item;
 import logbook.util.BeanUtils;
 
@@ -25,7 +25,7 @@ public class ItemMasterConfig {
      * 設定ファイルに書き込みます
      */
     public static void store() throws IOException {
-        Map<Integer, ItemDto> map = new HashMap<Integer, ItemDto>();
+        Map<Integer, ItemInfoDto> map = new HashMap<Integer, ItemInfoDto>();
         for (Integer id : Item.keySet()) {
             map.put(id, Item.get(id));
         }
@@ -40,9 +40,9 @@ public class ItemMasterConfig {
      */
     public static void load() {
         try {
-            Map<Integer, ItemDto> map = BeanUtils.readObject(AppConstants.ITEM_MST_CONFIG_FILE, Map.class);
+            Map<Integer, ItemInfoDto> map = BeanUtils.readObject(AppConstants.ITEM_MST_CONFIG_FILE, Map.class);
             if (map != null) {
-                for (Entry<Integer, ItemDto> entry : map.entrySet()) {
+                for (Entry<Integer, ItemInfoDto> entry : map.entrySet()) {
                     Item.set(entry.getKey(), entry.getValue());
                 }
             }

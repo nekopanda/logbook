@@ -1,10 +1,14 @@
 package logbook.dto;
 
+import java.util.Date;
+
 /**
  * 任務を表します
  *
  */
 public final class QuestDto extends AbstractDto {
+
+    private Date time;
 
     /** api_no */
     private int no;
@@ -66,6 +70,20 @@ public final class QuestDto extends AbstractDto {
         default:
             return "";
         }
+    }
+
+    /**
+     * @return time
+     */
+    public Date getTime() {
+        return this.time;
+    }
+
+    /**
+     * @param time セットする time
+     */
+    public void setTime(Date time) {
+        this.time = time;
     }
 
     /**

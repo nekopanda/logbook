@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -16,6 +17,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import logbook.constants.AppConstants;
+import logbook.gui.ApplicationMain;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,6 +36,9 @@ public class EnemyData {
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(EnemyData.class);
     private static Map<Integer, EnemyData> ENEMY = new TreeMap<Integer, EnemyData>();
+
+    /** 変更があったか */
+    private static boolean modified = false;
 
     // 始めてアクセスがあった時に読み込む
     public static final boolean INIT_COMPLETE;
@@ -55,6 +60,20 @@ public class EnemyData {
     @Tag(4)
     private final String formation;
 
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof EnemyData) {
+            EnemyData e = (EnemyData) o;
+            if ((e.enemyId == this.enemyId) &&
+                    e.enemyName.equals(this.enemyName) &&
+                    Arrays.equals(e.enemyShips, this.enemyShips) &&
+                    e.formation.equals(this.formation)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public EnemyData(int enemyId, String enemyName, String[] enemyShips, String formation) {
         this.enemyId = enemyId;
         this.enemyName = enemyName;
@@ -66,7 +85,13 @@ public class EnemyData {
      * 敵編成を設定します
      */
     public static void set(int id, EnemyData item) {
+        EnemyData old = ENEMY.get(id);
+        if ((old != null) && old.equals(item)) {
+            // 更新する必要なし
+            return;
+        }
         ENEMY.put(id, item);
+        modified = true;
     }
 
     /**
@@ -89,23 +114,28 @@ public class EnemyData {
     }
 
     public static void store() throws IOException {
-        CSVWriter writer = new CSVWriter(new OutputStreamWriter(
-                new FileOutputStream(AppConstants.ENEMY_DATA_FILE), AppConstants.CHARSET));
-        List<String> flatten = new ArrayList<String>();
-        for (Entry<Integer, EnemyData> e : ENEMY.entrySet()) {
-            EnemyData data = e.getValue();
-            flatten.add(String.valueOf(data.getEnemyId()));
-            for (String s : data.getEnemyShips()) {
-                flatten.add(s);
+        // 変更があったときだけ書き込む
+        if (modified) {
+            CSVWriter writer = new CSVWriter(new OutputStreamWriter(
+                    new FileOutputStream(AppConstants.ENEMY_DATA_FILE), AppConstants.CHARSET));
+            List<String> flatten = new ArrayList<String>();
+            for (Entry<Integer, EnemyData> e : ENEMY.entrySet()) {
+                EnemyData data = e.getValue();
+                flatten.add(String.valueOf(data.getEnemyId()));
+                for (String s : data.getEnemyShips()) {
+                    flatten.add(s);
+                }
+                flatten.add(data.getFormation());
+                if (data.getEnemyName() != null) {
+                    flatten.add(data.getEnemyName());
+                }
+                writer.writeNext(flatten.toArray(new String[flatten.size()]));
+                flatten.clear();
             }
-            flatten.add(data.getFormation());
-            if (data.getEnemyName() != null) {
-                flatten.add(data.getEnemyName());
-            }
-            writer.writeNext(flatten.toArray(new String[flatten.size()]));
-            flatten.clear();
+            writer.close();
+            ApplicationMain.sysPrint("Enemyファイル更新");
+            modified = false;
         }
-        writer.close();
     }
 
     public static void load() throws IOException {

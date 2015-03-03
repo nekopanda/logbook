@@ -3,6 +3,9 @@
  */
 package logbook.gui;
 
+import logbook.config.AppConfig;
+import logbook.gui.logic.WindowListener;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -83,19 +86,43 @@ public class LauncherWindow extends WindowBase {
                 "経験",
                 "演習",
                 "グル",
+                "資材",
+                "統計",
                 "ロー" // 最後は自分
         };
 
         RowData rowData = new RowData(40, 30);
         for (int i = 0; i < (winList.length - 1); i++) {
             final WindowBase win = winList[i];
-            Button button = new Button(shell, SWT.NONE);
+            final Button button = new Button(shell, SWT.TOGGLE);
             button.setText(nameList[i]);
+            button.setSelection((win.getShell() != null) ? win.getShell().getVisible() : false);
             button.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    win.open();
-                    win.getShell().setActive();
+                    boolean toggleEnabled = AppConfig.get().isToggleToolButton();
+                    if (!toggleEnabled || button.getSelection()) {
+                        if (!toggleEnabled) {
+                            // offにしない
+                            button.setSelection(true);
+                        }
+                        win.open();
+                        win.getShell().setActive();
+                    }
+                    else {
+                        win.hideWindow();
+                    }
+                }
+            });
+            win.addWindowListener(new WindowListener() {
+                @Override
+                public void windowShown() {
+                    button.setSelection(true);
+                }
+
+                @Override
+                public void windowHidden() {
+                    button.setSelection(false);
                 }
             });
             // ボタンのサイズを設定

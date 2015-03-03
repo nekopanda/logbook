@@ -119,7 +119,7 @@ public class TestDataFeeder extends WindowBase {
         btn3.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                TestDataFeeder.this.nextUntil(DataType.COMBINED_AIR_BATTLE);
+                TestDataFeeder.this.nextUntil(DataType.COMBINED_BATTLE_WATER);
             }
         });
 
@@ -176,7 +176,7 @@ public class TestDataFeeder extends WindowBase {
             try {
                 Data data = new TestData(filepath);
                 GlobalContext.updateContext(data);
-            } catch (ParseException | IOException e) {
+            } catch (ParseException | IOException | IllegalArgumentException e) {
                 e.printStackTrace();
             }
         }
@@ -209,7 +209,7 @@ public class TestDataFeeder extends WindowBase {
                 if (data.getDataType() == type) {
                     break;
                 }
-            } catch (ParseException | IOException e) {
+            } catch (ParseException | IOException | IllegalArgumentException e) {
                 e.printStackTrace();
             }
         }
@@ -222,7 +222,7 @@ public class TestDataFeeder extends WindowBase {
                 Data data = new TestData(filepath);
                 GlobalContext.updateContext(data);
                 this.updateLabel();
-            } catch (ParseException | IOException e) {
+            } catch (ParseException | IOException | IllegalArgumentException e) {
                 e.printStackTrace();
             }
         }

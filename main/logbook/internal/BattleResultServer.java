@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -97,6 +98,9 @@ public class BattleResultServer {
     private final List<BattleResult> resultList = new ArrayList<BattleResult>();
     private final Map<String, Integer> numRecordsMap = new HashMap<String, Integer>();
 
+    // 重複検出用
+    private final Set<Date> resultDateSet = new HashSet<Date>();
+
     // キャッシュ
     private File cachedFile;
     private List<BattleExDto> cachedResult;
@@ -110,8 +114,10 @@ public class BattleResultServer {
                 try {
                     List<BattleExDto> result = this.readResultFile(file);
                     for (int i = 0; i < result.size(); ++i) {
-                        if (result.get(i).isCompleteResult()) {
-                            this.resultList.add(new BattleResult(result.get(i), file, i));
+                        BattleExDto dto = result.get(i);
+                        if (dto.isCompleteResult() && !this.resultDateSet.contains(dto.getBattleDate())) {
+                            this.resultDateSet.add(dto.getBattleDate());
+                            this.resultList.add(new BattleResult(dto, file, i));
                         }
                     }
                     this.numRecordsMap.put(file.getPath(), result.size());
@@ -150,7 +156,7 @@ public class BattleResultServer {
             String dropName = battle.getDropName();
             int[] map = battle.getMapCell().getMap();
 
-            if (battle.isDropFlag()) {
+            if (battle.isDropShip() || battle.isDropItem()) {
                 this.dropShipList.add(dropName);
             }
             this.mapList.add(new IntegerPair(map[0], map[1], "-"));
@@ -208,6 +214,10 @@ public class BattleResultServer {
 
     public int size() {
         return this.resultList.size();
+    }
+
+    public BattleResultDto[] getList() {
+        return this.resultList.toArray(new BattleResultDto[this.resultList.size()]);
     }
 
     public List<BattleResultDto> getFilteredList(BattleResultFilter filter) {

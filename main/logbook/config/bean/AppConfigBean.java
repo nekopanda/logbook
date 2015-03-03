@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import logbook.constants.AppConstants;
 import logbook.dto.ShipFilterDto;
 
 import org.apache.commons.io.FilenameUtils;
@@ -75,6 +76,18 @@ public final class AppConfigBean {
     /** ImKayac による Push 通知 Password */
     private String ImKayacPrivateKey = "";
 
+    /** 遠征Push通知のPriority */
+    private int PushPriorityMission = 0;
+
+    /** 入渠Push通知のPriority */
+    private int PushPriorityNdock = 0;
+
+    /** 遠征帰投時にPush通知する */
+    private boolean PushMission = true;
+
+    /**　入渠完了時にPush通知する */
+    private boolean PushNdock = true;
+
     /** 出撃ログの保存先 */
     private String battleLogPath = new File("battlelog").getAbsolutePath();
 
@@ -99,9 +112,14 @@ public final class AppConfigBean {
     /** ローカルループバックアドレスからの接続のみ受け入れる */
     private boolean allowOnlyFromLocalhost = true;
 
+    /** 戦闘結果をログ出力するか */
     private boolean printSortieLog = false;
 
+    /** 轟沈をログ出力するか */
     private boolean printSunkLog = false;
+
+    /** 更新系をログ出力するか */
+    private boolean printUpdateLog = true;
 
     /** 遠征-1分前に通知する */
     private boolean noticeDeckmission = true;
@@ -139,6 +157,9 @@ public final class AppConfigBean {
     /** お風呂から上がる時に母港タブを表示 */
     private boolean visibleOnReturnBathwater = true;
 
+    /** モノクロアイコンを使用する */
+    private boolean monoIcon;
+
     /** 回数を表示 */
     private boolean displayCount;
 
@@ -149,6 +170,9 @@ public final class AppConfigBean {
     private String defaultEvaluate = "S勝利";
 
     /** 索敵表示形式 */
+    private boolean useRecommendedSakuteki = true;
+
+    /** 索敵表示形式 */
     private int sakutekiMethod = 0;
 
     /** タスクバー通知を使用する */
@@ -157,17 +181,41 @@ public final class AppConfigBean {
     /** 母港の空きがこれ以下で警告表示に変える */
     private int notifyFully = 1;
 
+    /** 母港の空きがこれ以下でバルーン通知 */
+    private int shipFullBalloonNotify = 5;
+
+    /** 母港の空きがこれ以下でバルーン通知 */
+    private boolean enableShipFullBalloonNotify = false;
+
+    /** 装備の空きがこれ以下でバルーン通知 */
+    private int itemFullBalloonNotify = 20;
+
+    /** 装備の空きがこれ以下でバルーン通知 */
+    private boolean enableItemFullBalloonNotify = false;
+
     /** 燃料の色 */
-    private RGB fuelColor = new RGB(0x00, 0x80, 0x00);
+    private RGB fuelColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[0]);
 
     /** 弾薬の色 */
-    private RGB ammoColor = new RGB(0x66, 0x33, 0x00);
+    private RGB ammoColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[1]);
 
     /** 鋼材の色 */
-    private RGB metalColor = new RGB(0x80, 0x80, 0x80);
+    private RGB metalColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[2]);
 
     /** ボーキの色 */
-    private RGB bauxiteColor = new RGB(0xCC, 0x33, 0x00);
+    private RGB bauxiteColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[3]);
+
+    /** バーナーの色 */
+    private RGB burnerColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[4]);
+
+    /** バケツの色 */
+    private RGB bucketColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[5]);
+
+    /** 開発の色 */
+    private RGB researchColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[6]);
+
+    /** ネジの色 */
+    private RGB screwColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[7]);
 
     /** 開発者オプション-JSONを保存する */
     private boolean storeJson;
@@ -193,6 +241,12 @@ public final class AppConfigBean {
     /** マウスが離れてから元の透明度に戻るまでの時間（0.1秒単位） */
     private int opaqueInterval = 6;
 
+    /** タイトルバー以外でもドラッグ&ドロップで移動できるようにする */
+    private boolean enableMoveWithDD = true;
+
+    /** ツールウィンドウのボタンをトグル方式にする */
+    private boolean toggleToolButton = true;
+
     /** 艦娘一覧ウィンドウの名前 */
     private String[] shipTableNames = new String[] {
             "所有艦娘一覧 1",
@@ -206,11 +260,37 @@ public final class AppConfigBean {
             null, null, null, null
     };
 
+    /** 艦娘一覧ウィンドウのフィルタパネル表示・非表示 */
+    private ShipFilterPanelConfigBean[] shipTablePanelVisibles = new ShipFilterPanelConfigBean[4];
+
     /** 保存したJSONを読み込ませてテストするためのウィンドウメニューを表示するかどうか */
     private boolean enableTestWindow = false;
 
     /** 縮小表示の時は他のウィンドウを閉じる */
     private boolean closeWhenMinimized = true;
+
+    /** キャプチャ範囲 [x,y,width,height] */
+    private int[] captureRect = null;
+
+    /** 開発報告書を読み込むか */
+    private boolean loadCreateItemLog = true;
+
+    /** 建造報告書を読みこむか */
+    private boolean loadCreateShipLog = true;
+
+    /** 遠征報告書を読みこむか */
+    private boolean loadMissionLog = true;
+
+    /** システムワイドホットキー (Windowsのみ対応) 0:なし, 1:Ctrl+Shift+z, 2:Win+Z */
+    private int systemWideHotKey = 0;
+
+    /** TwitterのAccessToken */
+    private String twitterToken;
+    private String twitterTokenSecret;
+
+    private static RGB cloneRGB(RGB rgb) {
+        return new RGB(rgb.red, rgb.green, rgb.blue);
+    }
 
     /**
      * ポート番号を取得します。
@@ -508,6 +588,62 @@ public final class AppConfigBean {
         this.ImKayacPrivateKey = privatekey;
     }
 
+    /** 遠征帰投時にPush通知する を取得します
+     * @return PushMission
+     */
+    public boolean getPushMission() {
+        return this.PushMission;
+    }
+
+    /** 入渠完了時にPush通知する を取得します
+     * @return PushNdock
+     */
+    public boolean getPushNdock() {
+        return this.PushNdock;
+    }
+
+    /** 遠征帰投時にPush通知する を設定します
+     * @param PushMission
+     */
+    public void setPushMission(boolean pushmission) {
+        this.PushMission = pushmission;
+    }
+
+    /** 入渠完了時にPush通知する を設定します
+     * @param PushNdock
+     */
+    public void setPushNdock(boolean pushndock) {
+        this.PushNdock = pushndock;
+    }
+
+    /** 遠征Push通知の Priorityを取得します
+     * @return priority
+     */
+    public int getPushPriorityMission() {
+        return this.PushPriorityMission;
+    }
+
+    /** 入渠Push通知の Priorityを取得します
+     * @return priority
+     */
+    public int getPushPriorityNdock() {
+        return this.PushPriorityNdock;
+    }
+
+    /** 遠征Push通知のPriorityを設定します
+     * @param priority
+     */
+    public void setPushPriorityMission(int priority) {
+        this.PushPriorityMission = priority;
+    }
+
+    /** 入渠Push通知のPriorityを設定します
+     * @param priority
+     */
+    public void setPushPriorityNdock(int priority) {
+        this.PushPriorityNdock = priority;
+    }
+
     /**
      * 報告書の保存先を設定します。
      * @param reportPath 報告書の保存先
@@ -666,6 +802,20 @@ public final class AppConfigBean {
      */
     public void setPrintSunkLog(boolean printSunkLog) {
         this.printSunkLog = printSunkLog;
+    }
+
+    /**
+     * @return printUpdateLog
+     */
+    public boolean isPrintUpdateLog() {
+        return this.printUpdateLog;
+    }
+
+    /**
+     * @param printUpdateLog セットする printUpdateLog
+     */
+    public void setPrintUpdateLog(boolean printUpdateLog) {
+        this.printUpdateLog = printUpdateLog;
     }
 
     /**
@@ -877,6 +1027,22 @@ public final class AppConfigBean {
     }
 
     /**
+     * モノクロアイコンを使用するを取得します。
+     * @return モノクロアイコンを使用する
+     */
+    public boolean isMonoIcon() {
+        return this.monoIcon;
+    }
+
+    /**
+     * モノクロアイコンを使用するを設定します。
+     * @param monoIcon モノクロアイコンを使用する
+     */
+    public void setMonoIcon(boolean monoIcon) {
+        this.monoIcon = monoIcon;
+    }
+
+    /**
      * 回数を表示を取得します。
      * @return 回数を表示
      */
@@ -925,6 +1091,20 @@ public final class AppConfigBean {
     }
 
     /**
+     * @return useRecommendedSakuteki
+     */
+    public boolean isUseRecommendedSakuteki() {
+        return this.useRecommendedSakuteki;
+    }
+
+    /**
+     * @param useRecommendedSakuteki セットする useRecommendedSakuteki
+     */
+    public void setUseRecommendedSakuteki(boolean useRecommendedSakuteki) {
+        this.useRecommendedSakuteki = useRecommendedSakuteki;
+    }
+
+    /**
      * 索敵値の表示形式を取得します。
      * @return 索敵値の表示形式
      */
@@ -970,6 +1150,70 @@ public final class AppConfigBean {
      */
     public void setNotifyFully(int notifyFully) {
         this.notifyFully = notifyFully;
+    }
+
+    /**
+     * 母港の空きがこれ以下でバルーン通知を取得します。
+     * @return 母港の空きがこれ以下でバルーン通知
+     */
+    public int getShipFullBalloonNotify() {
+        return this.shipFullBalloonNotify;
+    }
+
+    /**
+     * 母港の空きがこれ以下でバルーン通知を設定します。
+     * @param shipFullBalloonNotify 母港の空きがこれ以下でバルーン通知
+     */
+    public void setShipFullBalloonNotify(int shipFullBalloonNotify) {
+        this.shipFullBalloonNotify = shipFullBalloonNotify;
+    }
+
+    /**
+     * 母港の空きがこれ以下でバルーン通知を取得します。
+     * @return 装備の空きがこれ以下でバルーン通知
+     */
+    public boolean isEnableShipFullBalloonNotify() {
+        return this.enableShipFullBalloonNotify;
+    }
+
+    /**
+     * 母港の空きがこれ以下でバルーン通知を設定します。
+     * @param itemFullBalloonNotify 装備の空きがこれ以下でバルーン通知
+     */
+    public void setEnableShipFullBalloonNotify(boolean enableShipFullBalloonNotify) {
+        this.enableShipFullBalloonNotify = enableShipFullBalloonNotify;
+    }
+
+    /**
+     * 装備の空きがこれ以下でバルーン通知を取得します。
+     * @return 装備の空きがこれ以下でバルーン通知
+     */
+    public int getItemFullBalloonNotify() {
+        return this.itemFullBalloonNotify;
+    }
+
+    /**
+     * 装備の空きがこれ以下でバルーン通知を設定します。
+     * @param itemFullBalloonNotify 装備の空きがこれ以下でバルーン通知
+     */
+    public void setItemFullBalloonNotify(int itemFullBalloonNotify) {
+        this.itemFullBalloonNotify = itemFullBalloonNotify;
+    }
+
+    /**
+     * 装備の空きがこれ以下でバルーン通知を取得します。
+     * @return 装備の空きがこれ以下でバルーン通知
+     */
+    public boolean isEnableItemFullBalloonNotify() {
+        return this.enableItemFullBalloonNotify;
+    }
+
+    /**
+     * 装備の空きがこれ以下でバルーン通知を設定します。
+     * @param itemFullBalloonNotify 装備の空きがこれ以下でバルーン通知
+     */
+    public void setEnableItemFullBalloonNotify(boolean enableItemFullBalloonNotify) {
+        this.enableItemFullBalloonNotify = enableItemFullBalloonNotify;
     }
 
     /**
@@ -1034,6 +1278,62 @@ public final class AppConfigBean {
      */
     public void setBauxiteColor(RGB bauxiteColor) {
         this.bauxiteColor = bauxiteColor;
+    }
+
+    /**
+     * @return burnerColor
+     */
+    public RGB getBurnerColor() {
+        return this.burnerColor;
+    }
+
+    /**
+     * @param burnerColor セットする burnerColor
+     */
+    public void setBurnerColor(RGB burnerColor) {
+        this.burnerColor = burnerColor;
+    }
+
+    /**
+     * @return bucketColor
+     */
+    public RGB getBucketColor() {
+        return this.bucketColor;
+    }
+
+    /**
+     * @param bucketColor セットする bucketColor
+     */
+    public void setBucketColor(RGB bucketColor) {
+        this.bucketColor = bucketColor;
+    }
+
+    /**
+     * @return researchColor
+     */
+    public RGB getResearchColor() {
+        return this.researchColor;
+    }
+
+    /**
+     * @param researchColor セットする researchColor
+     */
+    public void setResearchColor(RGB researchColor) {
+        this.researchColor = researchColor;
+    }
+
+    /**
+     * @return screwColor
+     */
+    public RGB getScrewColor() {
+        return this.screwColor;
+    }
+
+    /**
+     * @param screwColor セットする screwColor
+     */
+    public void setScrewColor(RGB screwColor) {
+        this.screwColor = screwColor;
     }
 
     /**
@@ -1141,6 +1441,20 @@ public final class AppConfigBean {
     }
 
     /**
+     * @return enableMoveWithDD
+     */
+    public boolean isEnableMoveWithDD() {
+        return this.enableMoveWithDD;
+    }
+
+    /**
+     * @param enableMoveWithDD セットする enableMoveWithDD
+     */
+    public void setEnableMoveWithDD(boolean enableMoveWithDD) {
+        this.enableMoveWithDD = enableMoveWithDD;
+    }
+
+    /**
      * @return shipTableNames
      */
     public String[] getShipTableNames() {
@@ -1209,4 +1523,131 @@ public final class AppConfigBean {
     public void setDatabaseSendLog(boolean databaseSendLog) {
         this.databaseSendLog = databaseSendLog;
     }
+
+    /**
+     * @return captureRect
+     */
+    public int[] getCaptureRect() {
+        return this.captureRect;
+    }
+
+    /**
+     * @param captureRect セットする captureRect
+     */
+    public void setCaptureRect(int[] captureRect) {
+        this.captureRect = captureRect;
+    }
+
+    /**
+     * @return loadCreateItemLog
+     */
+    public boolean isLoadCreateItemLog() {
+        return this.loadCreateItemLog;
+    }
+
+    /**
+     * @param loadCreateItemLog セットする loadCreateItemLog
+     */
+    public void setLoadCreateItemLog(boolean loadCreateItemLog) {
+        this.loadCreateItemLog = loadCreateItemLog;
+    }
+
+    /**
+     * @return loadCreateShipLog
+     */
+    public boolean isLoadCreateShipLog() {
+        return this.loadCreateShipLog;
+    }
+
+    /**
+     * @param loadCreateShipLog セットする loadCreateShipLog
+     */
+    public void setLoadCreateShipLog(boolean loadCreateShipLog) {
+        this.loadCreateShipLog = loadCreateShipLog;
+    }
+
+    /**
+     * @return loadMissionLog
+     */
+    public boolean isLoadMissionLog() {
+        return this.loadMissionLog;
+    }
+
+    /**
+     * @param loadMissionLog セットする loadMissionLog
+     */
+    public void setLoadMissionLog(boolean loadMissionLog) {
+        this.loadMissionLog = loadMissionLog;
+    }
+
+    /**
+     * @return systemWideHotKey
+     */
+    public int getSystemWideHotKey() {
+        return this.systemWideHotKey;
+    }
+
+    /**
+     * @param systemWideHotKey セットする systemWideHotKey
+     */
+    public void setSystemWideHotKey(int systemWideHotKey) {
+        this.systemWideHotKey = systemWideHotKey;
+    }
+
+    /**
+     * @return twitterToken
+     */
+    public String getTwitterToken() {
+        return this.twitterToken;
+    }
+
+    /**
+     * @param twitterToken セットする twitterToken
+     */
+    public void setTwitterToken(String twitterToken) {
+        this.twitterToken = twitterToken;
+    }
+
+    /**
+     * @return twitterTokenSecret
+     */
+    public String getTwitterTokenSecret() {
+        return this.twitterTokenSecret;
+    }
+
+    /**
+     * @param twitterTokenSecret セットする twitterTokenSecret
+     */
+    public void setTwitterTokenSecret(String twitterTokenSecret) {
+        this.twitterTokenSecret = twitterTokenSecret;
+    }
+
+    /**
+     * @return shipTablePanelVisibles
+     */
+    public ShipFilterPanelConfigBean[] getShipTablePanelVisibles() {
+        return this.shipTablePanelVisibles;
+    }
+
+    /**
+     * @param shipTablePanelVisibles セットする shipTablePanelVisibles
+     */
+    public void setShipTablePanelVisibles(ShipFilterPanelConfigBean[] shipTablePanelVisibles) {
+        this.shipTablePanelVisibles = shipTablePanelVisibles;
+    }
+
+    /**
+     * @return toggleToolButton
+     */
+    public boolean isToggleToolButton() {
+        return this.toggleToolButton;
+    }
+
+    /**
+     * @param toggleToolButton セットする toggleToolButton
+     */
+    public void setToggleToolButton(boolean toggleToolButton) {
+        this.toggleToolButton = toggleToolButton;
+    }
+
 }
