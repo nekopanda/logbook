@@ -26,6 +26,7 @@ public class WindowNativeSupport {
     private static int SWP_NOSIZE = 0x0001;
     private static int SWP_NOMOVE = 0x0002;
     private static int SWP_NOACTIVATE = 0x0010;
+    private static int SWP_NOOWNERZORDER = 0x0200;
     private static int GWL_STYLE = -16;
     private static int WS_CAPTION = 0x00C00000;
 
@@ -65,7 +66,7 @@ public class WindowNativeSupport {
             try {
                 Object insertAfter = this.fromInt(topMost ? HWND_TOPMOST : HWND_NOTOPMOST);
                 Object[] args = new Object[] {
-                        this.handleField.get(shell), insertAfter, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE };
+                        this.handleField.get(shell), insertAfter, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOOWNERZORDER };
                 this.setWindowPosMethod.invoke(null, args);
             } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
                 ApplicationMain.main.printMessage("ウィンドウ操作に失敗しました");
