@@ -155,6 +155,9 @@ public final class ApplicationMain extends WindowBase {
     /** トレイ */
     private TrayItem trayItem;
 
+    /** タイトルテキスト */
+    private String titleText;
+
     /** キャプチャ */
     private CaptureDialog captureWindow;
     /** ドロップ報告書 */
@@ -1271,6 +1274,14 @@ public final class ApplicationMain extends WindowBase {
             this.shipTableWindows[i].windowTitleChanged();
         }
         JIntellitypeWrapper.changeSetting(AppConfig.get().getSystemWideHotKey());
+    }
+
+    public void setTitleText(String newText) {
+        if ((this.titleText == null) || (this.titleText.equals(newText) == false)) {
+            this.shell.setText(newText);
+            this.trayItem.setText(newText);
+            this.titleText = newText;
+        }
     }
 
     /**
