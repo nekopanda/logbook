@@ -3,14 +3,17 @@
  */
 package logbook.dto;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
+import javax.json.JsonReader;
 import javax.json.JsonValue;
 
 import logbook.data.context.GlobalContext;
@@ -133,9 +136,10 @@ public class BattleExDto extends AbstractDto {
      * BattleExDtoのバージョン
      * exVersion == 0 : Tag 34以降がない
      * exVersion == 1 : Tag 36まである
+     * exVersion == 2 : Jsonがある
      *  */
     @Tag(34)
-    private int exVersion = 1;
+    private int exVersion = 2;
 
     /** 母港空き（ドロップ分を含まない） */
     @Tag(35)
@@ -152,7 +156,26 @@ public class BattleExDto extends AbstractDto {
     @Tag(38)
     private boolean[] escaped;
 
+    @Tag(50)
+    private final List<PhaseJson> phaseJson = new ArrayList<PhaseJson>();
+
+    @Tag(51)
+    private String resultJson;
+
     /////////////////////////////////////////////////
+
+    public static class PhaseJson {
+        @Tag(1)
+        public final BattlePhaseKind kind;
+
+        @Tag(2)
+        public final String json;
+
+        public PhaseJson(BattlePhaseKind kind, String json) {
+            this.kind = kind;
+            this.json = json;
+        }
+    }
 
     public static class Phase {
 
@@ -680,7 +703,27 @@ public class BattleExDto extends AbstractDto {
         this.itemSpace = itemSpace;
     }
 
-    public Phase addPhase(JsonObject object, BattlePhaseKind kind) {
+    private static JsonObject jsonFromString(String str) {
+        JsonReader jsonReader = Json.createReader(new StringReader(str));
+        JsonObject object = jsonReader.readObject();
+        jsonReader.close();
+        return object;
+    }
+
+    /**
+     * 中に保存してあるJSONからフィールドを更新する
+     */
+    public void readFromJson() {
+        if (this.exVersion >= 2) {
+            this.phaseList.clear();
+            for (PhaseJson json : this.phaseJson) {
+                this.internalAddPhase(jsonFromString(json.json), json.kind);
+            }
+            this.readResultJson(jsonFromString(this.resultJson));
+        }
+    }
+
+    private void internalAddPhase(JsonObject object, BattlePhaseKind kind) {
         if (this.phaseList.size() == 0) {
             // 最初のフェーズ
             String dockId;
@@ -821,11 +864,15 @@ public class BattleExDto extends AbstractDto {
             this.phaseList.add(new Phase(this, object, kind,
                     this.startFriendHp, this.startFriendHpCombined, this.startEnemyHp));
         }
+    }
 
+    public Phase addPhase(JsonObject object, BattlePhaseKind kind) {
+        this.phaseJson.add(new PhaseJson(kind, object.toString()));
+        this.internalAddPhase(object, kind);
         return this.phaseList.get(this.phaseList.size() - 1);
     }
 
-    public void setResult(JsonObject object, MapCellDto mapInfo) {
+    private void readResultJson(JsonObject object) {
         if (object.get("api_quest_name") != null) {
             this.questName = object.getString("api_quest_name");
         }
@@ -839,7 +886,6 @@ public class BattleExDto extends AbstractDto {
         if ((lastPhase != null) && (lastPhase.getEstimatedRank() == ResultRank.PERFECT)) {
             this.rank = ResultRank.PERFECT;
         }
-        this.mapCellDto = mapInfo;
         this.enemyName = object.getJsonObject("api_enemy_info").getString("api_deck_name");
         this.dropShip = object.containsKey("api_get_ship");
         this.dropItem = object.containsKey("api_get_useitem");
@@ -868,6 +914,12 @@ public class BattleExDto extends AbstractDto {
                     jsonEscape.getJsonArray("api_tow_idx").getInt(0) - 1
             };
         }
+    }
+
+    public void setResult(JsonObject object, MapCellDto mapInfo) {
+        this.resultJson = object.toString();
+        this.mapCellDto = mapInfo;
+        this.readResultJson(object);
     }
 
     private static String toFormation(int f) {

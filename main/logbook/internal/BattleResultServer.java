@@ -3,6 +3,7 @@
  */
 package logbook.internal;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -15,12 +16,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import logbook.constants.AppConstants;
 import logbook.dto.BattleExDto;
@@ -52,10 +56,10 @@ public class BattleResultServer {
     private static Schema<BattleExDto> schema = RuntimeSchema.getSchema(BattleExDto.class);
 
     private static class BattleResult extends BattleResultDto {
-        public File file;
+        public DataFile file;
         public int index;
 
-        BattleResult(BattleExDto dto, File file, int index) {
+        BattleResult(BattleExDto dto, DataFile file, int index) {
             super(dto);
             this.file = file;
             this.index = index;
@@ -102,17 +106,125 @@ public class BattleResultServer {
     private final Set<Date> resultDateSet = new HashSet<Date>();
 
     // キャッシュ
-    private File cachedFile;
+    private DataFile cachedFile;
     private List<BattleExDto> cachedResult;
+
+    private static interface DataFile {
+        public List<BattleExDto> readAll() throws IOException;
+
+        public String getPath();
+
+    }
+
+    private class NormalDataFile implements DataFile {
+        private final File file;
+
+        public NormalDataFile(File file) {
+            this.file = file;
+        }
+
+        @Override
+        public List<BattleExDto> readAll() throws IOException {
+            return loadFromInputStream(new FileInputStream(this.file), BattleResultServer.this.buffer);
+        }
+
+        @Override
+        public String getPath() {
+            return this.file.getAbsolutePath();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof NormalDataFile) {
+                return ((NormalDataFile) o).file.equals(this.file);
+            }
+            return false;
+        }
+    }
+
+    private class ZipDataFile implements DataFile {
+
+        private final File file;
+        private final String zipName;
+
+        public ZipDataFile(File file, String zipName) {
+            this.file = file;
+            this.zipName = zipName;
+        }
+
+        @Override
+        public List<BattleExDto> readAll() throws IOException {
+            ZipFile zipFile = null;
+            try {
+                zipFile = new ZipFile(this.file);
+                return loadFromInputStream(
+                        zipFile.getInputStream(zipFile.getEntry(this.zipName)), BattleResultServer.this.buffer);
+            } finally {
+                if (zipFile != null) {
+                    zipFile.close();
+                }
+            }
+        }
+
+        @Override
+        public String getPath() {
+            return this.file.getAbsolutePath() + ":" + this.zipName;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof ZipDataFile) {
+                return ((ZipDataFile) o).file.equals(this.file) &&
+                        ((ZipDataFile) o).zipName.equals(this.zipName);
+            }
+            return false;
+        }
+    }
+
+    private static List<BattleExDto> loadFromInputStream(InputStream input, LinkedBuffer buffer) throws IOException {
+        List<BattleExDto> result = new ArrayList<BattleExDto>();
+        try {
+            while (input.available() > 0) {
+                BattleExDto battle = schema.newMessage();
+                ProtostuffIOUtil.mergeDelimitedFrom(input, battle, schema, buffer);
+                result.add(battle);
+            }
+        } catch (EOFException e) {
+        } finally {
+            input.close();
+        }
+        return result;
+    }
 
     private BattleResultServer(String path) {
         this.path = path;
         // ファイルを読み込んで resultList を作成
         File dir = new File(path);
         if (dir.exists()) {
-            for (File file : FileUtils.listFiles(dir, new String[] { "dat" }, true)) {
+            // ファイルリストを作成
+            List<DataFile> dataFiles = new ArrayList<DataFile>();
+            for (File file : FileUtils.listFiles(dir, new String[] { "dat", "zip" }, true)) {
                 try {
-                    List<BattleExDto> result = this.readResultFile(file);
+                    if (file.getName().endsWith("dat")) {
+                        dataFiles.add(new NormalDataFile(file));
+                    }
+                    else {
+                        ZipFile zipFile = new ZipFile(file);
+                        Enumeration<? extends ZipEntry> enumeration = zipFile.entries();
+                        while (enumeration.hasMoreElements()) {
+                            ZipEntry entry = enumeration.nextElement();
+                            dataFiles.add(new ZipDataFile(file, entry.getName()));
+                        }
+                        zipFile.close();
+                    }
+                } catch (IOException e) {
+                    LOG.warn("出撃ログの読み込みに失敗しました (" + file.getPath() + ")", e);
+                }
+            }
+            // 全部読み込む
+            for (DataFile file : dataFiles) {
+                try {
+                    List<BattleExDto> result = file.readAll();
                     for (int i = 0; i < result.size(); ++i) {
                         BattleExDto dto = result.get(i);
                         if (dto.isCompleteResult() && !this.resultDateSet.contains(dto.getBattleDate())) {
@@ -164,18 +276,6 @@ public class BattleResultServer {
         }
     }
 
-    private List<BattleExDto> readResultFile(File file) throws IOException {
-        List<BattleExDto> result = new ArrayList<BattleExDto>();
-        FileInputStream input = new FileInputStream(file);
-        while (input.available() > 0) {
-            BattleExDto battle = schema.newMessage();
-            ProtostuffIOUtil.mergeDelimitedFrom(input, battle, schema, this.buffer);
-            result.add(battle);
-        }
-        input.close();
-        return result;
-    }
-
     public void addNewResult(BattleExDto dto) {
         File file = new File(FilenameUtils.concat(this.path, format.format(dto.getBattleDate()) + ".dat"));
         try {
@@ -201,7 +301,7 @@ public class BattleResultServer {
             if (index == null) {
                 index = new Integer(0);
             }
-            BattleResult resultEntry = new BattleResult(dto, file, index);
+            BattleResult resultEntry = new BattleResult(dto, new NormalDataFile(file), index);
             this.update(resultEntry);
             this.resultList.add(resultEntry);
             this.numRecordsMap.put(file.getPath(), index + 1);
@@ -292,7 +392,7 @@ public class BattleResultServer {
         if ((this.cachedFile == null) || (result.file.equals(this.cachedFile) == false)) {
             this.cachedFile = result.file;
             try {
-                this.cachedResult = this.readResultFile(result.file);
+                this.cachedResult = result.file.readAll();
             } catch (IOException e) {
                 return null;
             }
