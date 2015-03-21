@@ -49,13 +49,13 @@ public abstract class AbstractTableDialog extends WindowBase {
     protected Timer timer;
 
     /** ヘッダー */
-    protected String[] header = this.getTableHeader();
+    protected String[] header;
 
     /** テーブルに表示しているボディー */
     protected List<Comparable[]> body;
 
     /** ソート順序 */
-    protected final boolean[] orderflgs = new boolean[this.header.length];
+    protected boolean[] orderflgs;
 
     /** シェル */
     protected Shell shell;
@@ -118,6 +118,8 @@ public abstract class AbstractTableDialog extends WindowBase {
         // テーブルより前に作成する必要があるコンポジットを作成
         this.createContentsBefore();
         // テーブル
+        this.header = this.getTableHeader();
+        this.orderflgs = new boolean[this.header.length];
         this.table = new Table(this.getTableParent(), SWT.FULL_SELECTION | SWT.MULTI);
         this.table.addKeyListener(new TableKeyShortcutAdapter(this.header, this.table));
         this.table.setLinesVisible(true);
@@ -300,20 +302,26 @@ public abstract class AbstractTableDialog extends WindowBase {
      * テーブルをリロードする
      */
     protected void reloadTable() {
+        //ApplicationMain.timeLogPrint("[S] reloadTable");
         this.table.setRedraw(false);
         int topindex = this.table.getTopIndex();
         int[] selection = this.table.getSelectionIndices();
         this.table.setSortColumn(null);
         this.disposeTableBody();
+        //ApplicationMain.timeLogPrint("[S] updateTableBody");
         this.updateTableBody();
+        //ApplicationMain.timeLogPrint("[E] updateTableBody");
         this.sortBody();
+        //ApplicationMain.timeLogPrint("[S] setTableBody");
         this.setTableBody();
+        //ApplicationMain.timeLogPrint("[E] setTableBody");
         this.setSortDirectionToHeader();
         this.table.setSelection(selection);
         this.table.setTopIndex(topindex);
         this.getShell().setText(this.getTitle());
         this.table.setRedraw(true);
         this.table.setTopIndex(topindex);
+        //ApplicationMain.timeLogPrint("[E] reloadTable");
     }
 
     /**
@@ -338,13 +346,14 @@ public abstract class AbstractTableDialog extends WindowBase {
      */
     protected void setTableBody() {
         TableItemCreator creator = this.getTableItemCreator();
-        creator.init();
+        creator.begin(this.getTableHeader());
         // 表示最大件数を制限する
         int numPrintItems = Math.min(MAX_PRINT_ITEMS, this.body.size());
         for (int i = 0; i < numPrintItems; i++) {
             Comparable[] line = this.body.get(i);
             creator.create(this.table, line, i);
         }
+        creator.end();
     }
 
     /**

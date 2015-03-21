@@ -1,7 +1,9 @@
 package logbook.gui;
 
+import logbook.constants.AppConstants;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.TableItemCreator;
+import logbook.scripting.TableItemCreatorProxy;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
@@ -69,7 +71,7 @@ public final class ItemTable extends AbstractTableDialog {
 
     @Override
     protected TableItemCreator getTableItemCreator() {
-        return CreateReportLogic.DEFAULT_TABLE_ITEM_CREATOR;
+        return TableItemCreatorProxy.get(AppConstants.ITEMTABLE_PREFIX);
     }
 
     @Override

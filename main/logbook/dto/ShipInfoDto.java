@@ -68,6 +68,9 @@ public final class ShipInfoDto extends AbstractDto {
     @Tag(13)
     private ShipParameters max;
 
+    @Tag(20)
+    private String json;
+
     /**
      * コンストラクター
      */
@@ -117,6 +120,7 @@ public final class ShipInfoDto extends AbstractDto {
         ShipParameters[] params = ShipParameters.fromMasterShip(object);
         this.param = params[0];
         this.max = params[1];
+        this.json = object.toString();
     }
 
     /**
@@ -159,7 +163,7 @@ public final class ShipInfoDto extends AbstractDto {
     }
 
     /**
-     * @return 改造後の艦ID(改造ができない場合、0)
+     * @param aftershipid 改造後の艦ID(改造ができない場合、0)
      */
     public void setAftershipid(int aftershipid) {
         this.aftershipid = aftershipid;
@@ -167,7 +171,6 @@ public final class ShipInfoDto extends AbstractDto {
 
     /**
      * 艦種を設定します。
-     * @param type 艦種
      */
     public int getStype() {
         return this.stype;
@@ -183,7 +186,7 @@ public final class ShipInfoDto extends AbstractDto {
 
     /**
      * 艦種を設定します。
-     * @param type 艦種
+     * @param stype 艦種
      */
     public void setStype(int stype) {
         this.stype = stype;
@@ -317,5 +320,12 @@ public final class ShipInfoDto extends AbstractDto {
      */
     public void setMax(ShipParameters max) {
         this.max = max;
+    }
+
+    /**
+     * @return json
+     */
+    public JsonObject getJson() {
+        return JsonUtils.fromString(this.json);
     }
 }

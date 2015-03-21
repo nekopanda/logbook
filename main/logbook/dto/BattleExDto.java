@@ -3,17 +3,14 @@
  */
 package logbook.dto;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
-import javax.json.JsonReader;
 import javax.json.JsonValue;
 
 import logbook.data.context.GlobalContext;
@@ -174,6 +171,14 @@ public class BattleExDto extends AbstractDto {
         public PhaseJson(BattlePhaseKind kind, String json) {
             this.kind = kind;
             this.json = json;
+        }
+
+        public JsonObject getJson() {
+            return JsonUtils.fromString(this.json);
+        }
+
+        public String getApi() {
+            return this.kind.getApi().getApiName();
         }
     }
 
@@ -703,13 +708,6 @@ public class BattleExDto extends AbstractDto {
         this.itemSpace = itemSpace;
     }
 
-    private static JsonObject jsonFromString(String str) {
-        JsonReader jsonReader = Json.createReader(new StringReader(str));
-        JsonObject object = jsonReader.readObject();
-        jsonReader.close();
-        return object;
-    }
-
     /**
      * 中に保存してあるJSONからフィールドを更新する
      */
@@ -717,9 +715,9 @@ public class BattleExDto extends AbstractDto {
         if (this.exVersion >= 2) {
             this.phaseList.clear();
             for (PhaseJson json : this.phaseJson) {
-                this.internalAddPhase(jsonFromString(json.json), json.kind);
+                this.internalAddPhase(JsonUtils.fromString(json.json), json.kind);
             }
-            this.readResultJson(jsonFromString(this.resultJson));
+            this.readResultJson(JsonUtils.fromString(this.resultJson));
         }
     }
 
@@ -1322,5 +1320,19 @@ public class BattleExDto extends AbstractDto {
      */
     public boolean[] getEscaped() {
         return this.escaped;
+    }
+
+    /**
+     * @return phaseJson
+     */
+    public List<PhaseJson> getPhaseJson() {
+        return this.phaseJson;
+    }
+
+    /**
+     * @return resultJson
+     */
+    public JsonObject getResultJson() {
+        return JsonUtils.fromString(this.resultJson);
     }
 }

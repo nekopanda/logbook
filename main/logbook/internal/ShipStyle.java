@@ -54,7 +54,8 @@ public class ShipStyle {
 
     /**
      * 更新します
-     * @param data
+     * @param id
+     * @param name
      */
     public static void set(int id, String name) {
         SHIPSTYLE.put(id, name);

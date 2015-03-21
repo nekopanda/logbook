@@ -3,9 +3,13 @@
  */
 package logbook.util;
 
+import java.io.StringReader;
+
+import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
+import javax.json.JsonReader;
 import javax.json.JsonValue;
 
 /**
@@ -32,5 +36,12 @@ public class JsonUtils {
             return false;
         }
         return true;
+    }
+
+    public static JsonObject fromString(String str) {
+        JsonReader jsonReader = Json.createReader(new StringReader(str));
+        JsonObject object = jsonReader.readObject();
+        jsonReader.close();
+        return object;
     }
 }

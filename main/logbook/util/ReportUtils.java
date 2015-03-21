@@ -53,4 +53,23 @@ public class ReportUtils {
         return cal;
     }
 
+    /**
+     * オブジェクト配列をテーブルウィジェットに表示できるように文字列に変換します
+     * 
+     * @param data テーブルに表示する内容
+     * @return テーブルに表示する内容
+     */
+    public static String[] toStringArray(Comparable[] data) {
+        String[] ret = new String[data.length];
+        for (int i = 0; i < data.length; ++i) {
+            if (data[i] == null) {
+                ret[i] = "";
+            }
+            else {
+                ret[i] = data[i].toString();
+            }
+        }
+        return ret;
+    }
+
 }

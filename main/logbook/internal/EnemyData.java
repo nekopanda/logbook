@@ -97,7 +97,7 @@ public class EnemyData {
     /**
      * 敵編成を取得します
      * 
-     * @param type ID
+     * @param id エネミーID
      * @return 敵編成
      */
     public static EnemyData get(int id) {

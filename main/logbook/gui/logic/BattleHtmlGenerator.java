@@ -829,8 +829,18 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.inline("td", detail.getRank().toString(), null);
         this.end(); // tr
 
-        String mvp1 = (result.getMvp() == null) ? "なし" : result.getMvp();
-        String mvp2 = (result.getMvpCombined() == null) ? "なし" : result.getMvpCombined();
+        // MVP
+        String mvp1 = "なし";
+        String mvp2 = "なし";
+        if (detail.getMvp() != -1) { // 敗北Eの時はMVPなし
+            mvp1 = detail.getDock().getShips().get(detail.getMvp() - 1).getFriendlyName();
+        }
+        if (detail.isCombined()) {
+            if (detail.getMvpCombined() != -1) { // 敗北Eの時はMVPなし
+                mvp2 = detail.getDockCombined().getShips()
+                        .get(detail.getMvpCombined() - 1).getFriendlyName();
+            }
+        }
 
         if (detail.isCombined()) {
             this.begin("tr", null);
@@ -855,7 +865,14 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.end(); // table
     }
 
-    /** 戦闘結果が不完全の場合はnullが返ることがある */
+    /** 戦闘結果が不完全の場合はnullが返ることがある
+     * @param title HTMLのタイトル
+     * @param result 戦闘結果概要データ
+     * @param battle 戦闘結果詳細データ
+     * @param getCharset charsetを生成するか。生成する場合UTF-8が指定される
+     * @return 生成されたHTML
+     * @throws java.io.IOException ファイルの書き込みに失敗した
+     *  */
     public String generateHTML(String title, BattleResultDto result, BattleExDto battle, boolean genCharset)
             throws IOException
     {

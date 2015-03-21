@@ -3,30 +3,34 @@
  */
 package logbook.dto;
 
+import logbook.data.DataType;
+
 /**
  * @author Nekopanda
  *
  */
 public enum BattlePhaseKind {
 
-    BATTLE(false, BattlePatternConstants.NON_COMBINED_PTTERN),
-    MIDNIGHT(true, BattlePatternConstants.NON_COMBINED_PTTERN),
-    PRACTICE_BATTLE(false, BattlePatternConstants.NON_COMBINED_PTTERN),
-    PRACTICE_MIDNIGHT(true, BattlePatternConstants.NON_COMBINED_PTTERN),
-    SP_MIDNIGHT(true, BattlePatternConstants.NON_COMBINED_PTTERN),
-    NIGHT_TO_DAY(false, BattlePatternConstants.NON_COMBINED_PTTERN),
-    COMBINED_BATTLE(false, BattlePatternConstants.BATTLE_PATTERN),
-    COMBINED_AIR(false, BattlePatternConstants.BATTLE_PATTERN),
-    COMBINED_MIDNIGHT(true, BattlePatternConstants.BATTLE_PATTERN),
-    COMBINED_SP_MIDNIGHT(true, BattlePatternConstants.BATTLE_PATTERN),
-    COMBINED_BATTLE_WATER(false, BattlePatternConstants.WATER_PATTERN);
+    BATTLE(false, BattlePatternConstants.NON_COMBINED_PTTERN, DataType.BATTLE),
+    MIDNIGHT(true, BattlePatternConstants.NON_COMBINED_PTTERN, DataType.BATTLE_MIDNIGHT),
+    PRACTICE_BATTLE(false, BattlePatternConstants.NON_COMBINED_PTTERN, DataType.PRACTICE_BATTLE),
+    PRACTICE_MIDNIGHT(true, BattlePatternConstants.NON_COMBINED_PTTERN, DataType.PRACTICE_BATTLE_MIDNIGHT),
+    SP_MIDNIGHT(true, BattlePatternConstants.NON_COMBINED_PTTERN, DataType.BATTLE_SP_MIDNIGHT),
+    NIGHT_TO_DAY(false, BattlePatternConstants.NON_COMBINED_PTTERN, DataType.BATTLE_NIGHT_TO_DAY),
+    COMBINED_BATTLE(false, BattlePatternConstants.BATTLE_PATTERN, DataType.COMBINED_BATTLE),
+    COMBINED_AIR(false, BattlePatternConstants.BATTLE_PATTERN, DataType.COMBINED_AIR_BATTLE),
+    COMBINED_MIDNIGHT(true, BattlePatternConstants.BATTLE_PATTERN, DataType.COMBINED_BATTLE_MIDNIGHT),
+    COMBINED_SP_MIDNIGHT(true, BattlePatternConstants.BATTLE_PATTERN, DataType.COMBINED_BATTLE_SP_MIDNIGHT),
+    COMBINED_BATTLE_WATER(false, BattlePatternConstants.WATER_PATTERN, DataType.COMBINED_BATTLE_WATER);
 
     private final boolean night;
     private final boolean[] pattern;
+    private final DataType api;
 
-    private BattlePhaseKind(boolean night, boolean[] pattern) {
+    private BattlePhaseKind(boolean night, boolean[] pattern, DataType api) {
         this.night = night;
         this.pattern = pattern;
+        this.api = api;
     }
 
     /**
@@ -58,6 +62,13 @@ public enum BattlePhaseKind {
 
     public boolean isRaigekiSecond() {
         return this.pattern[5];
+    }
+
+    /**
+     * @return api
+     */
+    public DataType getApi() {
+        return api;
     }
 }
 

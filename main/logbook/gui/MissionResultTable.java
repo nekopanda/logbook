@@ -1,8 +1,10 @@
 package logbook.gui;
 
+import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.TableItemCreator;
+import logbook.scripting.TableItemCreatorProxy;
 
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -51,7 +53,7 @@ public final class MissionResultTable extends AbstractTableDialog {
 
     @Override
     protected TableItemCreator getTableItemCreator() {
-        return CreateReportLogic.DEFAULT_TABLE_ITEM_CREATOR;
+        return TableItemCreatorProxy.get(AppConstants.MISSIONRESULTTABLE_PREFIX);
     }
 
     @Override

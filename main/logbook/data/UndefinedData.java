@@ -71,7 +71,6 @@ public class UndefinedData implements Data {
      * 同定出来ない場合の型はUndefeatedDataです
      * </p>
      * 
-     * @param plaindata
      * @return
      */
     public final Data toDefinedData() {

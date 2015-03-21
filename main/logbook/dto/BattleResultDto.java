@@ -44,25 +44,11 @@ public class BattleResultDto extends AbstractDto {
     /** 艦名 */
     private final String dropName;
 
-    /** 戦闘詳細 */
-    private final BattleDto battle;
-
-    /** この戦闘で大破艦が出たか　*/
-    private final boolean hasTaiha;
-
-    private final boolean isCombined;
-
-    /** メモリ節約のためShipDtoは持たない */
-    private final String mvp;
-
-    private final String mvpCombined;
-
-    private final String flagShip;
-
-    private final String flagShipCombined;
-
     /** 母港の空きがない？ */
     private final boolean noSpaceForShip;
+
+    /** スクリプトサポート */
+    private final Comparable[] extData;
 
     /**
      * コンストラクター
@@ -97,17 +83,11 @@ public class BattleResultDto extends AbstractDto {
             this.dropName = "";
         }
 
-        this.battle = battle;
-        this.hasTaiha = false;
-        this.isCombined = false;
-        this.mvp = null;
-        this.mvpCombined = null;
-        this.flagShip = null;
-        this.flagShipCombined = null;
         this.noSpaceForShip = false;
+        this.extData = null;
     }
 
-    public BattleResultDto(BattleExDto dto) {
+    public BattleResultDto(BattleExDto dto, Comparable[] extData) {
         this.battleDate = dto.getBattleDate();
         this.questName = dto.getQuestName();
         this.rank = dto.getRank();
@@ -117,47 +97,8 @@ public class BattleResultDto extends AbstractDto {
         this.dropItem = dto.isDropItem();
         this.dropType = dto.getDropType();
         this.dropName = dto.getDropName();
-        this.battle = null;
-
-        // 大破艦があるか
-        BattleExDto.Phase lastPhase = dto.getLastPhase();
-        this.hasTaiha = (this.hasTaihaInFleet(lastPhase.getNowFriendHp(), dto.getMaxFriendHp()) ||
-                this.hasTaihaInFleet(lastPhase.getNowFriendHpCombined(), dto.getMaxFriendHpCombined()));
-
-        this.isCombined = dto.isCombined();
-
-        // MVP
-        if (dto.getMvp() == -1) { // 敗北Eの時はMVPなし
-            this.mvp = null;
-        }
-        else {
-            this.mvp = dto.getDock().getShips().get(dto.getMvp() - 1).getFriendlyName();
-        }
-        if (dto.isCombined()) {
-            if (dto.getMvpCombined() == -1) { // 敗北Eの時はMVPなし
-                this.mvpCombined = null;
-            }
-            else {
-                this.mvpCombined = dto.getDockCombined().getShips()
-                        .get(dto.getMvpCombined() - 1).getFriendlyName();
-            }
-        }
-        else {
-            this.mvpCombined = null;
-        }
-
-        // 旗艦
-        this.flagShip = dto.getDock().getShips().get(0).getFriendlyName();
-        ;
-        if (dto.isCombined()) {
-            this.flagShipCombined = dto.getDockCombined()
-                    .getShips().get(0).getFriendlyName();
-        }
-        else {
-            this.flagShipCombined = null;
-        }
-
         this.noSpaceForShip = (dto.getExVersion() >= 1) && (dto.getShipSpace() == 0);
+        this.extData = extData;
     }
 
     private boolean hasTaihaInFleet(int[] nowhp, int[] maxhp) {
@@ -276,13 +217,6 @@ public class BattleResultDto extends AbstractDto {
     }
 
     /**
-     * @return 戦闘詳細
-     */
-    public BattleDto getBattleDto() {
-        return this.battle;
-    }
-
-    /**
      * 艦名を取得します。
      * @return 艦名
      */
@@ -302,59 +236,16 @@ public class BattleResultDto extends AbstractDto {
     }
 
     /**
-     * 戦闘詳細を取得します。
-     * @return 戦闘詳細
-     */
-    public BattleDto getBattle() {
-        return this.battle;
-    }
-
-    /**
-     * @return hasTaiha
-     */
-    public boolean isHasTaiha() {
-        return this.hasTaiha;
-    }
-
-    /**
-     * @return mvp
-     */
-    public String getMvp() {
-        return this.mvp;
-    }
-
-    /**
-     * @return mvpCombined
-     */
-    public String getMvpCombined() {
-        return this.mvpCombined;
-    }
-
-    /**
-     * @return flagShip
-     */
-    public String getFlagShip() {
-        return this.flagShip;
-    }
-
-    /**
-     * @return flagShipCombined
-     */
-    public String getFlagShipCombined() {
-        return this.flagShipCombined;
-    }
-
-    /**
-     * @return isCombined
-     */
-    public boolean isCombined() {
-        return this.isCombined;
-    }
-
-    /**
      * @return noSpaceForShip
      */
     public boolean isNoSpaceForShip() {
         return this.noSpaceForShip;
+    }
+
+    /**
+     * @return extData
+     */
+    public Comparable[] getExtData() {
+        return this.extData;
     }
 }

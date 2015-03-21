@@ -7,6 +7,7 @@ import logbook.config.AppConfig;
 import logbook.config.ShipGroupConfig;
 import logbook.config.bean.ShipFilterPanelConfigBean;
 import logbook.config.bean.ShipGroupBean;
+import logbook.constants.AppConstants;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipFilterDto;
 import logbook.gui.logic.CreateReportLogic;
@@ -14,6 +15,7 @@ import logbook.gui.logic.ShipGroupListener;
 import logbook.gui.logic.ShipGroupObserver;
 import logbook.gui.logic.TableItemCreator;
 import logbook.gui.widgets.ShipFilterComposite;
+import logbook.scripting.TableItemCreatorProxy;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
@@ -270,7 +272,7 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
 
     @Override
     protected TableItemCreator getTableItemCreator() {
-        return CreateReportLogic.SHIP_LIST_TABLE_ITEM_CREATOR;
+        return TableItemCreatorProxy.get(AppConstants.SHIPTABLE_PREFIX);
     }
 
     @Override

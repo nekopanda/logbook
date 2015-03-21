@@ -72,6 +72,7 @@ public final class BeanUtils {
             target = new File(file.getAbsolutePath() + ".backup");
             if (!target.canRead()) {
                 // バックアップファイルも読めない場合nullを返す
+                LOG.warn("バックアップからも読み込めなかったので諦めます: " + file.getName());
                 return null;
             }
         }

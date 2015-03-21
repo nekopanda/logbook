@@ -98,6 +98,10 @@ public final class ApplicationMain extends WindowBase {
         System.out.println(mes + ": " + (System.currentTimeMillis() - startTime) + " ms");
     }
 
+    public static void timeLogPrint(String mes) {
+        logPrint(mes + ": " + (System.currentTimeMillis() - startTime) + " ms");
+    }
+
     public static void logPrint(final String mes) {
         if (main.display.getThread() == Thread.currentThread()) {
             main.printMessage(mes);

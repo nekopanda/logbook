@@ -84,7 +84,7 @@ public class AppConstants {
     public static final RGB COND_GREEN_COLOR = new RGB(0, 128, 0);
 
     /** テーブルの疲労度色 */
-    public static final RGB[] COND_TABLE_LOCOR = new RGB[] {
+    public static final RGB[] COND_TABLE_COLOR = new RGB[] {
             new RGB(122, 206, 255), // #7aceff (100-85)
             new RGB(146, 255, 255), // #92ffff (84-76)
             new RGB(137, 240, 171), // #89f0ab (75-63)
@@ -406,4 +406,31 @@ public class AppConstants {
             new int[] { 13, 14 }, // 潜水艦
             new int[] { 1, 12, 15, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30 }, // その他
     };
+
+    /** ドロップ報告書用スクリプト */
+    public static final File SCRIPT_DIR = new File("./script");
+
+    public static final String TABLE_SCRIPT_PREFIX = "table";
+
+    public static final String TABLE_STYLE_SUFFIX = "style";
+
+    public static final String DROPTABLE_PREFIX = "drop";
+
+    public static final String ITEMTABLE_PREFIX = "item";
+
+    public static final String ITEMIDTABLE_PREFIX = "itemid";
+
+    public static final String SHIPTABLE_PREFIX = "ship";
+
+    public static final String SHIPGROUPTABLE_PREFIX = "shipgroup";
+
+    public static final String CREATEITEMTABLE_PREFIX = "createitem";
+
+    public static final String CREATESHIPTABLE_PREFIX = "createship";
+
+    public static final String MISSIONRESULTTABLE_PREFIX = "missionresult";
+
+    public static final String QUESTTABLE_PREFIX = "quest";
+
+    public static final String RESOURCECHAR_PREFIX = "quest";
 }

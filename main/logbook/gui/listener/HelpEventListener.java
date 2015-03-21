@@ -20,7 +20,7 @@ public final class HelpEventListener extends SelectionAdapter implements HelpLis
     /**
      * コンストラクター
      * 
-     * @param shell シェル
+     * @param parent 親ウィンドウ
      */
     public HelpEventListener(WindowBase parent) {
         this.parent = parent;

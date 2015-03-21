@@ -128,4 +128,8 @@ public enum DataType {
     public String getUrl() {
         return this.url;
     }
+
+    public String getApiName() {
+        return this.url.substring("/kcsapi/".length());
+    }
 }

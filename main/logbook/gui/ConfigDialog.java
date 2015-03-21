@@ -57,7 +57,7 @@ public final class ConfigDialog extends Dialog {
 
     /**
      * Create the dialog.
-     * @param parent
+     * @param main
      */
     public ConfigDialog(ApplicationMain main) {
         super(main.getShell(), SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE);

@@ -30,6 +30,8 @@ import logbook.constants.AppConstants;
 import logbook.dto.BattleExDto;
 import logbook.dto.BattleResultDto;
 import logbook.gui.logic.IntegerPair;
+import logbook.scripting.BattleLogListener;
+import logbook.scripting.BattleLogProxy;
 import logbook.util.ReportUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -59,8 +61,8 @@ public class BattleResultServer {
         public DataFile file;
         public int index;
 
-        BattleResult(BattleExDto dto, DataFile file, int index) {
-            super(dto);
+        BattleResult(BattleExDto dto, DataFile file, int index, Comparable[] extData) {
+            super(dto, extData);
             this.file = file;
             this.index = index;
         }
@@ -100,7 +102,7 @@ public class BattleResultServer {
     private final Set<Integer> cellList = new TreeSet<Integer>();
 
     private final List<BattleResult> resultList = new ArrayList<BattleResult>();
-    private final Map<String, Integer> numRecordsMap = new HashMap<String, Integer>();
+    private final Map<String, DataFile> fileMap = new HashMap<>();
 
     // 重複検出用
     private final Set<Date> resultDateSet = new HashSet<Date>();
@@ -109,23 +111,49 @@ public class BattleResultServer {
     private DataFile cachedFile;
     private List<BattleExDto> cachedResult;
 
-    private static interface DataFile {
-        public List<BattleExDto> readAll() throws IOException;
+    private abstract class DataFile {
+        final File file;
+        int numRecords = 0;
 
-        public String getPath();
+        public DataFile(File file) {
+            this.file = file;
+        }
+
+        public List<BattleExDto> readAll() throws IOException {
+            throw new UnsupportedOperationException();
+        }
+
+        public String getPath() {
+            throw new UnsupportedOperationException();
+        }
+
+        public void addToFile(BattleExDto dto) {
+            throw new UnsupportedOperationException();
+        }
+
+        public int getNumRecords() {
+            return this.numRecords;
+        }
+
+        List<BattleExDto> load(InputStream input) throws IOException {
+            List<BattleExDto> result = loadFromInputStream(input, BattleResultServer.this.buffer);
+            this.numRecords = result.size();
+            return result;
+        }
 
     }
 
-    private class NormalDataFile implements DataFile {
-        private final File file;
+    private class NormalDataFile extends DataFile {
 
         public NormalDataFile(File file) {
-            this.file = file;
+            super(file);
         }
 
         @Override
         public List<BattleExDto> readAll() throws IOException {
-            return loadFromInputStream(new FileInputStream(this.file), BattleResultServer.this.buffer);
+            try (InputStream input = new FileInputStream(this.file)) {
+                return this.load(input);
+            }
         }
 
         @Override
@@ -134,34 +162,32 @@ public class BattleResultServer {
         }
 
         @Override
-        public boolean equals(Object o) {
-            if (o instanceof NormalDataFile) {
-                return ((NormalDataFile) o).file.equals(this.file);
+        public void addToFile(BattleExDto dto) {
+            // ファイルとリストに追加
+            try (FileOutputStream output = new FileOutputStream(getStoreFile(this.file), true)) {
+                ProtostuffIOUtil.writeDelimitedTo(output, dto, schema, BattleResultServer.this.buffer);
+                BattleResultServer.this.buffer.clear();
+            } catch (IOException e) {
+                LOG.warn("出撃ログの書き込みに失敗しました", e);
             }
-            return false;
+            ++this.numRecords;
         }
     }
 
-    private class ZipDataFile implements DataFile {
+    private class ZipDataFile extends DataFile {
 
-        private final File file;
         private final String zipName;
 
         public ZipDataFile(File file, String zipName) {
-            this.file = file;
+            super(file);
             this.zipName = zipName;
         }
 
         @Override
         public List<BattleExDto> readAll() throws IOException {
-            ZipFile zipFile = null;
-            try {
-                zipFile = new ZipFile(this.file);
-                return loadFromInputStream(
-                        zipFile.getInputStream(zipFile.getEntry(this.zipName)), BattleResultServer.this.buffer);
-            } finally {
-                if (zipFile != null) {
-                    zipFile.close();
+            try (ZipFile zipFile = new ZipFile(this.file)) {
+                try (InputStream input = zipFile.getInputStream(zipFile.getEntry(this.zipName))) {
+                    return this.load(input);
                 }
             }
         }
@@ -169,15 +195,6 @@ public class BattleResultServer {
         @Override
         public String getPath() {
             return this.file.getAbsolutePath() + ":" + this.zipName;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o instanceof ZipDataFile) {
-                return ((ZipDataFile) o).file.equals(this.file) &&
-                        ((ZipDataFile) o).zipName.equals(this.zipName);
-            }
-            return false;
         }
     }
 
@@ -190,8 +207,6 @@ public class BattleResultServer {
                 result.add(battle);
             }
         } catch (EOFException e) {
-        } finally {
-            input.close();
         }
         return result;
     }
@@ -202,41 +217,27 @@ public class BattleResultServer {
         File dir = new File(path);
         if (dir.exists()) {
             // ファイルリストを作成
-            List<DataFile> dataFiles = new ArrayList<DataFile>();
             for (File file : FileUtils.listFiles(dir, new String[] { "dat", "zip" }, true)) {
                 try {
                     if (file.getName().endsWith("dat")) {
-                        dataFiles.add(new NormalDataFile(file));
+                        DataFile dataFile = new NormalDataFile(file);
+                        this.fileMap.put(dataFile.getPath(), dataFile);
                     }
                     else {
-                        ZipFile zipFile = new ZipFile(file);
-                        Enumeration<? extends ZipEntry> enumeration = zipFile.entries();
-                        while (enumeration.hasMoreElements()) {
-                            ZipEntry entry = enumeration.nextElement();
-                            dataFiles.add(new ZipDataFile(file, entry.getName()));
+                        try (ZipFile zipFile = new ZipFile(file)) {
+                            Enumeration<? extends ZipEntry> enumeration = zipFile.entries();
+                            while (enumeration.hasMoreElements()) {
+                                ZipEntry entry = enumeration.nextElement();
+                                DataFile dataFile = new ZipDataFile(file, entry.getName());
+                                this.fileMap.put(dataFile.getPath(), dataFile);
+                            }
                         }
-                        zipFile.close();
                     }
                 } catch (IOException e) {
                     LOG.warn("出撃ログの読み込みに失敗しました (" + file.getPath() + ")", e);
                 }
             }
-            // 全部読み込む
-            for (DataFile file : dataFiles) {
-                try {
-                    List<BattleExDto> result = file.readAll();
-                    for (int i = 0; i < result.size(); ++i) {
-                        BattleExDto dto = result.get(i);
-                        if (dto.isCompleteResult() && !this.resultDateSet.contains(dto.getBattleDate())) {
-                            this.resultDateSet.add(dto.getBattleDate());
-                            this.resultList.add(new BattleResult(dto, file, i));
-                        }
-                    }
-                    this.numRecordsMap.put(file.getPath(), result.size());
-                } catch (IOException e) {
-                    LOG.warn("出撃ログの読み込みに失敗しました (" + file.getPath() + ")", e);
-                }
-            }
+            this.reloadFiles();
         }
 
         // フィルタ用パラメータを計算
@@ -245,6 +246,32 @@ public class BattleResultServer {
         for (BattleResult battle : this.resultList) {
             this.update(battle);
         }
+    }
+
+    public void reloadFiles() {
+        this.resultDateSet.clear();
+        this.resultList.clear();
+
+        BattleLogListener battleLogScript = BattleLogProxy.get();
+
+        battleLogScript.begin();
+        // 全部読み込む
+        for (DataFile file : this.fileMap.values()) {
+            try {
+                List<BattleExDto> result = file.readAll();
+                for (int i = 0; i < result.size(); ++i) {
+                    BattleExDto dto = result.get(i);
+                    if (dto.isCompleteResult() && !this.resultDateSet.contains(dto.getBattleDate())) {
+                        this.resultDateSet.add(dto.getBattleDate());
+                        this.resultList.add(new BattleResult(dto, file, i,
+                                battleLogScript.body(dto)));
+                    }
+                }
+            } catch (IOException e) {
+                LOG.warn("出撃ログの読み込みに失敗しました (" + file.getPath() + ")", e);
+            }
+        }
+        battleLogScript.end();
 
         // 時刻でソート
         Collections.sort(this.resultList, new Comparator<BattleResult>() {
@@ -277,39 +304,32 @@ public class BattleResultServer {
     }
 
     public void addNewResult(BattleExDto dto) {
-        File file = new File(FilenameUtils.concat(this.path, format.format(dto.getBattleDate()) + ".dat"));
-        try {
-            FileOutputStream output = null;
-            try {
-                // ファイルとリストに追加
-                output = new FileOutputStream(getStoreFile(file), true);
-                ProtostuffIOUtil.writeDelimitedTo(output, dto, schema, this.buffer);
-                this.buffer.clear();
-            } catch (IOException e) {
-                LOG.warn("出撃ログの書き込みに失敗しました", e);
-            } finally {
-                if (output != null) {
-                    output.close();
-                }
-            }
-        } catch (IOException e) {
-            LOG.warn("出撃ログファイルの後処理に失敗しました", e);
-        }
         // ファイルとリストに追加
         if (dto.isCompleteResult()) {
-            Integer index = this.numRecordsMap.get(file.getPath());
-            if (index == null) {
-                index = new Integer(0);
+            File file = new File(FilenameUtils.concat(this.path, format.format(dto.getBattleDate()) + ".dat"));
+            DataFile dataFile = this.fileMap.get(file.getAbsoluteFile());
+            if (dataFile == null) {
+                dataFile = new NormalDataFile(file);
+                this.fileMap.put(dataFile.getPath(), dataFile);
             }
-            BattleResult resultEntry = new BattleResult(dto, new NormalDataFile(file), index);
+
+            BattleLogListener battleLogScript = BattleLogProxy.get();
+            BattleResult resultEntry = new BattleResult(dto, new NormalDataFile(file), dataFile.getNumRecords(),
+                    battleLogScript.body(dto));
             this.update(resultEntry);
             this.resultList.add(resultEntry);
-            this.numRecordsMap.put(file.getPath(), index + 1);
+
+            dataFile.addToFile(dto);
+
             // キャッシュされているときはキャッシュにも追加
-            if ((this.cachedFile != null) && file.equals(this.cachedFile)) {
+            if ((this.cachedFile != null) && (dataFile == this.cachedFile)) {
                 this.cachedResult.add(dto);
             }
         }
+    }
+
+    public String[] getExtHeader() {
+        return BattleLogProxy.get().header();
     }
 
     public int size() {
@@ -389,10 +409,10 @@ public class BattleResultServer {
     /** 詳細を読み込む（失敗したら null ） */
     public BattleExDto getBattleDetail(BattleResultDto summary) {
         BattleResult result = (BattleResult) summary;
-        if ((this.cachedFile == null) || (result.file.equals(this.cachedFile) == false)) {
-            this.cachedFile = result.file;
+        if ((this.cachedFile == null) || (result.file != this.cachedFile)) {
             try {
                 this.cachedResult = result.file.readAll();
+                this.cachedFile = result.file;
             } catch (IOException e) {
                 return null;
             }
@@ -458,13 +478,10 @@ public class BattleResultServer {
             alt_report.renameTo(report);
             return;
         }
-        OutputStream report_stream = new FileOutputStream(report, true);
-        InputStream alt_stream = new FileInputStream(alt_report);
-        try {
-            IOUtils.copy(alt_stream, report_stream);
-        } finally {
-            report_stream.close();
-            alt_stream.close();
+        try (OutputStream report_stream = new FileOutputStream(report, true)) {
+            try (InputStream alt_stream = new FileInputStream(alt_report)) {
+                IOUtils.copy(alt_stream, report_stream);
+            }
         }
         alt_report.delete();
     }

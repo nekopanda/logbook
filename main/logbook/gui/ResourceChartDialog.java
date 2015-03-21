@@ -21,9 +21,9 @@ import logbook.constants.AppConstants;
 import logbook.dto.chart.Resource;
 import logbook.dto.chart.ResourceLog;
 import logbook.dto.chart.ResourceLog.SortableLog;
-import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.ResourceChart;
 import logbook.gui.logic.TableItemCreator;
+import logbook.scripting.TableItemCreatorProxy;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
@@ -112,7 +112,6 @@ public final class ResourceChartDialog extends WindowBase {
 
     /**
      * Open the dialog.
-     * @return the result
      */
     @Override
     public void open() {
@@ -327,12 +326,13 @@ public final class ResourceChartDialog extends WindowBase {
      */
     private void setTableBody() {
         this.table.removeAll();
-        TableItemCreator creator = CreateReportLogic.DEFAULT_TABLE_ITEM_CREATOR;
-        creator.init();
+        TableItemCreator creator = TableItemCreatorProxy.get(AppConstants.RESOURCECHAR_PREFIX);
+        creator.begin(this.header);
         for (int i = 0; i < this.body.size(); i++) {
             String[] line = this.body.get(i);
             creator.create(this.table, line, i);
         }
+        creator.end();
     }
 
     @Override

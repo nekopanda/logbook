@@ -8,8 +8,9 @@ import org.eclipse.swt.widgets.TableItem;
  *
  */
 public interface TableItemCreator {
-
-    void init();
+    void begin(String[] header);
 
     TableItem create(Table table, Comparable[] text, int count);
+
+    void end();
 }

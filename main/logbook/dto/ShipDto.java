@@ -100,6 +100,9 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     @Tag(27)
     private final int[] onslot;
 
+    @Tag(40)
+    private final String json;
+
     /** */
     private transient final int lockedEquip;
 
@@ -144,6 +147,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
         if (this.cond < 49) {
             this.condClearTime.add(Calendar.MINUTE, Math.max(49 - this.cond, 3));
         }
+        this.json = object.toString();
     }
 
     /**
@@ -494,5 +498,12 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
      */
     public int getYasenPower() {
         return this.getKaryoku() + this.getRaisou();
+    }
+
+    /**
+     * @return json
+     */
+    public JsonObject getJson() {
+        return JsonUtils.fromString(this.json);
     }
 }

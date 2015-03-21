@@ -264,8 +264,7 @@ public class FleetComposite extends Composite {
      * 艦隊を更新します
      *
      * @param dock
-     * @param combinedFleetbadlyDamaed 連合艦隊の他の艦隊の艦が大破している
-     * @param escaped 退避したか（連合艦隊でない場合 or 情報がない場合はnull可）
+     * @param combinedFleetBadlyDamaed 連合艦隊の他の艦隊の艦が大破している
      */
     public void updateFleet(DockDto dock, boolean combinedFleetBadlyDamaed) {
         if ((this.dock == dock) && !this.dock.isUpdate()) {

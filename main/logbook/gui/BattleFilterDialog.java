@@ -67,7 +67,6 @@ public class BattleFilterDialog extends WindowBase {
 
     /**
      * Open the dialog.
-     * @return the result
      */
     @Override
     public void open() {

@@ -16,11 +16,11 @@ import logbook.config.bean.ShipGroupListBean;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.dto.ShipDto;
-import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.ShipGroupListener;
 import logbook.gui.logic.ShipGroupObserver;
 import logbook.gui.logic.TableItemCreator;
 import logbook.gui.logic.TableRowHeader;
+import logbook.scripting.TableItemCreatorProxy;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
@@ -41,7 +41,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
@@ -73,7 +72,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
     /**
      * Create the dialog.
      * @param parent
-     * @param style
+     * @param menuItem
      */
     public ShipFilterGroupDialog(Shell parent, MenuItem menuItem) {
         super(parent, menuItem);
@@ -226,6 +225,8 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
 
     @Override
     protected TableItemCreator getTableItemCreator() {
+        return TableItemCreatorProxy.get(AppConstants.SHIPGROUPTABLE_PREFIX);
+        /*
         return new TableItemCreator() {
 
             @Override
@@ -241,10 +242,11 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
                     item.setBackground(SWTResourceManager.getColor(AppConstants.ROW_BACKGROUND));
                 }
                 item.setBackground(6, CreateReportLogic.getTableCondColor(ship.getEstimatedCond()));
-                item.setText(CreateReportLogic.toStringArray(text));
+                item.setText(ReportUtils.toStringArray(text));
                 return item;
             }
         };
+        */
     }
 
     @Override

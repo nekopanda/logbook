@@ -81,7 +81,7 @@ public class BattleAggDialog extends WindowBase {
     /**
      * Create the dialog.
      * @param parent
-     * @param style
+     * @param menuItem
      */
     public BattleAggDialog(Shell parent, MenuItem menuItem) {
         super(menuItem);

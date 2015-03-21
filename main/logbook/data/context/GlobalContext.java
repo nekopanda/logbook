@@ -61,6 +61,7 @@ import logbook.internal.MasterData;
 import logbook.internal.MasterData.ShipTypeDto;
 import logbook.internal.Ship;
 import logbook.internal.ShipStyle;
+import logbook.scripting.EventListenerProxy;
 import logbook.util.JsonUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -194,7 +195,7 @@ public final class GlobalContext {
 
     /**
      * 装備を復元する
-     * @param map
+     * @param items 装備
      */
     public static void setItemMap(Collection<ItemDto> items) {
         for (ItemDto item : items) {
@@ -379,8 +380,7 @@ public final class GlobalContext {
 
     /**
      * 艦隊が遠征中かを調べます
-     *
-     * @param
+     * @param idstr 艦隊ID（1～）
      */
     public static boolean isMission(String idstr) {
         int id = Integer.parseInt(idstr);
@@ -472,13 +472,17 @@ public final class GlobalContext {
     /**
      * 情報を更新します
      *
-     * @return 更新する情報があった場合trueを返します
+     * @param data リクエスト・レスポンスデータ
      */
     public static void updateContext(Data data) {
         // json保存設定
         if (AppConfig.get().isStoreJson()) {
             doStoreJson(data);
         }
+
+        // ユーザスクリプト呼び出し
+        EventListenerProxy.get().update(data.getDataType(), data);
+
         switch (data.getDataType()) {
         // 補給
         case CHARGE:

@@ -19,6 +19,7 @@ import logbook.constants.AppConstants;
 import logbook.dto.UseItemDto;
 import logbook.gui.ApplicationMain;
 import logbook.util.BeanUtils;
+import logbook.util.JsonUtils;
 
 /**
  * @author Nekopanda
@@ -558,6 +559,7 @@ public class MasterData {
         private String name;
         private int id;
         private ArrayList<Boolean> equipType = new ArrayList<Boolean>();
+        private String json;
 
         public ShipTypeDto() {
         }
@@ -572,6 +574,7 @@ public class MasterData {
                     break;
                 this.equipType.add(number.intValue() != 0);
             }
+            this.json = object.toString();
         }
 
         /**
@@ -614,6 +617,13 @@ public class MasterData {
          */
         public void setEquipType(ArrayList<Boolean> equipType) {
             this.equipType = equipType;
+        }
+
+        /**
+         * @return json
+         */
+        public JsonObject getJson() {
+            return JsonUtils.fromString(this.json);
         }
     }
 

@@ -79,7 +79,8 @@ public abstract class ShipBaseDto extends AbstractDto {
 
     /**
      * 敵艦用コンストラクター
-     * @param object JSON Object
+     * @param shipId ship_id
+     * @param slot 装備
      */
     public ShipBaseDto(int shipId, int[] slot) {
         this.shipInfo = Ship.get(String.valueOf(shipId));

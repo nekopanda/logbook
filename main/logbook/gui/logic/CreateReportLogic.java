@@ -44,18 +44,19 @@ import logbook.dto.QuestDto;
 import logbook.dto.ResourceItemDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipFilterDto;
-import logbook.dto.ShipInfoDto;
 import logbook.dto.ShipParameters;
 import logbook.dto.UseItemDto;
 import logbook.internal.BattleResultFilter;
 import logbook.internal.BattleResultServer;
 import logbook.internal.MasterData;
-import logbook.internal.Ship;
+import logbook.scripting.ShipItemListener;
+import logbook.scripting.ShipItemProxy;
 import logbook.util.ReportUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -74,9 +75,9 @@ import au.com.bytecode.opencsv.CSVReader;
 public final class CreateReportLogic {
 
     public static Color getTableCondColor(int cond) {
-        for (int i = 0; i < AppConstants.COND_TABLE_LOCOR.length; ++i) {
+        for (int i = 0; i < AppConstants.COND_TABLE_COLOR.length; ++i) {
             if (cond >= AppConstants.COND_TABLE[i]) {
-                return SWTResourceManager.getColor(AppConstants.COND_TABLE_LOCOR[i]);
+                return SWTResourceManager.getColor(AppConstants.COND_TABLE_COLOR[i]);
             }
         }
         // 0より小さいってあり得ないけど
@@ -85,11 +86,6 @@ public final class CreateReportLogic {
 
     /** テーブルアイテム作成(デフォルト) */
     public static final TableItemCreator DEFAULT_TABLE_ITEM_CREATOR = new TableItemCreator() {
-
-        @Override
-        public void init() {
-        }
-
         @Override
         public TableItem create(Table table, Comparable[] text, int count) {
             TableItem item = new TableItem(table, SWT.NONE);
@@ -97,22 +93,40 @@ public final class CreateReportLogic {
             if ((count % 2) != 0) {
                 item.setBackground(SWTResourceManager.getColor(AppConstants.ROW_BACKGROUND));
             }
-            item.setText(toStringArray(text));
+            item.setText(ReportUtils.toStringArray(text));
             return item;
+        }
+
+        @Override
+        public void begin(String[] header) {
+            // TODO 自動生成されたメソッド・スタブ
+
+        }
+
+        @Override
+        public void end() {
+            // TODO 自動生成されたメソッド・スタブ
+
         }
     };
 
     /** テーブルアイテム作成(所有艦娘一覧) */
-    public static final TableItemCreator SHIP_LIST_TABLE_ITEM_CREATOR = new TableItemCreator() {
+    private static final class ShipTableItemCreator implements TableItemCreator {
 
-        private Set<Integer> deckmissions;
+        private final Set<Integer> missionShips = GlobalContext.getMissionShipSet();
 
-        private Set<Integer> docks;
+        private final Set<Integer> ndockShips = GlobalContext.getNDockShipSet();
 
-        @Override
-        public void init() {
-            this.deckmissions = GlobalContext.getMissionShipSet();
-            this.docks = GlobalContext.getNDockShipSet();
+        private int condIndex = 12;
+
+        public ShipTableItemCreator() {
+            String[] header = getShipListHeader();
+            for (int i = 1; i < header.length; ++i) {
+                if (header[i].equals("疲労")) {
+                    this.condIndex = i;
+                    break;
+                }
+            }
         }
 
         @Override
@@ -142,15 +156,15 @@ public final class CreateReportLogic {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.COND_GREEN_COLOR));
             }
             */
-            // 疲労は 12 番目
-            item.setBackground(12, getTableCondColor(ship.getCond()));
+            // 疲労
+            item.setBackground(this.condIndex, getTableCondColor(ship.getCond()));
 
             // 遠征
-            if (this.deckmissions.contains(ship.getId())) {
+            if (this.missionShips.contains(ship.getId())) {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.MISSION_COLOR));
             }
             // 入渠
-            if (this.docks.contains(ship.getId())) {
+            if (this.ndockShips.contains(ship.getId())) {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.NDOCK_COLOR));
             }
             // Lv1の艦娘をグレー色にする
@@ -160,11 +174,29 @@ public final class CreateReportLogic {
             }
             */
 
-            item.setText(toStringArray(text));
+            item.setText(ReportUtils.toStringArray(text));
 
             return item;
         }
-    };
+
+        /* (非 Javadoc)
+         * @see logbook.gui.logic.TableItemCreator#begin(java.lang.String[])
+         */
+        @Override
+        public void begin(String[] header) {
+            // TODO 自動生成されたメソッド・スタブ
+
+        }
+
+        /* (非 Javadoc)
+         * @see logbook.gui.logic.TableItemCreator#end()
+         */
+        @Override
+        public void end() {
+            // TODO 自動生成されたメソッド・スタブ
+
+        }
+    }
 
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(CreateReportLogic.class);
@@ -175,12 +207,14 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getBattleResultHeader() {
-        return new String[] { "No.", "日付", "海域", "マス", "出撃", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘",
-                "大破艦", "旗艦", "旗艦(第二艦隊)", "MVP", "MVP(第二艦隊)" };
+        return ArrayUtils.addAll(new String[] {
+                "No.", "日付", "海域", "マス", "出撃", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘" },
+                BattleResultServer.get().getExtHeader());
     }
 
     /**
      * ドロップ報告書の内容
+     * @param filter フィルタ
      * @return 内容
      */
     public static List<Comparable[]> getBattleResultBody(BattleResultFilter filter) {
@@ -189,7 +223,7 @@ public final class CreateReportLogic {
 
         for (int i = 0; i < results.size(); i++) {
             BattleResultDto item = results.get(i);
-            body.add(new Comparable[] {
+            body.add(ArrayUtils.addAll(new Comparable[] {
                     new TableRowHeader(i + 1, item),
                     new DateTimeString(item.getBattleDate()),
                     item.getQuestName(),
@@ -198,12 +232,8 @@ public final class CreateReportLogic {
                     item.getRank(),
                     item.getEnemyName(),
                     item.getDropType(),
-                    item.getScreenDropName(),
-                    item.isHasTaiha() ? "あり" : "",
-                    item.getFlagShip(),
-                    item.getFlagShipCombined(),
-                    item.getMvp(),
-                    item.getMvpCombined() });
+                    item.getScreenDropName() },
+                    item.getExtData()));
         }
         return body;
     }
@@ -303,7 +333,7 @@ public final class CreateReportLogic {
 
     /**
      * 建造報告書の内容
-     * 
+     * @param ships 建造された艦データ
      * @return 内容
      */
     public static List<Comparable[]> getCreateShipBody(List<GetShipDto> ships) {
@@ -355,7 +385,7 @@ public final class CreateReportLogic {
 
     /**
      * 開発報告書の内容
-     * 
+     * @param items 開発された装備データ
      * @return 内容
      */
     public static List<Comparable[]> getCreateItemBody(List<CreateItemDto> items) {
@@ -525,60 +555,9 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getShipListHeader() {
-        return new String[] {
-                "No.",
-                "ID",
-                "鍵",//
-                "艦隊",
-                "Lv順", //
-                "艦種順", //
-                "NEW順", //
-                "修理順", //
-                "名前",
-                "艦種",
-                "艦ID",//
-                "現在",//
-                "疲労",
-                "回復",
-                "HP", //
-                "燃料",//
-                "弾薬",//
-                "修理時間",//
-                "修理燃料",//
-                "修理鋼材",//
-                "損傷",//
-                "HP1あたり", //
-                "Lv",
-                "Next",
-                "経験値",
-                "制空",
-                "索敵", //
-                "装備1",
-                "艦載機1", //
-                "装備2",
-                "艦載機2", //
-                "装備3",
-                "艦載機3", //
-                "装備4",
-                "艦載機4", //
-                "耐久",
-                "燃料",//
-                "弾薬",//
-                "火力",
-                "雷装",
-                "対空",
-                "装甲",
-                "回避",
-                "対潜",
-                "索敵",
-                "運",
-                "装備命中",
-                "砲撃戦火力",
-                "雷撃戦火力",
-                "対潜火力",
-                "夜戦火力",
-                "改造可能"
-        };
+        return ArrayUtils.addAll(new String[] {
+                "No."
+        }, ShipItemProxy.get().header());
     }
 
     public static boolean[] getBathTableDefaultVisibles() {
@@ -618,233 +597,26 @@ public final class CreateReportLogic {
      * @return 内容
      */
     public static List<Comparable[]> getShipListBody(boolean specdiff, ShipFilterDto filter) {
+        //ApplicationMain.sysPrint("ShipListBody Start");
         Set<Integer> missionSet = GlobalContext.getMissionShipSet();
         List<Comparable[]> body = new ArrayList<Comparable[]>();
+        ShipItemListener script = ShipItemProxy.get();
+        script.begin(specdiff);
         int count = 0;
-        for (ShipWithSortNumber shipObj : getShipWithSortNumber()) {
+        for (ShipOrder shipObj : ShipOrder.getOrderedShipList()) {
             ShipDto ship = shipObj.ship;
 
             if ((filter != null) && !shipFilter(ship, filter, missionSet)) {
                 continue;
             }
 
-            ShipInfoDto shipInfo = Ship.get(String.valueOf(ship.getShipId()));
-
-            count++;
-
-            String fleet = null;
-            if (ship.isFleetMember()) {
-                fleet = String.valueOf(ship.getFleetid()) + "-" + String.valueOf(ship.getFleetpos() + 1);
-            }
-
-            String now = null;
-            if (missionSet.contains(ship.getId())) {
-                now = "遠征中";
-            }
-            else if (GlobalContext.isNdock(ship.getId())) {
-                now = "入渠中";
-            }
-
-            ShipParameters param = new ShipParameters();
-            if (specdiff) {
-                // 成長の余地 = (装備なしのMAX) + (装備による上昇分) - (装備込の現在値)
-                param.add(ship.getMax());
-                param.add(ship.getSlotParam());
-                param.subtract(ship.getParam());
-            }
-            else {
-                param.add(ship.getParam());
-            }
-
-            // HP1あたりの時間
-            long dockTime = ship.getDocktime();
-            long unitSeconds = ((long) (dockTime
-                    / (float) (ship.getMaxhp() - ship.getNowhp()) / 1000));
-            // 損傷
-            String damage = "";
-            if (ship.isBadlyDamage()) {
-                damage = "大破";
-            } else if (ship.isHalfDamage()) {
-                damage = "中破";
-            } else if (ship.isSlightDamage()) {
-                damage = "小破";
-            }
-
-            // 艦載機数
-            List<ItemDto> slotItems = ship.getItem2();
-            String[] slotNames = new String[4];
-            HpString[] onSlotString = new HpString[4];
-            int[] onSlot = ship.getOnSlot();
-            int[] maxEq = shipInfo.getMaxeq();
-            int slotNum = ship.getSlotNum();
-            for (int i = 0; i < slotNum; ++i) {
-                ItemDto item = slotItems.get(i);
-                if (ship.canEquipPlane()) { // 飛行機を装備できる場合だけ
-                    int cur = ((item != null) && item.isPlane()) ? onSlot[i] : 0;
-                    int max = maxEq != null ? maxEq[i] : 0;
-                    onSlotString[i] = new HpString(cur, max);
-                }
-                if (item != null) {
-                    slotNames[i] = item.getFriendlyName();
-                }
-            }
-
-            boolean canRemodel = (ship.getShipInfo().getAfterlv() > 0)
-                    && (ship.getLv() >= ship.getShipInfo().getAfterlv());
-
-            body.add(new Comparable[] {
-                    new TableRowHeader(count, ship),
-                    ship.getId(),
-                    ship.getLocked() ? "♥" : "",
-                    fleet,
-                    getPageNumber(shipObj.sortNumber[0]),
-                    getPageNumber(shipObj.sortNumber[1]),
-                    getPageNumber(shipObj.sortNumber[2]),
-                    getPageNumber(shipObj.sortNumber[3]),
-                    ship.getName(),
-                    ship.getType(),
-                    ship.getCharId(),
-                    now,
-                    ship.getCond(),
-                    (ship.getCond() < 49) ? new TimeString(ship.getCondClearTime().getTime()) : null,
-                    new HpString(ship.getNowhp(), ship.getMaxhp()),
-                    new HpString(ship.getFuel(), ship.getFuelMax()),
-                    new HpString(ship.getBull(), ship.getBullMax()),
-                    dockTime > 0 ? new TimeLogic(ship.getDocktime()) : null,
-                    dockTime > 0 ? ship.getDockfuel() : null,
-                    dockTime > 0 ? ship.getDockmetal() : null,
-                    damage,
-                    dockTime > 0 ? TimeLogic.fromSeconds(unitSeconds) : null,
-                    ship.getLv(),
-                    ship.getNext(),
-                    ship.getExp(),
-                    ship.getSeiku(),
-                    new SakutekiString(ship),
-                    slotNames[0],
-                    onSlotString[0],
-                    slotNames[1],
-                    onSlotString[1],
-                    slotNames[2],
-                    onSlotString[2],
-                    slotNames[3],
-                    onSlotString[3],
-                    ship.getMaxhp(),
-                    ship.getFuelMax(),
-                    ship.getBullMax(),
-                    param.getKaryoku(),
-                    param.getRaisou(),
-                    param.getTaiku(),
-                    param.getSoukou(),
-                    param.getKaihi(),
-                    param.getTaisen(),
-                    param.getSakuteki(),
-                    param.getLucky(),
-                    ship.getAccuracy(),
-                    ship.getHougekiPower(),
-                    ship.getRaigekiPower(),
-                    ship.getTaisenPower(),
-                    ship.getYasenPower(),
-                    canRemodel ? "可能" : null,
-            });
+            body.add(ArrayUtils.addAll(new Comparable[] {
+                    new TableRowHeader(count++, ship)
+            }, script.body(ship)));
         }
+        script.end();
+        //ApplicationMain.sysPrint("ShipListBody Finish");
         return body;
-    }
-
-    private static IntegerPair getPageNumber(int index) {
-        return new IntegerPair((index / 10) + 1, (index % 10) + 1, "-");
-    }
-
-    public static class ShipWithSortNumber {
-        public ShipDto ship;
-        /** Lv順, 艦種順, NEW順, 修理順 (ゼロ始まり) */
-        public int[] sortNumber = new int[4];
-
-        public ShipWithSortNumber(ShipDto ship) {
-            this.ship = ship;
-        }
-    }
-
-    private static class ShipComparatorBase implements Comparator<ShipWithSortNumber> {
-        @Override
-        public int compare(ShipWithSortNumber o1, ShipWithSortNumber o2) {
-            int ret = Integer.compare(o1.ship.getSortno(), o2.ship.getSortno());
-            if (ret == 0) {
-                ret = Integer.compare(o1.ship.getId(), o2.ship.getId());
-            }
-            return ret;
-        }
-    }
-
-    private static void genSortNumber(List<ShipWithSortNumber> list, int index, Comparator<ShipWithSortNumber> comp) {
-        Collections.sort(list, comp);
-        for (int i = 0; i < list.size(); ++i) {
-            list.get(i).sortNumber[index] = i;
-        }
-    }
-
-    public static List<ShipWithSortNumber> getShipWithSortNumber() {
-        List<ShipWithSortNumber> ships = new ArrayList<ShipWithSortNumber>();
-        for (ShipDto ship : GlobalContext.getShipMap().values()) {
-            ships.add(new ShipWithSortNumber(ship));
-        }
-        // Lv順
-        genSortNumber(ships, 0, new ShipComparatorBase() {
-            @Override
-            public int compare(ShipWithSortNumber o1, ShipWithSortNumber o2) {
-                int ret = -Integer.compare(o1.ship.getLv(), o2.ship.getLv());
-                if (ret == 0) {
-                    return super.compare(o1, o2);
-                }
-                return ret;
-            }
-        });
-        // 艦種順
-        genSortNumber(ships, 1, new Comparator<ShipWithSortNumber>() {
-            @Override
-            public int compare(ShipWithSortNumber o1, ShipWithSortNumber o2) {
-                int ret = -Integer.compare(o1.ship.getShipInfo().getStype(), o2.ship.getShipInfo().getStype());
-                if (ret == 0) {
-                    ret = Integer.compare(o1.ship.getSortno(), o2.ship.getSortno());
-                    /*// Lv順の後に安定ソートするので
-                    if (ret == 0) {
-                        ret = -Integer.compare(o1.ship.getLv(), o2.ship.getLv());
-                        if (ret == 0) {
-                            ret = Integer.compare(o1.ship.getId(), o2.ship.getId());
-                        }
-                    }
-                    */
-                }
-                return ret;
-            }
-        });
-        // NEW
-        genSortNumber(ships, 2, new ShipComparatorBase() {
-            @Override
-            public int compare(ShipWithSortNumber o1, ShipWithSortNumber o2) {
-                return -Integer.compare(o1.ship.getId(), o2.ship.getId());
-            }
-        });
-        // 修理順
-        genSortNumber(ships, 3, new ShipComparatorBase() {
-            @Override
-            public int compare(ShipWithSortNumber o1, ShipWithSortNumber o2) {
-                double o1rate = (double) o1.ship.getNowhp() / (double) o1.ship.getMaxhp();
-                double o2rate = (double) o2.ship.getNowhp() / (double) o2.ship.getMaxhp();
-                int ret = Double.compare(o1rate, o2rate);
-                if (ret == 0) {
-                    return super.compare(o1, o2);
-                }
-                return ret;
-            }
-        });
-        // 最後にID順にしておく
-        Collections.sort(ships, new Comparator<ShipWithSortNumber>() {
-            @Override
-            public int compare(ShipWithSortNumber o1, ShipWithSortNumber o2) {
-                return Integer.compare(o1.ship.getId(), o2.ship.getId());
-            }
-        });
-        return ships;
     }
 
     /**
@@ -858,7 +630,7 @@ public final class CreateReportLogic {
 
     /**
      * 遠征結果一覧の内容
-     * 
+     * @param resultlist 遠征結果データ
      * @return 遠征結果
      */
     public static List<Comparable[]> getMissionResultBody(List<MissionResultDto> resultlist) {
@@ -938,18 +710,14 @@ public final class CreateReportLogic {
     }
 
     /**
-     * 任務一覧のヘッダー
-     * 
-     * @return
+     * @return 任務一覧のヘッダー
      */
     public static String[] getCreateQuestHeader() {
         return new String[] { "No.", "表示位置", "状態", "進捗", "タイトル", "内容", "燃料", "弾薬", "鋼材", "ボーキ" };
     }
 
     /**
-     * 任務一覧の内容
-     * 
-     * @return
+     * @return 任務一覧の内容
      */
     public static List<Comparable[]> getQuestBody() {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
@@ -984,10 +752,8 @@ public final class CreateReportLogic {
     }
 
     /**
-     * 資材の内容
-     * 
      * @param materials 資材
-     * @return
+     * @return 資材の内容
      */
     public static List<Comparable[]> getMaterialStoreBody(List<MaterialDto> materials) {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
@@ -1022,10 +788,8 @@ public final class CreateReportLogic {
     }
 
     /**
-     * ロストログの内容
-     * 
      * @param lostList ロストデータ
-     * @return
+     * @return ロストログの内容
      */
     public static List<Comparable[]> getLostStoreBody(List<LostEntityDto> lostList) {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
@@ -1052,7 +816,7 @@ public final class CreateReportLogic {
      * @param header ヘッダー
      * @param body 内容
      * @param applend 追記フラグ
-     * @throws IOException
+     * @throws IOException 書き込みに失敗した
      */
     public static void writeCsvStripFirstColumn(File file, String[] header, List<Comparable[]> body, boolean applend)
             throws IOException {
@@ -1072,7 +836,7 @@ public final class CreateReportLogic {
      * @param header ヘッダー
      * @param body 内容
      * @param applend 追記フラグ
-     * @throws IOException
+     * @throws IOException 書き込みに失敗した
      */
     public static void writeCsv(File file, String[] header, List<Comparable[]> body, boolean applend)
             throws IOException {
@@ -1082,30 +846,12 @@ public final class CreateReportLogic {
                 IOUtils.write(StringUtils.join(header, ',') + "\r\n", stream, AppConstants.CHARSET);
             }
             for (Comparable[] colums : body) {
-                IOUtils.write(StringUtils.join(toStringArray(colums), ',') + "\r\n", stream, AppConstants.CHARSET);
+                IOUtils.write(StringUtils.join(ReportUtils.toStringArray(colums), ',') + "\r\n", stream,
+                        AppConstants.CHARSET);
             }
         } finally {
             stream.close();
         }
-    }
-
-    /**
-     * オブジェクト配列をテーブルウィジェットに表示できるように文字列に変換します
-     * 
-     * @param from テーブルに表示する内容
-     * @return テーブルに表示する内容
-     */
-    public static String[] toStringArray(Comparable[] data) {
-        String[] ret = new String[data.length];
-        for (int i = 0; i < data.length; ++i) {
-            if (data[i] == null) {
-                ret[i] = "";
-            }
-            else {
-                ret[i] = data[i].toString();
-            }
-        }
-        return ret;
     }
 
     /**

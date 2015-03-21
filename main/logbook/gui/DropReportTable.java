@@ -13,6 +13,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 
+import logbook.constants.AppConstants;
 import logbook.dto.BattleExDto;
 import logbook.dto.BattleResultDto;
 import logbook.gui.logic.BattleHtmlGenerator;
@@ -22,6 +23,7 @@ import logbook.gui.logic.TableRowHeader;
 import logbook.internal.BattleResultFilter;
 import logbook.internal.BattleResultServer;
 import logbook.internal.TimeSpanKind;
+import logbook.scripting.TableItemCreatorProxy;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
@@ -72,6 +74,23 @@ public final class DropReportTable extends AbstractTableDialog {
 
     @Override
     protected void createContents() {
+
+        final MenuItem reloadDB = new MenuItem(this.opemenu, SWT.NONE);
+        reloadDB.setText("データベースを再読み込み");
+        reloadDB.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                MessageBox box = new MessageBox(DropReportTable.this.shell, SWT.YES | SWT.NO | SWT.ICON_QUESTION);
+                box.setText("データベース再読み込み");
+                box.setMessage("件数によっては時間がかかることがあります。よろしいですか？");
+
+                if (box.open() == SWT.YES) {
+                    BattleResultServer.get().reloadFiles();
+                    DropReportTable.this.reloadTable();
+                }
+            }
+        });
+
         this.table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDoubleClick(MouseEvent e) {
@@ -249,7 +268,8 @@ public final class DropReportTable extends AbstractTableDialog {
 
     @Override
     protected TableItemCreator getTableItemCreator() {
-        return CreateReportLogic.DEFAULT_TABLE_ITEM_CREATOR;
+        //return CreateReportLogic.DEFAULT_TABLE_ITEM_CREATOR;
+        return TableItemCreatorProxy.get(AppConstants.DROPTABLE_PREFIX);
     }
 
     @Override
