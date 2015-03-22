@@ -190,7 +190,7 @@ public final class ConfigDialog extends Dialog {
 
         Label label82 = new Label(compositeSystem, SWT.NONE);
         label82.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        label82.setText("出撃ログの保存先*");
+        label82.setText("戦闘履歴の保存先*");
 
         final Text battlelogDir = new Text(compositeSystem, SWT.BORDER);
         GridData gdBattlelogDir = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);

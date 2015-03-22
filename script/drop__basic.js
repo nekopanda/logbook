@@ -3,16 +3,16 @@ ComparableArrayType = Java.type("java.lang.Comparable[]");
 AppConstants = Java.type("logbook.constants.AppConstants");
 
 function hasTaihaInFleet(nowhp, maxhp) {
-    if ((nowhp == null) || (maxhp == null)) {
-        return false;
-    }
-    for (var i = 0; i < nowhp.length; ++i) {
-        var rate = nowhp[i] / maxhp[i];
-        if (rate <= AppConstants.BADLY_DAMAGE) {
-            return true;
-        }
-    }
-    return false;
+	if ((nowhp == null) || (maxhp == null)) {
+		return false;
+	}
+	for (var i = 0; i < nowhp.length; ++i) {
+		var rate = nowhp[i] / maxhp[i];
+		if (rate <= AppConstants.BADLY_DAMAGE) {
+			return true;
+		}
+	}
+	return false;
 }
 
 function header() {
@@ -33,29 +33,29 @@ function begin() { }
 function body(battle) {
 	//var ret = [null,null,null,null,null]; // これをやると遅くなる
 	var ret = new ComparableArrayType(5);
-    // 大破艦があるか
-    var lastPhase = battle.getLastPhase();
-    var taiha = (hasTaihaInFleet(lastPhase.getNowFriendHp(), battle.getMaxFriendHp()) ||
-            hasTaihaInFleet(lastPhase.getNowFriendHpCombined(), battle.getMaxFriendHpCombined()));
+	// 大破艦があるか
+	var lastPhase = battle.getLastPhase();
+	var taiha = (hasTaihaInFleet(lastPhase.getNowFriendHp(), battle.getMaxFriendHp()) ||
+			hasTaihaInFleet(lastPhase.getNowFriendHpCombined(), battle.getMaxFriendHpCombined()));
 	ret[0] = taiha ? "あり" : null;
 
-    // 旗艦
-    ret[1] = battle.getDock().getShips().get(0).getFriendlyName();
-    if (battle.isCombined()) {
-        ret[2] = battle.getDockCombined()
-                .getShips().get(0).getFriendlyName();
-    }
+	// 旗艦
+	ret[1] = battle.getDock().getShips().get(0).getFriendlyName();
+	if (battle.isCombined()) {
+		ret[2] = battle.getDockCombined()
+				.getShips().get(0).getFriendlyName();
+	}
 
-    // MVP
-    if (battle.getMvp() != -1) { // 敗北Eの時はMVPなし
-        ret[3] = battle.getDock().getShips().get(battle.getMvp() - 1).getFriendlyName();
-    }
-    if (battle.isCombined()) {
-        if (battle.getMvpCombined() != -1) { // 敗北Eの時はMVPなし
-            ret[4] = battle.getDockCombined().getShips()
-                    .get(battle.getMvpCombined() - 1).getFriendlyName();
-        }
-    }
+	// MVP
+	if (battle.getMvp() != -1) { // 敗北Eの時はMVPなし
+		ret[3] = battle.getDock().getShips().get(battle.getMvp() - 1).getFriendlyName();
+	}
+	if (battle.isCombined()) {
+		if (battle.getMvpCombined() != -1) { // 敗北Eの時はMVPなし
+			ret[4] = battle.getDockCombined().getShips()
+					.get(battle.getMvpCombined() - 1).getFriendlyName();
+		}
+	}
 	return ret;
 }
 
