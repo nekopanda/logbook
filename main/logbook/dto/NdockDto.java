@@ -25,6 +25,7 @@ public final class NdockDto extends AbstractDto {
     }
 
     /**
+     * 艦娘ID
      * @return 艦娘ID
      */
     public int getNdockid() {
@@ -32,6 +33,7 @@ public final class NdockDto extends AbstractDto {
     }
 
     /**
+     * お風呂から上がる時間
      * @return お風呂から上がる時間
      */
     public Date getNdocktime() {

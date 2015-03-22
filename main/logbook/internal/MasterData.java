@@ -466,7 +466,7 @@ public class MasterData {
 
     public static class MissionDto {
         private int id;
-        private int maparea_id;
+        private int mapareaId;
         private String name;
         private int time;
         private UseItemDto[] winItem = new UseItemDto[2];
@@ -478,7 +478,7 @@ public class MasterData {
 
         public MissionDto(JsonObject data) {
             this.id = data.getInt("api_id");
-            this.maparea_id = data.getInt("api_maparea_id");
+            this.mapareaId = data.getInt("api_maparea_id");
             this.name = data.getString("api_name");
             this.time = data.getInt("api_time");
             this.winItem[0] = new UseItemDto(data.getJsonArray("api_win_item1"));
@@ -486,6 +486,7 @@ public class MasterData {
         }
 
         /**
+         * 遠征ID
          * @return id
          */
         public int getId() {
@@ -500,20 +501,22 @@ public class MasterData {
         }
 
         /**
+         * 遠征のマップエリアID
          * @return maparea_id
          */
-        public int getMaparea_id() {
-            return this.maparea_id;
+        public int getMapareaId() {
+            return this.mapareaId;
         }
 
         /**
          * @param mapareaId セットする maparea_id
          */
-        public void setMaparea_id(int mapareaId) {
-            this.maparea_id = mapareaId;
+        public void setMapareaId(int mapareaId) {
+            this.mapareaId = mapareaId;
         }
 
         /**
+         * 遠征名
          * @return name
          */
         public String getName() {
@@ -528,6 +531,7 @@ public class MasterData {
         }
 
         /**
+         * 遠征にかかる時間
          * @return time
          */
         public int getTime() {
@@ -542,6 +546,7 @@ public class MasterData {
         }
 
         /**
+         * もらえるかもしれないアイテム
          * @return winItem
          */
         public UseItemDto[] getWinItem() {

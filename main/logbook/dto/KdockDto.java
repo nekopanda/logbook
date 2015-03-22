@@ -6,8 +6,8 @@ package logbook.dto;
 import java.util.Date;
 
 /**
+ * 建造ドック
  * @author Nekopanda
- *
  */
 public class KdockDto {
 
@@ -28,6 +28,7 @@ public class KdockDto {
     }
 
     /**
+     * 今使用中？
      * @return 今使用中？
      */
     public boolean getNowUsing() {
@@ -35,6 +36,7 @@ public class KdockDto {
     }
 
     /**
+     * 完成する時間
      * @return 完成する時間
      */
     public Date getKdocktime() {

@@ -10,8 +10,8 @@ import javax.json.JsonObject;
 import com.dyuproject.protostuff.Tag;
 
 /**
+ * 艦や装備のパラメータ
  * @author Nekopanda
- * 艦や装備のパラメータをまとめて扱う
  */
 public class ShipParameters {
 
@@ -183,6 +183,10 @@ public class ShipParameters {
         return new ShipParameters[] { total, slotParam };
     }
 
+    /**
+     * パラメータoを自分に足す
+     * @param o　足すパラメータ
+     */
     public void add(ShipParameters o) {
         this.taik += o.taik;
         this.houg += o.houg;
@@ -199,6 +203,10 @@ public class ShipParameters {
         this.soku = Math.max(this.soku, o.soku);
     }
 
+    /**
+     * パラメータoを自分から引く
+     * @param o　引くパラメータ
+     */
     public void subtract(ShipParameters o) {
         this.taik -= o.taik;
         this.houg -= o.houg;
@@ -246,6 +254,7 @@ public class ShipParameters {
     ///////////////////////
 
     /**
+     * HP
      * @return HP
      */
     public int getHP() {
@@ -253,6 +262,7 @@ public class ShipParameters {
     }
 
     /**
+     * 火力
      * @return 火力
      */
     public int getKaryoku() {
@@ -260,6 +270,7 @@ public class ShipParameters {
     }
 
     /**
+     * 雷装
      * @return 雷装
      */
     public int getRaisou() {
@@ -267,6 +278,7 @@ public class ShipParameters {
     }
 
     /**
+     * 対空
      * @return 対空
      */
     public int getTaiku() {
@@ -274,6 +286,7 @@ public class ShipParameters {
     }
 
     /**
+     * 装甲
      * @return 装甲
      */
     public int getSoukou() {
@@ -281,6 +294,7 @@ public class ShipParameters {
     }
 
     /**
+     * 回避
      * @return 回避
      */
     public int getKaihi() {
@@ -288,6 +302,7 @@ public class ShipParameters {
     }
 
     /**
+     * 対潜
      * @return 対潜
      */
     public int getTaisen() {
@@ -295,6 +310,7 @@ public class ShipParameters {
     }
 
     /**
+     * 索敵
      * @return 索敵
      */
     public int getSakuteki() {
@@ -302,6 +318,7 @@ public class ShipParameters {
     }
 
     /**
+     * 運
      * @return 運
      */
     public int getLucky() {
@@ -309,6 +326,7 @@ public class ShipParameters {
     }
 
     /**
+     * kaih (= houk)
      * @return kaih (= houk)
      */
     public int getHouk() {

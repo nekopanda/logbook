@@ -151,6 +151,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
+     * 艦娘個人を識別するID
      * @return 艦娘個人を識別するID
      */
     public int getId() {
@@ -158,6 +159,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
+     * 艦娘キャラを識別するID
      * @return 艦娘キャラを識別するID
      */
     public int getCharId() {
@@ -165,6 +167,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
+     * sortno
      * @return sortno
      */
     public int getSortno() {
@@ -172,6 +175,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
+     * 鍵付き
      * @return 鍵付き
      */
     public boolean getLocked() {
@@ -200,11 +204,16 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
         this.fleetid = fleetid;
     }
 
+    /**
+     * 艦隊に所属しているか？
+     * @return
+     */
     public boolean isFleetMember() {
         return (this.fleetid != null) && (this.fleetid.length() > 0);
     }
 
     /**
+     * 艦隊での位置
      * @return fleetpos
      */
     public int getFleetpos() {
@@ -219,6 +228,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
+     * Lv
      * @return Lv
      */
     @Override
@@ -227,6 +237,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
+     * 疲労
      * @return 疲労
      */
     public int getCond() {
@@ -234,6 +245,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
+     * 現在の疲労推定値（下限値）
      * @return 現在の疲労推定値（下限値）
      */
     public int getEstimatedCond() {
@@ -247,6 +259,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
+     * 入渠時間
      * @return 入渠時間
      */
     public long getDocktime() {
@@ -261,6 +274,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
+     * 修復資材 燃料
      * @return 修復資材 燃料
      */
     public int getDockfuel() {
@@ -268,6 +282,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
+     * 修復資材 鋼材
      * @return 修復資材 鋼材
      */
     public int getDockmetal() {
@@ -275,7 +290,8 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
-     * @return 弾
+     * 残弾
+     * @return 残弾
      */
     public int getBull() {
         return this.bull;
@@ -289,6 +305,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
+     * 燃料
      * @return 燃料
      */
     public int getFuel() {
@@ -303,6 +320,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
+     * 経験値
      * @return 経験値
      */
     public int getExp() {
@@ -314,6 +332,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
+     * 経験値ゲージの割合
      * @return 経験値ゲージの割合
      */
     public float getExpraito() {
@@ -321,6 +340,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
+     * 現在のHP
      * @return HP
      */
     public int getNowhp() {
@@ -328,17 +348,23 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
+     * 最大HP
      * @return MaxHP
      */
     public int getMaxhp() {
         return this.maxhp;
     }
 
+    /**
+     * 装備可能スロット数
+     * @return
+     */
     public int getSlotNum() {
         return this.slotnum;
     }
 
     /**
+     * 現在の艦載機搭載数
      * @return 現在の艦載機搭載数
      */
     @Override
@@ -347,6 +373,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
+     * 次のレベルまでの経験値
      * @return 次のレベルまでの経験値
      */
     public Integer getNext() {
@@ -359,6 +386,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
+     * 疲労が抜けるまでの時間
      * @return 疲労が抜けるまでの時間
      */
     public Calendar getCondClearTime() {
@@ -412,7 +440,6 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
 
     /**
      * 装備で加算された命中
-     * 
      * @return 装備の命中
      */
     public int getAccuracy() {
@@ -431,7 +458,6 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
 
     /**
      * 砲撃戦火力
-     * 
      * @return 砲撃戦火力
      */
     public int getHougekiPower() {
@@ -461,7 +487,6 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
 
     /**
      * 雷撃戦火力
-     * 
      * @return 雷撃戦火力
      */
     public int getRaigekiPower() {
@@ -470,7 +495,6 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
 
     /**
      * 対潜火力
-     * 
      * @return 対潜火力
      */
     public int getTaisenPower() {
@@ -493,7 +517,6 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
 
     /**
      * 夜戦火力
-     * 
      * @return 夜戦火力
      */
     public int getYasenPower() {
@@ -501,6 +524,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
+     * データの更新に使ったJSON
      * @return json
      */
     public JsonObject getJson() {

@@ -4,8 +4,8 @@
 package logbook.gui.logic;
 
 /**
+ * 比較可能な数値ペア
  * @author Nekopanda
- *
  */
 public class IntegerPair implements Comparable<IntegerPair> {
     private final int now;

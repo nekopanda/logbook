@@ -10,7 +10,6 @@ import com.dyuproject.protostuff.Tag;
 
 /**
  * 装備を表します
- *
  */
 public final class ItemInfoDto extends AbstractDto {
 
@@ -150,7 +149,7 @@ public final class ItemInfoDto extends AbstractDto {
     }
 
     /**
-     * idを取得します。
+     * slotitem_id
      * @return id
      */
     public int getId() {
@@ -166,7 +165,7 @@ public final class ItemInfoDto extends AbstractDto {
     }
 
     /**
-     * nameを取得します。
+     * 名前
      * @return name
      */
     public String getName() {
@@ -195,6 +194,7 @@ public final class ItemInfoDto extends AbstractDto {
     }
 
     /**
+     * 装備のパラメータ
      * @return param
      */
     public ShipParameters getParam() {

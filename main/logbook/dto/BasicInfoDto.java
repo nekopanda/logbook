@@ -38,6 +38,7 @@ public class BasicInfoDto {
     }
 
     /**
+     * ユーザのニックネーム
      * @return nickname
      */
     public String getNickname() {
@@ -52,6 +53,7 @@ public class BasicInfoDto {
     }
 
     /**
+     * ユーザのメンバID
      * @return memberId
      */
     public long getMemberId() {
@@ -66,6 +68,7 @@ public class BasicInfoDto {
     }
 
     /**
+     * 開放された艦隊の数
      * @return deckCount
      */
     public int getDeckCount() {
@@ -80,6 +83,7 @@ public class BasicInfoDto {
     }
 
     /**
+     * 開放された建造ドックの数
      * @return kdockCount
      */
     public int getKdockCount() {
@@ -94,6 +98,7 @@ public class BasicInfoDto {
     }
 
     /**
+     * 開放された入渠ドックの数
      * @return ndockCount
      */
     public int getNdockCount() {
@@ -108,6 +113,7 @@ public class BasicInfoDto {
     }
 
     /**
+     * 遠征出撃回数
      * @return missionCount
      */
     public int getMissionCount() {
@@ -122,6 +128,7 @@ public class BasicInfoDto {
     }
 
     /**
+     * 遠征成功数
      * @return missionSuccess
      */
     public int getMissionSuccess() {
@@ -136,6 +143,7 @@ public class BasicInfoDto {
     }
 
     /**
+     * 演習勝利数
      * @return practiceWin
      */
     public int getPracticeWin() {
@@ -150,6 +158,7 @@ public class BasicInfoDto {
     }
 
     /**
+     * 演習敗北数
      * @return practiceLose
      */
     public int getPracticeLose() {
@@ -164,6 +173,7 @@ public class BasicInfoDto {
     }
 
     /**
+     * 出撃勝利数
      * @return sortieWin
      */
     public int getSortieWin() {
@@ -178,6 +188,7 @@ public class BasicInfoDto {
     }
 
     /**
+     * 出撃敗北数
      * @return sortieLose
      */
     public int getSortieLose() {

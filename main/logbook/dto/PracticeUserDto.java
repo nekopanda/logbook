@@ -43,6 +43,7 @@ public class PracticeUserDto {
     }
 
     /**
+     * 演習相手のID
      * @return id
      */
     public int getId() {
@@ -57,6 +58,7 @@ public class PracticeUserDto {
     }
 
     /**
+     * 演習相手の名前
      * @return name
      */
     public String getName() {
@@ -71,6 +73,7 @@ public class PracticeUserDto {
     }
 
     /**
+     * 状態
      * @return state
      */
     public int getState() {
@@ -85,6 +88,7 @@ public class PracticeUserDto {
     }
 
     /**
+     * 演習相手のComment
      * @return comment
      */
     public String getComment() {
@@ -99,6 +103,7 @@ public class PracticeUserDto {
     }
 
     /**
+     * 演習相手の司令部Lv
      * @return level
      */
     public int getLevel() {

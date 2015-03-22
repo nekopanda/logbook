@@ -9,7 +9,7 @@ import logbook.constants.AppConstants;
 import logbook.internal.MasterData;
 
 /**
- * 開発資材や家具箱など、装備アイテムではなくて普通のアイテム
+ * 開発資材や家具箱など、装備アイテムでない普通のアイテム
  * @author Nekopanda
  *
  */
@@ -45,6 +45,7 @@ public class UseItemDto {
     }
 
     /**
+     * 個数
      * @return itemCount
      */
     public int getItemCount() {

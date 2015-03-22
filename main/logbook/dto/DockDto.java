@@ -24,6 +24,7 @@ public final class DockDto extends AbstractDto {
     @Tag(3)
     private final List<ShipDto> ships = new ArrayList<ShipDto>();
 
+    /** 退避したか？対比した艦娘がいるときは長さ6の配列 */
     @Tag(4)
     private boolean[] escaped = null;
 
@@ -150,6 +151,9 @@ public final class DockDto extends AbstractDto {
     }
 
     /**
+     * 退避したか？
+     * 退避した艦娘がいるときは長さ6の配列
+     * 連合艦隊でない場合はnull
      * @return escaped
      */
     public boolean[] getEscaped() {

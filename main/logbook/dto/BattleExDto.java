@@ -23,8 +23,8 @@ import org.apache.commons.lang3.StringUtils;
 import com.dyuproject.protostuff.Tag;
 
 /**
+ * １回の会敵情報
  * @author Nekopanda
- * １回の会敵の情報をまとめた
  */
 public class BattleExDto extends AbstractDto {
 
@@ -136,7 +136,7 @@ public class BattleExDto extends AbstractDto {
      * exVersion == 2 : Jsonがある
      *  */
     @Tag(34)
-    private int exVersion = 2;
+    private final int exVersion = 2;
 
     /** 母港空き（ドロップ分を含まない） */
     @Tag(35)
@@ -158,6 +158,10 @@ public class BattleExDto extends AbstractDto {
 
     /////////////////////////////////////////////////
 
+    /**
+     * 戦闘1フェーズの情報
+     * @author Nekopanda
+     */
     public static class Phase {
 
         @Tag(1)
@@ -470,10 +474,19 @@ public class BattleExDto extends AbstractDto {
             }
         }
 
+        /**
+         * 連合艦隊か？
+         * @return
+         */
         public boolean isCombined() {
             return (this.nowFriendHpCombined != null);
         }
 
+        /**
+         * 航空戦情報 [１回目, 2回目]
+         * 2回目は連合艦隊航空戦マスでの戦闘のみ
+         * @return
+         */
         public AirBattleDto[] getAirBattleDto() {
             return new AirBattleDto[] {
                     this.air, this.air2
@@ -484,6 +497,12 @@ public class BattleExDto extends AbstractDto {
             return list.toArray(new BattleAtackDto[list.size()]);
         }
 
+        /**
+         * 攻撃の全シーケンスを取得
+         * [ 航空戦1, 支援艦隊の攻撃, 航空戦2, 開幕, 夜戦, 砲撃戦1, 雷撃, 砲撃戦2, 砲撃戦3 ]
+         * 各戦闘がない場合はnullになる
+         * @return
+         */
         public BattleAtackDto[][] getAtackSequence() {
             return new BattleAtackDto[][] {
                     ((this.air == null) || (this.air.atacks == null)) ? null :
@@ -500,6 +519,11 @@ public class BattleExDto extends AbstractDto {
             };
         }
 
+        /**
+         * 戦闘ランクの計算に使われた情報の概要を取得
+         * @param battle
+         * @return
+         */
         public String getRankCalcInfo(BattleExDto battle) {
             boolean isCombined = (this.nowFriendHpCombined != null);
             int numFships = this.nowFriendHp.length;
@@ -546,6 +570,10 @@ public class BattleExDto extends AbstractDto {
                     "判定:" + this.estimatedRank.rank();
         }
 
+        /**
+         * 受け取ったJSON
+         * @return
+         */
         public JsonObject getJson() {
             if (this.json == null) {
                 return null;
@@ -553,11 +581,16 @@ public class BattleExDto extends AbstractDto {
             return JsonUtils.fromString(this.json);
         }
 
+        /**
+         * この戦闘フェーズのAPIリクエスト先
+         * @return
+         */
         public String getApi() {
             return this.kind.getApi().getApiName();
         }
 
         /**
+         * この戦闘フェーズの種別
          * @return kind
          */
         public BattlePhaseKind getKind() {
@@ -565,6 +598,7 @@ public class BattleExDto extends AbstractDto {
         }
 
         /**
+         * この戦闘フェーズ後の味方艦HP（連合艦隊の時は第一艦隊）
          * @return nowFriendHp
          */
         public int[] getNowFriendHp() {
@@ -572,6 +606,7 @@ public class BattleExDto extends AbstractDto {
         }
 
         /**
+         * この戦闘フェーズ後の味方艦HP（連合艦隊でないときはnull）
          * @return nowFriendHpCombined
          */
         public int[] getNowFriendHpCombined() {
@@ -579,6 +614,7 @@ public class BattleExDto extends AbstractDto {
         }
 
         /**
+         * この戦闘フェーズ後の敵艦HP
          * @return nowEnemyHp
          */
         public int[] getNowEnemyHp() {
@@ -586,6 +622,7 @@ public class BattleExDto extends AbstractDto {
         }
 
         /**
+         * この戦闘フェーズ後のランク（予測値）
          * @return estimatedRank
          */
         public ResultRank getEstimatedRank() {
@@ -593,6 +630,7 @@ public class BattleExDto extends AbstractDto {
         }
 
         /**
+         * この戦闘フェーズが夜戦か？
          * @return isNight
          */
         public boolean isNight() {
@@ -600,6 +638,7 @@ public class BattleExDto extends AbstractDto {
         }
 
         /**
+         * 支援攻撃のタイプ
          * @return supportType
          */
         public String getSupportType() {
@@ -607,6 +646,7 @@ public class BattleExDto extends AbstractDto {
         }
 
         /**
+         * 触接機 [味方・敵] -1の場合は「触接なし」
          * @return touchPlane
          */
         public int[] getTouchPlane() {
@@ -614,6 +654,7 @@ public class BattleExDto extends AbstractDto {
         }
 
         /**
+         * 制空状態
          * @return seiku
          */
         public String getSeiku() {
@@ -621,6 +662,7 @@ public class BattleExDto extends AbstractDto {
         }
 
         /**
+         * 損害率 [味方, 敵]
          * @return damageRate
          */
         public double[] getDamageRate() {
@@ -628,6 +670,7 @@ public class BattleExDto extends AbstractDto {
         }
 
         /**
+         * 航空戦1
          * @return air
          */
         public AirBattleDto getAir() {
@@ -635,6 +678,7 @@ public class BattleExDto extends AbstractDto {
         }
 
         /**
+         * 航空戦2
          * @return air2
          */
         public AirBattleDto getAir2() {
@@ -642,6 +686,7 @@ public class BattleExDto extends AbstractDto {
         }
 
         /**
+         * 支援艦隊の攻撃
          * @return support
          */
         public List<BattleAtackDto> getSupport() {
@@ -649,6 +694,7 @@ public class BattleExDto extends AbstractDto {
         }
 
         /**
+         * 開幕
          * @return opening
          */
         public List<BattleAtackDto> getOpening() {
@@ -656,6 +702,7 @@ public class BattleExDto extends AbstractDto {
         }
 
         /**
+         * 雷撃戦
          * @return raigeki
          */
         public List<BattleAtackDto> getRaigeki() {
@@ -663,6 +710,7 @@ public class BattleExDto extends AbstractDto {
         }
 
         /**
+         * 夜戦
          * @return hougeki
          */
         public List<BattleAtackDto> getHougeki() {
@@ -670,6 +718,7 @@ public class BattleExDto extends AbstractDto {
         }
 
         /**
+         * 砲撃戦1
          * @return hougeki1
          */
         public List<BattleAtackDto> getHougeki1() {
@@ -677,6 +726,7 @@ public class BattleExDto extends AbstractDto {
         }
 
         /**
+         * 砲撃戦2
          * @return hougeki2
          */
         public List<BattleAtackDto> getHougeki2() {
@@ -684,6 +734,7 @@ public class BattleExDto extends AbstractDto {
         }
 
         /**
+         * 砲撃戦3
          * @return hougeki3
          */
         public List<BattleAtackDto> getHougeki3() {
@@ -691,17 +742,26 @@ public class BattleExDto extends AbstractDto {
         }
     }
 
+    /**
+     * 戦闘データオブジェクト作成
+     * @param date 戦闘のあった日時
+     */
     public BattleExDto(Date date) {
         this.battleDate = date;
     }
 
+    /**
+     * 母港情報を設定
+     * @param shipSpace
+     * @param itemSpace
+     */
     public void setBasicInfo(int shipSpace, int itemSpace) {
         this.shipSpace = shipSpace;
         this.itemSpace = itemSpace;
     }
 
     /**
-     * 中に保存してあるJSONからフィールドを更新する
+     * 中に保存してあるJSONを使ってフィールドを更新する
      */
     public void readFromJson() {
         if (this.exVersion >= 2) {
@@ -714,6 +774,12 @@ public class BattleExDto extends AbstractDto {
         }
     }
 
+    /**
+     * 戦闘フェーズ結果を読み込む
+     * @param object 受け取ったJSON
+     * @param kind 戦闘の種別
+     * @return 作成されたPhaseオブジェクト
+     */
     public Phase addPhase(JsonObject object, BattlePhaseKind kind) {
         if (this.phaseList.size() == 0) {
             // 最初のフェーズ
@@ -902,6 +968,11 @@ public class BattleExDto extends AbstractDto {
         }
     }
 
+    /**
+     * 戦闘結果を読み込む
+     * @param object 受け取ったJSON
+     * @param mapInfo マス情報
+     */
     public void setResult(JsonObject object, MapCellDto mapInfo) {
         this.resultJson = object.toString();
         this.mapCellDto = mapInfo;
@@ -992,6 +1063,12 @@ public class BattleExDto extends AbstractDto {
         }
     }
 
+    /**
+     * 保存用エネミーデータ作成
+     * @param enemyId
+     * @param enemyName
+     * @return
+     */
     public EnemyData getEnemyData(int enemyId, String enemyName) {
         String[] enemyShips = new String[] { "", "", "", "", "", "" };
         for (int i = 0; i < this.enemy.size(); ++i) {
@@ -1000,32 +1077,49 @@ public class BattleExDto extends AbstractDto {
         return new EnemyData(enemyId, enemyName, enemyShips, this.formation[1]);
     }
 
+    /**
+     * 連合艦隊か？
+     * @return
+     */
     public boolean isCombined() {
         return (this.startFriendHpCombined != null);
     }
 
-    /** 最後に行ったフェーズを取得 */
+    /**
+     * 最後に行ったフェーズを取得
+     * @return
+     */
     public Phase getLastPhase() {
         if (this.phaseList.size() == 0)
             return null;
         return this.phaseList.get(this.phaseList.size() - 1);
     }
 
-    /** 最初のフェーズ */
+    /**
+     * 最初のフェーズを取得
+     * @return
+     */
     public Phase getPhase1() {
         if (this.phaseList.size() < 1)
             return null;
         return this.phaseList.get(0);
     }
 
-    /** ２番目のフェーズ（ない時はnull） */
+    /**
+     * ２番目のフェーズ（ない時はnull）
+     * @return
+     */
     public Phase getPhase2() {
         if (this.phaseList.size() < 2)
             return null;
         return this.phaseList.get(1);
     }
 
-    /** 戦闘結果も含んでいるか */
+    /**
+     * 戦闘結果も含んでいるか
+     * これがfalseに場合は正常に記録されない
+     * @return
+     */
     public boolean isCompleteResult() {
         if (this.questName != null) {
             // 出撃の場合
@@ -1041,31 +1135,50 @@ public class BattleExDto extends AbstractDto {
                 (this.phaseList.size() > 0);
     }
 
+    /**
+     * 演習か？
+     * @return
+     */
     public boolean isPractice() {
         return (this.questName == null);
     }
 
-    /** 交戦後のHP */
+    /**
+     * 交戦後の味方艦HP（連合艦隊の時は第一艦隊）
+     * @return
+     */
     public int[] getNowFriendHp() {
         return this.getLastPhase().getNowFriendHp();
     }
 
-    /** 交戦後のHP（連合艦隊でないときはnull） */
+    /**
+     * 交戦後の味方艦HP（連合艦隊でないときはnull）
+     * @return
+     */
     public int[] getNowFriendHpCombined() {
         return this.getLastPhase().getNowFriendHpCombined();
     }
 
-    /** 交戦後のHP */
+    /**
+     * 交戦後の敵艦HP
+     * @return
+     */
     public int[] getNowEnemyHp() {
         return this.getLastPhase().getNowEnemyHp();
     }
 
-    /** 味方艦隊（連合艦隊の時は第一艦隊） */
+    /**
+     * 味方艦隊（連合艦隊の時は第一艦隊）
+     * @return
+     */
     public DockDto getDock() {
         return this.friends.get(0);
     }
 
-    /** 連合艦隊（連合艦隊でないときはnull） */
+    /**
+     * 連合艦隊第二艦隊（連合艦隊でないときはnull）
+     * @return
+     */
     public DockDto getDockCombined() {
         if (this.friends.size() < 2)
             return null;
@@ -1073,6 +1186,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * 戦闘のあった日時
      * @return battleDate
      */
     public Date getBattleDate() {
@@ -1080,6 +1194,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * 味方艦隊
      * @return friends
      */
     public List<DockDto> getFriends() {
@@ -1087,6 +1202,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * 敵艦
      * @return enemy
      */
     public List<EnemyShipDto> getEnemy() {
@@ -1094,6 +1210,8 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * 味方艦のMaxHP
+     * 連合艦隊の時は第一艦隊のみ
      * @return maxFriendHp
      */
     public int[] getMaxFriendHp() {
@@ -1101,6 +1219,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * 味方連合艦隊第二艦隊のMaxHP
      * @return maxFriendHpCombined
      */
     public int[] getMaxFriendHpCombined() {
@@ -1108,6 +1227,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * 敵艦のMaxHP
      * @return maxEnemyHp
      */
     public int[] getMaxEnemyHp() {
@@ -1115,6 +1235,8 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * 戦闘開始時の味方艦のHP
+     * 連合艦隊の時は第一艦隊のみ
      * @return startFriendHp
      */
     public int[] getStartFriendHp() {
@@ -1122,6 +1244,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * 味方連合艦隊第二艦隊の戦闘開始時HP
      * @return startFriendHpCombined
      */
     public int[] getStartFriendHpCombined() {
@@ -1129,6 +1252,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * 敵艦の戦闘開始時HP
      * @return startEnemyHp
      */
     public int[] getStartEnemyHp() {
@@ -1136,6 +1260,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * 味方戦果ゲージの最大（味方艦MaxHPの合計）
      * @return friendGaugeMax
      */
     public int getFriendGaugeMax() {
@@ -1143,6 +1268,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * 敵戦果ゲージの最大（敵艦MaxHPの合計）
      * @return enemyGaugeMax
      */
     public int getEnemyGaugeMax() {
@@ -1150,6 +1276,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * 陣形 [味方, 敵] 
      * @return formation
      */
     public String[] getFormation() {
@@ -1157,6 +1284,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * 同航戦、反航戦など
      * @return formationMatch
      */
     public String getFormationMatch() {
@@ -1164,6 +1292,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * 索敵状況 [味方, 敵]
      * @return sakuteki
      */
     public String[] getSakuteki() {
@@ -1171,6 +1300,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * 出撃海域情報
      * @return questName
      */
     public String getQuestName() {
@@ -1178,6 +1308,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * 戦闘結果のランク
      * @return rank
      */
     public ResultRank getRank() {
@@ -1185,6 +1316,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * 戦闘のあったマスの情報
      * @return mapCelldto
      */
     public MapCellDto getMapCellDto() {
@@ -1192,6 +1324,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * 敵艦隊の名前
      * @return enemyName
      */
     public String getEnemyName() {
@@ -1199,6 +1332,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * ドロップ艦があったか？
      * @return dropShip
      */
     public boolean isDropShip() {
@@ -1206,6 +1340,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * ドロップアイテムがあったか？
      * @return dropItem
      */
     public boolean isDropItem() {
@@ -1213,6 +1348,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * ドロップ艦の艦種（アイテムの場合は「アイテム」）
      * @return dropType
      */
     public String getDropType() {
@@ -1220,6 +1356,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * ドロップ艦・アイテムの名前
      * @return dropName
      */
     public String getDropName() {
@@ -1227,6 +1364,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * 戦闘フェーズ（昼戦・夜戦）リスト
      * @return phaseList
      */
     public List<Phase> getPhaseList() {
@@ -1234,6 +1372,8 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * MVP艦が何番目の艦か (0～)
+     * MVPがいない時は-1
      * @return mvp
      */
     public int getMvp() {
@@ -1241,6 +1381,8 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * 連合艦隊第二艦隊のMVP艦が何番目の艦か
+     * 連合艦隊でない時またはMVPがいない時は-1
      * @return mvpCombined
      */
     public int getMvpCombined() {
@@ -1248,13 +1390,18 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * 司令部Lv
      * @return hqLv
      */
     public int getHqLv() {
         return this.hqLv;
     }
 
-    /**
+    /*** 
+     * BattleExDtoのバージョン
+     * exVersion == 0 : Tag 34以降がない
+     * exVersion == 1 : Tag 36まである
+     * exVersion == 2 : Jsonがある
      * @return exVersion
      */
     public int getExVersion() {
@@ -1262,13 +1409,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
-     * @param exVersion セットする exVersion
-     */
-    public void setExVersion(int exVersion) {
-        this.exVersion = exVersion;
-    }
-
-    /**
+     * 母港の艦娘空き枠
      * @return shipSpace
      */
     public int getShipSpace() {
@@ -1276,13 +1417,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
-     * @param shipSpace セットする shipSpace
-     */
-    public void setShipSpace(int shipSpace) {
-        this.shipSpace = shipSpace;
-    }
-
-    /**
+     * 母港の装備アイテム空き枠
      * @return itemSpace
      */
     public int getItemSpace() {
@@ -1290,13 +1425,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
-     * @param itemSpace セットする itemSpace
-     */
-    public void setItemSpace(int itemSpace) {
-        this.itemSpace = itemSpace;
-    }
-
-    /**
+     * 連合艦隊における退避意見 [退避する艦(0-11), 護衛艦(0-11)]
      * @return escapeInfo
      */
     public int[] getEscapeInfo() {
@@ -1304,6 +1433,8 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * 護衛退避で戦線離脱したか [第1艦隊1番艦～第2艦隊6番艦]
+     * 艦隊の艦数に関係なく常に長さは12
      * @return escaped
      */
     public boolean[] getEscaped() {
@@ -1311,6 +1442,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
+     * 戦闘結果のレスポンスJSON
      * @return resultJson
      */
     public JsonObject getResultJson() {

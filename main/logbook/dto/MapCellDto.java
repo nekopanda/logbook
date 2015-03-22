@@ -105,6 +105,8 @@ public class MapCellDto implements Comparable<MapCellDto> {
     }
 
     /**
+     * マップ
+     * 3-2-1レベリングのポイントだったら[3,2,2]
      * @return map
      */
     public int[] getMap() {
@@ -119,6 +121,7 @@ public class MapCellDto implements Comparable<MapCellDto> {
     }
 
     /**
+     * エネミーID
      * @return enemyId
      */
     public int getEnemyId() {
@@ -133,6 +136,7 @@ public class MapCellDto implements Comparable<MapCellDto> {
     }
 
     /**
+     * 色
      * @return colorId
      */
     public int getColorNo() {
@@ -179,6 +183,7 @@ public class MapCellDto implements Comparable<MapCellDto> {
     }
 
     /**
+     * 出撃直後か？
      * @return start
      */
     public boolean isStart() {

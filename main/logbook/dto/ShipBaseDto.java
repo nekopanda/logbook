@@ -166,6 +166,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 艦のマスター情報を取得
      * @return shipInfo
      */
     public ShipInfoDto getShipInfo() {
@@ -173,6 +174,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 艦娘を識別するID
      * @return 艦娘を識別するID
      */
     public int getShipId() {
@@ -180,6 +182,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 名前
      * @return 名前
      */
     public String getName() {
@@ -187,6 +190,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 航海日誌における表示名
      * @return 表示名
      */
     public String getFriendlyName() {
@@ -202,11 +206,16 @@ public abstract class ShipBaseDto extends AbstractDto {
         return name;
     }
 
+    /**
+     * レベル
+     * @return
+     */
     public int getLv() {
         return 1;
     }
 
     /**
+     * 艦種
      * @return 艦種
      */
     public String getType() {
@@ -214,6 +223,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 艦種ID
      * @return 艦種
      */
     public int getStype() {
@@ -221,6 +231,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 弾Max
      * @return 弾Max
      */
     public int getBullMax() {
@@ -228,6 +239,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 燃料Max
      * @return 燃料Max
      */
     public int getFuelMax() {
@@ -235,6 +247,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 現在の艦載機搭載数
      * @return 現在の艦載機搭載数
      */
     public int[] getOnSlot() {
@@ -242,6 +255,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 艦載機最大搭載数
      * @return 艦載機最大搭載数
      */
     public int[] getMaxeq() {
@@ -249,6 +263,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 装備（名前）
      * @return 装備
      */
     public List<String> getSlot() {
@@ -260,6 +275,9 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 装備ID
+     * 艦娘の場合は 装備個別ID
+     * 敵艦の場合は 装備ID (slotitem_id)
      * @return 装備ID
      */
     public int[] getItemId() {
@@ -267,6 +285,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 装備(マスターデータ)
      * @return 装備
      */
     public List<ItemInfoDto> getItem() {
@@ -279,6 +298,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 装備(個別)
      * @return slotItem2
      */
     public List<ItemDto> getItem2() {
@@ -302,6 +322,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 制空値
      * @return 制空値
      */
     public int getSeiku() {
@@ -375,6 +396,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 飛行機を装備できるか？
      * @return 飛行機を装備できるか？
      */
     public boolean canEquipPlane() {
@@ -413,6 +435,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 火力
      * @return 火力
      */
     public int getKaryoku() {
@@ -420,6 +443,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 火力(最大)(艦娘のみ)
      * @return 火力(最大)(艦娘のみ)
      */
     public int getKaryokuMax() {
@@ -427,6 +451,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 雷装
      * @return 雷装
      */
     public int getRaisou() {
@@ -434,6 +459,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 雷装(最大)(艦娘のみ)
      * @return 雷装(最大)(艦娘のみ)
      */
     public int getRaisouMax() {
@@ -441,6 +467,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 対空
      * @return 対空
      */
     public int getTaiku() {
@@ -448,6 +475,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 対空(最大)(艦娘のみ)
      * @return 対空(最大)(艦娘のみ)
      */
     public int getTaikuMax() {
@@ -455,6 +483,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 装甲
      * @return 装甲
      */
     public int getSoukou() {
@@ -462,6 +491,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 装甲(最大)(艦娘のみ)
      * @return 装甲(最大)(艦娘のみ)
      */
     public int getSoukouMax() {
@@ -469,6 +499,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 回避
      * @return 回避
      */
     public int getKaihi() {
@@ -476,6 +507,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 回避(最大)(艦娘のみ)
      * @return 回避(最大)(艦娘のみ)
      */
     public int getKaihiMax() {
@@ -483,6 +515,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 対潜
      * @return 対潜
      */
     public int getTaisen() {
@@ -490,6 +523,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 対潜(最大)(艦娘のみ)
      * @return 対潜(最大)(艦娘のみ)
      */
     public int getTaisenMax() {
@@ -497,6 +531,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 索敵
      * @return 索敵
      */
     public int getSakuteki() {
@@ -504,6 +539,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 索敵(最大)(艦娘のみ)
      * @return 索敵(最大)(艦娘のみ)
      */
     public int getSakutekiMax() {
@@ -511,6 +547,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 運
      * @return 運
      */
     public int getLucky() {
@@ -518,6 +555,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 運(最大)(艦娘のみ)
      * @return 運(最大)(艦娘のみ)
      */
     public int getLuckyMax() {
@@ -525,6 +563,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 装備込のパラメータ
      * @return 装備込のパラメータ
      */
     public ShipParameters getParam() {
@@ -532,6 +571,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 装備による上昇分
      * @return 装備による上昇分
      */
     public ShipParameters getSlotParam() {
@@ -539,6 +579,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * この艦の最大パラメータ（装備なしで）
      * @return この艦の最大パラメータ（装備なしで）
      */
     public ShipParameters getMax() {

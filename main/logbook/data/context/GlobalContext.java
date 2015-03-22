@@ -72,8 +72,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.ToolTip;
 
 /**
- * 遠征・入渠などの情報を管理します
- *
+ * ゲームのユーザ情報を管理します
  */
 public final class GlobalContext {
     /** ロガー */
@@ -187,6 +186,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 装備Map
      * @return 装備Map
      */
     public static Map<Integer, ItemDto> getItemMap() {
@@ -209,6 +209,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 艦娘Map
      * @return 艦娘Map
      */
     public static Map<Integer, ShipDto> getShipMap() {
@@ -216,6 +217,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 秘書艦
      * @return 秘書艦
      */
     public static ShipDto getSecretary() {
@@ -223,6 +225,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 司令部Lv
      * @return 司令部Lv
      */
     public static int hqLevel() {
@@ -230,6 +233,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 最大保有可能 艦娘数
      * @return 最大保有可能 艦娘数
      */
     public static int maxChara() {
@@ -237,6 +241,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 最大保有可能 装備数
      * @return 最大保有可能 装備数
      */
     public static int maxSlotitem() {
@@ -244,6 +249,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 建造艦娘List
      * @return 建造艦娘List
      */
     public static List<GetShipDto> getGetshipList() {
@@ -258,6 +264,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 開発アイテムList
      * @return 開発アイテムList
      */
     public static List<CreateItemDto> getCreateItemList() {
@@ -272,6 +279,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 海戦・ドロップList
      * @return 海戦・ドロップList
      */
     public static List<BattleResultDto> getBattleResultList() {
@@ -279,6 +287,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 最後に行った海戦情報
      * @return 最後に行った海戦情報
      */
     public static BattleExDto getLastBattleDto() {
@@ -286,6 +295,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 遠征結果
      * @return 遠征結果
      */
     public static List<MissionResultDto> getMissionResultList() {
@@ -300,6 +310,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 遠征リスト
      * @return 遠征リスト
      */
     public static DeckMissionDto[] getDeckMissions() {
@@ -307,6 +318,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 入渠リスト
      * @return 入渠リスト
      */
     public static NdockDto[] getNdocks() {
@@ -314,6 +326,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 建造ドックリスト
      * @return 建造ドックリスト
      */
     public static KdockDto[] getKdocks() {
@@ -321,6 +334,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 遠征中の艦セット
      * @return 遠征中の艦セット
      */
     public static Set<Integer> getMissionShipSet() {
@@ -334,6 +348,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 入渠中の艦セット
      * @return 入渠中の艦セット
      */
     public static Set<Integer> getNDockShipSet() {
@@ -348,7 +363,6 @@ public final class GlobalContext {
 
     /**
      * 艦娘が入渠しているかを調べます
-     *
      * @param ship 艦娘
      * @return 入渠している場合true
      */
@@ -370,10 +384,18 @@ public final class GlobalContext {
         return false;
     }
 
+    /**
+     * 演習相手リスト
+     * @return
+     */
     public static PracticeUserDto[] getPracticeUser() {
         return practiceUser;
     }
 
+    /**
+     * 演習リストが最後に更新された時間
+     * @return
+     */
     public static Date getPracticeUserLastUpdate() {
         return practiceUserLastUpdate;
     }
@@ -393,6 +415,8 @@ public final class GlobalContext {
     }
 
     /**
+     * ドック
+     * @param id 番号 "1"～"4"
      * @return ドック
      */
     public static DockDto getDock(String id) {
@@ -400,16 +424,25 @@ public final class GlobalContext {
     }
 
     /**
-     * @return ドックMap
+     * ドックMap
+     * @return ドックMap キーは"1"～"4"
      */
     public static Map<String, DockDto> getDock() {
         return dock;
     }
 
+    /**
+     * 出撃艦隊情報
+     * @return
+     */
     public static boolean[] getIsSortie() {
         return isSortie;
     }
 
+    /**
+     * 今いるマス
+     * @return
+     */
     public static MapCellDto getSortieMap() {
         return mapCellDto;
     }
@@ -422,6 +455,10 @@ public final class GlobalContext {
         return questList;
     }
 
+    /**
+     * 任務が最後に更新された時間
+     * @return
+     */
     public static Date getQuestLastUpdate() {
         return questLastUpdate;
     }
@@ -682,6 +719,7 @@ public final class GlobalContext {
     }
 
     /** 
+     * updateContext()が呼ばれた数
      * @return updateContext()が呼ばれた数
      */
     public static int getUpdateCounter() {
