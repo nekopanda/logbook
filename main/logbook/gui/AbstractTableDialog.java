@@ -686,7 +686,16 @@ public abstract class AbstractTableDialog extends WindowBase {
      * テーブルヘッダーの{@link org.eclipse.swt.events.SelectionListener}です
      * @return SelectionListener
      */
-    protected abstract SelectionListener getHeaderSelectionListener();
+    protected SelectionListener getHeaderSelectionListener() {
+        return new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (e.getSource() instanceof TableColumn) {
+                    AbstractTableDialog.this.sortTableItems((TableColumn) e.getSource());
+                }
+            }
+        };
+    }
 
     /**
      * テーブルの初期状態

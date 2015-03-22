@@ -5,13 +5,9 @@ import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.TableItemCreator;
 import logbook.scripting.TableItemCreatorProxy;
 
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TableColumn;
 
 /**
  * 開発報告書
@@ -53,17 +49,5 @@ public final class CreateItemReportTable extends AbstractTableDialog {
     @Override
     protected TableItemCreator getTableItemCreator() {
         return TableItemCreatorProxy.get("createitem");
-    }
-
-    @Override
-    protected SelectionListener getHeaderSelectionListener() {
-        return new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (e.getSource() instanceof TableColumn) {
-                    CreateItemReportTable.this.sortTableItems((TableColumn) e.getSource());
-                }
-            }
-        };
     }
 }

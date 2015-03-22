@@ -178,6 +178,8 @@ public final class ApplicationMain extends WindowBase {
     private final ShipTable[] shipTableWindows = new ShipTable[4];
     /** お風呂に入りたい艦娘 */
     private BathwaterTableDialog bathwaterTablwWindow;
+    /** 遠征一覧 */
+    private MissionTable missionTableWindow;
     /** 任務一覧 */
     private QuestTable questTableWindow;
     /** 戦況 */
@@ -434,6 +436,12 @@ public final class ApplicationMain extends WindowBase {
         cmdmissionresult.setText("遠征報告書(&T)\tCtrl+T");
         cmdmissionresult.setAccelerator(SWT.CTRL + 'T');
         this.missionResultWindow = new MissionResultTable(this.dummyHolder, cmdmissionresult);
+
+        // コマンド-遠征一覧
+        MenuItem missionlist = new MenuItem(cmdmenu, SWT.CHECK);
+        missionlist.setText("遠征一覧");
+        this.missionTableWindow = new MissionTable(this.dummyHolder, missionlist);
+
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // コマンド-所有装備一覧
@@ -462,6 +470,7 @@ public final class ApplicationMain extends WindowBase {
         this.bathwaterTablwWindow = new BathwaterTableDialog(this.dummyHolder, cmdbathwaterlist);
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
+
         // コマンド-任務一覧
         MenuItem questlist = new MenuItem(cmdmenu, SWT.CHECK);
         questlist.setText("任務一覧(&Q)\tCtrl+Q");
@@ -1117,6 +1126,7 @@ public final class ApplicationMain extends WindowBase {
                 this.createShipReportWindow,
                 this.createItemReportWindow,
                 this.missionResultWindow,
+                this.missionTableWindow,
                 this.itemTableWindow,
                 this.shipTableWindows[0],
                 this.shipTableWindows[1],

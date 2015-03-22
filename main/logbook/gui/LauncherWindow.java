@@ -72,6 +72,7 @@ public class LauncherWindow extends WindowBase {
                 "建造",
                 "開発",
                 "遠征",
+                "一覧",
                 "装備",
                 "艦1",
                 "艦2",

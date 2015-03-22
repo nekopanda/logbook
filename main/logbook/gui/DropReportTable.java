@@ -39,7 +39,6 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TableColumn;
 
 /**
  * ドロップ報告書
@@ -270,18 +269,6 @@ public final class DropReportTable extends AbstractTableDialog {
     protected TableItemCreator getTableItemCreator() {
         //return CreateReportLogic.DEFAULT_TABLE_ITEM_CREATOR;
         return TableItemCreatorProxy.get(AppConstants.DROPTABLE_PREFIX);
-    }
-
-    @Override
-    protected SelectionListener getHeaderSelectionListener() {
-        return new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (e.getSource() instanceof TableColumn) {
-                    DropReportTable.this.sortTableItems((TableColumn) e.getSource());
-                }
-            }
-        };
     }
 
     /**

@@ -4,7 +4,7 @@
 package logbook.scripting;
 
 import logbook.constants.AppConstants;
-import logbook.dto.ShipDto;
+import logbook.internal.MasterData.MissionDto;
 import logbook.scripting.ScriptLoader.MethodInvoke;
 import logbook.scripting.ScriptLoader.TableScriptCollection;
 
@@ -12,25 +12,25 @@ import logbook.scripting.ScriptLoader.TableScriptCollection;
  * @author Nekopanda
  *
  */
-public class ShipItemProxy implements ShipItemListener {
+public class MissionProxy implements MissionListener {
 
     private class BodyMethod implements MethodInvoke {
-        public ShipDto ship;
+        public MissionDto data;
 
         @Override
         public Object invoke(Object arg) {
-            return ((ShipItemListener) arg).body(this.ship);
+            return ((MissionListener) arg).body(this.data);
         }
     }
 
     private TableScriptCollection script;
     private final BodyMethod bodyMethod = new BodyMethod();
 
-    private static ShipItemProxy instance = new ShipItemProxy();
+    private static MissionProxy instance = new MissionProxy();
 
-    public static ShipItemProxy get() {
+    public static MissionProxy get() {
         instance.script = ScriptLoader.getTableScript(
-                AppConstants.SHIPTABLE_PREFIX, ShipItemListener.class);
+                AppConstants.MISSIONTABLE_PREFIX, MissionListener.class);
         return instance;
     }
 
@@ -40,19 +40,19 @@ public class ShipItemProxy implements ShipItemListener {
     }
 
     @Override
-    public void begin(final boolean specdiff) {
+    public void begin(final int fleetid) {
         this.script.invoke(new MethodInvoke() {
             @Override
             public Object invoke(Object arg) {
-                ((ShipItemListener) arg).begin(specdiff);
+                ((MissionListener) arg).begin(fleetid);
                 return null;
             }
         });
     }
 
     @Override
-    public Comparable[] body(ShipDto ship) {
-        this.bodyMethod.ship = ship;
+    public Comparable[] body(MissionDto data) {
+        this.bodyMethod.data = data;
         return this.script.body(this.bodyMethod);
     }
 
@@ -61,7 +61,7 @@ public class ShipItemProxy implements ShipItemListener {
         this.script.invoke(new MethodInvoke() {
             @Override
             public Object invoke(Object arg) {
-                ((ShipItemListener) arg).end();
+                ((MissionListener) arg).end();
                 return null;
             }
         });

@@ -49,6 +49,8 @@ import logbook.dto.UseItemDto;
 import logbook.internal.BattleResultFilter;
 import logbook.internal.BattleResultServer;
 import logbook.internal.MasterData;
+import logbook.internal.MasterData.MissionDto;
+import logbook.scripting.MissionProxy;
 import logbook.scripting.ShipItemListener;
 import logbook.scripting.ShipItemProxy;
 import logbook.util.ReportUtils;
@@ -474,13 +476,10 @@ public final class CreateReportLogic {
         ShipItemListener script = ShipItemProxy.get();
         script.begin(specdiff);
         int count = 0;
-        for (ShipOrder shipObj : ShipOrder.getOrderedShipList()) {
-            ShipDto ship = shipObj.ship;
-
+        for (ShipDto ship : GlobalContext.getShipMap().values()) {
             if ((filter != null) && !shipFilter(ship, filter, missionSet)) {
                 continue;
             }
-
             body.add(ArrayUtils.addAll(new Comparable[] {
                     new TableRowHeader(count++, ship)
             }, script.body(ship)));
@@ -677,6 +676,35 @@ public final class CreateReportLogic {
             });
         }
 
+        return body;
+    }
+
+    /**
+     * 遠征可否のヘッダー
+     * 
+     * @return ヘッダー
+     */
+    public static String[] getMissionHeader() {
+        return ArrayUtils.addAll(new String[] { "ID" },
+                MissionProxy.get().header());
+    }
+
+    /**
+     * 遠征可否の内容
+     * 
+     * @param fleetid 遠征艦隊（2～4）
+     * @return 内容
+     */
+    public static List<Comparable[]> getMissionBody(int fleetid) {
+        List<Comparable[]> body = new ArrayList<Comparable[]>();
+        MissionProxy script = MissionProxy.get();
+        script.begin(fleetid);
+        for (MissionDto data : MasterData.getInstance().getMission().values()) {
+            body.add(ArrayUtils.addAll(new Comparable[] {
+                    new TableRowHeader(data.getId(), data)
+            }, script.body(data)));
+        }
+        script.end();
         return body;
     }
 

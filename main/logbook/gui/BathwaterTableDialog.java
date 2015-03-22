@@ -10,11 +10,9 @@ import logbook.scripting.TableItemCreatorProxy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TableColumn;
 
 /**
  * お風呂に入りたい艦娘
@@ -85,18 +83,6 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
     @Override
     protected TableItemCreator getTableItemCreator() {
         return TableItemCreatorProxy.get(AppConstants.SHIPTABLE_PREFIX);
-    }
-
-    @Override
-    protected SelectionListener getHeaderSelectionListener() {
-        return new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (e.getSource() instanceof TableColumn) {
-                    BathwaterTableDialog.this.sortTableItems((TableColumn) e.getSource());
-                }
-            }
-        };
     }
 
     @Override

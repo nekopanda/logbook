@@ -35,7 +35,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 /**
@@ -278,18 +277,6 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
     @Override
     public String getWindowId() {
         return this.getClass().getName() + ((this.index == 0) ? "" : String.valueOf(this.index));
-    }
-
-    @Override
-    protected SelectionListener getHeaderSelectionListener() {
-        return new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (e.getSource() instanceof TableColumn) {
-                    ShipTable.this.sortTableItems((TableColumn) e.getSource());
-                }
-            }
-        };
     }
 
     /**

@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
@@ -70,22 +71,22 @@ public class MasterData {
     private ArrayList<MapAreaDto> maparea = new ArrayList<MapAreaDto>();
 
     /** 1-1, 1-2, ... , 2-1, 2-2, ... */
-    private Map<Integer, MapInfoDto> mapinfo = new HashMap<Integer, MapInfoDto>();
+    private Map<Integer, MapInfoDto> mapinfo = new TreeMap<Integer, MapInfoDto>();
 
-    /** 全ての任務  */
-    private Map<Integer, MissionDto> mission = new HashMap<Integer, MissionDto>();
+    /** 全ての遠征  */
+    private Map<Integer, MissionDto> mission = new TreeMap<Integer, MissionDto>();
 
     /** マップクリア情報 -1: 非表示 or 未更新 0: クリアしていない 1: クリア済み */
-    private Map<Integer, Integer> mapState = new HashMap<Integer, Integer>();
+    private Map<Integer, Integer> mapState = new TreeMap<Integer, Integer>();
 
     /** 遠征クリア情報 -1: 非表示 or 未更新 0: NEW 1: 無印 2:　達成 */
-    private Map<Integer, Integer> missionState = new HashMap<Integer, Integer>();
+    private Map<Integer, Integer> missionState = new TreeMap<Integer, Integer>();
 
     /** 艦種 */
     private List<ShipTypeDto> stype = new ArrayList<ShipTypeDto>();
 
     /** UseItem　（バケツとか、家具箱とか） */
-    private Map<Integer, UseItemInfoDto> useItem = new HashMap<Integer, UseItemInfoDto>();
+    private Map<Integer, UseItemInfoDto> useItem = new TreeMap<Integer, UseItemInfoDto>();
 
     /** 最後に START2 によるマスターデータを受け取った日時 */
     private Date masterUpdateTime = new Date(0);

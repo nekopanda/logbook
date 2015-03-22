@@ -422,6 +422,8 @@ public class AppConstants {
 
     public static final String SHIPTABLE_PREFIX = "ship";
 
+    public static final String MISSIONTABLE_PREFIX = "mission";
+
     public static final String SHIPGROUPTABLE_PREFIX = "shipgroup";
 
     public static final String CREATEITEMTABLE_PREFIX = "createitem";
