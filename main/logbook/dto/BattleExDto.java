@@ -153,34 +153,10 @@ public class BattleExDto extends AbstractDto {
     @Tag(38)
     private boolean[] escaped;
 
-    @Tag(50)
-    private final List<PhaseJson> phaseJson = new ArrayList<PhaseJson>();
-
     @Tag(51)
     private String resultJson;
 
     /////////////////////////////////////////////////
-
-    public static class PhaseJson {
-        @Tag(1)
-        public final BattlePhaseKind kind;
-
-        @Tag(2)
-        public final String json;
-
-        public PhaseJson(BattlePhaseKind kind, String json) {
-            this.kind = kind;
-            this.json = json;
-        }
-
-        public JsonObject getJson() {
-            return JsonUtils.fromString(this.json);
-        }
-
-        public String getApi() {
-            return this.kind.getApi().getApiName();
-        }
-    }
 
     public static class Phase {
 
@@ -239,6 +215,9 @@ public class BattleExDto extends AbstractDto {
         private List<BattleAtackDto> hougeki2 = null;
         @Tag(19)
         private List<BattleAtackDto> hougeki3 = null;
+
+        @Tag(30)
+        private final String json;
 
         public Phase(BattleExDto battle, JsonObject object, BattlePhaseKind kind,
                 int[] beforeFriendHp, int[] beforeFriendHpCombined, int[] beforeEnemyHp)
@@ -354,6 +333,8 @@ public class BattleExDto extends AbstractDto {
 
             // 判定を計算
             this.estimatedRank = this.calcResultRank(battle);
+
+            this.json = object.toString();
         }
 
         // 勝利判定 //
@@ -565,6 +546,17 @@ public class BattleExDto extends AbstractDto {
                     "判定:" + this.estimatedRank.rank();
         }
 
+        public JsonObject getJson() {
+            if (this.json == null) {
+                return null;
+            }
+            return JsonUtils.fromString(this.json);
+        }
+
+        public String getApi() {
+            return this.kind.getApi().getApiName();
+        }
+
         /**
          * @return kind
          */
@@ -713,15 +705,16 @@ public class BattleExDto extends AbstractDto {
      */
     public void readFromJson() {
         if (this.exVersion >= 2) {
+            Phase[] phaseCopy = this.phaseList.toArray(new Phase[0]);
             this.phaseList.clear();
-            for (PhaseJson json : this.phaseJson) {
-                this.internalAddPhase(JsonUtils.fromString(json.json), json.kind);
+            for (Phase phase : phaseCopy) {
+                this.addPhase(phase.getJson(), phase.getKind());
             }
             this.readResultJson(JsonUtils.fromString(this.resultJson));
         }
     }
 
-    private void internalAddPhase(JsonObject object, BattlePhaseKind kind) {
+    public Phase addPhase(JsonObject object, BattlePhaseKind kind) {
         if (this.phaseList.size() == 0) {
             // 最初のフェーズ
             String dockId;
@@ -862,11 +855,6 @@ public class BattleExDto extends AbstractDto {
             this.phaseList.add(new Phase(this, object, kind,
                     this.startFriendHp, this.startFriendHpCombined, this.startEnemyHp));
         }
-    }
-
-    public Phase addPhase(JsonObject object, BattlePhaseKind kind) {
-        this.phaseJson.add(new PhaseJson(kind, object.toString()));
-        this.internalAddPhase(object, kind);
         return this.phaseList.get(this.phaseList.size() - 1);
     }
 
@@ -1320,13 +1308,6 @@ public class BattleExDto extends AbstractDto {
      */
     public boolean[] getEscaped() {
         return this.escaped;
-    }
-
-    /**
-     * @return phaseJson
-     */
-    public List<PhaseJson> getPhaseJson() {
-        return this.phaseJson;
     }
 
     /**

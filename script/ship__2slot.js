@@ -4,7 +4,7 @@ SakutekiString = Java.type("logbook.gui.logic.SakutekiString");
 
 function header() {
 	return [	"制空",
-                "索敵", //
+                "索敵#索敵2-5計算値", //
                 "装備1",
                 "艦載機1", //
                 "装備2",

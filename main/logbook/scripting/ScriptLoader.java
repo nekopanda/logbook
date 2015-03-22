@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.script.Compilable;
-import javax.script.CompiledScript;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -32,8 +31,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
+ * スクリプトローダ
  * @author Nekopanda
- *
  */
 public class ScriptLoader {
     private static ScriptLoader instance = null;
@@ -134,6 +133,10 @@ public class ScriptLoader {
         }
     }
 
+    /**
+     * "prefix_*.js"にマッチするスクリプトの集合
+     * @author Nekopanda
+     */
     public class ScriptCollection {
         private final String prefix;
         private final Class<?> type;
@@ -199,6 +202,10 @@ public class ScriptLoader {
             this.loadScripts();
         }
 
+        /**
+         * 各スクリプトで実行
+         * @param invokable 実行するメソッド
+         */
         public void invoke(MethodInvoke invokable) {
             for (Script script : this.get()) {
                 script.invoke(invokable);
@@ -206,6 +213,10 @@ public class ScriptLoader {
         }
     }
 
+    /**
+     * 各種テーブルのカラム拡張用スクリプト
+     * @author Nekopanda
+     */
     public class TableScript extends Script {
         private final MethodInvoke headerMethod = new MethodInvoke() {
             @Override
@@ -264,6 +275,11 @@ public class ScriptLoader {
         }
     }
 
+    /**
+     * テーブルカラム拡張用スクリプトの集合
+     * テーブルヘッダは起動中変更できないので、reloadでファイルが増減しないようになっています
+     * @author Nekopanda
+     */
     public class TableScriptCollection extends ScriptCollection {
 
         public TableScriptCollection(String prefix, Class<?> type) {
@@ -329,14 +345,31 @@ public class ScriptLoader {
         }
     }
 
+    /**
+     * prefixにマッチするテーブルカラム拡張用スクリプト集合を取得
+     * @param prefix
+     * @param type
+     * @return
+     */
     public static TableScriptCollection getTableScript(String prefix, Class<?> type) {
         return instance.getTableScript_(prefix, type);
     }
 
+    /**
+     * prefixにマッチするスクリプト集合を取得
+     * @param prefix
+     * @param type
+     * @return
+     */
     public static ScriptCollection getScriptCollection(String prefix, Class<?> type) {
         return instance.getScriptCollection_(prefix, type);
     }
 
+    /**
+     * テープル行を作るスクリプトを取得
+     * @param prefix
+     * @return
+     */
     public static Script getTableStyleScript(String prefix) {
         return instance.getTableStyleScript_(prefix);
     }
