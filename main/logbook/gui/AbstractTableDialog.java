@@ -471,6 +471,14 @@ public abstract class AbstractTableDialog extends WindowBase {
 
         int oldLength = oldVisibles.length;
 
+        // 各カラムの位置
+        int[] oldPos = new int[oldLength];
+        for (int i = 0; i < oldLength; ++i) {
+            if (oldOrder[i] < oldLength) {
+                oldPos[oldOrder[i]] = i;
+            }
+        }
+
         // 互換性維持
         if (oldWidth == null) {
             oldWidth = new int[oldLength];
@@ -479,12 +487,6 @@ public abstract class AbstractTableDialog extends WindowBase {
             // ヘッダー情報がない場合は今のヘッダーから作る
             oldLength = Math.min(oldLength, this.header.length);
             oldIds = ArrayUtils.subarray(this.headerId, 0, oldLength);
-        }
-
-        // 各カラムの位置
-        int[] oldPos = new int[oldLength];
-        for (int i = 0; i < oldLength; ++i) {
-            oldPos[oldOrder[i]] = i;
         }
 
         // pos順にする
@@ -795,7 +797,18 @@ public abstract class AbstractTableDialog extends WindowBase {
                 if (sortKeys[i] != null) {
                     this.comparator.setIndex(sortKeys[i].index);
                     this.comparator.setOrder(sortKeys[i].order);
-                    Collections.sort(this.body, this.comparator);
+                    try {
+                        Collections.sort(this.body, this.comparator);
+                    } catch (ClassCastException e) {
+                        MessageBox box = new MessageBox(this.shell, SWT.OK | SWT.ICON_ERROR);
+                        box.setText("テーブルレコードをソート中にエラー");
+                        box.setMessage(this.getTitleMain() + "のレコードをソート中に型変換エラーが発生しました\n" +
+                                "外部スクリプトの返したデータに問題があるようです\n" +
+                                "最近インストールしたスクリプトがある場合は取り除くと解決されるかもしれません\n" +
+                                e.getMessage());
+                        box.open();
+                        return;
+                    }
                 }
             }
         }
