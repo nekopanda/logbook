@@ -213,7 +213,7 @@ public final class CreateReportLogic {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
         for (int i = 0; i < ships.size(); i++) {
             GetShipDto ship = ships.get(i);
-            body.add(new Comparable[] { i + 1,
+            body.add(new Comparable[] { new TableRowHeader(i + 1, ship),
                     new DateTimeString(ship.getGetDate()), ship.getBuildType(),
                     ship.getName(), ship.getType(), ship.getFuel(), ship.getAmmo(), ship.getMetal(), ship.getBauxite(),
                     ship.getResearchMaterials(), ship.getFreeDock(), ship.getSecretary(), ship.getHqLevel() });
@@ -272,7 +272,7 @@ public final class CreateReportLogic {
                 name = item.getName();
                 type = item.getType();
             }
-            body.add(new Comparable[] { i + 1,
+            body.add(new Comparable[] { new TableRowHeader(i + 1, item),
                     new DateTimeString(item.getCreateDate()), name, type,
                     item.getFuel(), item.getAmmo(), item.getMetal(), item.getBauxite(), item.getSecretary(),
                     item.getHqLevel() });
@@ -412,7 +412,8 @@ public final class CreateReportLogic {
             ShipParameters param = item.getParam();
             String level = (itemInfo.maxLevel != 0) ? "★+" + itemInfo.maxLevel : null;
             count++;
-            body.add(new Comparable[] { count, item.getName(), item.getTypeName(), itemInfo.count,
+            body.add(new Comparable[] { new TableRowHeader(count, item),
+                    item.getName(), item.getTypeName(), itemInfo.count,
                     itemInfo.locked, level, param.getHoug(),
                     param.getHoum(), param.getLeng(), param.getLuck(), param.getHouk(), param.getBaku(),
                     param.getRaig(), param.getSaku(), param.getTais(), param.getTyku(), param.getSouk(),
@@ -524,7 +525,7 @@ public final class CreateReportLogic {
             }
 
             body.add(new Comparable[] {
-                    Integer.toString(i + 1),
+                    new TableRowHeader(i + 1, result),
                     new DateTimeString(result.getDate()),
                     result.getClearResult(),
                     result.getQuestName(),
@@ -597,7 +598,7 @@ public final class CreateReportLogic {
                 continue;
 
             body.add(new Comparable[] {
-                    quest.getNo(),
+                    new TableRowHeader(quest.getNo(), quest),
                     "" + quest.getPage() + "-" + quest.getPos(),
                     quest.getStateString(),
                     quest.getProgressString(),
@@ -680,7 +681,7 @@ public final class CreateReportLogic {
     }
 
     /**
-     * 遠征可否のヘッダー
+     * 遠征一覧のヘッダー
      * 
      * @return ヘッダー
      */
@@ -690,7 +691,7 @@ public final class CreateReportLogic {
     }
 
     /**
-     * 遠征可否の内容
+     * 遠征一覧の内容
      * 
      * @param fleetid 遠征艦隊（2～4）
      * @return 内容

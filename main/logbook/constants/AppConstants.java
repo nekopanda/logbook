@@ -434,5 +434,5 @@ public class AppConstants {
 
     public static final String QUESTTABLE_PREFIX = "quest";
 
-    public static final String RESOURCECHAR_PREFIX = "quest";
+    public static final String RESOURCECHAR_PREFIX = "resource";
 }

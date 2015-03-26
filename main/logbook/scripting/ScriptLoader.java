@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -45,11 +46,11 @@ public class ScriptLoader {
 
     public class Script {
 
-        public File scriptFile;
-        public long lastModified;
-        public ScriptEngine engine;
+        private final File scriptFile;
+        private long lastModified;
+        private ScriptEngine engine;
         private final Class<?> type;
-        public Object listener;
+        private Object listener;
 
         public boolean exception = false;
         public int errorCounter = 0;
@@ -66,6 +67,7 @@ public class ScriptLoader {
                 this.listener = null;
                 LOG.warn("スクリプトファイル " + scriptFile.getPath() + " を読み込み中にエラー", e);
             }
+            ScriptLoader.this.allScripts.put(scriptFile.getName(), this);
         }
 
         public Script(File scriptFile, Class<?> type) {
@@ -90,7 +92,7 @@ public class ScriptLoader {
             }
         }
 
-        public void reload_() throws IOException, ScriptException {
+        private void reload_() throws IOException, ScriptException {
             try (BufferedReader reader = Files.newBufferedReader(this.scriptFile.toPath(), Charset.forName("UTF-8"))) {
                 this.engine = ScriptLoader.this.manager.getEngineByName("nashorn");
                 if (this.engine == null) {
@@ -140,7 +142,7 @@ public class ScriptLoader {
     public class ScriptCollection {
         private final String prefix;
         private final Class<?> type;
-        private final Map<String, Script> scripts = new TreeMap<>();
+        private Map<String, Script> scripts = new TreeMap<>();
 
         public ScriptCollection(String prefix, Class<?> type) {
             this.prefix = prefix;
@@ -157,8 +159,17 @@ public class ScriptLoader {
         }
 
         private void loadScripts() {
+            Map<String, Script> oldScripts = this.scripts;
+            this.scripts = new TreeMap<>();
             for (File file : this.getScriptFiles()) {
-                this.scripts.put(file.getPath(), this.makeScript(file, this.type));
+                Script script = oldScripts.get(file.getPath());
+                if ((script == null)) {
+                    script = this.makeScript(file, this.type);
+                }
+                else if (script.isUpdated()) {
+                    script.reload();
+                }
+                this.scripts.put(file.getPath(), script);
             }
         }
 
@@ -199,6 +210,10 @@ public class ScriptLoader {
 
         public void reload() {
             this.scripts.clear();
+            this.loadScripts();
+        }
+
+        public void update() {
             this.loadScripts();
         }
 
@@ -300,6 +315,16 @@ public class ScriptLoader {
         }
 
         @Override
+        public void update() {
+            // テーブルヘッダは起動中変更できないので、ファイルは増減させない
+            for (Script script : this.get()) {
+                if (script.isUpdated()) {
+                    script.reload();
+                }
+            }
+        }
+
+        @Override
         public boolean isUpdated() {
             // テーブルヘッダは起動中変更できないので、ファイルは増減させない
             for (Script script : this.get()) {
@@ -328,6 +353,7 @@ public class ScriptLoader {
     }
 
     private final ScriptEngineManager manager = new ScriptEngineManager();
+    private final Map<String, Script> allScripts = new HashMap<>();
     private final Map<String, ScriptCollection> scriptCollections = new TreeMap<>();
     private final Map<String, Script> scripts = new TreeMap<>();
 
@@ -381,7 +407,7 @@ public class ScriptLoader {
             this.scriptCollections.put(prefix, script);
         }
         else if (script.isUpdated()) {
-            script.reload();
+            script.update();
         }
         return (TableScriptCollection) script;
     }
@@ -393,7 +419,7 @@ public class ScriptLoader {
             this.scriptCollections.put(prefix, script);
         }
         else if (script.isUpdated()) {
-            script.reload();
+            script.update();
         }
         return script;
     }
