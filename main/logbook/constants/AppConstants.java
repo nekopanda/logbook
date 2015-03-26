@@ -114,7 +114,7 @@ public class AppConstants {
             new RGB(0xA5, 0x2A, 0x2A), // バーナー
             new RGB(0xF0, 0x80, 0x80), // バケツ
             new RGB(0x48, 0x76, 0xFF), // 開発
-            new RGB(0x00, 0xF5, 0xFF) // ネジ
+            new RGB(0x00, 0xAB, 0xB2) // ネジ
     };
 
     /** 小破の色 */

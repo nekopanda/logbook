@@ -1336,6 +1336,19 @@ public final class AppConfigBean {
         this.screwColor = screwColor;
     }
 
+    public RGB[] getResourceColors() {
+        return new RGB[] {
+                this.fuelColor,
+                this.ammoColor,
+                this.metalColor,
+                this.bauxiteColor,
+                this.burnerColor,
+                this.bucketColor,
+                this.researchColor,
+                this.screwColor
+        };
+    }
+
     /**
      * 開発者オプション-JSONを保存するを取得します。
      * @return 開発者オプション-JSONを保存する

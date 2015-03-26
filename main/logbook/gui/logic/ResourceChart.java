@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -14,6 +15,7 @@ import logbook.dto.chart.ResourceLog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Path;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.wb.swt.SWTResourceManager;
 
@@ -46,7 +48,9 @@ public class ResourceChart {
     /** Height */
     private final int height;
 
-    private final boolean[] enabled;
+    private final ActiveLevel[] activeLevel;
+
+    private final boolean printHeader;
 
     private int max;
     private int min;
@@ -54,6 +58,13 @@ public class ResourceChart {
     private int min2;
     private long[] time = {};
     private Resource[] resources = {};
+
+    public enum ActiveLevel {
+        DISABLED,
+        INACTIVE,
+        NORMAL,
+        ACTIVE,
+    }
 
     /**
      * 資材チャート
@@ -63,11 +74,12 @@ public class ResourceChart {
      * @param width 幅
      * @param height 高さ
      */
-    public ResourceChart(GC gc, ResourceLog log, int scale, String scaleText, int width, int height, boolean[] enabled) {
+    public ResourceChart(GC gc, ResourceLog log, int scale, String scaleText, int width, int height,
+            ActiveLevel[] activeLevel, boolean printHeader) {
         int labelHeight = gc.getFontMetrics().getHeight();
         this.LEFT_WIDTH = getStringWidth(gc, "100000") + 10;
         this.RIGHT_WIDTH = getStringWidth(gc, "1000") + 15;
-        this.TOP_HEIGHT = labelHeight + 10;
+        this.TOP_HEIGHT = (printHeader ? labelHeight : 0) + 10;
         this.BOTTOM_HEIGHT = labelHeight + 10;
 
         this.log = log;
@@ -76,7 +88,8 @@ public class ResourceChart {
         this.notch = (long) (this.term / ((double) (width - this.LEFT_WIDTH - this.RIGHT_WIDTH) / 4));
         this.width = width;
         this.height = height;
-        this.enabled = enabled;
+        this.activeLevel = activeLevel;
+        this.printHeader = printHeader;
         // データロード
         this.load();
     }
@@ -86,12 +99,12 @@ public class ResourceChart {
      * 
      * @param gc グラフィックコンテキスト
      */
-    public void draw(GC gc) {
+    public void draw(final GC gc) {
 
         // グラフエリアの幅
-        float w = this.width - this.LEFT_WIDTH - this.RIGHT_WIDTH;
+        final float w = this.width - this.LEFT_WIDTH - this.RIGHT_WIDTH;
         // グラフエリアの高さ
-        float h = this.height - this.TOP_HEIGHT - this.BOTTOM_HEIGHT;
+        final float h = this.height - this.TOP_HEIGHT - this.BOTTOM_HEIGHT;
         // お絵かき開始
         gc.setAntialias(SWT.ON);
         gc.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
@@ -140,32 +153,71 @@ public class ResourceChart {
             int y = (this.height - this.BOTTOM_HEIGHT) + 6;
             gc.drawText(label, x, y, true);
         }
-        // 判例を描く
-        int hx = this.LEFT_WIDTH;
-        int hy = 5;
-        for (int i = 0; i < this.resources.length; i++) {
-            gc.setLineWidth(3);
-            gc.setForeground(SWTResourceManager.getColor(this.resources[i].color));
+        if (this.printHeader) {
+            // 判例を描く
+            int hx = this.LEFT_WIDTH;
+            int hy = 5;
+            for (int i = 0; i < this.resources.length; i++) {
+                ActiveLevel level = this.activeLevel[i];
+                if (level == ActiveLevel.DISABLED) {
+                    continue;
+                }
+                gc.setLineWidth(3);
+                gc.setForeground(SWTResourceManager.getColor(this.resources[i].color));
 
-            String label = this.resources[i].name;
-            int labelWidth = getStringWidth(gc, label);
-            int labelHeight = gc.getFontMetrics().getHeight();
-            gc.drawLine(hx, hy + (labelHeight / 2), hx += 20, hy + (labelHeight / 2));
-            hx += 1;
-            gc.drawText(label, hx, hy, true);
-            hx += labelWidth + 2;
+                String label = this.resources[i].name;
+                int labelWidth = getStringWidth(gc, label);
+                int labelHeight = gc.getFontMetrics().getHeight();
+                gc.drawLine(hx, hy + (labelHeight / 2), hx += 20, hy + (labelHeight / 2));
+                hx += 1;
+                gc.drawText(label, hx, hy, true);
+                hx += labelWidth + 2;
+            }
+            // スケールテキストを描く
+            int sx = this.width - this.RIGHT_WIDTH - getStringWidth(gc, this.scaleText);
+            int sy = 5;
+            gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+            gc.drawText(this.scaleText, sx, sy, true);
         }
-        // スケールテキストを描く
-        int sx = this.width - this.RIGHT_WIDTH - getStringWidth(gc, this.scaleText);
-        int sy = 5;
-        gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-        gc.drawText(this.scaleText, sx, sy, true);
+
+        // よりアクティブな線が前になるように
+        class ResourceLine {
+            ActiveLevel level;
+            int index;
+
+            ResourceLine(ActiveLevel level, int index) {
+                this.level = level;
+                this.index = index;
+            }
+        }
+        ResourceLine[] drawLines = new ResourceLine[8];
+        for (int i = 0; i < this.resources.length; i++) {
+            drawLines[i] = new ResourceLine(this.activeLevel[i], i);
+        }
+        Arrays.sort(drawLines, new Comparator<ResourceLine>() {
+            @Override
+            public int compare(ResourceLine o1, ResourceLine o2) {
+                return o1.level.compareTo(o2.level);
+            }
+        });
 
         // グラフを描く
-        for (int i = 0; i < this.resources.length; i++) {
-            if (this.enabled[i]) {
-                gc.setLineWidth(2);
-                gc.setForeground(SWTResourceManager.getColor(this.resources[i].color));
+        for (int c = 0; c < drawLines.length; c++) {
+            ActiveLevel level = drawLines[c].level;
+            int i = drawLines[c].index;
+            if (level != ActiveLevel.DISABLED) {
+                RGB color = this.resources[i].color;
+                if (level == ActiveLevel.INACTIVE) {
+                    gc.setLineWidth(1);
+                    color = new RGB(
+                            (int) (255 - ((255 - color.red) * 0.25)),
+                            (int) (255 - ((255 - color.green) * 0.25)),
+                            (int) (255 - ((255 - color.blue) * 0.25)));
+                }
+                else {
+                    gc.setLineWidth(2);
+                }
+                gc.setForeground(SWTResourceManager.getColor(color));
 
                 int[] values = this.resources[i].values;
                 Path path = new Path(Display.getCurrent());
@@ -266,7 +318,7 @@ public class ResourceChart {
                         values[j] = 0;
                     }
                 }
-                if ((values[j] >= 0) && this.enabled[i]) {
+                if ((values[j] >= 0) && (this.activeLevel[i] != ActiveLevel.DISABLED)) {
                     if (i < 4) {
                         // 資材最大数を設定
                         this.max = Math.max(values[j], this.max);
