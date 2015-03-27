@@ -1,5 +1,7 @@
 package logbook.gui;
 
+import logbook.data.Data;
+import logbook.data.DataType;
 import logbook.data.context.GlobalContext;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.TableItemCreator;
@@ -49,5 +51,17 @@ public final class CreateItemReportTable extends AbstractTableDialog {
     @Override
     protected TableItemCreator getTableItemCreator() {
         return TableItemCreatorProxy.get("createitem");
+    }
+
+    /**
+     * 更新する必要のあるデータ
+     */
+    @SuppressWarnings("incomplete-switch")
+    @Override
+    public void update(DataType type, Data data) {
+        switch (type) {
+        case CREATE_ITEM:
+            this.needsUpdate = true;
+        }
     }
 }

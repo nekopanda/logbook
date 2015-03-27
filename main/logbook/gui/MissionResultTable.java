@@ -1,6 +1,8 @@
 package logbook.gui;
 
 import logbook.constants.AppConstants;
+import logbook.data.Data;
+import logbook.data.DataType;
 import logbook.data.context.GlobalContext;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.TableItemCreator;
@@ -50,5 +52,17 @@ public final class MissionResultTable extends AbstractTableDialog {
     @Override
     protected TableItemCreator getTableItemCreator() {
         return TableItemCreatorProxy.get(AppConstants.MISSIONRESULTTABLE_PREFIX);
+    }
+
+    /**
+     * 更新する必要のあるデータ
+     */
+    @SuppressWarnings("incomplete-switch")
+    @Override
+    public void update(DataType type, Data data) {
+        switch (type) {
+        case MISSION_RESULT:
+            this.needsUpdate = true;
+        }
     }
 }

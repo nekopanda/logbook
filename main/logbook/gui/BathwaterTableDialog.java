@@ -2,10 +2,13 @@ package logbook.gui;
 
 import logbook.config.bean.TableConfigBean;
 import logbook.constants.AppConstants;
+import logbook.data.Data;
+import logbook.data.DataType;
 import logbook.dto.ShipFilterDto;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.TableItemCreator;
 import logbook.scripting.TableItemCreatorProxy;
+import logbook.util.ReportUtils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -96,5 +99,16 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
         config.setVisibleColumn(CreateReportLogic.getBathTableDefaultVisibles());
         config.setColumnOrder(CreateReportLogic.getBathTableDefaultColumnOrder());
         return config;
+    }
+
+    /**
+     * 更新する必要のあるデータ
+     */
+    @SuppressWarnings("incomplete-switch")
+    @Override
+    public void update(DataType type, Data data) {
+        if (ReportUtils.isShipUpdate(type)) {
+            this.needsUpdate = true;
+        }
     }
 }

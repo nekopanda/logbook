@@ -13,6 +13,10 @@ import logbook.config.AppConfig;
 import logbook.config.bean.TableConfigBean;
 import logbook.config.bean.TableConfigBean.Column;
 import logbook.config.bean.TableConfigBean.SortKey;
+import logbook.data.Data;
+import logbook.data.DataType;
+import logbook.data.EventListener;
+import logbook.data.context.GlobalContext;
 import logbook.gui.listener.TableKeyShortcutAdapter;
 import logbook.gui.listener.TableToClipboardAdapter;
 import logbook.gui.listener.TableToCsvSaveAdapter;
@@ -43,7 +47,7 @@ import org.eclipse.swt.widgets.TableColumn;
  * テーブルで構成されるダイアログの基底クラス
  *
  */
-public abstract class AbstractTableDialog extends WindowBase {
+public abstract class AbstractTableDialog extends WindowBase implements EventListener {
 
     private static int MAX_PRINT_ITEMS = 2000;
 
@@ -92,6 +96,8 @@ public abstract class AbstractTableDialog extends WindowBase {
     protected MenuItem cyclicReloadMenuItem;
 
     private Display display;
+
+    protected boolean needsUpdate = true;
 
     /**
      * コンストラクター
@@ -286,8 +292,13 @@ public abstract class AbstractTableDialog extends WindowBase {
                 AbstractTableDialog.this.tablemenu.dispose();
                 // タイマーの終了
                 AbstractTableDialog.this.disableCyclicReload();
+                // GlobalContextへのリスナ登録解除
+                GlobalContext.removeEventListener(AbstractTableDialog.this);
             }
         });
+
+        // 更新リスナ登録
+        GlobalContext.addEventListener(this);
 
         // orderflgsを初期化
         TableConfigBean.SortKey[] sortKeys = this.getConfig().getSortKeys();
@@ -336,6 +347,7 @@ public abstract class AbstractTableDialog extends WindowBase {
         this.table.setRedraw(true);
         this.table.setTopIndex(topindex);
         //ApplicationMain.timeLogPrint("[E] reloadTable");
+        this.needsUpdate = false;
     }
 
     /**
@@ -833,6 +845,15 @@ public abstract class AbstractTableDialog extends WindowBase {
     }
 
     /**
+     * データ受信
+     * デフォルト動作はどんなデータでも更新をONにする
+     */
+    @Override
+    public void update(DataType type, Data data) {
+        this.needsUpdate = true;
+    }
+
+    /**
      * テーブルをソートする{@link java.util.Comparator}です。
      */
     protected class TableComparator implements Comparator<Comparable[]> {
@@ -960,6 +981,10 @@ public abstract class AbstractTableDialog extends WindowBase {
 
         @Override
         public void run() {
+            if (!this.dialog.needsUpdate) {
+                // 更新の必要はない
+                return;
+            }
             this.dialog.display.asyncExec(new Runnable() {
                 @Override
                 public void run() {

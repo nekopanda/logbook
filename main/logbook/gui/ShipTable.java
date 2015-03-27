@@ -8,6 +8,8 @@ import logbook.config.ShipGroupConfig;
 import logbook.config.bean.ShipFilterPanelConfigBean;
 import logbook.config.bean.ShipGroupBean;
 import logbook.constants.AppConstants;
+import logbook.data.Data;
+import logbook.data.DataType;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipFilterDto;
 import logbook.gui.logic.CreateReportLogic;
@@ -16,6 +18,7 @@ import logbook.gui.logic.ShipGroupObserver;
 import logbook.gui.logic.TableItemCreator;
 import logbook.gui.widgets.ShipFilterComposite;
 import logbook.scripting.TableItemCreatorProxy;
+import logbook.util.ReportUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
@@ -597,6 +600,16 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
 
             // モード
             this.setGroupMode(filter.groupMode);
+        }
+    }
+
+    /**
+     * 更新する必要のあるデータ
+     */
+    @Override
+    public void update(DataType type, Data data) {
+        if (ReportUtils.isShipUpdate(type)) {
+            this.needsUpdate = true;
         }
     }
 }

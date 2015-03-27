@@ -14,6 +14,8 @@ import logbook.config.ShipGroupConfig;
 import logbook.config.bean.ShipGroupBean;
 import logbook.config.bean.ShipGroupListBean;
 import logbook.constants.AppConstants;
+import logbook.data.Data;
+import logbook.data.DataType;
 import logbook.data.context.GlobalContext;
 import logbook.dto.ShipDto;
 import logbook.gui.logic.ShipGroupListener;
@@ -21,6 +23,7 @@ import logbook.gui.logic.ShipGroupObserver;
 import logbook.gui.logic.TableItemCreator;
 import logbook.gui.logic.TableRowHeader;
 import logbook.scripting.TableItemCreatorProxy;
+import logbook.util.ReportUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
@@ -605,6 +608,16 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
     public void groupShipChanged(ShipGroupBean group) {
         if ((this.property != null) && (this.property.getShipGroupBean() == group)) {
             this.reloadTable();
+        }
+    }
+
+    /**
+     * 更新する必要のあるデータ
+     */
+    @Override
+    public void update(DataType type, Data data) {
+        if (ReportUtils.isShipUpdate(type)) {
+            this.needsUpdate = true;
         }
     }
 }

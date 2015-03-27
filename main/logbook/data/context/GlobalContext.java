@@ -28,6 +28,7 @@ import logbook.config.ItemConfig;
 import logbook.config.KdockConfig;
 import logbook.constants.AppConstants;
 import logbook.data.Data;
+import logbook.data.EventListener;
 import logbook.dto.BasicInfoDto;
 import logbook.dto.BattleExDto;
 import logbook.dto.BattleExDto.Phase;
@@ -170,6 +171,8 @@ public final class GlobalContext {
 
     /** 情報の取得状態 0:母港情報未受信 1:正常 2:マスターデータの更新が必要 3:アカウントが変わった！   */
     private static int state = 0;
+
+    private static List<EventListener> eventListeners = new ArrayList<>();
 
     // 始めてアクセスがあった時に読み込む
     public static final boolean INIT_COMPLETE;
@@ -507,6 +510,22 @@ public final class GlobalContext {
     }
 
     /**
+     * リクエスト・レスポンスを受け取るEventListener登録
+     */
+    public static void addEventListener(EventListener listener) {
+        if (eventListeners.indexOf(listener) == -1) {
+            eventListeners.add(listener);
+        }
+    }
+
+    /**
+     * リクエスト・レスポンスを受け取るEventListener登録解除
+     */
+    public static void removeEventListener(EventListener listener) {
+        eventListeners.remove(listener);
+    }
+
+    /**
      * 情報を更新します
      *
      * @param data リクエスト・レスポンスデータ
@@ -516,9 +535,6 @@ public final class GlobalContext {
         if (AppConfig.get().isStoreJson()) {
             doStoreJson(data);
         }
-
-        // ユーザスクリプト呼び出し
-        EventListenerProxy.get().update(data.getDataType(), data);
 
         switch (data.getDataType()) {
         // 補給
@@ -716,6 +732,13 @@ public final class GlobalContext {
             break;
         }
         ++updateCounter;
+
+        // ユーザスクリプト呼び出し
+        EventListenerProxy.get().update(data.getDataType(), data);
+        // 登録リスナ呼び出し
+        for (EventListener listener : eventListeners) {
+            listener.update(data.getDataType(), data);
+        }
     }
 
     /** 

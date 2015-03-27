@@ -12,6 +12,8 @@ import java.nio.channels.FileLock;
 import java.util.Calendar;
 import java.util.Date;
 
+import logbook.data.DataType;
+
 /**
  * @author Nekopanda
  *
@@ -70,6 +72,28 @@ public class ReportUtils {
             }
         }
         return ret;
+    }
+
+    @SuppressWarnings("incomplete-switch")
+    public static boolean isShipUpdate(DataType type) {
+        switch (type) {
+        case CHARGE:
+        case CHANGE:
+        case PORT:
+        case SHIP2:
+        case SHIP3:
+        case MISSION_RESULT:
+        case NDOCK:
+        case DECK:
+        case GET_SHIP:
+        case DESTROY_SHIP:
+        case POWERUP:
+        case LOCK_SHIP:
+        case NYUKYO_START:
+        case NYUKYO_SPEEDCHANGE:
+            return true;
+        }
+        return false;
     }
 
 }

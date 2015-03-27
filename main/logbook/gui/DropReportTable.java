@@ -14,6 +14,8 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 
 import logbook.constants.AppConstants;
+import logbook.data.Data;
+import logbook.data.DataType;
 import logbook.dto.BattleExDto;
 import logbook.dto.BattleResultDto;
 import logbook.gui.logic.BattleHtmlGenerator;
@@ -319,5 +321,19 @@ public final class DropReportTable extends AbstractTableDialog {
             }
         }
 
+    }
+
+    /**
+     * 更新する必要のあるデータ
+     */
+    @SuppressWarnings("incomplete-switch")
+    @Override
+    public void update(DataType type, Data data) {
+        switch (type) {
+        case BATTLE_RESULT:
+        case COMBINED_BATTLE_RESULT:
+        case PRACTICE_BATTLE_RESULT:
+            this.needsUpdate = true;
+        }
     }
 }
