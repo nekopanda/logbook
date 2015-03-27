@@ -20,7 +20,7 @@ public final class ProxyServer {
 
     private static Server server;
 
-    public static void start(int port) {
+    public static void start(int port, String host) {
         try {
             QueuedThreadPool threadpool = new QueuedThreadPool();
             threadpool.setMinThreads(2);
@@ -29,6 +29,7 @@ public final class ProxyServer {
 
             ServerConnector connector = new ServerConnector(server, 1, 1);
             connector.setPort(port);
+            connector.setHost(host);
             server.setConnectors(new Connector[] { connector });
             /*// httpsをプロキシできないので下のコードに移行
                         ServletHandler servletHandler = new ServletHandler();

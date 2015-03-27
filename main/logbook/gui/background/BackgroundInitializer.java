@@ -46,7 +46,8 @@ public final class BackgroundInitializer extends Thread {
         ApplicationMain.sysPrint("バックグラウンド初期化開始");
         try {
             // プロキシサーバーを開始する
-            ProxyServer.start(AppConfig.get().getListenPort());
+            String host = (AppConfig.get().isAllowOnlyFromLocalhost() ? "localhost" : null);
+            ProxyServer.start(AppConfig.get().getListenPort(), host);
 
         } catch (Exception e) {
             LOG.warn("サーバ起動に失敗しました", e);
