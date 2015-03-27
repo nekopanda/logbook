@@ -20,9 +20,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -44,12 +42,13 @@ import logbook.dto.QuestDto;
 import logbook.dto.ResourceItemDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipFilterDto;
-import logbook.dto.ShipParameters;
 import logbook.dto.UseItemDto;
 import logbook.internal.BattleResultFilter;
 import logbook.internal.BattleResultServer;
 import logbook.internal.MasterData;
 import logbook.internal.MasterData.MissionDto;
+import logbook.scripting.ItemInfoListener;
+import logbook.scripting.ItemInfoProxy;
 import logbook.scripting.MissionProxy;
 import logbook.scripting.ShipItemListener;
 import logbook.scripting.ShipItemProxy;
@@ -312,47 +311,9 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getItemListHeader() {
-        return new String[] { "No.", "名称", "種別", "個数", "施錠", "改修",
-                "火力", "命中", "射程", "運", "回避", "爆装", "雷装", "索敵", "対潜", "対空", "装甲",
-                "装備してる艦娘" };
-    }
-
-    private static class ItemInfo {
-        public ItemInfoDto item;
-        public int count = 0;
-        public int locked = 0;
-        public int maxLevel = 0;
-        public Map<ShipDto, Integer> shipMap = new TreeMap<>();
-
-        public ItemInfo(ItemInfoDto item) {
-            this.item = item;
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            int count = 0;
-            // 持っている個数で個数ソート
-            List<Entry<ShipDto, Integer>> sorted = new ArrayList<>(this.shipMap.entrySet());
-            Collections.sort(sorted, new Comparator<Entry<ShipDto, Integer>>() {
-                @Override
-                public int compare(Entry<ShipDto, Integer> o1, Entry<ShipDto, Integer> o2) {
-                    return -Integer.compare(o1.getValue(), o2.getValue());
-                }
-            });
-            for (Entry<ShipDto, Integer> entry : sorted) {
-                if (count++ != 0) {
-                    sb.append(",");
-                }
-                sb.append(entry.getKey().getFriendlyName()).append("x").append(entry.getValue());
-            }
-            // 長さ制限
-            if (sb.length() > 100) {
-                sb.setLength(100);
-                sb.append(" ...");
-            }
-            return sb.toString();
-        }
+        return ArrayUtils.addAll(new String[] {
+                "No."
+        }, ItemInfoProxy.get().header());
     }
 
     /**
@@ -361,64 +322,42 @@ public final class CreateReportLogic {
      * @return 内容
      */
     public static List<Comparable[]> getItemListBody() {
+        // ItemInfoを作成してスクリプトに渡す
         Map<Integer, ItemInfo> itemCountMap = new HashMap<Integer, ItemInfo>();
 
-        // 装備の個数を計算
         for (ItemDto item : GlobalContext.getItemMap().values()) {
             ItemInfo info = itemCountMap.get(item.getSlotitemId());
             if (info == null) {
                 info = new ItemInfo(item.getInfo());
                 itemCountMap.put(item.getSlotitemId(), info);
             }
-            info.count++;
-            if (item.isLocked()) {
-                info.locked++;
-            }
-            info.maxLevel = Math.max(info.maxLevel, item.getLevel());
+            info.getItems().add(item);
         }
-
-        // 艦娘が持っている個数を計算
         for (ShipDto ship : GlobalContext.getShipMap().values()) {
             for (ItemInfoDto item : ship.getItem()) {
                 if (item != null) {
                     ItemInfo info = itemCountMap.get(item.getId());
                     if (info != null) {
-                        Integer count = info.shipMap.get(ship);
-                        if (count == null) {
-                            count = 1;
-                        }
-                        else {
-                            count++;
-                        }
-                        info.shipMap.put(ship, count);
+                        info.getShips().add(ship);
                     }
                 }
             }
         }
-
         List<ItemInfo> countitems = new ArrayList<ItemInfo>(itemCountMap.values());
         Collections.sort(countitems, new Comparator<ItemInfo>() {
             @Override
             public int compare(ItemInfo o1, ItemInfo o2) {
-                return Integer.compare(o1.count, o2.count);
+                return Integer.compare(o1.getItems().size(), o2.getItems().size());
             }
         });
 
         List<Comparable[]> body = new ArrayList<Comparable[]>();
-
+        ItemInfoListener script = ItemInfoProxy.get();
         int count = 0;
         for (ItemInfo itemInfo : countitems) {
-            ItemInfoDto item = itemInfo.item;
-            ShipParameters param = item.getParam();
-            String level = (itemInfo.maxLevel != 0) ? "★+" + itemInfo.maxLevel : null;
-            count++;
-            body.add(new Comparable[] { new TableRowHeader(count, item),
-                    item.getName(), item.getTypeName(), itemInfo.count,
-                    itemInfo.locked, level, param.getHoug(),
-                    param.getHoum(), param.getLeng(), param.getLuck(), param.getHouk(), param.getBaku(),
-                    param.getRaig(), param.getSaku(), param.getTais(), param.getTyku(), param.getSouk(),
-                    itemInfo.toString()
-            });
+            body.add(ArrayUtils.addAll(new Comparable[] {
+                    new TableRowHeader(count++, itemInfo) },
+                    script.body(itemInfo)));
         }
         return body;
     }
