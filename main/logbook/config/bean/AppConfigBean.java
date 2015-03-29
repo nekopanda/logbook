@@ -112,6 +112,9 @@ public final class AppConfigBean {
     /** ローカルループバックアドレスからの接続のみ受け入れる */
     private boolean allowOnlyFromLocalhost = true;
 
+    /** 全てのネットワークインターフェースで受け付ける */
+    private boolean closeOutsidePort = true;
+
     /** 戦闘結果をログ出力するか */
     private boolean printSortieLog = false;
 
@@ -774,6 +777,20 @@ public final class AppConfigBean {
      */
     public void setAllowOnlyFromLocalhost(boolean allowOnlyFromLocalhost) {
         this.allowOnlyFromLocalhost = allowOnlyFromLocalhost;
+    }
+
+    /**
+     * @return listenAllNIC
+     */
+    public boolean isCloseOutsidePort() {
+        return this.closeOutsidePort;
+    }
+
+    /**
+     * @param listenAllNIC セットする listenAllNIC
+     */
+    public void setCloseOutsidePort(boolean listenAllNIC) {
+        this.closeOutsidePort = listenAllNIC;
     }
 
     /**

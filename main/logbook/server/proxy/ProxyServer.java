@@ -1,5 +1,9 @@
 package logbook.server.proxy;
 
+import logbook.config.AppConfig;
+import logbook.gui.ApplicationMain;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.proxy.ConnectHandler;
@@ -20,17 +24,19 @@ public final class ProxyServer {
 
     private static Server server;
 
-    public static void start(int port, String host) {
+    private static String host;
+    private static int port;
+    private static String proxyHost;
+    private static int proxyPort;
+
+    public static void start() {
         try {
             QueuedThreadPool threadpool = new QueuedThreadPool();
             threadpool.setMinThreads(2);
 
             server = new Server(threadpool);
-
-            ServerConnector connector = new ServerConnector(server, 1, 1);
-            connector.setPort(port);
-            connector.setHost(host);
-            server.setConnectors(new Connector[] { connector });
+            updateSetting();
+            setConnector();
             /*// httpsをプロキシできないので下のコードに移行
                         ServletHandler servletHandler = new ServletHandler();
                         servletHandler.addServletWithMapping(ReverseProxyServlet.class, "/*");
@@ -54,6 +60,23 @@ public final class ProxyServer {
         }
     }
 
+    public static void restart() {
+        try {
+            if (server == null) {
+                return;
+            }
+            if (updateSetting()) {
+                server.stop();
+                setConnector();
+                server.start();
+                ApplicationMain.logPrint("プロキシサーバを再起動しました");
+            }
+        } catch (Exception e) {
+            LOG.fatal("Proxyサーバーの起動に失敗しました", e);
+            throw new RuntimeException(e);
+        }
+    }
+
     public static void end() {
         try {
             if (server != null) {
@@ -64,5 +87,41 @@ public final class ProxyServer {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * AppConfigの設定をローカルにコピーします。その際、更新があったか判定します。
+     * @return 更新があった
+     */
+    private static boolean updateSetting() {
+        String newHost = null;
+        if (AppConfig.get().isAllowOnlyFromLocalhost() && AppConfig.get().isCloseOutsidePort()) {
+            newHost = "localhost";
+        }
+        int newPort = AppConfig.get().getListenPort();
+        String newProxyHost = null;
+        int newProxyPort = 0;
+        if (AppConfig.get().isUseProxy()) {
+            newProxyHost = AppConfig.get().getProxyHost();
+            newProxyPort = AppConfig.get().getProxyPort();
+        }
+
+        if (StringUtils.equals(newHost, host) && (newPort == port) &&
+                StringUtils.equals(newProxyHost, proxyHost) && (newProxyPort == proxyPort)) {
+            return false;
+        }
+
+        host = newHost;
+        port = newPort;
+        proxyHost = newProxyHost;
+        proxyPort = newProxyPort;
+        return true;
+    }
+
+    private static void setConnector() {
+        ServerConnector connector = new ServerConnector(server, 1, 1);
+        connector.setPort(port);
+        connector.setHost(host);
+        server.setConnectors(new Connector[] { connector });
     }
 }

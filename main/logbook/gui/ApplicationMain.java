@@ -1288,6 +1288,8 @@ public final class ApplicationMain extends WindowBase {
             this.shipTableWindows[i].windowTitleChanged();
         }
         JIntellitypeWrapper.changeSetting(AppConfig.get().getSystemWideHotKey());
+        // プロキシサーバ再起動
+        ProxyServer.restart();
     }
 
     public void setTitleText(String newText) {
