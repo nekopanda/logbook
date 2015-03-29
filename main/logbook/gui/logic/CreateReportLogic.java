@@ -373,35 +373,6 @@ public final class CreateReportLogic {
         }, ShipItemProxy.get().header());
     }
 
-    public static boolean[] getBathTableDefaultVisibles() {
-        Map<String, Integer> colMap = AppConstants.BATHTABLE_COLUMN_MAP;
-        String[] header = getShipListHeader();
-        boolean[] visibles = new boolean[header.length];
-        for (int i = 0; i < visibles.length; ++i) {
-            visibles[i] = colMap.containsKey(header[i]);
-        }
-        return visibles;
-    }
-
-    public static int[] getBathTableDefaultColumnOrder() {
-        Map<String, Integer> colMap = AppConstants.BATHTABLE_COLUMN_MAP;
-        String[] header = getShipListHeader();
-        int[] order = new int[header.length];
-        int hiddenColIndex = colMap.size();
-        for (int i = 0; i < order.length; ++i) {
-            if (colMap.containsKey(header[i])) {
-                order[colMap.get(header[i])] = i;
-            }
-            else {
-                order[hiddenColIndex++] = i;
-            }
-        }
-        if (hiddenColIndex != header.length) {
-            LOG.warn("BATHTABLE_COLUMN_MAPに実際にはないカラムがあるようです");
-        }
-        return order;
-    }
-
     /**
      * 所有艦娘一覧の内容
      * 

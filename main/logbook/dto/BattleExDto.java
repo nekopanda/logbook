@@ -136,7 +136,7 @@ public class BattleExDto extends AbstractDto {
      * exVersion == 2 : Jsonがある
      *  */
     @Tag(34)
-    private final int exVersion = 2;
+    private int exVersion = 2;
 
     /** 母港空き（ドロップ分を含まない） */
     @Tag(35)
@@ -1408,6 +1408,10 @@ public class BattleExDto extends AbstractDto {
         return this.exVersion;
     }
 
+    void setExVersion(int exVersion) {
+        this.exVersion = exVersion;
+    }
+
     /**
      * 母港の艦娘空き枠
      * @return shipSpace
@@ -1446,6 +1450,9 @@ public class BattleExDto extends AbstractDto {
      * @return resultJson
      */
     public JsonObject getResultJson() {
+        if (this.resultJson == null) {
+            return null;
+        }
         return JsonUtils.fromString(this.resultJson);
     }
 }

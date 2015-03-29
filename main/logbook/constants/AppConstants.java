@@ -23,7 +23,7 @@ public class AppConstants {
     public static final String SUFFIX = "拡張版";
 
     /** バージョン */
-    public static final String VERSION = "1.6.0";
+    public static final String VERSION = "1.6.1";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://nekopanda.blog.jp/");
@@ -366,8 +366,8 @@ public class AppConstants {
             this.put("Lv", 6);
             this.put("HP", 7);
             this.put("修理時間", 8);
-            this.put("修理燃料", 9);
-            this.put("修理鋼材", 10);
+            this.put("修理に必要な燃料", 9);
+            this.put("修理に必要な鋼材", 10);
             this.put("損傷", 11);
             this.put("HP1あたり", 12);
         }
