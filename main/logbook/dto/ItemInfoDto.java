@@ -17,9 +17,9 @@ public final class ItemInfoDto extends AbstractDto {
     private int id;
     /**
      * [0]: 大分類（砲、魚雷、艦載機、...）
-     * [1]: 種別(夜戦判定)（主砲、副砲、魚雷、...）
+     * [1]: 図鑑の背景にある英語表記分類
      * [2]: 装備可能艦種別分類
-     * [3]: 表示用の分類
+     * [3]: アイコンの分類
      */
     @Tag(2)
     private int[] type = new int[4];
@@ -117,7 +117,7 @@ public final class ItemInfoDto extends AbstractDto {
     }
 
     /**
-     * type0を取得します。
+     * type[0]: 大分類（砲、魚雷、艦載機、...）
      * @return type0
      */
     public int getType0() {
@@ -125,7 +125,7 @@ public final class ItemInfoDto extends AbstractDto {
     }
 
     /**
-     * type1を取得します。
+     * type[1]: 図鑑の背景にある英語表記分類
      * @return type1
      */
     public int getType1() {
@@ -133,7 +133,7 @@ public final class ItemInfoDto extends AbstractDto {
     }
 
     /**
-     * type2を取得します。
+     * type[2]: 装備可能艦種別分類
      * @return type2
      */
     public int getType2() {
@@ -141,7 +141,7 @@ public final class ItemInfoDto extends AbstractDto {
     }
 
     /**
-     * type3を取得します。
+     * type[3]: アイコンの分類
      * @return type3
      */
     public int getType3() {

@@ -13,8 +13,8 @@ import logbook.dto.ItemInfoDto;
 import logbook.dto.ShipDto;
 
 /**
+ * 装備アイテムに関する情報
  * @author Nekopanda
- *
  */
 public class ItemInfo {
     private final ItemInfoDto info;
@@ -26,6 +26,7 @@ public class ItemInfo {
     }
 
     /**
+     * 装備のマスターデータ
      * @return info
      */
     public ItemInfoDto getInfo() {
@@ -33,6 +34,7 @@ public class ItemInfo {
     }
 
     /**
+     * 持っている装備
      * @return items
      */
     public List<ItemDto> getItems() {
@@ -40,6 +42,7 @@ public class ItemInfo {
     }
 
     /**
+     * この装備を1つ以上装備してる艦娘
      * @return ships
      */
     public Set<ShipDto> getShips() {
