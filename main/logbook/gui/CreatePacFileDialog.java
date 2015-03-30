@@ -34,7 +34,7 @@ public final class CreatePacFileDialog extends Dialog {
 
     protected static final String SCRIPT = "function FindProxyForURL(url, host) '{'\r\n"
             + "  if (/^{0}/.test(host)) '{'\r\n"
-            + "     return \"PROXY localhost:{1}; DIRECT\";\r\n"
+            + "     return \"PROXY 127.0.0.1:{1}; DIRECT\";\r\n"
             + "  '}'\r\n"
             + "  return \"DIRECT\";\r\n"
             + "'}'\r\n";

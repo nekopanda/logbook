@@ -356,7 +356,7 @@ public final class CreateReportLogic {
         int count = 0;
         for (ItemInfo itemInfo : countitems) {
             body.add(ArrayUtils.addAll(new Comparable[] {
-                    new TableRowHeader(count++, itemInfo) },
+                    new TableRowHeader(++count, itemInfo) },
                     script.body(itemInfo)));
         }
         return body;
@@ -392,7 +392,7 @@ public final class CreateReportLogic {
                 continue;
             }
             body.add(ArrayUtils.addAll(new Comparable[] {
-                    new TableRowHeader(count++, ship)
+                    new TableRowHeader(++count, ship)
             }, script.body(ship)));
         }
         script.end();
@@ -457,7 +457,7 @@ public final class CreateReportLogic {
 
         // アイテム名->IDへのマッピングを作成
         Map<String, Integer> itemNameMap = new HashMap<>();
-        Map<Integer, MasterData.UseItemInfoDto> itemIdMap = MasterData.getInstance().getUseItem();
+        Map<Integer, MasterData.UseItemInfoDto> itemIdMap = MasterData.getMaster().getUseItem();
         for (MasterData.UseItemInfoDto item : itemIdMap.values()) {
             itemNameMap.put(item.getName(), item.getId());
         }
@@ -610,7 +610,7 @@ public final class CreateReportLogic {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
         MissionProxy script = MissionProxy.get();
         script.begin(fleetid);
-        for (MissionDto data : MasterData.getInstance().getMission().values()) {
+        for (MissionDto data : MasterData.getMaster().getMission().values()) {
             body.add(ArrayUtils.addAll(new Comparable[] {
                     new TableRowHeader(data.getId(), data)
             }, script.body(data)));

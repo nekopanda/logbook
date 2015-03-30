@@ -175,6 +175,9 @@ public class ScriptLoader {
 
         private File[] getScriptFiles() {
             final String starts = this.prefix + "_";
+            if (AppConstants.SCRIPT_DIR.exists() == false) {
+                return new File[0];
+            }
             File[] array = FileUtils.listFiles(AppConstants.SCRIPT_DIR, new AbstractFileFilter() {
                 @Override
                 public boolean accept(File file) {

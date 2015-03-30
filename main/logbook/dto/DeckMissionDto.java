@@ -50,7 +50,7 @@ public final class DeckMissionDto extends AbstractDto {
     public DeckMissionDto(String name, int missionId, Date time, int fleetid, List<Integer> ships) {
         this.name = name;
         this.missionId = missionId;
-        String missionName = MasterData.getInstance().getMissionName(missionId);
+        String missionName = MasterData.getMaster().getMissionName(missionId);
         if (missionName == null) {
             missionName = Deck.get(missionId);
         }

@@ -1937,24 +1937,7 @@ public final class GlobalContext {
                         JsonObject questobject = (JsonObject) value;
                         // 任務を作成
                         int index = ((disp_page - 1) * items_per_page) + (pos - 1);
-                        QuestDto quest = new QuestDto();
-                        quest.setTime(now);
-                        quest.setNo(questobject.getInt("api_no"));
-                        quest.setPage(disp_page);
-                        quest.setPos(pos++);
-                        quest.setCategory(questobject.getInt("api_category"));
-                        quest.setType(questobject.getInt("api_type"));
-                        quest.setState(questobject.getInt("api_state"));
-                        quest.setTitle(questobject.getString("api_title"));
-                        quest.setDetail(questobject.getString("api_detail"));
-                        JsonArray material = questobject.getJsonArray("api_get_material");
-                        quest.setFuel(material.getJsonNumber(0).toString());
-                        quest.setAmmo(material.getJsonNumber(1).toString());
-                        quest.setMetal(material.getJsonNumber(2).toString());
-                        quest.setBauxite(material.getJsonNumber(3).toString());
-                        quest.setBonusFlag(questobject.getInt("api_bonus_flag"));
-                        quest.setProgressFlag(questobject.getInt("api_progress_flag"));
-
+                        QuestDto quest = new QuestDto(questobject, disp_page, pos);
                         questList.set(index, quest);
                     }
                 }
@@ -2095,7 +2078,7 @@ public final class GlobalContext {
                 MasterData.updateMaster(obj);
 
                 // 艦種
-                for (ShipTypeDto dto : MasterData.getInstance().getStype()) {
+                for (ShipTypeDto dto : MasterData.getMaster().getStype()) {
                     ShipStyle.set(dto.getId(), dto.getName());
                 }
             }
