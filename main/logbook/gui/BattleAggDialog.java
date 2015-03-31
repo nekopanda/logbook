@@ -254,7 +254,7 @@ public class BattleAggDialog extends WindowBase implements EventListener {
      * @return String[]
      */
     private String[] getTableHeader() {
-        return new String[] { "集計", "出撃合計", "勝利合計", "S勝利", "A勝利", "B勝利", "C敗北", "D敗北" };
+        return new String[] { "集計", "出撃合計", "勝利合計", "S勝利", "A勝利", "B勝利", "C敗北", "D以下" };
     }
 
     /**

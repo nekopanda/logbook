@@ -1937,7 +1937,7 @@ public final class GlobalContext {
                         JsonObject questobject = (JsonObject) value;
                         // 任務を作成
                         int index = ((disp_page - 1) * items_per_page) + (pos - 1);
-                        QuestDto quest = new QuestDto(questobject, disp_page, ++pos);
+                        QuestDto quest = new QuestDto(questobject, disp_page, pos++);
                         questList.set(index, quest);
                     }
                 }

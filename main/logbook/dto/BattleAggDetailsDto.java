@@ -67,12 +67,10 @@ public final class BattleAggDetailsDto extends AbstractDto {
                 this.bossC++;
             break;
         case D:
+        case E:
             this.d++;
             if (isBoss)
                 this.bossD++;
-            break;
-        case E:
-            // ?
             break;
         }
     }
@@ -172,6 +170,6 @@ public final class BattleAggDetailsDto extends AbstractDto {
      * @return areaName
      */
     public String getAreaName() {
-        return areaName;
+        return this.areaName;
     }
 }

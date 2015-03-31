@@ -307,14 +307,14 @@ public class BattleResultServer {
         // ファイルとリストに追加
         if (dto.isCompleteResult()) {
             File file = new File(FilenameUtils.concat(this.path, format.format(dto.getBattleDate()) + ".dat"));
-            DataFile dataFile = this.fileMap.get(file.getAbsoluteFile());
+            DataFile dataFile = this.fileMap.get(file.getAbsolutePath());
             if (dataFile == null) {
                 dataFile = new NormalDataFile(file);
                 this.fileMap.put(dataFile.getPath(), dataFile);
             }
 
             BattleLogListener battleLogScript = BattleLogProxy.get();
-            BattleResult resultEntry = new BattleResult(dto, new NormalDataFile(file), dataFile.getNumRecords(),
+            BattleResult resultEntry = new BattleResult(dto, dataFile, dataFile.getNumRecords(),
                     battleLogScript.body(dto));
             this.update(resultEntry);
             this.resultList.add(resultEntry);
