@@ -66,7 +66,8 @@ public class WindowNativeSupport {
             try {
                 Object insertAfter = this.fromInt(topMost ? HWND_TOPMOST : HWND_NOTOPMOST);
                 Object[] args = new Object[] {
-                        this.handleField.get(shell), insertAfter, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOOWNERZORDER };
+                        this.handleField.get(shell), insertAfter, 0, 0, 0, 0,
+                        SWP_NOMOVE | SWP_NOSIZE | SWP_NOOWNERZORDER };
                 this.setWindowPosMethod.invoke(null, args);
             } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
                 ApplicationMain.main.printMessage("ウィンドウ操作に失敗しました");
@@ -78,7 +79,8 @@ public class WindowNativeSupport {
                 Rectangle rect = shell.getBounds();
                 Object insertAfter = (behindTo != null) ? this.handleField.get(behindTo) : this.fromInt(HWND_TOP);
                 Object[] args = new Object[] {
-                        this.handleField.get(shell), insertAfter, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE };
+                        this.handleField.get(shell), insertAfter, 0, 0, 0, 0,
+                        SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE | SWP_NOOWNERZORDER };
                 this.setWindowPosMethod.invoke(null, args);
             } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
                 ApplicationMain.main.printMessage("ウィンドウ操作に失敗しました");

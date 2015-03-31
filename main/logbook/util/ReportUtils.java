@@ -91,6 +91,17 @@ public class ReportUtils {
         case LOCK_SHIP:
         case NYUKYO_START:
         case NYUKYO_SPEEDCHANGE:
+
+            // 戦闘結果を反映させるため戦闘でも更新
+        case BATTLE:
+        case BATTLE_MIDNIGHT:
+        case BATTLE_SP_MIDNIGHT:
+        case BATTLE_NIGHT_TO_DAY:
+        case COMBINED_AIR_BATTLE:
+        case COMBINED_BATTLE:
+        case COMBINED_BATTLE_MIDNIGHT:
+        case COMBINED_BATTLE_SP_MIDNIGHT:
+        case COMBINED_BATTLE_WATER:
             return true;
         }
         return false;

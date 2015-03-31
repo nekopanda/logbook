@@ -1,5 +1,6 @@
 package logbook.gui;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,6 +24,8 @@ import logbook.gui.listener.TableToCsvSaveAdapter;
 import logbook.gui.logic.TableItemCreator;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
@@ -48,6 +51,8 @@ import org.eclipse.swt.widgets.TableColumn;
  *
  */
 public abstract class AbstractTableDialog extends WindowBase implements EventListener {
+    /** ロガー */
+    private static final Logger LOG = LogManager.getLogger(AbstractTableDialog.class);
 
     private static int MAX_PRINT_ITEMS = 2000;
 
@@ -234,8 +239,14 @@ public abstract class AbstractTableDialog extends WindowBase implements EventLis
         reloadtable.addSelectionListener(new TableReloadAdapter());
         // テーブルにヘッダーをセット
         this.setTableHeader();
-        // テーブルに内容をセット
-        this.updateTableBody();
+        try {
+            // テーブルに内容をセット
+            this.updateTableBody();
+        } catch (Exception e) {
+            // データの読み取りでエラーが発生するかもしれないので落ちないようにしておく
+            this.body = new ArrayList<>();
+            LOG.warn("テーブルの内容生成でエラー", e);
+        }
         this.sortBody();
         this.setTableBody();
         // 列幅を復元
@@ -334,7 +345,14 @@ public abstract class AbstractTableDialog extends WindowBase implements EventLis
         this.table.setSortColumn(null);
         this.disposeTableBody();
         //ApplicationMain.timeLogPrint("[S] updateTableBody");
-        this.updateTableBody();
+        try {
+            // テーブルに内容をセット
+            this.updateTableBody();
+        } catch (Exception e) {
+            // データの読み取りでエラーが発生するかもしれないので落ちないようにしておく
+            this.body = new ArrayList<>();
+            LOG.warn("テーブルの内容生成でエラー", e);
+        }
         //ApplicationMain.timeLogPrint("[E] updateTableBody");
         this.sortBody();
         //ApplicationMain.timeLogPrint("[S] setTableBody");
