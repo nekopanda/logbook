@@ -58,7 +58,7 @@ function body(data) {
 				}
 			}
 			else {
-				sb.append("x").append(levels.length);
+				sb.append("x").append(this.count | 0);
 			}
 		}
 	}
