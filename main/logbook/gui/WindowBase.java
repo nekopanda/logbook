@@ -59,8 +59,6 @@ public class WindowBase {
     private final WindowTreeNode treeNode = new WindowTreeNode(this);
     // アプリ上の仮想的な親子関係
     private WindowBase parent;
-    // OS上での実際の親子関係
-    private Shell actualParent;
     private Shell shell;
     private Menu alphamenu;
     private MenuItem menuItem;
@@ -270,6 +268,10 @@ public class WindowBase {
                     window.topMostChanged(newValue);
                 }
             });
+            if (newValue == false) {
+                // 他のウィンドウがつられて非最前面になっているので、再設定する
+                startUpdateTopMost(source.getShell());
+            }
         }
 
         public void showTitlebarChanged(WindowBase source) {
@@ -431,7 +433,6 @@ public class WindowBase {
      */
     protected void createContents(Shell shell, int style, boolean menuCascade) {
         if (this.shell == null) {
-            this.actualParent = shell;
             this.shell = new Shell(shell, style | this.getDefaultStyle());
             this.createContents(menuCascade);
         }
@@ -444,7 +445,6 @@ public class WindowBase {
      */
     protected void createContents(WindowBase parent, int style, boolean menuCascade) {
         if (this.shell == null) {
-            this.actualParent = parent.getShell();
             this.parent = parent;
             this.shell = new Shell(parent.shell, style | this.getDefaultStyle());
             this.createContents(menuCascade);
@@ -534,6 +534,29 @@ public class WindowBase {
         if (this.topMost != topMost) {
             this.topMost = topMost;
             nativeService.setTopMost(this.getShell(), topMost);
+        }
+    }
+
+    private static void updateTopMost(Shell shell) {
+        WindowBase window = (WindowBase) shell.getData();
+        if ((window != null) && window.topMost) {
+            // TopMostだったら設定して終わり
+            nativeService.setTopMost(window.getShell(), window.topMost);
+        }
+        else {
+            // 子Shellを見ていく
+            for (Shell s : shell.getShells()) {
+                updateTopMost(s);
+            }
+        }
+    }
+
+    private static void startUpdateTopMost(Shell shell) {
+        for (Shell s : shell.getDisplay().getShells()) {
+            if (s.getParent() == null) {
+                // root shell
+                updateTopMost(s);
+            }
         }
     }
 
@@ -832,7 +855,9 @@ public class WindowBase {
     }
 
     public Shell getActualParent() {
-        return this.actualParent;
+        if (this.shell.getParent() == null)
+            return null;
+        return this.shell.getParent().getShell();
     }
 
     /**
