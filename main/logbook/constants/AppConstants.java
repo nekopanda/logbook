@@ -6,6 +6,7 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.TreeMap;
 
 import org.eclipse.swt.graphics.RGB;
 
@@ -22,7 +23,7 @@ public class AppConstants {
     public static final String SUFFIX = "拡張版";
 
     /** バージョン */
-    public static final String VERSION = "1.5.0";
+    public static final String VERSION = "1.5.6";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://nekopanda.blog.jp/");
@@ -55,8 +56,11 @@ public class AppConstants {
     /** 疲労オレンジ色 */
     public static final int COND_ORANGE = 30;
 
+    /** 疲労緑色(偽) */
+    public static final int COND_DARK_GREEN = 50;
+
     /** 疲労緑色 */
-    public static final int COND_GREEN = 50;
+    public static final int COND_GREEN = 53;
 
     /** 疲労緑色 */
     public static final int COND_YELLOW = 75;
@@ -72,6 +76,9 @@ public class AppConstants {
 
     /** 疲労オレンジ色 */
     public static final RGB COND_ORANGE_COLOR = new RGB(255, 140, 0);
+
+    /** 疲労緑色(偽) */
+    public static final RGB COND_DARK_GREEN_COLOR = new RGB(0, 60, 0);
 
     /** 疲労緑色 */
     public static final RGB COND_GREEN_COLOR = new RGB(0, 128, 0);
@@ -206,9 +213,6 @@ public class AppConstants {
     /** 保有資材:ネジ */
     public static final int MATERIAL_SCREW = 8;
 
-    /** 報告書のオンメモリ記憶数 */
-    public static final int MAX_LOG_SIZE = 5000;
-
     public static final int USEITEM_UNKNOWN = -1;
     public static final int USEITEM_BUCKET = 1;
     public static final int USEITEM_BURNER = 2;
@@ -224,17 +228,29 @@ public class AppConstants {
     /** /resources/icon/error.png */
     public static final String R_ICON_ERROR = "/resources/icon/error.png";
 
+    /** /resources/icon/error_mono.png */
+    public static final String R_ICON_ERROR_MONO = "/resources/icon/error_mono.png";
+
     /** /resources/icon/exclamation.png */
     public static final String R_ICON_EXCLAMATION = "/resources/icon/exclamation.png";
 
-    /** /resources/icon/folder_star.png */
-    public static final String R_ICON_FOLDER_STAR = "/resources/icon/folder_star.png";
+    /** /resources/icon/exclamation_mono.png */
+    public static final String R_ICON_EXCLAMATION_MONO = "/resources/icon/exclamation_mono.png";
+
+    /** /resources/icon/folder.png */
+    public static final String R_ICON_FOLDER = "/resources/icon/folder.png";
 
     /** /resources/icon/star.png */
     public static final String R_ICON_STAR = "/resources/icon/star.png";
 
     /** /resources/icon/heart.png */
     public static final String R_ICON_LOCKED = "/resources/icon/heart.png";
+
+    /** /resources/icon/arrow-left.png */
+    public static final String R_ICON_LEFT = "/resources/icon/arrow-left.png";
+
+    /** /resources/icon/arrow-right.png */
+    public static final String R_ICON_RIGHT = "/resources/icon/arrow-right.png";
 
     /** 航海日誌のロゴ */
     public static final String LOGO = "/resources/logo.png";
@@ -355,4 +371,39 @@ public class AppConstants {
             this.put("損傷", 11);
             this.put("HP1あたり", 12);
         }
-    };}
+    };
+
+    /** 艦種に関する表示情報 */
+    public static final Map<Integer, String> SHIP_TYPE_INFO = new TreeMap<Integer, String>() {
+        {
+            this.put(1, "#"); // "#"は非表示
+            this.put(8, "巡洋戦艦");
+            this.put(12, "#");
+            this.put(15, "#");
+        }
+    };
+
+    public static final String[] SHIP_CATEGORY_NAMES = new String[] {
+            "駆逐艦",
+            "軽巡",
+            "雷巡",
+            "重巡",
+            "航巡",
+            "戦艦・航戦",
+            "空母",
+            "潜水艦",
+            "その他"
+    };
+
+    public static final int[][] SHIP_CATEGORY_TYPES = new int[][] {
+            new int[] { 2 }, // 駆逐艦
+            new int[] { 3 }, // 軽巡洋艦
+            new int[] { 4 }, // 重雷装巡洋艦
+            new int[] { 5 }, // 重巡洋艦
+            new int[] { 6 }, // 航空巡洋艦
+            new int[] { 8, 9, 10 }, // 戦艦
+            new int[] { 7, 11, 16, 18 }, // 空母
+            new int[] { 13, 14 }, // 潜水艦
+            new int[] { 1, 12, 15, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30 }, // その他
+    };
+}

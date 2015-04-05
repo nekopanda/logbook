@@ -278,16 +278,18 @@ public final class ResourceChartDialog extends WindowBase {
         int scale = SCALE_DAYS[ResourceChartDialog.this.combo.getSelectionIndex()];
         String scaleText = "スケール:" + ResourceChartDialog.this.combo.getText();
         Point size = ResourceChartDialog.this.canvas.getSize();
-        int width = size.x - 1;
-        int height = size.y - 1;
+        if ((size.x > 0) && (size.y > 0)) {
+            int width = size.x - 1;
+            int height = size.y - 1;
 
-        if (this.log != null) {
-            if (this.currentImage != null) {
-                this.currentImage.dispose();
+            if (this.log != null) {
+                if (this.currentImage != null) {
+                    this.currentImage.dispose();
+                }
+                this.currentImage = createImage(this.log, scale, scaleText, width, height,
+                        ResourceChartDialog.this.getResourceEnabled());
+                this.canvas.redraw();
             }
-            this.currentImage = createImage(this.log, scale, scaleText, width, height,
-                    ResourceChartDialog.this.getResourceEnabled());
-            this.canvas.redraw();
         }
     }
 

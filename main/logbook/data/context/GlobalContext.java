@@ -58,7 +58,9 @@ import logbook.internal.BattleResultServer;
 import logbook.internal.EnemyData;
 import logbook.internal.Item;
 import logbook.internal.MasterData;
+import logbook.internal.MasterData.ShipTypeDto;
 import logbook.internal.Ship;
+import logbook.internal.ShipStyle;
 import logbook.util.JsonUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -345,7 +347,7 @@ public final class GlobalContext {
 
     /**
      * 艦娘が入渠しているかを調べます
-     * 
+     *
      * @param ship 艦娘
      * @return 入渠している場合true
      */
@@ -377,8 +379,8 @@ public final class GlobalContext {
 
     /**
      * 艦隊が遠征中かを調べます
-     * 
-     * @param 
+     *
+     * @param
      */
     public static boolean isMission(String idstr) {
         int id = Integer.parseInt(idstr);
@@ -469,7 +471,7 @@ public final class GlobalContext {
 
     /**
      * 情報を更新します
-     * 
+     *
      * @return 更新する情報があった場合trueを返します
      */
     public static void updateContext(Data data) {
@@ -1047,10 +1049,6 @@ public final class GlobalContext {
                 if (!battle.getRank().equals(lastPhase.getEstimatedRank())) {
                     LOG.info("戦闘結果判定ミス: 正解ランク:" + battle.getRank() + " " + lastPhase.getRankCalcInfo(battle));
                 }
-
-                for (int i = 0; i < (battleResultList.size() - AppConstants.MAX_LOG_SIZE); i++) {
-                    battleResultList.remove(0);
-                }
             }
             // 出撃を更新
             isStart = false;
@@ -1221,7 +1219,7 @@ public final class GlobalContext {
 
     /**
      * 装備開発情報を更新します
-     * 
+     *
      * @param data
      */
     private static void doCreateitem(Data data) {
@@ -1261,7 +1259,7 @@ public final class GlobalContext {
 
     /**
      * 保有装備を更新します
-     * 
+     *
      * @param data
      */
     private static void doSlotitemMember(Data data) {
@@ -1285,7 +1283,7 @@ public final class GlobalContext {
 
     /**
      * 保有艦娘を更新します
-     * 
+     *
      * @param data
      */
     private static void doShip3(Data data) {
@@ -1324,7 +1322,7 @@ public final class GlobalContext {
 
     /**
      * 保有艦娘を更新します
-     * 
+     *
      * @param data
      */
     private static void doShip2(Data data) {
@@ -1363,7 +1361,7 @@ public final class GlobalContext {
 
     /**
      * 艦隊を更新します
-     * 
+     *
      * @param data
      */
     private static void doDeck(Data data) {
@@ -1435,7 +1433,7 @@ public final class GlobalContext {
 
     /**
      * 秘書艦を設定します
-     * 
+     *
      * @param ship
      */
     private static void setSecretary(ShipDto ship) {
@@ -1611,7 +1609,7 @@ public final class GlobalContext {
 
     /**
      * 司令部を更新する
-     * 
+     *
      * @param data
      */
     private static void doBasic(Data data) {
@@ -1628,7 +1626,7 @@ public final class GlobalContext {
 
     /**
      * 司令部を更新する
-     * 
+     *
      * @param apidata
      */
     private static void doBasicSub(JsonObject apidata) {
@@ -1649,7 +1647,7 @@ public final class GlobalContext {
 
     /**
      * 保有資材を更新する
-     * 
+     *
      * @param data
      */
     private static void doMaterial(Data data) {
@@ -1667,7 +1665,7 @@ public final class GlobalContext {
 
     /**
      * 保有資材を更新する
-     * 
+     *
      * @param apidata
      */
     private static void doMaterialSub(JsonArray apidata) {
@@ -1722,7 +1720,7 @@ public final class GlobalContext {
 
     /**
      * 遠征(帰還)を更新します
-     * 
+     *
      * @param data
      */
     private static void doMissionResult(Data data) {
@@ -1842,7 +1840,7 @@ public final class GlobalContext {
 
     /**
      * 任務を更新します
-     * 
+     *
      * @param data
      */
     private static void doQuest(Data data) {
@@ -1921,7 +1919,7 @@ public final class GlobalContext {
 
     /**
      * 消化した任務を除去します
-     * 
+     *
      * @param data
      */
     private static void doQuestClear(Data data) {
@@ -1948,7 +1946,7 @@ public final class GlobalContext {
 
     /**
      * 出撃を更新します
-     * 
+     *
      * @param data
      */
     private static void doStart(Data data) {
@@ -1984,7 +1982,7 @@ public final class GlobalContext {
 
     /**
      * 進撃を更新します
-     * 
+     *
      * @param data
      */
     private static void doNext(Data data) {
@@ -2003,7 +2001,7 @@ public final class GlobalContext {
 
     /**
      * 設定を更新します
-     * 
+     *
      * @param data
      */
     private static void doStart2(Data data) {
@@ -2030,6 +2028,11 @@ public final class GlobalContext {
                 addUpdateLog("装備一覧を更新しました");
 
                 MasterData.updateMaster(obj);
+
+                // 艦種
+                for (ShipTypeDto dto : MasterData.getInstance().getStype()) {
+                    ShipStyle.set(dto.getId(), dto.getName());
+                }
             }
 
             addConsole("マスターデータを更新しました");
@@ -2286,7 +2289,7 @@ public final class GlobalContext {
 
     /**
      * 艦娘を作成します
-     * 
+     *
      * @param object
      * @return
      */

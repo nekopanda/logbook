@@ -12,13 +12,18 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TaskBar;
@@ -48,6 +53,31 @@ public final class SwtUtils {
         return item;
     }
 
+    private static class ButtonImagePainter implements Listener {
+        private final Button button;
+        private final Image image;
+
+        public ButtonImagePainter(Button button, Image image) {
+            this.button = button;
+            this.image = image;
+        }
+
+        @Override
+        public void handleEvent(Event event) {
+            Rectangle rect = this.button.getBounds();
+            Image scaled = SwtUtils.scaleToFit(this.image, rect.width, rect.height);
+            Image old = this.button.getImage();
+            this.button.setImage(scaled);
+            if (old != null) {
+                old.dispose();
+            }
+        }
+    }
+
+    public static void setButtonImage(Button button, Image image) {
+        button.addListener(SWT.Resize, new ButtonImagePainter(button, image));
+    }
+
     public static FormData makeFormData(
             FormAttachment left, FormAttachment right,
             FormAttachment top, FormAttachment bottom)
@@ -58,6 +88,19 @@ public final class SwtUtils {
         data.top = top;
         data.bottom = bottom;
         return data;
+    }
+
+    public static GridLayout makeGridLayout(
+            int numColumns,
+            int horizontalSpacing, int verticalSpacing,
+            int marginWidth, int marginHeight)
+    {
+        GridLayout gl = new GridLayout(numColumns, false);
+        gl.horizontalSpacing = horizontalSpacing;
+        gl.verticalSpacing = verticalSpacing;
+        gl.marginWidth = marginWidth;
+        gl.marginHeight = marginHeight;
+        return gl;
     }
 
     private static String defaultFontName = null;

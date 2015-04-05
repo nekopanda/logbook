@@ -136,6 +136,8 @@ public final class CreateReportLogic {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
             } else if (cond <= AppConstants.COND_ORANGE) {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
+            } else if ((cond >= AppConstants.COND_DARK_GREEN) && (cond < AppConstants.COND_GREEN)) {
+                item.setForeground(SWTResourceManager.getColor(AppConstants.COND_DARK_GREEN_COLOR));
             } else if (cond >= AppConstants.COND_GREEN) {
                 item.setForeground(SWTResourceManager.getColor(AppConstants.COND_GREEN_COLOR));
             }
@@ -569,7 +571,13 @@ public final class CreateReportLogic {
                 "回避",
                 "対潜",
                 "索敵",
-                "運"
+                "運",
+                "装備命中",
+                "砲撃戦火力",
+                "雷撃戦火力",
+                "対潜火力",
+                "夜戦火力",
+                "改造可能"
         };
     }
 
@@ -681,6 +689,9 @@ public final class CreateReportLogic {
                 }
             }
 
+            boolean canRemodel = (ship.getShipInfo().getAfterlv() > 0)
+                    && (ship.getLv() >= ship.getShipInfo().getAfterlv());
+
             body.add(new Comparable[] {
                     new TableRowHeader(count, ship),
                     ship.getId(),
@@ -727,7 +738,13 @@ public final class CreateReportLogic {
                     param.getKaihi(),
                     param.getTaisen(),
                     param.getSakuteki(),
-                    param.getLucky()
+                    param.getLucky(),
+                    ship.getAccuracy(),
+                    ship.getHougekiPower(),
+                    ship.getRaigekiPower(),
+                    ship.getTaisenPower(),
+                    ship.getYasenPower(),
+                    canRemodel ? "可能" : null,
             });
         }
         return body;
@@ -1167,114 +1184,6 @@ public final class CreateReportLogic {
                 }
             }
         }
-        // 艦種でフィルタ
-        if (!filter.destroyer) {
-            if ("駆逐艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.lightCruiser) {
-            if ("軽巡洋艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.torpedoCruiser) {
-            if ("重雷装巡洋艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.heavyCruiser) {
-            if ("重巡洋艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.flyingDeckCruiser) {
-            if ("航空巡洋艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.seaplaneTender) {
-            if ("水上機母艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.escortCarrier) {
-            if ("軽空母".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.carrier) {
-            if ("正規空母".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.battleship) {
-            if ("戦艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.flyingDeckBattleship) {
-            if ("航空戦艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.submarine) {
-            if ("潜水艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.carrierSubmarine) {
-            if ("潜水空母".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.landingship) {
-            if ("揚陸艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.armoredcarrier) {
-            if ("装甲空母".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.repairship) {
-            if ("工作艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.submarineTender) {
-            if ("潜水母艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        if (!filter.trainingCruiser) {
-            if ("練習巡洋艦".equals(ship.getType())) {
-                return false;
-            }
-        }
-        // グループでフィルタ
-        if (filter.group != null) {
-            if (!filter.group.getShips().contains(ship.getId())) {
-                return false;
-            }
-        }
-        // 装備でフィルタ
-        if (!StringUtils.isEmpty(filter.itemname)) {
-            List<ItemInfoDto> item = ship.getItem();
-            boolean hit = false;
-            for (ItemInfoDto itemDto : item) {
-                if (itemDto != null) {
-                    if (filter.itemname.equals(itemDto.getName())) {
-                        hit = true;
-                        break;
-                    }
-                }
-            }
-            if (!hit) {
-                return false;
-            }
-        }
         // 艦隊に所属
         if (!filter.onfleet) {
             if (!StringUtils.isEmpty(ship.getFleetid())) {
@@ -1319,6 +1228,23 @@ public final class CreateReportLogic {
             // 修理の必要なし
             if (!filter.notneedbath && !needBath) {
                 return false;
+            }
+        }
+
+        if (filter.groupMode == false) {
+            // 艦種でフィルタ
+            if ((filter.enabledType != null) &&
+                    (filter.enabledType[ship.getStype()] == false))
+            {
+                return false;
+            }
+        }
+        else {
+            // グループでフィルタ
+            if (filter.group != null) {
+                if (!filter.group.getShips().contains(ship.getId())) {
+                    return false;
+                }
             }
         }
         return true;

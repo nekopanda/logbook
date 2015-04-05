@@ -30,6 +30,8 @@ public class TableConfigBean {
 
     private SortKey[] sortKeys;
 
+    private String[] headerNames;
+
     private boolean cyclicReload;
 
     /**
@@ -92,7 +94,7 @@ public class TableConfigBean {
      * @return cyclicReload
      */
     public boolean isCyclicReload() {
-        return cyclicReload;
+        return this.cyclicReload;
     }
 
     /**
@@ -100,5 +102,19 @@ public class TableConfigBean {
      */
     public void setCyclicReload(boolean cyclicReload) {
         this.cyclicReload = cyclicReload;
+    }
+
+    /**
+     * @return headerNames
+     */
+    public String[] getHeaderNames() {
+        return this.headerNames;
+    }
+
+    /**
+     * @param headerNames セットする headerNames
+     */
+    public void setHeaderNames(String[] headerNames) {
+        this.headerNames = headerNames;
     }
 }

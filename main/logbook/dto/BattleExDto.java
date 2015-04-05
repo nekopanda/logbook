@@ -15,7 +15,10 @@ import javax.json.JsonValue;
 
 import logbook.data.context.GlobalContext;
 import logbook.internal.EnemyData;
+import logbook.internal.UseItem;
 import logbook.util.JsonUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.dyuproject.protostuff.Tag;
 
@@ -101,7 +104,11 @@ public class BattleExDto extends AbstractDto {
 
     /** ドロップフラグ */
     @Tag(22)
-    private boolean dropFlag;
+    private boolean dropShip;
+
+    /** ドロップフラグ */
+    @Tag(39)
+    private boolean dropItem;
 
     /** 艦種 */
     @Tag(23)
@@ -834,10 +841,17 @@ public class BattleExDto extends AbstractDto {
         }
         this.mapCellDto = mapInfo;
         this.enemyName = object.getJsonObject("api_enemy_info").getString("api_deck_name");
-        this.dropFlag = object.containsKey("api_get_ship");
-        if (this.isDropFlag()) {
-            this.dropType = object.getJsonObject("api_get_ship").getString("api_ship_type");
-            this.dropName = object.getJsonObject("api_get_ship").getString("api_ship_name");
+        this.dropShip = object.containsKey("api_get_ship");
+        this.dropItem = object.containsKey("api_get_useitem");
+        if (this.dropShip || this.dropItem) {
+            if (this.dropShip) {
+                this.dropType = object.getJsonObject("api_get_ship").getString("api_ship_type");
+                this.dropName = object.getJsonObject("api_get_ship").getString("api_ship_name");
+            } else {
+                String name = UseItem.get(object.getJsonObject("api_get_useitem").getInt("api_useitem_id"));
+                this.dropType = "アイテム";
+                this.dropName = StringUtils.defaultString(name);
+            }
         } else {
             this.dropType = "";
             this.dropName = "";
@@ -1147,10 +1161,17 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
-     * @return dropFlag
+     * @return dropShip
      */
-    public boolean isDropFlag() {
-        return this.dropFlag;
+    public boolean isDropShip() {
+        return this.dropShip;
+    }
+
+    /**
+     * @return dropItem
+     */
+    public boolean isDropItem() {
+        return this.dropItem;
     }
 
     /**

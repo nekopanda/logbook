@@ -1164,7 +1164,7 @@ public final class ApplicationMain extends WindowBase {
      */
     private void startThread() {
         // 時間のかかる初期化を別スレッドで実行
-        new BackgroundInitializer(this.shell, this).start();
+        new BackgroundInitializer(this.shell).start();
 
         sysPrint("その他のスレッド起動...");
         // 非同期で画面を更新するスレッド

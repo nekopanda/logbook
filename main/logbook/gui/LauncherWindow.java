@@ -3,6 +3,7 @@
  */
 package logbook.gui;
 
+import logbook.config.AppConfig;
 import logbook.gui.logic.WindowListener;
 
 import org.eclipse.swt.SWT;
@@ -99,7 +100,12 @@ public class LauncherWindow extends WindowBase {
             button.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    if (button.getSelection()) {
+                    boolean toggleEnabled = AppConfig.get().isToggleToolButton();
+                    if (!toggleEnabled || button.getSelection()) {
+                        if (!toggleEnabled) {
+                            // offにしない
+                            button.setSelection(true);
+                        }
                         win.open();
                         win.getShell().setActive();
                     }

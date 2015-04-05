@@ -125,7 +125,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
         for (ShipGroupBean bean : shipGroupList.getGroup()) {
             TreeItem groupItem = new TreeItem(this.treeItem, SWT.NONE);
             groupItem.setImage(SWTResourceManager
-                    .getImage(ShipFilterGroupDialog.class, AppConstants.R_ICON_FOLDER_STAR));
+                    .getImage(ShipFilterGroupDialog.class, AppConstants.R_ICON_FOLDER));
             groupItem.setText(bean.getName());
             groupItem.setData(new GroupProperty(bean, groupItem));
         }
@@ -369,7 +369,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
             ShipGroupBean bean = this.createNewGroup(shipGroupList);
 
             TreeItem item = new TreeItem(this.dialog.treeItem, SWT.NONE);
-            item.setImage(SWTResourceManager.getImage(ShipFilterGroupDialog.class, AppConstants.R_ICON_FOLDER_STAR));
+            item.setImage(SWTResourceManager.getImage(ShipFilterGroupDialog.class, AppConstants.R_ICON_FOLDER));
             item.setText(bean.getName());
             item.setData(new GroupProperty(bean, item));
             this.dialog.treeItem.setExpanded(true);

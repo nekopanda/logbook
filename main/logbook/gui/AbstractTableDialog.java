@@ -427,21 +427,52 @@ public abstract class AbstractTableDialog extends WindowBase {
         if (this.config == null) {
             this.config = AppConfig.get().getTableConfigMap().get(this.getWindowId());
 
-            // 列の表示・非表示設定のサイズがカラム数と異なっている場合は破棄する
             if (this.config != null) {
-                if (this.config.getVisibleColumn() == null) {
+                if (this.config.getColumnWidth() == null) { // 互換性維持
+                    this.config.setColumnWidth(new int[this.header.length]);
+                }
+                if ((this.config.getVisibleColumn() == null) ||
+                        (this.config.getColumnOrder() == null)) {
                     this.config = null;
                 }
-                else if (this.config.getVisibleColumn().length != this.header.length) {
-                    this.config = null;
+                else {
+                    int oldLength = this.config.getVisibleColumn().length;
+                    if (oldLength != this.header.length) {
+                        // 列の表示・非表示設定のサイズがカラム数と異なっている場合は長さを新しくする
+                        boolean[] visibles = new boolean[this.header.length];
+                        Arrays.fill(visibles, true);
+                        int[] columnWidth = new int[this.header.length];
+                        int[] columnOrder = new int[this.header.length];
+                        for (int i = 0; i < this.header.length; ++i) {
+                            columnOrder[i] = i;
+                        }
+                        int copyLength = Math.min(oldLength, this.header.length);
+                        System.arraycopy(this.config.getVisibleColumn(), 0, visibles, 0, copyLength);
+                        System.arraycopy(this.config.getColumnWidth(), 0, columnWidth, 0, copyLength);
+                        System.arraycopy(this.config.getColumnOrder(), 0, columnOrder, 0, copyLength);
+                        this.config.setVisibleColumn(visibles);
+                        this.config.setColumnWidth(columnWidth);
+                        this.config.setColumnOrder(columnOrder);
+
+                        // sortOrderをチェック
+                        TableConfigBean.SortKey[] sortKeys = this.config.getSortKeys();
+                        for (int i = 0; i < sortKeys.length; ++i) {
+                            if (sortKeys[i] != null) {
+                                if (sortKeys[i].index >= this.header.length) {
+                                    // 超えてる
+                                    sortKeys[i] = null;
+                                }
+                            }
+                        }
+                        this.config.setSortKeys(sortKeys);
+                    }
                 }
             }
             if (this.config == null) {
                 this.config = this.getDefaultTableConfig();
             }
-            if (this.config.getColumnWidth() == null) { // 互換性維持
-                this.config.setColumnWidth(new int[this.header.length]);
-            }
+
+            // 古い設定がある場合はできるだけ持ってくる
         }
         return this.config;
     }
@@ -476,6 +507,8 @@ public abstract class AbstractTableDialog extends WindowBase {
             }
             this.config.setColumnWidth(widths);
             this.config.setCyclicReload(this.cyclicReloadMenuItem.getSelection());
+            // 将来の互換性維持のため
+            this.config.setHeaderNames(this.header);
 
             AppConfig.get().getTableConfigMap().put(this.getWindowId(), this.config);
         }

@@ -157,6 +157,9 @@ public final class AppConfigBean {
     /** お風呂から上がる時に母港タブを表示 */
     private boolean visibleOnReturnBathwater = true;
 
+    /** モノクロアイコンを使用する */
+    private boolean monoIcon;
+
     /** 回数を表示 */
     private boolean displayCount;
 
@@ -241,6 +244,9 @@ public final class AppConfigBean {
     /** タイトルバー以外でもドラッグ&ドロップで移動できるようにする */
     private boolean enableMoveWithDD = true;
 
+    /** ツールウィンドウのボタンをトグル方式にする */
+    private boolean toggleToolButton = true;
+
     /** 艦娘一覧ウィンドウの名前 */
     private String[] shipTableNames = new String[] {
             "所有艦娘一覧 1",
@@ -253,6 +259,9 @@ public final class AppConfigBean {
     private ShipFilterDto[] shipFilters = new ShipFilterDto[] {
             null, null, null, null
     };
+
+    /** 艦娘一覧ウィンドウのフィルタパネル表示・非表示 */
+    private ShipFilterPanelConfigBean[] shipTablePanelVisibles = new ShipFilterPanelConfigBean[4];
 
     /** 保存したJSONを読み込ませてテストするためのウィンドウメニューを表示するかどうか */
     private boolean enableTestWindow = false;
@@ -1018,6 +1027,22 @@ public final class AppConfigBean {
     }
 
     /**
+     * モノクロアイコンを使用するを取得します。
+     * @return モノクロアイコンを使用する
+     */
+    public boolean isMonoIcon() {
+        return this.monoIcon;
+    }
+
+    /**
+     * モノクロアイコンを使用するを設定します。
+     * @param monoIcon モノクロアイコンを使用する
+     */
+    public void setMonoIcon(boolean monoIcon) {
+        this.monoIcon = monoIcon;
+    }
+
+    /**
      * 回数を表示を取得します。
      * @return 回数を表示
      */
@@ -1595,6 +1620,34 @@ public final class AppConfigBean {
      */
     public void setTwitterTokenSecret(String twitterTokenSecret) {
         this.twitterTokenSecret = twitterTokenSecret;
+    }
+
+    /**
+     * @return shipTablePanelVisibles
+     */
+    public ShipFilterPanelConfigBean[] getShipTablePanelVisibles() {
+        return this.shipTablePanelVisibles;
+    }
+
+    /**
+     * @param shipTablePanelVisibles セットする shipTablePanelVisibles
+     */
+    public void setShipTablePanelVisibles(ShipFilterPanelConfigBean[] shipTablePanelVisibles) {
+        this.shipTablePanelVisibles = shipTablePanelVisibles;
+    }
+
+    /**
+     * @return toggleToolButton
+     */
+    public boolean isToggleToolButton() {
+        return this.toggleToolButton;
+    }
+
+    /**
+     * @param toggleToolButton セットする toggleToolButton
+     */
+    public void setToggleToolButton(boolean toggleToolButton) {
+        this.toggleToolButton = toggleToolButton;
     }
 
 }
