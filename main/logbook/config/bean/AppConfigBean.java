@@ -112,6 +112,9 @@ public final class AppConfigBean {
     /** ローカルループバックアドレスからの接続のみ受け入れる */
     private boolean allowOnlyFromLocalhost = true;
 
+    /** 全てのネットワークインターフェースで受け付ける */
+    private boolean closeOutsidePort = true;
+
     /** 戦闘結果をログ出力するか */
     private boolean printSortieLog = false;
 
@@ -777,6 +780,20 @@ public final class AppConfigBean {
     }
 
     /**
+     * @return listenAllNIC
+     */
+    public boolean isCloseOutsidePort() {
+        return this.closeOutsidePort;
+    }
+
+    /**
+     * @param listenAllNIC セットする listenAllNIC
+     */
+    public void setCloseOutsidePort(boolean listenAllNIC) {
+        this.closeOutsidePort = listenAllNIC;
+    }
+
+    /**
      * @return printSortieLog
      */
     public boolean isPrintSortieLog() {
@@ -1334,6 +1351,19 @@ public final class AppConfigBean {
      */
     public void setScrewColor(RGB screwColor) {
         this.screwColor = screwColor;
+    }
+
+    public RGB[] getResourceColors() {
+        return new RGB[] {
+                this.fuelColor,
+                this.ammoColor,
+                this.metalColor,
+                this.bauxiteColor,
+                this.burnerColor,
+                this.bucketColor,
+                this.researchColor,
+                this.screwColor
+        };
     }
 
     /**

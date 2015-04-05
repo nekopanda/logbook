@@ -87,7 +87,7 @@ public enum DataType {
     START2("/kcsapi/api_start2"),
     /** マップ情報 */
     MAPINFO("/kcsapi/api_get_member/mapinfo"),
-    /** 任務情報 */
+    /** 遠征情報 */
     MISSION("/kcsapi/api_get_member/mission"),
     /** 演習情報 */
     PRACTICE("/kcsapi/api_get_member/practice"),
@@ -127,5 +127,9 @@ public enum DataType {
 
     public String getUrl() {
         return this.url;
+    }
+
+    public String getApiName() {
+        return this.url.substring("/kcsapi/".length());
     }
 }

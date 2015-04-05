@@ -1,0 +1,54 @@
+load("script/utils.js");
+HpString = Java.type("logbook.gui.logic.HpString");
+SakutekiString = Java.type("logbook.gui.logic.SakutekiString");
+
+function header() {
+	return [	"制空",
+				"索敵#索敵2-5計算値", //
+				"装備1",
+				"艦載機1", //
+				"装備2",
+				"艦載機2", //
+				"装備3",
+				"艦載機3", //
+				"装備4",
+				"艦載機4"];
+}
+
+function begin(specdiff) { }
+
+function body(ship) {
+
+	 // 艦載機数
+	var slotItems = ship.item2;
+	var slotNames = new Array(4);
+	var onSlotString = new Array(4);
+	var onSlot = ship.onSlot;
+	var maxEq = ship.shipInfo.maxeq;
+	var slotNum = ship.slotNum;
+	for (var i = 0; i < slotNum; ++i) {
+		var item = slotItems.get(i);
+		if (ship.canEquipPlane()) { // 飛行機を装備できる場合だけ
+			var cur = (((item != null) && item.isPlane()) ? onSlot[i] : 0);
+			var max = (maxEq != null ? maxEq[i] : 0);
+			onSlotString[i] = new HpString(cur, max);
+		}
+		if (item != null) {
+			slotNames[i] = item.friendlyName;
+		}
+	}
+
+	return toComparable([
+					ship.seiku,
+					new SakutekiString(ship),
+					slotNames[0],
+					onSlotString[0],
+					slotNames[1],
+					onSlotString[1],
+					slotNames[2],
+					onSlotString[2],
+					slotNames[3],
+					onSlotString[3] ]);
+}
+
+function end() { }

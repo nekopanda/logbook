@@ -13,6 +13,10 @@ import java.util.concurrent.TimeUnit;
 
 import logbook.config.AppConfig;
 import logbook.config.bean.TableConfigBean;
+import logbook.data.Data;
+import logbook.data.DataType;
+import logbook.data.EventListener;
+import logbook.data.context.GlobalContext;
 import logbook.dto.BattleAggDetailsDto;
 import logbook.dto.BattleAggUnitDto;
 import logbook.dto.BattleResultDto;
@@ -32,6 +36,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -43,7 +49,7 @@ import org.eclipse.swt.widgets.TreeItem;
  * 出撃統計
  *
  */
-public class BattleAggDialog extends WindowBase {
+public class BattleAggDialog extends WindowBase implements EventListener {
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(BattleAggDialog.class);
 
@@ -78,10 +84,12 @@ public class BattleAggDialog extends WindowBase {
 
     private Display display;
 
+    protected boolean needsUpdate = true;
+
     /**
      * Create the dialog.
      * @param parent
-     * @param style
+     * @param menuItem
      */
     public BattleAggDialog(Shell parent, MenuItem menuItem) {
         super(menuItem);
@@ -152,6 +160,17 @@ public class BattleAggDialog extends WindowBase {
         MenuItem reloadtable = new MenuItem(this.tablemenu, SWT.NONE);
         reloadtable.setText("再読み込み(&R)");
         reloadtable.addSelectionListener(new TableReloadAdapter());
+
+        this.tree.addListener(SWT.Dispose, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                // GlobalContextへのリスナ登録解除
+                GlobalContext.removeEventListener(BattleAggDialog.this);
+            }
+        });
+
+        // 更新リスナ登録
+        GlobalContext.addEventListener(this);
 
         // 自動更新設定を反映
         if (this.getConfig().isCyclicReload()) {
@@ -235,7 +254,7 @@ public class BattleAggDialog extends WindowBase {
      * @return String[]
      */
     private String[] getTableHeader() {
-        return new String[] { "集計", "出撃合計", "勝利合計", "S勝利", "A勝利", "B勝利", "C敗北", "D敗北" };
+        return new String[] { "集計", "出撃合計", "勝利合計", "S勝利", "A勝利", "B勝利", "C敗北", "D以下" };
     }
 
     /**
@@ -251,6 +270,7 @@ public class BattleAggDialog extends WindowBase {
         this.treeItems.setTopItem(topItem);
         this.packTableHeader();
         this.tree.setRedraw(true);
+        this.needsUpdate = false;
     }
 
     /**
@@ -551,6 +571,10 @@ public class BattleAggDialog extends WindowBase {
 
         @Override
         public void run() {
+            if (!this.dialog.needsUpdate) {
+                // 更新の必要はない
+                return;
+            }
             this.dialog.display.asyncExec(new Runnable() {
                 @Override
                 public void run() {
@@ -566,6 +590,23 @@ public class BattleAggDialog extends WindowBase {
                     }
                 }
             });
+        }
+    }
+
+    /**
+     * データ受信
+     * デフォルト動作はどんなデータでも更新をONにする
+     */
+    @SuppressWarnings("incomplete-switch")
+    @Override
+    public void update(DataType type, Data data) {
+        switch (type) {
+        case BATTLE_RESULT:
+        case COMBINED_BATTLE_RESULT:
+        case PRACTICE_BATTLE_RESULT:
+            //case START:
+            //case NEXT:
+            this.needsUpdate = true;
         }
     }
 }

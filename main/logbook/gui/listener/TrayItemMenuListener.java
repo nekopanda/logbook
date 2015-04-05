@@ -64,6 +64,7 @@ public final class TrayItemMenuListener implements MenuDetectListener {
                 "建造報告書(&Y)", // 2
                 "開発報告書(&E)", // 3
                 "遠征報告書(&T)", // 4
+                "遠征一覧", // 4'
                 "所有装備一覧(&X) (" + itemCount + "/" + itemMax + ")", // 5
                 shpiTableNames[0] + "(&S) (" + shipCount + "/" + shipMax + ")", // 6
                 shpiTableNames[1] + "(&2)", // 7
@@ -84,6 +85,7 @@ public final class TrayItemMenuListener implements MenuDetectListener {
         boolean[] hasSeparator = new boolean[] {
                 false,
                 true,
+                false,
                 false,
                 false,
                 false,

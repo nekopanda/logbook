@@ -14,13 +14,16 @@ import logbook.config.ShipGroupConfig;
 import logbook.config.bean.ShipGroupBean;
 import logbook.config.bean.ShipGroupListBean;
 import logbook.constants.AppConstants;
+import logbook.data.Data;
+import logbook.data.DataType;
 import logbook.data.context.GlobalContext;
 import logbook.dto.ShipDto;
-import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.ShipGroupListener;
 import logbook.gui.logic.ShipGroupObserver;
 import logbook.gui.logic.TableItemCreator;
 import logbook.gui.logic.TableRowHeader;
+import logbook.scripting.TableItemCreatorProxy;
+import logbook.util.ReportUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
@@ -29,7 +32,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -41,8 +43,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
@@ -73,7 +73,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
     /**
      * Create the dialog.
      * @param parent
-     * @param style
+     * @param menuItem
      */
     public ShipFilterGroupDialog(Shell parent, MenuItem menuItem) {
         super(parent, menuItem);
@@ -226,6 +226,8 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
 
     @Override
     protected TableItemCreator getTableItemCreator() {
+        return TableItemCreatorProxy.get(AppConstants.SHIPGROUPTABLE_PREFIX);
+        /*
         return new TableItemCreator() {
 
             @Override
@@ -241,22 +243,11 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
                     item.setBackground(SWTResourceManager.getColor(AppConstants.ROW_BACKGROUND));
                 }
                 item.setBackground(6, CreateReportLogic.getTableCondColor(ship.getEstimatedCond()));
-                item.setText(CreateReportLogic.toStringArray(text));
+                item.setText(ReportUtils.toStringArray(text));
                 return item;
             }
         };
-    }
-
-    @Override
-    protected SelectionListener getHeaderSelectionListener() {
-        return new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (e.getSource() instanceof TableColumn) {
-                    ShipFilterGroupDialog.this.sortTableItems((TableColumn) e.getSource());
-                }
-            }
-        };
+        */
     }
 
     @Override
@@ -617,6 +608,16 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
     public void groupShipChanged(ShipGroupBean group) {
         if ((this.property != null) && (this.property.getShipGroupBean() == group)) {
             this.reloadTable();
+        }
+    }
+
+    /**
+     * 更新する必要のあるデータ
+     */
+    @Override
+    public void update(DataType type, Data data) {
+        if (ReportUtils.isShipUpdate(type)) {
+            this.needsUpdate = true;
         }
     }
 }

@@ -13,9 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import logbook.config.AppConfig;
 import logbook.data.Data;
-import logbook.data.DataProxy;
 import logbook.data.DataType;
 import logbook.data.UndefinedData;
+import logbook.data.context.GlobalContext;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +26,7 @@ import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.proxy.ProxyServlet;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * リバースプロキシ
@@ -36,16 +37,14 @@ public final class ReverseProxyServlet extends ProxyServlet {
     /** ライブラリバグ対応 (HttpRequest#queryを上書きする) */
     private static final Field QUERY_FIELD = getDeclaredField(HttpRequest.class, "query");
 
-    /** ローカルループバックアドレスからの接続のみ受け入れる */
-    private final boolean allowOnlyFromLocalhost = AppConfig.get().isAllowOnlyFromLocalhost();
-
     /*
      * リモートホストがローカルループバックアドレス以外の場合400を返し通信しない
      */
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
             IOException {
-        if (this.allowOnlyFromLocalhost && !InetAddress.getByName(request.getRemoteAddr()).isLoopbackAddress()) {
+        if (AppConfig.get().isAllowOnlyFromLocalhost()
+                && !InetAddress.getByName(request.getRemoteAddr()).isLoopbackAddress()) {
             response.setStatus(400);
             return;
         }
@@ -131,23 +130,29 @@ public final class ReverseProxyServlet extends ProxyServlet {
                     }
                 }
 
-                UndefinedData rawData = new UndefinedData(request.getRequestURL().toString(),
+                final UndefinedData rawData = new UndefinedData(request.getRequestURL().toString(),
                         request.getRequestURI(), postField, responseBody);
+                final String serverName = request.getServerName();
 
-                // 統計データベース(http://kancolle-db.net/)に送信する
-                DatabaseClient.send(rawData);
+                Display.getDefault().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        // 統計データベース(http://kancolle-db.net/)に送信する
+                        DatabaseClient.send(rawData);
 
-                // キャプチャしたバイト配列は何のデータかを決定する
-                Data data = rawData.toDefinedData();
-                if (data.getDataType() != DataType.UNDEFINED) {
-                    // 定義済みのデータの場合にキューに追加する
-                    DataProxy.add(data);
+                        // キャプチャしたバイト配列は何のデータかを決定する
+                        Data data = rawData.toDefinedData();
+                        if (data.getDataType() != DataType.UNDEFINED) {
+                            // 定義済みのデータの場合にキューに追加する
+                            GlobalContext.updateContext(data);
 
-                    // サーバー名が不明の場合、サーバー名をセットする
-                    if (!Filter.isServerDetected()) {
-                        Filter.setServerName(request.getServerName());
+                            // サーバー名が不明の場合、サーバー名をセットする
+                            if (!Filter.isServerDetected()) {
+                                Filter.setServerName(serverName);
+                            }
+                        }
                     }
-                }
+                });
             }
         }
         super.onResponseSuccess(request, response, proxyResponse);

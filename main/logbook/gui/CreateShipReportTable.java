@@ -1,16 +1,16 @@
 package logbook.gui;
 
+import logbook.constants.AppConstants;
+import logbook.data.Data;
+import logbook.data.DataType;
 import logbook.data.context.GlobalContext;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.TableItemCreator;
+import logbook.scripting.TableItemCreatorProxy;
 
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TableColumn;
 
 /**
  * 建造報告書
@@ -51,18 +51,19 @@ public final class CreateShipReportTable extends AbstractTableDialog {
 
     @Override
     protected TableItemCreator getTableItemCreator() {
-        return CreateReportLogic.DEFAULT_TABLE_ITEM_CREATOR;
+        return TableItemCreatorProxy.get(AppConstants.CREATESHIPTABLE_PREFIX);
     }
 
+    /**
+     * 更新する必要のあるデータ
+     */
+    @SuppressWarnings("incomplete-switch")
     @Override
-    protected SelectionListener getHeaderSelectionListener() {
-        return new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (e.getSource() instanceof TableColumn) {
-                    CreateShipReportTable.this.sortTableItems((TableColumn) e.getSource());
-                }
-            }
-        };
+    public void update(DataType type, Data data) {
+        switch (type) {
+        case CREATE_SHIP:
+        case GET_SHIP:
+            this.needsUpdate = true;
+        }
     }
 }

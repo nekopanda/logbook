@@ -1,24 +1,36 @@
 package logbook.gui;
 
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+
 import logbook.config.bean.TableConfigBean;
+import logbook.constants.AppConstants;
+import logbook.data.Data;
+import logbook.data.DataType;
 import logbook.dto.ShipFilterDto;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.TableItemCreator;
+import logbook.scripting.TableItemCreatorProxy;
+import logbook.util.ReportUtils;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TableColumn;
 
 /**
  * お風呂に入りたい艦娘
  * 
  */
 public final class BathwaterTableDialog extends AbstractTableDialog {
+
+    /** ロガー */
+    private static final Logger LOG = LogManager.getLogger(BathwaterTableDialog.class);
 
     /** フィルター */
     private final ShipFilterDto filter = new ShipFilterDto();
@@ -43,7 +55,7 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 BathwaterTableDialog.this.getConfig().setVisibleColumn(
-                        CreateReportLogic.getBathTableDefaultVisibles());
+                        BathwaterTableDialog.this.getBathTableDefaultVisibles());
                 BathwaterTableDialog.this.restoreColumnWidth(false);
             }
         });
@@ -82,31 +94,62 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
 
     @Override
     protected TableItemCreator getTableItemCreator() {
-        return CreateReportLogic.SHIP_LIST_TABLE_ITEM_CREATOR;
-    }
-
-    @Override
-    protected SelectionListener getHeaderSelectionListener() {
-        return new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (e.getSource() instanceof TableColumn) {
-                    BathwaterTableDialog.this.sortTableItems((TableColumn) e.getSource());
-                }
-            }
-        };
+        return TableItemCreatorProxy.get(AppConstants.SHIPTABLE_PREFIX);
     }
 
     @Override
     protected int[] defaultColumnOrder() {
-        return CreateReportLogic.getBathTableDefaultColumnOrder();
+        Map<String, Integer> colMap = AppConstants.BATHTABLE_COLUMN_MAP;
+        Map<Integer, Integer> orderMap = new TreeMap<>();
+        int[] order = new int[this.headerId.length];
+        for (int i = 0; i < order.length; ++i) {
+            if (colMap.containsKey(this.headerId[i])) {
+                orderMap.put(colMap.get(this.headerId[i]), 0);
+            }
+        }
+        int hiddenColIndex = 0;
+        for (Entry<Integer, Integer> entry : orderMap.entrySet()) {
+            entry.setValue(hiddenColIndex++);
+        }
+        if (hiddenColIndex != colMap.size()) {
+            LOG.warn("BATHTABLE_COLUMN_MAPに実際にはないカラムがあるようです");
+        }
+        for (int i = 0; i < order.length; ++i) {
+            if (colMap.containsKey(this.headerId[i])) {
+                order[orderMap.get(colMap.get(this.headerId[i]))] = i;
+            }
+            else {
+                order[hiddenColIndex++] = i;
+            }
+        }
+        return order;
     }
 
     @Override
     protected TableConfigBean getDefaultTableConfig() {
         TableConfigBean config = super.getDefaultTableConfig();
-        config.setVisibleColumn(CreateReportLogic.getBathTableDefaultVisibles());
-        config.setColumnOrder(CreateReportLogic.getBathTableDefaultColumnOrder());
+        config.setVisibleColumn(this.getBathTableDefaultVisibles());
+        config.setColumnOrder(this.defaultColumnOrder());
         return config;
+    }
+
+    private boolean[] getBathTableDefaultVisibles() {
+        Map<String, Integer> colMap = AppConstants.BATHTABLE_COLUMN_MAP;
+        boolean[] visibles = new boolean[this.headerId.length];
+        for (int i = 0; i < visibles.length; ++i) {
+            visibles[i] = colMap.containsKey(this.headerId[i]);
+        }
+        return visibles;
+    }
+
+    /**
+     * 更新する必要のあるデータ
+     */
+    @SuppressWarnings("incomplete-switch")
+    @Override
+    public void update(DataType type, Data data) {
+        if (ReportUtils.isShipUpdate(type)) {
+            this.needsUpdate = true;
+        }
     }
 }

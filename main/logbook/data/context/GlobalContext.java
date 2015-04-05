@@ -28,6 +28,7 @@ import logbook.config.ItemConfig;
 import logbook.config.KdockConfig;
 import logbook.constants.AppConstants;
 import logbook.data.Data;
+import logbook.data.EventListener;
 import logbook.dto.BasicInfoDto;
 import logbook.dto.BattleExDto;
 import logbook.dto.BattleExDto.Phase;
@@ -61,6 +62,7 @@ import logbook.internal.MasterData;
 import logbook.internal.MasterData.ShipTypeDto;
 import logbook.internal.Ship;
 import logbook.internal.ShipStyle;
+import logbook.scripting.EventListenerProxy;
 import logbook.util.JsonUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -71,8 +73,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.ToolTip;
 
 /**
- * 遠征・入渠などの情報を管理します
- *
+ * ゲームのユーザ情報を管理します
  */
 public final class GlobalContext {
     /** ロガー */
@@ -171,6 +172,8 @@ public final class GlobalContext {
     /** 情報の取得状態 0:母港情報未受信 1:正常 2:マスターデータの更新が必要 3:アカウントが変わった！   */
     private static int state = 0;
 
+    private static List<EventListener> eventListeners = new ArrayList<>();
+
     // 始めてアクセスがあった時に読み込む
     public static final boolean INIT_COMPLETE;
     static {
@@ -186,6 +189,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 装備Map
      * @return 装備Map
      */
     public static Map<Integer, ItemDto> getItemMap() {
@@ -194,7 +198,7 @@ public final class GlobalContext {
 
     /**
      * 装備を復元する
-     * @param map
+     * @param items 装備
      */
     public static void setItemMap(Collection<ItemDto> items) {
         for (ItemDto item : items) {
@@ -208,6 +212,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 艦娘Map
      * @return 艦娘Map
      */
     public static Map<Integer, ShipDto> getShipMap() {
@@ -215,6 +220,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 秘書艦
      * @return 秘書艦
      */
     public static ShipDto getSecretary() {
@@ -222,6 +228,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 司令部Lv
      * @return 司令部Lv
      */
     public static int hqLevel() {
@@ -229,6 +236,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 最大保有可能 艦娘数
      * @return 最大保有可能 艦娘数
      */
     public static int maxChara() {
@@ -236,6 +244,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 最大保有可能 装備数
      * @return 最大保有可能 装備数
      */
     public static int maxSlotitem() {
@@ -243,6 +252,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 建造艦娘List
      * @return 建造艦娘List
      */
     public static List<GetShipDto> getGetshipList() {
@@ -257,6 +267,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 開発アイテムList
      * @return 開発アイテムList
      */
     public static List<CreateItemDto> getCreateItemList() {
@@ -271,6 +282,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 海戦・ドロップList
      * @return 海戦・ドロップList
      */
     public static List<BattleResultDto> getBattleResultList() {
@@ -278,6 +290,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 最後に行った海戦情報
      * @return 最後に行った海戦情報
      */
     public static BattleExDto getLastBattleDto() {
@@ -285,6 +298,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 遠征結果
      * @return 遠征結果
      */
     public static List<MissionResultDto> getMissionResultList() {
@@ -299,6 +313,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 遠征リスト
      * @return 遠征リスト
      */
     public static DeckMissionDto[] getDeckMissions() {
@@ -306,6 +321,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 入渠リスト
      * @return 入渠リスト
      */
     public static NdockDto[] getNdocks() {
@@ -313,6 +329,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 建造ドックリスト
      * @return 建造ドックリスト
      */
     public static KdockDto[] getKdocks() {
@@ -320,6 +337,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 遠征中の艦セット
      * @return 遠征中の艦セット
      */
     public static Set<Integer> getMissionShipSet() {
@@ -333,6 +351,7 @@ public final class GlobalContext {
     }
 
     /**
+     * 入渠中の艦セット
      * @return 入渠中の艦セット
      */
     public static Set<Integer> getNDockShipSet() {
@@ -347,7 +366,6 @@ public final class GlobalContext {
 
     /**
      * 艦娘が入渠しているかを調べます
-     *
      * @param ship 艦娘
      * @return 入渠している場合true
      */
@@ -369,18 +387,25 @@ public final class GlobalContext {
         return false;
     }
 
+    /**
+     * 演習相手リスト
+     * @return
+     */
     public static PracticeUserDto[] getPracticeUser() {
         return practiceUser;
     }
 
+    /**
+     * 演習リストが最後に更新された時間
+     * @return
+     */
     public static Date getPracticeUserLastUpdate() {
         return practiceUserLastUpdate;
     }
 
     /**
      * 艦隊が遠征中かを調べます
-     *
-     * @param
+     * @param idstr 艦隊ID（1～）
      */
     public static boolean isMission(String idstr) {
         int id = Integer.parseInt(idstr);
@@ -393,6 +418,8 @@ public final class GlobalContext {
     }
 
     /**
+     * ドック
+     * @param id 番号 "1"～"4"
      * @return ドック
      */
     public static DockDto getDock(String id) {
@@ -400,16 +427,25 @@ public final class GlobalContext {
     }
 
     /**
-     * @return ドックMap
+     * ドックMap
+     * @return ドックMap キーは"1"～"4"
      */
     public static Map<String, DockDto> getDock() {
         return dock;
     }
 
+    /**
+     * 出撃艦隊情報
+     * @return
+     */
     public static boolean[] getIsSortie() {
         return isSortie;
     }
 
+    /**
+     * 今いるマス
+     * @return
+     */
     public static MapCellDto getSortieMap() {
         return mapCellDto;
     }
@@ -422,6 +458,10 @@ public final class GlobalContext {
         return questList;
     }
 
+    /**
+     * 任務が最後に更新された時間
+     * @return
+     */
     public static Date getQuestLastUpdate() {
         return questLastUpdate;
     }
@@ -470,15 +510,32 @@ public final class GlobalContext {
     }
 
     /**
+     * リクエスト・レスポンスを受け取るEventListener登録
+     */
+    public static void addEventListener(EventListener listener) {
+        if (eventListeners.indexOf(listener) == -1) {
+            eventListeners.add(listener);
+        }
+    }
+
+    /**
+     * リクエスト・レスポンスを受け取るEventListener登録解除
+     */
+    public static void removeEventListener(EventListener listener) {
+        eventListeners.remove(listener);
+    }
+
+    /**
      * 情報を更新します
      *
-     * @return 更新する情報があった場合trueを返します
+     * @param data リクエスト・レスポンスデータ
      */
     public static void updateContext(Data data) {
         // json保存設定
         if (AppConfig.get().isStoreJson()) {
             doStoreJson(data);
         }
+
         switch (data.getDataType()) {
         // 補給
         case CHARGE:
@@ -675,9 +732,17 @@ public final class GlobalContext {
             break;
         }
         ++updateCounter;
+
+        // ユーザスクリプト呼び出し
+        EventListenerProxy.get().update(data.getDataType(), data);
+        // 登録リスナ呼び出し
+        for (EventListener listener : eventListeners) {
+            listener.update(data.getDataType(), data);
+        }
     }
 
     /** 
+     * updateContext()が呼ばれた数
      * @return updateContext()が呼ばれた数
      */
     public static int getUpdateCounter() {
@@ -1872,24 +1937,7 @@ public final class GlobalContext {
                         JsonObject questobject = (JsonObject) value;
                         // 任務を作成
                         int index = ((disp_page - 1) * items_per_page) + (pos - 1);
-                        QuestDto quest = new QuestDto();
-                        quest.setTime(now);
-                        quest.setNo(questobject.getInt("api_no"));
-                        quest.setPage(disp_page);
-                        quest.setPos(pos++);
-                        quest.setCategory(questobject.getInt("api_category"));
-                        quest.setType(questobject.getInt("api_type"));
-                        quest.setState(questobject.getInt("api_state"));
-                        quest.setTitle(questobject.getString("api_title"));
-                        quest.setDetail(questobject.getString("api_detail"));
-                        JsonArray material = questobject.getJsonArray("api_get_material");
-                        quest.setFuel(material.getJsonNumber(0).toString());
-                        quest.setAmmo(material.getJsonNumber(1).toString());
-                        quest.setMetal(material.getJsonNumber(2).toString());
-                        quest.setBauxite(material.getJsonNumber(3).toString());
-                        quest.setBonusFlag(questobject.getInt("api_bonus_flag"));
-                        quest.setProgressFlag(questobject.getInt("api_progress_flag"));
-
+                        QuestDto quest = new QuestDto(questobject, disp_page, pos++);
                         questList.set(index, quest);
                     }
                 }
@@ -2030,7 +2078,7 @@ public final class GlobalContext {
                 MasterData.updateMaster(obj);
 
                 // 艦種
-                for (ShipTypeDto dto : MasterData.getInstance().getStype()) {
+                for (ShipTypeDto dto : MasterData.getMaster().getStype()) {
                     ShipStyle.set(dto.getId(), dto.getName());
                 }
             }

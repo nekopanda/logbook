@@ -12,6 +12,8 @@ import java.nio.channels.FileLock;
 import java.util.Calendar;
 import java.util.Date;
 
+import logbook.data.DataType;
+
 /**
  * @author Nekopanda
  *
@@ -51,6 +53,58 @@ public class ReportUtils {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         return cal;
+    }
+
+    /**
+     * オブジェクト配列をテーブルウィジェットに表示できるように文字列に変換します
+     * 
+     * @param data テーブルに表示する内容
+     * @return テーブルに表示する内容
+     */
+    public static String[] toStringArray(Comparable[] data) {
+        String[] ret = new String[data.length];
+        for (int i = 0; i < data.length; ++i) {
+            if (data[i] == null) {
+                ret[i] = "";
+            }
+            else {
+                ret[i] = data[i].toString();
+            }
+        }
+        return ret;
+    }
+
+    @SuppressWarnings("incomplete-switch")
+    public static boolean isShipUpdate(DataType type) {
+        switch (type) {
+        case CHARGE:
+        case CHANGE:
+        case PORT:
+        case SHIP2:
+        case SHIP3:
+        case MISSION_RESULT:
+        case NDOCK:
+        case DECK:
+        case GET_SHIP:
+        case DESTROY_SHIP:
+        case POWERUP:
+        case LOCK_SHIP:
+        case NYUKYO_START:
+        case NYUKYO_SPEEDCHANGE:
+
+            // 戦闘結果を反映させるため戦闘でも更新
+        case BATTLE:
+        case BATTLE_MIDNIGHT:
+        case BATTLE_SP_MIDNIGHT:
+        case BATTLE_NIGHT_TO_DAY:
+        case COMBINED_AIR_BATTLE:
+        case COMBINED_BATTLE:
+        case COMBINED_BATTLE_MIDNIGHT:
+        case COMBINED_BATTLE_SP_MIDNIGHT:
+        case COMBINED_BATTLE_WATER:
+            return true;
+        }
+        return false;
     }
 
 }

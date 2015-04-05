@@ -12,8 +12,16 @@
                     size="250 MB" />
             </Policies>
         </RollingFile>
+        <File name="ScriptLog" fileName="logs/script.log" append="false">
+            <PatternLayout>
+                <pattern>%d %p %c{1.} [%t] %m%n</pattern>
+            </PatternLayout>
+        </File>
     </appenders>
     <loggers>
+	    <Logger name="script" level="info" additivity="false">
+	      <appender-ref ref="ScriptLog"/>
+	    </Logger>
         <root level="info">
             <appender-ref ref="RollingFile" />
         </root>

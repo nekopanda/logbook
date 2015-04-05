@@ -97,9 +97,7 @@ public final class ShipFilterComposite extends Composite {
     /**
      * Create the dialog.
      * 
-     * @param parent シェル
      * @param shipTable 呼び出し元
-     * @param filter 初期値
      */
     public ShipFilterComposite(ShipTable shipTable) {
         super(shipTable.getShell(), SWT.NONE);

@@ -50,7 +50,7 @@ public final class DeckMissionDto extends AbstractDto {
     public DeckMissionDto(String name, int missionId, Date time, int fleetid, List<Integer> ships) {
         this.name = name;
         this.missionId = missionId;
-        String missionName = MasterData.getInstance().getMissionName(missionId);
+        String missionName = MasterData.getMaster().getMissionName(missionId);
         if (missionName == null) {
             missionName = Deck.get(missionId);
         }
@@ -61,6 +61,7 @@ public final class DeckMissionDto extends AbstractDto {
     }
 
     /**
+     * 艦隊名
      * @return 艦隊名
      */
     public String getName() {
@@ -68,6 +69,7 @@ public final class DeckMissionDto extends AbstractDto {
     }
 
     /**
+     * 遠征ID
      * @return 遠征ID
      */
     public int getMissionId() {
@@ -75,6 +77,7 @@ public final class DeckMissionDto extends AbstractDto {
     }
 
     /**
+     * 遠征名
      * @return 遠征名
      */
     public String getMission() {
@@ -82,6 +85,7 @@ public final class DeckMissionDto extends AbstractDto {
     }
 
     /**
+     * 帰投時間
      * @return 帰投時間
      */
     public Date getTime() {
@@ -89,6 +93,7 @@ public final class DeckMissionDto extends AbstractDto {
     }
 
     /**
+     * 艦隊
      * @return 艦隊
      */
     public int getFleetid() {
@@ -96,6 +101,7 @@ public final class DeckMissionDto extends AbstractDto {
     }
 
     /**
+     * 艦娘
      * @return 艦娘
      */
     public List<Integer> getShips() {

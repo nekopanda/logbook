@@ -2,8 +2,6 @@ package logbook.gui;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import logbook.config.AppConfig;
@@ -31,6 +29,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
@@ -50,14 +49,14 @@ import org.eclipse.wb.swt.SWTResourceManager;
 public final class ConfigDialog extends Dialog {
 
     private final ApplicationMain main;
-    private final Map<String, Composite> compositeMap = new HashMap<String, Composite>();
     private Shell shell;
+    private Tree tree;
     private Composite composite;
     private ScrolledComposite scrolledComposite;
 
     /**
      * Create the dialog.
-     * @param parent
+     * @param main
      */
     public ConfigDialog(ApplicationMain main) {
         super(main.getShell(), SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE);
@@ -92,42 +91,8 @@ public final class ConfigDialog extends Dialog {
         SashForm sashForm = new SashForm(this.shell, SWT.SMOOTH);
         sashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
-        // ツリーメニュー
-        Tree tree = new Tree(sashForm, SWT.BORDER);
-        tree.addSelectionListener(new TreeSelectionAdapter(this));
-        TreeItem systemroot = new TreeItem(tree, SWT.NONE);
-        systemroot.setText("一般");
-        systemroot.setData("system");
-        TreeItem maintab = new TreeItem(systemroot, SWT.NONE);
-        maintab.setText("一般2");
-        maintab.setData("maintab");
-        TreeItem fleettab = new TreeItem(systemroot, SWT.NONE);
-        fleettab.setText("艦隊タブ");
-        fleettab.setData("fleettab");
-        TreeItem notify = new TreeItem(systemroot, SWT.NONE);
-        notify.setText("通知");
-        notify.setData("notify");
-        TreeItem capture = new TreeItem(systemroot, SWT.NONE);
-        capture.setText("キャプチャ");
-        capture.setData("capture");
-        TreeItem chart = new TreeItem(systemroot, SWT.NONE);
-        chart.setText("資材ログ");
-        chart.setData("chart");
-        TreeItem window = new TreeItem(systemroot, SWT.NONE);
-        window.setText("ウィンドウ");
-        window.setData("window");
-        TreeItem proxy = new TreeItem(systemroot, SWT.NONE);
-        proxy.setText("通信");
-        proxy.setData("connection");
-        TreeItem pushnotify = new TreeItem(tree, SWT.NONE);
-        pushnotify.setText("Push通知");
-        pushnotify.setData("pushnotify");
-        TreeItem development = new TreeItem(tree, SWT.NONE);
-        development.setText("Development");
-        development.setData("development");
-
-        systemroot.setExpanded(true);
-        development.setExpanded(true);
+        this.tree = new Tree(sashForm, SWT.BORDER);
+        this.tree.addSelectionListener(new TreeSelectionAdapter(this));
 
         this.scrolledComposite = new ScrolledComposite(sashForm, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         this.scrolledComposite.setExpandHorizontal(true);
@@ -136,82 +101,143 @@ public final class ConfigDialog extends Dialog {
         this.composite = new Composite(this.scrolledComposite, SWT.NONE);
         this.composite.setLayout(new GridLayout(1, false));
 
-        // システム タブ
+        // ツリーメニュー
+        TreeItem connection = new TreeItem(this.tree, SWT.NONE);
+        connection.setText("通信");
+        Composite compositeConnection = new Composite(this.composite, SWT.NONE);
+        connection.setData(compositeConnection);
+        TreeItem systemroot = new TreeItem(this.tree, SWT.NONE);
+        systemroot.setText("一般");
         Composite compositeSystem = new Composite(this.composite, SWT.NONE);
-        this.compositeMap.put("system", compositeSystem);
-        compositeSystem.setLayout(new GridLayout(3, false));
+        systemroot.setData(compositeSystem);
+        TreeItem reportTab = new TreeItem(this.tree, SWT.NONE);
+        reportTab.setText("報告書");
+        Composite compositeReport = new Composite(this.composite, SWT.NONE);
+        reportTab.setData(compositeReport);
+        TreeItem fleettab = new TreeItem(this.tree, SWT.NONE);
+        fleettab.setText("艦隊タブ");
+        Composite compositeFleetTab = new Composite(this.composite, SWT.NONE);
+        fleettab.setData(compositeFleetTab);
+        TreeItem fleetdetail = new TreeItem(fleettab, SWT.NONE);
+        fleetdetail.setText("詳細");
+        Composite compositeFleetDetail = new Composite(this.composite, SWT.NONE);
+        fleetdetail.setData(compositeFleetDetail);
+        TreeItem notify = new TreeItem(this.tree, SWT.NONE);
+        notify.setText("通知");
+        Composite compositeNotify = new Composite(this.composite, SWT.NONE);
+        notify.setData(compositeNotify);
+        TreeItem pushnotify = new TreeItem(this.tree, SWT.NONE);
+        pushnotify.setText("Push通知");
+        Composite compositePushNotify = new Composite(this.composite, SWT.NONE);
+        pushnotify.setData(compositePushNotify);
+        TreeItem capture = new TreeItem(this.tree, SWT.NONE);
+        capture.setText("キャプチャ");
+        Composite compositeCapture = new Composite(this.composite, SWT.NONE);
+        capture.setData(compositeCapture);
+        TreeItem chart = new TreeItem(this.tree, SWT.NONE);
+        chart.setText("資材チャート");
+        Composite compositeChart = new Composite(this.composite, SWT.NONE);
+        chart.setData(compositeChart);
+        TreeItem window = new TreeItem(this.tree, SWT.NONE);
+        window.setText("ウィンドウ");
+        Composite compositeWindow = new Composite(this.composite, SWT.NONE);
+        window.setData(compositeWindow);
+        TreeItem development = new TreeItem(this.tree, SWT.NONE);
+        development.setText("Development");
+        Composite compositeDevelopment = new Composite(this.composite, SWT.NONE);
+        development.setData(compositeDevelopment);
 
-        Label label = new Label(compositeSystem, SWT.NONE);
+        fleettab.setExpanded(true);
+
+        // 通信
+        compositeConnection.setLayout(new GridLayout(4, false));
+
+        Label label = new Label(compositeConnection, SWT.NONE);
         label.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        label.setText("ポート番号*");
+        label.setText("受信ポート");
 
-        final Text listenport = new Text(compositeSystem, SWT.BORDER);
+        final Text listenport = new Text(compositeConnection, SWT.BORDER);
         GridData gdListenport = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
         gdListenport.widthHint = 90;
         listenport.setLayoutData(gdListenport);
         listenport.setText(Integer.toString(AppConfig.get().getListenPort()));
-        new Label(compositeSystem, SWT.NONE);
+        new Label(compositeConnection, SWT.NONE);
+        new Label(compositeConnection, SWT.NONE);
 
-        Label label3 = new Label(compositeSystem, SWT.NONE);
-        label3.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        label3.setText("音量(%)");
+        new Label(compositeConnection, SWT.NONE);
+        final Button onlyFromLocalhost = new Button(compositeConnection, SWT.CHECK);
+        onlyFromLocalhost.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        onlyFromLocalhost.setText("他のマシンからの要求は拒否する");
+        onlyFromLocalhost.setSelection(AppConfig.get().isAllowOnlyFromLocalhost());
+        onlyFromLocalhost.setToolTipText("セキュリティの観点から通常は拒否設定にしてください。\n" +
+                "他のマシンから接続するなど特別な事情がある場合のみOFFにします");
 
-        final Text soundlevel = new Text(compositeSystem, SWT.BORDER);
-        GridData gdSoundlevel = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
-        gdSoundlevel.widthHint = 90;
-        soundlevel.setLayoutData(gdSoundlevel);
-        soundlevel.setText(Integer.toString((int) (AppConfig.get().getSoundLevel() * 100)));
-        new Label(compositeSystem, SWT.NONE);
+        new Label(compositeConnection, SWT.NONE);
+        final Button closeOutsidePort = new Button(compositeConnection, SWT.CHECK);
+        closeOutsidePort.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        closeOutsidePort.setText("外向けポートは閉じておく");
+        closeOutsidePort.setSelection(AppConfig.get().isCloseOutsidePort());
+        closeOutsidePort
+                .setToolTipText("1.6.0からデフォルト動作になりました。ただし、専ブラなどでポートを開けておく必要がある場合があります。\n" +
+                        "マシンが直接インターネットに接続されている場合、ポートを開けると若干セキュリティが低下します");
+        closeOutsidePort.setEnabled(onlyFromLocalhost.getSelection());
 
-        Label label8 = new Label(compositeSystem, SWT.NONE);
-        label8.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        label8.setText("報告書の保存先");
-
-        final Text reportDir = new Text(compositeSystem, SWT.BORDER);
-        GridData gdReportDir = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
-        gdReportDir.widthHint = 120;
-        reportDir.setLayoutData(gdReportDir);
-        reportDir.setText(AppConfig.get().getReportPath());
-
-        Button reportSavedirBtn = new Button(compositeSystem, SWT.NONE);
-        reportSavedirBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        reportSavedirBtn.addSelectionListener(new SelectionAdapter() {
+        onlyFromLocalhost.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                DirectoryDialog dialog = new DirectoryDialog(ConfigDialog.this.shell);
-                dialog.setMessage("保存先を指定して下さい");
-                String path = dialog.open();
-                if (path != null) {
-                    reportDir.setText(path);
-                }
+                closeOutsidePort.setEnabled(onlyFromLocalhost.getSelection());
             }
         });
-        reportSavedirBtn.setText("選択...");
 
-        Label label82 = new Label(compositeSystem, SWT.NONE);
-        label82.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        label82.setText("出撃ログの保存先*");
+        final Button useProxyButton = new Button(compositeConnection, SWT.CHECK);
+        useProxyButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
+        useProxyButton.setText("接続にプロキシを使用する");
+        useProxyButton.setSelection(AppConfig.get().isUseProxy());
 
-        final Text battlelogDir = new Text(compositeSystem, SWT.BORDER);
-        GridData gdBattlelogDir = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
-        gdBattlelogDir.widthHint = 120;
-        battlelogDir.setLayoutData(gdBattlelogDir);
-        battlelogDir.setText(AppConfig.get().getBattleLogPath());
+        Label proxyHostLabel = new Label(compositeConnection, SWT.NONE);
+        proxyHostLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        proxyHostLabel.setText("サーバ:");
 
-        Button battleLogdirBtn = new Button(compositeSystem, SWT.NONE);
-        battleLogdirBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        battleLogdirBtn.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                DirectoryDialog dialog = new DirectoryDialog(ConfigDialog.this.shell);
-                dialog.setMessage("保存先を指定して下さい");
-                String path = dialog.open();
-                if (path != null) {
-                    battlelogDir.setText(path);
-                }
-            }
-        });
-        battleLogdirBtn.setText("選択...");
+        final Text proxyHostText = new Text(compositeConnection, SWT.BORDER);
+        GridData gdProxyHostText = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        gdProxyHostText.widthHint = 100;
+        proxyHostText.setLayoutData(gdProxyHostText);
+        proxyHostText.setText(AppConfig.get().getProxyHost());
+
+        Label proxyPortLabel = new Label(compositeConnection, SWT.NONE);
+        proxyPortLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        proxyPortLabel.setText("ポート:");
+
+        final Spinner proxyPortSpinner = new Spinner(compositeConnection, SWT.BORDER);
+        proxyPortSpinner.setMaximum(65535);
+        proxyPortSpinner.setMinimum(1);
+        proxyPortSpinner.setSelection(AppConfig.get().getProxyPort());
+        GridData gdProxyPortSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        gdProxyPortSpinner.widthHint = 55;
+        proxyPortSpinner.setLayoutData(gdProxyPortSpinner);
+
+        final Button sendDatabaseButton = new Button(compositeConnection, SWT.CHECK);
+        sendDatabaseButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
+        sendDatabaseButton.setText("艦これ統計データベースへデータを送信する");
+        sendDatabaseButton.setSelection(AppConfig.get().isSendDatabase());
+
+        Label accessKeyLabel = new Label(compositeConnection, SWT.NONE);
+        accessKeyLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        accessKeyLabel.setText("アクセスキー:");
+
+        final Text accessKeyText = new Text(compositeConnection, SWT.BORDER);
+        GridData gdAccessKeyText = new GridData(SWT.FILL, SWT.CENTER, false, false, 3, 1);
+        // gdAccessKeyText.widthHint = 300;
+        accessKeyText.setLayoutData(gdAccessKeyText);
+        accessKeyText.setText(AppConfig.get().getAccessKey());
+
+        final Button databaseLogButton = new Button(compositeConnection, SWT.CHECK);
+        databaseLogButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
+        databaseLogButton.setText("データベースへの送信をログ出力する");
+        databaseLogButton.setSelection(AppConfig.get().isDatabaseSendLog());
+
+        // システム タブ
+        compositeSystem.setLayout(new GridLayout(3, false));
 
         final Button hidewindow = new Button(compositeSystem, SWT.CHECK);
         hidewindow.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
@@ -249,61 +275,11 @@ public final class ConfigDialog extends Dialog {
         nameOnTitlebar.setText("タイトルバーに提督名を表示する");
         nameOnTitlebar.setSelection(AppConfig.get().isNameOnTitlebar());
 
-        final Button onlyFromLocalhost = new Button(compositeSystem, SWT.CHECK);
-        onlyFromLocalhost.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-        onlyFromLocalhost.setText("ローカルループバックアドレスからの接続のみ受け入れる*");
-        onlyFromLocalhost.setSelection(AppConfig.get().isAllowOnlyFromLocalhost());
-
-        // メインタブ タブ
-        Composite compositeMainTab = new Composite(this.composite, SWT.NONE);
-        this.compositeMap.put("maintab", compositeMainTab);
-        compositeMainTab.setLayout(new GridLayout(1, false));
-
-        Group logGroup = new Group(compositeMainTab, SWT.NONE);
-        logGroup.setText("母港タブのログ");
-        logGroup.setLayout(new GridLayout(1, false));
-        logGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        final Button printSortieLog = new Button(logGroup, SWT.CHECK);
-        printSortieLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        printSortieLog.setText("マップや勝利判定をログに表示");
-        printSortieLog.setSelection(AppConfig.get().isPrintSortieLog());
-
-        final Button printSunkLog = new Button(logGroup, SWT.CHECK);
-        printSunkLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        printSunkLog.setText("艦娘の轟沈をログに表示（ダメコン未対応）");
-        printSunkLog.setSelection(AppConfig.get().isPrintSunkLog());
-
-        final Button printUpdateLog = new Button(logGroup, SWT.CHECK);
-        printUpdateLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        printUpdateLog.setText("更新系ログを表示");
-        printUpdateLog.setSelection(AppConfig.get().isPrintUpdateLog());
-
-        Group loadReportGroup = new Group(compositeMainTab, SWT.NONE);
-        loadReportGroup.setText("報告書読み込み（起動時にCSVファイルを全て読み込みます）");
-        loadReportGroup.setLayout(new GridLayout(1, false));
-        loadReportGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        final Button loadCreateShipLog = new Button(loadReportGroup, SWT.CHECK);
-        loadCreateShipLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        loadCreateShipLog.setText("建造報告書を読み込む*");
-        loadCreateShipLog.setSelection(AppConfig.get().isLoadCreateShipLog());
-
-        final Button loadCreateItemLog = new Button(loadReportGroup, SWT.CHECK);
-        loadCreateItemLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        loadCreateItemLog.setText("開発報告書を読み込む*");
-        loadCreateItemLog.setSelection(AppConfig.get().isLoadCreateItemLog());
-
-        final Button loadMissionLog = new Button(loadReportGroup, SWT.CHECK);
-        loadMissionLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        loadMissionLog.setText("遠征報告書を読み込む*");
-        loadMissionLog.setSelection(AppConfig.get().isLoadMissionLog());
-
         final Combo systemWideShortcutKey;
         if (JIntellitypeWrapper.getInstance() != null) {
-            final Label systemWideShortcutKeyLabel = new Label(compositeMainTab, SWT.NONE);
+            final Label systemWideShortcutKeyLabel = new Label(compositeSystem, SWT.NONE);
             systemWideShortcutKeyLabel.setText("航海日誌をアクティブにするホットキー");
-            systemWideShortcutKey = new Combo(compositeMainTab, SWT.READ_ONLY);
+            systemWideShortcutKey = new Combo(compositeSystem, SWT.READ_ONLY);
             systemWideShortcutKey.add("なし");
             systemWideShortcutKey.add("Ctrl+Shift+Z");
             systemWideShortcutKey.add("Ctrl+Alt+Z");
@@ -313,12 +289,176 @@ public final class ConfigDialog extends Dialog {
             systemWideShortcutKey = null;
         }
 
-        // 艦隊タブ タブ
-        Composite compositeFleetTab = new Composite(this.composite, SWT.NONE);
-        this.compositeMap.put("fleettab", compositeFleetTab);
-        compositeFleetTab.setLayout(new GridLayout(1, false));
+        // 報告書 タブ
+        compositeReport.setLayout(new GridLayout(3, false));
 
-        Group leveling = new Group(compositeFleetTab, SWT.NONE);
+        Label label8 = new Label(compositeReport, SWT.NONE);
+        label8.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        label8.setText("報告書の保存先");
+
+        final Text reportDir = new Text(compositeReport, SWT.BORDER);
+        GridData gdReportDir = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+        gdReportDir.widthHint = 120;
+        reportDir.setLayoutData(gdReportDir);
+        reportDir.setText(AppConfig.get().getReportPath());
+
+        Button reportSavedirBtn = new Button(compositeReport, SWT.NONE);
+        reportSavedirBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        reportSavedirBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                DirectoryDialog dialog = new DirectoryDialog(ConfigDialog.this.shell);
+                dialog.setMessage("保存先を指定して下さい");
+                String path = dialog.open();
+                if (path != null) {
+                    reportDir.setText(path);
+                }
+            }
+        });
+        reportSavedirBtn.setText("選択...");
+
+        Label label82 = new Label(compositeReport, SWT.NONE);
+        label82.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        label82.setText("戦闘履歴の保存先*");
+
+        final Text battlelogDir = new Text(compositeReport, SWT.BORDER);
+        GridData gdBattlelogDir = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+        gdBattlelogDir.widthHint = 120;
+        battlelogDir.setLayoutData(gdBattlelogDir);
+        battlelogDir.setText(AppConfig.get().getBattleLogPath());
+
+        Button battleLogdirBtn = new Button(compositeReport, SWT.NONE);
+        battleLogdirBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        battleLogdirBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                DirectoryDialog dialog = new DirectoryDialog(ConfigDialog.this.shell);
+                dialog.setMessage("保存先を指定して下さい");
+                String path = dialog.open();
+                if (path != null) {
+                    battlelogDir.setText(path);
+                }
+            }
+        });
+        battleLogdirBtn.setText("選択...");
+
+        Label materialintervallabel = new Label(compositeReport, SWT.NONE);
+        materialintervallabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        materialintervallabel.setText("資材ログ保存間隔(秒)");
+
+        final Spinner materialintervalSpinner = new Spinner(compositeReport, SWT.BORDER);
+        materialintervalSpinner.setMaximum(60 * 60 * 24);
+        materialintervalSpinner.setMinimum(10);
+        materialintervalSpinner.setSelection(AppConfig.get().getMaterialLogInterval());
+        GridData gdMaterialIntervalSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        gdMaterialIntervalSpinner.widthHint = 55;
+        materialintervalSpinner.setLayoutData(gdMaterialIntervalSpinner);
+        new Label(compositeReport, SWT.NONE);
+
+        final Button detailMaterial = new Button(compositeReport, SWT.CHECK);
+        detailMaterial.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        detailMaterial.setText("遠征帰還時や開発・建造時に資材ログ出力する");
+        detailMaterial.setSelection(AppConfig.get().isMaterialLogDetail());
+
+        Label loadReport = new Label(compositeReport, SWT.NONE);
+        loadReport.setText("報告書読み込み（起動時にCSVファイルを全て読み込みます）");
+        loadReport.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+
+        final Button loadCreateShipLog = new Button(compositeReport, SWT.CHECK);
+        loadCreateShipLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        loadCreateShipLog.setText("建造報告書を読み込む*");
+        loadCreateShipLog.setSelection(AppConfig.get().isLoadCreateShipLog());
+
+        final Button loadCreateItemLog = new Button(compositeReport, SWT.CHECK);
+        loadCreateItemLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        loadCreateItemLog.setText("開発報告書を読み込む*");
+        loadCreateItemLog.setSelection(AppConfig.get().isLoadCreateItemLog());
+
+        final Button loadMissionLog = new Button(compositeReport, SWT.CHECK);
+        loadMissionLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        loadMissionLog.setText("遠征報告書を読み込む*");
+        loadMissionLog.setSelection(AppConfig.get().isLoadMissionLog());
+
+        // 艦隊タブ タブ
+        compositeFleetTab.setLayout(new GridLayout(2, false));
+
+        final Button balloonBybadlyDamage = new Button(compositeFleetTab, SWT.CHECK);
+        balloonBybadlyDamage.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+        balloonBybadlyDamage.setText("大破でバルーンツールチップを表示");
+        balloonBybadlyDamage.setSelection(AppConfig.get().isBalloonBybadlyDamage());
+
+        final Button visibleOnReturnMission = new Button(compositeFleetTab, SWT.CHECK);
+        visibleOnReturnMission.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+        visibleOnReturnMission.setText("遠征からの帰還時に母港タブを表示");
+        visibleOnReturnMission.setSelection(AppConfig.get().isVisibleOnReturnMission());
+
+        final Button visibleOnReturnBathwater = new Button(compositeFleetTab, SWT.CHECK);
+        visibleOnReturnBathwater.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+        visibleOnReturnBathwater.setText("お風呂から上がる時に母港タブを表示");
+        visibleOnReturnBathwater.setSelection(AppConfig.get().isVisibleOnReturnBathwater());
+
+        Label sakutekiLabel = new Label(compositeFleetTab, SWT.NONE);
+        sakutekiLabel.setText("索敵計算式");
+        sakutekiLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+
+        final Button useRecommendedSakuteki = new Button(compositeFleetTab, SWT.CHECK);
+        useRecommendedSakuteki.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        useRecommendedSakuteki.setText("推奨計算式を使用する");
+        useRecommendedSakuteki.setSelection(AppConfig.get().isUseRecommendedSakuteki());
+
+        final Combo sakutekiCombo = new Combo(compositeFleetTab, SWT.READ_ONLY);
+        sakutekiCombo.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+        sakutekiCombo.add("A.艦隊素の索敵値 + 装備の索敵値");
+        sakutekiCombo.add("B.ほっぼアルファVer2.0.1(艦隊素の索敵分 + 装備分 + 提督Lv分)");
+        sakutekiCombo.add("C.ほっぼアルファVer2.0.1(旧:2-5式(秋))");
+        sakutekiCombo.add("D.2-5式(秋)(艦隊素の索敵分 + 装備分 + 提督Lv分)");
+        sakutekiCombo.add("E.装備込みの艦隊索敵値合計(2-5式(秋))");
+        sakutekiCombo.add("F.2-5式(旧)(偵察機×2 + 電探 + √(装備込みの艦隊索敵値-偵察機-電探))");
+        sakutekiCombo.add("G.装備込みの艦隊索敵値(2-5式(旧))");
+        sakutekiCombo.select(AppConfig.get().getSakutekiMethod());
+
+        SelectionListener recommendedSakutekiListener = new SelectionAdapter() {
+            int sakutekiMethod = sakutekiCombo.getSelectionIndex();
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (useRecommendedSakuteki.getSelection()) {
+                    this.sakutekiMethod = sakutekiCombo.getSelectionIndex();
+                    sakutekiCombo.select(1);
+                    sakutekiCombo.setEnabled(false);
+                }
+                else {
+                    sakutekiCombo.setEnabled(true);
+                    sakutekiCombo.select(this.sakutekiMethod);
+                }
+            }
+        };
+        recommendedSakutekiListener.widgetSelected(null);
+        useRecommendedSakuteki.addSelectionListener(recommendedSakutekiListener);
+
+        Label mainLog = new Label(compositeFleetTab, SWT.NONE);
+        mainLog.setText("母港タブのログ");
+        mainLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+
+        final Button printSortieLog = new Button(compositeFleetTab, SWT.CHECK);
+        printSortieLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+        printSortieLog.setText("マップや勝利判定をログに表示");
+        printSortieLog.setSelection(AppConfig.get().isPrintSortieLog());
+
+        final Button printSunkLog = new Button(compositeFleetTab, SWT.CHECK);
+        printSunkLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+        printSunkLog.setText("艦娘の轟沈をログに表示（ダメコン未対応）");
+        printSunkLog.setSelection(AppConfig.get().isPrintSunkLog());
+
+        final Button printUpdateLog = new Button(compositeFleetTab, SWT.CHECK);
+        printUpdateLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+        printUpdateLog.setText("更新系ログを表示");
+        printUpdateLog.setSelection(AppConfig.get().isPrintUpdateLog());
+
+        // 艦隊タブ タブ
+        compositeFleetDetail.setLayout(new GridLayout(1, false));
+
+        Group leveling = new Group(compositeFleetDetail, SWT.NONE);
         leveling.setText("レベリング");
         leveling.setLayout(new RowLayout());
         leveling.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -350,89 +490,44 @@ public final class ConfigDialog extends Dialog {
             count++;
         }
 
-        final Button warnByNeedSupply = new Button(compositeFleetTab, SWT.CHECK);
+        final Button warnByNeedSupply = new Button(compositeFleetDetail, SWT.CHECK);
         warnByNeedSupply.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         warnByNeedSupply.setText("補給不足で警告アイコン表示");
         warnByNeedSupply.setSelection(AppConfig.get().isWarnByNeedSupply());
 
-        final Button warnByCondState = new Button(compositeFleetTab, SWT.CHECK);
+        final Button warnByCondState = new Button(compositeFleetDetail, SWT.CHECK);
         warnByCondState.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         warnByCondState.setText("疲労状態で警告アイコン表示");
         warnByCondState.setSelection(AppConfig.get().isWarnByCondState());
 
-        final Button warnByHalfDamage = new Button(compositeFleetTab, SWT.CHECK);
+        final Button warnByHalfDamage = new Button(compositeFleetDetail, SWT.CHECK);
         warnByHalfDamage.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         warnByHalfDamage.setText("中破で警告アイコン表示");
         warnByHalfDamage.setSelection(AppConfig.get().isWarnByHalfDamage());
 
-        final Button fatalBybadlyDamage = new Button(compositeFleetTab, SWT.CHECK);
+        final Button fatalBybadlyDamage = new Button(compositeFleetDetail, SWT.CHECK);
         fatalBybadlyDamage.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         fatalBybadlyDamage.setText("大破で致命的アイコン表示");
         fatalBybadlyDamage.setSelection(AppConfig.get().isFatalBybadlyDamage());
 
-        final Button balloonBybadlyDamage = new Button(compositeFleetTab, SWT.CHECK);
-        balloonBybadlyDamage.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        balloonBybadlyDamage.setText("大破でバルーンツールチップを表示");
-        balloonBybadlyDamage.setSelection(AppConfig.get().isBalloonBybadlyDamage());
-
-        final Button visibleOnReturnMission = new Button(compositeFleetTab, SWT.CHECK);
-        visibleOnReturnMission.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        visibleOnReturnMission.setText("遠征からの帰還時に母港タブを表示");
-        visibleOnReturnMission.setSelection(AppConfig.get().isVisibleOnReturnMission());
-
-        final Button visibleOnReturnBathwater = new Button(compositeFleetTab, SWT.CHECK);
-        visibleOnReturnBathwater.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        visibleOnReturnBathwater.setText("お風呂から上がる時に母港タブを表示");
-        visibleOnReturnBathwater.setSelection(AppConfig.get().isVisibleOnReturnBathwater());
-
-        final Button useMonoIcon = new Button(compositeFleetTab, SWT.CHECK);
+        final Button useMonoIcon = new Button(compositeFleetDetail, SWT.CHECK);
         useMonoIcon.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         useMonoIcon.setText("モノクロアイコンを使用");
         useMonoIcon.setSelection(AppConfig.get().isMonoIcon());
 
-        Group sakutekiGroup = new Group(compositeFleetTab, SWT.NONE);
-        sakutekiGroup.setText("索敵計算式");
-        sakutekiGroup.setLayout(new GridLayout(1, false));
-        sakutekiGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        final Button useRecommendedSakuteki = new Button(sakutekiGroup, SWT.CHECK);
-        useRecommendedSakuteki.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        useRecommendedSakuteki.setText("推奨計算式を使用する");
-        useRecommendedSakuteki.setSelection(AppConfig.get().isUseRecommendedSakuteki());
-
-        final Combo sakutekiCombo = new Combo(sakutekiGroup, SWT.READ_ONLY);
-        sakutekiCombo.add("A.艦隊素の索敵値 + 装備の索敵値");
-        sakutekiCombo.add("B.ほっぼアルファVer2.0.1(艦隊素の索敵分 + 装備分 + 提督Lv分)");
-        sakutekiCombo.add("C.ほっぼアルファVer2.0.1(旧:2-5式(秋))");
-        sakutekiCombo.add("D.2-5式(秋)(艦隊素の索敵分 + 装備分 + 提督Lv分)");
-        sakutekiCombo.add("E.装備込みの艦隊索敵値合計(2-5式(秋))");
-        sakutekiCombo.add("F.2-5式(旧)(偵察機×2 + 電探 + √(装備込みの艦隊索敵値-偵察機-電探))");
-        sakutekiCombo.add("G.装備込みの艦隊索敵値(2-5式(旧))");
-        sakutekiCombo.select(AppConfig.get().getSakutekiMethod());
-
-        SelectionListener recommendedSakutekiListener = new SelectionAdapter() {
-            int sakutekiMethod = sakutekiCombo.getSelectionIndex();
-
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (useRecommendedSakuteki.getSelection()) {
-                    this.sakutekiMethod = sakutekiCombo.getSelectionIndex();
-                    sakutekiCombo.select(1);
-                    sakutekiCombo.setEnabled(false);
-                }
-                else {
-                    sakutekiCombo.setEnabled(true);
-                    sakutekiCombo.select(this.sakutekiMethod);
-                }
-            }
-        };
-        recommendedSakutekiListener.widgetSelected(null);
-        useRecommendedSakuteki.addSelectionListener(recommendedSakutekiListener);
-
         // 通知
-        Composite compositeNotify = new Composite(this.composite, SWT.NONE);
-        this.compositeMap.put("notify", compositeNotify);
         compositeNotify.setLayout(new GridLayout(3, false));
+
+        Label label3 = new Label(compositeNotify, SWT.NONE);
+        label3.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        label3.setText("音量(%)");
+
+        final Text soundlevel = new Text(compositeNotify, SWT.BORDER);
+        GridData gdSoundlevel = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+        gdSoundlevel.widthHint = 90;
+        soundlevel.setLayoutData(gdSoundlevel);
+        soundlevel.setText(Integer.toString((int) (AppConfig.get().getSoundLevel() * 100)));
+        new Label(compositeNotify, SWT.NONE);
 
         final Button remind = new Button(compositeNotify, SWT.CHECK);
         remind.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
@@ -510,8 +605,6 @@ public final class ConfigDialog extends Dialog {
         fullyLabel4.setText("以下でバルーン通知");
 
         // キャプチャ タブ
-        Composite compositeCapture = new Composite(this.composite, SWT.NONE);
-        this.compositeMap.put("capture", compositeCapture);
         compositeCapture.setLayout(new GridLayout(3, false));
 
         Label label4 = new Label(compositeCapture, SWT.NONE);
@@ -560,53 +653,27 @@ public final class ConfigDialog extends Dialog {
         createDateFolder.setText("日付のフォルダを作成する");
         createDateFolder.setSelection(AppConfig.get().isCreateDateFolder());
 
-        // 資材ログ タブ
-        Composite compositeChart = new Composite(this.composite, SWT.NONE);
-        this.compositeMap.put("chart", compositeChart);
+        // 資材チャート タブ
         compositeChart.setLayout(new GridLayout(3, false));
 
-        Label materialintervallabel = new Label(compositeChart, SWT.NONE);
-        materialintervallabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        materialintervallabel.setText("資材ログ保存間隔(秒)");
-
-        final Spinner materialintervalSpinner = new Spinner(compositeChart, SWT.BORDER);
-        materialintervalSpinner.setMaximum(60 * 60 * 24);
-        materialintervalSpinner.setMinimum(10);
-        materialintervalSpinner.setSelection(AppConfig.get().getMaterialLogInterval());
-        GridData gdMaterialIntervalSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1);
-        gdMaterialIntervalSpinner.widthHint = 55;
-        materialintervalSpinner.setLayoutData(gdMaterialIntervalSpinner);
-
-        final Button detailMaterial = new Button(compositeChart, SWT.CHECK);
-        detailMaterial.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-        detailMaterial.setText("遠征帰還時や開発・建造時に資材ログ出力する");
-        detailMaterial.setSelection(AppConfig.get().isMaterialLogDetail());
-
-        Group chartGroup = new Group(compositeChart, SWT.NONE);
-        chartGroup.setText("資材チャート");
-        chartGroup.setLayout(new GridLayout(3, false));
-        chartGroup.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-
-        final Label fuel = this.createColorSetting(chartGroup, "燃料の色■",
+        final Label fuel = this.createColorSetting(compositeChart, "燃料の色■",
                 AppConfig.get().getFuelColor(), AppConstants.CHART_COLOR_TABLE[0]);
-        final Label ammo = this.createColorSetting(chartGroup, "弾薬の色■",
+        final Label ammo = this.createColorSetting(compositeChart, "弾薬の色■",
                 AppConfig.get().getAmmoColor(), AppConstants.CHART_COLOR_TABLE[1]);
-        final Label metal = this.createColorSetting(chartGroup, "鋼材の色■",
+        final Label metal = this.createColorSetting(compositeChart, "鋼材の色■",
                 AppConfig.get().getMetalColor(), AppConstants.CHART_COLOR_TABLE[2]);
-        final Label bauxite = this.createColorSetting(chartGroup, "ボーキの色■",
+        final Label bauxite = this.createColorSetting(compositeChart, "ボーキの色■",
                 AppConfig.get().getBauxiteColor(), AppConstants.CHART_COLOR_TABLE[3]);
-        final Label burner = this.createColorSetting(chartGroup, "バーナーの色■",
+        final Label burner = this.createColorSetting(compositeChart, "バーナーの色■",
                 AppConfig.get().getBurnerColor(), AppConstants.CHART_COLOR_TABLE[4]);
-        final Label bucket = this.createColorSetting(chartGroup, "バケツの色■",
+        final Label bucket = this.createColorSetting(compositeChart, "バケツの色■",
                 AppConfig.get().getBucketColor(), AppConstants.CHART_COLOR_TABLE[5]);
-        final Label research = this.createColorSetting(chartGroup, "開発資材の色■",
+        final Label research = this.createColorSetting(compositeChart, "開発資材の色■",
                 AppConfig.get().getResearchColor(), AppConstants.CHART_COLOR_TABLE[6]);
-        final Label screw = this.createColorSetting(chartGroup, "ネジの色■",
+        final Label screw = this.createColorSetting(compositeChart, "ネジの色■",
                 AppConfig.get().getScrewColor(), AppConstants.CHART_COLOR_TABLE[6]);
 
         // ウィンドウ
-        Composite compositeWindow = new Composite(this.composite, SWT.NONE);
-        this.compositeMap.put("window", compositeWindow);
         compositeWindow.setLayout(new GridLayout(3, false));
 
         final Button enableMoveWithDD = new Button(compositeWindow, SWT.CHECK);
@@ -623,12 +690,6 @@ public final class ConfigDialog extends Dialog {
         opaqueIntervalGroup.setText("マウスが離れてから元の透明度に戻るまでの時間");
         opaqueIntervalGroup.setLayout(new GridLayout(2, false));
         opaqueIntervalGroup.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 3, 1));
-
-        //Label opaqueInterval = new Label(compositeWindow, SWT.NONE);
-        //opaqueInterval.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-        //opaqueInterval.setText("マウスが離れてから元の透明度に戻るまでの時間");
-
-        //new Label(compositeWindow, SWT.NONE);
 
         final Spinner opaqueIntervalSpinner = new Spinner(opaqueIntervalGroup, SWT.BORDER);
         opaqueIntervalSpinner.setMaximum(60 * 60 * 10);
@@ -661,56 +722,7 @@ public final class ConfigDialog extends Dialog {
             shipTableNameText[i].setText(AppConfig.get().getShipTableNames()[i]);
         }
 
-        // プロキシ
-        Composite compositeProxy = new Composite(this.composite, SWT.NONE);
-        this.compositeMap.put("connection", compositeProxy);
-        compositeProxy.setLayout(new GridLayout(4, false));
-
-        final Button useProxyButton = new Button(compositeProxy, SWT.CHECK);
-        useProxyButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
-        useProxyButton.setText("接続にプロキシを使用する*");
-        useProxyButton.setSelection(AppConfig.get().isUseProxy());
-
-        Label proxyHostLabel = new Label(compositeProxy, SWT.NONE);
-        proxyHostLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        proxyHostLabel.setText("ホスト:");
-
-        final Text proxyHostText = new Text(compositeProxy, SWT.BORDER);
-        GridData gdProxyHostText = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdProxyHostText.widthHint = 100;
-        proxyHostText.setLayoutData(gdProxyHostText);
-        proxyHostText.setText(AppConfig.get().getProxyHost());
-
-        Label proxyPortLabel = new Label(compositeProxy, SWT.NONE);
-        proxyPortLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        proxyPortLabel.setText("ポート:");
-
-        final Spinner proxyPortSpinner = new Spinner(compositeProxy, SWT.BORDER);
-        proxyPortSpinner.setMaximum(65535);
-        proxyPortSpinner.setMinimum(1);
-        proxyPortSpinner.setSelection(AppConfig.get().getProxyPort());
-        GridData gdProxyPortSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdProxyPortSpinner.widthHint = 55;
-        proxyPortSpinner.setLayoutData(gdProxyPortSpinner);
-
-        final Button sendDatabaseButton = new Button(compositeProxy, SWT.CHECK);
-        sendDatabaseButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
-        sendDatabaseButton.setText("艦これ統計データベースへデータを送信する");
-        sendDatabaseButton.setSelection(AppConfig.get().isSendDatabase());
-
-        Label accessKeyLabel = new Label(compositeProxy, SWT.NONE);
-        accessKeyLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        accessKeyLabel.setText("アクセスキー:");
-
-        final Text accessKeyText = new Text(compositeProxy, SWT.BORDER);
-        GridData gdAccessKeyText = new GridData(SWT.FILL, SWT.CENTER, false, false, 3, 1);
-        // gdAccessKeyText.widthHint = 300;
-        accessKeyText.setLayoutData(gdAccessKeyText);
-        accessKeyText.setText(AppConfig.get().getAccessKey());
-
         // Push通知タブ
-        Composite compositePushNotify = new Composite(this.composite, SWT.NONE);
-        this.compositeMap.put("pushnotify", compositePushNotify);
         compositePushNotify.setLayout(new GridLayout(3, false));
 
         final Button prowl = new Button(compositePushNotify, SWT.CHECK);
@@ -856,14 +868,7 @@ public final class ConfigDialog extends Dialog {
         });
         TestNotifyNdockBtn.setText("テスト通知(入渠)");
 
-        final Button databaseLogButton = new Button(compositeProxy, SWT.CHECK);
-        databaseLogButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
-        databaseLogButton.setText("データベースへの送信をログ出力する");
-        databaseLogButton.setSelection(AppConfig.get().isDatabaseSendLog());
-
         // Development タブ
-        Composite compositeDevelopment = new Composite(this.composite, SWT.NONE);
-        this.compositeMap.put("development", compositeDevelopment);
         compositeDevelopment.setLayout(new GridLayout(2, false));
 
         new Label(compositeDevelopment, SWT.NONE);
@@ -950,6 +955,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setBattleLogPath(battlelogDir.getText());
                 AppConfig.get().setUpdateCheck(checkUpdate.getSelection());
                 AppConfig.get().setAllowOnlyFromLocalhost(onlyFromLocalhost.getSelection());
+                AppConfig.get().setCloseOutsidePort(closeOutsidePort.getSelection());
                 // maintab
                 AppConfig.get().setPrintSortieLog(printSortieLog.getSelection());
                 AppConfig.get().setPrintSunkLog(printSunkLog.getSelection());
@@ -1056,8 +1062,8 @@ public final class ConfigDialog extends Dialog {
             }
         });
 
-        for (Entry<String, Composite> entry : this.compositeMap.entrySet()) {
-            LayoutLogic.hide(entry.getValue(), true);
+        for (Control control : this.composite.getChildren()) {
+            LayoutLogic.hide(control, true);
         }
 
         sashForm.setWeights(new int[] { 2, 5 });
@@ -1065,7 +1071,7 @@ public final class ConfigDialog extends Dialog {
         this.scrolledComposite.setMinSize(this.composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
     }
 
-    private Label createColorSetting(Group chartGroup, String title, RGB currentColor, final RGB defaultColor) {
+    private Label createColorSetting(Composite chartGroup, String title, RGB currentColor, final RGB defaultColor) {
         final Label label = new Label(chartGroup, SWT.NONE);
         label.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
         label.setText(title);
@@ -1116,14 +1122,10 @@ public final class ConfigDialog extends Dialog {
         @Override
         public void widgetSelected(SelectionEvent e) {
             Object data = e.item.getData();
-            if (data instanceof String) {
-                String treeKey = (String) data;
-                for (Entry<String, Composite> entry : this.dialog.compositeMap.entrySet()) {
-                    if (entry.getKey().equals(treeKey)) {
-                        LayoutLogic.hide(entry.getValue(), false);
-                    } else {
-                        LayoutLogic.hide(entry.getValue(), true);
-                    }
+            if (data instanceof Composite) {
+                Composite selected = (Composite) data;
+                for (Control control : this.dialog.composite.getChildren()) {
+                    LayoutLogic.hide(control, selected != control);
                 }
                 this.dialog.composite.layout();
                 this.dialog.scrolledComposite.setMinSize(this.dialog.composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));

@@ -58,7 +58,7 @@ public final class SelectVisibleColumnDialog extends WindowBase {
         this.shell.setLayout(new FillLayout(SWT.HORIZONTAL));
 
         // ヘッダー
-        String[] header = this.dialog.getTableHeader();
+        String[] header = this.dialog.header;
         // カラム設定を取得
         boolean[] visibles = this.dialog.getConfig().getVisibleColumn();
 

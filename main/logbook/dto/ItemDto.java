@@ -10,8 +10,9 @@ import javax.json.JsonObject;
 import com.dyuproject.protostuff.Tag;
 
 /**
+ * 個別装備
+ * ロックや改修値などの情報を持つ
  * @author Nekopanda
- *
  */
 public class ItemDto extends AbstractDto {
 
@@ -49,6 +50,7 @@ public class ItemDto extends AbstractDto {
     }
 
     /**
+     * この装備のマスターデータ
      * @return info
      */
     // java beans はメソッドで認識するのでここに付ける必要がある
@@ -65,6 +67,7 @@ public class ItemDto extends AbstractDto {
     }
 
     /**
+     * 装備ID
      * @return slotitemId
      */
     public int getSlotitemId() {
@@ -79,6 +82,7 @@ public class ItemDto extends AbstractDto {
     }
 
     /**
+     * 装備個別ID
      * @return id
      */
     public int getId() {
@@ -93,6 +97,7 @@ public class ItemDto extends AbstractDto {
     }
 
     /**
+     * ロックされているか？
      * @return locked
      */
     public boolean isLocked() {
@@ -107,6 +112,7 @@ public class ItemDto extends AbstractDto {
     }
 
     /**
+     * 改修値
      * @return level
      */
     public int getLevel() {
@@ -125,6 +131,7 @@ public class ItemDto extends AbstractDto {
     }
 
     /**
+     * 表示分類名
      * @return 表示分類名
      */
     public String getTypeName() {
@@ -180,7 +187,7 @@ public class ItemDto extends AbstractDto {
     }
 
     /**
-     * 表示名を取得
+     * 航海日誌における表示名を取得
      * @return
      */
     public String getFriendlyName() {
@@ -190,6 +197,10 @@ public class ItemDto extends AbstractDto {
         return this.info.getName();
     }
 
+    /**
+     * 装備のパラメータ
+     * @return
+     */
     public ShipParameters getParam() {
         return this.info.getParam();
     }

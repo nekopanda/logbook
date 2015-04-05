@@ -21,15 +21,18 @@ import logbook.constants.AppConstants;
 import logbook.dto.chart.Resource;
 import logbook.dto.chart.ResourceLog;
 import logbook.dto.chart.ResourceLog.SortableLog;
-import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.ResourceChart;
+import logbook.gui.logic.ResourceChart.ActiveLevel;
 import logbook.gui.logic.TableItemCreator;
+import logbook.scripting.TableItemCreatorProxy;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -40,6 +43,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -47,6 +52,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
@@ -58,6 +64,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
  * 資材チャートのダイアログ
@@ -97,6 +104,9 @@ public final class ResourceChartDialog extends WindowBase {
     /** 最後に読み込んだ時間 */
     private Date lastLoadDate = new Date(0);
 
+    private int nextActivated = -1;
+    private int nowActivated = -1;
+
     private Image currentImage;
 
     private final Button[] enableCheckButtons = new Button[8];
@@ -112,7 +122,6 @@ public final class ResourceChartDialog extends WindowBase {
 
     /**
      * Open the dialog.
-     * @return the result
      */
     @Override
     public void open() {
@@ -209,14 +218,63 @@ public final class ResourceChartDialog extends WindowBase {
                 ResourceChartDialog.this.reloadImage();
             }
         };
-        this.enableCheckButtons[0] = createCheckbox(enableCheckGroup, "燃料", checkboxListener);
-        this.enableCheckButtons[1] = createCheckbox(enableCheckGroup, "弾薬", checkboxListener);
-        this.enableCheckButtons[2] = createCheckbox(enableCheckGroup, "鋼材", checkboxListener);
-        this.enableCheckButtons[3] = createCheckbox(enableCheckGroup, "ボーキ", checkboxListener);
-        this.enableCheckButtons[4] = createCheckbox(enableCheckGroup, "バーナー", checkboxListener);
-        this.enableCheckButtons[5] = createCheckbox(enableCheckGroup, "バケツ", checkboxListener);
-        this.enableCheckButtons[6] = createCheckbox(enableCheckGroup, "開発資材", checkboxListener);
-        this.enableCheckButtons[7] = createCheckbox(enableCheckGroup, "ネジ", checkboxListener);
+        final Runnable updateImage = new Runnable() {
+            @Override
+            public void run() {
+                ResourceChartDialog.this.updateActivatedImage();
+            }
+        };
+        MouseTrackListener checkboxMouseListener = new MouseTrackListener() {
+            @Override
+            public void mouseEnter(MouseEvent e) {
+                Control control = (Control) e.getSource();
+                ResourceChartDialog.this.nextActivated = (Integer) control.getData();
+                Display.getDefault().asyncExec(updateImage);
+            }
+
+            @Override
+            public void mouseExit(MouseEvent e) {
+                ResourceChartDialog.this.nextActivated = -1;
+                Display.getDefault().timerExec(100, updateImage);
+            }
+
+            @Override
+            public void mouseHover(MouseEvent e) {
+            }
+        };
+        String[] resourceNames = new String[] {
+                "燃料",
+                "弾薬",
+                "鋼材",
+                "ボーキ",
+                "バーナー",
+                "バケツ",
+                "開発資材",
+                "ネジ"
+        };
+        RGB[] colors = AppConfig.get().getResourceColors();
+        for (int i = 0; i < 8; ++i) {
+            Button check = new Button(enableCheckGroup, SWT.CHECK);
+            check.setData(i);
+            check.addSelectionListener(checkboxListener);
+            check.addMouseTrackListener(checkboxMouseListener);
+            check.setSelection(true);
+
+            // ButtonはWindowsだと色を変えられないので画像化して貼り付ける
+            String text = resourceNames[i];
+            GC gc = new GC(check);
+            Point textExtent = gc.stringExtent(text);
+            gc.dispose();
+            Image image = new Image(check.getDisplay(), new Rectangle(0, 0, textExtent.x, textExtent.y));
+            GC gcImage = new GC(image);
+            gcImage.setBackground(check.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+            gcImage.setForeground(SWTResourceManager.getColor(colors[i]));
+            gcImage.drawText(text, 0, 0);
+            gcImage.dispose();
+            check.setImage(image);
+
+            this.enableCheckButtons[i] = check;
+        }
 
         this.canvas = new Canvas(compositeChart, SWT.NO_BACKGROUND);
         this.canvas.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1));
@@ -258,6 +316,13 @@ public final class ResourceChartDialog extends WindowBase {
         this.updateContents();
     }
 
+    private void updateActivatedImage() {
+        if (this.nowActivated != this.nextActivated) {
+            this.nowActivated = this.nextActivated;
+            this.reloadImage();
+        }
+    }
+
     private void updateContents() {
         File report = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), AppConstants.LOG_RESOURCE));
         try {
@@ -287,18 +352,10 @@ public final class ResourceChartDialog extends WindowBase {
                     this.currentImage.dispose();
                 }
                 this.currentImage = createImage(this.log, scale, scaleText, width, height,
-                        ResourceChartDialog.this.getResourceEnabled());
+                        ResourceChartDialog.this.getResourceActiveLevel(), false);
                 this.canvas.redraw();
             }
         }
-    }
-
-    private static Button createCheckbox(Composite parent, String text, SelectionListener listener) {
-        Button check = new Button(parent, SWT.CHECK);
-        check.setText(text);
-        check.addSelectionListener(listener);
-        check.setSelection(true);
-        return check;
     }
 
     /**
@@ -327,12 +384,13 @@ public final class ResourceChartDialog extends WindowBase {
      */
     private void setTableBody() {
         this.table.removeAll();
-        TableItemCreator creator = CreateReportLogic.DEFAULT_TABLE_ITEM_CREATOR;
-        creator.init();
+        TableItemCreator creator = TableItemCreatorProxy.get(AppConstants.RESOURCECHAR_PREFIX);
+        creator.begin(this.header);
         for (int i = 0; i < this.body.size(); i++) {
             String[] line = this.body.get(i);
             creator.create(this.table, line, i);
         }
+        creator.end();
     }
 
     @Override
@@ -354,13 +412,14 @@ public final class ResourceChartDialog extends WindowBase {
      * @return グラフイメージ
      */
     private static Image createImage(ResourceLog log, int scale, String scaleText, int width, int height,
-            boolean[] enabled) {
+            ActiveLevel[] activeLevel, boolean printHeader) {
 
         Image image = new Image(Display.getCurrent(), Math.max(width, 1), Math.max(height, 1));
         try {
             GC gc = new GC(image);
             try {
-                ResourceChart chart = new ResourceChart(gc, log, scale, scaleText, width, height, enabled);
+                ResourceChart chart = new ResourceChart(
+                        gc, log, scale, scaleText, width, height, activeLevel, printHeader);
                 chart.draw(gc);
             } finally {
                 gc.dispose();
@@ -450,12 +509,27 @@ public final class ResourceChartDialog extends WindowBase {
         return body;
     }
 
-    private boolean[] getResourceEnabled() {
-        boolean[] enabled = new boolean[this.enableCheckButtons.length];
-        for (int i = 0; i < enabled.length; ++i) {
-            enabled[i] = this.enableCheckButtons[i].getSelection();
+    private ActiveLevel[] getResourceActiveLevel() {
+        ActiveLevel[] activated = new ActiveLevel[this.enableCheckButtons.length];
+        int nowActivated = ((this.nowActivated != -1) && this.enableCheckButtons[this.nowActivated].getSelection())
+                ? this.nowActivated
+                : -1;
+        for (int i = 0; i < activated.length; ++i) {
+            boolean enabled = this.enableCheckButtons[i].getSelection();
+            if (!enabled) {
+                activated[i] = ActiveLevel.DISABLED;
+            }
+            else if (nowActivated == -1) {
+                activated[i] = ActiveLevel.NORMAL;
+            }
+            else if (nowActivated == i) {
+                activated[i] = ActiveLevel.ACTIVE;
+            }
+            else {
+                activated[i] = ActiveLevel.INACTIVE;
+            }
         }
-        return enabled;
+        return activated;
     }
 
     private void saveImage() {
@@ -486,7 +560,8 @@ public final class ResourceChartDialog extends WindowBase {
                 int height = size.y - 1;
                 try (OutputStream out = new BufferedOutputStream(new FileOutputStream(file))) {
                     // イメージの生成
-                    Image image = createImage(this.log, scale, scaleText, width, height, this.getResourceEnabled());
+                    Image image = createImage(
+                            this.log, scale, scaleText, width, height, this.getResourceActiveLevel(), true);
                     try {
                         ImageLoader loader = new ImageLoader();
                         loader.data = new ImageData[] { image.getImageData() };

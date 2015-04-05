@@ -23,7 +23,7 @@ public final class AsyncExecUpdateCheck extends Thread {
     /**
      * コンストラクター
      * 
-     * @param shell
+     * @param handler
      */
     public AsyncExecUpdateCheck(UpdateResult handler) {
         this.handler = handler;

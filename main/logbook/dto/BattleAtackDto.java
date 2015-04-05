@@ -15,25 +15,31 @@ import javax.json.JsonValue;
 import com.dyuproject.protostuff.Tag;
 
 /**
+ * 攻撃シーケンス
  * @author Nekopanda
- *
- * 攻撃シーケンスを読み取ってBattleAtackDtoに変換
  */
 public class BattleAtackDto {
+    /** 攻撃の種類 */
     @Tag(1)
     public AtackKind kind;
+    /** 味方からの攻撃か？ */
     @Tag(2)
     public boolean friendAtack;
+    /** 攻撃元(0-11) */
     @Tag(3)
-    public int[] origin; // 攻撃元(0-11)
+    public int[] origin;
+    /** 雷撃の攻撃先 */
     @Tag(4)
-    public int[] ot; // 雷撃の攻撃先
+    public int[] ot;
+    /** 雷撃の与ダメージ */
     @Tag(5)
-    public int[] ydam; // 雷撃の与ダメージ
+    public int[] ydam;
+    /** 攻撃先(0-11) */
     @Tag(6)
-    public int[] target; // 攻撃先(0-11)
+    public int[] target;
+    /** ダメージ */
     @Tag(7)
-    public int[] damage; // ダメージ
+    public int[] damage;
 
     private static List<BattleAtackDto> makeHougeki(
             JsonArray at_list, JsonArray df_list, JsonArray damage_list) {
@@ -208,6 +214,13 @@ public class BattleAtackDto {
         }
     }
 
+    /**
+     * 航空戦を読み込む
+     * @param plane_from
+     * @param raigeki
+     * @param combined
+     * @return
+     */
     public static List<BattleAtackDto> makeAir(JsonValue plane_from, JsonValue raigeki, JsonValue combined) {
         if ((raigeki == null) || (raigeki == JsonValue.NULL) || (plane_from == null) || (plane_from == JsonValue.NULL))
             return null;
@@ -233,6 +246,12 @@ public class BattleAtackDto {
         return Arrays.asList(new BattleAtackDto[] { fatack, eatack });
     }
 
+    /**
+     * 雷撃戦を読み込む
+     * @param raigeki
+     * @param second
+     * @return
+     */
     public static List<BattleAtackDto> makeRaigeki(JsonValue raigeki, boolean second) {
         if ((raigeki == null) || (raigeki == JsonValue.NULL))
             return null;
@@ -263,7 +282,7 @@ public class BattleAtackDto {
     }
 
     /**
-     * api_hougeki* を処理する
+     * api_hougeki* を読み込む
      * @param hougeki
      */
     public static List<BattleAtackDto> makeHougeki(JsonValue hougeki, boolean second) {
@@ -292,6 +311,11 @@ public class BattleAtackDto {
         return seq;
     }
 
+    /**
+     * 支援艦隊の攻撃を読み込む
+     * @param dam_list
+     * @return
+     */
     public static List<BattleAtackDto> makeSupport(JsonArray dam_list) {
         BattleAtackDto dto = new BattleAtackDto();
         dto.kind = AtackKind.SUPPORT;

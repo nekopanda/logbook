@@ -1,20 +1,31 @@
 package logbook.gui;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import logbook.config.AppConfig;
 import logbook.config.bean.TableConfigBean;
+import logbook.config.bean.TableConfigBean.Column;
+import logbook.config.bean.TableConfigBean.SortKey;
+import logbook.data.Data;
+import logbook.data.DataType;
+import logbook.data.EventListener;
+import logbook.data.context.GlobalContext;
 import logbook.gui.listener.TableKeyShortcutAdapter;
 import logbook.gui.listener.TableToClipboardAdapter;
 import logbook.gui.listener.TableToCsvSaveAdapter;
 import logbook.gui.logic.TableItemCreator;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
@@ -39,7 +50,9 @@ import org.eclipse.swt.widgets.TableColumn;
  * テーブルで構成されるダイアログの基底クラス
  *
  */
-public abstract class AbstractTableDialog extends WindowBase {
+public abstract class AbstractTableDialog extends WindowBase implements EventListener {
+    /** ロガー */
+    private static final Logger LOG = LogManager.getLogger(AbstractTableDialog.class);
 
     private static int MAX_PRINT_ITEMS = 2000;
 
@@ -49,13 +62,15 @@ public abstract class AbstractTableDialog extends WindowBase {
     protected Timer timer;
 
     /** ヘッダー */
-    protected String[] header = this.getTableHeader();
+    protected String[] header;
+
+    protected String[] headerId;
 
     /** テーブルに表示しているボディー */
     protected List<Comparable[]> body;
 
     /** ソート順序 */
-    protected final boolean[] orderflgs = new boolean[this.header.length];
+    protected boolean[] orderflgs;
 
     /** シェル */
     protected Shell shell;
@@ -87,6 +102,8 @@ public abstract class AbstractTableDialog extends WindowBase {
 
     private Display display;
 
+    protected boolean needsUpdate = true;
+
     /**
      * コンストラクター
      */
@@ -117,6 +134,16 @@ public abstract class AbstractTableDialog extends WindowBase {
         this.shell.setMenuBar(this.menubar);
         // テーブルより前に作成する必要があるコンポジットを作成
         this.createContentsBefore();
+        // ヘッダ
+        String[] headerWithId = this.getTableHeader();
+        this.header = new String[headerWithId.length];
+        this.headerId = new String[headerWithId.length];
+        for (int i = 0; i < headerWithId.length; ++i) {
+            String[] splitted = headerWithId[i].split("#");
+            this.header[i] = splitted[0];
+            this.headerId[i] = splitted[(splitted.length == 1) ? 0 : 1];
+        }
+        this.orderflgs = new boolean[this.header.length];
         // テーブル
         this.table = new Table(this.getTableParent(), SWT.FULL_SELECTION | SWT.MULTI);
         this.table.addKeyListener(new TableKeyShortcutAdapter(this.header, this.table));
@@ -212,8 +239,14 @@ public abstract class AbstractTableDialog extends WindowBase {
         reloadtable.addSelectionListener(new TableReloadAdapter());
         // テーブルにヘッダーをセット
         this.setTableHeader();
-        // テーブルに内容をセット
-        this.updateTableBody();
+        try {
+            // テーブルに内容をセット
+            this.updateTableBody();
+        } catch (Exception e) {
+            // データの読み取りでエラーが発生するかもしれないので落ちないようにしておく
+            this.body = new ArrayList<>();
+            LOG.warn("テーブルの内容生成でエラー", e);
+        }
         this.sortBody();
         this.setTableBody();
         // 列幅を復元
@@ -270,8 +303,13 @@ public abstract class AbstractTableDialog extends WindowBase {
                 AbstractTableDialog.this.tablemenu.dispose();
                 // タイマーの終了
                 AbstractTableDialog.this.disableCyclicReload();
+                // GlobalContextへのリスナ登録解除
+                GlobalContext.removeEventListener(AbstractTableDialog.this);
             }
         });
+
+        // 更新リスナ登録
+        GlobalContext.addEventListener(this);
 
         // orderflgsを初期化
         TableConfigBean.SortKey[] sortKeys = this.getConfig().getSortKeys();
@@ -300,20 +338,34 @@ public abstract class AbstractTableDialog extends WindowBase {
      * テーブルをリロードする
      */
     protected void reloadTable() {
+        //ApplicationMain.timeLogPrint("[S] reloadTable");
         this.table.setRedraw(false);
         int topindex = this.table.getTopIndex();
         int[] selection = this.table.getSelectionIndices();
         this.table.setSortColumn(null);
         this.disposeTableBody();
-        this.updateTableBody();
+        //ApplicationMain.timeLogPrint("[S] updateTableBody");
+        try {
+            // テーブルに内容をセット
+            this.updateTableBody();
+        } catch (Exception e) {
+            // データの読み取りでエラーが発生するかもしれないので落ちないようにしておく
+            this.body = new ArrayList<>();
+            LOG.warn("テーブルの内容生成でエラー", e);
+        }
+        //ApplicationMain.timeLogPrint("[E] updateTableBody");
         this.sortBody();
+        //ApplicationMain.timeLogPrint("[S] setTableBody");
         this.setTableBody();
+        //ApplicationMain.timeLogPrint("[E] setTableBody");
         this.setSortDirectionToHeader();
         this.table.setSelection(selection);
         this.table.setTopIndex(topindex);
         this.getShell().setText(this.getTitle());
         this.table.setRedraw(true);
         this.table.setTopIndex(topindex);
+        //ApplicationMain.timeLogPrint("[E] reloadTable");
+        this.needsUpdate = false;
     }
 
     /**
@@ -338,13 +390,14 @@ public abstract class AbstractTableDialog extends WindowBase {
      */
     protected void setTableBody() {
         TableItemCreator creator = this.getTableItemCreator();
-        creator.init();
+        creator.begin(this.getTableHeader());
         // 表示最大件数を制限する
         int numPrintItems = Math.min(MAX_PRINT_ITEMS, this.body.size());
         for (int i = 0; i < numPrintItems; i++) {
             Comparable[] line = this.body.get(i);
             creator.create(this.table, line, i);
         }
+        creator.end();
     }
 
     /**
@@ -423,56 +476,135 @@ public abstract class AbstractTableDialog extends WindowBase {
         this.table.setColumnOrder(columnOrder);
     }
 
+    private static void renumberColumnPosision(Column[] columns) {
+        Arrays.sort(columns, comparePosition);
+        int next = 0;
+        for (Column col : columns) {
+            col.pos = next++;
+        }
+    }
+
+    private static Comparator<Column> comparePosition = new Comparator<Column>() {
+        @Override
+        public int compare(Column arg0, Column arg1) {
+            return Integer.compare(arg0.pos, arg1.pos);
+        }
+    };
+
+    private void updateConfig() {
+
+        Map<String, Column> columns = this.config.getColumns();
+        String[] oldIds = this.config.getHeaderNames();
+        boolean[] oldVisibles = this.config.getVisibleColumn();
+        int[] oldWidth = this.config.getColumnWidth();
+        int[] oldOrder = this.config.getColumnOrder();
+
+        int oldLength = oldVisibles.length;
+
+        // 各カラムの位置
+        int[] oldPos = new int[oldLength];
+        for (int i = 0; i < oldLength; ++i) {
+            if (oldOrder[i] < oldLength) {
+                oldPos[oldOrder[i]] = i;
+            }
+        }
+
+        // 互換性維持
+        if (oldWidth == null) {
+            oldWidth = new int[oldLength];
+        }
+        if (oldIds == null) {
+            // ヘッダー情報がない場合は今のヘッダーから作る
+            oldLength = Math.min(oldLength, this.header.length);
+            oldIds = ArrayUtils.subarray(this.headerId, 0, oldLength);
+        }
+
+        // pos順にする
+        Column[] oldColumns = new Column[oldLength];
+        for (int i = 0; i < oldLength; ++i) {
+            oldColumns[i] = new Column(oldIds[i], oldVisibles[i], oldWidth[i], oldPos[i]);
+        }
+        Arrays.sort(oldColumns, comparePosition);
+
+        // columnsデータに追加
+        int next = 0;
+        for (Column col : oldColumns) {
+            Column colm = columns.get(col.id);
+            if (colm != null) {
+                // 順番を維持するためposをすりあわせる
+                next = Math.max(next, colm.pos);
+            }
+            col.pos = next++;
+            columns.put(col.id, col);
+        }
+
+        // columnsデータのpos番号を整理
+        renumberColumnPosision(columns.values().toArray(new Column[0]));
+
+        // 設定情報を引き継いだデータを作成
+        Column[] newColumns = new Column[this.header.length];
+        int nextNew = columns.size();
+        for (int i = 0; i < this.header.length; ++i) {
+            String id = this.headerId[i];
+            Column colm = columns.get(id);
+            if (colm != null) {
+                newColumns[i] = colm.clone();
+            }
+            else {
+                newColumns[i] = new Column(id, true, 0, nextNew++);
+            }
+        }
+
+        // pos番号を整理
+        renumberColumnPosision(newColumns.clone());
+
+        // 完成したのでデータを戻す
+        boolean[] visibles = new boolean[this.header.length];
+        int[] columnWidth = new int[this.header.length];
+        int[] columnOrder = new int[this.header.length];
+        for (int i = 0; i < this.header.length; ++i) {
+            visibles[i] = newColumns[i].visible;
+            columnWidth[i] = newColumns[i].width;
+            columnOrder[newColumns[i].pos] = i;
+        }
+
+        this.config.setColumns(columns);
+        this.config.setHeaderNames(this.headerId);
+        this.config.setVisibleColumn(visibles);
+        this.config.setColumnWidth(columnWidth);
+        this.config.setColumnOrder(columnOrder);
+
+        // sortOrderをチェック
+        SortKey[] sortKeys = this.config.getSortKeys();
+        for (int i = 0; i < sortKeys.length; ++i) {
+            if (sortKeys[i] != null) {
+                if (sortKeys[i].index >= this.header.length) {
+                    // 超えてる
+                    sortKeys[i] = null;
+                }
+            }
+        }
+        this.config.setSortKeys(sortKeys);
+    }
+
     protected TableConfigBean getConfig() {
         if (this.config == null) {
             this.config = AppConfig.get().getTableConfigMap().get(this.getWindowId());
 
             if (this.config != null) {
-                if (this.config.getColumnWidth() == null) { // 互換性維持
-                    this.config.setColumnWidth(new int[this.header.length]);
-                }
                 if ((this.config.getVisibleColumn() == null) ||
                         (this.config.getColumnOrder() == null)) {
+                    // これがないとお話にならないので
                     this.config = null;
                 }
                 else {
-                    int oldLength = this.config.getVisibleColumn().length;
-                    if (oldLength != this.header.length) {
-                        // 列の表示・非表示設定のサイズがカラム数と異なっている場合は長さを新しくする
-                        boolean[] visibles = new boolean[this.header.length];
-                        Arrays.fill(visibles, true);
-                        int[] columnWidth = new int[this.header.length];
-                        int[] columnOrder = new int[this.header.length];
-                        for (int i = 0; i < this.header.length; ++i) {
-                            columnOrder[i] = i;
-                        }
-                        int copyLength = Math.min(oldLength, this.header.length);
-                        System.arraycopy(this.config.getVisibleColumn(), 0, visibles, 0, copyLength);
-                        System.arraycopy(this.config.getColumnWidth(), 0, columnWidth, 0, copyLength);
-                        System.arraycopy(this.config.getColumnOrder(), 0, columnOrder, 0, copyLength);
-                        this.config.setVisibleColumn(visibles);
-                        this.config.setColumnWidth(columnWidth);
-                        this.config.setColumnOrder(columnOrder);
-
-                        // sortOrderをチェック
-                        TableConfigBean.SortKey[] sortKeys = this.config.getSortKeys();
-                        for (int i = 0; i < sortKeys.length; ++i) {
-                            if (sortKeys[i] != null) {
-                                if (sortKeys[i].index >= this.header.length) {
-                                    // 超えてる
-                                    sortKeys[i] = null;
-                                }
-                            }
-                        }
-                        this.config.setSortKeys(sortKeys);
-                    }
+                    // 古い設定を新しいバージョンに対応させる
+                    this.updateConfig();
                 }
             }
             if (this.config == null) {
                 this.config = this.getDefaultTableConfig();
             }
-
-            // 古い設定がある場合はできるだけ持ってくる
         }
         return this.config;
     }
@@ -508,7 +640,7 @@ public abstract class AbstractTableDialog extends WindowBase {
             this.config.setColumnWidth(widths);
             this.config.setCyclicReload(this.cyclicReloadMenuItem.getSelection());
             // 将来の互換性維持のため
-            this.config.setHeaderNames(this.header);
+            this.config.setHeaderNames(this.headerId);
 
             AppConfig.get().getTableConfigMap().put(this.getWindowId(), this.config);
         }
@@ -586,7 +718,16 @@ public abstract class AbstractTableDialog extends WindowBase {
      * テーブルヘッダーの{@link org.eclipse.swt.events.SelectionListener}です
      * @return SelectionListener
      */
-    protected abstract SelectionListener getHeaderSelectionListener();
+    protected SelectionListener getHeaderSelectionListener() {
+        return new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (e.getSource() instanceof TableColumn) {
+                    AbstractTableDialog.this.sortTableItems((TableColumn) e.getSource());
+                }
+            }
+        };
+    }
 
     /**
      * テーブルの初期状態
@@ -686,7 +827,18 @@ public abstract class AbstractTableDialog extends WindowBase {
                 if (sortKeys[i] != null) {
                     this.comparator.setIndex(sortKeys[i].index);
                     this.comparator.setOrder(sortKeys[i].order);
-                    Collections.sort(this.body, this.comparator);
+                    try {
+                        Collections.sort(this.body, this.comparator);
+                    } catch (ClassCastException e) {
+                        MessageBox box = new MessageBox(this.shell, SWT.OK | SWT.ICON_ERROR);
+                        box.setText("テーブルレコードをソート中にエラー");
+                        box.setMessage(this.getTitleMain() + "のレコードをソート中に型変換エラーが発生しました\n" +
+                                "外部スクリプトの返したデータに問題があるようです\n" +
+                                "最近インストールしたスクリプトがある場合は取り除くと解決されるかもしれません\n" +
+                                e.getMessage());
+                        box.open();
+                        return;
+                    }
                 }
             }
         }
@@ -708,6 +860,15 @@ public abstract class AbstractTableDialog extends WindowBase {
             this.timer.cancel();
             this.timer = null;
         }
+    }
+
+    /**
+     * データ受信
+     * デフォルト動作はどんなデータでも更新をONにする
+     */
+    @Override
+    public void update(DataType type, Data data) {
+        this.needsUpdate = true;
     }
 
     /**
@@ -838,6 +999,10 @@ public abstract class AbstractTableDialog extends WindowBase {
 
         @Override
         public void run() {
+            if (!this.dialog.needsUpdate) {
+                // 更新の必要はない
+                return;
+            }
             this.dialog.display.asyncExec(new Runnable() {
                 @Override
                 public void run() {

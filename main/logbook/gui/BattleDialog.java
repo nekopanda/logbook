@@ -83,7 +83,7 @@ public final class BattleDialog extends Dialog {
 
         int id = Integer.valueOf(this.id) - 1;
         BattleResultDto result = GlobalContext.getBattleResultList().get(id);
-        BattleDto battle = result.getBattleDto();
+        BattleDto battle = null;
 
         // タイトル
         Label lblTitle = new Label(this.shell, SWT.NONE);
@@ -283,7 +283,7 @@ public final class BattleDialog extends Dialog {
 
         int id = Integer.valueOf(this.id) - 1;
         BattleResultDto result = GlobalContext.getBattleResultList().get(id);
-        BattleDto battle = result.getBattleDto();
+        BattleDto battle = null;
 
         String time = new SimpleDateFormat(AppConstants.DATE_FORMAT).format(result.getBattleDate());
         StringBuilder sb = new StringBuilder();

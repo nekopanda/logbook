@@ -1,17 +1,19 @@
 package logbook.gui;
 
+import logbook.constants.AppConstants;
+import logbook.data.Data;
+import logbook.data.DataType;
 import logbook.data.context.GlobalContext;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.TableItemCreator;
+import logbook.scripting.TableItemCreatorProxy;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TableColumn;
 
 /**
  * 任務一覧テーブル
@@ -62,18 +64,19 @@ public final class QuestTable extends AbstractTableDialog {
 
     @Override
     protected TableItemCreator getTableItemCreator() {
-        return CreateReportLogic.DEFAULT_TABLE_ITEM_CREATOR;
+        return TableItemCreatorProxy.get(AppConstants.QUESTTABLE_PREFIX);
     }
 
+    /**
+     * 更新する必要のあるデータ
+     */
+    @SuppressWarnings("incomplete-switch")
     @Override
-    protected SelectionListener getHeaderSelectionListener() {
-        return new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (e.getSource() instanceof TableColumn) {
-                    QuestTable.this.sortTableItems((TableColumn) e.getSource());
-                }
-            }
-        };
+    public void update(DataType type, Data data) {
+        switch (type) {
+        case QUEST_LIST:
+        case QUEST_CLEAR:
+            this.needsUpdate = true;
+        }
     }
 }

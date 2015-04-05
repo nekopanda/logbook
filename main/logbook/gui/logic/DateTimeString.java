@@ -10,8 +10,8 @@ import java.util.Date;
 import logbook.constants.AppConstants;
 
 /**
+ * アプリケーションのフォーマットで文字列化可能な日時
  * @author Nekopanda
- *
  */
 public class DateTimeString implements Comparable<DateTimeString> {
     private static DateFormat format = new SimpleDateFormat(AppConstants.DATE_FORMAT);

@@ -3,6 +3,9 @@
  */
 package logbook.config.bean;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 /**
  * @author Nekopanda
  *
@@ -22,6 +25,32 @@ public class TableConfigBean {
         }
     }
 
+    public static class Column implements Cloneable {
+        public String id;
+        public boolean visible;
+        public int width;
+        public int pos;
+
+        public Column() {
+        }
+
+        public Column(String id, boolean visible, int width, int pos) {
+            this.id = id;
+            this.visible = visible;
+            this.width = width;
+            this.pos = pos;
+        }
+
+        @Override
+        public Column clone() {
+            try {
+                return (Column) super.clone();
+            } catch (CloneNotSupportedException e) {
+                throw new InternalError(e.toString());
+            }
+        }
+    }
+
     private boolean[] visibleColumn;
 
     private int[] columnWidth;
@@ -33,6 +62,8 @@ public class TableConfigBean {
     private String[] headerNames;
 
     private boolean cyclicReload;
+
+    private Map<String, Column> columns = new TreeMap<>();
 
     /**
      * @return visibleColumn
@@ -116,5 +147,19 @@ public class TableConfigBean {
      */
     public void setHeaderNames(String[] headerNames) {
         this.headerNames = headerNames;
+    }
+
+    /**
+     * @return columns
+     */
+    public Map<String, Column> getColumns() {
+        return this.columns;
+    }
+
+    /**
+     * @param columns セットする columns
+     */
+    public void setColumns(Map<String, Column> columns) {
+        this.columns = columns;
     }
 }

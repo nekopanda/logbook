@@ -19,17 +19,19 @@ import com.dyuproject.protostuff.Tag;
  */
 public class AirBattleDto {
 
+    /** 攻撃シーケンス */
     @Tag(1)
     public List<BattleAtackDto> atacks;
-    /** 触接（味方・敵） */
+    /** 触接 [味方, 敵] */
     @Tag(2)
     public int[] touchPlane;
-    /** 制空 */
+    /** 制空状態 */
     @Tag(3)
     public String seiku;
-    /** 艦載機数 [味方ロスト, 味方全, 敵ロスト, 敵全] */
+    /** stage1 艦載機数 [味方ロスト, 味方全, 敵ロスト, 敵全] */
     @Tag(4)
     public int[] stage1;
+    /** stage2 艦載機数 [味方ロスト, 味方全, 敵ロスト, 敵全] */
     @Tag(5)
     public int[] stage2;
 
@@ -101,7 +103,7 @@ public class AirBattleDto {
     }
 
     /**
-     * 艦載機ロスト表示を生成(味方・敵)
+     * 艦載機ロスト表示を生成 [味方・敵]
      * @param stage
      * @return
      */
@@ -152,7 +154,7 @@ public class AirBattleDto {
     }
 
     /**
-     * 触接表示を生成(味方・敵)
+     * 触接表示を生成 [味方・敵]
      * @param touchPlane
      * @return
      */

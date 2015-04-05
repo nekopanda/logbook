@@ -9,12 +9,19 @@ package logbook.dto;
  */
 public enum ResultRank {
 
+    /** 完全勝利S */
     PERFECT("S", "完全勝利!!S"),
+    /** 勝利S */
     S("S", "勝利S"),
+    /** 勝利A */
     A("A", "勝利A"),
+    /** 戦術的勝利B */
     B("B", "戦術的勝利B"),
+    /** 戦術的敗北C */
     C("C", "戦術的敗北C"),
+    /** 敗北D */
     D("D", "敗北D"),
+    /** 敗北E */
     E("E", "敗北E");
 
     private String rank;

@@ -148,7 +148,7 @@ public final class VersionDialog extends WindowBase {
 
         label("マスターデータ", dataGroup);
         String updateTimeStr = "不明";
-        Date masterUpdateTime = MasterData.getInstance().getMasterUpdateTime();
+        Date masterUpdateTime = MasterData.getMaster().getTime();
         if (masterUpdateTime.getTime() > 0) {
             updateTimeStr = (new SimpleDateFormat("yyyy/MM/dd HH:mm").format(masterUpdateTime));
         }

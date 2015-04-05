@@ -13,6 +13,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 
+import logbook.constants.AppConstants;
+import logbook.data.Data;
+import logbook.data.DataType;
 import logbook.dto.BattleExDto;
 import logbook.dto.BattleResultDto;
 import logbook.gui.logic.BattleHtmlGenerator;
@@ -22,6 +25,7 @@ import logbook.gui.logic.TableRowHeader;
 import logbook.internal.BattleResultFilter;
 import logbook.internal.BattleResultServer;
 import logbook.internal.TimeSpanKind;
+import logbook.scripting.TableItemCreatorProxy;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
@@ -37,7 +41,6 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TableColumn;
 
 /**
  * ドロップ報告書
@@ -72,6 +75,23 @@ public final class DropReportTable extends AbstractTableDialog {
 
     @Override
     protected void createContents() {
+
+        final MenuItem reloadDB = new MenuItem(this.opemenu, SWT.NONE);
+        reloadDB.setText("データベースを再読み込み");
+        reloadDB.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                MessageBox box = new MessageBox(DropReportTable.this.shell, SWT.YES | SWT.NO | SWT.ICON_QUESTION);
+                box.setText("データベース再読み込み");
+                box.setMessage("件数によっては時間がかかることがあります。よろしいですか？");
+
+                if (box.open() == SWT.YES) {
+                    BattleResultServer.get().reloadFiles();
+                    DropReportTable.this.reloadTable();
+                }
+            }
+        });
+
         this.table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDoubleClick(MouseEvent e) {
@@ -249,19 +269,8 @@ public final class DropReportTable extends AbstractTableDialog {
 
     @Override
     protected TableItemCreator getTableItemCreator() {
-        return CreateReportLogic.DEFAULT_TABLE_ITEM_CREATOR;
-    }
-
-    @Override
-    protected SelectionListener getHeaderSelectionListener() {
-        return new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (e.getSource() instanceof TableColumn) {
-                    DropReportTable.this.sortTableItems((TableColumn) e.getSource());
-                }
-            }
-        };
+        //return CreateReportLogic.DEFAULT_TABLE_ITEM_CREATOR;
+        return TableItemCreatorProxy.get(AppConstants.DROPTABLE_PREFIX);
     }
 
     /**
@@ -312,5 +321,19 @@ public final class DropReportTable extends AbstractTableDialog {
             }
         }
 
+    }
+
+    /**
+     * 更新する必要のあるデータ
+     */
+    @SuppressWarnings("incomplete-switch")
+    @Override
+    public void update(DataType type, Data data) {
+        switch (type) {
+        case BATTLE_RESULT:
+        case COMBINED_BATTLE_RESULT:
+        case PRACTICE_BATTLE_RESULT:
+            this.needsUpdate = true;
+        }
     }
 }
