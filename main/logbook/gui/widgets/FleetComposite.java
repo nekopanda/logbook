@@ -339,7 +339,8 @@ public class FleetComposite extends Composite {
             // 疲労している艦娘がいる場合メッセージを表示
             if (this.cond > cond) {
                 this.cond = cond;
-                this.clearDate = new TimeString(ship.getCondClearTime().getTime()).toString();
+                this.clearDate = new TimeString(ship.getCondClearTime(
+                        GlobalContext.getCondTiming())).toString();
             }
 
             // 体力メッセージ

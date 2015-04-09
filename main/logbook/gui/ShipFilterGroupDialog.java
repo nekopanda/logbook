@@ -22,6 +22,7 @@ import logbook.gui.logic.ShipGroupListener;
 import logbook.gui.logic.ShipGroupObserver;
 import logbook.gui.logic.TableItemCreator;
 import logbook.gui.logic.TableRowHeader;
+import logbook.internal.CondTiming;
 import logbook.scripting.TableItemCreatorProxy;
 import logbook.util.ReportUtils;
 
@@ -206,6 +207,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
     @Override
     protected void updateTableBody() {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
+        CondTiming condTiming = GlobalContext.getCondTiming();
         if (this.property != null) {
             List<ShipDto> shipList = this.property.getShipList();
             for (int i = 0; i < shipList.size(); i++) {
@@ -217,7 +219,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
                         ship.getName(),
                         ship.getType(),
                         ship.getLv(),
-                        ship.getEstimatedCond()
+                        ship.getEstimatedCond(condTiming)
                 });
             }
         }
