@@ -249,6 +249,13 @@ public final class ApplicationMain extends WindowBase {
     private Label ndock4name;
     /** 入渠.ドッグ4.お風呂から上がる時間 **/
     private Text ndock4time;
+
+    /** その他グループ**/
+    private Group otherGroup;
+
+    private Label condTimerLabel;
+    private Text condTimerTime;
+
     /** コンソールコンポジット **/
     private Composite consoleComposite;
     /** エラー表示 **/
@@ -850,12 +857,42 @@ public final class ApplicationMain extends WindowBase {
         gdndock4time.widthHint = 75;
         this.ndock4time.setLayoutData(gdndock4time);
 
+        // -------
+
+        this.otherGroup = new Group(this.mainComposite, SWT.NONE);
+        this.otherGroup.setLayoutData(SwtUtils.makeFormData(
+                new FormAttachment(0),
+                new FormAttachment(100),
+                new FormAttachment(this.ndockGroup),
+                null));
+
+        GridLayout glOtherComposite = new GridLayout(2, false);
+        glOtherComposite.verticalSpacing = 1;
+        glOtherComposite.marginTop = 0;
+        glOtherComposite.marginWidth = 0;
+        glOtherComposite.marginHeight = 0;
+        glOtherComposite.marginBottom = 0;
+        glOtherComposite.horizontalSpacing = 1;
+        this.otherGroup.setLayout(glOtherComposite);
+
+        this.condTimerLabel = new Label(this.otherGroup, SWT.NONE);
+        this.condTimerLabel.setText("次の疲労回復まで");
+        this.condTimerLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        this.condTimerTime = new Text(this.otherGroup, SWT.SINGLE | SWT.BORDER);
+        this.condTimerTime.setText("次の疲労回復までの時間");
+        GridData gdconTimeTime = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        gdconTimeTime.widthHint = 75;
+        this.condTimerTime.setLayoutData(gdconTimeTime);
+
+        // -------
+
         // エラー表示
         this.errorLabel = new Label(this.mainComposite, SWT.NONE);
         this.errorLabel.setLayoutData(SwtUtils.makeFormData(
                 new FormAttachment(0),
                 new FormAttachment(100),
-                new FormAttachment(this.ndockGroup),
+                new FormAttachment(this.otherGroup),
                 null));
         this.errorLabel.setAlignment(SWT.CENTER);
         this.errorLabel.setBackground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
@@ -875,7 +912,7 @@ public final class ApplicationMain extends WindowBase {
         this.consoleComposite.setLayoutData(SwtUtils.makeFormData(
                 new FormAttachment(0),
                 new FormAttachment(100),
-                new FormAttachment(this.ndockGroup),
+                new FormAttachment(this.otherGroup),
                 new FormAttachment(100)));
 
         this.console = new org.eclipse.swt.widgets.List(this.consoleComposite, SWT.BORDER | SWT.V_SCROLL);
@@ -954,6 +991,7 @@ public final class ApplicationMain extends WindowBase {
                 this.deckNotice, this.ndockNotice,
                 this.deck1time, this.deck2time,
                 this.deck3time, this.ndock1time, this.ndock2time, this.ndock3time, this.ndock4time,
+                this.condTimerTime,
                 this.consoleComposite }) {
             c.setData("disable-drag-move", true);
         }
@@ -1466,6 +1504,14 @@ public final class ApplicationMain extends WindowBase {
      */
     public Text getNdock4time() {
         return this.ndock4time;
+    }
+
+    public Label getCondTimerLabel() {
+        return this.condTimerLabel;
+    }
+
+    public Text getCondTimerTime() {
+        return this.condTimerTime;
     }
 
     /**

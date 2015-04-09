@@ -40,19 +40,21 @@ public class TimeLogic implements Comparable<TimeLogic> {
      * @return
      */
     public static String toDateRestString(long rest) {
-        if (rest > 0) {
-            if (rest > ONE_DAY) {
-                return (rest / ONE_DAY) + "日" + ((rest % ONE_DAY) / ONE_HOUR) + "時間"
-                        + ((rest % ONE_HOUR) / ONE_MINUTES) + "分";
-            } else if (rest > ONE_HOUR) {
-                return (rest / ONE_HOUR) + "時間" + ((rest % ONE_HOUR) / ONE_MINUTES) + "分";
-            } else if (rest > ONE_MINUTES) {
-                return (rest / ONE_MINUTES) + "分" + (rest % ONE_MINUTES) + "秒";
-            } else {
-                return rest + "秒";
-            }
-        } else {
+        return toDateRestString(rest, false);
+    }
+
+    public static String toDateRestString(long rest, boolean allowZeroAndLess) {
+        if (!allowZeroAndLess && (rest <= 0)) {
             return null;
         }
+        if (rest > ONE_DAY) {
+            return (rest / ONE_DAY) + "日" + ((rest % ONE_DAY) / ONE_HOUR) + "時間"
+                    + ((rest % ONE_HOUR) / ONE_MINUTES) + "分";
+        } else if (rest > ONE_HOUR) {
+            return (rest / ONE_HOUR) + "時間" + ((rest % ONE_HOUR) / ONE_MINUTES) + "分";
+        } else if (rest > ONE_MINUTES) {
+            return (rest / ONE_MINUTES) + "分" + (rest % ONE_MINUTES) + "秒";
+        }
+        return rest + "秒";
     }
 }

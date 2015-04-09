@@ -12,7 +12,7 @@ import java.util.Date;
  *
  */
 public class TimeString implements Comparable<TimeString> {
-    private static DateFormat format = new SimpleDateFormat("HH:mm");
+    private static DateFormat format = new SimpleDateFormat("HH:mm:ss");
     private final Date date;
 
     public TimeString(Date date) {

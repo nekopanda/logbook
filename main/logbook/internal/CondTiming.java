@@ -100,6 +100,19 @@ public class CondTiming {
     }
 
     /**
+     * 次の疲労回復タイミング
+     * @param time
+     * @return　不明な場合はnull
+     */
+    public Date getNextUpdateTime(Date time) {
+        if (this.updateTiming == null) {
+            return null;
+        }
+        long next = this.updateTiming.getNext(time);
+        return new Date(time.getTime() + next);
+    }
+
+    /**
      * in milliseconds
      * @return
      */

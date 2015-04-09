@@ -23,6 +23,7 @@ import logbook.gui.logic.PushNotify;
 import logbook.gui.logic.Sound;
 import logbook.gui.logic.TimeLogic;
 import logbook.gui.widgets.FleetComposite;
+import logbook.internal.CondTiming;
 import logbook.internal.EnemyData;
 import logbook.internal.MasterData;
 import logbook.util.SwtUtils;
@@ -32,6 +33,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -242,6 +244,9 @@ public final class AsyncExecApplicationMain extends Thread {
                 Sound.randomDockSoundPlay();
                 visibleHome |= AppConfig.get().isVisibleOnReturnBathwater();
             }
+            // その他の時間を更新
+            this.updateOtherTimer(now);
+
             if (visibleHome) {
                 this.main.getTabFolder().setSelection(0);
             }
@@ -281,6 +286,21 @@ public final class AsyncExecApplicationMain extends Thread {
             this.updateErrorLabel();
         }
 
+        private static Color getBackgroundColor(long rest) {
+            // 20分前、10分前、5分前になったら背景色を変更する
+            if (rest <= (ONE_MINUTES * 5)) {
+                return SWTResourceManager
+                        .getColor(AppConstants.TIME_IN_5_MIN);
+            } else if (rest <= (ONE_MINUTES * 10)) {
+                return SWTResourceManager
+                        .getColor(AppConstants.TIME_IN_10_MIN);
+            } else if (rest <= (ONE_MINUTES * 20)) {
+                return SWTResourceManager
+                        .getColor(AppConstants.TIME_IN_20_MIN);
+            }
+            return SWTResourceManager.getColor(SWT.COLOR_WHITE);
+        }
+
         /**
          * 遠征を更新する
          * 
@@ -318,18 +338,8 @@ public final class AsyncExecApplicationMain extends Thread {
                         deckTimeTexts[i].setToolTipText(this.format.format(deckMissions[i].getTime()));
 
                         // 20分前、10分前、5分前になったら背景色を変更する
-                        if (rest <= (ONE_MINUTES * 5)) {
-                            deckTimeTexts[i].setBackground(SWTResourceManager
-                                    .getColor(AppConstants.TIME_IN_5_MIN));
-                        } else if (rest <= (ONE_MINUTES * 10)) {
-                            deckTimeTexts[i].setBackground(SWTResourceManager
-                                    .getColor(AppConstants.TIME_IN_10_MIN));
-                        } else if (rest <= (ONE_MINUTES * 20)) {
-                            deckTimeTexts[i].setBackground(SWTResourceManager
-                                    .getColor(AppConstants.TIME_IN_20_MIN));
-                        } else {
-                            deckTimeTexts[i].setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-                        }
+                        deckTimeTexts[i].setBackground(getBackgroundColor(rest));
+
                         if (this.main.getDeckNotice().getSelection()) {
                             if ((rest <= ONE_MINUTES) && !FLAG_NOTICE_DECK[i]) {
                                 notice.add(dispname + " がまもなく帰投します");
@@ -394,19 +404,8 @@ public final class AsyncExecApplicationMain extends Thread {
                         ndockTimeTexts[i].setToolTipText(this.format.format(ndocks[i].getNdocktime()));
 
                         // 20分前、10分前、5分前になったら背景色を変更する
-                        if (rest <= (ONE_MINUTES * 5)) {
-                            ndockTimeTexts[i].setBackground(SWTResourceManager
-                                    .getColor(AppConstants.TIME_IN_5_MIN));
-                        } else if (rest <= (ONE_MINUTES * 10)) {
-                            ndockTimeTexts[i].setBackground(SWTResourceManager
-                                    .getColor(AppConstants.TIME_IN_10_MIN));
-                        } else if (rest <= (ONE_MINUTES * 20)) {
-                            ndockTimeTexts[i].setBackground(SWTResourceManager
-                                    .getColor(AppConstants.TIME_IN_20_MIN));
-                        } else {
-                            ndockTimeTexts[i].setBackground(SWTResourceManager
-                                    .getColor(SWT.COLOR_WHITE));
-                        }
+                        ndockTimeTexts[i].setBackground(getBackgroundColor(rest));
+
                         if (this.main.getNdockNotice().getSelection()) {
 
                             if ((rest <= ONE_MINUTES) && !FLAG_NOTICE_NDOCK[i]) {
@@ -432,6 +431,30 @@ public final class AsyncExecApplicationMain extends Thread {
                 ndockTimeTexts[i].setText(time);
             }
             return noticeflg;
+        }
+
+        private void updateOtherTimer(Date now) {
+            Label condTimerLabel = this.main.getCondTimerLabel();
+            Text condTimerText = this.main.getCondTimerTime();
+
+            CondTiming timing = GlobalContext.getCondTiming();
+            Date nextUpdateTime = timing.getNextUpdateTime(now);
+
+            if (nextUpdateTime == null) {
+                condTimerLabel.setText("");
+                condTimerText.setToolTipText(null);
+                condTimerText.setText("");
+            }
+            else {
+                int accuracy = (int) timing.getCurrentAccuracy() / 2000;
+                condTimerLabel.setText("次の疲労回復まで(±" + accuracy + "秒)");
+
+                long rest = getRest(now, nextUpdateTime);
+
+                // ツールチップテキストで時刻を表示する
+                condTimerText.setToolTipText(this.format.format(nextUpdateTime));
+                condTimerText.setText(TimeLogic.toDateRestString(rest, true));
+            }
         }
 
         /** エラー表示を更新 */
