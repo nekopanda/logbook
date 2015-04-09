@@ -5,6 +5,7 @@ package logbook.scripting;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -365,12 +366,20 @@ public class ScriptLoader {
     }
 
     private ScriptLoader() {
-        if (AppConstants.SCRIPT_DIR.exists() == false) {
-            try {
-                FileUtils.copyDirectory(new File("./templates/script"), AppConstants.SCRIPT_DIR);
-            } catch (IOException e) {
-                LOG.warn("スクリプトをテンプレートからコピー中にエラー", e);
-            }
+        final File sourceDir = new File("./templates/script");
+        try {
+            FileUtils.copyDirectory(new File("./templates/script"), AppConstants.SCRIPT_DIR, new FileFilter() {
+                @Override
+                public boolean accept(File src) {
+                    File dstFile = new File(AppConstants.SCRIPT_DIR.getAbsolutePath() +
+                            src.getAbsolutePath().substring(sourceDir.getAbsolutePath().length()));
+                    // 新規ファイルまたは更新されていたらコピー
+                    return ((dstFile.exists() == false) ||
+                    (dstFile.lastModified() < src.lastModified()));
+                }
+            });
+        } catch (IOException e) {
+            LOG.warn("スクリプトをテンプレートからコピー中にエラー", e);
         }
     }
 
