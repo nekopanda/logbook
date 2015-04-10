@@ -34,6 +34,9 @@ public final class AppConfigBean {
     /** 縮小表示 */
     private boolean minimumLayout;
 
+    /** 疲労度タイマー表示 */
+    private boolean showCondTimer;
+
     /** 音量 */
     private float soundLevel = 0.85f;
 
@@ -82,11 +85,23 @@ public final class AppConfigBean {
     /** 入渠Push通知のPriority */
     private int PushPriorityNdock = 0;
 
+    /** 泊地修理Push通知のPriority */
+    private int PushPriorityAkashi = 0;
+
+    /** 疲労Push通知のPriority */
+    private int PushPriorityCond = 0;
+
     /** 遠征帰投時にPush通知する */
     private boolean PushMission = true;
 
     /**　入渠完了時にPush通知する */
     private boolean PushNdock = true;
+
+    /** 泊地修理完了時にPush通知する */
+    private boolean PushAkashi = true;
+
+    /**　疲労完了時にPush通知する */
+    private boolean PushCond = true;
 
     /** 出撃ログの保存先 */
     private String battleLogPath = new File("battlelog").getAbsolutePath();
@@ -392,6 +407,20 @@ public final class AppConfigBean {
     }
 
     /**
+     * @return showCondTimer
+     */
+    public boolean isShowCondTimer() {
+        return this.showCondTimer;
+    }
+
+    /**
+     * @param showCondTimer セットする showCondTimer
+     */
+    public void setShowCondTimer(boolean showCondTimer) {
+        this.showCondTimer = showCondTimer;
+    }
+
+    /**
      * 音量を取得します。
      * @return 音量
      */
@@ -619,6 +648,34 @@ public final class AppConfigBean {
         this.PushNdock = pushndock;
     }
 
+    /**
+     * @return pushAkashi
+     */
+    public boolean isPushAkashi() {
+        return this.PushAkashi;
+    }
+
+    /**
+     * @param pushAkashi セットする pushAkashi
+     */
+    public void setPushAkashi(boolean pushAkashi) {
+        this.PushAkashi = pushAkashi;
+    }
+
+    /**
+     * @return pushCond
+     */
+    public boolean isPushCond() {
+        return this.PushCond;
+    }
+
+    /**
+     * @param pushCond セットする pushCond
+     */
+    public void setPushCond(boolean pushCond) {
+        this.PushCond = pushCond;
+    }
+
     /** 遠征Push通知の Priorityを取得します
      * @return priority
      */
@@ -645,6 +702,34 @@ public final class AppConfigBean {
      */
     public void setPushPriorityNdock(int priority) {
         this.PushPriorityNdock = priority;
+    }
+
+    /**
+     * @return pushPriorityAkashi
+     */
+    public int getPushPriorityAkashi() {
+        return this.PushPriorityAkashi;
+    }
+
+    /**
+     * @param pushPriorityAkashi セットする pushPriorityAkashi
+     */
+    public void setPushPriorityAkashi(int pushPriorityAkashi) {
+        this.PushPriorityAkashi = pushPriorityAkashi;
+    }
+
+    /**
+     * @return pushPriorityCond
+     */
+    public int getPushPriorityCond() {
+        return this.PushPriorityCond;
+    }
+
+    /**
+     * @param pushPriorityCond セットする pushPriorityCond
+     */
+    public void setPushPriorityCond(int pushPriorityCond) {
+        this.PushPriorityCond = pushPriorityCond;
     }
 
     /**

@@ -138,6 +138,15 @@ public class AppConstants {
     /** 20分前 */
     public static final RGB TIME_IN_20_MIN = new RGB(255, 247, 203);
 
+    /** 疲労回復1分前 */
+    public static final RGB COND_IN_3_MIN = new RGB(0, 255, 37);
+
+    /** 疲労回復5分前 */
+    public static final RGB COND_WAITING = new RGB(149, 255, 165);
+
+    /** 泊地中理中 */
+    public static final RGB AKASHI_REPAIR_COLOR = new RGB(168, 211, 255);
+
     /** テーブル行(偶数行)背景色 */
     public static final RGB ROW_BACKGROUND = new RGB(246, 246, 246);
 

@@ -176,6 +176,9 @@ public final class GlobalContext {
     /** 疲労回復タイマー */
     private static CondTiming condTiming = new CondTiming();
 
+    /** 泊地修理開始時刻 */
+    private static Date akashiRepairStart = new Date();
+
     private static List<EventListener> eventListeners = new ArrayList<>();
 
     // 始めてアクセスがあった時に読み込む
@@ -521,6 +524,13 @@ public final class GlobalContext {
     }
 
     /**
+     * @return akashiRepairStart
+     */
+    public static Date getAkashiRepairStart() {
+        return akashiRepairStart;
+    }
+
+    /**
      * リクエスト・レスポンスを受け取るEventListener登録
      */
     public static void addEventListener(EventListener listener) {
@@ -828,6 +838,13 @@ public final class GlobalContext {
         }
     }
 
+    private static boolean isFlagshipAkashi(DockDto dock) {
+        if (dock != null) {
+            return dock.isFlagshipAkashi();
+        }
+        return false;
+    }
+
     /**
      * 編成を更新します
      * @param data
@@ -842,6 +859,7 @@ public final class GlobalContext {
 
             if (dockdto != null) {
                 List<ShipDto> ships = dockdto.getShips();
+                DockDto rdock = null;
 
                 if (shipidx == -1) {
                     // 旗艦以外解除
@@ -856,7 +874,7 @@ public final class GlobalContext {
                     // 入れる艦娘(外す場合はnull)
                     ShipDto rship = shipMap.get(shipid);
                     // 入れる艦娘の現在の所属艦隊(ない場合はnull)
-                    DockDto rdock = (rship != null) ? dock.get(rship.getFleetid()) : null;
+                    rdock = (rship != null) ? dock.get(rship.getFleetid()) : null;
                     int rdockPos = (rship != null) ? rship.getFleetpos() : 0;
 
                     // 艦隊IDを一旦全部外す
@@ -902,6 +920,12 @@ public final class GlobalContext {
                         rdock.setUpdate(true);
                     }
                 }
+
+                // 泊地修理判定
+                if (isFlagshipAkashi(dockdto) || isFlagshipAkashi(rdock)) {
+                    akashiRepairStart = new Date();
+                }
+
                 DockDto firstdock = dock.get("1");
                 if (firstdock != null) {
                     // 秘書艦を再設定
@@ -964,6 +988,7 @@ public final class GlobalContext {
 
                 // 保有艦娘を更新する
                 boolean condUpdated = false;
+                boolean hpUpdated = false;
                 Map<Integer, ShipDto> oldShipMap = shipMap;
                 shipMap = new TreeMap<>();
                 JsonArray apiShip = apidata.getJsonArray("api_ship");
@@ -971,16 +996,24 @@ public final class GlobalContext {
                     ShipDto ship = new ShipDto((JsonObject) apiShip.get(i));
                     shipMap.put(ship.getId(), ship);
 
-                    // 疲労度に変化があったか
                     ShipDto oldShip = oldShipMap.get(ship.getId());
                     if (oldShip != null) {
+                        // 疲労度に変化があったか
                         if (oldShip.getCond() != ship.getCond()) {
                             condUpdated = true;
+                        }
+                        // HPに変化があったか
+                        if (oldShip.getNowhp() != ship.getNowhp()) {
+                            hpUpdated = true;
                         }
                     }
                 }
                 // 疲労回復タイミング更新
                 condTiming.onPort(condUpdated);
+                // 泊地修理タイマー更新
+                if (hpUpdated) {
+                    akashiRepairStart = new Date();
+                }
 
                 JsonArray apiDeckPort = apidata.getJsonArray("api_deck_port");
                 doDeck(apiDeckPort);

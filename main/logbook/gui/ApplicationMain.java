@@ -203,8 +203,6 @@ public final class ApplicationMain extends WindowBase {
 
     /** コマンドボタン */
     private Composite commandComposite;
-    /** 縮小表示メニューアイテム */
-    private MenuItem dispsize;
     /** 所有装備 */
     private Button itemList;
     /** 所有艦娘 */
@@ -217,18 +215,22 @@ public final class ApplicationMain extends WindowBase {
     private Group deckGroup;
     /** 1分前に通知する(遠征) */
     private Button deckNotice;
-    /** 遠征.艦隊2の艦隊名 */
+    /** 艦隊.艦隊1の艦隊名 */
     private Label deck1name;
-    /** 遠征.艦隊2の帰投時間 */
+    /** 艦隊.艦隊1の帰投時間 */
     private Text deck1time;
-    /** 遠征.艦隊3の艦隊名 */
+    /** 艦隊.艦隊2の艦隊名 */
     private Label deck2name;
-    /** 遠征.艦隊3の帰投時間 */
+    /** 艦隊.艦隊2の帰投時間 */
     private Text deck2time;
-    /** 遠征.艦隊4の艦隊名 */
+    /** 艦隊.艦隊3の艦隊名 */
     private Label deck3name;
-    /** 遠征.艦隊4の帰投時間 */
+    /** 艦隊.艦隊3の帰投時間 */
     private Text deck3time;
+    /** 艦隊.艦隊4の艦隊名 */
+    private Label deck4name;
+    /** 艦隊.艦隊4の帰投時間 */
+    private Text deck4time;
     /** 入渠グループ **/
     private Group ndockGroup;
     /** 1分前に通知する(入渠) */
@@ -251,7 +253,7 @@ public final class ApplicationMain extends WindowBase {
     private Text ndock4time;
 
     /** その他グループ**/
-    private Group otherGroup;
+    private Composite otherGroup;
 
     private Label condTimerLabel;
     private Text condTimerTime;
@@ -504,12 +506,6 @@ public final class ApplicationMain extends WindowBase {
         battleShipWinMenu.setAccelerator(SWT.CTRL + 'P');
         this.battleShipWindow = new BattleShipWindow(this.dummyHolder, battleShipWinMenu);
 
-        // 表示-縮小表示
-        // ウィンドウの右クリックメニューに追加
-        new MenuItem(this.getMenu(), SWT.SEPARATOR);
-        this.dispsize = new MenuItem(this.getMenu(), SWT.CHECK);
-        this.dispsize.setText("縮小表示(&M)\tCtrl+M");
-        this.dispsize.setAccelerator(SWT.CTRL + 'M');
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // 終了
@@ -704,9 +700,9 @@ public final class ApplicationMain extends WindowBase {
         this.mainComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         mainItem.setControl(this.mainComposite);
 
-        // 遠征
+        // 艦隊
         Label deckLabel = new Label(this.mainComposite, SWT.NONE);
-        deckLabel.setText("遠征");
+        deckLabel.setText("艦隊");
         deckLabel.setLayoutData(SwtUtils.makeFormData(
                 new FormAttachment(0, 7), // 7 pixel indent
                 null, // free width
@@ -747,34 +743,44 @@ public final class ApplicationMain extends WindowBase {
         this.deckGroup.setLayout(glDeckGroup);
 
         this.deck1name = new Label(this.deckGroup, SWT.NONE);
-        this.deck1name.setText("ここに艦隊2の艦隊名が入ります");
+        this.deck1name.setText("ここに艦隊1の艦隊名が入ります");
         this.deck1name.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         this.deck1time = new Text(this.deckGroup, SWT.SINGLE | SWT.BORDER);
-        this.deck1time.setText("艦隊2の帰投時間");
+        this.deck1time.setText("艦隊1の帰投時間");
         GridData gddeck1time = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
         gddeck1time.widthHint = 75;
         this.deck1time.setLayoutData(gddeck1time);
 
         this.deck2name = new Label(this.deckGroup, SWT.NONE);
-        this.deck2name.setText("ここに艦隊3の艦隊名が入ります");
+        this.deck2name.setText("ここに艦隊2の艦隊名が入ります");
         this.deck2name.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         this.deck2time = new Text(this.deckGroup, SWT.SINGLE | SWT.BORDER);
-        this.deck2time.setText("艦隊3の帰投時間");
+        this.deck2time.setText("艦隊2の帰投時間");
         GridData gddeck2time = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
         gddeck2time.widthHint = 75;
         this.deck2time.setLayoutData(gddeck2time);
 
         this.deck3name = new Label(this.deckGroup, SWT.NONE);
-        this.deck3name.setText("ここに艦隊4の艦隊名が入ります");
+        this.deck3name.setText("ここに艦隊3の艦隊名が入ります");
         this.deck3name.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         this.deck3time = new Text(this.deckGroup, SWT.SINGLE | SWT.BORDER);
-        this.deck3time.setText("艦隊4の帰投時間");
+        this.deck3time.setText("艦隊3の帰投時間");
         GridData gddeck3time = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
         gddeck3time.widthHint = 75;
         this.deck3time.setLayoutData(gddeck3time);
+
+        this.deck4name = new Label(this.deckGroup, SWT.NONE);
+        this.deck4name.setText("ここに艦隊4の艦隊名が入ります");
+        this.deck4name.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        this.deck4time = new Text(this.deckGroup, SWT.SINGLE | SWT.BORDER);
+        this.deck4time.setText("艦隊4の帰投時間");
+        GridData gddeck4time = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        gddeck4time.widthHint = 75;
+        this.deck4time.setLayoutData(gddeck4time);
 
         // 入渠
         Label ndockLabel = new Label(this.mainComposite, SWT.NONE);
@@ -859,7 +865,7 @@ public final class ApplicationMain extends WindowBase {
 
         // -------
 
-        this.otherGroup = new Group(this.mainComposite, SWT.NONE);
+        this.otherGroup = new Composite(this.mainComposite, SWT.NONE);
         this.otherGroup.setLayoutData(SwtUtils.makeFormData(
                 new FormAttachment(0),
                 new FormAttachment(100),
@@ -869,8 +875,8 @@ public final class ApplicationMain extends WindowBase {
         GridLayout glOtherComposite = new GridLayout(2, false);
         glOtherComposite.verticalSpacing = 1;
         glOtherComposite.marginTop = 0;
-        glOtherComposite.marginWidth = 0;
-        glOtherComposite.marginHeight = 0;
+        glOtherComposite.marginWidth = 3;
+        glOtherComposite.marginHeight = 3;
         glOtherComposite.marginBottom = 0;
         glOtherComposite.horizontalSpacing = 1;
         this.otherGroup.setLayout(glOtherComposite);
@@ -918,24 +924,30 @@ public final class ApplicationMain extends WindowBase {
         this.console = new org.eclipse.swt.widgets.List(this.consoleComposite, SWT.BORDER | SWT.V_SCROLL);
         this.console.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
 
+        // 縮小表示 ウィンドウの右クリックメニューに追加
+        new MenuItem(this.getMenu(), SWT.SEPARATOR);
+        final MenuItem dispsize = new MenuItem(this.getMenu(), SWT.CHECK);
+        dispsize.setText("縮小表示(&M)\tCtrl+M");
+        dispsize.setAccelerator(SWT.CTRL + 'M');
+
         // 初期設定 縮小表示が有効なら縮小表示にする
         if (AppConfig.get().isMinimumLayout()) {
             this.shell.setRedraw(false);
             ApplicationMain.this.hide(true, this.commandComposite, this.deckNotice, this.deck1name, this.deck2name,
                     this.deck3name, this.ndockNotice, this.ndock1name, this.ndock2name, this.ndock3name,
                     this.ndock4name, this.consoleComposite);
-            this.dispsize.setSelection(true);
+            dispsize.setSelection(true);
             this.shell.pack();
             this.shell.setRedraw(true);
         }
 
         // 縮小表示チェック時の動作
-        this.dispsize.addSelectionListener(new SelectionAdapter() {
+        dispsize.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 Shell shell = ApplicationMain.this.shell;
                 shell.setRedraw(false);
-                boolean minimum = ApplicationMain.this.dispsize.getSelection();
+                boolean minimum = dispsize.getSelection();
                 // コントロールを隠す
                 ApplicationMain.this.hide(minimum, ApplicationMain.this.commandComposite,
                         ApplicationMain.this.deckNotice, ApplicationMain.this.deck1name,
@@ -957,7 +969,6 @@ public final class ApplicationMain extends WindowBase {
                     }
                 }
 
-                shell.setRedraw(true);
                 // ウインドウサイズを調節
                 if (minimum) {
                     ApplicationMain.this.tabFolder.setSingle(true);
@@ -981,16 +992,45 @@ public final class ApplicationMain extends WindowBase {
                 } else {
                     shell.setSize(ApplicationMain.this.getRestoreSize());
                 }
+                shell.setRedraw(true);
+
                 // 設定を保存
                 AppConfig.get().setMinimumLayout(minimum);
+            }
+        });
+
+        // 疲労タイマーを表示
+        final MenuItem showCondTimer = new MenuItem(this.getMenu(), SWT.CHECK);
+        showCondTimer.setText("疲労タイマーを表示");
+        showCondTimer.setSelection(AppConfig.get().isShowCondTimer());
+        // 初期設定
+        if (!AppConfig.get().isShowCondTimer()) {
+            this.shell.setRedraw(false);
+            ApplicationMain.this.hide(true, ApplicationMain.this.otherGroup);
+            this.shell.setRedraw(true);
+        }
+        showCondTimer.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                boolean show = showCondTimer.getSelection();
+
+                // コントロールを隠す
+                Shell shell = ApplicationMain.this.shell;
+                shell.setRedraw(false);
+                ApplicationMain.this.hide(!show, ApplicationMain.this.otherGroup);
+                ApplicationMain.this.mainComposite.layout();
+                shell.setRedraw(true);
+
+                // 設定を保存
+                AppConfig.get().setShowCondTimer(show);
             }
         });
 
         // 選択する項目はドラックで移動できないようにする
         for (Control c : new Control[] { this.commandComposite,
                 this.deckNotice, this.ndockNotice,
-                this.deck1time, this.deck2time,
-                this.deck3time, this.ndock1time, this.ndock2time, this.ndock3time, this.ndock4time,
+                this.deck1time, this.deck2time, this.deck3time, this.deck4time,
+                this.ndock1time, this.ndock2time, this.ndock3time, this.ndock4time,
                 this.condTimerTime,
                 this.consoleComposite }) {
             c.setData("disable-drag-move", true);
@@ -1434,6 +1474,20 @@ public final class ApplicationMain extends WindowBase {
      */
     public Text getDeck3time() {
         return this.deck3time;
+    }
+
+    /**
+     * @return 遠征.艦隊4の艦隊名
+     */
+    public Label getDeck4name() {
+        return this.deck4name;
+    }
+
+    /**
+     * @return 遠征.艦隊4の帰投時間
+     */
+    public Text getDeck4time() {
+        return this.deck4time;
     }
 
     /**

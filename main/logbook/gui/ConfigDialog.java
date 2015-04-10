@@ -790,35 +790,56 @@ public final class ConfigDialog extends Dialog {
         imkayacPrivateKey.setLayoutData(gdimkayacUserName);
         imkayacPrivateKey.setText(AppConfig.get().getImKayacPrivateKey());
 
+        String pushName[] = new String[] {
+                "遠征帰投を通知",
+                "入渠完了を通知",
+                "泊地修理完了を通知",
+                "疲労回復を通知"
+        };
+
         final Button pushNotifyMission = new Button(compositePushNotify, SWT.CHECK);
-        pushNotifyMission.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        pushNotifyMission.setText("遠征帰投を通知");
-        pushNotifyMission.setSelection(AppConfig.get().getPushMission());
-
         final Combo pushPriorityMissionCombo = new Combo(compositePushNotify, SWT.READ_ONLY);
-        GridData gdpushPriorityMissionCombo = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
-        pushPriorityMissionCombo.setLayoutData(gdpushPriorityMissionCombo);
-        pushPriorityMissionCombo.add("Priority: Very Low");
-        pushPriorityMissionCombo.add("Priority: Moderate");
-        pushPriorityMissionCombo.add("Priority: Normal");
-        pushPriorityMissionCombo.add("Priority: High");
-        pushPriorityMissionCombo.add("Priority: Emergency");
-        pushPriorityMissionCombo.select(AppConfig.get().getPushPriorityMission() + 2);
-
         final Button pushNotifyNdock = new Button(compositePushNotify, SWT.CHECK);
-        pushNotifyNdock.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        pushNotifyNdock.setText("入渠完了を通知");
-        pushNotifyNdock.setSelection(AppConfig.get().getPushNdock());
-
         final Combo pushPriorityNdockCombo = new Combo(compositePushNotify, SWT.READ_ONLY);
-        GridData gdpushPriorityNdockCombo = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
-        pushPriorityNdockCombo.setLayoutData(gdpushPriorityNdockCombo);
-        pushPriorityNdockCombo.add("Priority: Very Low");
-        pushPriorityNdockCombo.add("Priority: Moderate");
-        pushPriorityNdockCombo.add("Priority: Normal");
-        pushPriorityNdockCombo.add("Priority: High");
-        pushPriorityNdockCombo.add("Priority: Emergency");
-        pushPriorityNdockCombo.select(AppConfig.get().getPushPriorityNdock() + 2);
+        final Button pushNotifyAkashi = new Button(compositePushNotify, SWT.CHECK);
+        final Combo pushPriorityAkashiCombo = new Combo(compositePushNotify, SWT.READ_ONLY);
+        final Button pushNotifyCond = new Button(compositePushNotify, SWT.CHECK);
+        final Combo pushPriorityCondCombo = new Combo(compositePushNotify, SWT.READ_ONLY);
+
+        Button[] pushNotifyButtons = new Button[] {
+                pushNotifyMission, pushNotifyNdock, pushNotifyAkashi, pushNotifyCond };
+        Combo[] pushNotifyCombos = new Combo[] {
+                pushPriorityMissionCombo, pushPriorityNdockCombo, pushPriorityAkashiCombo, pushPriorityCondCombo };
+        boolean[] pushEnabled = new boolean[] {
+                AppConfig.get().getPushMission(),
+                AppConfig.get().getPushNdock(),
+                AppConfig.get().isPushAkashi(),
+                AppConfig.get().isPushCond()
+        };
+        int[] pushPriorities = new int[] {
+                AppConfig.get().getPushPriorityMission(),
+                AppConfig.get().getPushPriorityNdock(),
+                AppConfig.get().getPushPriorityAkashi(),
+                AppConfig.get().getPushPriorityCond()
+        };
+
+        for (int i = 0; i < pushNotifyButtons.length; ++i) {
+            Button button = pushNotifyButtons[i];
+            Combo compo = pushNotifyCombos[i];
+
+            button.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+            button.setText(pushName[i]);
+            button.setSelection(pushEnabled[i]);
+
+            GridData gdpushPriorityMissionCombo = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
+            compo.setLayoutData(gdpushPriorityMissionCombo);
+            compo.add("Priority: Very Low");
+            compo.add("Priority: Moderate");
+            compo.add("Priority: Normal");
+            compo.add("Priority: High");
+            compo.add("Priority: Emergency");
+            compo.select(pushPriorities[i] + 2);
+        }
 
         Button TestNotifyMissionBtn = new Button(compositePushNotify, SWT.NONE);
         TestNotifyMissionBtn.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 2, 1));
@@ -1035,8 +1056,12 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setImKayacPrivateKey(imkayacPrivateKey.getText());
                 AppConfig.get().setPushMission(pushNotifyMission.getSelection());
                 AppConfig.get().setPushNdock(pushNotifyNdock.getSelection());
+                AppConfig.get().setPushAkashi(pushNotifyAkashi.getSelection());
+                AppConfig.get().setPushCond(pushNotifyCond.getSelection());
                 AppConfig.get().setPushPriorityMission(pushPriorityMissionCombo.getSelectionIndex() - 2);
                 AppConfig.get().setPushPriorityNdock(pushPriorityNdockCombo.getSelectionIndex() - 2);
+                AppConfig.get().setPushPriorityAkashi(pushPriorityAkashiCombo.getSelectionIndex() - 2);
+                AppConfig.get().setPushPriorityCond(pushPriorityCondCombo.getSelectionIndex() - 2);
 
                 // development
                 AppConfig.get().setStoreJson(btnJson.getSelection());

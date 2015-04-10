@@ -126,6 +126,22 @@ public final class Sound {
     }
 
     /**
+     * 泊地修理した時に再生するサウンドを再生します
+     * 
+     */
+    public static void randomAkashiSoundPlay() {
+        randomPlay(getFileList("./sound/akashi"));
+    }
+
+    /**
+     * 疲労が回復した時に再生するサウンドを再生します
+     * 
+     */
+    public static void randomCondSoundPlay() {
+        randomPlay(getFileList("./sound/condition"));
+    }
+
+    /**
      * 大破した時に再生するサウンドを再生します
      * 
      */
