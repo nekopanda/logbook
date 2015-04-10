@@ -23,6 +23,8 @@ public enum BattlePhaseKind {
     SP_MIDNIGHT(true, BattlePatternConstants.NON_COMBINED_PTTERN, DataType.BATTLE_SP_MIDNIGHT),
     /** 夜戦→昼戦マスの昼戦 */
     NIGHT_TO_DAY(false, BattlePatternConstants.NON_COMBINED_PTTERN, DataType.BATTLE_NIGHT_TO_DAY),
+    /** 夜戦→昼戦マスの昼戦 */
+    AIR_BATTLE(false, BattlePatternConstants.NON_COMBINED_PTTERN, DataType.AIR_BATTLE),
     /** 連合艦隊空母機動部隊の昼戦 */
     COMBINED_BATTLE(false, BattlePatternConstants.BATTLE_PATTERN, DataType.COMBINED_BATTLE),
     /** 連合艦隊航空戦マス */

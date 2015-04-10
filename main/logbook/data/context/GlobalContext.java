@@ -634,6 +634,10 @@ public final class GlobalContext {
             doBattle(data, BattlePhaseKind.NIGHT_TO_DAY);
             break;
         // 海戦
+        case AIR_BATTLE:
+            doBattle(data, BattlePhaseKind.AIR_BATTLE);
+            break;
+        // 海戦
         case COMBINED_AIR_BATTLE:
             doBattle(data, BattlePhaseKind.COMBINED_AIR);
             break;
