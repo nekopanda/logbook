@@ -34,14 +34,14 @@ public final class AppConfigBean {
     /** 縮小表示 */
     private boolean minimumLayout;
 
+    /** 通知設定を表示 */
+    private boolean showNofitySetting;
+
     /** 疲労度タイマー表示 */
     private boolean showCondTimer;
 
     /** 音量 */
     private float soundLevel = 0.85f;
-
-    /** 透明度 */
-    //private int alpha = 255;
 
     /** 遠征のリマインド */
     private boolean missionRemind = true;
@@ -145,6 +145,12 @@ public final class AppConfigBean {
     /** 入渠-1分前に通知する */
     private boolean noticeNdock = true;
 
+    /** 泊地修理完了時に通知する */
+    private boolean noticeAkashi = true;
+
+    /** 疲労回復時に通知する */
+    private boolean noticeCond = true;
+
     /** 画面キャプチャ-保存先 */
     private String capturePath = new File("").getAbsolutePath();
 
@@ -192,6 +198,9 @@ public final class AppConfigBean {
 
     /** 索敵表示形式 */
     private int sakutekiMethod = 0;
+
+    /** 疲労度回復判定値 */
+    private int okCond = 49;
 
     /** タスクバー通知を使用する */
     private boolean useTaskbarNotify = true;
@@ -418,6 +427,20 @@ public final class AppConfigBean {
      */
     public void setShowCondTimer(boolean showCondTimer) {
         this.showCondTimer = showCondTimer;
+    }
+
+    /**
+     * @return showNofitySetting
+     */
+    public boolean isShowNofitySetting() {
+        return this.showNofitySetting;
+    }
+
+    /**
+     * @param showNofitySetting セットする showNofitySetting
+     */
+    public void setShowNofitySetting(boolean showNofitySetting) {
+        this.showNofitySetting = showNofitySetting;
     }
 
     /**
@@ -950,6 +973,34 @@ public final class AppConfigBean {
      */
     public void setNoticeNdock(boolean noticeNdock) {
         this.noticeNdock = noticeNdock;
+    }
+
+    /**
+     * @return noticeAkashi
+     */
+    public boolean isNoticeAkashi() {
+        return this.noticeAkashi;
+    }
+
+    /**
+     * @param noticeAkashi セットする noticeAkashi
+     */
+    public void setNoticeAkashi(boolean noticeAkashi) {
+        this.noticeAkashi = noticeAkashi;
+    }
+
+    /**
+     * @return noticeCond
+     */
+    public boolean isNoticeCond() {
+        return this.noticeCond;
+    }
+
+    /**
+     * @param noticeCond セットする noticeCond
+     */
+    public void setNoticeCond(boolean noticeCond) {
+        this.noticeCond = noticeCond;
     }
 
     /**
@@ -1763,6 +1814,20 @@ public final class AppConfigBean {
      */
     public void setToggleToolButton(boolean toggleToolButton) {
         this.toggleToolButton = toggleToolButton;
+    }
+
+    /**
+     * @return okCond
+     */
+    public int getOkCond() {
+        return this.okCond;
+    }
+
+    /**
+     * @param okCond セットする okCond
+     */
+    public void setOkCond(int okCond) {
+        this.okCond = okCond;
     }
 
 }

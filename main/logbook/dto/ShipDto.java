@@ -381,8 +381,11 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
      * 疲労が抜けるまでの時間
      * @return 疲労が抜けるまでの時間
      */
-    public Date getCondClearTime(CondTiming timer) {
-        return timer.calcCondClearTime(this.cond, this.time, 49);
+    public Date getCondClearTime(CondTiming timer, int okCond) {
+        if (okCond >= this.cond) {
+            return null;
+        }
+        return timer.calcCondClearTime(this.cond, this.time, okCond);
     }
 
     /**

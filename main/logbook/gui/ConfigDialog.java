@@ -529,6 +529,22 @@ public final class ConfigDialog extends Dialog {
         soundlevel.setText(Integer.toString((int) (AppConfig.get().getSoundLevel() * 100)));
         new Label(compositeNotify, SWT.NONE);
 
+        Label condLabel1 = new Label(compositeNotify, SWT.NONE);
+        condLabel1.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        condLabel1.setText("疲労度が");
+
+        final Spinner condSpinner = new Spinner(compositeNotify, SWT.BORDER);
+        condSpinner.setMaximum(49);
+        condSpinner.setMinimum(0);
+        condSpinner.setSelection(AppConfig.get().getOkCond());
+        GridData gdCondSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        gdCondSpinner.widthHint = 55;
+        condSpinner.setLayoutData(gdCondSpinner);
+
+        Label condLabel2 = new Label(compositeNotify, SWT.NONE);
+        condLabel2.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        condLabel2.setText("で回復したとみなす");
+
         final Button remind = new Button(compositeNotify, SWT.CHECK);
         remind.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
         remind.setText("遠征の通知をリマインドする");
@@ -1007,6 +1023,7 @@ public final class ConfigDialog extends Dialog {
                     AppConfig.get().setSakutekiMethod(sakutekiCombo.getSelectionIndex());
                 }
                 // notify
+                AppConfig.get().setOkCond(condSpinner.getSelection());
                 AppConfig.get().setMissionRemind(remind.getSelection());
                 AppConfig.get().setRemindInterbal(intervalSpinner.getSelection());
                 AppConfig.get().setUseBalloon(balloon.getSelection());

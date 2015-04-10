@@ -21,6 +21,7 @@ import logbook.dto.DockDto;
 import logbook.dto.NdockDto;
 import logbook.dto.ShipDto;
 import logbook.gui.ApplicationMain;
+import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.PushNotify;
 import logbook.gui.logic.Sound;
 import logbook.gui.logic.TimeLogic;
@@ -110,17 +111,6 @@ public final class AsyncExecApplicationMain extends Thread {
             LOG.fatal("スレッドが異常終了しました", e);
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * 2つの日付から残り時間を計算する
-     * 
-     * @param date1
-     * @param date2
-     * @return
-     */
-    private static long getRest(Date date1, Date date2) {
-        return TimeUnit.MILLISECONDS.toSeconds(date2.getTime() - date1.getTime());
     }
 
     /**
@@ -377,7 +367,7 @@ public final class AsyncExecApplicationMain extends Thread {
             if (notice == null) {
                 notice = new Boolean(false);
             }
-            if (this.main.getNdockNotice().getSelection()) {
+            if (this.main.getAkashiNotice().getSelection()) {
                 if ((rest <= 0) && !notice) {
                     this.noticeAkashi.add(dispname + " がまもなく修理完了します");
                     notice = true;
@@ -391,7 +381,7 @@ public final class AsyncExecApplicationMain extends Thread {
         }
 
         private void updateNoticeCond(String dispname, int index, long rest) {
-            if (this.main.getDeckNotice().getSelection()) {
+            if (this.main.getCondNotice().getSelection()) {
                 if ((rest <= 0) && !FLAG_NOTICE_COND[index]) {
                     this.noticeCond.add(dispname + " 疲労回復しました");
                     FLAG_NOTICE_COND[index] = true;
@@ -445,7 +435,7 @@ public final class AsyncExecApplicationMain extends Thread {
                         dispname = dockName + " (" + mission.getMission() + ")";
 
                         if (mission.getTime() != null) {
-                            long rest = getRest(this.now, mission.getTime());
+                            long rest = TimeLogic.getRest(this.now, mission.getTime());
 
                             // ツールチップテキストで時刻を表示する
                             tooltip = this.format.format(mission.getTime());
@@ -469,12 +459,12 @@ public final class AsyncExecApplicationMain extends Thread {
                         Date condClearTime = null;
                         long condRest = -1;
                         for (ShipDto ship : dock.getShips()) {
-                            if (ship.getCond() < 49) {
-                                Date clearTime = ship.getCondClearTime(condTiming);
+                            if (ship.getCond() < AppConfig.get().getOkCond()) {
+                                Date clearTime = ship.getCondClearTime(condTiming, AppConfig.get().getOkCond());
                                 if ((condClearTime == null) || condClearTime.before(clearTime)) {
                                     condClearTime = clearTime;
                                 }
-                                condRest = Math.max(condRest, getRest(this.now, clearTime));
+                                condRest = Math.max(condRest, TimeLogic.getRest(this.now, clearTime));
                             }
                         }
                         if (condClearTime != null) {
@@ -486,7 +476,7 @@ public final class AsyncExecApplicationMain extends Thread {
                             // 泊地修理中
                             Date repairStartTime = GlobalContext.getAkashiRepairStart();
                             dispname = dockName + " (泊地修理中)";
-                            long past = getRest(repairStartTime, this.now);
+                            long past = TimeLogic.getRest(repairStartTime, this.now);
                             time = TimeLogic.toDateRestString(past, true);
                             backColor = SWTResourceManager.getColor(AppConstants.AKASHI_REPAIR_COLOR);
 
@@ -495,9 +485,9 @@ public final class AsyncExecApplicationMain extends Thread {
                             for (int p = 0; p < ships.size(); ++p) {
                                 ShipDto ship = ships.get(p);
                                 if (!ship.isHalfDamage() && (ship.getNowhp() != ship.getMaxhp())) {
-                                    long needs = Math.max(20 * 60 * 1000, ship.getDocktime());
+                                    long needs = Math.max(AppConstants.AKASHI_REPAIR_MINIMUM, ship.getDocktime());
                                     Date finish = new Date(repairStartTime.getTime() + needs);
-                                    long rest = getRest(this.now, finish);
+                                    long rest = TimeLogic.getRest(this.now, finish);
 
                                     String txt = ship.getFriendlyName();
 
@@ -584,7 +574,7 @@ public final class AsyncExecApplicationMain extends Thread {
                     ShipDto ship = shipMap.get(ndocks[i].getNdockid());
                     if (ship != null) {
                         name = ship.getFriendlyName();
-                        long rest = getRest(this.now, ndocks[i].getNdocktime());
+                        long rest = TimeLogic.getRest(this.now, ndocks[i].getNdocktime());
 
                         // ツールチップテキストで時刻を表示する
                         ndockTimeTexts[i].setToolTipText(this.format.format(ndocks[i].getNdocktime()));
@@ -625,7 +615,7 @@ public final class AsyncExecApplicationMain extends Thread {
                 int accuracy = (int) timing.getCurrentAccuracy() / 2000;
                 condTimerLabel.setText("次の疲労回復まで(±" + accuracy + "秒)");
 
-                long rest = getRest(this.now, nextUpdateTime);
+                long rest = TimeLogic.getRest(this.now, nextUpdateTime);
 
                 // ツールチップテキストで時刻を表示する
                 condTimerText.setToolTipText(this.format.format(nextUpdateTime));
@@ -651,6 +641,7 @@ public final class AsyncExecApplicationMain extends Thread {
             }
             if ((errorLabel.getText().equals(errorText) == false) || (errorLabel.getVisible() != printLabel)) {
                 errorLabel.setText(errorText);
+                LayoutLogic.hide(errorLabel, !printLabel);
                 errorLabel.setVisible(printLabel);
                 ApplicationMain.main.getMainComposite().layout();
             }

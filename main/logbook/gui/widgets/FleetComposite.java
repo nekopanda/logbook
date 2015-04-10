@@ -3,6 +3,7 @@ package logbook.gui.widgets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.CheckForNull;
@@ -16,7 +17,9 @@ import logbook.dto.ShipDto;
 import logbook.gui.ApplicationMain;
 import logbook.gui.logic.SakutekiString;
 import logbook.gui.logic.Sound;
+import logbook.gui.logic.TimeLogic;
 import logbook.gui.logic.TimeString;
+import logbook.internal.CondTiming;
 import logbook.internal.EvaluateExp;
 import logbook.internal.SeaExp;
 import logbook.util.CalcExpUtils;
@@ -115,12 +118,10 @@ public class FleetComposite extends Composite {
     private final Label[] bullstLabels = new Label[MAXCHARA];
     /** 燃料ステータス */
     private final Label[] fuelstLabels = new Label[MAXCHARA];
-    /** ダメコンステータス(要員) */
-    private final Label[] dmgcstyLabels = new Label[MAXCHARA];
-    /** ダメコンステータス(女神) */
-    private final Label[] dmgcstmLabels = new Label[MAXCHARA];
-    /** レベリングステータス */
-    private final Label[] nextLabels = new Label[MAXCHARA];
+    /** ダメコン or 泊地修理 */
+    private final Label[] etc1Labels = new Label[MAXCHARA];
+    /** レベリング or 疲労回復 */
+    private final Label[] etc2Labels = new Label[MAXCHARA];
     /** メッセージ */
     private final StyledText message;
 
@@ -233,12 +234,10 @@ public class FleetComposite extends Composite {
             SwtUtils.initLabel(fuelst, "燃", new GridData());
             Label bullst = new Label(stateComposite, SWT.NONE);
             SwtUtils.initLabel(bullst, "弾", new GridData());
-            Label dmgcsty = new Label(stateComposite, SWT.NONE);
-            SwtUtils.initLabel(dmgcsty, "ダ", new GridData());
-            Label dmgcstm = new Label(stateComposite, SWT.NONE);
-            SwtUtils.initLabel(dmgcstm, "ダ", new GridData());
-            Label next = new Label(stateComposite, SWT.NONE);
-            SwtUtils.initLabel(next, "", SMALL, new GridData());
+            Label etc1 = new Label(stateComposite, SWT.NONE);
+            SwtUtils.initLabel(etc1, "ダ", new GridData());
+            Label etc2 = new Label(stateComposite, SWT.NONE);
+            SwtUtils.initLabel(etc2, "ダ", new GridData());
 
             // 疲労
             Label cond = new Label(this.fleetGroup, SWT.NONE);
@@ -253,10 +252,9 @@ public class FleetComposite extends Composite {
             this.condLabels[i] = cond;
             this.condstLabels[i] = condst;
             this.bullstLabels[i] = bullst;
-            this.dmgcstyLabels[i] = dmgcsty;
-            this.dmgcstmLabels[i] = dmgcstm;
             this.fuelstLabels[i] = fuelst;
-            this.nextLabels[i] = next;
+            this.etc1Labels[i] = etc1;
+            this.etc2Labels[i] = etc2;
         }
     }
 
@@ -276,7 +274,7 @@ public class FleetComposite extends Composite {
         this.dock = dock;
         this.state.set(WARN, false);
         this.state.set(FATAL, false);
-        this.cond = 49;
+        this.cond = AppConfig.get().getOkCond();
         this.clearDate = null;
         this.badlyDamage = false;
         this.message.setText("");
@@ -293,19 +291,17 @@ public class FleetComposite extends Composite {
             this.condLabels[i].setText("");
             this.condstLabels[i].setText("");
             this.bullstLabels[i].setText("");
-            this.dmgcstyLabels[i].setText("");
-            this.dmgcstmLabels[i].setText("");
             this.fuelstLabels[i].setText("");
-            this.nextLabels[i].setText("");
+            this.etc1Labels[i].setText("");
+            this.etc2Labels[i].setText("");
         }
         // 艦隊合計Lv
         int totallv = 0;
-        // 索敵値計(素)
-        int totalSakuteki = 0;
-        // 偵察機索敵値計
-        int totalSakutekiSurvey = 0;
-        // 電探索敵値計
-        int totalSakutekiRader = 0;
+
+        int akashiCapacity = dock.getAkashiCapacity();
+        Date now = new Date();
+        Date repairStartTime = GlobalContext.getAkashiRepairStart();
+        CondTiming condTiming = GlobalContext.getCondTiming();
 
         for (int i = 0; i < ships.size(); i++) {
             ShipDto ship = ships.get(i);
@@ -337,10 +333,10 @@ public class FleetComposite extends Composite {
             totallv += ship.getLv();
 
             // 疲労している艦娘がいる場合メッセージを表示
+            Date condClearDate = ship.getCondClearTime(condTiming, AppConfig.get().getOkCond());
             if (this.cond > cond) {
                 this.cond = cond;
-                this.clearDate = new TimeString(ship.getCondClearTime(
-                        GlobalContext.getCondTiming())).toString();
+                this.clearDate = new TimeString(condClearDate).toString();
             }
 
             // 体力メッセージ
@@ -447,35 +443,49 @@ public class FleetComposite extends Composite {
                     }
                 }
             }
-            if (dmgcsty > 0) {
-                this.dmgcstyLabels[i].setText("要員x" + dmgcsty);
-                this.dmgcstyLabels[i].setEnabled(true);
-                this.dmgcstyLabels[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN));
 
-            } else {
-                this.dmgcstyLabels[i].setText("");
-                this.dmgcstyLabels[i].setEnabled(false);
-                this.dmgcstyLabels[i].setForeground(null);
+            String dmgcstr = "";
+            boolean isRepairing = (i < akashiCapacity) && !ship.isHalfDamage() && (nowhp != maxhp);
+            if (isRepairing) {
+                // 泊地修理中
+                long needs = Math.max(AppConstants.AKASHI_REPAIR_MINIMUM, ship.getDocktime());
+                Date finish = new Date(repairStartTime.getTime() + needs);
+                long rest = TimeLogic.getRest(now, finish);
+                dmgcstr = "あと" + TimeLogic.toDateRestString(rest) + "で完了";
             }
-            if (dmgcstm > 0) {
-                this.dmgcstmLabels[i].setText("女神x" + dmgcstm);
-                this.dmgcstmLabels[i].setEnabled(true);
-                this.dmgcstmLabels[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN));
+            else {
+                // ダメコン
+                if (dmgcsty > 0) {
+                    dmgcstr += "要員x" + dmgcsty + " ";
+                }
+                if (dmgcstm > 0) {
+                    dmgcstr += "女神x" + dmgcstm + " ";
+                }
+            }
+            if (dmgcstr.length() > 0) {
+                this.etc1Labels[i].setText(dmgcstr);
+                this.etc1Labels[i].setEnabled(true);
+                this.etc1Labels[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN));
+            }
+            else {
+                this.etc1Labels[i].setText("");
+                this.etc1Labels[i].setEnabled(false);
+                this.etc1Labels[i].setForeground(null);
+            }
 
-            } else {
-                this.dmgcstmLabels[i].setText("");
-                this.dmgcstmLabels[i].setEnabled(false);
-                this.dmgcstmLabels[i].setForeground(null);
-            }
             // ステータス.あと何回
+            String statusstr = "";
             if (AppConfig.get().isDisplayCount()) {
                 Integer nextcount = this.getNextCount(ship, i == 0);
                 if (nextcount != null) {
-                    this.nextLabels[i].setText(MessageFormat.format("あと{0}回", nextcount));
-                } else {
-                    this.nextLabels[i].setText("");
+                    statusstr = MessageFormat.format("あと{0}回", nextcount);
                 }
             }
+            else {
+                long rest = TimeLogic.getRest(now, condClearDate);
+                statusstr = "あと" + TimeLogic.toDateRestString(rest) + "で回復";
+            }
+            this.etc2Labels[i].setText(statusstr);
 
             // コンディション
             if (cond <= AppConstants.COND_RED) {
@@ -554,6 +564,8 @@ public class FleetComposite extends Composite {
                 break;
             }
         }
+        boolean isAkashi = dock.isAkashiRepairing();
+
         // 制空値を計算
         int seiku = 0;
         for (ShipDto shipDto : ships) {
@@ -589,11 +601,8 @@ public class FleetComposite extends Composite {
         if (GlobalContext.isMission(this.dock.getId())) {
             // 遠征中
             this.addStyledText(this.message, AppConstants.MESSAGE_MISSION, messageStyle);
-        } else if (isBathwater) {
-            // 入渠中
-            this.addStyledText(this.message,
-                    MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BATHWATER), messageStyle);
-        } else if (GlobalContext.isSortie(this.dock.getId())) {
+        }
+        else if (GlobalContext.isSortie(this.dock.getId())) {
             // 出撃中
             this.addStyledText(this.message, AppConstants.MESSAGE_SORTIE, messageStyle);
             if (this.badlyDamage) {
@@ -619,6 +628,15 @@ public class FleetComposite extends Composite {
             // 連合艦隊の他の艦隊に大破艦がある
             this.addStyledText(this.message, AppConstants.MESSAGE_IN_COMBINED +
                     MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BADLY_DAMAGE), taihaStyle);
+        }
+        else if (isBathwater) {
+            // 入渠中
+            this.addStyledText(this.message,
+                    MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BATHWATER), messageStyle);
+        }
+        else if (isAkashi) {
+            // 泊地修理中
+            this.addStyledText(this.message, "泊地修理中。" + AppConstants.MESSAGE_GOOD, messageStyle);
         }
         else {
             // 出撃可能

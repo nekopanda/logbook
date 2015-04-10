@@ -183,15 +183,14 @@ public final class DockDto extends AbstractDto {
     }
 
     /**
-     * 泊地修理中か？
+     * 泊地修理可能艦数
      * @return
      */
-    public boolean isAkashiRepairing() {
+    public int getAkashiCapacity() {
         if (!this.isFlagshipAkashi()) {
             // 旗艦が明石でない
-            return false;
+            return 0;
         }
-
         ShipDto akashi = this.ships.get(0);
         int numRepairShips = 2;
         for (ItemInfoDto item : akashi.getItem()) {
@@ -201,6 +200,16 @@ public final class DockDto extends AbstractDto {
                 }
             }
         }
+
+        return numRepairShips;
+    }
+
+    /**
+     * 泊地修理中か？
+     * @return
+     */
+    public boolean isAkashiRepairing() {
+        int numRepairShips = this.getAkashiCapacity();
         if (numRepairShips > this.ships.size()) {
             numRepairShips = this.ships.size();
         }

@@ -74,6 +74,9 @@ public class CondTiming {
      * @return 回復する時刻
      */
     public Date calcCondClearTime(int latestCond, Date time, int targetCond) {
+        if (latestCond >= targetCond) {
+            return null;
+        }
         int requiredCycles = (int) Math.ceil((targetCond - latestCond) / 3.0);
         if (this.updateTiming == null) {
             return new Date((time.getTime() + (requiredCycles * COND_CYCLE)) - (COND_CYCLE / 2));

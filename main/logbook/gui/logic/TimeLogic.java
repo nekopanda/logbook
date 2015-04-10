@@ -1,5 +1,8 @@
 package logbook.gui.logic;
 
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 /**
  * 時間を計算する
  *
@@ -56,5 +59,15 @@ public class TimeLogic implements Comparable<TimeLogic> {
             return (rest / ONE_MINUTES) + "分" + (rest % ONE_MINUTES) + "秒";
         }
         return rest + "秒";
+    }
+
+    /**
+     * 2つの日付から残り時間(秒)を計算する
+     * @param from
+     * @param to
+     * @return
+     */
+    public static long getRest(Date from, Date to) {
+        return TimeUnit.MILLISECONDS.toSeconds(to.getTime() - from.getTime());
     }
 }
