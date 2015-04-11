@@ -888,7 +888,7 @@ public final class ApplicationMain extends WindowBase {
 
         MenuItem showCondTimer = new MenuItem(this.getMenu(), SWT.CHECK);
         showCondTimer.setText("疲労タイマーを表示");
-        this.bindControlToMenuItem(this.otherGroup, showCondTimer, "ShowCondTimer");
+        this.bindControlToMenuItem(this.otherGroup, showCondTimer, "ShowCondCycleTimer");
 
         // 縮小表示
         final MenuItem dispsize = new MenuItem(this.getMenu(), SWT.CHECK);
@@ -929,6 +929,9 @@ public final class ApplicationMain extends WindowBase {
 
                 // ウインドウサイズを調節
                 if (minimum) {
+                    // ウィンドウのサイズを記憶
+                    ApplicationMain.this.save();
+
                     ApplicationMain.this.tabFolder.setSingle(true);
                     CTabItem[] tabitems = ApplicationMain.this.tabFolder.getItems();
                     for (CTabItem tabitem : tabitems) {
@@ -1171,7 +1174,7 @@ public final class ApplicationMain extends WindowBase {
         if (AppConfig.get().isShowNofitySetting()) {
             controls = ArrayUtils.add(controls, this.notifySettingGroup);
         }
-        if (AppConfig.get().isShowCondTimer()) {
+        if (AppConfig.get().isShowCondCycleTimer()) {
             controls = ArrayUtils.add(controls, this.otherGroup);
         }
         return ArrayUtils.addAll(controls,

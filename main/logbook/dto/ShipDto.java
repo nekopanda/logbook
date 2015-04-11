@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.json.JsonObject;
 
+import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.internal.CondTiming;
@@ -259,6 +260,14 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
+     * 泊地修理による修理時間
+     * @return
+     */
+    public long getAkashiTime() {
+        return this.docktime + (30 * 1000); // 最大30秒の遅延
+    }
+
+    /**
      * 入渠時間をセット
      */
     public void setDockTime(long docktime) {
@@ -382,10 +391,18 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
      * @return 疲労が抜けるまでの時間
      */
     public Date getCondClearTime(CondTiming timer, int okCond) {
-        if (okCond >= this.cond) {
+        if (this.cond >= okCond) {
             return null;
         }
         return timer.calcCondClearTime(this.cond, this.time, okCond);
+    }
+
+    /**
+     * 疲労が抜けるまでの時間
+     * @return 疲労が抜けるまでの時間
+     */
+    public Date getCondClearTime(CondTiming timer) {
+        return this.getCondClearTime(timer, AppConfig.get().getOkCond());
     }
 
     /**

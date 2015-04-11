@@ -6,6 +6,7 @@ import java.util.Map;
 
 import logbook.constants.AppConstants;
 import logbook.dto.ShipFilterDto;
+import logbook.internal.CondTiming;
 
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.swt.graphics.RGB;
@@ -38,7 +39,7 @@ public final class AppConfigBean {
     private boolean showNofitySetting;
 
     /** 疲労度タイマー表示 */
-    private boolean showCondTimer;
+    private boolean showCondCycleTimer;
 
     /** 音量 */
     private float soundLevel = 0.85f;
@@ -184,6 +185,12 @@ public final class AppConfigBean {
     /** モノクロアイコンを使用する */
     private boolean monoIcon;
 
+    /** 疲労タイマーを表示する */
+    private boolean showCondTimer;
+
+    /** 泊地修理タイマーを表示する */
+    private boolean showAkashiTimer;
+
     /** 回数を表示 */
     private boolean displayCount;
 
@@ -315,6 +322,9 @@ public final class AppConfigBean {
     private String twitterToken;
     private String twitterTokenSecret;
 
+    /** Cond値更新タイミング情報 */
+    private CondTiming.TimeSpan condTimingData;
+
     private static RGB cloneRGB(RGB rgb) {
         return new RGB(rgb.red, rgb.green, rgb.blue);
     }
@@ -418,15 +428,15 @@ public final class AppConfigBean {
     /**
      * @return showCondTimer
      */
-    public boolean isShowCondTimer() {
-        return this.showCondTimer;
+    public boolean isShowCondCycleTimer() {
+        return this.showCondCycleTimer;
     }
 
     /**
      * @param showCondTimer セットする showCondTimer
      */
-    public void setShowCondTimer(boolean showCondTimer) {
-        this.showCondTimer = showCondTimer;
+    public void setShowCondCycleTimer(boolean showCondTimer) {
+        this.showCondCycleTimer = showCondTimer;
     }
 
     /**
@@ -1196,6 +1206,34 @@ public final class AppConfigBean {
     }
 
     /**
+     * @return showCondTimer
+     */
+    public boolean isShowCondTimer() {
+        return this.showCondTimer;
+    }
+
+    /**
+     * @param showCondTimer セットする showCondTimer
+     */
+    public void setShowCondTimer(boolean showCondTimer) {
+        this.showCondTimer = showCondTimer;
+    }
+
+    /**
+     * @return showAkashiTimer
+     */
+    public boolean isShowAkashiTimer() {
+        return this.showAkashiTimer;
+    }
+
+    /**
+     * @param showAkashiTimer セットする showAkashiTimer
+     */
+    public void setShowAkashiTimer(boolean showAkashiTimer) {
+        this.showAkashiTimer = showAkashiTimer;
+    }
+
+    /**
      * 回数を表示を取得します。
      * @return 回数を表示
      */
@@ -1828,6 +1866,20 @@ public final class AppConfigBean {
      */
     public void setOkCond(int okCond) {
         this.okCond = okCond;
+    }
+
+    /**
+     * @return condTimingData
+     */
+    public CondTiming.TimeSpan getCondTimingData() {
+        return this.condTimingData;
+    }
+
+    /**
+     * @param condTimingData セットする condTimingData
+     */
+    public void setCondTimingData(CondTiming.TimeSpan condTimingData) {
+        this.condTimingData = condTimingData;
     }
 
 }

@@ -5,6 +5,8 @@ package logbook.internal;
 
 import java.util.Date;
 
+import logbook.config.AppConfig;
+
 /**
  * 疲労回復時刻計算
  * @author Nekopanda
@@ -17,9 +19,13 @@ public class CondTiming {
     private TimeSpan updateTiming = null;
     private Date from = null;
 
-    private static class TimeSpan {
+    public static class TimeSpan {
         private long offset;
         private long mills;
+
+        public TimeSpan() {
+            //
+        }
 
         public TimeSpan(Date from, long mills) {
             this.offset = from.getTime() % COND_CYCLE;
@@ -64,6 +70,33 @@ public class CondTiming {
         public long getMills() {
             return this.mills;
         }
+
+        /**
+         * @return offset
+         */
+        public long getOffset() {
+            return this.offset;
+        }
+
+        /**
+         * @param offset セットする offset
+         */
+        public void setOffset(long offset) {
+            this.offset = offset;
+        }
+
+        /**
+         * @param mills セットする mills
+         */
+        public void setMills(long mills) {
+            this.mills = mills;
+        }
+    }
+
+    private void loadData() {
+        if ((this.updateTiming == null) && (AppConfig.get() != null)) {
+            this.updateTiming = AppConfig.get().getCondTimingData();
+        }
     }
 
     /**
@@ -74,6 +107,7 @@ public class CondTiming {
      * @return 回復する時刻
      */
     public Date calcCondClearTime(int latestCond, Date time, int targetCond) {
+        this.loadData();
         if (latestCond >= targetCond) {
             return null;
         }
@@ -91,6 +125,7 @@ public class CondTiming {
      * @return 経過した疲労回復回数
      */
     public int calcPastCycles(Date time) {
+        this.loadData();
         long pastMills = new Date().getTime() - time.getTime();
         if (this.updateTiming == null) {
             return (int) ((pastMills + (COND_CYCLE / 2)) / COND_CYCLE);
@@ -108,6 +143,7 @@ public class CondTiming {
      * @return　不明な場合はnull
      */
     public Date getNextUpdateTime(Date time) {
+        this.loadData();
         if (this.updateTiming == null) {
             return null;
         }
@@ -120,6 +156,7 @@ public class CondTiming {
      * @return
      */
     public long getCurrentAccuracy() {
+        this.loadData();
         if (this.updateTiming == null) {
             return COND_CYCLE;
         }
@@ -131,6 +168,7 @@ public class CondTiming {
     }
 
     public void onPort(boolean updated) {
+        this.loadData();
         if ((updated == false) || this.ignoreNextPort) {
             this.ignoreNextPort = false;
         }
@@ -139,6 +177,7 @@ public class CondTiming {
             long mills = new Date().getTime() - this.from.getTime();
             if (this.updateTiming == null) {
                 this.updateTiming = new TimeSpan(this.from, mills);
+                AppConfig.get().setCondTimingData(this.updateTiming);
             }
             else {
                 this.updateTiming.intersection(this.from, mills);

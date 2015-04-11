@@ -383,7 +383,7 @@ public final class AsyncExecApplicationMain extends Thread {
         private void updateNoticeCond(String dispname, int index, long rest) {
             if (this.main.getCondNotice().getSelection()) {
                 if ((rest <= 0) && !FLAG_NOTICE_COND[index]) {
-                    this.noticeCond.add(dispname + " 疲労回復しました");
+                    this.noticeCond.add(dispname + " がまもなく疲労回復します");
                     FLAG_NOTICE_COND[index] = true;
                 } else if (rest > 0) {
                     FLAG_NOTICE_COND[index] = false;
@@ -459,8 +459,8 @@ public final class AsyncExecApplicationMain extends Thread {
                         Date condClearTime = null;
                         long condRest = -1;
                         for (ShipDto ship : dock.getShips()) {
-                            if (ship.getCond() < AppConfig.get().getOkCond()) {
-                                Date clearTime = ship.getCondClearTime(condTiming, AppConfig.get().getOkCond());
+                            Date clearTime = ship.getCondClearTime(condTiming, AppConfig.get().getOkCond());
+                            if (clearTime != null) {
                                 if ((condClearTime == null) || condClearTime.before(clearTime)) {
                                     condClearTime = clearTime;
                                 }
@@ -485,7 +485,7 @@ public final class AsyncExecApplicationMain extends Thread {
                             for (int p = 0; p < ships.size(); ++p) {
                                 ShipDto ship = ships.get(p);
                                 if (!ship.isHalfDamage() && (ship.getNowhp() != ship.getMaxhp())) {
-                                    long needs = Math.max(AppConstants.AKASHI_REPAIR_MINIMUM, ship.getDocktime());
+                                    long needs = Math.max(AppConstants.AKASHI_REPAIR_MINIMUM, ship.getAkashiTime());
                                     Date finish = new Date(repairStartTime.getTime() + needs);
                                     long rest = TimeLogic.getRest(this.now, finish);
 

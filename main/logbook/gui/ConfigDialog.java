@@ -515,6 +515,16 @@ public final class ConfigDialog extends Dialog {
         useMonoIcon.setText("モノクロアイコンを使用");
         useMonoIcon.setSelection(AppConfig.get().isMonoIcon());
 
+        final Button showCondTimer = new Button(compositeFleetDetail, SWT.CHECK);
+        showCondTimer.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        showCondTimer.setText("疲労回復までの時間を表示");
+        showCondTimer.setSelection(AppConfig.get().isShowCondTimer());
+
+        final Button showAkashiTimer = new Button(compositeFleetDetail, SWT.CHECK);
+        showAkashiTimer.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        showAkashiTimer.setText("泊地修理終了までの時間を表示");
+        showAkashiTimer.setSelection(AppConfig.get().isShowAkashiTimer());
+
         // 通知
         compositeNotify.setLayout(new GridLayout(3, false));
 
@@ -1015,6 +1025,8 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setVisibleOnReturnMission(visibleOnReturnMission.getSelection());
                 AppConfig.get().setVisibleOnReturnBathwater(visibleOnReturnBathwater.getSelection());
                 AppConfig.get().setMonoIcon(useMonoIcon.getSelection());
+                AppConfig.get().setShowCondTimer(showCondTimer.getSelection());
+                AppConfig.get().setShowAkashiTimer(showAkashiTimer.getSelection());
                 if (useRecommendedSakuteki.getSelection()) {
                     AppConfig.get().setUseRecommendedSakuteki(true);
                 }
