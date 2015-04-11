@@ -199,9 +199,9 @@ public final class ApplicationMain extends WindowBase {
     private BattleAggDialog battleCounterWindow;
     /** グループエディター */
     private ShipFilterGroupDialog shipFilterGroupWindow;
-    /** グループエディター */
+    /** 資材チャート */
     private ResourceChartDialog resourceChartWindow;
-    /** ツール */
+    /** ツールウィンドウ */
     private LauncherWindow launcherWindow;
 
     /** コマンドボタン */
@@ -1365,6 +1365,101 @@ public final class ApplicationMain extends WindowBase {
             this.trayItem.setText(newText);
             this.titleText = newText;
         }
+    }
+
+    /** キャプチャ */
+    public CaptureDialog getCaptureDialog() {
+        return this.captureWindow;
+    }
+
+    /** ドロップ報告書 */
+    public DropReportTable getDropTable() {
+        return this.dropReportWindow;
+    }
+
+    /** 建造報告書 */
+    public CreateShipReportTable getCreateShipReportTable() {
+        return this.createShipReportWindow;
+    }
+
+    /** 開発報告書 */
+    public CreateItemReportTable getCreateItemReportTable() {
+        return this.createItemReportWindow;
+    }
+
+    /** 遠征報告書 */
+    public MissionResultTable getMissionResultTable() {
+        return this.missionResultWindow;
+    }
+
+    /** 所有装備一覧 */
+    public ItemTable getItemTable() {
+        return this.itemTableWindow;
+    }
+
+    /** 艦娘一覧1-4 */
+    public ShipTable[] getShipTables() {
+        return this.shipTableWindows;
+    }
+
+    /** お風呂に入りたい艦娘 */
+    public BathwaterTableDialog getBathwaterTableDialog() {
+        return this.bathwaterTablwWindow;
+    }
+
+    /** 遠征一覧 */
+    public MissionTable getMissionTable() {
+        return this.missionTableWindow;
+    }
+
+    /** 任務一覧 */
+    public QuestTable getQuestTable() {
+        return this.questTableWindow;
+    }
+
+    /** 戦況 */
+    public BattleWindowLarge getBattleWindowLarge() {
+        return this.battleWindowLarge;
+    }
+
+    /** 戦況-横 */
+    public BattleWindowSmall getBattleWindowSmall() {
+        return this.battleWindowSmall;
+    }
+
+    /** 自軍敵軍パラメータ */
+    public BattleShipWindow getBattleShipWindow() {
+        return this.battleShipWindow;
+    }
+
+    /** 経験値計算 */
+    public CalcExpDialog getCalcExpDialog() {
+        return this.calcExpWindow;
+    }
+
+    /** 演習経験値計算 */
+    public CalcPracticeExpDialog getCalcPracticeExpDialog() {
+        return this.calcPracticeExpWindow;
+    }
+
+    /** 出撃統計 */
+    public BattleAggDialog getBattleAggDialog() {
+        return this.battleCounterWindow;
+    }
+
+    /** グループエディター */
+    public ShipFilterGroupDialog getShipFilterGroupDialog() {
+        return this.shipFilterGroupWindow;
+    }
+
+    /** 資材チャート */
+    public ResourceChartDialog getResourceChartDialog() {
+        return this.resourceChartWindow;
+    }
+
+    /** ツールウィンドウ */
+    public LauncherWindow getLauncherWindow() {
+        return this.launcherWindow;
     }
 
     /**
