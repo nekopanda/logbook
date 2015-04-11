@@ -1,8 +1,10 @@
 package logbook.gui.widgets;
 
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.CheckForNull;
@@ -10,13 +12,17 @@ import javax.annotation.CheckForNull;
 import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
+import logbook.data.context.TimerContext;
 import logbook.dto.DockDto;
 import logbook.dto.ItemInfoDto;
 import logbook.dto.ShipDto;
 import logbook.gui.ApplicationMain;
 import logbook.gui.logic.SakutekiString;
 import logbook.gui.logic.Sound;
+import logbook.gui.logic.TimeLogic;
 import logbook.gui.logic.TimeString;
+import logbook.internal.AkashiTimer;
+import logbook.internal.CondTiming;
 import logbook.internal.EvaluateExp;
 import logbook.internal.SeaExp;
 import logbook.util.CalcExpUtils;
@@ -115,14 +121,19 @@ public class FleetComposite extends Composite {
     private final Label[] bullstLabels = new Label[MAXCHARA];
     /** 燃料ステータス */
     private final Label[] fuelstLabels = new Label[MAXCHARA];
-    /** ダメコンステータス(要員) */
-    private final Label[] dmgcstyLabels = new Label[MAXCHARA];
-    /** ダメコンステータス(女神) */
-    private final Label[] dmgcstmLabels = new Label[MAXCHARA];
-    /** レベリングステータス */
+    /** ダメコン */
+    private final Label[] dmgcLabels = new Label[MAXCHARA];
+    /** レベリング  */
     private final Label[] nextLabels = new Label[MAXCHARA];
+    /** 泊地修理 or 疲労回復 */
+    private final Label[] timeLabels = new Label[MAXCHARA];
     /** メッセージ */
     private final StyledText message;
+
+    /** 時間表示系の更新タスク */
+    private final List<Runnable> updators = new ArrayList<>();
+
+    private static SimpleDateFormat format = new SimpleDateFormat(AppConstants.DATE_SHORT_FORMAT);
 
     /**
      * @param parent 艦隊タブの親
@@ -144,7 +155,7 @@ public class FleetComposite extends Composite {
 
         this.fleetGroup = new Composite(this, SWT.NONE);
         this.fleetGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        GridLayout glShipGroup = new GridLayout(3, false);
+        GridLayout glShipGroup = new GridLayout(2, false);
         glShipGroup.horizontalSpacing = 0;
         glShipGroup.marginTop = 0;
         glShipGroup.marginWidth = 1;
@@ -173,58 +184,43 @@ public class FleetComposite extends Composite {
         for (int i = 0; i < MAXCHARA; i++) {
             // アイコン
             Label iconlabel = new Label(this.fleetGroup, SWT.NONE);
-            GridData gdIconlabel = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
+            GridData gdIconlabel = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 2);
             gdIconlabel.widthHint = 16;
             iconlabel.setLayoutData(gdIconlabel);
-            // 名前
-            Composite nameComposite = new Composite(this.fleetGroup, SWT.NONE);
-            GridLayout glName = new GridLayout(2, false);
-            glName.horizontalSpacing = 0;
-            glName.marginTop = 0;
-            glName.marginWidth = 1;
-            glName.marginHeight = 0;
-            glName.marginBottom = 0;
-            glName.verticalSpacing = 0;
-            nameComposite.setLayout(glName);
-            nameComposite.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 
+            // 上段
+            Composite upsideBase = new Composite(this.fleetGroup, SWT.NONE);
+            upsideBase.setLayout(SwtUtils.makeGridLayout(2, 0, 0, 0, 0));
+            upsideBase.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+            // 名前
+            Composite nameComposite = new Composite(upsideBase, SWT.NONE);
+            nameComposite.setLayout(SwtUtils.makeGridLayout(2, 0, 0, 1, 0));
+            nameComposite.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
             Label namelabel = new Label(nameComposite, SWT.NONE);
             SwtUtils.initLabel(namelabel, "名前", LARGE, new GridData());
-
             Label lvlabel = new Label(nameComposite, SWT.NONE);
             SwtUtils.initLabel(lvlabel, "Lv.0", SMALL, 1.4, new GridData(SWT.CENTER, SWT.BOTTOM, false, false, 1, 1));
-            // HP
-            Composite hpComposite = new Composite(this.fleetGroup, SWT.NONE);
-            GridLayout glHp = new GridLayout(3, false);
-            glHp.horizontalSpacing = 0;
-            glHp.marginTop = 0;
-            glHp.marginWidth = 1;
-            glHp.marginHeight = 0;
-            glHp.marginBottom = 0;
-            glHp.verticalSpacing = 0;
-            hpComposite.setLayout(glHp);
-            hpComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 
+            // HP
+            Composite hpComposite = new Composite(upsideBase, SWT.NONE);
+            hpComposite.setLayout(SwtUtils.makeGridLayout(3, 0, 0, 1, 0));
+            hpComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
             Label hp = new Label(hpComposite, SWT.NONE);
-            SwtUtils.initLabel(hp, "/", SMALL, new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
+            SwtUtils.initLabel(hp, "/", SMALL, new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
             Label hpgauge = new Label(hpComposite, SWT.NONE);
             hpgauge.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, false, false, 1, 1));
             Label hpmsg = new Label(hpComposite, SWT.NONE);
             SwtUtils.initLabel(hpmsg, "健在", new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
 
-            // ステータス
-            Label skip1 = new Label(this.fleetGroup, SWT.NONE);
-            SwtUtils.initLabel(skip1, "", new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
+            // 下段
+            Composite downsideBase = new Composite(this.fleetGroup, SWT.NONE);
+            downsideBase.setLayout(SwtUtils.makeGridLayout(2, 0, 0, 0, 0));
+            downsideBase.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-            Composite stateComposite = new Composite(this.fleetGroup, SWT.NONE);
-            GridLayout glState = new GridLayout(6, false);
-            glState.horizontalSpacing = 0;
-            glState.marginTop = 0;
-            glState.marginWidth = 0;
-            glState.marginHeight = 0;
-            glState.marginBottom = 0;
-            glState.verticalSpacing = 0;
-            stateComposite.setLayout(glState);
+            // ステータス
+            Composite stateComposite = new Composite(downsideBase, SWT.NONE);
+            stateComposite.setLayout(SwtUtils.makeGridLayout(6, 0, 0, 0, 0));
             stateComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
             Label condst = new Label(stateComposite, SWT.NONE);
@@ -233,15 +229,15 @@ public class FleetComposite extends Composite {
             SwtUtils.initLabel(fuelst, "燃", new GridData());
             Label bullst = new Label(stateComposite, SWT.NONE);
             SwtUtils.initLabel(bullst, "弾", new GridData());
-            Label dmgcsty = new Label(stateComposite, SWT.NONE);
-            SwtUtils.initLabel(dmgcsty, "ダ", new GridData());
-            Label dmgcstm = new Label(stateComposite, SWT.NONE);
-            SwtUtils.initLabel(dmgcstm, "ダ", new GridData());
+            Label dmgc = new Label(stateComposite, SWT.NONE);
+            SwtUtils.initLabel(dmgc, "ダ", new GridData());
             Label next = new Label(stateComposite, SWT.NONE);
-            SwtUtils.initLabel(next, "", SMALL, new GridData());
+            SwtUtils.initLabel(next, "next", new GridData());
+            Label time = new Label(stateComposite, SWT.NONE);
+            SwtUtils.initLabel(time, "time", new GridData());
 
             // 疲労
-            Label cond = new Label(this.fleetGroup, SWT.NONE);
+            Label cond = new Label(downsideBase, SWT.NONE);
             SwtUtils.initLabel(cond, "49 cond.", new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 
             this.iconLabels[i] = iconlabel;
@@ -253,10 +249,10 @@ public class FleetComposite extends Composite {
             this.condLabels[i] = cond;
             this.condstLabels[i] = condst;
             this.bullstLabels[i] = bullst;
-            this.dmgcstyLabels[i] = dmgcsty;
-            this.dmgcstmLabels[i] = dmgcstm;
             this.fuelstLabels[i] = fuelst;
+            this.dmgcLabels[i] = dmgc;
             this.nextLabels[i] = next;
+            this.timeLabels[i] = time;
         }
     }
 
@@ -268,15 +264,20 @@ public class FleetComposite extends Composite {
      */
     public void updateFleet(DockDto dock, boolean combinedFleetBadlyDamaed) {
         if ((this.dock == dock) && !this.dock.isUpdate()) {
+            // 時間表示だけ更新
+            for (Runnable update : this.updators) {
+                update.run();
+            }
             return;
         }
 
+        this.updators.clear();
         this.getShell().setRedraw(false);
 
         this.dock = dock;
         this.state.set(WARN, false);
         this.state.set(FATAL, false);
-        this.cond = 49;
+        this.cond = AppConfig.get().getOkCond();
         this.clearDate = null;
         this.badlyDamage = false;
         this.message.setText("");
@@ -293,19 +294,18 @@ public class FleetComposite extends Composite {
             this.condLabels[i].setText("");
             this.condstLabels[i].setText("");
             this.bullstLabels[i].setText("");
-            this.dmgcstyLabels[i].setText("");
-            this.dmgcstmLabels[i].setText("");
             this.fuelstLabels[i].setText("");
+            this.dmgcLabels[i].setText("");
             this.nextLabels[i].setText("");
+            this.timeLabels[i].setText("");
         }
         // 艦隊合計Lv
         int totallv = 0;
-        // 索敵値計(素)
-        int totalSakuteki = 0;
-        // 偵察機索敵値計
-        int totalSakutekiSurvey = 0;
-        // 電探索敵値計
-        int totalSakutekiRader = 0;
+
+        int dockIndex = Integer.parseInt(dock.getId()) - 1;
+        CondTiming condTiming = GlobalContext.getCondTiming();
+        AkashiTimer.RepairState repairState = TimerContext.get().getAkashiRepairState(dockIndex);
+        List<AkashiTimer.ShipState> repairShips = repairState.isRepairing() ? repairState.get() : null;
 
         for (int i = 0; i < ships.size(); i++) {
             ShipDto ship = ships.get(i);
@@ -337,9 +337,10 @@ public class FleetComposite extends Composite {
             totallv += ship.getLv();
 
             // 疲労している艦娘がいる場合メッセージを表示
+            final Date condClearDate = ship.getCondClearTime(condTiming, AppConfig.get().getOkCond());
             if (this.cond > cond) {
                 this.cond = cond;
-                this.clearDate = new TimeString(ship.getCondClearTime().getTime()).toString();
+                this.clearDate = new TimeString(condClearDate).toString();
             }
 
             // 体力メッセージ
@@ -446,34 +447,64 @@ public class FleetComposite extends Composite {
                     }
                 }
             }
+            String dmgcstr = "";
             if (dmgcsty > 0) {
-                this.dmgcstyLabels[i].setText("要員x" + dmgcsty);
-                this.dmgcstyLabels[i].setEnabled(true);
-                this.dmgcstyLabels[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN));
-
-            } else {
-                this.dmgcstyLabels[i].setText("");
-                this.dmgcstyLabels[i].setEnabled(false);
-                this.dmgcstyLabels[i].setForeground(null);
+                dmgcstr += "要員x" + dmgcsty + " ";
             }
             if (dmgcstm > 0) {
-                this.dmgcstmLabels[i].setText("女神x" + dmgcstm);
-                this.dmgcstmLabels[i].setEnabled(true);
-                this.dmgcstmLabels[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN));
-
-            } else {
-                this.dmgcstmLabels[i].setText("");
-                this.dmgcstmLabels[i].setEnabled(false);
-                this.dmgcstmLabels[i].setForeground(null);
+                dmgcstr += "女神x" + dmgcstm + " ";
             }
+            this.dmgcLabels[i].setText(dmgcstr);
+            this.dmgcLabels[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN));
+
             // ステータス.あと何回
+            String statusstr = "";
             if (AppConfig.get().isDisplayCount()) {
                 Integer nextcount = this.getNextCount(ship, i == 0);
                 if (nextcount != null) {
-                    this.nextLabels[i].setText(MessageFormat.format("あと{0}回", nextcount));
-                } else {
-                    this.nextLabels[i].setText("");
+                    statusstr = MessageFormat.format("あと{0}回", nextcount);
                 }
+            }
+            this.nextLabels[i].setText(statusstr);
+
+            // 残り修理時間/疲労回復までの時間/ダメコン表示
+            Runnable updator = null;
+            final Label timeLabel = this.timeLabels[i];
+            boolean isRepairing = (repairShips != null) && (repairShips.get(i) != null);
+            if (isRepairing && AppConfig.get().isShowAkashiTimer()) {
+                // 泊地修理中
+                updator = new AkashiTimerUpdator(timeLabel, dockIndex, i);
+            }
+            else if ((condClearDate != null) && AppConfig.get().isShowCondTimer()) {
+                updator = new Runnable() {
+                    @Override
+                    public void run() {
+                        long rest = TimeLogic.getRest(new Date(), condClearDate);
+                        String str;
+                        String tip = null;
+                        String reststr = TimeLogic.toDateRestString(rest);
+                        if (reststr != null) {
+                            str = "疲労あと" + reststr;
+                            tip = format.format(condClearDate);
+                        }
+                        else {
+                            str = "疲労まもなく回復";
+                        }
+                        timeLabel.setText(str);
+                        timeLabel.setToolTipText(tip);
+                        timeLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN));
+                        timeLabel.getParent().layout();
+                    }
+                };
+            }
+            if (updator != null) {
+                updator.run();
+                this.updators.add(updator);
+            }
+            else {
+                timeLabel.setText("");
+                timeLabel.setForeground(null);
+                timeLabel.setToolTipText(null);
             }
 
             // コンディション
@@ -541,7 +572,10 @@ public class FleetComposite extends Composite {
             this.hpgaugeImages[i] = gauge;
             // コンディション
             this.condLabels[i].setText(MessageFormat.format("{0} cond.", cond));
-            this.bullstLabels[i].getParent().layout();
+
+            //this.nameLabels[i].getParent().layout();
+            //this.hpLabels[i].getParent().layout();
+            //this.bullstLabels[i].getParent().layout();
 
         }
         // メッセージを更新する
@@ -553,6 +587,7 @@ public class FleetComposite extends Composite {
                 break;
             }
         }
+
         // 制空値を計算
         int seiku = 0;
         for (ShipDto shipDto : ships) {
@@ -588,11 +623,8 @@ public class FleetComposite extends Composite {
         if (GlobalContext.isMission(this.dock.getId())) {
             // 遠征中
             this.addStyledText(this.message, AppConstants.MESSAGE_MISSION, messageStyle);
-        } else if (isBathwater) {
-            // 入渠中
-            this.addStyledText(this.message,
-                    MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BATHWATER), messageStyle);
-        } else if (GlobalContext.isSortie(this.dock.getId())) {
+        }
+        else if (GlobalContext.isSortie(this.dock.getId())) {
             // 出撃中
             this.addStyledText(this.message, AppConstants.MESSAGE_SORTIE, messageStyle);
             if (this.badlyDamage) {
@@ -618,6 +650,15 @@ public class FleetComposite extends Composite {
             // 連合艦隊の他の艦隊に大破艦がある
             this.addStyledText(this.message, AppConstants.MESSAGE_IN_COMBINED +
                     MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BADLY_DAMAGE), taihaStyle);
+        }
+        else if (isBathwater) {
+            // 入渠中
+            this.addStyledText(this.message,
+                    MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BATHWATER), messageStyle);
+        }
+        else if (repairState.isRepairing()) {
+            // 泊地修理中
+            this.addStyledText(this.message, "泊地修理中。" + AppConstants.MESSAGE_GOOD, messageStyle);
         }
         else {
             // 出撃可能
@@ -654,6 +695,11 @@ public class FleetComposite extends Composite {
         this.updateTabIcon();
         this.postFatal();
 
+        for (org.eclipse.swt.widgets.Control control : this.fleetGroup.getChildren()) {
+            if (control instanceof Composite) {
+                ((Composite) control).layout();
+            }
+        }
         this.fleetGroup.layout();
 
         this.getShell().setRedraw(true);
@@ -842,5 +888,68 @@ public class FleetComposite extends Composite {
         int g = (int) (start.green + ((end.green - start.green) * raito));
         int b = (int) (start.blue + ((end.blue - start.blue) * raito));
         return new RGB(r, g, b);
+    }
+
+    /**
+     * 泊地修理タイマー表示を更新する
+     * @author Nekopanda
+     */
+    private static class AkashiTimerUpdator implements Runnable {
+        private final Label label;
+        private final int dockIndex;
+        private final int dockPosition;
+        private int showCount = 0;
+
+        public AkashiTimerUpdator(Label l, int i, int p) {
+            this.label = l;
+            this.dockIndex = i;
+            this.dockPosition = p;
+        }
+
+        @Override
+        public void run() {
+            String str = "";
+            String tip = null;
+
+            Date now = TimerContext.get().getLastUpdated();
+            AkashiTimer.RepairState repairState = TimerContext.get().getAkashiRepairState(this.dockIndex);
+            if (repairState.isRepairing()) {
+                AkashiTimer.ShipState state = repairState.get().get(this.dockPosition);
+                if (now.before(state.getFinish())) {
+                    String reststr = TimeLogic.toDateRestString(TimeLogic.getRest(now, state.getFinish()), true);
+                    String nextstr = TimeLogic.toDateRestString(state.getNext() / 1000, true);
+                    boolean showRemain;
+                    switch (AppConfig.get().getAkashiTimerFormat()) {
+                    case 1:
+                        showRemain = false;
+                        break;
+                    case 2:
+                        showRemain = ((this.showCount++ / 4) % 2) == 0;
+                        break;
+                    default:
+                        showRemain = true;
+                        break;
+                    }
+                    if (showRemain) {
+                        str = "修理あと" + reststr;
+                    }
+                    else {
+                        str = "次回復まで" + nextstr;
+                    }
+                    tip = "現在までに+" + state.getCurrentGain() + "回復\n" +
+                            "次の回復まで" + nextstr + "\n" +
+                            "全回復まで" + reststr +
+                            "(" + format.format(state.getFinish()) + ")";
+                }
+                else {
+                    str = "修理まもなく完了";
+                }
+            }
+
+            this.label.setText(str);
+            this.label.setToolTipText(tip);
+            this.label.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_BLUE));
+            this.label.getParent().layout();
+        }
     }
 }

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import logbook.constants.AppConstants;
 import logbook.dto.ShipFilterDto;
+import logbook.internal.CondTiming;
 
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.swt.graphics.RGB;
@@ -34,11 +35,23 @@ public final class AppConfigBean {
     /** 縮小表示 */
     private boolean minimumLayout;
 
+    /** 通知設定を表示 */
+    private boolean showNofitySetting;
+
+    /** 疲労度タイマー表示 */
+    private boolean showCondCycleTimer;
+
     /** 音量 */
     private float soundLevel = 0.85f;
 
-    /** 透明度 */
-    //private int alpha = 255;
+    /** 疲労度回復判定値 */
+    private int okCond = 49;
+
+    /**  */
+    private boolean akashiNotifyFirstStep = false;
+
+    /**  */
+    private boolean akashiNotifyEveryStep = false;
 
     /** 遠征のリマインド */
     private boolean missionRemind = true;
@@ -82,11 +95,23 @@ public final class AppConfigBean {
     /** 入渠Push通知のPriority */
     private int PushPriorityNdock = 0;
 
+    /** 泊地修理Push通知のPriority */
+    private int PushPriorityAkashi = 0;
+
+    /** 疲労Push通知のPriority */
+    private int PushPriorityCond = 0;
+
     /** 遠征帰投時にPush通知する */
     private boolean PushMission = true;
 
     /**　入渠完了時にPush通知する */
     private boolean PushNdock = true;
+
+    /** 泊地修理完了時にPush通知する */
+    private boolean PushAkashi = true;
+
+    /**　疲労完了時にPush通知する */
+    private boolean PushCond = true;
 
     /** 出撃ログの保存先 */
     private String battleLogPath = new File("battlelog").getAbsolutePath();
@@ -130,6 +155,12 @@ public final class AppConfigBean {
     /** 入渠-1分前に通知する */
     private boolean noticeNdock = true;
 
+    /** 泊地修理完了時に通知する */
+    private boolean noticeAkashi = true;
+
+    /** 疲労回復時に通知する */
+    private boolean noticeCond = true;
+
     /** 画面キャプチャ-保存先 */
     private String capturePath = new File("").getAbsolutePath();
 
@@ -162,6 +193,15 @@ public final class AppConfigBean {
 
     /** モノクロアイコンを使用する */
     private boolean monoIcon;
+
+    /** 疲労タイマーを表示する */
+    private boolean showCondTimer;
+
+    /** 泊地修理タイマーを表示する */
+    private boolean showAkashiTimer;
+
+    /** 泊地修理タイマー表示形式 */
+    private int akashiTimerFormat = 0;
 
     /** 回数を表示 */
     private boolean displayCount;
@@ -291,6 +331,9 @@ public final class AppConfigBean {
     private String twitterToken;
     private String twitterTokenSecret;
 
+    /** Cond値更新タイミング情報 */
+    private CondTiming.TimeSpan condTimingData;
+
     private static RGB cloneRGB(RGB rgb) {
         return new RGB(rgb.red, rgb.green, rgb.blue);
     }
@@ -389,6 +432,34 @@ public final class AppConfigBean {
      */
     public void setMinimumLayout(boolean minimumLayout) {
         this.minimumLayout = minimumLayout;
+    }
+
+    /**
+     * @return showCondTimer
+     */
+    public boolean isShowCondCycleTimer() {
+        return this.showCondCycleTimer;
+    }
+
+    /**
+     * @param showCondTimer セットする showCondTimer
+     */
+    public void setShowCondCycleTimer(boolean showCondTimer) {
+        this.showCondCycleTimer = showCondTimer;
+    }
+
+    /**
+     * @return showNofitySetting
+     */
+    public boolean isShowNofitySetting() {
+        return this.showNofitySetting;
+    }
+
+    /**
+     * @param showNofitySetting セットする showNofitySetting
+     */
+    public void setShowNofitySetting(boolean showNofitySetting) {
+        this.showNofitySetting = showNofitySetting;
     }
 
     /**
@@ -619,6 +690,34 @@ public final class AppConfigBean {
         this.PushNdock = pushndock;
     }
 
+    /**
+     * @return pushAkashi
+     */
+    public boolean isPushAkashi() {
+        return this.PushAkashi;
+    }
+
+    /**
+     * @param pushAkashi セットする pushAkashi
+     */
+    public void setPushAkashi(boolean pushAkashi) {
+        this.PushAkashi = pushAkashi;
+    }
+
+    /**
+     * @return pushCond
+     */
+    public boolean isPushCond() {
+        return this.PushCond;
+    }
+
+    /**
+     * @param pushCond セットする pushCond
+     */
+    public void setPushCond(boolean pushCond) {
+        this.PushCond = pushCond;
+    }
+
     /** 遠征Push通知の Priorityを取得します
      * @return priority
      */
@@ -645,6 +744,34 @@ public final class AppConfigBean {
      */
     public void setPushPriorityNdock(int priority) {
         this.PushPriorityNdock = priority;
+    }
+
+    /**
+     * @return pushPriorityAkashi
+     */
+    public int getPushPriorityAkashi() {
+        return this.PushPriorityAkashi;
+    }
+
+    /**
+     * @param pushPriorityAkashi セットする pushPriorityAkashi
+     */
+    public void setPushPriorityAkashi(int pushPriorityAkashi) {
+        this.PushPriorityAkashi = pushPriorityAkashi;
+    }
+
+    /**
+     * @return pushPriorityCond
+     */
+    public int getPushPriorityCond() {
+        return this.PushPriorityCond;
+    }
+
+    /**
+     * @param pushPriorityCond セットする pushPriorityCond
+     */
+    public void setPushPriorityCond(int pushPriorityCond) {
+        this.PushPriorityCond = pushPriorityCond;
     }
 
     /**
@@ -868,6 +995,34 @@ public final class AppConfigBean {
     }
 
     /**
+     * @return noticeAkashi
+     */
+    public boolean isNoticeAkashi() {
+        return this.noticeAkashi;
+    }
+
+    /**
+     * @param noticeAkashi セットする noticeAkashi
+     */
+    public void setNoticeAkashi(boolean noticeAkashi) {
+        this.noticeAkashi = noticeAkashi;
+    }
+
+    /**
+     * @return noticeCond
+     */
+    public boolean isNoticeCond() {
+        return this.noticeCond;
+    }
+
+    /**
+     * @param noticeCond セットする noticeCond
+     */
+    public void setNoticeCond(boolean noticeCond) {
+        this.noticeCond = noticeCond;
+    }
+
+    /**
      * 画面キャプチャ-保存先を取得します。
      * @return 画面キャプチャ-保存先
      */
@@ -1057,6 +1212,34 @@ public final class AppConfigBean {
      */
     public void setMonoIcon(boolean monoIcon) {
         this.monoIcon = monoIcon;
+    }
+
+    /**
+     * @return showCondTimer
+     */
+    public boolean isShowCondTimer() {
+        return this.showCondTimer;
+    }
+
+    /**
+     * @param showCondTimer セットする showCondTimer
+     */
+    public void setShowCondTimer(boolean showCondTimer) {
+        this.showCondTimer = showCondTimer;
+    }
+
+    /**
+     * @return showAkashiTimer
+     */
+    public boolean isShowAkashiTimer() {
+        return this.showAkashiTimer;
+    }
+
+    /**
+     * @param showAkashiTimer セットする showAkashiTimer
+     */
+    public void setShowAkashiTimer(boolean showAkashiTimer) {
+        this.showAkashiTimer = showAkashiTimer;
     }
 
     /**
@@ -1678,6 +1861,76 @@ public final class AppConfigBean {
      */
     public void setToggleToolButton(boolean toggleToolButton) {
         this.toggleToolButton = toggleToolButton;
+    }
+
+    /**
+     * @return okCond
+     */
+    public int getOkCond() {
+        return this.okCond;
+    }
+
+    /**
+     * @param okCond セットする okCond
+     */
+    public void setOkCond(int okCond) {
+        this.okCond = okCond;
+    }
+
+    /**
+     * @return condTimingData
+     */
+    public CondTiming.TimeSpan getCondTimingData() {
+        return this.condTimingData;
+    }
+
+    /**
+     * @param condTimingData セットする condTimingData
+     */
+    public void setCondTimingData(CondTiming.TimeSpan condTimingData) {
+        this.condTimingData = condTimingData;
+    }
+
+    /**
+     * @return akashiTimerFormat
+     */
+    public int getAkashiTimerFormat() {
+        return this.akashiTimerFormat;
+    }
+
+    /**
+     * @param akashiTimerFormat セットする akashiTimerFormat
+     */
+    public void setAkashiTimerFormat(int akashiTimerFormat) {
+        this.akashiTimerFormat = akashiTimerFormat;
+    }
+
+    /**
+     * @return akashiNotifyFirstStep
+     */
+    public boolean isAkashiNotifyFirstStep() {
+        return this.akashiNotifyFirstStep;
+    }
+
+    /**
+     * @param akashiNotifyFirstStep セットする akashiNotifyFirstStep
+     */
+    public void setAkashiNotifyFirstStep(boolean akashiNotifyFirstStep) {
+        this.akashiNotifyFirstStep = akashiNotifyFirstStep;
+    }
+
+    /**
+     * @return akashiNotifyEveryStep
+     */
+    public boolean isAkashiNotifyEveryStep() {
+        return this.akashiNotifyEveryStep;
+    }
+
+    /**
+     * @param akashiNotifyEveryStep セットする akashiNotifyEveryStep
+     */
+    public void setAkashiNotifyEveryStep(boolean akashiNotifyEveryStep) {
+        this.akashiNotifyEveryStep = akashiNotifyEveryStep;
     }
 
 }

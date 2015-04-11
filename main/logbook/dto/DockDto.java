@@ -166,4 +166,41 @@ public final class DockDto extends AbstractDto {
     public void setEscaped(boolean[] escaped) {
         this.escaped = escaped;
     }
+
+    /**
+     * 旗艦が明石か？
+     * @return
+     */
+    public boolean isFlagshipAkashi() {
+        List<ShipDto> ships = this.getShips();
+        if (ships.size() > 0) {
+            String name = ships.get(0).getName();
+            if (name.startsWith("明石")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 泊地修理可能艦数
+     * @return
+     */
+    public int getAkashiCapacity() {
+        if (!this.isFlagshipAkashi()) {
+            // 旗艦が明石でない
+            return 0;
+        }
+        ShipDto akashi = this.ships.get(0);
+        int numRepairShips = 2;
+        for (ItemInfoDto item : akashi.getItem()) {
+            if (item != null) {
+                if (item.getName().equals("艦艇修理施設")) {
+                    ++numRepairShips;
+                }
+            }
+        }
+
+        return numRepairShips;
+    }
 }

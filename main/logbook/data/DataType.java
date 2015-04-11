@@ -107,6 +107,10 @@ public enum DataType {
     NYUKYO_START("/kcsapi/api_req_nyukyo/start"),
     /** 高速修復 */
     NYUKYO_SPEEDCHANGE("/kcsapi/api_req_nyukyo/speedchange"),
+    /** 改造 */
+    REMODELING("/kcsapi/api_req_kaisou/remodeling"),
+    /** 疲労度回復アイテム使用 */
+    ITEMUSE_COND("/kcsapi/api_req_member/itemuse_cond"),
     /** フィルタ前のデータ */
     UNDEFINED(null);
 

@@ -78,6 +78,8 @@ function body(ship) {
 		damage = "小破";
 	}
 
+	var condClearTime = ship.getCondClearTime(GlobalContext.getCondTiming());
+
 	return toComparable([
 					ship.id,
 					ship.locked ? "♥" : "",
@@ -91,7 +93,7 @@ function body(ship) {
 					ship.charId,
 					now,
 					ship.cond,
-					(ship.cond < 49) ? new TimeString(ship.condClearTime.time) : null,
+					(ship.cond < 49) ? new TimeString(condClearTime) : null,
 					new HpString(ship.nowhp, ship.maxhp),
 					new HpString(ship.fuel, ship.fuelMax),
 					new HpString(ship.bull, ship.bullMax),

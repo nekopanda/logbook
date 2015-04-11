@@ -515,6 +515,29 @@ public final class ConfigDialog extends Dialog {
         useMonoIcon.setText("モノクロアイコンを使用");
         useMonoIcon.setSelection(AppConfig.get().isMonoIcon());
 
+        final Button showCondTimer = new Button(compositeFleetDetail, SWT.CHECK);
+        showCondTimer.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        showCondTimer.setText("疲労回復までの時間を表示");
+        showCondTimer.setSelection(AppConfig.get().isShowCondTimer());
+
+        final Button showAkashiTimer = new Button(compositeFleetDetail, SWT.CHECK);
+        showAkashiTimer.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        showAkashiTimer.setText("泊地修理終了までの時間を表示");
+        showAkashiTimer.setSelection(AppConfig.get().isShowAkashiTimer());
+
+        Composite akashiFormatBase = new Composite(compositeFleetDetail, SWT.NONE);
+        akashiFormatBase.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        akashiFormatBase.setLayout(new RowLayout(SWT.HORIZONTAL));
+
+        Label akashiFormatLabel = new Label(akashiFormatBase, SWT.NONE);
+        akashiFormatLabel.setText("表示");
+
+        final Combo akashiFormatCombo = new Combo(akashiFormatBase, SWT.READ_ONLY);
+        akashiFormatCombo.add("全回復までの時間");
+        akashiFormatCombo.add("次の回復ポイントまでの時間");
+        akashiFormatCombo.add("交互に表示");
+        akashiFormatCombo.select(AppConfig.get().getAkashiTimerFormat());
+
         // 通知
         compositeNotify.setLayout(new GridLayout(3, false));
 
@@ -528,6 +551,34 @@ public final class ConfigDialog extends Dialog {
         soundlevel.setLayoutData(gdSoundlevel);
         soundlevel.setText(Integer.toString((int) (AppConfig.get().getSoundLevel() * 100)));
         new Label(compositeNotify, SWT.NONE);
+
+        final Button balloon = new Button(compositeNotify, SWT.CHECK);
+        balloon.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        balloon.setText("タイマー類をバルーンで通知する");
+        balloon.setSelection(AppConfig.get().isUseBalloon());
+
+        Label condLabel1 = new Label(compositeNotify, SWT.NONE);
+        condLabel1.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        condLabel1.setText("回復判定疲労度");
+
+        final Spinner condSpinner = new Spinner(compositeNotify, SWT.BORDER);
+        condSpinner.setMaximum(49);
+        condSpinner.setMinimum(0);
+        condSpinner.setSelection(AppConfig.get().getOkCond());
+        GridData gdCondSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        gdCondSpinner.widthHint = 55;
+        condSpinner.setLayoutData(gdCondSpinner);
+        new Label(compositeNotify, SWT.NONE);
+
+        final Button akashiFirstStep = new Button(compositeNotify, SWT.CHECK);
+        akashiFirstStep.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        akashiFirstStep.setText("泊地修理開始から20分経過を通知する");
+        akashiFirstStep.setSelection(AppConfig.get().isAkashiNotifyFirstStep());
+
+        final Button akashiEveryStep = new Button(compositeNotify, SWT.CHECK);
+        akashiEveryStep.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        akashiEveryStep.setText("泊地修理中艦娘のHPが1回復する度に通知する");
+        akashiEveryStep.setSelection(AppConfig.get().isAkashiNotifyEveryStep());
 
         final Button remind = new Button(compositeNotify, SWT.CHECK);
         remind.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
@@ -547,11 +598,6 @@ public final class ConfigDialog extends Dialog {
         intervalSpinner.setLayoutData(gdIntervalSpinner);
 
         new Label(compositeNotify, SWT.NONE);
-
-        final Button balloon = new Button(compositeNotify, SWT.CHECK);
-        balloon.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-        balloon.setText("遠征・入渠をバルーンで通知する");
-        balloon.setSelection(AppConfig.get().isUseBalloon());
 
         final Button taskbar = new Button(compositeNotify, SWT.CHECK);
         taskbar.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
@@ -790,35 +836,56 @@ public final class ConfigDialog extends Dialog {
         imkayacPrivateKey.setLayoutData(gdimkayacUserName);
         imkayacPrivateKey.setText(AppConfig.get().getImKayacPrivateKey());
 
+        String pushName[] = new String[] {
+                "遠征帰投を通知",
+                "入渠完了を通知",
+                "泊地修理完了を通知",
+                "疲労回復を通知"
+        };
+
         final Button pushNotifyMission = new Button(compositePushNotify, SWT.CHECK);
-        pushNotifyMission.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        pushNotifyMission.setText("遠征帰投を通知");
-        pushNotifyMission.setSelection(AppConfig.get().getPushMission());
-
         final Combo pushPriorityMissionCombo = new Combo(compositePushNotify, SWT.READ_ONLY);
-        GridData gdpushPriorityMissionCombo = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
-        pushPriorityMissionCombo.setLayoutData(gdpushPriorityMissionCombo);
-        pushPriorityMissionCombo.add("Priority: Very Low");
-        pushPriorityMissionCombo.add("Priority: Moderate");
-        pushPriorityMissionCombo.add("Priority: Normal");
-        pushPriorityMissionCombo.add("Priority: High");
-        pushPriorityMissionCombo.add("Priority: Emergency");
-        pushPriorityMissionCombo.select(AppConfig.get().getPushPriorityMission() + 2);
-
         final Button pushNotifyNdock = new Button(compositePushNotify, SWT.CHECK);
-        pushNotifyNdock.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        pushNotifyNdock.setText("入渠完了を通知");
-        pushNotifyNdock.setSelection(AppConfig.get().getPushNdock());
-
         final Combo pushPriorityNdockCombo = new Combo(compositePushNotify, SWT.READ_ONLY);
-        GridData gdpushPriorityNdockCombo = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
-        pushPriorityNdockCombo.setLayoutData(gdpushPriorityNdockCombo);
-        pushPriorityNdockCombo.add("Priority: Very Low");
-        pushPriorityNdockCombo.add("Priority: Moderate");
-        pushPriorityNdockCombo.add("Priority: Normal");
-        pushPriorityNdockCombo.add("Priority: High");
-        pushPriorityNdockCombo.add("Priority: Emergency");
-        pushPriorityNdockCombo.select(AppConfig.get().getPushPriorityNdock() + 2);
+        final Button pushNotifyAkashi = new Button(compositePushNotify, SWT.CHECK);
+        final Combo pushPriorityAkashiCombo = new Combo(compositePushNotify, SWT.READ_ONLY);
+        final Button pushNotifyCond = new Button(compositePushNotify, SWT.CHECK);
+        final Combo pushPriorityCondCombo = new Combo(compositePushNotify, SWT.READ_ONLY);
+
+        Button[] pushNotifyButtons = new Button[] {
+                pushNotifyMission, pushNotifyNdock, pushNotifyAkashi, pushNotifyCond };
+        Combo[] pushNotifyCombos = new Combo[] {
+                pushPriorityMissionCombo, pushPriorityNdockCombo, pushPriorityAkashiCombo, pushPriorityCondCombo };
+        boolean[] pushEnabled = new boolean[] {
+                AppConfig.get().getPushMission(),
+                AppConfig.get().getPushNdock(),
+                AppConfig.get().isPushAkashi(),
+                AppConfig.get().isPushCond()
+        };
+        int[] pushPriorities = new int[] {
+                AppConfig.get().getPushPriorityMission(),
+                AppConfig.get().getPushPriorityNdock(),
+                AppConfig.get().getPushPriorityAkashi(),
+                AppConfig.get().getPushPriorityCond()
+        };
+
+        for (int i = 0; i < pushNotifyButtons.length; ++i) {
+            Button button = pushNotifyButtons[i];
+            Combo compo = pushNotifyCombos[i];
+
+            button.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+            button.setText(pushName[i]);
+            button.setSelection(pushEnabled[i]);
+
+            GridData gdpushPriorityMissionCombo = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
+            compo.setLayoutData(gdpushPriorityMissionCombo);
+            compo.add("Priority: Very Low");
+            compo.add("Priority: Moderate");
+            compo.add("Priority: Normal");
+            compo.add("Priority: High");
+            compo.add("Priority: Emergency");
+            compo.select(pushPriorities[i] + 2);
+        }
 
         Button TestNotifyMissionBtn = new Button(compositePushNotify, SWT.NONE);
         TestNotifyMissionBtn.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 2, 1));
@@ -978,6 +1045,9 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setVisibleOnReturnMission(visibleOnReturnMission.getSelection());
                 AppConfig.get().setVisibleOnReturnBathwater(visibleOnReturnBathwater.getSelection());
                 AppConfig.get().setMonoIcon(useMonoIcon.getSelection());
+                AppConfig.get().setShowCondTimer(showCondTimer.getSelection());
+                AppConfig.get().setShowAkashiTimer(showAkashiTimer.getSelection());
+                AppConfig.get().setAkashiTimerFormat(akashiFormatCombo.getSelectionIndex());
                 if (useRecommendedSakuteki.getSelection()) {
                     AppConfig.get().setUseRecommendedSakuteki(true);
                 }
@@ -986,6 +1056,9 @@ public final class ConfigDialog extends Dialog {
                     AppConfig.get().setSakutekiMethod(sakutekiCombo.getSelectionIndex());
                 }
                 // notify
+                AppConfig.get().setOkCond(condSpinner.getSelection());
+                AppConfig.get().setAkashiNotifyFirstStep(akashiFirstStep.getSelection());
+                AppConfig.get().setAkashiNotifyEveryStep(akashiEveryStep.getSelection());
                 AppConfig.get().setMissionRemind(remind.getSelection());
                 AppConfig.get().setRemindInterbal(intervalSpinner.getSelection());
                 AppConfig.get().setUseBalloon(balloon.getSelection());
@@ -1035,8 +1108,12 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setImKayacPrivateKey(imkayacPrivateKey.getText());
                 AppConfig.get().setPushMission(pushNotifyMission.getSelection());
                 AppConfig.get().setPushNdock(pushNotifyNdock.getSelection());
+                AppConfig.get().setPushAkashi(pushNotifyAkashi.getSelection());
+                AppConfig.get().setPushCond(pushNotifyCond.getSelection());
                 AppConfig.get().setPushPriorityMission(pushPriorityMissionCombo.getSelectionIndex() - 2);
                 AppConfig.get().setPushPriorityNdock(pushPriorityNdockCombo.getSelectionIndex() - 2);
+                AppConfig.get().setPushPriorityAkashi(pushPriorityAkashiCombo.getSelectionIndex() - 2);
+                AppConfig.get().setPushPriorityCond(pushPriorityCondCombo.getSelectionIndex() - 2);
 
                 // development
                 AppConfig.get().setStoreJson(btnJson.getSelection());

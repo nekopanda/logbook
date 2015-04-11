@@ -1,13 +1,14 @@
 package logbook.dto;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
 import javax.json.JsonObject;
 
+import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
+import logbook.internal.CondTiming;
 import logbook.internal.ExpTable;
 import logbook.internal.Ship;
 import logbook.util.JsonUtils;
@@ -21,10 +22,7 @@ import com.dyuproject.protostuff.Tag;
 public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
 
     /** 日時 */
-    private transient final Calendar time = Calendar.getInstance();
-
-    /** 日時 */
-    private transient final Calendar condClearTime = Calendar.getInstance();
+    private transient final Date time = new Date();
 
     /** 艦娘個人を識別するID */
     @Tag(10)
@@ -143,10 +141,6 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
         this.slotnum = object.getJsonNumber("api_slotnum").intValue();
         this.onslot = JsonUtils.getIntArray(object, "api_onslot");
         this.lockedEquip = object.getJsonNumber("api_locked_equip").intValue();
-        // 疲労が抜ける時間を計算する
-        if (this.cond < 49) {
-            this.condClearTime.add(Calendar.MINUTE, Math.max(49 - this.cond, 3));
-        }
         this.json = object.toString();
     }
 
@@ -248,11 +242,10 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
      * 現在の疲労推定値（下限値）
      * @return 現在の疲労推定値（下限値）
      */
-    public int getEstimatedCond() {
+    public int getEstimatedCond(CondTiming timer) {
         if (this.cond >= 49)
             return this.cond;
-        long elapsedTime = new Date().getTime() - this.time.getTime().getTime();
-        int estimatedCond = (int) (this.cond + ((elapsedTime / (3 * 60 * 1000)) * 3));
+        int estimatedCond = this.cond + (timer.calcPastCycles(this.time) * 3);
         if (estimatedCond > 49)
             return 49;
         return estimatedCond;
@@ -264,6 +257,14 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
      */
     public long getDocktime() {
         return this.docktime;
+    }
+
+    /**
+     * 泊地修理による修理時間
+     * @return
+     */
+    public long getAkashiTime() {
+        return this.docktime + (30 * 1000); // 最大30秒の遅延
     }
 
     /**
@@ -389,8 +390,19 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
      * 疲労が抜けるまでの時間
      * @return 疲労が抜けるまでの時間
      */
-    public Calendar getCondClearTime() {
-        return this.condClearTime;
+    public Date getCondClearTime(CondTiming timer, int okCond) {
+        if (this.cond >= okCond) {
+            return null;
+        }
+        return timer.calcCondClearTime(this.cond, this.time, okCond);
+    }
+
+    /**
+     * 疲労が抜けるまでの時間
+     * @return 疲労が抜けるまでの時間
+     */
+    public Date getCondClearTime(CondTiming timer) {
+        return this.getCondClearTime(timer, AppConfig.get().getOkCond());
     }
 
     /**

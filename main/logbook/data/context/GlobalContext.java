@@ -55,7 +55,9 @@ import logbook.dto.ShipInfoDto;
 import logbook.gui.ApplicationMain;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.Sound;
+import logbook.internal.AkashiTimer;
 import logbook.internal.BattleResultServer;
+import logbook.internal.CondTiming;
 import logbook.internal.EnemyData;
 import logbook.internal.Item;
 import logbook.internal.MasterData;
@@ -171,6 +173,12 @@ public final class GlobalContext {
 
     /** 情報の取得状態 0:母港情報未受信 1:正常 2:マスターデータの更新が必要 3:アカウントが変わった！   */
     private static int state = 0;
+
+    /** 疲労回復タイマー */
+    private static CondTiming condTiming = new CondTiming();
+
+    /** 泊地修理タイマー */
+    private static AkashiTimer akashiTimer = new AkashiTimer();
 
     private static List<EventListener> eventListeners = new ArrayList<>();
 
@@ -510,6 +518,20 @@ public final class GlobalContext {
     }
 
     /**
+     * @return condTiming
+     */
+    public static CondTiming getCondTiming() {
+        return condTiming;
+    }
+
+    /**
+     * @return akashiRepairStart
+     */
+    public static AkashiTimer getAkashiTimer() {
+        return akashiTimer;
+    }
+
+    /**
      * リクエスト・レスポンスを受け取るEventListener登録
      */
     public static void addEventListener(EventListener listener) {
@@ -732,6 +754,14 @@ public final class GlobalContext {
         case NYUKYO_SPEEDCHANGE:
             doSpeedChange(data);
             break;
+        // 改造
+        case REMODELING:
+            doRemodeling(data);
+            break;
+        // 疲労度回復アイテム使用
+        case ITEMUSE_COND:
+            doItemuseCond(data);
+            break;
         default:
             break;
         }
@@ -813,6 +843,13 @@ public final class GlobalContext {
         }
     }
 
+    private static boolean isFlagshipAkashi(DockDto dock) {
+        if (dock != null) {
+            return dock.isFlagshipAkashi();
+        }
+        return false;
+    }
+
     /**
      * 編成を更新します
      * @param data
@@ -827,6 +864,7 @@ public final class GlobalContext {
 
             if (dockdto != null) {
                 List<ShipDto> ships = dockdto.getShips();
+                DockDto rdock = null;
 
                 if (shipidx == -1) {
                     // 旗艦以外解除
@@ -834,6 +872,7 @@ public final class GlobalContext {
                         ships.get(i).setFleetid("");
                     }
                     dockdto.removeExceptFlagship();
+                    dockdto.setUpdate(true);
                 } else {
                     // 入れ替えまたは外す
                     // 入れ替え前の艦娘(いない場合はnull)
@@ -841,7 +880,7 @@ public final class GlobalContext {
                     // 入れる艦娘(外す場合はnull)
                     ShipDto rship = shipMap.get(shipid);
                     // 入れる艦娘の現在の所属艦隊(ない場合はnull)
-                    DockDto rdock = (rship != null) ? dock.get(rship.getFleetid()) : null;
+                    rdock = (rship != null) ? dock.get(rship.getFleetid()) : null;
                     int rdockPos = (rship != null) ? rship.getFleetpos() : 0;
 
                     // 艦隊IDを一旦全部外す
@@ -887,6 +926,12 @@ public final class GlobalContext {
                         rdock.setUpdate(true);
                     }
                 }
+
+                // 泊地修理判定
+                if (isFlagshipAkashi(dockdto) || isFlagshipAkashi(rdock)) {
+                    akashiTimer.reset();
+                }
+
                 DockDto firstdock = dock.get("1");
                 if (firstdock != null) {
                     // 秘書艦を再設定
@@ -948,12 +993,34 @@ public final class GlobalContext {
                 //addConsole("保有資材を更新しました");
 
                 // 保有艦娘を更新する
-                shipMap.clear();
+                boolean condUpdated = false;
+                boolean hpUpdated = false;
+                Map<Integer, ShipDto> oldShipMap = shipMap;
+                shipMap = new TreeMap<>();
                 JsonArray apiShip = apidata.getJsonArray("api_ship");
                 for (int i = 0; i < apiShip.size(); i++) {
                     ShipDto ship = new ShipDto((JsonObject) apiShip.get(i));
-                    shipMap.put(Integer.valueOf(ship.getId()), ship);
+                    shipMap.put(ship.getId(), ship);
+
+                    ShipDto oldShip = oldShipMap.get(ship.getId());
+                    if (oldShip != null) {
+                        // 疲労度に変化があったか
+                        if (oldShip.getCond() != ship.getCond()) {
+                            condUpdated = true;
+                        }
+                        // HPに変化があったか
+                        if (oldShip.getNowhp() != ship.getNowhp()) {
+                            hpUpdated = true;
+                        }
+                    }
                 }
+                // 疲労回復タイミング更新
+                condTiming.onPort(condUpdated);
+                // 泊地修理タイマー更新
+                if (hpUpdated) {
+                    akashiTimer.reset();
+                }
+
                 JsonArray apiDeckPort = apidata.getJsonArray("api_deck_port");
                 doDeck(apiDeckPort);
                 //addConsole("保有艦娘情報を更新しました");
@@ -1806,6 +1873,9 @@ public final class GlobalContext {
                 updateDetailedMaterial("遠征帰還", res, MATERIAL_DIFF.OBTAINED);
             }
 
+            // 遠征により疲労度が変化しているので
+            condTiming.ignoreNext();
+
             MissionResultDto result = new MissionResultDto(clearResult, questName, res);
 
             CreateReportLogic.storeMissionReport(result);
@@ -1844,6 +1914,8 @@ public final class GlobalContext {
             ship.setNowhp(ship.getMaxhp());
             ship.setDockTime(0);
         }
+        // 修理が終わったことにより疲労度が変わっているので
+        condTiming.ignoreNext();
     }
 
     /**
@@ -1903,6 +1975,38 @@ public final class GlobalContext {
             addUpdateLog("バケツを使いました");
         } catch (Exception e) {
             LOG.warn("入渠を更新しますに失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 改造
+     * @param data
+     */
+    private static void doRemodeling(Data data) {
+        try {
+            // 改造で疲労度が変わっているので
+            condTiming.ignoreNext();
+
+            addUpdateLog("改造しました");
+        } catch (Exception e) {
+            LOG.warn("改造を更新しますに失敗しました", e);
+            LOG.warn(data);
+        }
+    }
+
+    /**
+     * 疲労回復アイテム使用
+     * @param data
+     */
+    private static void doItemuseCond(Data data) {
+        try {
+            // 疲労度が変わっているので
+            condTiming.ignoreNext();
+
+            addUpdateLog("疲労回復アイテム使用しました");
+        } catch (Exception e) {
+            LOG.warn("疲労回復アイテム使用を更新しますに失敗しました", e);
             LOG.warn(data);
         }
     }
@@ -2014,6 +2118,9 @@ public final class GlobalContext {
             }
             // 出撃を更新
             isStart = true;
+
+            // 出撃により疲労度が変わっているので
+            condTiming.ignoreNext();
 
             JsonObject obj = data.getJsonObject().getJsonObject("api_data");
 
