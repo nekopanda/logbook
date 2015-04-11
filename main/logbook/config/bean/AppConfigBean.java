@@ -36,10 +36,10 @@ public final class AppConfigBean {
     private boolean minimumLayout;
 
     /** 通知設定を表示 */
-    private boolean showNofitySetting;
+    private boolean showNofitySetting = true;
 
     /** 疲労度タイマー表示 */
-    private boolean showCondCycleTimer;
+    private boolean showCondCycleTimer = true;
 
     /** 音量 */
     private float soundLevel = 0.85f;
@@ -195,10 +195,10 @@ public final class AppConfigBean {
     private boolean monoIcon;
 
     /** 疲労タイマーを表示する */
-    private boolean showCondTimer;
+    private boolean showCondTimer = true;
 
     /** 泊地修理タイマーを表示する */
-    private boolean showAkashiTimer;
+    private boolean showAkashiTimer = true;
 
     /** 泊地修理タイマー表示形式 */
     private int akashiTimerFormat = 0;

@@ -50,6 +50,8 @@ import logbook.internal.MasterData.MissionDto;
 import logbook.scripting.ItemInfoListener;
 import logbook.scripting.ItemInfoProxy;
 import logbook.scripting.MissionProxy;
+import logbook.scripting.QuestListener;
+import logbook.scripting.QuestProxy;
 import logbook.scripting.ShipItemListener;
 import logbook.scripting.ShipItemProxy;
 import logbook.util.ReportUtils;
@@ -494,7 +496,9 @@ public final class CreateReportLogic {
      * @return 任務一覧のヘッダー
      */
     public static String[] getCreateQuestHeader() {
-        return new String[] { "No.", "表示位置", "状態", "進捗", "タイトル", "内容", "燃料", "弾薬", "鋼材", "ボーキ" };
+        return ArrayUtils.addAll(new String[] {
+                "No."
+        }, QuestProxy.get().header());
     }
 
     /**
@@ -503,22 +507,14 @@ public final class CreateReportLogic {
     public static List<Comparable[]> getQuestBody() {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
 
+        QuestListener script = QuestProxy.get();
         for (QuestDto quest : GlobalContext.getQuest()) {
             if (quest == null)
                 continue;
 
-            body.add(new Comparable[] {
-                    new TableRowHeader(quest.getNo(), quest),
-                    "" + quest.getPage() + "-" + quest.getPos(),
-                    quest.getStateString(),
-                    quest.getProgressString(),
-                    quest.getTitle(),
-                    quest.getDetail(),
-                    quest.getFuel(),
-                    quest.getAmmo(),
-                    quest.getMetal(),
-                    quest.getBauxite()
-            });
+            body.add(ArrayUtils.addAll(new Comparable[] {
+                    new TableRowHeader(quest.getNo(), quest)
+            }, script.body(quest)));
         }
         return body;
     }

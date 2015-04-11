@@ -872,6 +872,13 @@ public abstract class AbstractTableDialog extends WindowBase implements EventLis
     }
 
     /**
+     * 次の更新タイミングでテーブルを更新します
+     */
+    public void update() {
+        this.needsUpdate = true;
+    }
+
+    /**
      * テーブルをソートする{@link java.util.Comparator}です。
      */
     protected class TableComparator implements Comparator<Comparable[]> {

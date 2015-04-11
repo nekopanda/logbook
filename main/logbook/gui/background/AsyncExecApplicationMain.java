@@ -255,8 +255,6 @@ public final class AsyncExecApplicationMain extends Thread {
                 Sound.randomExpeditionSoundPlay();
                 visibleHome |= AppConfig.get().isVisibleOnReturnMission();
 
-                ApplicationMain.sysPrint("遠征通知");
-
                 // Push通知 遠征
                 if (AppConfig.get().getPushMission()) {
                     PushNotify.add(StringUtils.join(this.noticeMission, "\r\n"), "遠征",
@@ -269,8 +267,6 @@ public final class AsyncExecApplicationMain extends Thread {
                 Sound.randomDockSoundPlay();
                 visibleHome |= AppConfig.get().isVisibleOnReturnBathwater();
 
-                ApplicationMain.sysPrint("入渠通知");
-
                 // Push通知 入渠
                 if (AppConfig.get().getPushNdock()) {
                     PushNotify.add(StringUtils.join(this.noticeNdock, "\r\n"), "入渠",
@@ -282,8 +278,6 @@ public final class AsyncExecApplicationMain extends Thread {
             if (this.noticeCond.size() > 0) {
                 Sound.randomCondSoundPlay();
 
-                ApplicationMain.sysPrint("疲労通知");
-
                 // Push通知 疲労回復
                 if (AppConfig.get().isPushCond()) {
                     PushNotify.add(StringUtils.join(this.noticeCond, "\r\n"), "疲労回復",
@@ -294,8 +288,6 @@ public final class AsyncExecApplicationMain extends Thread {
             // 泊地修理通知
             if (this.noticeAkashi.size() > 0) {
                 Sound.randomAkashiSoundPlay();
-
-                ApplicationMain.sysPrint("泊地修理通知");
 
                 // Push通知 泊地修理
                 if (AppConfig.get().isPushAkashi()) {
@@ -524,7 +516,7 @@ public final class AsyncExecApplicationMain extends Thread {
 
                             this.updateNoticeAkashi(dock, repairState);
                         }
-                        else if (condClearTime != null) {
+                        else if (!GlobalContext.isSortie(dock.getId()) && (condClearTime != null)) {
                             dispname = dockName + " (疲労回復中)";
 
                             // ツールチップテキストで時刻を表示する

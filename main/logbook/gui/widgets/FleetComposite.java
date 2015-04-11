@@ -306,6 +306,7 @@ public class FleetComposite extends Composite {
         CondTiming condTiming = GlobalContext.getCondTiming();
         AkashiTimer.RepairState repairState = TimerContext.get().getAkashiRepairState(dockIndex);
         List<AkashiTimer.ShipState> repairShips = repairState.isRepairing() ? repairState.get() : null;
+        boolean isSortie = GlobalContext.isSortie(dock.getId());
 
         for (int i = 0; i < ships.size(); i++) {
             ShipDto ship = ships.get(i);
@@ -475,7 +476,7 @@ public class FleetComposite extends Composite {
                 // 泊地修理中
                 updator = new AkashiTimerUpdator(timeLabel, dockIndex, i);
             }
-            else if ((condClearDate != null) && AppConfig.get().isShowCondTimer()) {
+            else if (!isSortie && (condClearDate != null) && AppConfig.get().isShowCondTimer()) {
                 updator = new Runnable() {
                     @Override
                     public void run() {
