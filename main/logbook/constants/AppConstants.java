@@ -444,6 +444,4 @@ public class AppConstants {
     public static final String QUESTTABLE_PREFIX = "quest";
 
     public static final String RESOURCECHAR_PREFIX = "resource";
-
-    public static final long AKASHI_REPAIR_MINIMUM = 20 * 60 * 1000;
 }

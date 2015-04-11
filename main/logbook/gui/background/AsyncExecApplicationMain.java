@@ -8,13 +8,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import logbook.config.AppConfig;
 import logbook.config.ShipGroupConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
+import logbook.data.context.TimerContext;
 import logbook.dto.BasicInfoDto;
 import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
@@ -26,6 +26,7 @@ import logbook.gui.logic.PushNotify;
 import logbook.gui.logic.Sound;
 import logbook.gui.logic.TimeLogic;
 import logbook.gui.widgets.FleetComposite;
+import logbook.internal.AkashiTimer;
 import logbook.internal.CondTiming;
 import logbook.internal.EnemyData;
 import logbook.internal.MasterData;
@@ -79,6 +80,9 @@ public final class AsyncExecApplicationMain extends Thread {
                 Display.getDefault().syncExec(new Runnable() {
                     @Override
                     public void run() {
+                        // タイマー更新
+                        TimerContext.get().update();
+
                         // 保有アイテム数を更新する
                         new UpdateItemCountTask(main).run();
                         // 保有艦娘数を更新する
@@ -206,7 +210,6 @@ public final class AsyncExecApplicationMain extends Thread {
         private static final boolean[] FLAG_NOTICE_DECK = { false, false, false };
         private static final boolean[] FLAG_NOTICE_NDOCK = { false, false, false, false };
         private static final boolean[] FLAG_NOTICE_COND = { false, false, false, false };
-        private static final Map<Integer, Boolean> FLAG_NOTICE_AKASHI = new TreeMap<>();
 
         private final ApplicationMain main;
 
@@ -224,6 +227,13 @@ public final class AsyncExecApplicationMain extends Thread {
          */
         public UpdateDeckNdockTask(ApplicationMain main) {
             this.main = main;
+        }
+
+        private void addNotice(List<String> notices, List<String> titles, List<String> notice, String title) {
+            if (notice.size() > 0) {
+                titles.add(title);
+                notices.addAll(notice);
+            }
         }
 
         @Override
@@ -302,13 +312,16 @@ public final class AsyncExecApplicationMain extends Thread {
                 // バルーンツールチップを表示する
                 try {
                     // 遠征・入渠のお知らせ
+                    List<String> title = new ArrayList<String>();
                     List<String> notice = new ArrayList<String>();
-                    notice.addAll(this.noticeMission);
-                    notice.addAll(this.noticeNdock);
+                    this.addNotice(notice, title, this.noticeMission, "遠征");
+                    this.addNotice(notice, title, this.noticeNdock, "入渠");
+                    this.addNotice(notice, title, this.noticeCond, "疲労回復");
+                    this.addNotice(notice, title, this.noticeAkashi, "泊地修理");
                     if (notice.size() > 0) {
                         ToolTip tip = new ToolTip(this.main.getShell(), SWT.BALLOON
                                 | SWT.ICON_INFORMATION);
-                        tip.setText("遠征・入渠");
+                        tip.setText(StringUtils.join(title, "・"));
                         tip.setMessage(StringUtils.join(notice, "\r\n"));
                         this.main.getTrayItem().setToolTip(tip);
                         tip.setVisible(true);
@@ -362,34 +375,41 @@ public final class AsyncExecApplicationMain extends Thread {
             }
         }
 
-        private void updateNoticeAkashi(String dispname, int index, long rest) {
-            Boolean notice = FLAG_NOTICE_AKASHI.get(index);
-            if (notice == null) {
-                notice = new Boolean(false);
-            }
-            if (this.main.getAkashiNotice().getSelection()) {
-                if ((rest <= 0) && !notice) {
-                    this.noticeAkashi.add(dispname + " がまもなく修理完了します");
-                    notice = true;
-                } else if (rest > 0) {
-                    notice = false;
-                }
-            } else {
-                notice = false;
-            }
-            FLAG_NOTICE_AKASHI.put(index, notice);
-        }
-
         private void updateNoticeCond(String dispname, int index, long rest) {
             if (this.main.getCondNotice().getSelection()) {
                 if ((rest <= 0) && !FLAG_NOTICE_COND[index]) {
-                    this.noticeCond.add(dispname + " がまもなく疲労回復します");
+                    this.noticeCond.add(dispname + " が疲労回復しました");
                     FLAG_NOTICE_COND[index] = true;
                 } else if (rest > 0) {
                     FLAG_NOTICE_COND[index] = false;
                 }
             } else {
                 FLAG_NOTICE_COND[index] = false;
+            }
+        }
+
+        private void updateNoticeAkashi(DockDto dock, AkashiTimer.RepairState repairState) {
+            if (this.main.getAkashiNotice().getSelection()) {
+                if (repairState.isFirstNotify() && AppConfig.get().isAkashiNotifyFirstStep()) {
+                    this.noticeAkashi.add(dock.getName() + " の泊地修理が20分経過しました");
+                }
+                for (AkashiTimer.ShipState state : repairState.get()) {
+                    if (state != null) {
+                        ShipDto ship = state.getShip();
+                        if (state.isStepNotify()) {
+                            int estimatedHp = state.getCurrentGain() + ship.getNowhp();
+                            boolean full = (estimatedHp == ship.getMaxhp());
+                            if (full) {
+                                this.noticeAkashi.add(ship.getFriendlyName() + " がまもなく修理完了します");
+                            }
+                            // 20分経過通知があるときはそれで代用する
+                            else if (!repairState.isFirstNotify() && AppConfig.get().isAkashiNotifyEveryStep()) {
+                                this.noticeAkashi.add(ship.getFriendlyName() + " がHP1ポイント回復(" +
+                                        (estimatedHp - 1) + "→" + estimatedHp + "/" + ship.getMaxhp() + ")");
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -472,36 +492,27 @@ public final class AsyncExecApplicationMain extends Thread {
                             this.updateNoticeCond(dockName, i, condRest);
                         }
 
-                        if (dock.isAkashiRepairing()) {
+                        // 泊地修理タイマー更新
+                        AkashiTimer.RepairState repairState = TimerContext.get().getAkashiRepairState(i);
+                        if (repairState.isRepairing()) {
                             // 泊地修理中
-                            Date repairStartTime = GlobalContext.getAkashiRepairStart();
                             dispname = dockName + " (泊地修理中)";
-                            long past = TimeLogic.getRest(repairStartTime, this.now);
-                            time = TimeLogic.toDateRestString(past, true);
+                            time = TimeLogic.toDateRestString(repairState.getElapsed() / 1000, true);
                             backColor = SWTResourceManager.getColor(AppConstants.AKASHI_REPAIR_COLOR);
 
                             // ツールチップで詳細表示
-                            List<ShipDto> ships = dock.getShips();
-                            for (int p = 0; p < ships.size(); ++p) {
-                                ShipDto ship = ships.get(p);
-                                if (!ship.isHalfDamage() && (ship.getNowhp() != ship.getMaxhp())) {
-                                    long needs = Math.max(AppConstants.AKASHI_REPAIR_MINIMUM, ship.getAkashiTime());
-                                    Date finish = new Date(repairStartTime.getTime() + needs);
-                                    long rest = TimeLogic.getRest(this.now, finish);
-
+                            for (AkashiTimer.ShipState state : repairState.get()) {
+                                if (state != null) {
+                                    ShipDto ship = state.getShip();
+                                    long rest = TimeLogic.getRest(this.now, state.getFinish());
                                     String txt = ship.getFriendlyName();
-
-                                    // 通知生成
-                                    this.updateNoticeAkashi(txt, (i * 6) + p, rest);
-
                                     String remainStr = TimeLogic.toDateRestString(rest);
                                     if (remainStr == null) {
                                         txt += ":まもなく修理完了します";
                                     }
                                     else {
-                                        txt += ":残り" + remainStr + "(" + this.format.format(finish) + ")";
+                                        txt += ":残り" + remainStr + "(" + this.format.format(state.getFinish()) + ")";
                                     }
-
                                     if (tooltip == null) {
                                         tooltip = txt;
                                     }
@@ -510,6 +521,8 @@ public final class AsyncExecApplicationMain extends Thread {
                                     }
                                 }
                             }
+
+                            this.updateNoticeAkashi(dock, repairState);
                         }
                         else if (condClearTime != null) {
                             dispname = dockName + " (疲労回復中)";

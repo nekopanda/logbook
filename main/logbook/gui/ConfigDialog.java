@@ -525,6 +525,19 @@ public final class ConfigDialog extends Dialog {
         showAkashiTimer.setText("泊地修理終了までの時間を表示");
         showAkashiTimer.setSelection(AppConfig.get().isShowAkashiTimer());
 
+        Composite akashiFormatBase = new Composite(compositeFleetDetail, SWT.NONE);
+        akashiFormatBase.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        akashiFormatBase.setLayout(new RowLayout(SWT.HORIZONTAL));
+
+        Label akashiFormatLabel = new Label(akashiFormatBase, SWT.NONE);
+        akashiFormatLabel.setText("表示");
+
+        final Combo akashiFormatCombo = new Combo(akashiFormatBase, SWT.READ_ONLY);
+        akashiFormatCombo.add("全回復までの時間");
+        akashiFormatCombo.add("次の回復ポイントまでの時間");
+        akashiFormatCombo.add("交互に表示");
+        akashiFormatCombo.select(AppConfig.get().getAkashiTimerFormat());
+
         // 通知
         compositeNotify.setLayout(new GridLayout(3, false));
 
@@ -539,9 +552,14 @@ public final class ConfigDialog extends Dialog {
         soundlevel.setText(Integer.toString((int) (AppConfig.get().getSoundLevel() * 100)));
         new Label(compositeNotify, SWT.NONE);
 
+        final Button balloon = new Button(compositeNotify, SWT.CHECK);
+        balloon.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        balloon.setText("タイマー類をバルーンで通知する");
+        balloon.setSelection(AppConfig.get().isUseBalloon());
+
         Label condLabel1 = new Label(compositeNotify, SWT.NONE);
         condLabel1.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        condLabel1.setText("疲労度が");
+        condLabel1.setText("回復判定疲労度");
 
         final Spinner condSpinner = new Spinner(compositeNotify, SWT.BORDER);
         condSpinner.setMaximum(49);
@@ -550,10 +568,17 @@ public final class ConfigDialog extends Dialog {
         GridData gdCondSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
         gdCondSpinner.widthHint = 55;
         condSpinner.setLayoutData(gdCondSpinner);
+        new Label(compositeNotify, SWT.NONE);
 
-        Label condLabel2 = new Label(compositeNotify, SWT.NONE);
-        condLabel2.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        condLabel2.setText("で回復したとみなす");
+        final Button akashiFirstStep = new Button(compositeNotify, SWT.CHECK);
+        akashiFirstStep.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        akashiFirstStep.setText("泊地修理開始から20分経過を通知する");
+        akashiFirstStep.setSelection(AppConfig.get().isAkashiNotifyFirstStep());
+
+        final Button akashiEveryStep = new Button(compositeNotify, SWT.CHECK);
+        akashiEveryStep.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        akashiEveryStep.setText("泊地修理中艦娘のHPが1回復する度に通知する");
+        akashiEveryStep.setSelection(AppConfig.get().isAkashiNotifyEveryStep());
 
         final Button remind = new Button(compositeNotify, SWT.CHECK);
         remind.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
@@ -573,11 +598,6 @@ public final class ConfigDialog extends Dialog {
         intervalSpinner.setLayoutData(gdIntervalSpinner);
 
         new Label(compositeNotify, SWT.NONE);
-
-        final Button balloon = new Button(compositeNotify, SWT.CHECK);
-        balloon.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-        balloon.setText("遠征・入渠をバルーンで通知する");
-        balloon.setSelection(AppConfig.get().isUseBalloon());
 
         final Button taskbar = new Button(compositeNotify, SWT.CHECK);
         taskbar.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
@@ -1027,6 +1047,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setMonoIcon(useMonoIcon.getSelection());
                 AppConfig.get().setShowCondTimer(showCondTimer.getSelection());
                 AppConfig.get().setShowAkashiTimer(showAkashiTimer.getSelection());
+                AppConfig.get().setAkashiTimerFormat(akashiFormatCombo.getSelectionIndex());
                 if (useRecommendedSakuteki.getSelection()) {
                     AppConfig.get().setUseRecommendedSakuteki(true);
                 }
@@ -1036,6 +1057,8 @@ public final class ConfigDialog extends Dialog {
                 }
                 // notify
                 AppConfig.get().setOkCond(condSpinner.getSelection());
+                AppConfig.get().setAkashiNotifyFirstStep(akashiFirstStep.getSelection());
+                AppConfig.get().setAkashiNotifyEveryStep(akashiEveryStep.getSelection());
                 AppConfig.get().setMissionRemind(remind.getSelection());
                 AppConfig.get().setRemindInterbal(intervalSpinner.getSelection());
                 AppConfig.get().setUseBalloon(balloon.getSelection());

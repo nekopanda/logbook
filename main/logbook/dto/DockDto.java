@@ -203,24 +203,4 @@ public final class DockDto extends AbstractDto {
 
         return numRepairShips;
     }
-
-    /**
-     * 泊地修理中か？
-     * @return
-     */
-    public boolean isAkashiRepairing() {
-        int numRepairShips = this.getAkashiCapacity();
-        if (numRepairShips > this.ships.size()) {
-            numRepairShips = this.ships.size();
-        }
-        for (int i = 0; i < numRepairShips; ++i) {
-            ShipDto ship = this.ships.get(i);
-            if (!ship.isHalfDamage() && (ship.getNowhp() != ship.getMaxhp())) {
-                // 修理中
-                return true;
-            }
-        }
-
-        return false;
-    }
 }

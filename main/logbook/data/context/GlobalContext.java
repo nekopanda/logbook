@@ -55,6 +55,7 @@ import logbook.dto.ShipInfoDto;
 import logbook.gui.ApplicationMain;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.Sound;
+import logbook.internal.AkashiTimer;
 import logbook.internal.BattleResultServer;
 import logbook.internal.CondTiming;
 import logbook.internal.EnemyData;
@@ -176,8 +177,8 @@ public final class GlobalContext {
     /** 疲労回復タイマー */
     private static CondTiming condTiming = new CondTiming();
 
-    /** 泊地修理開始時刻 */
-    private static Date akashiRepairStart = new Date();
+    /** 泊地修理タイマー */
+    private static AkashiTimer akashiTimer = new AkashiTimer();
 
     private static List<EventListener> eventListeners = new ArrayList<>();
 
@@ -526,8 +527,8 @@ public final class GlobalContext {
     /**
      * @return akashiRepairStart
      */
-    public static Date getAkashiRepairStart() {
-        return akashiRepairStart;
+    public static AkashiTimer getAkashiTimer() {
+        return akashiTimer;
     }
 
     /**
@@ -867,6 +868,7 @@ public final class GlobalContext {
                         ships.get(i).setFleetid("");
                     }
                     dockdto.removeExceptFlagship();
+                    dockdto.setUpdate(true);
                 } else {
                     // 入れ替えまたは外す
                     // 入れ替え前の艦娘(いない場合はnull)
@@ -923,7 +925,7 @@ public final class GlobalContext {
 
                 // 泊地修理判定
                 if (isFlagshipAkashi(dockdto) || isFlagshipAkashi(rdock)) {
-                    akashiRepairStart = new Date();
+                    akashiTimer.reset();
                 }
 
                 DockDto firstdock = dock.get("1");
@@ -1012,7 +1014,7 @@ public final class GlobalContext {
                 condTiming.onPort(condUpdated);
                 // 泊地修理タイマー更新
                 if (hpUpdated) {
-                    akashiRepairStart = new Date();
+                    akashiTimer.reset();
                 }
 
                 JsonArray apiDeckPort = apidata.getJsonArray("api_deck_port");

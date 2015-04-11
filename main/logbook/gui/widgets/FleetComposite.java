@@ -12,6 +12,7 @@ import javax.annotation.CheckForNull;
 import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
+import logbook.data.context.TimerContext;
 import logbook.dto.DockDto;
 import logbook.dto.ItemInfoDto;
 import logbook.dto.ShipDto;
@@ -20,6 +21,7 @@ import logbook.gui.logic.SakutekiString;
 import logbook.gui.logic.Sound;
 import logbook.gui.logic.TimeLogic;
 import logbook.gui.logic.TimeString;
+import logbook.internal.AkashiTimer;
 import logbook.internal.CondTiming;
 import logbook.internal.EvaluateExp;
 import logbook.internal.SeaExp;
@@ -300,9 +302,10 @@ public class FleetComposite extends Composite {
         // 艦隊合計Lv
         int totallv = 0;
 
-        int akashiCapacity = dock.getAkashiCapacity();
-        Date repairStartTime = GlobalContext.getAkashiRepairStart();
+        int dockIndex = Integer.parseInt(dock.getId()) - 1;
         CondTiming condTiming = GlobalContext.getCondTiming();
+        AkashiTimer.RepairState repairState = TimerContext.get().getAkashiRepairState(dockIndex);
+        List<AkashiTimer.ShipState> repairShips = repairState.isRepairing() ? repairState.get() : null;
 
         for (int i = 0; i < ships.size(); i++) {
             ShipDto ship = ships.get(i);
@@ -467,52 +470,10 @@ public class FleetComposite extends Composite {
             // 残り修理時間/疲労回復までの時間/ダメコン表示
             Runnable updator = null;
             final Label timeLabel = this.timeLabels[i];
-            boolean isRepairing = (i < akashiCapacity) && !ship.isHalfDamage() && (nowhp != maxhp);
+            boolean isRepairing = (repairShips != null) && (repairShips.get(i) != null);
             if (isRepairing && AppConfig.get().isShowAkashiTimer()) {
                 // 泊地修理中
-                long needs = Math.max(AppConstants.AKASHI_REPAIR_MINIMUM, ship.getAkashiTime());
-                final long repairStart = repairStartTime.getTime();
-                final Date finish = new Date(repairStart + needs);
-                int damage = maxhp - nowhp;
-                final long time1pt = ship.getDocktime() / damage;
-                updator = new Runnable() {
-                    @Override
-                    public void run() {
-                        Date now = new Date();
-                        long rest = TimeLogic.getRest(now, finish);
-                        String str;
-                        String tip = null;
-                        String reststr = TimeLogic.toDateRestString(rest);
-                        if (reststr != null) {
-                            str = "修理あと" + reststr;
-
-                            // 経過時間
-                            long elapsed = now.getTime() - repairStart;
-                            // 次の回復時間
-                            long next = ((elapsed + time1pt) / time1pt) * time1pt;
-                            if (elapsed < AppConstants.AKASHI_REPAIR_MINIMUM) {
-                                next = AppConstants.AKASHI_REPAIR_MINIMUM;
-                            }
-                            // 最低時間を加味した時間
-                            long remain = next - elapsed;
-                            // 回復したポイント
-                            int healed = (elapsed >= AppConstants.AKASHI_REPAIR_MINIMUM)
-                                    ? (int) (elapsed / time1pt) : 0;
-
-                            tip = "現在までに+" + healed + "回復\n" +
-                                    "次の回復まで" + TimeLogic.toDateRestString(remain / 1000, true) + "\n" +
-                                    format.format(finish) + "に全回復予定";
-                        }
-                        else {
-                            str = "修理まもなく完了";
-                        }
-                        timeLabel.setText(str);
-                        timeLabel.setToolTipText(tip);
-                        timeLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_BLUE));
-                        timeLabel.getParent().layout();
-
-                    }
-                };
+                updator = new AkashiTimerUpdator(timeLabel, dockIndex, i);
             }
             else if ((condClearDate != null) && AppConfig.get().isShowCondTimer()) {
                 updator = new Runnable() {
@@ -611,7 +572,10 @@ public class FleetComposite extends Composite {
             this.hpgaugeImages[i] = gauge;
             // コンディション
             this.condLabels[i].setText(MessageFormat.format("{0} cond.", cond));
-            this.bullstLabels[i].getParent().layout();
+
+            //this.nameLabels[i].getParent().layout();
+            //this.hpLabels[i].getParent().layout();
+            //this.bullstLabels[i].getParent().layout();
 
         }
         // メッセージを更新する
@@ -623,7 +587,6 @@ public class FleetComposite extends Composite {
                 break;
             }
         }
-        boolean isAkashi = dock.isAkashiRepairing();
 
         // 制空値を計算
         int seiku = 0;
@@ -693,7 +656,7 @@ public class FleetComposite extends Composite {
             this.addStyledText(this.message,
                     MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BATHWATER), messageStyle);
         }
-        else if (isAkashi) {
+        else if (repairState.isRepairing()) {
             // 泊地修理中
             this.addStyledText(this.message, "泊地修理中。" + AppConstants.MESSAGE_GOOD, messageStyle);
         }
@@ -732,6 +695,11 @@ public class FleetComposite extends Composite {
         this.updateTabIcon();
         this.postFatal();
 
+        for (org.eclipse.swt.widgets.Control control : this.fleetGroup.getChildren()) {
+            if (control instanceof Composite) {
+                ((Composite) control).layout();
+            }
+        }
         this.fleetGroup.layout();
 
         this.getShell().setRedraw(true);
@@ -920,5 +888,68 @@ public class FleetComposite extends Composite {
         int g = (int) (start.green + ((end.green - start.green) * raito));
         int b = (int) (start.blue + ((end.blue - start.blue) * raito));
         return new RGB(r, g, b);
+    }
+
+    /**
+     * 泊地修理タイマー表示を更新する
+     * @author Nekopanda
+     */
+    private static class AkashiTimerUpdator implements Runnable {
+        private final Label label;
+        private final int dockIndex;
+        private final int dockPosition;
+        private int showCount = 0;
+
+        public AkashiTimerUpdator(Label l, int i, int p) {
+            this.label = l;
+            this.dockIndex = i;
+            this.dockPosition = p;
+        }
+
+        @Override
+        public void run() {
+            String str = "";
+            String tip = null;
+
+            Date now = TimerContext.get().getLastUpdated();
+            AkashiTimer.RepairState repairState = TimerContext.get().getAkashiRepairState(this.dockIndex);
+            if (repairState.isRepairing()) {
+                AkashiTimer.ShipState state = repairState.get().get(this.dockPosition);
+                if (now.before(state.getFinish())) {
+                    String reststr = TimeLogic.toDateRestString(TimeLogic.getRest(now, state.getFinish()), true);
+                    String nextstr = TimeLogic.toDateRestString(state.getNext() / 1000, true);
+                    boolean showRemain;
+                    switch (AppConfig.get().getAkashiTimerFormat()) {
+                    case 1:
+                        showRemain = false;
+                        break;
+                    case 2:
+                        showRemain = ((this.showCount++ / 4) % 2) == 0;
+                        break;
+                    default:
+                        showRemain = true;
+                        break;
+                    }
+                    if (showRemain) {
+                        str = "修理あと" + reststr;
+                    }
+                    else {
+                        str = "次回復まで" + nextstr;
+                    }
+                    tip = "現在までに+" + state.getCurrentGain() + "回復\n" +
+                            "次の回復まで" + nextstr + "\n" +
+                            "全回復まで" + reststr +
+                            "(" + format.format(state.getFinish()) + ")";
+                }
+                else {
+                    str = "修理まもなく完了";
+                }
+            }
+
+            this.label.setText(str);
+            this.label.setToolTipText(tip);
+            this.label.setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_BLUE));
+            this.label.getParent().layout();
+        }
     }
 }

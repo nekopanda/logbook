@@ -44,6 +44,15 @@ public final class AppConfigBean {
     /** 音量 */
     private float soundLevel = 0.85f;
 
+    /** 疲労度回復判定値 */
+    private int okCond = 49;
+
+    /**  */
+    private boolean akashiNotifyFirstStep = false;
+
+    /**  */
+    private boolean akashiNotifyEveryStep = false;
+
     /** 遠征のリマインド */
     private boolean missionRemind = true;
 
@@ -191,6 +200,9 @@ public final class AppConfigBean {
     /** 泊地修理タイマーを表示する */
     private boolean showAkashiTimer;
 
+    /** 泊地修理タイマー表示形式 */
+    private int akashiTimerFormat = 0;
+
     /** 回数を表示 */
     private boolean displayCount;
 
@@ -205,9 +217,6 @@ public final class AppConfigBean {
 
     /** 索敵表示形式 */
     private int sakutekiMethod = 0;
-
-    /** 疲労度回復判定値 */
-    private int okCond = 49;
 
     /** タスクバー通知を使用する */
     private boolean useTaskbarNotify = true;
@@ -1880,6 +1889,48 @@ public final class AppConfigBean {
      */
     public void setCondTimingData(CondTiming.TimeSpan condTimingData) {
         this.condTimingData = condTimingData;
+    }
+
+    /**
+     * @return akashiTimerFormat
+     */
+    public int getAkashiTimerFormat() {
+        return this.akashiTimerFormat;
+    }
+
+    /**
+     * @param akashiTimerFormat セットする akashiTimerFormat
+     */
+    public void setAkashiTimerFormat(int akashiTimerFormat) {
+        this.akashiTimerFormat = akashiTimerFormat;
+    }
+
+    /**
+     * @return akashiNotifyFirstStep
+     */
+    public boolean isAkashiNotifyFirstStep() {
+        return this.akashiNotifyFirstStep;
+    }
+
+    /**
+     * @param akashiNotifyFirstStep セットする akashiNotifyFirstStep
+     */
+    public void setAkashiNotifyFirstStep(boolean akashiNotifyFirstStep) {
+        this.akashiNotifyFirstStep = akashiNotifyFirstStep;
+    }
+
+    /**
+     * @return akashiNotifyEveryStep
+     */
+    public boolean isAkashiNotifyEveryStep() {
+        return this.akashiNotifyEveryStep;
+    }
+
+    /**
+     * @param akashiNotifyEveryStep セットする akashiNotifyEveryStep
+     */
+    public void setAkashiNotifyEveryStep(boolean akashiNotifyEveryStep) {
+        this.akashiNotifyEveryStep = akashiNotifyEveryStep;
     }
 
 }
