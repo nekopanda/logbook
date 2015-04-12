@@ -170,13 +170,18 @@ public final class ResourceChartDialog extends WindowBase {
         glShell.horizontalSpacing = 2;
         this.shell.setLayout(glShell);
 
-        this.menubar = new Menu(this.shell, SWT.BAR);
-        this.shell.setMenuBar(this.menubar);
+        this.createMenubar();
+        this.menubar = this.getMenubar();
 
-        MenuItem fileroot = new MenuItem(this.menubar, SWT.CASCADE);
-        fileroot.setText("ファイル");
-        this.filemenu = new Menu(fileroot);
-        fileroot.setMenu(this.filemenu);
+        if (this.isNoMenubar()) {
+            this.filemenu = this.menubar;
+        }
+        else {
+            MenuItem fileroot = new MenuItem(this.menubar, SWT.CASCADE);
+            fileroot.setText("ファイル");
+            this.filemenu = new Menu(fileroot);
+            fileroot.setMenu(this.filemenu);
+        }
 
         MenuItem save = new MenuItem(this.filemenu, SWT.NONE);
         save.setText("画像ファイルとして保存(&S)\tCtrl+S");

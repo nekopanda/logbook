@@ -287,6 +287,9 @@ public final class AppConfigBean {
     /** タイトルバー以外でもドラッグ&ドロップで移動できるようにする */
     private boolean enableMoveWithDD = true;
 
+    /** メニューバーを消してポップアップメニュー化する */
+    private boolean noMenubar = false;
+
     /** ツールウィンドウのボタンをトグル方式にする */
     private boolean toggleToolButton = true;
 
@@ -1931,6 +1934,20 @@ public final class AppConfigBean {
      */
     public void setAkashiNotifyEveryStep(boolean akashiNotifyEveryStep) {
         this.akashiNotifyEveryStep = akashiNotifyEveryStep;
+    }
+
+    /**
+     * @return noMenubar
+     */
+    public boolean isNoMenubar() {
+        return this.noMenubar;
+    }
+
+    /**
+     * @param noMenubar セットする noMenubar
+     */
+    public void setNoMenubar(boolean noMenubar) {
+        this.noMenubar = noMenubar;
     }
 
 }

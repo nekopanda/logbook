@@ -57,10 +57,12 @@ public class WindowBase {
     }
 
     private final WindowTreeNode treeNode = new WindowTreeNode(this);
+    private final boolean noMenubar = AppConfig.get().isNoMenubar();
     // アプリ上の仮想的な親子関係
     private WindowBase parent;
     private Shell shell;
-    private Menu alphamenu;
+    private Menu menubar;
+    private Menu popupmenu;
     private MenuItem menuItem;
 
     private DragMoveEventHandler dragMoveHandler;
@@ -456,12 +458,12 @@ public class WindowBase {
      * これを呼び出した時点でウィンドウに載っているすべてのオブジェクトに右クリックメニューを設定する
      */
     protected void registerEvents() {
-        setMenu(this.shell, this.alphamenu);
+        setMenu(this.shell, this.popupmenu);
         this.shell.addListener(SWT.Dispose, new Listener() {
             @Override
             public void handleEvent(Event event) {
                 // setMenuされたメニューしかdisposeされないので
-                WindowBase.this.alphamenu.dispose();
+                WindowBase.this.popupmenu.dispose();
                 // アニメーションをオフ
                 WindowBase.this.treeNode.setEnabled(false);
                 // ツリーから切り離す
@@ -492,6 +494,21 @@ public class WindowBase {
                     WindowBase.this.hideWindow();
                 }
             });
+        }
+    }
+
+    protected void createMenubar() {
+        if (this.noMenubar) {
+            // セパレータだけ追加しておく
+            new MenuItem(this.popupmenu, SWT.SEPARATOR);
+            return;
+        }
+        if (this.menubar == null) {
+            if (this.shell == null) {
+                throw new IllegalStateException("You need to create shell before creating menu bar.");
+            }
+            this.menubar = new Menu(this.shell, SWT.BAR);
+            this.shell.setMenuBar(this.menubar);
         }
     }
 
@@ -620,10 +637,10 @@ public class WindowBase {
         this.shell.setData(this);
         this.shell.setImage(SWTResourceManager.getImage(WindowBase.class, AppConstants.LOGO));
         // ウィンドウ基本メニュー
-        this.alphamenu = new Menu(this.shell);
-        Menu rootMenu = this.alphamenu;
+        this.popupmenu = new Menu(this.shell);
+        Menu rootMenu = this.popupmenu;
         if (cascade) {
-            MenuItem rootItem = new MenuItem(this.alphamenu, SWT.CASCADE);
+            MenuItem rootItem = new MenuItem(this.popupmenu, SWT.CASCADE);
             rootMenu = new Menu(this.shell, SWT.DROP_DOWN);
             rootItem.setMenu(rootMenu);
             rootItem.setText("ウィンドウ");
@@ -867,8 +884,15 @@ public class WindowBase {
         return this.shell;
     }
 
-    public Menu getMenu() {
-        return this.alphamenu;
+    public Menu getMenubar() {
+        if (this.noMenubar) {
+            return this.popupmenu;
+        }
+        return this.menubar;
+    }
+
+    public Menu getPopupMenu() {
+        return this.popupmenu;
     }
 
     public MenuItem getMenuItem() {
@@ -1012,5 +1036,12 @@ public class WindowBase {
 
     private void dbgprint(String text) {
         //System.out.println("[" + this.getWindowId() + "] " + text);
+    }
+
+    /**
+     * @return noMenubar
+     */
+    public boolean isNoMenubar() {
+        return noMenubar;
     }
 }

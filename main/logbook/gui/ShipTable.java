@@ -131,19 +131,21 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
         this.filterMenu = new FilterMenu(this.menubar);
 
         // 成長の余地を表示メニュー
+        new MenuItem(this.opemenu, SWT.SEPARATOR);
         this.switchdiff = new MenuItem(this.opemenu, SWT.CHECK);
         this.switchdiff.setText("成長の余地を表示");
         this.switchdiff.setSelection(this.specdiff);
         this.switchdiff.addSelectionListener(switchDiffListener);
 
-        // セパレータ
-        new MenuItem(this.tablemenu, SWT.SEPARATOR);
-
-        // 成長の余地を表示メニュー
-        this.switchdiff2 = new MenuItem(this.tablemenu, SWT.CHECK);
-        this.switchdiff2.setText("成長の余地を表示");
-        this.switchdiff2.setSelection(this.specdiff);
-        this.switchdiff2.addSelectionListener(switchDiffListener);
+        if (!this.isNoMenubar()) {
+            // セパレータ
+            new MenuItem(this.tablemenu, SWT.SEPARATOR);
+            // 成長の余地を表示メニュー
+            this.switchdiff2 = new MenuItem(this.tablemenu, SWT.CHECK);
+            this.switchdiff2.setText("成長の余地を表示");
+            this.switchdiff2.setSelection(this.specdiff);
+            this.switchdiff2.addSelectionListener(switchDiffListener);
+        }
 
         // セパレータ
         new MenuItem(this.tablemenu, SWT.SEPARATOR);

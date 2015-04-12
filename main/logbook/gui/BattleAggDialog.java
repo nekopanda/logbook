@@ -126,8 +126,8 @@ public class BattleAggDialog extends WindowBase implements EventListener {
         this.shell.setLayout(new FillLayout(SWT.HORIZONTAL));
         this.display = this.shell.getDisplay();
         // メニューバー
-        this.menubar = new Menu(this.shell, SWT.BAR);
-        this.shell.setMenuBar(this.menubar);
+        this.createMenubar();
+        this.menubar = this.getMenubar();
         // ツリーテーブル
         this.tree = new Tree(this.shell, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL | SWT.MULTI);
         this.tree.addKeyListener(new TreeKeyShortcutAdapter(this.header, this.tree));
@@ -135,10 +135,15 @@ public class BattleAggDialog extends WindowBase implements EventListener {
         this.tree.setHeaderVisible(true);
         this.treeItems = new AggTableItems(this.tree);
         // メニューバーのメニュー
-        MenuItem operoot = new MenuItem(this.menubar, SWT.CASCADE);
-        operoot.setText("操作");
-        this.opemenu = new Menu(operoot);
-        operoot.setMenu(this.opemenu);
+        if (this.isNoMenubar()) {
+            this.opemenu = this.menubar;
+        }
+        else {
+            MenuItem operoot = new MenuItem(this.menubar, SWT.CASCADE);
+            operoot.setText("操作");
+            this.opemenu = new Menu(operoot);
+            operoot.setMenu(this.opemenu);
+        }
         MenuItem reload = new MenuItem(this.opemenu, SWT.NONE);
         reload.setText("再読み込み(&R)\tF5");
         reload.setAccelerator(SWT.F5);
@@ -152,14 +157,16 @@ public class BattleAggDialog extends WindowBase implements EventListener {
         super.registerEvents();
 
         // テーブル右クリックメニュー
-        this.tablemenu = this.getMenu();
+        this.tablemenu = this.getPopupMenu();
         this.tree.setMenu(this.tablemenu);
         MenuItem sendclipbord = new MenuItem(this.tablemenu, SWT.NONE);
         sendclipbord.addSelectionListener(new TreeToClipboardAdapter(this.header, this.tree));
         sendclipbord.setText("クリップボードにコピー(&C)");
-        MenuItem reloadtable = new MenuItem(this.tablemenu, SWT.NONE);
-        reloadtable.setText("再読み込み(&R)");
-        reloadtable.addSelectionListener(new TableReloadAdapter());
+        if (!this.isNoMenubar()) {
+            MenuItem reloadtable = new MenuItem(this.tablemenu, SWT.NONE);
+            reloadtable.setText("再読み込み(&R)");
+            reloadtable.addSelectionListener(new TableReloadAdapter());
+        }
 
         this.tree.addListener(SWT.Dispose, new Listener() {
             @Override

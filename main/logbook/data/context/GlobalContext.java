@@ -992,6 +992,12 @@ public final class GlobalContext {
                 doMaterialSub(apiMaterial);
                 //addConsole("保有資材を更新しました");
 
+                // 入渠の状態を更新する
+                // 入渠終了処理を行わないと泊地修理が誤ってリセットされるため先に行う
+                JsonArray apiNdock = apidata.getJsonArray("api_ndock");
+                doNdockSub(apiNdock);
+                //addConsole("入渠情報を更新しました");
+
                 // 保有艦娘を更新する
                 boolean condUpdated = false;
                 boolean hpUpdated = false;
@@ -1024,11 +1030,6 @@ public final class GlobalContext {
                 JsonArray apiDeckPort = apidata.getJsonArray("api_deck_port");
                 doDeck(apiDeckPort);
                 //addConsole("保有艦娘情報を更新しました");
-
-                // 入渠の状態を更新する
-                JsonArray apiNdock = apidata.getJsonArray("api_ndock");
-                doNdockSub(apiNdock);
-                //addConsole("入渠情報を更新しました");
 
                 //addConsole("遠征情報を更新しました");
 

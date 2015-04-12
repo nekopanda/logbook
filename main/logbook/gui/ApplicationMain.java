@@ -411,8 +411,8 @@ public final class ApplicationMain extends WindowBase {
         });
 
         // メニューバー
-        Menu menubar = new Menu(this.shell, SWT.BAR);
-        this.shell.setMenuBar(menubar);
+        this.createMenubar();
+        Menu menubar = this.getMenubar();
         MenuItem cmdmenuroot = new MenuItem(menubar, SWT.CASCADE);
         cmdmenuroot.setText("コマンド");
         Menu cmdmenu = new Menu(cmdmenuroot);
@@ -880,18 +880,18 @@ public final class ApplicationMain extends WindowBase {
         this.console.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
 
         //  ウィンドウの右クリックメニューに追加
-        new MenuItem(this.getMenu(), SWT.SEPARATOR);
+        new MenuItem(this.getPopupMenu(), SWT.SEPARATOR);
 
-        MenuItem showNotifySetting = new MenuItem(this.getMenu(), SWT.CHECK);
+        MenuItem showNotifySetting = new MenuItem(this.getPopupMenu(), SWT.CHECK);
         showNotifySetting.setText("通知設定を表示");
         this.bindControlToMenuItem(this.notifySettingGroup, showNotifySetting, "ShowNofitySetting");
 
-        MenuItem showCondTimer = new MenuItem(this.getMenu(), SWT.CHECK);
+        MenuItem showCondTimer = new MenuItem(this.getPopupMenu(), SWT.CHECK);
         showCondTimer.setText("疲労タイマーを表示");
         this.bindControlToMenuItem(this.otherGroup, showCondTimer, "ShowCondCycleTimer");
 
         // 縮小表示
-        final MenuItem dispsize = new MenuItem(this.getMenu(), SWT.CHECK);
+        final MenuItem dispsize = new MenuItem(this.getPopupMenu(), SWT.CHECK);
         dispsize.setText("縮小表示(&M)\tCtrl+M");
         dispsize.setAccelerator(SWT.CTRL + 'M');
 

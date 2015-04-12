@@ -114,11 +114,13 @@ public final class DropReportTable extends AbstractTableDialog {
                 DropReportTable.this.battleFilterDialog.open();
             }
         };
-        // フィルターメニュー
-        final MenuItem filter = new MenuItem(this.menubar, SWT.PUSH);
-        filter.setText("フィルター");
-        filter.setAccelerator(SWT.CTRL + 'F');
-        filter.addSelectionListener(filterListener);
+        if (!this.isNoMenubar()) {
+            // フィルターメニュー
+            final MenuItem filter = new MenuItem(this.menubar, SWT.PUSH);
+            filter.setText("フィルター");
+            filter.setAccelerator(SWT.CTRL + 'F');
+            filter.addSelectionListener(filterListener);
+        }
         // セパレータ
         new MenuItem(this.tablemenu, SWT.SEPARATOR);
         // 右クリックメニューに追加する

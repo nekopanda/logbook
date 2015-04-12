@@ -130,8 +130,8 @@ public abstract class AbstractTableDialog extends WindowBase implements EventLis
         this.shell = this.getShell();
         this.shell.setLayout(new FillLayout());
         // メニューバー
-        this.menubar = new Menu(this.shell, SWT.BAR);
-        this.shell.setMenuBar(this.menubar);
+        this.createMenubar();
+        this.menubar = this.getMenubar();
         // テーブルより前に作成する必要があるコンポジットを作成
         this.createContentsBefore();
         // ヘッダ
@@ -157,10 +157,15 @@ public abstract class AbstractTableDialog extends WindowBase implements EventLis
             }
         });
         // メニューバーのメニュー
-        MenuItem fileroot = new MenuItem(this.menubar, SWT.CASCADE);
-        fileroot.setText("ファイル");
-        this.filemenu = new Menu(fileroot);
-        fileroot.setMenu(this.filemenu);
+        if (this.isNoMenubar()) {
+            this.filemenu = this.menubar;
+        }
+        else {
+            MenuItem fileroot = new MenuItem(this.menubar, SWT.CASCADE);
+            fileroot.setText("ファイル");
+            this.filemenu = new Menu(fileroot);
+            fileroot.setMenu(this.filemenu);
+        }
 
         MenuItem savecsv = new MenuItem(this.filemenu, SWT.NONE);
         savecsv.setText("CSVファイルに保存(&S)\tCtrl+S");
@@ -168,10 +173,16 @@ public abstract class AbstractTableDialog extends WindowBase implements EventLis
         savecsv.addSelectionListener(new TableToCsvSaveAdapter(this.shell, this.getTitle(), this.getTableHeader(),
                 this.table));
 
-        MenuItem operoot = new MenuItem(this.menubar, SWT.CASCADE);
-        operoot.setText("操作");
-        this.opemenu = new Menu(operoot);
-        operoot.setMenu(this.opemenu);
+        if (this.isNoMenubar()) {
+            this.opemenu = this.menubar;
+            new MenuItem(this.opemenu, SWT.SEPARATOR);
+        }
+        else {
+            MenuItem operoot = new MenuItem(this.menubar, SWT.CASCADE);
+            operoot.setText("操作");
+            this.opemenu = new Menu(operoot);
+            operoot.setMenu(this.opemenu);
+        }
 
         MenuItem reload = new MenuItem(this.opemenu, SWT.NONE);
         reload.setText("再読み込み(&R)\tF5");
@@ -225,18 +236,20 @@ public abstract class AbstractTableDialog extends WindowBase implements EventLis
         // ウィンドウの基本メニューを設定
         super.registerEvents();
 
-        new MenuItem(this.opemenu, SWT.SEPARATOR);
-
         // テーブル右クリックメニュー
-        this.tablemenu = this.getMenu();
+        this.tablemenu = this.getPopupMenu();
         this.table.setMenu(this.tablemenu);
         new MenuItem(this.tablemenu, SWT.SEPARATOR);
         MenuItem sendclipbord = new MenuItem(this.tablemenu, SWT.NONE);
         sendclipbord.addSelectionListener(new TableToClipboardAdapter(this.header, this.table));
         sendclipbord.setText("クリップボードにコピー(&C)");
-        MenuItem reloadtable = new MenuItem(this.tablemenu, SWT.NONE);
-        reloadtable.setText("再読み込み(&R)");
-        reloadtable.addSelectionListener(new TableReloadAdapter());
+
+        if (!this.isNoMenubar()) {
+            MenuItem reloadtable = new MenuItem(this.tablemenu, SWT.NONE);
+            reloadtable.setText("再読み込み(&R)");
+            reloadtable.addSelectionListener(new TableReloadAdapter());
+        }
+
         // テーブルにヘッダーをセット
         this.setTableHeader();
         try {

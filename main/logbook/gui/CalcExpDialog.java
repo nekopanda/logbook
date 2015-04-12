@@ -257,7 +257,7 @@ public final class CalcExpDialog extends WindowBase {
         }
 
         // 「新しいウィンドウを作る」を右クリックメニューに追加する
-        final MenuItem createNewWin = new MenuItem(this.getMenu(), SWT.PUSH, 0);
+        final MenuItem createNewWin = new MenuItem(this.getPopupMenu(), SWT.PUSH, 0);
         createNewWin.setText("新しいウィンドウを開く(&N)\tCtrl+N");
         createNewWin.setAccelerator(SWT.CTRL + 'N');
         createNewWin.addSelectionListener(new SelectionAdapter() {
@@ -266,7 +266,7 @@ public final class CalcExpDialog extends WindowBase {
                 new CalcExpDialog().open();
             }
         });
-        new MenuItem(this.getMenu(), SWT.SEPARATOR, 1);
+        new MenuItem(this.getPopupMenu(), SWT.SEPARATOR, 1);
 
         this.shell.pack();
         this.setShipComboData();

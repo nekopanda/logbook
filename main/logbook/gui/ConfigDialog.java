@@ -517,12 +517,12 @@ public final class ConfigDialog extends Dialog {
 
         final Button showCondTimer = new Button(compositeFleetDetail, SWT.CHECK);
         showCondTimer.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        showCondTimer.setText("疲労回復までの時間を表示");
+        showCondTimer.setText("疲労回復タイマーを表示");
         showCondTimer.setSelection(AppConfig.get().isShowCondTimer());
 
         final Button showAkashiTimer = new Button(compositeFleetDetail, SWT.CHECK);
         showAkashiTimer.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        showAkashiTimer.setText("泊地修理終了までの時間を表示");
+        showAkashiTimer.setText("泊地修理タイマーを表示");
         showAkashiTimer.setSelection(AppConfig.get().isShowAkashiTimer());
 
         Composite akashiFormatBase = new Composite(compositeFleetDetail, SWT.NONE);
@@ -534,7 +534,7 @@ public final class ConfigDialog extends Dialog {
 
         final Combo akashiFormatCombo = new Combo(akashiFormatBase, SWT.READ_ONLY);
         akashiFormatCombo.add("全回復までの時間");
-        akashiFormatCombo.add("次の回復ポイントまでの時間");
+        akashiFormatCombo.add("次の回復までの時間");
         akashiFormatCombo.add("交互に表示");
         akashiFormatCombo.select(AppConfig.get().getAkashiTimerFormat());
 
@@ -726,6 +726,11 @@ public final class ConfigDialog extends Dialog {
         enableMoveWithDD.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
         enableMoveWithDD.setSelection(AppConfig.get().isEnableMoveWithDD());
         enableMoveWithDD.setText("タイトルバー以外でもドラッグ&&ドロップで移動できるようにする*");
+
+        final Button noMenubar = new Button(compositeWindow, SWT.CHECK);
+        noMenubar.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        noMenubar.setSelection(AppConfig.get().isNoMenubar());
+        noMenubar.setText("メニューバーを消してポップアップメニュー化する*");
 
         final Button toggleToolButton = new Button(compositeWindow, SWT.CHECK);
         toggleToolButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
@@ -1086,6 +1091,7 @@ public final class ConfigDialog extends Dialog {
                 // ウィンドウ
                 AppConfig.get().setOpaqueInterval(opaqueIntervalSpinner.getSelection());
                 AppConfig.get().setEnableMoveWithDD(enableMoveWithDD.getSelection());
+                AppConfig.get().setNoMenubar(noMenubar.getSelection());
                 AppConfig.get().setToggleToolButton(toggleToolButton.getSelection());
                 for (int i = 0; i < 4; ++i) {
                     AppConfig.get().getShipTableNames()[i] = shipTableNameText[i].getText();
