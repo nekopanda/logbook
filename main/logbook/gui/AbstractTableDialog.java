@@ -175,13 +175,16 @@ public abstract class AbstractTableDialog extends WindowBase implements EventLis
 
         if (this.isNoMenubar()) {
             this.opemenu = this.menubar;
-            new MenuItem(this.opemenu, SWT.SEPARATOR);
         }
         else {
             MenuItem operoot = new MenuItem(this.menubar, SWT.CASCADE);
             operoot.setText("操作");
             this.opemenu = new Menu(operoot);
             operoot.setMenu(this.opemenu);
+        }
+
+        if (this.opemenu.getItemCount() > 0) {
+            new MenuItem(this.opemenu, SWT.SEPARATOR);
         }
 
         MenuItem reload = new MenuItem(this.opemenu, SWT.NONE);
@@ -239,7 +242,9 @@ public abstract class AbstractTableDialog extends WindowBase implements EventLis
         // テーブル右クリックメニュー
         this.tablemenu = this.getPopupMenu();
         this.table.setMenu(this.tablemenu);
-        new MenuItem(this.tablemenu, SWT.SEPARATOR);
+        if (this.tablemenu.getItemCount() > 0) {
+            new MenuItem(this.tablemenu, SWT.SEPARATOR);
+        }
         MenuItem sendclipbord = new MenuItem(this.tablemenu, SWT.NONE);
         sendclipbord.addSelectionListener(new TableToClipboardAdapter(this.header, this.table));
         sendclipbord.setText("クリップボードにコピー(&C)");

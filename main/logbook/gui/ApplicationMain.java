@@ -880,7 +880,9 @@ public final class ApplicationMain extends WindowBase {
         this.console.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
 
         //  ウィンドウの右クリックメニューに追加
-        new MenuItem(this.getPopupMenu(), SWT.SEPARATOR);
+        if (this.getPopupMenu().getItemCount() > 0) {
+            new MenuItem(this.getPopupMenu(), SWT.SEPARATOR);
+        }
 
         MenuItem showNotifySetting = new MenuItem(this.getPopupMenu(), SWT.CHECK);
         showNotifySetting.setText("通知設定を表示");

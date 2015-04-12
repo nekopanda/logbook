@@ -290,6 +290,9 @@ public final class AppConfigBean {
     /** メニューバーを消してポップアップメニュー化する */
     private boolean noMenubar = false;
 
+    /** ウィンドウメニューを無効化 */
+    private boolean disableWindowMenu = false;
+
     /** ツールウィンドウのボタンをトグル方式にする */
     private boolean toggleToolButton = true;
 
@@ -1948,6 +1951,20 @@ public final class AppConfigBean {
      */
     public void setNoMenubar(boolean noMenubar) {
         this.noMenubar = noMenubar;
+    }
+
+    /**
+     * @return disableWindowMenu
+     */
+    public boolean isDisableWindowMenu() {
+        return this.disableWindowMenu;
+    }
+
+    /**
+     * @param disableWindowMenu セットする disableWindowMenu
+     */
+    public void setDisableWindowMenu(boolean disableWindowMenu) {
+        this.disableWindowMenu = disableWindowMenu;
     }
 
 }

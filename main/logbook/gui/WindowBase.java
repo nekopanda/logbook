@@ -58,6 +58,7 @@ public class WindowBase {
 
     private final WindowTreeNode treeNode = new WindowTreeNode(this);
     private final boolean noMenubar = AppConfig.get().isNoMenubar();
+    private final boolean disableWindowMenu = AppConfig.get().isDisableWindowMenu();
     // アプリ上の仮想的な親子関係
     private WindowBase parent;
     private Shell shell;
@@ -553,6 +554,9 @@ public class WindowBase {
 
     private void topMostChanged(boolean topMost) {
         this.topMostItem.setSelection(topMost);
+        if (this.disableWindowMenu) {
+            return;
+        }
         if (this.topMost != topMost) {
             this.topMost = topMost;
             nativeService.setTopMost(this.getShell(), topMost);
@@ -586,13 +590,14 @@ public class WindowBase {
      * @param newValue
      */
     protected void showTitlebarChanged(boolean showTitlebar) {
-        //if (this.moveWithDrag()) {
         this.showTitlebarItem.setSelection(showTitlebar);
+        if (this.disableWindowMenu) {
+            return;
+        }
         if (this.showTitlebar != showTitlebar) {
             this.showTitlebar = showTitlebar;
             nativeService.toggleTitlebar(this.getShell(), showTitlebar);
         }
-        //}
     }
 
     private boolean isMouseHovering() {
@@ -638,19 +643,7 @@ public class WindowBase {
         }
     }
 
-    private void createContents(boolean cascade) {
-        this.shell.setData(this);
-        this.shell.setImage(SWTResourceManager.getImage(WindowBase.class, AppConstants.LOGO));
-        // ウィンドウ基本メニュー
-        this.popupmenu = new Menu(this.shell);
-        Menu rootMenu = this.popupmenu;
-        if (cascade) {
-            MenuItem rootItem = new MenuItem(this.popupmenu, SWT.CASCADE);
-            rootMenu = new Menu(this.shell, SWT.DROP_DOWN);
-            rootItem.setMenu(rootMenu);
-            rootItem.setText("ウィンドウ");
-        }
-
+    private void createWindowMenu(Menu rootMenu) {
         if (nativeService.isTopMostAvailable()) {
             // 最前面に表示する
             this.topMostItem = new MenuItem(rootMenu, SWT.CHECK);
@@ -730,6 +723,33 @@ public class WindowBase {
                 }
             });
         }
+    }
+
+    private void createContents(boolean cascade) {
+        this.shell.setData(this);
+        this.shell.setImage(SWTResourceManager.getImage(WindowBase.class, AppConstants.LOGO));
+        // ウィンドウ基本メニュー
+        this.popupmenu = new Menu(this.shell);
+        Menu rootMenu = this.popupmenu;
+
+        if (this.disableWindowMenu) {
+            // ダミーメニューを作る
+            final Menu dummy = rootMenu = new Menu(this.shell, SWT.DROP_DOWN);
+            this.shell.addListener(SWT.Dispose, new Listener() {
+                @Override
+                public void handleEvent(Event event) {
+                    dummy.dispose();
+                }
+            });
+        }
+        else if (cascade) {
+            MenuItem rootItem = new MenuItem(this.popupmenu, SWT.CASCADE);
+            rootMenu = new Menu(this.shell, SWT.DROP_DOWN);
+            rootItem.setMenu(rootMenu);
+            rootItem.setText("ウィンドウ");
+        }
+
+        this.createWindowMenu(rootMenu);
 
         // 初期状態を設定
         if (this.parent != null) {
@@ -766,7 +786,8 @@ public class WindowBase {
             //}
         }
         // 透過設定
-        boolean changeAnimation = (this.shareOpacitySetting != this.config.isShareOpacitySetting());
+        boolean changeAnimation = false;
+        changeAnimation = (this.shareOpacitySetting != this.config.isShareOpacitySetting());
         this.shareOpacitySetting = this.config.isShareOpacitySetting();
         this.shareOpacityItem.setSelection(this.shareOpacitySetting);
         this.opaqueChanged(this.config.isMouseHoveringAware());

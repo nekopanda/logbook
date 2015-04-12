@@ -732,6 +732,11 @@ public final class ConfigDialog extends Dialog {
         noMenubar.setSelection(AppConfig.get().isNoMenubar());
         noMenubar.setText("メニューバーを消してポップアップメニュー化する*");
 
+        final Button diableWindowMenu = new Button(compositeWindow, SWT.CHECK);
+        diableWindowMenu.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        diableWindowMenu.setSelection(AppConfig.get().isDisableWindowMenu());
+        diableWindowMenu.setText("ウィンドウメニューを無効化*");
+
         final Button toggleToolButton = new Button(compositeWindow, SWT.CHECK);
         toggleToolButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
         toggleToolButton.setSelection(AppConfig.get().isToggleToolButton());
@@ -1092,6 +1097,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setOpaqueInterval(opaqueIntervalSpinner.getSelection());
                 AppConfig.get().setEnableMoveWithDD(enableMoveWithDD.getSelection());
                 AppConfig.get().setNoMenubar(noMenubar.getSelection());
+                AppConfig.get().setDisableWindowMenu(diableWindowMenu.getSelection());
                 AppConfig.get().setToggleToolButton(toggleToolButton.getSelection());
                 for (int i = 0; i < 4; ++i) {
                     AppConfig.get().getShipTableNames()[i] = shipTableNameText[i].getText();
