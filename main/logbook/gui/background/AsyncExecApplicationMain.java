@@ -611,10 +611,25 @@ public final class AsyncExecApplicationMain extends Thread {
             CondTiming timing = GlobalContext.getCondTiming();
             Date nextUpdateTime = timing.getNextUpdateTime(this.now);
 
-            if (nextUpdateTime == null) {
+            // 疲労のある艦娘はいる？
+            boolean needTimer = false;
+            int okCond = AppConfig.get().getOkCond();
+            for (ShipDto ship : GlobalContext.getShipMap().values()) {
+                if (ship.getCond() < okCond) {
+                    needTimer = true;
+                    break;
+                }
+            }
+
+            if (needTimer == false) {
                 condTimerLabel.setText("");
                 condTimerText.setToolTipText(null);
                 condTimerText.setText("");
+            }
+            else if (nextUpdateTime == null) {
+                condTimerLabel.setText("次の疲労回復まで");
+                condTimerText.setToolTipText("十分な情報がありません");
+                condTimerText.setText("???");
             }
             else {
                 int accuracy = (int) timing.getCurrentAccuracy() / 2000;

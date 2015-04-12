@@ -149,7 +149,7 @@ public class BattleAggDialog extends WindowBase implements EventListener {
         reload.setAccelerator(SWT.F5);
         reload.addSelectionListener(new TableReloadAdapter());
         this.cyclicReloadMenuItem = new MenuItem(this.opemenu, SWT.CHECK);
-        this.cyclicReloadMenuItem.setText("定期的に再読み込み(3秒)(&A)\tCtrl+F5");
+        this.cyclicReloadMenuItem.setText("定期的に再読み込み(1秒)(&A)\tCtrl+F5");
         this.cyclicReloadMenuItem.setAccelerator(SWT.CTRL + SWT.F5);
         this.cyclicReloadMenuItem.addSelectionListener(new CyclicReloadAdapter(this.cyclicReloadMenuItem));
 
@@ -530,9 +530,9 @@ public class BattleAggDialog extends WindowBase implements EventListener {
         // タイマーを作成
         if (this.timer == null) {
             this.timer = new Timer(true);
-            // 3秒毎に再読み込みするようにスケジュールする
+            // 1秒毎に再読み込みするようにスケジュールする
             this.timer.schedule(new CyclicReloadTask(BattleAggDialog.this), 0,
-                    TimeUnit.SECONDS.toMillis(3));
+                    TimeUnit.SECONDS.toMillis(1));
         }
     }
 
