@@ -356,6 +356,11 @@ public class WindowBase {
         }
     }
 
+    public static boolean isCommonTopMostEnabled() {
+        return (nativeService.isTopMostAvailable() == false) && // Windows
+                !"gtk".equals(SWT.getPlatform()); // gtkでON_TOPするとフレームが表示されない
+    }
+
     /**
      * 親ウィンドウ用のコンストラクタ
      */
@@ -410,7 +415,7 @@ public class WindowBase {
     }
 
     private int getDefaultStyle() {
-        if ((nativeService.isTopMostAvailable() == false) && AppConfig.get().isOnTop()) {
+        if (isCommonTopMostEnabled() && AppConfig.get().isOnTop()) {
             return SWT.ON_TOP;
         }
         return 0;
@@ -1042,6 +1047,6 @@ public class WindowBase {
      * @return noMenubar
      */
     public boolean isNoMenubar() {
-        return noMenubar;
+        return this.noMenubar;
     }
 }

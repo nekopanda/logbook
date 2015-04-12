@@ -250,7 +250,7 @@ public final class ConfigDialog extends Dialog {
         closewindow.setSelection(AppConfig.get().isCloseWhenMinimized());
 
         final Button ontop;
-        if (WindowBase.nativeService.isTopMostAvailable() == false) { // 右クリックから設定できる場合は表示しない
+        if (WindowBase.isCommonTopMostEnabled()) { // 右クリックから設定できる場合は表示しない
             ontop = new Button(compositeSystem, SWT.CHECK);
             ontop.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
             ontop.setText("最前面に表示する*");
