@@ -328,10 +328,6 @@ public class BattleResultServer {
         }
     }
 
-    public String[] getExtHeader() {
-        return BattleLogProxy.get().header();
-    }
-
     public int size() {
         return this.resultList.size();
     }

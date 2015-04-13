@@ -409,9 +409,9 @@ public final class ConfigDialog extends Dialog {
         final Combo sakutekiCombo = new Combo(compositeFleetTab, SWT.READ_ONLY);
         sakutekiCombo.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
         sakutekiCombo.add("A.艦隊素の索敵値 + 装備の索敵値");
-        sakutekiCombo.add("B.ほっぼアルファVer2.0.1(艦隊素の索敵分 + 装備分 + 提督Lv分)");
+        sakutekiCombo.add("B.ほっぼアルファVer2.0.1(艦隊素の索敵分 + 装備分 - 提督Lv分)");
         sakutekiCombo.add("C.ほっぼアルファVer2.0.1(旧:2-5式(秋))");
-        sakutekiCombo.add("D.2-5式(秋)(艦隊素の索敵分 + 装備分 + 提督Lv分)");
+        sakutekiCombo.add("D.2-5式(秋)(艦隊素の索敵分 + 装備分 - 提督Lv分)");
         sakutekiCombo.add("E.装備込みの艦隊索敵値合計(2-5式(秋))");
         sakutekiCombo.add("F.2-5式(旧)(偵察機×2 + 電探 + √(装備込みの艦隊索敵値-偵察機-電探))");
         sakutekiCombo.add("G.装備込みの艦隊索敵値(2-5式(旧))");
@@ -533,9 +533,9 @@ public final class ConfigDialog extends Dialog {
         akashiFormatLabel.setText("表示");
 
         final Combo akashiFormatCombo = new Combo(akashiFormatBase, SWT.READ_ONLY);
-        akashiFormatCombo.add("全回復までの時間");
-        akashiFormatCombo.add("次の回復までの時間");
-        akashiFormatCombo.add("交互に表示");
+        akashiFormatCombo.add("A.全回復までの時間");
+        akashiFormatCombo.add("B.次の回復までの時間");
+        akashiFormatCombo.add("C.AとBを交互に表示");
         akashiFormatCombo.select(AppConfig.get().getAkashiTimerFormat());
 
         // 通知

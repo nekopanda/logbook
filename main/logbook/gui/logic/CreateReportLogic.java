@@ -47,6 +47,7 @@ import logbook.internal.BattleResultFilter;
 import logbook.internal.BattleResultServer;
 import logbook.internal.MasterData;
 import logbook.internal.MasterData.MissionDto;
+import logbook.scripting.BattleLogProxy;
 import logbook.scripting.ItemInfoListener;
 import logbook.scripting.ItemInfoProxy;
 import logbook.scripting.MissionProxy;
@@ -83,7 +84,7 @@ public final class CreateReportLogic {
     public static String[] getBattleResultHeader() {
         return ArrayUtils.addAll(new String[] {
                 "No.", "日付", "海域", "マス", "出撃", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘" },
-                BattleResultServer.get().getExtHeader());
+                BattleLogProxy.get().header());
     }
 
     /**

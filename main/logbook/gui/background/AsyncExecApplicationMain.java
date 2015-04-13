@@ -613,9 +613,8 @@ public final class AsyncExecApplicationMain extends Thread {
 
             // 疲労のある艦娘はいる？
             boolean needTimer = false;
-            int okCond = AppConfig.get().getOkCond();
             for (ShipDto ship : GlobalContext.getShipMap().values()) {
-                if (ship.getCond() < okCond) {
+                if (ship.getCond() < 49) {
                     needTimer = true;
                     break;
                 }

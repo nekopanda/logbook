@@ -15,6 +15,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
@@ -104,6 +107,9 @@ public final class ResourceChartDialog extends WindowBase {
     /** 最後に読み込んだ時間 */
     private Date lastLoadDate = new Date(0);
 
+    /** 更新タイマー */
+    protected Timer timer;
+
     private int nextActivated = -1;
     private int nowActivated = -1;
 
@@ -143,6 +149,11 @@ public final class ResourceChartDialog extends WindowBase {
         this.registerEvents();
         this.setWindowInitialized(true);
         this.setVisible(true);
+
+        // 更新タイマー
+        this.timer = new Timer(true);
+        // 3分毎に再読み込みするようにスケジュールする
+        this.timer.schedule(new CyclicReloadTask(), 0, TimeUnit.MINUTES.toMillis(3));
     }
 
     /**
@@ -592,6 +603,31 @@ public final class ResourceChartDialog extends WindowBase {
         @Override
         public void widgetSelected(SelectionEvent e) {
             ResourceChartDialog.this.saveImage();
+        }
+    }
+
+    /**
+     * テーブルを定期的に再読み込みする
+     */
+    protected class CyclicReloadTask extends TimerTask {
+
+        @Override
+        public void run() {
+            ResourceChartDialog.this.shell.getDisplay().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    if (!ResourceChartDialog.this.shell.isDisposed()) {
+                        // 見えているときだけ処理する
+                        if (ResourceChartDialog.this.shell.isVisible()) {
+                            ResourceChartDialog.this.updateContents();
+                        }
+                    }
+                    else {
+                        // ウインドウが消えていたらタスクをキャンセルする
+                        CyclicReloadTask.this.cancel();
+                    }
+                }
+            });
         }
     }
 }
