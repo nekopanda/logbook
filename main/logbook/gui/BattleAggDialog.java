@@ -7,16 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Timer;
-import java.util.TimerTask;
 import java.util.TreeMap;
-import java.util.concurrent.TimeUnit;
 
 import logbook.config.AppConfig;
 import logbook.config.bean.TableConfigBean;
-import logbook.data.Data;
-import logbook.data.DataType;
-import logbook.data.EventListener;
-import logbook.data.context.GlobalContext;
 import logbook.dto.BattleAggDetailsDto;
 import logbook.dto.BattleAggUnitDto;
 import logbook.dto.BattleResultDto;
@@ -24,6 +18,7 @@ import logbook.dto.MapCellDto;
 import logbook.dto.ResultRank;
 import logbook.gui.listener.TreeKeyShortcutAdapter;
 import logbook.gui.listener.TreeToClipboardAdapter;
+import logbook.gui.logic.GuiUpdator;
 import logbook.internal.BattleAggDate;
 import logbook.internal.BattleAggUnit;
 import logbook.internal.BattleResultServer;
@@ -35,7 +30,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
@@ -49,7 +43,7 @@ import org.eclipse.swt.widgets.TreeItem;
  * 出撃統計
  *
  */
-public class BattleAggDialog extends WindowBase implements EventListener {
+public class BattleAggDialog extends WindowBase {
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger(BattleAggDialog.class);
 
@@ -81,8 +75,6 @@ public class BattleAggDialog extends WindowBase implements EventListener {
     protected TableConfigBean config;
 
     protected MenuItem cyclicReloadMenuItem;
-
-    private Display display;
 
     protected boolean needsUpdate = true;
 
@@ -124,7 +116,6 @@ public class BattleAggDialog extends WindowBase implements EventListener {
         this.shell = this.getShell();
         this.shell.setText(this.getTitle());
         this.shell.setLayout(new FillLayout(SWT.HORIZONTAL));
-        this.display = this.shell.getDisplay();
         // メニューバー
         this.createMenubar();
         this.menubar = this.getMenubar();
@@ -148,10 +139,6 @@ public class BattleAggDialog extends WindowBase implements EventListener {
         reload.setText("再読み込み(&R)\tF5");
         reload.setAccelerator(SWT.F5);
         reload.addSelectionListener(new TableReloadAdapter());
-        this.cyclicReloadMenuItem = new MenuItem(this.opemenu, SWT.CHECK);
-        this.cyclicReloadMenuItem.setText("定期的に再読み込み(1秒)(&A)\tCtrl+F5");
-        this.cyclicReloadMenuItem.setAccelerator(SWT.CTRL + SWT.F5);
-        this.cyclicReloadMenuItem.addSelectionListener(new CyclicReloadAdapter(this.cyclicReloadMenuItem));
 
         // ウィンドウの基本メニューを設定
         super.registerEvents();
@@ -168,25 +155,23 @@ public class BattleAggDialog extends WindowBase implements EventListener {
             reloadtable.addSelectionListener(new TableReloadAdapter());
         }
 
-        this.tree.addListener(SWT.Dispose, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                // GlobalContextへのリスナ登録解除
-                GlobalContext.removeEventListener(BattleAggDialog.this);
-            }
-        });
-
-        // 更新リスナ登録
-        GlobalContext.addEventListener(this);
-
-        // 自動更新設定を反映
-        if (this.getConfig().isCyclicReload()) {
-            this.cyclicReloadMenuItem.setSelection(true);
-            this.enableCyclicReload();
-        }
-
         this.setTableHeader();
         this.reloadTable();
+
+        // データの更新を受け取る
+        final Runnable listener = new GuiUpdator(new Runnable() {
+            @Override
+            public void run() {
+                BattleAggDialog.this.reloadTable();
+            }
+        });
+        BattleResultServer.addListener(listener);
+        this.shell.addListener(SWT.Dispose, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                BattleResultServer.removeListener(listener);
+            }
+        });
     }
 
     /**
@@ -523,97 +508,6 @@ public class BattleAggDialog extends WindowBase implements EventListener {
                 this.expanded = this.item.getExpanded();
                 this.item = this.bossItem = null;
             }
-        }
-    }
-
-    private void enableCyclicReload() {
-        // タイマーを作成
-        if (this.timer == null) {
-            this.timer = new Timer(true);
-            // 1秒毎に再読み込みするようにスケジュールする
-            this.timer.schedule(new CyclicReloadTask(BattleAggDialog.this), 0,
-                    TimeUnit.SECONDS.toMillis(1));
-        }
-    }
-
-    private void disableCyclicReload() {
-        // タイマーを終了
-        if (this.timer != null) {
-            this.timer.cancel();
-            this.timer = null;
-        }
-    }
-
-    /**
-     * テーブルを定期的に再読み込みする
-     */
-    protected class CyclicReloadAdapter extends SelectionAdapter {
-
-        private final MenuItem menuitem;
-
-        public CyclicReloadAdapter(MenuItem menuitem) {
-            this.menuitem = menuitem;
-        }
-
-        @Override
-        public void widgetSelected(SelectionEvent e) {
-            if (this.menuitem.getSelection()) {
-                BattleAggDialog.this.enableCyclicReload();
-            } else {
-                BattleAggDialog.this.disableCyclicReload();
-            }
-        }
-    }
-
-    /**
-     * テーブルを定期的に再読み込みする
-     */
-    protected static class CyclicReloadTask extends TimerTask {
-
-        private final BattleAggDialog dialog;
-
-        public CyclicReloadTask(BattleAggDialog dialog) {
-            this.dialog = dialog;
-        }
-
-        @Override
-        public void run() {
-            if (!this.dialog.needsUpdate) {
-                // 更新の必要はない
-                return;
-            }
-            this.dialog.display.asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    if (!CyclicReloadTask.this.dialog.shell.isDisposed()) {
-                        // 見えているときだけ処理する
-                        if (CyclicReloadTask.this.dialog.shell.isVisible()) {
-                            CyclicReloadTask.this.dialog.reloadTable();
-                        }
-                    }
-                    else {
-                        // ウインドウが消えていたらタスクをキャンセルする
-                        CyclicReloadTask.this.cancel();
-                    }
-                }
-            });
-        }
-    }
-
-    /**
-     * データ受信
-     * デフォルト動作はどんなデータでも更新をONにする
-     */
-    @SuppressWarnings("incomplete-switch")
-    @Override
-    public void update(DataType type, Data data) {
-        switch (type) {
-        case BATTLE_RESULT:
-        case COMBINED_BATTLE_RESULT:
-        case PRACTICE_BATTLE_RESULT:
-            //case START:
-            //case NEXT:
-            this.needsUpdate = true;
         }
     }
 }

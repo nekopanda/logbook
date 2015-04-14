@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 import logbook.dto.ResultRank;
+import logbook.gui.logic.GuiUpdator;
 import logbook.gui.logic.IntegerPair;
 import logbook.gui.logic.LayoutLogic;
 import logbook.internal.BattleResultFilter;
@@ -28,7 +29,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DateTime;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -196,6 +199,21 @@ public class BattleFilterDialog extends WindowBase {
 
         this.updateCalenderVisible();
         shell.pack();
+
+        // データの更新を受け取る
+        final Runnable datalistener = new GuiUpdator(new Runnable() {
+            @Override
+            public void run() {
+                BattleFilterDialog.this.updateContents();
+            }
+        });
+        BattleResultServer.addListener(datalistener);
+        this.getShell().addListener(SWT.Dispose, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                BattleResultServer.removeListener(datalistener);
+            }
+        });
     }
 
     private void updateContents() {

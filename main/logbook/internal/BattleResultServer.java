@@ -39,6 +39,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.swt.widgets.Display;
 
 import com.dyuproject.protostuff.LinkedBuffer;
 import com.dyuproject.protostuff.ProtostuffIOUtil;
@@ -69,10 +70,42 @@ public class BattleResultServer {
     }
 
     private static String logPath = null;
-    private static volatile BattleResultServer instance = null;
+    private static volatile BattleResultServer instance = new BattleResultServer();
+
+    private static List<Runnable> eventListeners = new ArrayList<>();
 
     public static void setLogPath(String path) {
         logPath = path;
+    }
+
+    public static void addListener(Runnable listener) {
+        eventListeners.add(listener);
+    }
+
+    public static void removeListener(Runnable listener) {
+        eventListeners.remove(listener);
+    }
+
+    private static void fireEvent() {
+        for (Runnable listener : eventListeners) {
+            listener.run();
+        }
+    }
+
+    public static void load() {
+        final BattleResultServer data = new BattleResultServer(logPath);
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                // 一時的にストアしてたのを処理する
+                for (BattleExDto dto : instance.tmpDat) {
+                    data.addNewResult(dto);
+                }
+                instance = data;
+                fireEvent();
+
+            }
+        });
     }
 
     public static void dispose() {
@@ -80,13 +113,6 @@ public class BattleResultServer {
     }
 
     public static BattleResultServer get() {
-        if (instance == null) {
-            synchronized (BattleResultServer.class) {
-                if (instance == null) {
-                    instance = new BattleResultServer(logPath);
-                }
-            }
-        }
         return instance;
     }
 
@@ -110,6 +136,9 @@ public class BattleResultServer {
     // キャッシュ
     private DataFile cachedFile;
     private List<BattleExDto> cachedResult;
+
+    // 一時ストア
+    private List<BattleExDto> tmpDat = null;
 
     private abstract class DataFile {
         final File file;
@@ -211,6 +240,14 @@ public class BattleResultServer {
         return result;
     }
 
+    private BattleResultServer() {
+        this.path = null;
+        this.firstBattleTime = new Date();
+        this.lastBattleTime = new Date();
+        // とりあえず貯める
+        this.tmpDat = new ArrayList<>();
+    }
+
     private BattleResultServer(String path) {
         this.path = path;
         // ファイルを読み込んで resultList を作成
@@ -281,6 +318,8 @@ public class BattleResultServer {
                         arg0.getBattleDate().getTime(), arg1.getBattleDate().getTime());
             }
         });
+
+        fireEvent();
     }
 
     private void update(BattleResultDto battle) {
@@ -306,25 +345,32 @@ public class BattleResultServer {
     public void addNewResult(BattleExDto dto) {
         // ファイルとリストに追加
         if (dto.isCompleteResult()) {
-            File file = new File(FilenameUtils.concat(this.path, format.format(dto.getBattleDate()) + ".dat"));
-            DataFile dataFile = this.fileMap.get(file.getAbsolutePath());
-            if (dataFile == null) {
-                dataFile = new NormalDataFile(file);
-                this.fileMap.put(dataFile.getPath(), dataFile);
+            if (this.tmpDat != null) {
+                this.tmpDat.add(dto);
+            }
+            else {
+                File file = new File(FilenameUtils.concat(this.path, format.format(dto.getBattleDate()) + ".dat"));
+                DataFile dataFile = this.fileMap.get(file.getAbsolutePath());
+                if (dataFile == null) {
+                    dataFile = new NormalDataFile(file);
+                    this.fileMap.put(dataFile.getPath(), dataFile);
+                }
+
+                BattleLogListener battleLogScript = BattleLogProxy.get();
+                BattleResult resultEntry = new BattleResult(dto, dataFile, dataFile.getNumRecords(),
+                        battleLogScript.body(dto));
+                this.update(resultEntry);
+                this.resultList.add(resultEntry);
+
+                dataFile.addToFile(dto);
+
+                // キャッシュされているときはキャッシュにも追加
+                if ((this.cachedFile != null) && (dataFile == this.cachedFile)) {
+                    this.cachedResult.add(dto);
+                }
             }
 
-            BattleLogListener battleLogScript = BattleLogProxy.get();
-            BattleResult resultEntry = new BattleResult(dto, dataFile, dataFile.getNumRecords(),
-                    battleLogScript.body(dto));
-            this.update(resultEntry);
-            this.resultList.add(resultEntry);
-
-            dataFile.addToFile(dto);
-
-            // キャッシュされているときはキャッシュにも追加
-            if ((this.cachedFile != null) && (dataFile == this.cachedFile)) {
-                this.cachedResult.add(dto);
-            }
+            fireEvent();
         }
     }
 

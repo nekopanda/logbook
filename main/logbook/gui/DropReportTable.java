@@ -20,6 +20,7 @@ import logbook.dto.BattleExDto;
 import logbook.dto.BattleResultDto;
 import logbook.gui.logic.BattleHtmlGenerator;
 import logbook.gui.logic.CreateReportLogic;
+import logbook.gui.logic.GuiUpdator;
 import logbook.gui.logic.TableItemCreator;
 import logbook.gui.logic.TableRowHeader;
 import logbook.internal.BattleResultFilter;
@@ -37,7 +38,9 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
@@ -131,6 +134,21 @@ public final class DropReportTable extends AbstractTableDialog {
         final MenuItem save = new MenuItem(this.tablemenu, SWT.NONE);
         save.setText("選択したログを保存する");
         save.addSelectionListener(new SaveAdapter());
+
+        // データの更新を受け取る
+        final Runnable listener = new GuiUpdator(new Runnable() {
+            @Override
+            public void run() {
+                DropReportTable.this.reloadTable();
+            }
+        });
+        BattleResultServer.addListener(listener);
+        this.shell.addListener(SWT.Dispose, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                BattleResultServer.removeListener(listener);
+            }
+        });
     }
 
     private BattleResultDto getItemFromIndex(int index) {
@@ -328,14 +346,8 @@ public final class DropReportTable extends AbstractTableDialog {
     /**
      * 更新する必要のあるデータ
      */
-    @SuppressWarnings("incomplete-switch")
     @Override
     public void update(DataType type, Data data) {
-        switch (type) {
-        case BATTLE_RESULT:
-        case COMBINED_BATTLE_RESULT:
-        case PRACTICE_BATTLE_RESULT:
-            this.needsUpdate = true;
-        }
+        // BattleResultServerから直接更新を受け取るので何もしない
     }
 }

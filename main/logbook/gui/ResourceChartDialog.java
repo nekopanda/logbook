@@ -152,8 +152,8 @@ public final class ResourceChartDialog extends WindowBase {
 
         // 更新タイマー
         this.timer = new Timer(true);
-        // 3分毎に再読み込みするようにスケジュールする
-        this.timer.schedule(new CyclicReloadTask(), 0, TimeUnit.MINUTES.toMillis(3));
+        // 10分毎に再読み込みするようにスケジュールする
+        this.timer.schedule(new CyclicReloadTask(), 0, TimeUnit.MINUTES.toMillis(10));
     }
 
     /**

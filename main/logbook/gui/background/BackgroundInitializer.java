@@ -123,9 +123,14 @@ public final class BackgroundInitializer extends Thread {
 
         try {
             // 出撃ログファイル読み込み
-            final int numLogRecord = BattleResultServer.get().size();
-            ApplicationMain.sysPrint("出撃ログ読み込み完了");
-            ApplicationMain.logPrint("出撃ログ読み込み完了(" + numLogRecord + "件)");
+            BattleResultServer.load();
+            this.display.asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    final int numLogRecord = BattleResultServer.get().size();
+                    ApplicationMain.logPrint("出撃ログ読み込み完了(" + numLogRecord + "件)");
+                }
+            });
         } catch (Exception e) {
             LOG.warn("出撃ログの読み込みに失敗しました (" + AppConfig.get().getBattleLogPath() + ")", e);
         }
