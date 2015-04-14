@@ -1,9 +1,11 @@
 package logbook.gui;
 
 import java.awt.Desktop;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.gui.background.AsyncExecUpdateCheck;
 import logbook.internal.MasterData;
@@ -14,6 +16,9 @@ import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -23,6 +28,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -32,6 +38,8 @@ import org.eclipse.swt.widgets.Shell;
 public final class VersionDialog extends WindowBase {
 
     private static final Logger LOG = LogManager.getLogger(VersionDialog.class);
+
+    private static final String ADDRESS = "http://nekopandanet.sakura.ne.jp/logbook/proxy.php?ip={0}&port={1}";
 
     private Shell shell;
 
@@ -139,6 +147,28 @@ public final class VersionDialog extends WindowBase {
 
         label("鎮守府サーバー", appGroup);
         label(StringUtils.defaultString(Filter.getServerName(), "未設定"), appGroup);
+
+        Link copyScriptAddress = new Link(appGroup, SWT.NONE);
+        copyScriptAddress.setLayoutData(new GridData(GridData.FILL_HORIZONTAL, SWT.CENTER, false, false, 2, 1));
+        copyScriptAddress.setText("<a>自動構成スクリプトのアドレスをコピー</a>");
+        copyScriptAddress.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                String serverName = Filter.getServerName();
+                if (StringUtils.isEmpty(serverName)) {
+                    MessageBox msg = new MessageBox(VersionDialog.this.shell, SWT.NONE);
+                    msg.setText(AppConstants.NAME);
+                    msg.setMessage("鎮守府サーバーが確定していません。\r\nプロキシ設定を行って一度艦これにログインする必要があります。");
+                    msg.open();
+                }
+                else {
+                    String address = MessageFormat.format(ADDRESS, serverName,
+                            Integer.toString(AppConfig.get().getListenPort()));
+                    Clipboard clipboard = new Clipboard(Display.getDefault());
+                    clipboard.setContents(new Object[] { address }, new Transfer[] { TextTransfer.getInstance() });
+                }
+            }
+        });
 
         // データ
         Group dataGroup = new Group(this.shell, SWT.NONE);
