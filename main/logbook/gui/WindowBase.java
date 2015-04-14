@@ -505,8 +505,10 @@ public class WindowBase {
 
     protected void createMenubar() {
         if (this.noMenubar) {
-            // セパレータだけ追加しておく
-            new MenuItem(this.popupmenu, SWT.SEPARATOR);
+            if (!this.disableWindowMenu) {
+                // ウィンドウメニューがあるときはセパレータだけ追加しておく
+                new MenuItem(this.popupmenu, SWT.SEPARATOR);
+            }
             return;
         }
         if (this.menubar == null) {

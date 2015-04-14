@@ -43,10 +43,11 @@ public final class ReverseProxyServlet extends ProxyServlet {
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
             IOException {
-        if (AppConfig.get().isAllowOnlyFromLocalhost()
-                && !InetAddress.getByName(request.getRemoteAddr()).isLoopbackAddress()) {
-            response.setStatus(400);
-            return;
+        if (AppConfig.get().isAllowOnlyFromLocalhost() && !AppConfig.get().isCloseOutsidePort()) {
+            if (!InetAddress.getByName(request.getRemoteAddr()).isLoopbackAddress()) {
+                response.setStatus(400);
+                return;
+            }
         }
         super.service(request, response);
     }

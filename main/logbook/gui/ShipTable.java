@@ -232,7 +232,9 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
     private void switchSpecDiff(MenuItem source) {
         this.specdiff = source.getSelection();
         this.switchdiff.setSelection(this.specdiff);
-        this.switchdiff2.setSelection(this.specdiff);
+        if (this.switchdiff2 != null) {
+            this.switchdiff2.setSelection(this.specdiff);
+        }
         this.reloadTable();
     }
 
