@@ -916,34 +916,36 @@ public class FleetComposite extends Composite {
             AkashiTimer.RepairState repairState = TimerContext.get().getAkashiRepairState(this.dockIndex);
             if (repairState.isRepairing()) {
                 AkashiTimer.ShipState state = repairState.get().get(this.dockPosition);
-                if (now.before(state.getFinish())) {
-                    String reststr = TimeLogic.toDateRestString(TimeLogic.getRest(now, state.getFinish()), true);
-                    String nextstr = TimeLogic.toDateRestString(state.getNext() / 1000, true);
-                    boolean showRemain;
-                    switch (AppConfig.get().getAkashiTimerFormat()) {
-                    case 1:
-                        showRemain = false;
-                        break;
-                    case 2:
-                        showRemain = ((this.showCount++ / 4) % 2) == 0;
-                        break;
-                    default:
-                        showRemain = true;
-                        break;
-                    }
-                    if (showRemain) {
-                        str = "修理あと" + reststr;
+                if (state != null) {
+                    if (now.before(state.getFinish())) {
+                        String reststr = TimeLogic.toDateRestString(TimeLogic.getRest(now, state.getFinish()), true);
+                        String nextstr = TimeLogic.toDateRestString(state.getNext() / 1000, true);
+                        boolean showRemain;
+                        switch (AppConfig.get().getAkashiTimerFormat()) {
+                        case 1:
+                            showRemain = false;
+                            break;
+                        case 2:
+                            showRemain = ((this.showCount++ / 4) % 2) == 0;
+                            break;
+                        default:
+                            showRemain = true;
+                            break;
+                        }
+                        if (showRemain) {
+                            str = "修理あと" + reststr;
+                        }
+                        else {
+                            str = "次回復まで" + nextstr;
+                        }
+                        tip = "現在までに+" + state.getCurrentGain() + "回復\n" +
+                                "次の回復まで" + nextstr + "\n" +
+                                "全回復まで" + reststr +
+                                "(" + format.format(state.getFinish()) + ")";
                     }
                     else {
-                        str = "次回復まで" + nextstr;
+                        str = "修理まもなく完了";
                     }
-                    tip = "現在までに+" + state.getCurrentGain() + "回復\n" +
-                            "次の回復まで" + nextstr + "\n" +
-                            "全回復まで" + reststr +
-                            "(" + format.format(state.getFinish()) + ")";
-                }
-                else {
-                    str = "修理まもなく完了";
                 }
             }
 
