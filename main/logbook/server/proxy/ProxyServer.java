@@ -51,6 +51,7 @@ public final class ProxyServer {
             // httpはこっちのハンドラでプロキシ
             ServletContextHandler context = new ServletContextHandler(proxy, "/", ServletContextHandler.SESSIONS);
             ServletHolder proxyServlet = new ServletHolder(new ReverseProxyServlet());
+            proxyServlet.setInitParameter("timeout", "600000");
             context.addServlet(proxyServlet, "/*");
 
             server.start();
