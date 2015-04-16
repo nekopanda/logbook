@@ -1917,6 +1917,14 @@ public final class GlobalContext {
         }
         // 修理が終わったことにより疲労度が変わっているので
         condTiming.ignoreNext();
+        // 次アップデート
+        String fleetid = ship.getFleetid();
+        if (fleetid != null) {
+            DockDto dockdto = dock.get(fleetid);
+            if (dockdto != null) {
+                dockdto.setUpdate(true);
+            }
+        }
     }
 
     /**
