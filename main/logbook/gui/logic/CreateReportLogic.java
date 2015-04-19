@@ -357,11 +357,13 @@ public final class CreateReportLogic {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
         ItemInfoListener script = ItemInfoProxy.get();
         int count = 0;
+        script.begin();
         for (ItemInfo itemInfo : countitems) {
             body.add(ArrayUtils.addAll(new Comparable[] {
                     new TableRowHeader(++count, itemInfo) },
                     script.body(itemInfo)));
         }
+        script.end();
         return body;
     }
 
@@ -509,6 +511,7 @@ public final class CreateReportLogic {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
 
         QuestListener script = QuestProxy.get();
+        script.begin();
         for (QuestDto quest : GlobalContext.getQuest()) {
             if (quest == null)
                 continue;
@@ -517,6 +520,7 @@ public final class CreateReportLogic {
                     new TableRowHeader(quest.getNo(), quest)
             }, script.body(quest)));
         }
+        script.end();
         return body;
     }
 
