@@ -8,6 +8,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -27,7 +30,22 @@ public class ScriptData {
     /** ロガー */
     private static final Logger LOG = LogManager.getLogger("script");
 
-    private static Map<String, Object> dataMap = new HashMap<>();
+    private static class DataObject implements Serializable {
+        private static final long serialVersionUID = -115021202763582793L;
+        public Date lastAccessed = null;
+        public Object data;
+
+        public DataObject(Object data) {
+            this.data = data;
+        }
+
+        @Override
+        public String toString() {
+            return this.data.toString();
+        }
+    }
+
+    private static Map<String, DataObject> dataMap = new HashMap<>();
 
     private static boolean modified = false;
 
@@ -35,6 +53,8 @@ public class ScriptData {
     static {
         try {
             load();
+            // 60日間アクセスがないデータを削除
+            cleanup(60);
         } catch (IOException e) {
             LOG.warn("スクリプトデータ読み込みに失敗しました", e);
         }
@@ -49,7 +69,15 @@ public class ScriptData {
      * @param value データ
      */
     public static void setData(String key, Object value) {
-        dataMap.put(key, value);
+        DataObject data = dataMap.get(key);
+        // lastAccessedはstore()で書き込まれる
+        if (data != null) {
+            data.data = value;
+            data.lastAccessed = null;
+        }
+        else {
+            dataMap.put(key, new DataObject(value));
+        }
         modified = true;
     }
 
@@ -59,7 +87,12 @@ public class ScriptData {
      * @return データ
      */
     public static Object getData(String key) {
-        return dataMap.get(key);
+        DataObject data = dataMap.get(key);
+        if (data == null) {
+            return null;
+        }
+        data.lastAccessed = null;
+        return data.data;
     }
 
     /**
@@ -71,15 +104,20 @@ public class ScriptData {
         if (!modified) {
             return;
         }
+        Date time = new Date();
         try (ZipOutputStream zos = new ZipOutputStream(
                 new FileOutputStream(AppConstants.SCRIPT_DATA_FILE)))
         {
-            for (Map.Entry<String, Object> entry : dataMap.entrySet()) {
+            for (Map.Entry<String, DataObject> entry : dataMap.entrySet()) {
+                DataObject data = entry.getValue();
+                if (data.lastAccessed == null) {
+                    data.lastAccessed = time;
+                }
                 try {
                     ZipEntry zipentry = new ZipEntry(entry.getKey());
                     zos.putNextEntry(zipentry);
                     ObjectOutputStream oos = new ObjectOutputStream(zos);
-                    oos.writeObject(entry.getValue());
+                    oos.writeObject(data);
                     oos.flush();
                 } catch (IOException e) {
                     LOG.warn("データの保存に失敗", e);
@@ -95,20 +133,50 @@ public class ScriptData {
      * @throws IOException
      */
     public static void load() throws IOException {
-        //
-        try (ZipInputStream zis = new ZipInputStream(
-                new FileInputStream(AppConstants.SCRIPT_DATA_FILE)))
-        {
-            for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
-                try {
-                    String key = entry.getName();
-                    dataMap.put(key, new ObjectInputStream(zis).readObject());
-                } catch (ClassNotFoundException e) {
-                    LOG.warn("データの読み込みに失敗", e);
-                } catch (IOException e) {
-                    LOG.warn("データの読み込みに失敗", e);
+        if (AppConstants.SCRIPT_DATA_FILE.exists()) {
+            try (ZipInputStream zis = new ZipInputStream(
+                    new FileInputStream(AppConstants.SCRIPT_DATA_FILE)))
+            {
+                for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
+                    try {
+                        String key = entry.getName();
+                        DataObject data = (DataObject) (new ObjectInputStream(zis).readObject());
+                        dataMap.put(key, data);
+                    } catch (ClassNotFoundException | ClassCastException e) {
+                        LOG.warn("データの読み込みに失敗", e);
+                    } catch (IOException e) {
+                        LOG.warn("データの読み込みに失敗", e);
+                    }
                 }
             }
         }
+    }
+
+    /**
+     * 記憶しているデータ数
+     * @return
+     */
+    public static int size() {
+        return dataMap.size();
+    }
+
+    /**
+     * （システム用です。スクリプトから呼び出す必要はありません。）
+     * daysBefore日前以前のデータを削除
+     * @param daysBefore
+     */
+    public static void cleanup(int daysBefore) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.DATE, -daysBefore);
+        Date time = calendar.getTime();
+        Map<String, DataObject> newDataMap = new HashMap<>();
+        for (Map.Entry<String, DataObject> entry : dataMap.entrySet()) {
+            Date lastAccessed = entry.getValue().lastAccessed;
+            if ((lastAccessed == null) || lastAccessed.after(time)) {
+                newDataMap.put(entry.getKey(), entry.getValue());
+            }
+        }
+        dataMap = newDataMap;
     }
 }

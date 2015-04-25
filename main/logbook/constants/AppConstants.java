@@ -195,6 +195,9 @@ public class AppConstants {
     /** 敵データファイル  */
     public static final File ENEMY_DATA_FILE = new File("./config/KCRDB-enemyid.csv");
 
+    /** スクリプトデータファイル  */
+    public static final File SCRIPT_DATA_FILE = new File("./config/scriptdata.zip");
+
     /** 出撃ログ表示用CSSファイル */
     public static final File BATTLE_LOG_CSS_FILE = new File("./templates/battle-log.css");
 
