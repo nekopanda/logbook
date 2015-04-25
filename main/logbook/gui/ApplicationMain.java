@@ -42,6 +42,7 @@ import logbook.internal.EnemyData;
 import logbook.internal.Item;
 import logbook.internal.MasterData;
 import logbook.internal.Ship;
+import logbook.scripting.ScriptData;
 import logbook.server.proxy.DatabaseClient;
 import logbook.server.proxy.ProxyServer;
 import logbook.thread.ThreadManager;
@@ -146,6 +147,7 @@ public final class ApplicationMain extends WindowBase {
                 ItemConfig.store();
                 MasterData.store();
                 EnemyData.store();
+                ScriptData.store();
             } catch (Exception e) {
                 LOG.fatal("シャットダウンスレッドで異常終了しました", e);
             }
