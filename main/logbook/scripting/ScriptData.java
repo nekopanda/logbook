@@ -3,6 +3,8 @@
  */
 package logbook.scripting;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -34,9 +36,11 @@ public class ScriptData {
         private static final long serialVersionUID = -115021202763582793L;
         public Date lastAccessed = null;
         public Object data;
+        public transient boolean persist;
 
-        public DataObject(Object data) {
+        public DataObject(Object data, boolean persist) {
             this.data = data;
+            this.persist = persist;
         }
 
         @Override
@@ -69,16 +73,23 @@ public class ScriptData {
      * @param value データ
      */
     public static void setData(String key, Object value) {
+        setData(key, value, true);
+    }
+
+    public static void setData(String key, Object value, boolean persist) {
         DataObject data = dataMap.get(key);
         // lastAccessedはstore()で書き込まれる
         if (data != null) {
             data.data = value;
             data.lastAccessed = null;
+            data.persist = persist;
         }
         else {
-            dataMap.put(key, new DataObject(value));
+            dataMap.put(key, new DataObject(value, persist));
         }
-        modified = true;
+        if (persist) {
+            modified = true;
+        }
     }
 
     /**
@@ -106,10 +117,13 @@ public class ScriptData {
         }
         Date time = new Date();
         try (ZipOutputStream zos = new ZipOutputStream(
-                new FileOutputStream(AppConstants.SCRIPT_DATA_FILE)))
+                new BufferedOutputStream(new FileOutputStream(AppConstants.SCRIPT_DATA_FILE))))
         {
             for (Map.Entry<String, DataObject> entry : dataMap.entrySet()) {
                 DataObject data = entry.getValue();
+                if (data.persist == false) {
+                    continue;
+                }
                 if (data.lastAccessed == null) {
                     data.lastAccessed = time;
                 }
@@ -135,12 +149,13 @@ public class ScriptData {
     public static void load() throws IOException {
         if (AppConstants.SCRIPT_DATA_FILE.exists()) {
             try (ZipInputStream zis = new ZipInputStream(
-                    new FileInputStream(AppConstants.SCRIPT_DATA_FILE)))
+                    new BufferedInputStream(new FileInputStream(AppConstants.SCRIPT_DATA_FILE))))
             {
                 for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
                     try {
                         String key = entry.getName();
                         DataObject data = (DataObject) (new ObjectInputStream(zis).readObject());
+                        data.persist = true;
                         dataMap.put(key, data);
                     } catch (ClassNotFoundException | ClassCastException e) {
                         LOG.warn("データの読み込みに失敗", e);
@@ -170,13 +185,12 @@ public class ScriptData {
         calendar.setTime(new Date());
         calendar.add(Calendar.DATE, -daysBefore);
         Date time = calendar.getTime();
-        Map<String, DataObject> newDataMap = new HashMap<>();
         for (Map.Entry<String, DataObject> entry : dataMap.entrySet()) {
             Date lastAccessed = entry.getValue().lastAccessed;
-            if ((lastAccessed == null) || lastAccessed.after(time)) {
-                newDataMap.put(entry.getKey(), entry.getValue());
+            if ((lastAccessed != null) && lastAccessed.before(time)) {
+                // 終了時までアクセスされなかったら保存されない
+                entry.getValue().persist = false;
             }
         }
-        dataMap = newDataMap;
     }
 }

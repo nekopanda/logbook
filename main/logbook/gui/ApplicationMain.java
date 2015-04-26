@@ -1,6 +1,7 @@
 package logbook.gui;
 
 import java.awt.Desktop;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -617,7 +618,7 @@ public final class ApplicationMain extends WindowBase {
                     try {
                         File file = new File("itemInfo.csv");
                         OutputStreamWriter fw = new OutputStreamWriter(
-                                new FileOutputStream(file), AppConstants.CHARSET);
+                                new BufferedOutputStream(new FileOutputStream(file)), AppConstants.CHARSET);
                         Item.dumpCSV(fw);
                         fw.close();
                         SwtUtils.messageDialog("以下のファイルに書き込みました\n" + file.getAbsolutePath(),
@@ -635,7 +636,7 @@ public final class ApplicationMain extends WindowBase {
                     try {
                         File file = new File("shipInfo.csv");
                         OutputStreamWriter fw = new OutputStreamWriter(
-                                new FileOutputStream(file), AppConstants.CHARSET);
+                                new BufferedOutputStream(new FileOutputStream(file)), AppConstants.CHARSET);
                         Ship.dumpCSV(fw);
                         fw.close();
                         SwtUtils.messageDialog("以下のファイルに書き込みました\n" + file.getAbsolutePath(),

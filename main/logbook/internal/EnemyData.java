@@ -3,6 +3,7 @@
  */
 package logbook.internal;
 
+import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -116,23 +117,23 @@ public class EnemyData {
     public static void store() throws IOException {
         // 変更があったときだけ書き込む
         if (modified) {
-            CSVWriter writer = new CSVWriter(new OutputStreamWriter(
-                    new FileOutputStream(AppConstants.ENEMY_DATA_FILE), AppConstants.CHARSET));
-            List<String> flatten = new ArrayList<String>();
-            for (Entry<Integer, EnemyData> e : ENEMY.entrySet()) {
-                EnemyData data = e.getValue();
-                flatten.add(String.valueOf(data.getEnemyId()));
-                for (String s : data.getEnemyShips()) {
-                    flatten.add(s);
+            try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(new BufferedOutputStream(
+                    new FileOutputStream(AppConstants.ENEMY_DATA_FILE)), AppConstants.CHARSET))) {
+                List<String> flatten = new ArrayList<String>();
+                for (Entry<Integer, EnemyData> e : ENEMY.entrySet()) {
+                    EnemyData data = e.getValue();
+                    flatten.add(String.valueOf(data.getEnemyId()));
+                    for (String s : data.getEnemyShips()) {
+                        flatten.add(s);
+                    }
+                    flatten.add(data.getFormation());
+                    if (data.getEnemyName() != null) {
+                        flatten.add(data.getEnemyName());
+                    }
+                    writer.writeNext(flatten.toArray(new String[flatten.size()]));
+                    flatten.clear();
                 }
-                flatten.add(data.getFormation());
-                if (data.getEnemyName() != null) {
-                    flatten.add(data.getEnemyName());
-                }
-                writer.writeNext(flatten.toArray(new String[flatten.size()]));
-                flatten.clear();
             }
-            writer.close();
             ApplicationMain.sysPrint("Enemyファイル更新");
             modified = false;
         }
