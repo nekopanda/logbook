@@ -65,10 +65,9 @@ public class ScriptData {
     }
 
     /**
-     * 指定されたキーでデータを保存
-     * スクリプトのオブジェクト（連想配列や配列など）はシリアライズできないため保存できません。
-     * オブジェクトはJSON.stringify()であらかじめシリアライズしておいてください。
-     * （復元はJSON.parse()でできます）
+     * 指定されたキーでデータを格納
+     * 
+     * setData(key, value, true)と同じです
      * @param key データのキー
      * @param value データ
      */
@@ -76,6 +75,17 @@ public class ScriptData {
         setData(key, value, true);
     }
 
+    /**
+     * 指定されたキーでデータを格納
+     * 
+     * データを保存する場合は、はシリアライズ可能でなければなりません。
+     * スクリプトのオブジェクト（連想配列や配列など）はシリアライズできないため保存できません。
+     * オブジェクトを保存したい場合はJSON.stringify()であらかじめシリアライズしておいてください。
+     * （復元はJSON.parse()でできます）
+     * @param key データのキー
+     * @param value データ
+     * @param persist データを保存するかどうか
+     */
     public static void setData(String key, Object value, boolean persist) {
         DataObject data = dataMap.get(key);
         // lastAccessedはstore()で書き込まれる
