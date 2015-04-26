@@ -16,3 +16,14 @@ function toComparable(raw) {
 	}
 	return ret;
 }
+
+// メッセージボックス表示
+function alert(str) {
+	SWT = Java.type("org.eclipse.swt.SWT");
+	MessageBox = Java.type("org.eclipse.swt.widgets.MessageBox");
+	Display = Java.type("org.eclipse.swt.widgets.Display");
+	var shell = Display.getDefault().getActiveShell();
+	var box = new MessageBox(shell,SWT.OK);
+	box.setMessage(String(str));
+	box.open();
+}
