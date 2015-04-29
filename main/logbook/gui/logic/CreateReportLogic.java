@@ -390,7 +390,7 @@ public final class CreateReportLogic {
         Set<Integer> missionSet = GlobalContext.getMissionShipSet();
         List<Comparable[]> body = new ArrayList<Comparable[]>();
         ShipItemListener script = ShipItemProxy.get();
-        script.begin(specdiff);
+        script.begin(specdiff, filter);
         int count = 0;
         for (ShipDto ship : GlobalContext.getShipMap().values()) {
             if ((filter != null) && !shipFilter(ship, filter, missionSet)) {

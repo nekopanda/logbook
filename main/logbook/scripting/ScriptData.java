@@ -144,7 +144,7 @@ public class ScriptData {
                     oos.writeObject(data);
                     oos.flush();
                 } catch (IOException e) {
-                    LOG.warn("データの保存に失敗", e);
+                    LOG.warn("データの保存に失敗(" + entry.getKey() + ")", e);
                 }
             }
             modified = false;
@@ -162,15 +162,15 @@ public class ScriptData {
                     new BufferedInputStream(new FileInputStream(AppConstants.SCRIPT_DATA_FILE))))
             {
                 for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
+                    String key = entry.getName();
                     try {
-                        String key = entry.getName();
                         DataObject data = (DataObject) (new ObjectInputStream(zis).readObject());
                         data.persist = true;
                         dataMap.put(key, data);
                     } catch (ClassNotFoundException | ClassCastException e) {
-                        LOG.warn("データの読み込みに失敗", e);
+                        LOG.warn("データの読み込みに失敗(" + key + ")", e);
                     } catch (IOException e) {
-                        LOG.warn("データの読み込みに失敗", e);
+                        LOG.warn("データの読み込みに失敗(" + key + ")", e);
                     }
                 }
             }

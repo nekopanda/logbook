@@ -5,6 +5,7 @@ package logbook.scripting;
 
 import logbook.constants.AppConstants;
 import logbook.dto.ShipDto;
+import logbook.dto.ShipFilterDto;
 import logbook.scripting.ScriptLoader.MethodInvoke;
 import logbook.scripting.ScriptLoader.TableScriptCollection;
 
@@ -40,11 +41,11 @@ public class ShipItemProxy implements ShipItemListener {
     }
 
     @Override
-    public void begin(final boolean specdiff) {
+    public void begin(final boolean specdiff, final ShipFilterDto filter) {
         this.script.invoke(new MethodInvoke() {
             @Override
             public Object invoke(Object arg) {
-                ((ShipItemListener) arg).begin(specdiff);
+                ((ShipItemListener) arg).begin(specdiff, filter);
                 return null;
             }
         });

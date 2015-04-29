@@ -4,6 +4,7 @@
 package logbook.scripting;
 
 import logbook.dto.ShipDto;
+import logbook.dto.ShipFilterDto;
 
 /**
  * 艦娘一覧のカラム拡張スクリプトが実装すべきインターフェース
@@ -13,8 +14,9 @@ public interface ShipItemListener extends TableScriptListener {
     /**
      * 艦娘一覧の内容更新開始時にbody()が呼ばれる前に呼び出されます。
      * @param specdiff 「成長の余地を表示」が選択されているか
+     * @param filter フィルター
      */
-    public void begin(boolean specdiff);
+    public void begin(boolean specdiff, ShipFilterDto filter);
 
     /**
      * 艦娘データに対する拡張表示内容を返します
