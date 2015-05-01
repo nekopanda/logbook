@@ -24,6 +24,7 @@ import logbook.constants.AppConstants;
 import logbook.dto.chart.Resource;
 import logbook.dto.chart.ResourceLog;
 import logbook.dto.chart.ResourceLog.SortableLog;
+import logbook.gui.logic.ColorManager;
 import logbook.gui.logic.ResourceChart;
 import logbook.gui.logic.ResourceChart.ActiveLevel;
 import logbook.gui.logic.TableItemCreator;
@@ -67,7 +68,6 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
  * 資材チャートのダイアログ
@@ -284,7 +284,7 @@ public final class ResourceChartDialog extends WindowBase {
             Image image = new Image(check.getDisplay(), new Rectangle(0, 0, textExtent.x, textExtent.y));
             GC gcImage = new GC(image);
             gcImage.setBackground(check.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-            gcImage.setForeground(SWTResourceManager.getColor(colors[i]));
+            gcImage.setForeground(ColorManager.getColor(colors[i]));
             gcImage.drawText(text, 0, 0);
             gcImage.dispose();
             check.setImage(image);

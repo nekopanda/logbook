@@ -1,5 +1,7 @@
 package logbook.gui;
 
+import logbook.gui.logic.ColorManager;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -107,8 +109,8 @@ public final class FullScreenDialog extends Dialog {
         private final Image image;
         private final Display monitor;
 
-        private final Color white = SWTResourceManager.getColor(new RGB(255, 255, 255));
-        private final Color black = SWTResourceManager.getColor(new RGB(0, 0, 0));
+        private final Color white = ColorManager.getColor(new RGB(255, 255, 255));
+        private final Color black = ColorManager.getColor(new RGB(0, 0, 0));
         private final Font normalfont;
         private final Font largefont;
 

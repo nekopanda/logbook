@@ -18,9 +18,11 @@ import logbook.data.context.TimerContext;
 import logbook.dto.BasicInfoDto;
 import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
+import logbook.dto.ItemInfoDto;
 import logbook.dto.NdockDto;
 import logbook.dto.ShipDto;
 import logbook.gui.ApplicationMain;
+import logbook.gui.logic.ColorManager;
 import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.PushNotify;
 import logbook.gui.logic.Sound;
@@ -332,24 +334,24 @@ public final class AsyncExecApplicationMain extends Thread {
         private static Color getBackgroundColor(long rest) {
             // 20分前、10分前、5分前になったら背景色を変更する
             if (rest <= (ONE_MINUTES * 5)) {
-                return SWTResourceManager
+                return ColorManager
                         .getColor(AppConstants.TIME_IN_5_MIN);
             } else if (rest <= (ONE_MINUTES * 10)) {
-                return SWTResourceManager
+                return ColorManager
                         .getColor(AppConstants.TIME_IN_10_MIN);
             } else if (rest <= (ONE_MINUTES * 20)) {
-                return SWTResourceManager
+                return ColorManager
                         .getColor(AppConstants.TIME_IN_20_MIN);
             }
-            return SWTResourceManager.getColor(SWT.COLOR_WHITE);
+            return ColorManager.getColor(SWT.COLOR_WHITE);
         }
 
         private static Color getCondBackgroundColor(long rest) {
             if (rest <= (ONE_MINUTES * 3)) {
-                return SWTResourceManager
+                return ColorManager
                         .getColor(AppConstants.COND_IN_3_MIN);
             }
-            return SWTResourceManager.getColor(AppConstants.COND_WAITING);
+            return ColorManager.getColor(AppConstants.COND_WAITING);
         }
 
         private void updateNoticeDeck(String dispname, int index, long rest) {
@@ -492,7 +494,7 @@ public final class AsyncExecApplicationMain extends Thread {
                             // 泊地修理中
                             dispname = dockName + " (泊地修理中)";
                             time = TimeLogic.toDateRestString(repairState.getElapsed() / 1000, true);
-                            backColor = SWTResourceManager.getColor(AppConstants.AKASHI_REPAIR_COLOR);
+                            backColor = ColorManager.getColor(AppConstants.AKASHI_REPAIR_COLOR);
 
                             // ツールチップで詳細表示
                             for (AkashiTimer.ShipState state : repairState.get()) {
@@ -687,6 +689,42 @@ public final class AsyncExecApplicationMain extends Thread {
             this.main = main;
         }
 
+        /**
+         * 艦隊が出撃中で大破した場合に警告を行います
+         */
+        private void postFatal(List<ShipDto> badlyDamaged) {
+            if (badlyDamaged.size() > 0) {
+                if (AppConfig.get().isBalloonBybadlyDamage()) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(AppConstants.MESSAGE_STOP_SORTIE);
+                    sb.append("\n");
+                    for (ShipDto shipDto : badlyDamaged) {
+                        sb.append(shipDto.getName());
+                        sb.append("(" + shipDto.getLv() + ")");
+                        sb.append(" : ");
+                        List<ItemInfoDto> items = shipDto.getItem();
+                        List<String> names = new ArrayList<String>();
+                        for (ItemInfoDto itemDto : items) {
+                            if (itemDto != null) {
+                                names.add(itemDto.getName());
+                            }
+                        }
+                        sb.append(StringUtils.join(names, ","));
+                        sb.append("\n");
+                    }
+                    ToolTip tip = new ToolTip(this.main.getShell(), SWT.BALLOON
+                            | SWT.ICON_ERROR);
+                    tip.setText("大破警告");
+                    tip.setMessage(sb.toString());
+
+                    this.main.getTrayItem().setToolTip(tip);
+                    tip.setVisible(true);
+                }
+                // 大破時にサウンドを再生する
+                Sound.randomBadlySoundPlay();
+            }
+        }
+
         @Override
         public void run() {
             if (this.main.getShell().isDisposed()) {
@@ -706,6 +744,8 @@ public final class AsyncExecApplicationMain extends Thread {
                         GlobalContext.getDock("1").isBadlyDamaged() ||
                                 GlobalContext.getDock("2").isBadlyDamaged();
             }
+
+            List<ShipDto> badlyDamaged = new ArrayList<>();
 
             for (int i = 0; i < 4; i++) {
                 DockDto dock = GlobalContext.getDock(Integer.toString(i + 1));
@@ -729,11 +769,13 @@ public final class AsyncExecApplicationMain extends Thread {
                         dockname[i] = dock.getName();
                     }
 
-                    tabComposite.updateFleet(dock, (i < 2) ? combinedFleetBadlyDamaed : false);
+                    tabComposite.updateFleet(dock, (i < 2) ? combinedFleetBadlyDamaed : false, badlyDamaged);
                     tabItem.setText(dock.getName());
                     dock.setUpdate(false);
                 }
             }
+
+            this.postFatal(badlyDamaged);
         }
     }
 }

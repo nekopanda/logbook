@@ -342,17 +342,11 @@ public final class CalcExpDialog extends WindowBase {
      * @param combo
      */
     private void setShipComboData() {
-        // 選択していた艦娘を取得
+        // 秘書艦を選択する
         int select = 0;
-        if (this.shipcombo.getSelectionIndex() >= 0) {
-            ShipDto ship = this.shipmap.get(this.shipcombo.getItem(this.shipcombo.getSelectionIndex()));
-            select = ship.getId();
-        } else {
-            // 誰も選択されてない状態の場合は秘書艦を選択する
-            ShipDto ship = GlobalContext.getSecretary();
-            if (ship != null) {
-                select = ship.getId();
-            }
+        ShipDto secretary = GlobalContext.getSecretary();
+        if (secretary != null) {
+            select = secretary.getId();
         }
         // コンボボックスから全ての艦娘を削除
         this.shipcombo.removeAll();

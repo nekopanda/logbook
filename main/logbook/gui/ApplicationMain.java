@@ -34,6 +34,7 @@ import logbook.gui.listener.HelpEventListener;
 import logbook.gui.listener.MainShellAdapter;
 import logbook.gui.listener.TrayItemMenuListener;
 import logbook.gui.listener.TraySelectionListener;
+import logbook.gui.logic.ColorManager;
 import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.PushNotify;
 import logbook.gui.logic.Sound;
@@ -873,7 +874,7 @@ public final class ApplicationMain extends WindowBase {
         this.errorLabel = new Label(this.mainComposite, SWT.NONE);
         this.errorLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         this.errorLabel.setAlignment(SWT.CENTER);
-        this.errorLabel.setBackground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
+        this.errorLabel.setBackground(ColorManager.getColor(AppConstants.COND_RED_COLOR));
         this.errorLabel.setText("エラー表示");
         LayoutLogic.hide(this.errorLabel, true);
         this.errorLabel.setVisible(false);

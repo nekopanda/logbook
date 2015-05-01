@@ -17,8 +17,8 @@ import logbook.dto.DockDto;
 import logbook.dto.ItemInfoDto;
 import logbook.dto.ShipDto;
 import logbook.gui.ApplicationMain;
+import logbook.gui.logic.ColorManager;
 import logbook.gui.logic.SakutekiString;
-import logbook.gui.logic.Sound;
 import logbook.gui.logic.TimeLogic;
 import logbook.gui.logic.TimeString;
 import logbook.internal.AkashiTimer;
@@ -28,7 +28,6 @@ import logbook.internal.SeaExp;
 import logbook.util.CalcExpUtils;
 import logbook.util.SwtUtils;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
@@ -44,7 +43,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.ToolTip;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
@@ -262,7 +260,7 @@ public class FleetComposite extends Composite {
      * @param dock
      * @param combinedFleetBadlyDamaed 連合艦隊の他の艦隊の艦が大破している
      */
-    public void updateFleet(DockDto dock, boolean combinedFleetBadlyDamaed) {
+    public void updateFleet(DockDto dock, boolean combinedFleetBadlyDamaed, List<ShipDto> badlyDamaged) {
         if ((this.dock == dock) && !this.dock.isUpdate()) {
             // 時間表示だけ更新
             for (Runnable update : this.updators) {
@@ -348,7 +346,7 @@ public class FleetComposite extends Composite {
             boolean isEscaped = ((escaped != null) && escaped[i]);
             if (isEscaped) {
                 this.hpmsgLabels[i].setText("退避");
-                this.hpmsgLabels[i].setBackground(SWTResourceManager.getColor(AppConstants.ESCAPED_SHIP_COLOR));
+                this.hpmsgLabels[i].setBackground(ColorManager.getColor(AppConstants.ESCAPED_SHIP_COLOR));
                 this.hpmsgLabels[i].setForeground(null);
             }
             else if (ship.isBadlyDamage()) {
@@ -364,9 +362,12 @@ public class FleetComposite extends Composite {
                 }
                 else {
                     this.hpmsgLabels[i].setText("大破");
+                    if (isSortie) {
+                        badlyDamaged.add(ship);
+                    }
                 }
-                this.hpmsgLabels[i].setBackground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
-                this.hpmsgLabels[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+                this.hpmsgLabels[i].setBackground(ColorManager.getColor(AppConstants.COND_RED_COLOR));
+                this.hpmsgLabels[i].setForeground(ColorManager.getColor(SWT.COLOR_WHITE));
             } else if (ship.isHalfDamage()) {
                 if (AppConfig.get().isWarnByHalfDamage()) {
                     // 中破で警告アイコン
@@ -375,8 +376,8 @@ public class FleetComposite extends Composite {
                 }
 
                 this.hpmsgLabels[i].setText("中破");
-                this.hpmsgLabels[i].setBackground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
-                this.hpmsgLabels[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+                this.hpmsgLabels[i].setBackground(ColorManager.getColor(AppConstants.COND_ORANGE_COLOR));
+                this.hpmsgLabels[i].setForeground(ColorManager.getColor(SWT.COLOR_WHITE));
             } else if (ship.isSlightDamage()) {
                 this.hpmsgLabels[i].setText("小破");
                 this.hpmsgLabels[i].setBackground(null);
@@ -409,10 +410,10 @@ public class FleetComposite extends Composite {
                 this.fuelstLabels[i].setEnabled(true);
                 if (fuelraito <= AppConstants.EMPTY_SUPPLY) {
                     // 補給赤
-                    this.fuelstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
+                    this.fuelstLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_RED_COLOR));
                 } else if (fuelraito <= AppConstants.LOW_SUPPLY) {
                     // 補給橙
-                    this.fuelstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
+                    this.fuelstLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_ORANGE_COLOR));
                 }
             }
             // ステータス.弾
@@ -429,9 +430,9 @@ public class FleetComposite extends Composite {
                 }
                 this.bullstLabels[i].setEnabled(true);
                 if (bullraito <= AppConstants.EMPTY_SUPPLY) {
-                    this.bullstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
+                    this.bullstLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_RED_COLOR));
                 } else if (bullraito <= AppConstants.LOW_SUPPLY) {
-                    this.bullstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
+                    this.bullstLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_ORANGE_COLOR));
                 }
             }
 
@@ -509,32 +510,32 @@ public class FleetComposite extends Composite {
             }
 
             // コンディション
-            if (cond <= AppConstants.COND_RED) {
+            if (cond < AppConstants.COND_RED) {
                 // 疲労19以下
                 if (AppConfig.get().isWarnByCondState()) {
                     // 疲労状態で警告アイコン
                     this.state.set(WARN);
                     shipstatus.set(WARN);
                 }
-                this.condLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
-                this.condstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_RED_COLOR));
-            } else if (cond <= AppConstants.COND_ORANGE) {
+                this.condLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_RED_COLOR));
+                this.condstLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_RED_COLOR));
+            } else if (cond < AppConstants.COND_ORANGE) {
                 // 疲労29以下
                 if (AppConfig.get().isWarnByCondState()) {
                     // 疲労状態で警告アイコン
                     this.state.set(WARN);
                     shipstatus.set(WARN);
                 }
-                this.condLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
-                this.condstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_ORANGE_COLOR));
+                this.condLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_ORANGE_COLOR));
+                this.condstLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_ORANGE_COLOR));
             } else if ((cond >= AppConstants.COND_DARK_GREEN) && (cond < AppConstants.COND_GREEN)) {
                 // 疲労50以上
-                this.condLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_DARK_GREEN_COLOR));
-                this.condstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_DARK_GREEN_COLOR));
+                this.condLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_DARK_GREEN_COLOR));
+                this.condstLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_DARK_GREEN_COLOR));
             } else if (cond >= AppConstants.COND_GREEN) {
                 // 疲労53以上
-                this.condLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_GREEN_COLOR));
-                this.condstLabels[i].setForeground(SWTResourceManager.getColor(AppConstants.COND_GREEN_COLOR));
+                this.condLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_GREEN_COLOR));
+                this.condstLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_GREEN_COLOR));
             } else {
                 this.condLabels[i].setForeground(null);
                 this.condstLabels[i].setForeground(null);
@@ -694,7 +695,6 @@ public class FleetComposite extends Composite {
         }
 
         this.updateTabIcon();
-        this.postFatal();
 
         for (org.eclipse.swt.widgets.Control control : this.fleetGroup.getChildren()) {
             if (control instanceof Composite) {
@@ -726,45 +726,6 @@ public class FleetComposite extends Composite {
     }
 
     /**
-     * 艦隊が出撃中で大破した場合に警告を行います
-     */
-    private void postFatal() {
-        if (this.badlyDamage && GlobalContext.isSortie(this.dock.getId())) {
-            if (AppConfig.get().isBalloonBybadlyDamage()) {
-                List<ShipDto> ships = this.dock.getShips();
-                StringBuilder sb = new StringBuilder();
-                sb.append(AppConstants.MESSAGE_STOP_SORTIE);
-                sb.append("\n");
-                for (ShipDto shipDto : ships) {
-                    if (shipDto.isBadlyDamage()) {
-                        sb.append(shipDto.getName());
-                        sb.append("(" + shipDto.getLv() + ")");
-                        sb.append(" : ");
-                        List<ItemInfoDto> items = shipDto.getItem();
-                        List<String> names = new ArrayList<String>();
-                        for (ItemInfoDto itemDto : items) {
-                            if (itemDto != null) {
-                                names.add(itemDto.getName());
-                            }
-                        }
-                        sb.append(StringUtils.join(names, ","));
-                        sb.append("\n");
-                    }
-                }
-                ToolTip tip = new ToolTip(this.getShell(), SWT.BALLOON
-                        | SWT.ICON_ERROR);
-                tip.setText("大破警告");
-                tip.setMessage(sb.toString());
-
-                this.main.getTrayItem().setToolTip(tip);
-                tip.setVisible(true);
-            }
-            // 大破時にサウンドを再生する
-            Sound.randomBadlySoundPlay();
-        }
-    }
-
-    /**
      * HPゲージのイメージを取得します
      * @param hpratio HP割合
      * @return HPゲージのイメージ
@@ -772,11 +733,11 @@ public class FleetComposite extends Composite {
     private Image getHpGaugeImage(float hpratio, float expraito) {
         Image image = new Image(Display.getDefault(), GAUGE_WIDTH, GAUGE_HEIGHT);
         GC gc = new GC(image);
-        gc.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+        gc.setBackground(ColorManager.getColor(SWT.COLOR_WHITE));
         gc.fillRectangle(0, 0, GAUGE_WIDTH, GAUGE_HEIGHT);
-        gc.setBackground(SWTResourceManager.getColor(gradation(hpratio, GAUGE_EMPTY, GAUGE_HALF, GAUGE_FULL)));
+        gc.setBackground(ColorManager.getColor(gradation(hpratio, GAUGE_EMPTY, GAUGE_HALF, GAUGE_FULL)));
         gc.fillRectangle(0, 0, (int) (GAUGE_WIDTH * hpratio), GAUGE_HEIGHT);
-        gc.setBackground(SWTResourceManager.getColor(EXP_GAUGE));
+        gc.setBackground(ColorManager.getColor(EXP_GAUGE));
         gc.fillRectangle(0, GAUGE_HEIGHT - EXP_GAUGE_HEIGHT, (int) (GAUGE_WIDTH * expraito), EXP_GAUGE_HEIGHT);
         gc.drawImage(image, 0, 0);
         gc.dispose();

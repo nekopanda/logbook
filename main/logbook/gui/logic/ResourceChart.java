@@ -163,7 +163,7 @@ public class ResourceChart {
                     continue;
                 }
                 gc.setLineWidth(3);
-                gc.setForeground(SWTResourceManager.getColor(this.resources[i].color));
+                gc.setForeground(ColorManager.getColor(this.resources[i].color));
 
                 String label = this.resources[i].name;
                 int labelWidth = getStringWidth(gc, label);
@@ -217,7 +217,7 @@ public class ResourceChart {
                 else {
                     gc.setLineWidth(2);
                 }
-                gc.setForeground(SWTResourceManager.getColor(color));
+                gc.setForeground(ColorManager.getColor(color));
 
                 int[] values = this.resources[i].values;
                 Path path = new Path(Display.getCurrent());

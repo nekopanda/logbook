@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
+import logbook.gui.logic.ColorManager;
 import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.PushNotify;
 import logbook.internal.EvaluateExp;
@@ -40,7 +41,6 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
  * 設定画面
@@ -274,6 +274,11 @@ public final class ConfigDialog extends Dialog {
         nameOnTitlebar.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
         nameOnTitlebar.setText("タイトルバーに提督名を表示する");
         nameOnTitlebar.setSelection(AppConfig.get().isNameOnTitlebar());
+
+        final Button colorSupport = new Button(compositeSystem, SWT.CHECK);
+        colorSupport.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        colorSupport.setText("色覚サポート");
+        colorSupport.setSelection(AppConfig.get().isColorSupport());
 
         final Combo systemWideShortcutKey;
         if (JIntellitypeWrapper.getInstance() != null) {
@@ -1019,6 +1024,7 @@ public final class ConfigDialog extends Dialog {
                 }
                 AppConfig.get().setCheckDoit(checkDoit.getSelection());
                 AppConfig.get().setNameOnTitlebar(nameOnTitlebar.getSelection());
+                AppConfig.get().setColorSupport(colorSupport.getSelection());
                 if (StringUtils.isNumeric(soundlevel.getText())) {
                     float level = (float) Integer.parseInt(soundlevel.getText()) / 100;
                     AppConfig.get().setSoundLevel(level);
@@ -1160,11 +1166,11 @@ public final class ConfigDialog extends Dialog {
         this.scrolledComposite.setMinSize(this.composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
     }
 
-    private Label createColorSetting(Composite chartGroup, String title, RGB currentColor, final RGB defaultColor) {
+    private Label createColorSetting(Composite chartGroup, String title, RGB currentColor, final RGB[] defaultColor) {
         final Label label = new Label(chartGroup, SWT.NONE);
         label.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
         label.setText(title);
-        label.setForeground(SWTResourceManager.getColor(currentColor));
+        label.setForeground(ColorManager.getColor(currentColor));
 
         Button changeColor = new Button(chartGroup, SWT.NONE);
         changeColor.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
@@ -1174,7 +1180,7 @@ public final class ConfigDialog extends Dialog {
                 ColorDialog dialog = new ColorDialog(ConfigDialog.this.shell);
                 RGB rgb = dialog.open();
                 if (rgb != null) {
-                    label.setForeground(SWTResourceManager.getColor(rgb));
+                    label.setForeground(ColorManager.getColor(rgb));
                 }
             }
         });
@@ -1185,7 +1191,7 @@ public final class ConfigDialog extends Dialog {
         resetColor.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                label.setForeground(SWTResourceManager.getColor(defaultColor));
+                label.setForeground(ColorManager.getColor(defaultColor));
             }
         });
         resetColor.setText("リセット");

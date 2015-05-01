@@ -23,7 +23,7 @@ public class AppConstants {
     public static final String SUFFIX = "拡張版";
 
     /** バージョン */
-    public static final String VERSION = "1.7.9";
+    public static final String VERSION = "1.8.0";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://nekopanda.blog.jp/");
@@ -106,19 +106,25 @@ public class AppConstants {
             0
     };
 
-    public static final RGB[] CHART_COLOR_TABLE = new RGB[] {
-            new RGB(0x00, 0x80, 0x00), // 燃料
-            new RGB(0x66, 0x33, 0x00), // 弾薬
-            new RGB(0x80, 0x80, 0x80), // 鋼材
-            new RGB(0xCC, 0x33, 0x00), // ボーキ
-            new RGB(0xA5, 0x2A, 0x2A), // バーナー
-            new RGB(0xF0, 0x80, 0x80), // バケツ
-            new RGB(0x48, 0x76, 0xFF), // 開発
-            new RGB(0x00, 0xAB, 0xB2) // ネジ
+    public static final RGB[][] CHART_COLOR_TABLE = new RGB[][] {
+            new RGB[] { new RGB(0x00, 0x80, 0x00), new RGB(213, 94, 0) }, // 燃料 赤
+            new RGB[] { new RGB(0x66, 0x33, 0x00), new RGB(0, 0, 0) }, // 弾薬 黒
+            new RGB[] { new RGB(0x80, 0x80, 0x80), new RGB(0, 114, 178) }, // 鋼材  青
+            new RGB[] { new RGB(0xCC, 0x33, 0x00), new RGB(86, 180, 233) }, // ボーキ 水色
+            new RGB[] { new RGB(0xA5, 0x2A, 0x2A), new RGB(240, 228, 66) }, // バーナー 黄色
+            new RGB[] { new RGB(0xF0, 0x80, 0x80), new RGB(230, 159, 0) }, // バケツ　オレンジ
+            new RGB[] { new RGB(0x48, 0x76, 0xFF), new RGB(0, 158, 115) }, // 開発 緑
+            new RGB[] { new RGB(0x00, 0xAB, 0xB2), new RGB(204, 121, 167) } // ネジ 紫
     };
 
     /** 小破の色 */
     public static final RGB SYOHA_SHIP_COLOR = new RGB(210, 255, 0);
+
+    /** 中破の色 */
+    public static final RGB TYUHA_SHIP_COLOR = new RGB(210, 255, 0);
+
+    /** 大破の色 */
+    public static final RGB[] TAIHA_SHIP_COLOR = new RGB[] { new RGB(210, 255, 0), new RGB(204, 121, 167) };
 
     /** 轟沈の色 */
     public static final RGB SUNK_SHIP_COLOR = new RGB(77, 166, 223);

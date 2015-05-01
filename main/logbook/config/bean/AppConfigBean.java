@@ -191,6 +191,9 @@ public final class AppConfigBean {
     /** お風呂から上がる時に母港タブを表示 */
     private boolean visibleOnReturnBathwater = true;
 
+    /** 色合い */
+    private boolean colorSupport = false;
+
     /** モノクロアイコンを使用する */
     private boolean monoIcon;
 
@@ -237,28 +240,28 @@ public final class AppConfigBean {
     private boolean enableItemFullBalloonNotify = false;
 
     /** 燃料の色 */
-    private RGB fuelColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[0]);
+    private RGB fuelColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[0][0]);
 
     /** 弾薬の色 */
-    private RGB ammoColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[1]);
+    private RGB ammoColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[1][0]);
 
     /** 鋼材の色 */
-    private RGB metalColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[2]);
+    private RGB metalColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[2][0]);
 
     /** ボーキの色 */
-    private RGB bauxiteColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[3]);
+    private RGB bauxiteColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[3][0]);
 
     /** バーナーの色 */
-    private RGB burnerColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[4]);
+    private RGB burnerColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[4][0]);
 
     /** バケツの色 */
-    private RGB bucketColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[5]);
+    private RGB bucketColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[5][0]);
 
     /** 開発の色 */
-    private RGB researchColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[6]);
+    private RGB researchColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[6][0]);
 
     /** ネジの色 */
-    private RGB screwColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[7]);
+    private RGB screwColor = cloneRGB(AppConstants.CHART_COLOR_TABLE[7][0]);
 
     /** 開発者オプション-JSONを保存する */
     private boolean storeJson;
@@ -1965,6 +1968,20 @@ public final class AppConfigBean {
      */
     public void setDisableWindowMenu(boolean disableWindowMenu) {
         this.disableWindowMenu = disableWindowMenu;
+    }
+
+    /**
+     * @return colorSupport
+     */
+    public boolean isColorSupport() {
+        return this.colorSupport;
+    }
+
+    /**
+     * @param colorSupport セットする colorSupport
+     */
+    public void setColorSupport(boolean colorSupport) {
+        this.colorSupport = colorSupport;
     }
 
 }

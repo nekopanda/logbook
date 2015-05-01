@@ -4,6 +4,7 @@
 package logbook.scripting;
 
 import logbook.constants.AppConstants;
+import logbook.gui.logic.ColorManager;
 import logbook.gui.logic.TableItemCreator;
 import logbook.scripting.ScriptLoader.MethodInvoke;
 import logbook.scripting.ScriptLoader.Script;
@@ -12,7 +13,6 @@ import logbook.util.ReportUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
  * @author Nekopanda
@@ -58,7 +58,7 @@ public class TableItemCreatorProxy implements TableItemCreator {
         TableItem item = new TableItem(table, SWT.NONE);
         // 偶数行に背景色を付ける
         if ((index % 2) != 0) {
-            item.setBackground(SWTResourceManager.getColor(AppConstants.ROW_BACKGROUND));
+            item.setBackground(ColorManager.getColor(AppConstants.ROW_BACKGROUND));
         }
         item.setText(ReportUtils.toStringArray(data));
         return item;

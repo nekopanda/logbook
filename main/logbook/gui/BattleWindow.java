@@ -15,13 +15,13 @@ import logbook.dto.DockDto;
 import logbook.dto.MapCellDto;
 import logbook.dto.ResultRank;
 import logbook.dto.ShipDto;
+import logbook.gui.logic.ColorManager;
 import logbook.internal.EnemyData;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
  * @author Nekopanda
@@ -321,8 +321,8 @@ public class BattleWindow extends BattleWindowBase {
 
         for (int i = 0; i < 3; ++i) {
             if ((rank == ResultRank.C) || (rank == ResultRank.D) || (rank == ResultRank.E)) {
-                this.resultLabel[i].setBackground(SWTResourceManager.getColor(AppConstants.LOSE_BATTLE_COLOR));
-                this.resultLabel[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+                this.resultLabel[i].setBackground(ColorManager.getColor(AppConstants.LOSE_BATTLE_COLOR));
+                this.resultLabel[i].setForeground(ColorManager.getColor(SWT.COLOR_WHITE));
             }
             else {
                 this.resultLabel[i].setBackground(null);
