@@ -393,7 +393,7 @@ public final class ApplicationMain extends WindowBase {
                     WindowBase[] windowArray = windows.toArray(new WindowBase[windows.size()]);
                     for (int i = windowArray.length - 1; i >= 0; --i) {
                         WindowBase win = windowArray[i];
-                        if (win.getShell().getVisible() && (win.getActualParent() == ApplicationMain.this.dummyHolder)) {
+                        if (win.getVisible() && (win.getActualParent() == ApplicationMain.this.dummyHolder)) {
                             windowArray[i].setBehindTo(ApplicationMain.this);
                             break;
                         }

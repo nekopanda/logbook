@@ -74,6 +74,9 @@ public class WindowBase {
     private boolean topMost = false;
     private boolean showTitlebar = true;
 
+    // shell.getVisible() は最小化状態だとfalseを返すので独自の状態を持つ
+    private boolean visible = false;
+
     // メニュー
     private MenuItem topMostItem;
     private MenuItem showTitlebarItem;
@@ -876,7 +879,8 @@ public class WindowBase {
     }
 
     public void setVisible(boolean visible) {
-        if (this.shell.getVisible() != visible) {
+        if (this.visible != visible) {
+            this.visible = visible;
             // 関連付けられたメニューがある場合はメニューも連動させる
             if (this.menuItem != null) {
                 this.menuItem.setSelection(visible);
@@ -897,6 +901,10 @@ public class WindowBase {
                 }
             }
         }
+    }
+
+    public boolean getVisible() {
+        return this.visible;
     }
 
     public Shell getActualParent() {

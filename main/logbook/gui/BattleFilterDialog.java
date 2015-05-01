@@ -87,7 +87,7 @@ public class BattleFilterDialog extends WindowBase {
             this.setWindowInitialized(true);
         }
         this.updateContents();
-        if (this.getShell().getVisible() == false) {
+        if (this.getVisible() == false) {
             this.getShell().pack();
             this.setVisible(true);
         }

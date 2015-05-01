@@ -13,7 +13,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javax.script.Compilable;
@@ -367,10 +369,27 @@ public class ScriptLoader {
 
     private ScriptLoader() {
         final File sourceDir = new File("./templates/script");
+        final Set<String> ignoreList = new HashSet<>();
+
+        File ignoreFile = new File(AppConstants.SCRIPT_DIR + "/ignore_update.txt");
+        if (ignoreFile.exists()) {
+            try {
+                for (String filename : FileUtils.readLines(ignoreFile)) {
+                    ignoreList.add(filename);
+                }
+            } catch (IOException e) {
+                LOG.warn("除外リストファイル読み込み中にエラー", e);
+            }
+        }
+
         try {
             FileUtils.copyDirectory(new File("./templates/script"), AppConstants.SCRIPT_DIR, new FileFilter() {
                 @Override
                 public boolean accept(File src) {
+                    if (ignoreList.contains(src.getName())) {
+                        LOG.info("このファイルは除外されているためアップデートされません: " + src.getAbsolutePath());
+                        return false;
+                    }
                     File dstFile = new File(AppConstants.SCRIPT_DIR.getAbsolutePath() +
                             src.getAbsolutePath().substring(sourceDir.getAbsolutePath().length()));
                     // 新規ファイルまたは更新されていたらコピー
@@ -378,6 +397,11 @@ public class ScriptLoader {
                     (dstFile.lastModified() < src.lastModified()));
                 }
             });
+
+            // 除外リストファイルを作っておく
+            if (ignoreFile.exists() == false) {
+                ignoreFile.createNewFile();
+            }
         } catch (IOException e) {
             LOG.warn("スクリプトをテンプレートからコピー中にエラー", e);
         }

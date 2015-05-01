@@ -17,6 +17,7 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -101,6 +102,15 @@ public final class SwtUtils {
         gl.marginWidth = marginWidth;
         gl.marginHeight = marginHeight;
         return gl;
+    }
+
+    public static RowLayout makeRowLayout(boolean horizontal, int spacing, int margin, boolean wrap) {
+        RowLayout rl = new RowLayout(horizontal ? SWT.HORIZONTAL : SWT.VERTICAL);
+        rl.spacing = spacing;
+        rl.center = true;
+        rl.marginBottom = rl.marginLeft = rl.marginRight = rl.marginTop = margin;
+        rl.wrap = wrap;
+        return rl;
     }
 
     private static String defaultFontName = null;

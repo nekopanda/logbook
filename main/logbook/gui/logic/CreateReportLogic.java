@@ -788,7 +788,7 @@ public final class CreateReportLogic {
             }
         }
 
-        if (filter.groupMode == false) {
+        if (filter.groupMode == 1) {
             // 艦種でフィルタ
             if ((filter.enabledType != null) &&
                     (filter.enabledType[ship.getStype()] == false))
@@ -796,7 +796,7 @@ public final class CreateReportLogic {
                 return false;
             }
         }
-        else {
+        else if (filter.groupMode == 0) {
             // グループでフィルタ
             if (filter.group != null) {
                 if (!filter.group.getShips().contains(ship.getId())) {

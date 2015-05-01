@@ -366,7 +366,7 @@ public class FleetComposite extends Composite {
                         badlyDamaged.add(ship);
                     }
                 }
-                this.hpmsgLabels[i].setBackground(ColorManager.getColor(AppConstants.COND_RED_COLOR));
+                this.hpmsgLabels[i].setBackground(ColorManager.getColor(AppConstants.TAIHA_SHIP_COLOR));
                 this.hpmsgLabels[i].setForeground(ColorManager.getColor(SWT.COLOR_WHITE));
             } else if (ship.isHalfDamage()) {
                 if (AppConfig.get().isWarnByHalfDamage()) {
@@ -376,7 +376,7 @@ public class FleetComposite extends Composite {
                 }
 
                 this.hpmsgLabels[i].setText("中破");
-                this.hpmsgLabels[i].setBackground(ColorManager.getColor(AppConstants.COND_ORANGE_COLOR));
+                this.hpmsgLabels[i].setBackground(ColorManager.getColor(AppConstants.TYUHA_SHIP_COLOR));
                 this.hpmsgLabels[i].setForeground(ColorManager.getColor(SWT.COLOR_WHITE));
             } else if (ship.isSlightDamage()) {
                 this.hpmsgLabels[i].setText("小破");

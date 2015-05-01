@@ -232,7 +232,7 @@ public final class CalcPracticeExpDialog extends WindowBase {
         for (int i = 0; i < ships.size(); i++) {
             this.shipNames[i] = ships.get(i).getName();
         }
-        if (this.isWindowInitialized() && this.getShell().getVisible()) {
+        if (this.isWindowInitialized() && this.getVisible()) {
             this.clearText();
             this.updateData();
         }

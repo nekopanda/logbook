@@ -121,10 +121,10 @@ public class AppConstants {
     public static final RGB SYOHA_SHIP_COLOR = new RGB(210, 255, 0);
 
     /** 中破の色 */
-    public static final RGB TYUHA_SHIP_COLOR = new RGB(210, 255, 0);
+    public static final RGB[] TYUHA_SHIP_COLOR = new RGB[] { new RGB(255, 140, 0), new RGB(240, 228, 66) };
 
     /** 大破の色 */
-    public static final RGB[] TAIHA_SHIP_COLOR = new RGB[] { new RGB(210, 255, 0), new RGB(204, 121, 167) };
+    public static final RGB[] TAIHA_SHIP_COLOR = new RGB[] { new RGB(255, 16, 0), new RGB(213, 94, 0) };
 
     /** 轟沈の色 */
     public static final RGB SUNK_SHIP_COLOR = new RGB(77, 166, 223);
@@ -205,7 +205,10 @@ public class AppConstants {
     public static final File SCRIPT_DATA_FILE = new File("./config/scriptdata.zip");
 
     /** 出撃ログ表示用CSSファイル */
-    public static final File BATTLE_LOG_CSS_FILE = new File("./templates/battle-log.css");
+    public static final File BATTLE_LOG_CSS_FILE = new File("./config/battle-log.css");
+
+    /** テンプレート */
+    public static final File BATTLE_LOG_CSS_TMPL_FILE = new File("./templates/battle-log.css");
 
     /** 保有資材:燃料 */
     public static final int MATERIAL_FUEL = 1;

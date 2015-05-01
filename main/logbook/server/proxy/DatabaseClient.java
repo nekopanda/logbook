@@ -3,6 +3,7 @@ package logbook.server.proxy;
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import logbook.config.AppConfig;
@@ -18,6 +19,7 @@ import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.util.StringContentProvider;
 import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.util.UrlEncoded;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -124,6 +126,8 @@ public class DatabaseClient extends Thread {
             int skipCount = 0;
             int errorCount = 0;
             this.httpClient = new HttpClient();
+            this.httpClient.setExecutor(new QueuedThreadPool(2, 1));
+            this.httpClient.setMaxConnectionsPerDestination(2);
             this.httpClient.start();
 
             while (true) {
@@ -135,7 +139,8 @@ public class DatabaseClient extends Thread {
                 for (int retly = 0;; ++retly) {
                     String errorReason = null;
                     try {
-                        ContentResponse response = this.createRequest(data).send();
+                        // 20秒でタイムアウト
+                        ContentResponse response = this.createRequest(data).timeout(20, TimeUnit.SECONDS).send();
                         if (HttpStatus.isSuccess(response.getStatus())) {
                             // 成功したらエラーカウンタをリセット
                             skipCount = errorCount = 0;

@@ -10,6 +10,7 @@ import java.util.List;
 
 import logbook.constants.AppConstants;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -22,6 +23,17 @@ public class HTMLGenerator {
     private int nestedCount = 0;
 
     private static String TAB = "    ";
+
+    static {
+        if (AppConstants.BATTLE_LOG_CSS_FILE.exists() == false) {
+            // CSSファイルが存在しない場合はtemplatesからコピー
+            try {
+                FileUtils.copyFile(AppConstants.BATTLE_LOG_CSS_TMPL_FILE, AppConstants.BATTLE_LOG_CSS_FILE);
+            } catch (IOException e) {
+                //
+            }
+        }
+    }
 
     public void genHeader(String title, boolean genCharset) throws IOException {
         this.sb.append("<!DOCTYPE html>").append("\r\n");

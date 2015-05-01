@@ -53,7 +53,7 @@ public final class ShipFilterComposite extends Composite {
     private boolean changeEnabled = false;
     private boolean panelVisible = true;
     private boolean etcVisible = true;
-    private boolean groupMode = true;
+    private int groupMode = 0;
 
     private Menu switchMenu;
     private MenuItem groupMenuItem;
@@ -81,14 +81,22 @@ public final class ShipFilterComposite extends Composite {
     /** 全て選択 */
     private Button selectall;
 
+    private Composite lockedGroup;
     /** 鍵付き */
     private Button lockedAny;
     /** 鍵付き */
     private Button lockedOnly;
     /** 鍵付きではない */
     private Button lockedNo;
-    /** 艦隊所属を除外 */
-    private Button ignoreOnFleet;
+
+    private Composite fleetGroup;
+    /** 艦隊所属 */
+    private Button fleetAny;
+    /** 艦隊所属 */
+    private Button fleetOnly;
+    /** 艦隊所属でない */
+    private Button fleetNo;
+
     /** 遠征中を除外 */
     public Button ignoreOnMission;
     /** 要修理 */
@@ -133,9 +141,9 @@ public final class ShipFilterComposite extends Composite {
         this.switchCompo.setLayout(SwtUtils.makeGridLayout(1, 0, 0, 0, 0));
 
         // グループタブ
-        this.groupCompo = new Composite(this.switchCompo, SWT.NONE);
-        this.groupCompo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
-        this.groupCompo.setLayout(new RowLayout(SWT.HORIZONTAL));
+        this.groupCompo = new Composite(this.switchCompo, SWT.BORDER);
+        this.groupCompo.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, true, false, 1, 1));
+        this.groupCompo.setLayout(SwtUtils.makeRowLayout(true, 0, 0, true));
 
         this.groupAllButton = new Button(this.groupCompo, SWT.RADIO);
         this.groupAllButton.setText("すべて");
@@ -149,10 +157,7 @@ public final class ShipFilterComposite extends Composite {
         // 艦種カテゴリボタン
         this.typeCheckCompo = new Composite(this.typeCompo, SWT.NONE);
         this.typeCheckCompo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
-        RowLayout rlTypeCheck = new RowLayout(SWT.HORIZONTAL);
-        rlTypeCheck.spacing = 1;
-        rlTypeCheck.marginBottom = rlTypeCheck.marginRight = rlTypeCheck.marginTop = 0;
-        this.typeCheckCompo.setLayout(rlTypeCheck);
+        this.typeCheckCompo.setLayout(SwtUtils.makeRowLayout(true, 1, 0, true));
 
         this.selectall = new Button(this.typeCheckCompo, SWT.CHECK);
         this.selectall.setText("全て選択");
@@ -188,60 +193,55 @@ public final class ShipFilterComposite extends Composite {
             button.addSelectionListener(categoryListener);
         }
 
-        //------------------
-
-        SelectionListener arrowButtonListener = new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                ShipFilterComposite.this.setGroupMode(!ShipFilterComposite.this.groupMode);
-                //ShipFilterComposite.this.shipTable.getFilterMenu().setGroupMode(ShipFilterComposite.this.groupMode);
-                ShipFilterComposite.this.shipTable.updateFilter(ShipFilterComposite.this.createFilter(), true);
-                ShipFilterComposite.this.shipTable.getShell().layout();
-            }
-        };
-
-        Button btnRight = new Button(this, SWT.NONE);
-        GridData gdBtnRight = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
-        gdBtnRight.widthHint = 24;
-        gdBtnRight.heightHint = 24;
-        btnRight.setLayoutData(gdBtnRight);
-        btnRight.addSelectionListener(arrowButtonListener);
-        SwtUtils.setButtonImage(btnRight, SWTResourceManager.getImage(WindowBase.class, AppConstants.R_ICON_RIGHT));
-
-        //------------------
-
         // その他パネル
-        this.etcCompo = new Composite(this, SWT.NONE);
-        this.etcCompo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+        this.etcCompo = new Composite(this.switchCompo, SWT.NONE);
+        this.etcCompo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
         this.etcCompo.setLayout(SwtUtils.makeGridLayout(2, 0, 0, 0, 0));
 
-        Composite etcgroup = new Composite(this.etcCompo, SWT.NONE);
-        etcgroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
-        etcgroup.setLayout(SwtUtils.makeGridLayout(3, 0, 0, 3, 0));
+        Composite etcSelectCompo = new Composite(this.etcCompo, SWT.NONE);
+        etcSelectCompo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+        etcSelectCompo.setLayout(SwtUtils.makeRowLayout(true, 2, 0, true));
 
-        this.lockedAny = new Button(etcgroup, SWT.RADIO);
-        this.lockedAny.setText("すべて");
-        this.lockedAny.addSelectionListener(listener);
+        {
+            this.lockedGroup = new Composite(etcSelectCompo, SWT.BORDER);
+            this.lockedGroup.setLayout(SwtUtils.makeRowLayout(true, 0, 0, false));
 
-        this.lockedOnly = new Button(etcgroup, SWT.RADIO);
-        this.lockedOnly.setText("鍵付き");
-        this.lockedOnly.addSelectionListener(listener);
+            this.lockedAny = new Button(this.lockedGroup, SWT.RADIO);
+            this.lockedAny.setText("すべて");
+            this.lockedAny.addSelectionListener(listener);
 
-        this.lockedNo = new Button(etcgroup, SWT.RADIO);
-        this.lockedNo.setText("鍵付きではない");
-        this.lockedNo.addSelectionListener(listener);
+            this.lockedOnly = new Button(this.lockedGroup, SWT.RADIO);
+            this.lockedOnly.setText("鍵付き");
+            this.lockedOnly.addSelectionListener(listener);
 
-        this.ignoreOnFleet = new Button(etcgroup, SWT.CHECK);
-        this.ignoreOnFleet.setText("艦隊所属を除外");
-        this.ignoreOnFleet.setSelection(false);
-        this.ignoreOnFleet.addSelectionListener(listener);
+            this.lockedNo = new Button(this.lockedGroup, SWT.RADIO);
+            this.lockedNo.setText("鍵付きでない");
+            this.lockedNo.addSelectionListener(listener);
+        }
 
-        this.ignoreOnMission = new Button(etcgroup, SWT.CHECK);
+        {
+            this.fleetGroup = new Composite(etcSelectCompo, SWT.BORDER);
+            this.fleetGroup.setLayout(SwtUtils.makeRowLayout(true, 0, 0, false));
+
+            this.fleetAny = new Button(this.fleetGroup, SWT.RADIO);
+            this.fleetAny.setText("すべて");
+            this.fleetAny.addSelectionListener(listener);
+
+            this.fleetOnly = new Button(this.fleetGroup, SWT.RADIO);
+            this.fleetOnly.setText("艦隊所属");
+            this.fleetOnly.addSelectionListener(listener);
+
+            this.fleetNo = new Button(this.fleetGroup, SWT.RADIO);
+            this.fleetNo.setText("艦隊所属でない");
+            this.fleetNo.addSelectionListener(listener);
+        }
+
+        this.ignoreOnMission = new Button(etcSelectCompo, SWT.CHECK);
         this.ignoreOnMission.setText("遠征中を除外");
         this.ignoreOnMission.setSelection(false);
         this.ignoreOnMission.addSelectionListener(listener);
 
-        this.needBath = new Button(etcgroup, SWT.CHECK);
+        this.needBath = new Button(etcSelectCompo, SWT.CHECK);
         this.needBath.setText("お風呂に入りたい艦娘");
         this.needBath.setSelection(false);
         this.needBath.addSelectionListener(listener);
@@ -252,7 +252,7 @@ public final class ShipFilterComposite extends Composite {
         namegroup.setLayout(new RowLayout(SWT.HORIZONTAL));
 
         this.nametext = new Combo(namegroup, SWT.BORDER);
-        this.nametext.setLayoutData(new RowData(180, SWT.DEFAULT));
+        this.nametext.setLayoutData(new RowData(150, SWT.DEFAULT));
         this.nametext.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
@@ -271,10 +271,33 @@ public final class ShipFilterComposite extends Composite {
         this.nametext.setToolTipText("フリーワード検索(半角SPでAND検索)");
 
         this.regexp = new Button(namegroup, SWT.CHECK);
-        this.regexp.setText("正規表現");
+        this.regexp.setToolTipText("正規表現");
         this.regexp.addSelectionListener(listener);
 
         //-----------------------------
+
+        //------------------ 切り替えボタン
+
+        SelectionListener arrowButtonListener = new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                int next = (ShipFilterComposite.this.groupMode + 1) % 3;
+                ShipFilterComposite.this.setGroupMode(next);
+                //ShipFilterComposite.this.shipTable.getFilterMenu().setGroupMode(ShipFilterComposite.this.groupMode);
+                ShipFilterComposite.this.shipTable.updateFilter(ShipFilterComposite.this.createFilter(), true);
+                ShipFilterComposite.this.shipTable.getShell().layout();
+            }
+        };
+
+        Button btnRight = new Button(this, SWT.NONE);
+        GridData gdBtnRight = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
+        gdBtnRight.widthHint = 24;
+        gdBtnRight.heightHint = 24;
+        btnRight.setLayoutData(gdBtnRight);
+        btnRight.addSelectionListener(arrowButtonListener);
+        SwtUtils.setButtonImage(btnRight, SWTResourceManager.getImage(WindowBase.class, AppConstants.R_ICON_RIGHT));
+
+        //------------------
 
         this.switchMenu = new Menu(this);
 
@@ -379,35 +402,31 @@ public final class ShipFilterComposite extends Composite {
 
     private void switchMenuSelected(SelectionEvent e) {
         MenuItem selectedItem = (MenuItem) e.widget;
-        if (selectedItem.getSelection() == false) {
-            // OFFにはできない
-            selectedItem.setSelection(true);
-        }
-        else {
-            this.setGroupMode(selectedItem == this.groupMenuItem);
-            //this.shipTable.getFilterMenu().setGroupMode(this.groupMode);
-            if (this.changeEnabled) {
-                this.shipTable.updateFilter(this.createFilter(), true);
-                this.shipTable.getShell().layout();
-            }
+        int mode = !selectedItem.getSelection() ? 2 :
+                (selectedItem == this.groupMenuItem) ? 0 : 1;
+        this.setGroupMode(mode);
+        //this.shipTable.getFilterMenu().setGroupMode(this.groupMode);
+        if (this.changeEnabled) {
+            this.shipTable.updateFilter(this.createFilter(), true);
+            this.shipTable.getShell().layout();
         }
     }
 
     private void switchPanel() {
-        LayoutLogic.hide(this.groupCompo, !this.groupMode);
-        LayoutLogic.hide(this.typeCompo, this.groupMode);
+        LayoutLogic.hide(this.groupCompo, this.groupMode != 0);
+        LayoutLogic.hide(this.typeCompo, this.groupMode != 1);
         LayoutLogic.hide(this.etcCompo, !this.etcVisible);
     }
 
-    public boolean isGroupMode() {
+    public int getGroupMode() {
         return this.groupMode;
     }
 
-    public void setGroupMode(boolean groupMode) {
-        if (this.groupMode != groupMode) {
-            this.groupMode = groupMode;
-            this.groupMenuItem.setSelection(groupMode);
-            this.typeMenuItem.setSelection(!groupMode);
+    public void setGroupMode(int mode) {
+        if (this.groupMode != mode) {
+            this.groupMode = mode;
+            this.groupMenuItem.setSelection(mode == 0);
+            this.typeMenuItem.setSelection(mode == 1);
             if (this.panelVisible) {
                 this.switchPanel();
                 //this.switchCompo.layout();
@@ -604,7 +623,15 @@ public final class ShipFilterComposite extends Composite {
             this.lockedAny.setSelection(true);
         }
         // 艦隊に所属
-        this.ignoreOnFleet.setSelection(!filter.onfleet);
+        if (filter.onfleet == false) {
+            this.fleetNo.setSelection(true);
+        }
+        else if (filter.notonfleet == false) {
+            this.fleetOnly.setSelection(true);
+        }
+        else {
+            this.fleetAny.setSelection(true);
+        }
         // 遠征中を除外
         this.ignoreOnMission.setSelection(!filter.mission);
         // お風呂に入りたい
@@ -658,8 +685,17 @@ public final class ShipFilterComposite extends Composite {
             filter.locked = false;
             filter.notlocked = true;
         }
-        filter.onfleet = !this.ignoreOnFleet.getSelection();
-        filter.notonfleet = true;
+        if (this.fleetAny.getSelection()) {
+            filter.onfleet = filter.notonfleet = true;
+        }
+        else if (this.fleetOnly.getSelection()) {
+            filter.onfleet = true;
+            filter.notonfleet = false;
+        }
+        else {
+            filter.onfleet = false;
+            filter.notonfleet = true;
+        }
         filter.mission = !this.ignoreOnMission.getSelection();
         filter.notmission = true;
         filter.needbath = true;
