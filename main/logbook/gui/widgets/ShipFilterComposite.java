@@ -87,10 +87,10 @@ public final class ShipFilterComposite extends Composite {
     private Button lockedOnly;
     /** 鍵付きではない */
     private Button lockedNo;
-    /** 艦隊に所属 */
-    private Button onlyOnFleet;
-    /** 遠征中 */
-    public Button exceptOnMission;
+    /** 艦隊所属を除外 */
+    private Button ignoreOnFleet;
+    /** 遠征中を除外 */
+    public Button ignoreOnMission;
     /** 要修理 */
     public Button needBath;
 
@@ -231,15 +231,15 @@ public final class ShipFilterComposite extends Composite {
         this.lockedNo.setText("鍵付きではない");
         this.lockedNo.addSelectionListener(listener);
 
-        this.onlyOnFleet = new Button(etcgroup, SWT.CHECK);
-        this.onlyOnFleet.setText("艦隊に所属");
-        this.onlyOnFleet.setSelection(false);
-        this.onlyOnFleet.addSelectionListener(listener);
+        this.ignoreOnFleet = new Button(etcgroup, SWT.CHECK);
+        this.ignoreOnFleet.setText("艦隊所属を除外");
+        this.ignoreOnFleet.setSelection(false);
+        this.ignoreOnFleet.addSelectionListener(listener);
 
-        this.exceptOnMission = new Button(etcgroup, SWT.CHECK);
-        this.exceptOnMission.setText("遠征中を除外");
-        this.exceptOnMission.setSelection(false);
-        this.exceptOnMission.addSelectionListener(listener);
+        this.ignoreOnMission = new Button(etcgroup, SWT.CHECK);
+        this.ignoreOnMission.setText("遠征中を除外");
+        this.ignoreOnMission.setSelection(false);
+        this.ignoreOnMission.addSelectionListener(listener);
 
         this.needBath = new Button(etcgroup, SWT.CHECK);
         this.needBath.setText("お風呂に入りたい艦娘");
@@ -604,9 +604,9 @@ public final class ShipFilterComposite extends Composite {
             this.lockedAny.setSelection(true);
         }
         // 艦隊に所属
-        this.onlyOnFleet.setSelection(!filter.notonfleet);
+        this.ignoreOnFleet.setSelection(!filter.onfleet);
         // 遠征中を除外
-        this.exceptOnMission.setSelection(!filter.mission);
+        this.ignoreOnMission.setSelection(!filter.mission);
         // お風呂に入りたい
         this.needBath.setSelection(!filter.notneedbath);
 
@@ -658,9 +658,9 @@ public final class ShipFilterComposite extends Composite {
             filter.locked = false;
             filter.notlocked = true;
         }
-        filter.onfleet = true;
-        filter.notonfleet = !this.onlyOnFleet.getSelection();
-        filter.mission = !this.exceptOnMission.getSelection();
+        filter.onfleet = !this.ignoreOnFleet.getSelection();
+        filter.notonfleet = true;
+        filter.mission = !this.ignoreOnMission.getSelection();
         filter.notmission = true;
         filter.needbath = true;
         filter.notneedbath = !this.needBath.getSelection();
