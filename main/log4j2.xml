@@ -2,14 +2,23 @@
 <configuration status="warn" name="MyApp" packages="">
     <appenders>
         <RollingFile name="RollingFile" fileName="logs/app.log"
-            filePattern="logs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log">
+            filePattern="logs/$${date:yyyy-MM}/app-%d{yyyy-MM-dd}-%i.log">
             <PatternLayout>
                 <pattern>%d %p %c{1.} [%t] %m%n</pattern>
             </PatternLayout>
             <Policies>
                 <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy
-                    size="250 MB" />
+                <SizeBasedTriggeringPolicy size="250 MB" />
+            </Policies>
+        </RollingFile>
+        <RollingFile name="UserLog" fileName="logs/user.log"
+            filePattern="logs/$${date:yyyy-MM}/user-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout>
+                <pattern>%d %m%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="1 MB" />
             </Policies>
         </RollingFile>
         <File name="ScriptLog" fileName="logs/script.log" append="false">
@@ -19,6 +28,9 @@
         </File>
     </appenders>
     <loggers>
+	    <Logger name="user" level="info" additivity="false">
+	      <appender-ref ref="UserLog"/>
+	    </Logger>
 	    <Logger name="script" level="info" additivity="false">
 	      <appender-ref ref="ScriptLog"/>
 	    </Logger>

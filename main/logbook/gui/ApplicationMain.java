@@ -100,6 +100,8 @@ public final class ApplicationMain extends WindowBase {
 
     private static final long startTime = System.currentTimeMillis();
 
+    private static final Logger userLogger = LogManager.getLogger("user");
+
     public static void sysPrint(String mes) {
         System.out.println(mes + ": " + (System.currentTimeMillis() - startTime) + " ms");
     }
@@ -287,6 +289,7 @@ public final class ApplicationMain extends WindowBase {
             Display.setAppName(AppConstants.NAME);
             // 設定読み込み
             sysPrint("起動");
+            userLogger.info(AppConstants.TITLEBAR_TEXT + " 起動しました");
             AppConfig.load();
             /*　static initializer に移行
             ShipConfig.load();
@@ -1685,6 +1688,7 @@ public final class ApplicationMain extends WindowBase {
      * @param message コンソールに表示するメッセージ
      */
     public void printMessage(final String message) {
+        this.userLogger.info(message);
         if (disableUpdate || this.console.isDisposed())
             return;
         int size = this.console.getItemCount();

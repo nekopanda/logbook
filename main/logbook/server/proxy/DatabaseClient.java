@@ -56,6 +56,14 @@ public class DatabaseClient extends Thread {
             "api_req_combined_battle/battleresult"
     };
 
+    private static class QueueItem {
+        public UndefinedData data;
+
+        public QueueItem(UndefinedData data) {
+            this.data = data;
+        }
+    }
+
     private static synchronized DatabaseClient getInstance() {
         if (instance == null) {
             instance = new DatabaseClient();
@@ -70,7 +78,7 @@ public class DatabaseClient extends Thread {
             {
                 if (data.getUrl().endsWith(entry))
                 {
-                    getInstance().dataQueue.offer(data);
+                    getInstance().dataQueue.offer(new QueueItem(data));
                     break;
                 }
             }
@@ -80,7 +88,7 @@ public class DatabaseClient extends Thread {
     public static synchronized void end() {
         if (instance != null) {
             instance.endRequested = true;
-            instance.interrupt();
+            instance.dataQueue.offer(new QueueItem(null));
             try {
                 instance.join();
                 instance = null;
@@ -94,7 +102,7 @@ public class DatabaseClient extends Thread {
     private final Pattern apiTokenPattern = Pattern
             .compile("&api(_|%5F)token=[0-9a-f]+|api(_|%5F)token=[0-9a-f]+&?");
 
-    private final BlockingQueue<UndefinedData> dataQueue = new ArrayBlockingQueue<UndefinedData>(32);
+    private final BlockingQueue<QueueItem> dataQueue = new ArrayBlockingQueue<>(32);
 
     private HttpClient httpClient = null;
 
@@ -131,7 +139,10 @@ public class DatabaseClient extends Thread {
             this.httpClient.start();
 
             while (true) {
-                final UndefinedData data = this.dataQueue.take();
+                final UndefinedData data = this.dataQueue.take().data;
+                if (this.endRequested) {
+                    return;
+                }
                 if (skipCount > 0) {
                     --skipCount;
                     continue;
@@ -140,7 +151,11 @@ public class DatabaseClient extends Thread {
                     String errorReason = null;
                     try {
                         // 20秒でタイムアウト
-                        ContentResponse response = this.createRequest(data).timeout(20, TimeUnit.SECONDS).send();
+                        Request request = this.createRequest(data).timeout(20, TimeUnit.SECONDS);
+                        ContentResponse response = request.send();
+                        if (this.endRequested) {
+                            return;
+                        }
                         if (HttpStatus.isSuccess(response.getStatus())) {
                             // 成功したらエラーカウンタをリセット
                             skipCount = errorCount = 0;
@@ -168,6 +183,9 @@ public class DatabaseClient extends Thread {
                     if (errorReason != null) {
                         // 少し時間をおいてリトライ
                         Thread.sleep(1000);
+                        if (this.endRequested) {
+                            return;
+                        }
                         if (retly >= 4) {
                             // リトライが多すぎたらエラーにする
                             skipCount = (errorCount++) * 4;
