@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 
 /**
@@ -117,11 +118,15 @@ public class AppConstants {
             new RGB[] { new RGB(0x00, 0xAB, 0xB2), new RGB(204, 121, 167) } // ネジ 紫
     };
 
+    /** 無傷の色 */
+    public static final RGB[] MUKIZU_SHIP_COLOR = new RGB[] { new RGB(149, 255, 165), null };
+
     /** 小破の色 */
-    public static final RGB SYOHA_SHIP_COLOR = new RGB(210, 255, 0);
+    public static final RGB[] SYOHA_SHIP_COLOR = new RGB[] { new RGB(210, 255, 0), new RGB(241, 255, 163) };
 
     /** 中破の色 */
-    public static final RGB[] TYUHA_SHIP_COLOR = new RGB[] { new RGB(255, 140, 0), new RGB(240, 228, 66) };
+    public static final RGB[] TYUHA_SHIP_COLOR = new RGB[] { new RGB(255, 140, 0), new RGB(255, 252, 20) };
+    public static final int[] TYUHA_FORGROUNG_COLOR = new int[] { SWT.COLOR_WHITE, SWT.COLOR_BLACK };
 
     /** 大破の色 */
     public static final RGB[] TAIHA_SHIP_COLOR = new RGB[] { new RGB(255, 16, 0), new RGB(213, 94, 0) };

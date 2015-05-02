@@ -271,8 +271,16 @@ public final class ShipFilterComposite extends Composite {
         this.nametext.setToolTipText("フリーワード検索(半角SPでAND検索)");
 
         this.regexp = new Button(namegroup, SWT.CHECK);
-        this.regexp.setToolTipText("正規表現");
+        this.regexp.setToolTipText("正規表現:オフ");
         this.regexp.addSelectionListener(listener);
+        this.regexp.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                Button button = (Button) e.widget;
+                String tooltip = "正規表現:" + (button.getSelection() ? "オン" : "オフ");
+                button.setToolTipText(tooltip);
+            }
+        });
 
         //-----------------------------
 

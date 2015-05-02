@@ -18,6 +18,7 @@ import logbook.dto.ItemInfoDto;
 import logbook.dto.ShipDto;
 import logbook.gui.ApplicationMain;
 import logbook.gui.logic.ColorManager;
+import logbook.gui.logic.DamageRate;
 import logbook.gui.logic.SakutekiString;
 import logbook.gui.logic.TimeLogic;
 import logbook.gui.logic.TimeString;
@@ -349,43 +350,30 @@ public class FleetComposite extends Composite {
                 this.hpmsgLabels[i].setBackground(ColorManager.getColor(AppConstants.ESCAPED_SHIP_COLOR));
                 this.hpmsgLabels[i].setForeground(null);
             }
-            else if (ship.isBadlyDamage()) {
-                if (AppConfig.get().isFatalBybadlyDamage()) {
-                    // 大破で致命的アイコン
-                    this.state.set(FATAL);
-                    shipstatus.set(FATAL);
-                }
-                // 大破している艦娘がいる場合メッセージを表示
-                this.badlyDamage = true;
-                if (ship.isSunk()) {
-                    this.hpmsgLabels[i].setText("轟沈");
-                }
-                else {
-                    this.hpmsgLabels[i].setText("大破");
+            else {
+                DamageRate rate = DamageRate.fromHP(nowhp, maxhp);
+                this.hpmsgLabels[i].setText(rate.toString());
+                this.hpmsgLabels[i].setBackground(rate.getBackground());
+                this.hpmsgLabels[i].setForeground(rate.getForeground());
+
+                if (rate == DamageRate.TAIHA) {
+                    if (AppConfig.get().isFatalBybadlyDamage()) {
+                        // 大破で致命的アイコン
+                        this.state.set(FATAL);
+                        shipstatus.set(FATAL);
+                    }
+                    this.badlyDamage = true;
                     if (isSortie) {
                         badlyDamaged.add(ship);
                     }
                 }
-                this.hpmsgLabels[i].setBackground(ColorManager.getColor(AppConstants.TAIHA_SHIP_COLOR));
-                this.hpmsgLabels[i].setForeground(ColorManager.getColor(SWT.COLOR_WHITE));
-            } else if (ship.isHalfDamage()) {
-                if (AppConfig.get().isWarnByHalfDamage()) {
-                    // 中破で警告アイコン
-                    this.state.set(WARN);
-                    shipstatus.set(WARN);
+                else if (rate == DamageRate.TYUHA) {
+                    if (AppConfig.get().isWarnByHalfDamage()) {
+                        // 中破で警告アイコン
+                        this.state.set(WARN);
+                        shipstatus.set(WARN);
+                    }
                 }
-
-                this.hpmsgLabels[i].setText("中破");
-                this.hpmsgLabels[i].setBackground(ColorManager.getColor(AppConstants.TYUHA_SHIP_COLOR));
-                this.hpmsgLabels[i].setForeground(ColorManager.getColor(SWT.COLOR_WHITE));
-            } else if (ship.isSlightDamage()) {
-                this.hpmsgLabels[i].setText("小破");
-                this.hpmsgLabels[i].setBackground(null);
-                this.hpmsgLabels[i].setForeground(null);
-            } else {
-                this.hpmsgLabels[i].setText("健在");
-                this.hpmsgLabels[i].setBackground(null);
-                this.hpmsgLabels[i].setForeground(null);
             }
 
             // ステータス

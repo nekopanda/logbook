@@ -14,12 +14,12 @@ import org.eclipse.swt.graphics.Color;
  */
 public enum DamageRate {
 
-    MUKIZU("無傷", 0, null, null),
+    MUKIZU("無傷", 0, ColorManager.getColor(AppConstants.MUKIZU_SHIP_COLOR), null),
     KENZAI("健在", 1, null, null),
     SYOHA("小破", 2, ColorManager.getColor(AppConstants.SYOHA_SHIP_COLOR), null),
     TYUHA("中破", 3,
             ColorManager.getColor(AppConstants.TYUHA_SHIP_COLOR),
-            ColorManager.getColor(SWT.COLOR_WHITE)),
+            ColorManager.getColor(AppConstants.TYUHA_FORGROUNG_COLOR)),
     TAIHA("大破", 4,
             ColorManager.getColor(AppConstants.TAIHA_SHIP_COLOR),
             ColorManager.getColor(SWT.COLOR_WHITE)),
