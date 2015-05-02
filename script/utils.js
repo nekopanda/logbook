@@ -1,5 +1,6 @@
 
 ComparableArrayType = Java.type("java.lang.Comparable[]");
+JsonValue = Java.type("javax.json.JsonValue");
 
 // javascriptの配列をそのまま返すと遅いので
 // Comparable[]に変換しておく
@@ -26,4 +27,8 @@ function alert(str) {
 	var box = new MessageBox(shell,SWT.OK);
 	box.setMessage(String(str));
 	box.open();
+}
+
+function isJsonNull(jsonval) {
+	return (jsonval == null) || (jsonval == JsonValue.NULL);
 }
