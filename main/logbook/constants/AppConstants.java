@@ -24,7 +24,7 @@ public class AppConstants {
     public static final String SUFFIX = "拡張版";
 
     /** バージョン */
-    public static final String VERSION = "1.8.1";
+    public static final String VERSION = "1.8.2";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://nekopanda.blog.jp/");
@@ -122,7 +122,7 @@ public class AppConstants {
     public static final RGB[] MUKIZU_SHIP_COLOR = new RGB[] { new RGB(149, 255, 165), null };
 
     /** 小破の色 */
-    public static final RGB[] SYOHA_SHIP_COLOR = new RGB[] { new RGB(210, 255, 0), new RGB(241, 255, 163) };
+    public static final RGB[] SYOHA_SHIP_COLOR = new RGB[] { new RGB(230, 255, 0), new RGB(241, 255, 163) };
 
     /** 中破の色 */
     public static final RGB[] TYUHA_SHIP_COLOR = new RGB[] { new RGB(255, 140, 0), new RGB(255, 252, 20) };

@@ -75,7 +75,7 @@ public class WindowBase {
     private boolean showTitlebar = true;
 
     // shell.getVisible() は最小化状態だとfalseを返すので独自の状態を持つ
-    private boolean visible = false;
+    private boolean minimized = false;
 
     // メニュー
     private MenuItem topMostItem;
@@ -822,14 +822,16 @@ public class WindowBase {
 
     /** parent is un-minimized */
     public void shellDeiconified() {
-        if ((this.menuItem != null) && this.menuItem.getSelection()) {
+        if ((this.menuItem != null) && this.menuItem.getSelection() && this.minimized) {
+            this.minimized = false;
             this.shell.setVisible(true);
         }
     }
 
     /** parent is minimized */
     public void shellIconified() {
-        if ((this.menuItem != null) && this.menuItem.getSelection()) {
+        if ((this.menuItem != null) && this.menuItem.getSelection() && this.shell.getVisible()) {
+            this.minimized = true;
             this.shell.setVisible(false);
         }
     }
@@ -879,8 +881,7 @@ public class WindowBase {
     }
 
     public void setVisible(boolean visible) {
-        if (this.visible != visible) {
-            this.visible = visible;
+        if (this.shell.getVisible() != visible) {
             // 関連付けられたメニューがある場合はメニューも連動させる
             if (this.menuItem != null) {
                 this.menuItem.setSelection(visible);
@@ -904,7 +905,7 @@ public class WindowBase {
     }
 
     public boolean getVisible() {
-        return this.visible;
+        return this.minimized || this.shell.getVisible();
     }
 
     public Shell getActualParent() {

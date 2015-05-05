@@ -277,7 +277,7 @@ public final class ConfigDialog extends Dialog {
 
         final Button colorSupport = new Button(compositeSystem, SWT.CHECK);
         colorSupport.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-        colorSupport.setText("色覚サポート");
+        colorSupport.setText("色覚サポート*");
         colorSupport.setSelection(AppConfig.get().isColorSupport());
 
         final Combo systemWideShortcutKey;

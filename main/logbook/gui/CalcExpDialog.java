@@ -5,12 +5,13 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import logbook.config.AppConfig;
+import logbook.data.Data;
+import logbook.data.DataType;
+import logbook.data.EventListener;
 import logbook.data.context.GlobalContext;
 import logbook.dto.ShipDto;
 import logbook.internal.EvaluateExp;
@@ -18,7 +19,6 @@ import logbook.internal.ExpTable;
 import logbook.internal.SeaExp;
 import logbook.util.CalcExpUtils;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
@@ -33,7 +33,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
@@ -45,12 +47,7 @@ import org.eclipse.swt.widgets.Text;
  */
 public final class CalcExpDialog extends WindowBase {
 
-    /** 旗艦 */
-    private static boolean flag = true;
-    /** MVP */
-    private static boolean mvp;
-
-    private final Map<String, ShipDto> shipmap = new HashMap<String, ShipDto>();
+    private final List<ShipDto> shiplist = new ArrayList<ShipDto>();
 
     private final Shell parent;
     private Shell shell;
@@ -123,8 +120,8 @@ public final class CalcExpDialog extends WindowBase {
         select.setLayout(new RowLayout());
         select.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         this.shipcombo = new Combo(select, SWT.READ_ONLY);
-        Button reload = new Button(select, SWT.NONE);
-        reload.setText("更新");
+        Button secretary = new Button(select, SWT.NONE);
+        secretary.setText("秘書艦");
 
         Composite plan = new Composite(this.shell, SWT.NONE);
         plan.setLayout(new GridLayout(5, false));
@@ -230,13 +227,9 @@ public final class CalcExpDialog extends WindowBase {
                 this.evalcombo.select(i);
             }
         }
-        // 旗艦チェックを復元
-        this.flagbtn.setSelection(flag);
-        // MVPチェックを復元
-        this.mvpbtn.setSelection(mvp);
 
         this.shipcombo.addSelectionListener(new PresetListener());
-        reload.addSelectionListener(new ReloadListener());
+        secretary.addSelectionListener(new SecretaryListener());
         SelectionListener beforeLvListener = new BeforeLvListener(this.beforexp, this.beforelv);
         this.beforelv.addSelectionListener(beforeLvListener);
         this.beforelv.addMouseWheelListener(new WheelListener(this.beforelv, beforeLvListener));
@@ -249,8 +242,30 @@ public final class CalcExpDialog extends WindowBase {
         this.flagbtn.addSelectionListener(new UpdateListener());
         this.mvpbtn.addSelectionListener(new UpdateListener());
 
+        final EventListener updateListener = new EventListener() {
+            @Override
+            public void update(DataType type, Data data) {
+                switch (type) {
+                case PORT:
+                case SHIP2:
+                case SHIP3:
+                    CalcExpDialog.this.reload();
+                    break;
+                default:
+                    break;
+                }
+            }
+        };
+        GlobalContext.addEventListener(updateListener);
+        this.getShell().addListener(SWT.Dispose, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                GlobalContext.removeEventListener(updateListener);
+            }
+        });
+
         // 選択する項目はドラックで移動できないようにする
-        for (Control c : new Control[] { this.shipcombo, reload, this.beforexp, this.afterexp, this.getexp,
+        for (Control c : new Control[] { this.shipcombo, secretary, this.beforexp, this.afterexp, this.getexp,
                 this.needexp, this.beforelv, this.afterlv, this.seacombo, this.evalcombo, this.flagbtn,
                 this.mvpbtn }) {
             c.setData("disable-drag-move", true);
@@ -279,8 +294,7 @@ public final class CalcExpDialog extends WindowBase {
      */
     public void preset() {
         if (this.shipcombo.getSelectionIndex() > -1) {
-            ShipDto ship = CalcExpDialog.this.shipmap
-                    .get(this.shipcombo.getItem(this.shipcombo.getSelectionIndex()));
+            ShipDto ship = this.shiplist.get(this.shipcombo.getSelectionIndex());
             if (ship != null) {
                 int before = ship.getLv();
                 int after = this.afterlv.getSelection();
@@ -330,10 +344,6 @@ public final class CalcExpDialog extends WindowBase {
         this.needexp.setText(Integer.toString(needexpint));
         // 戦闘回数
         this.battlecount.setText(Integer.toString(count));
-        // 旗艦チェックを保存
-        CalcExpDialog.flag = this.flagbtn.getSelection();
-        // MVPチェックを保存
-        CalcExpDialog.mvp = this.mvpbtn.getSelection();
     }
 
     /**
@@ -342,39 +352,36 @@ public final class CalcExpDialog extends WindowBase {
      * @param combo
      */
     private void setShipComboData() {
-        // 秘書艦を選択する
-        int select = 0;
-        ShipDto secretary = GlobalContext.getSecretary();
-        if (secretary != null) {
-            select = secretary.getId();
+        int selected = -1;
+        if (this.shipcombo.getSelectionIndex() != -1) {
+            selected = this.shiplist.get(this.shipcombo.getSelectionIndex()).getId();
+        }
+        else {
+            ShipDto secretary = GlobalContext.getSecretary();
+            if (secretary != null) {
+                selected = secretary.getId();
+            }
         }
         // コンボボックスから全ての艦娘を削除
         this.shipcombo.removeAll();
         // 表示用文字列と艦娘の紐付けを削除
-        this.shipmap.clear();
+        this.shiplist.clear();
         // 艦娘IDの最大を取得してゼロ埋め長さを算出
-        int maxshipid = 0;
         for (ShipDto ship : GlobalContext.getShipMap().values()) {
-            maxshipid = Math.max(ship.getId(), maxshipid);
-        }
-        int padlength = String.valueOf(maxshipid).length();
-        // 表示用文字列と艦娘の紐付けを追加
-        for (ShipDto ship : GlobalContext.getShipMap().values()) {
-            this.shipmap.put(this.getShipLabel(ship, padlength), ship);
+            this.shiplist.add(ship);
         }
         // 艦娘を経験値順でソート
-        List<ShipDto> ships = new ArrayList<ShipDto>(this.shipmap.values());
-        Collections.sort(ships, new Comparator<ShipDto>() {
+        Collections.sort(this.shiplist, new Comparator<ShipDto>() {
             @Override
             public int compare(ShipDto o1, ShipDto o2) {
                 return Integer.compare(o2.getExp(), o1.getExp());
             }
         });
         // コンボボックスに追加
-        for (int i = 0; i < ships.size(); i++) {
-            String key = this.getShipLabel(ships.get(i), padlength);
-            this.shipcombo.add(key);
-            if (ships.get(i).getId() == select) {
+        for (int i = 0; i < this.shiplist.size(); i++) {
+            ShipDto ship = this.shiplist.get(i);
+            this.shipcombo.add(ship.getFriendlyName());
+            if (ship.getId() == selected) {
                 this.shipcombo.select(i);
             }
         }
@@ -384,28 +391,13 @@ public final class CalcExpDialog extends WindowBase {
     }
 
     /**
-     * 艦娘のプルダウン表示用文字列を作成します
-     * 
-     * @param ship
-     * @param padlength
-     * @return
-     */
-    private String getShipLabel(ShipDto ship, int padlength) {
-        return new StringBuilder().append(StringUtils.leftPad(String.valueOf(ship.getId()), padlength, '0'))
-                .append(": ").append(ship.getName()).append(" (Lv").append(ship.getLv() + ")").toString();
-    }
-
-    /**
      * 艦娘の状態を更新する
      * 
      */
-    private final class ReloadListener extends SelectionAdapter {
-        @Override
-        public void widgetSelected(SelectionEvent e) {
-            CalcExpDialog.this.setShipComboData();
-            CalcExpDialog.this.preset();
-            CalcExpDialog.this.calc();
-        }
+    private void reload() {
+        this.setShipComboData();
+        this.preset();
+        this.calc();
     }
 
     /**
@@ -416,6 +408,18 @@ public final class CalcExpDialog extends WindowBase {
         @Override
         public void widgetSelected(SelectionEvent e) {
             CalcExpDialog.this.calc();
+        }
+    }
+
+    /**
+     * 秘書艦をセット
+     *
+     */
+    private final class SecretaryListener extends SelectionAdapter {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+            CalcExpDialog.this.shipcombo.deselectAll();
+            CalcExpDialog.this.reload();
         }
     }
 

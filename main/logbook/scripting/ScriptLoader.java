@@ -387,7 +387,7 @@ public class ScriptLoader {
                 @Override
                 public boolean accept(File src) {
                     if (ignoreList.contains(src.getName())) {
-                        LOG.info("このファイルは除外されているためアップデートされません: " + src.getAbsolutePath());
+                        LOG.info("除外されているためアップデートされません: " + src.getAbsolutePath());
                         return false;
                     }
                     File dstFile = new File(AppConstants.SCRIPT_DIR.getAbsolutePath() +
