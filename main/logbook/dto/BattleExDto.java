@@ -179,7 +179,7 @@ public class BattleExDto extends AbstractDto {
 
         /** ランク */
         @Tag(5)
-        private final ResultRank estimatedRank;
+        private ResultRank estimatedRank;
 
         /** 夜戦 */
         @Tag(6)
@@ -226,10 +226,7 @@ public class BattleExDto extends AbstractDto {
         public Phase(BattleExDto battle, JsonObject object, BattlePhaseKind kind,
                 int[] beforeFriendHp, int[] beforeFriendHpCombined, int[] beforeEnemyHp)
         {
-            int numFships = beforeFriendHp.length;
-            int numEships = beforeEnemyHp.length;
             boolean isCombined = (beforeFriendHpCombined != null);
-            int numFshipsCombined = isCombined ? beforeFriendHpCombined.length : 0;
 
             this.kind = kind;
             this.isNight = kind.isNight();
@@ -319,6 +316,39 @@ public class BattleExDto extends AbstractDto {
             this.doAtack(this.hougeki2);
             this.doAtack(this.hougeki3);
 
+            this.json = object.toString();
+        }
+
+        public void battleDamage(BattleExDto battle) {
+            int numFships = this.nowFriendHp.length;
+            int numEships = this.nowEnemyHp.length;
+            boolean isCombined = (this.nowFriendHpCombined != null);
+            int numFshipsCombined = isCombined ? this.nowFriendHpCombined.length : 0;
+
+            // HP0以下を0にする
+            for (int i = 0; i < numFships; i++) {
+                this.nextHp(i, this.nowFriendHp, battle.getDock().getShips());
+            }
+            for (int i = 0; i < numEships; i++) {
+                if (this.nowEnemyHp[i] <= 0)
+                    this.nowEnemyHp[i] = 0;
+            }
+            if (isCombined) {
+                for (int i = 0; i < numFshipsCombined; i++) {
+                    this.nextHp(i, this.nowFriendHpCombined, battle.getDockCombined().getShips());
+                }
+            }
+
+            // 判定を計算
+            this.estimatedRank = this.calcResultRank(battle);
+        }
+
+        public void practiceDamage(BattleExDto battle) {
+            int numFships = this.nowFriendHp.length;
+            int numEships = this.nowEnemyHp.length;
+            boolean isCombined = (this.nowFriendHpCombined != null);
+            int numFshipsCombined = isCombined ? this.nowFriendHpCombined.length : 0;
+
             // HP0以下を0にする
             for (int i = 0; i < numFships; i++) {
                 if (this.nowFriendHp[i] <= 0)
@@ -338,7 +368,40 @@ public class BattleExDto extends AbstractDto {
             // 判定を計算
             this.estimatedRank = this.calcResultRank(battle);
 
-            this.json = object.toString();
+            // HP0以下を1にする
+            for (int i = 0; i < numFships; i++) {
+                if (this.nowFriendHp[i] <= 0)
+                    this.nowFriendHp[i] = 1;
+            }
+            for (int i = 0; i < numEships; i++) {
+                if (this.nowEnemyHp[i] <= 0)
+                    this.nowEnemyHp[i] = 1;
+            }
+            if (isCombined) {
+                for (int i = 0; i < numFshipsCombined; i++) {
+                    if (this.nowFriendHpCombined[i] <= 0)
+                        this.nowFriendHpCombined[i] = 1;
+                }
+            }
+        }
+
+        private void nextHp(int index, int[] hps, List<ShipDto> ships) {
+            int hp = hps[index];
+            ShipDto ship = ships.get(index);
+            if (hp <= 0) {
+                for (ItemInfoDto item : ship.getItem()) {
+                    if (item.getId() == 42) { //応急修理要員
+                        hps[index] = (int) (ship.getMaxhp() * 0.2);
+                        return;
+                    } else if (item.getId() == 43) { //応急修理女神
+                        hps[index] = ship.getMaxhp();
+                        return;
+                    }
+                }
+                hps[index] = 0;
+                return;
+            }
+            return;
         }
 
         // 勝利判定 //
@@ -914,14 +977,24 @@ public class BattleExDto extends AbstractDto {
 
         if (this.phaseList.size() > 0) {
             Phase phase = this.phaseList.get(0);
-            this.phaseList.add(new Phase(this, object, kind,
-                    phase.getNowFriendHp(), phase.getNowFriendHpCombined(), phase.getNowEnemyHp()));
+            this.completeDamageAndAddPhase(new Phase(this, object, kind,
+                    phase.getNowFriendHp(), phase.getNowFriendHpCombined(), phase.getNowEnemyHp()), kind);
         }
         else {
-            this.phaseList.add(new Phase(this, object, kind,
-                    this.startFriendHp, this.startFriendHpCombined, this.startEnemyHp));
+            this.completeDamageAndAddPhase(new Phase(this, object, kind,
+                    this.startFriendHp, this.startFriendHpCombined, this.startEnemyHp), kind);
         }
         return this.phaseList.get(this.phaseList.size() - 1);
+    }
+
+    private void completeDamageAndAddPhase(Phase phase, BattlePhaseKind kind) {
+        if (kind.isPractice()) {
+            phase.practiceDamage(this);
+        }
+        else {
+            phase.battleDamage(this);
+        }
+        this.phaseList.add(phase);
     }
 
     private void readResultJson(JsonObject object) {
