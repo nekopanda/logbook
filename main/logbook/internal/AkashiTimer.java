@@ -182,6 +182,12 @@ public class AkashiTimer {
                     }
                 }
 
+                int damage = ship.getMaxhp() - ship.getNowhp();
+                if (gain > damage) {
+                    // MAX以上は回復しない
+                    gain = damage;
+                }
+
                 boolean stepNotify = (state.currentGain != gain);
 
                 state.setShip(ship);

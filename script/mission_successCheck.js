@@ -129,7 +129,7 @@ function getCanMission(missionID){
 		case 34: return sTypeLock(2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0); break;
 		case 35: return sTypeLock(6, 40, 0, 0, 0, 0, 1, 2, 0, 0, 1, 0, 0, 0); break;
 		case 36: return sTypeLock(6, 30, 0, 0, 0, 1, 1, 0, 0, 0, 0, 2, 0, 0); break;
-		case 37: return sTypeLock(6, 50, 200, 4, 4, 1, 5, 0, 0, 0, 0, 0, 0, 0); break;
+		case 37: return sTypeLock(6, 50, 200, 3, 4, 1, 5, 0, 0, 0, 0, 0, 0, 0); break;
 		case 38: return sTypeLock(6, 65, 240, 4, 8, 0, 5, 0, 0, 0, 0, 0, 0, 0); break;
 		case 39: return sTypeLock(5, 3, 180, 0, 0, 0, 0, 0, 0, 4, 0, 0, 1, 0); break;
 		default: return "不明";

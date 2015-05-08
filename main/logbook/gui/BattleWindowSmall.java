@@ -68,7 +68,7 @@ public class BattleWindowSmall extends BattleWindow {
     }
 
     private void createHpLabels(Label[][] labels, int i) {
-        labels[0][i] = this.addLabel("000"); //0 開始時HP
+        labels[0][i] = this.addLabel("000/000"); //0 開始時HP
         labels[1][i] = this.addLabel("000"); //2 Dmg
         labels[2][i] = this.addLabel("000"); //3 後HP
     }
