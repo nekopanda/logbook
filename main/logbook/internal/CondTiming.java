@@ -17,7 +17,7 @@ public class CondTiming {
 
     private boolean ignoreNextPort = false;
     private TimeSpan updateTiming = null;
-    private Date from = null;
+    private Date from = new Date();
 
     public static class TimeSpan {
         private long offset;
@@ -106,31 +106,30 @@ public class CondTiming {
      * @param targetCond 目標疲労度
      * @return 回復する時刻
      */
-    public Date calcCondClearTime(int latestCond, Date time, int targetCond) {
+    public Date calcCondClearTime(int latestCond, int targetCond) {
         this.loadData();
         if (latestCond >= targetCond) {
             return null;
         }
         int requiredCycles = (int) Math.ceil((targetCond - latestCond) / 3.0);
         if (this.updateTiming == null) {
-            return new Date((time.getTime() + (requiredCycles * COND_CYCLE)) - (COND_CYCLE / 2));
+            return new Date((this.from.getTime() + (requiredCycles * COND_CYCLE)) - (COND_CYCLE / 2));
         }
-        long next = this.updateTiming.getNext(time);
-        return new Date(time.getTime() + next + ((requiredCycles - 1) * COND_CYCLE));
+        long next = this.updateTiming.getNext(this.from);
+        return new Date(this.from.getTime() + next + ((requiredCycles - 1) * COND_CYCLE));
     }
 
     /**
-     * 指定した時刻から何回疲労回復タイミングが過ぎたか計算
-     * @param time 起点となる時刻
+     * 何回疲労回復タイミングが過ぎたか計算
      * @return 経過した疲労回復回数
      */
-    public int calcPastCycles(Date time) {
+    public int calcPastCycles() {
         this.loadData();
-        long pastMills = new Date().getTime() - time.getTime();
+        long pastMills = new Date().getTime() - this.from.getTime();
         if (this.updateTiming == null) {
             return (int) ((pastMills + (COND_CYCLE / 2)) / COND_CYCLE);
         }
-        long next = this.updateTiming.getNext(time);
+        long next = this.updateTiming.getNext(this.from);
         if (pastMills < next) {
             return 0;
         }

@@ -21,9 +21,6 @@ import com.dyuproject.protostuff.Tag;
  */
 public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
 
-    /** 日時 */
-    private transient final Date time = new Date();
-
     /** 艦娘個人を識別するID */
     @Tag(10)
     private final int id;
@@ -245,7 +242,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     public int getEstimatedCond(CondTiming timer) {
         if (this.cond >= 49)
             return this.cond;
-        int estimatedCond = this.cond + (timer.calcPastCycles(this.time) * 3);
+        int estimatedCond = this.cond + (timer.calcPastCycles() * 3);
         if (estimatedCond > 49)
             return 49;
         return estimatedCond;
@@ -394,7 +391,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
         if (this.cond >= okCond) {
             return null;
         }
-        return timer.calcCondClearTime(this.cond, this.time, okCond);
+        return timer.calcCondClearTime(this.cond, okCond);
     }
 
     /**

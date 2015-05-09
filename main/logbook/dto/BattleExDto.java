@@ -367,22 +367,6 @@ public class BattleExDto extends AbstractDto {
 
             // 判定を計算
             this.estimatedRank = this.calcResultRank(battle);
-
-            // HP0以下を1にする
-            for (int i = 0; i < numFships; i++) {
-                if (this.nowFriendHp[i] <= 0)
-                    this.nowFriendHp[i] = 1;
-            }
-            for (int i = 0; i < numEships; i++) {
-                if (this.nowEnemyHp[i] <= 0)
-                    this.nowEnemyHp[i] = 1;
-            }
-            if (isCombined) {
-                for (int i = 0; i < numFshipsCombined; i++) {
-                    if (this.nowFriendHpCombined[i] <= 0)
-                        this.nowFriendHpCombined[i] = 1;
-                }
-            }
         }
 
         private void nextHp(int index, int[] hps, List<ShipDto> ships) {
