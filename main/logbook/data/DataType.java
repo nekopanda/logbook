@@ -19,6 +19,8 @@ public enum DataType {
     SHIP2("/kcsapi/api_get_member/ship2"),
     /** 保有艦 */
     SHIP3("/kcsapi/api_get_member/ship3"),
+    /** 出撃中の更新 */
+    SHIP_DECK("/kcsapi/api_get_member/ship_deck"),
     /** 遠征(帰還) */
     MISSION_RESULT("/kcsapi/api_req_mission/result"),
     /** 基本 */

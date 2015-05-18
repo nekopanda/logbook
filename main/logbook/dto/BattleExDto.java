@@ -153,6 +153,14 @@ public class BattleExDto extends AbstractDto {
     @Tag(38)
     private boolean[] escaped;
 
+    /** 轟沈フラグ */
+    @Tag(44)
+    private boolean[] lostflag;
+
+    /** 次の連合艦隊ではこうなりそう(ならなかったら轟沈艦を取り除くことができないので処理を再考する必要あり) */
+    //@Tag(45)
+    //private boolean[] lostflagCombined;
+
     @Tag(51)
     private String resultJson;
 
@@ -1023,6 +1031,13 @@ public class BattleExDto extends AbstractDto {
                     jsonEscape.getJsonArray("api_tow_idx").getInt(0) - 1
             };
         }
+        if (JsonUtils.hasKey(object, "api_lost_flag")) {
+            this.lostflag = new boolean[6];
+            JsonArray jsonLostflag = object.getJsonArray("api_lost_flag");
+            for (int i = 1; i < jsonLostflag.size(); i++) {
+                this.lostflag[i - 1] = (jsonLostflag.getInt(i) != 0);
+            }
+        }
     }
 
     /**
@@ -1511,5 +1526,12 @@ public class BattleExDto extends AbstractDto {
             return null;
         }
         return JsonUtils.fromString(this.resultJson);
+    }
+
+    /**
+     * @return lostflag
+     */
+    public boolean[] getLostflag() {
+        return this.lostflag;
     }
 }

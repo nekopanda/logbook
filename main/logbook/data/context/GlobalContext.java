@@ -180,6 +180,9 @@ public final class GlobalContext {
     /** 泊地修理タイマー */
     private static AkashiTimer akashiTimer = new AkashiTimer();
 
+    /** まだ削除してない轟沈艦 */
+    private static List<ShipDto> sunkShips = new ArrayList<ShipDto>();
+
     private static List<EventListener> eventListeners = new ArrayList<>();
 
     // 始めてアクセスがあった時に読み込む
@@ -577,11 +580,15 @@ public final class GlobalContext {
             break;
         // 保有艦
         case SHIP3:
-            doShip3(data);
+            doShipDeck(data);
             break;
         // 保有艦
         case SHIP2:
             doShip2(data);
+            break;
+        // 出撃中の更新
+        case SHIP_DECK:
+            doShipDeck(data);
             break;
         // 基本
         case BASIC:
@@ -1159,6 +1166,12 @@ public final class GlobalContext {
                     BattleResultServer.get().addNewResult(battle);
                 }
 
+                // ランクが合っているかチェック
+                Phase lastPhase = battle.getLastPhase();
+                if (!battle.getRank().equals(lastPhase.getEstimatedRank())) {
+                    LOG.info("戦闘結果判定ミス: 正解ランク:" + battle.getRank() + " " + lastPhase.getRankCalcInfo(battle));
+                }
+
                 if (battle.isPractice() == false) { // 演習は記録しない
                     //battleResultList.add(battle);
                     CreateReportLogic.storeBattleResultReport(battle);
@@ -1173,18 +1186,23 @@ public final class GlobalContext {
                         EnemyData.set(enemyId, enemyData);
                         mapCellDto.setEnemyData(enemyData);
                     }
+
+                    // 轟沈艦
+                    boolean[] lostflag = battle.getLostflag();
+                    DockDto dock = battle.getDock();
+                    if ((lostflag != null) && (dock != null)) {
+                        for (int i = 0; i < lostflag.length; ++i) {
+                            if (lostflag[i]) {
+                                sunkShips.add(dock.getShips().get(i));
+                            }
+                        }
+                    }
                 }
 
                 // 警告を出すためにバージョンアップ
                 battle.getDock().setUpdate(true);
                 if (battle.isCombined()) {
                     battle.getDockCombined().setUpdate(true);
-                }
-
-                // ランクが合っているかチェック
-                Phase lastPhase = battle.getLastPhase();
-                if (!battle.getRank().equals(lastPhase.getEstimatedRank())) {
-                    LOG.info("戦闘結果判定ミス: 正解ランク:" + battle.getRank() + " " + lastPhase.getRankCalcInfo(battle));
                 }
             }
             // 出撃を更新
@@ -1423,30 +1441,33 @@ public final class GlobalContext {
      *
      * @param data
      */
-    private static void doShip3(Data data) {
+    private static void doShipDeck(Data data) {
         try {
             JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
 
-            String shipidstr = data.getField("api_shipid");
-            JsonArray shipdata = apidata.getJsonArray("api_ship_data");
-
-            if (shipidstr != null) {
-                // 艦娘の指定がある場合は艦娘を差し替える
-                int shipid = Integer.parseInt(shipidstr);
-                for (int i = 0; i < shipdata.size(); i++) {
-                    ShipDto ship = new ShipDto((JsonObject) shipdata.get(i));
-                    shipMap.put(shipid, ship);
+            // 轟沈艦があるときはこのタイミングで削除
+            if (sunkShips.size() > 0) {
+                for (ShipDto ship : sunkShips) {
+                    shipMap.remove(ship.getId());
                 }
-            } else {
-                // 情報を破棄
-                shipMap.clear();
-                for (int i = 0; i < shipdata.size(); i++) {
-                    ShipDto ship = new ShipDto((JsonObject) shipdata.get(i));
-                    shipMap.put(ship.getId(), ship);
-                }
+                sunkShips.clear();
             }
+
+            // 艦娘を更新
+            JsonArray shipdata = apidata.getJsonArray("api_ship_data");
+            for (int i = 0; i < shipdata.size(); i++) {
+                ShipDto ship = new ShipDto((JsonObject) shipdata.get(i));
+                shipMap.put(ship.getId(), ship);
+            }
+
             // 艦隊を設定
             doDeck(apidata.getJsonArray("api_deck_data"));
+
+            if (battle != null) {
+                ApplicationMain.main.updateSortieDock();
+            }
+
+            battle = null;
 
             state = checkDataState();
 
@@ -1525,7 +1546,6 @@ public final class GlobalContext {
      * @param apidata
      */
     private static void doDeck(JsonArray apidata) {
-        Map<String, DockDto> newDocks = new TreeMap<String, DockDto>();
         for (int i = 0; i < apidata.size(); i++) {
             JsonObject jsonObject = (JsonObject) apidata.get(i);
             int fleetid = jsonObject.getInt("api_id");
@@ -1535,7 +1555,7 @@ public final class GlobalContext {
 
             DockDto dockdto = new DockDto(fleetidstr, name, dock.get(fleetidstr));
             List<Integer> shipIds = new ArrayList<Integer>();
-            newDocks.put(fleetidstr, dockdto);
+            dock.put(fleetidstr, dockdto);
 
             for (int j = 0; j < apiship.size(); j++) {
                 int shipId = apiship.getInt(j);
@@ -1545,7 +1565,7 @@ public final class GlobalContext {
                 if (ship != null) {
                     dockdto.addShip(ship);
 
-                    if ((i == 0) && (j == 0)) {
+                    if ((fleetid == 1) && (j == 0)) {
                         setSecretary(ship);
                     }
                     // 艦隊IDを設定
@@ -1554,7 +1574,7 @@ public final class GlobalContext {
                 }
             }
 
-            if (i >= 1) {
+            if (fleetid >= 2) {
                 JsonArray jmission = jsonObject.getJsonArray("api_mission");
                 int section = ((JsonNumber) jmission.get(1)).intValue();
                 long milis = ((JsonNumber) jmission.get(2)).longValue();
@@ -1562,10 +1582,9 @@ public final class GlobalContext {
                 if (milis > 0) {
                     time = new Date(milis);
                 }
-                deckMissions[i - 1] = new DeckMissionDto(name, section, time, fleetid, shipIds);
+                deckMissions[fleetid - 2] = new DeckMissionDto(name, section, time, fleetid, shipIds);
             }
         }
-        dock = newDocks;
     }
 
     /**
