@@ -895,7 +895,7 @@ public final class ApplicationMain extends WindowBase {
 
         MenuItem showNotifySetting = new MenuItem(this.getPopupMenu(), SWT.CHECK);
         showNotifySetting.setText("通知設定を表示");
-        this.bindControlToMenuItem(this.notifySettingGroup, showNotifySetting, "ShowNofitySetting");
+        this.bindControlToMenuItem(this.notifySettingGroup, showNotifySetting, "ShowNotifySetting");
 
         MenuItem showCondTimer = new MenuItem(this.getPopupMenu(), SWT.CHECK);
         showCondTimer.setText("疲労タイマーを表示");
@@ -1023,14 +1023,12 @@ public final class ApplicationMain extends WindowBase {
                 public void widgetSelected(SelectionEvent e) {
                     boolean show = menu.getSelection();
 
-                    if (!AppConfig.get().isMinimumLayout()) {
-                        // コントロールを隠す
-                        Shell shell = ApplicationMain.this.shell;
-                        shell.setRedraw(false);
-                        ApplicationMain.this.hide(!show, new Control[] { control });
-                        ApplicationMain.this.mainComposite.layout();
-                        shell.setRedraw(true);
-                    }
+                    // コントロールを隠す
+                    Shell shell = ApplicationMain.this.shell;
+                    shell.setRedraw(false);
+                    ApplicationMain.this.hide(!show, new Control[] { control });
+                    ApplicationMain.this.mainComposite.layout();
+                    shell.setRedraw(true);
 
                     // 設定を保存
                     try {
@@ -1182,12 +1180,6 @@ public final class ApplicationMain extends WindowBase {
 
     private Control[] getSwitchControls() {
         Control[] controls = new Control[0];
-        if (AppConfig.get().isShowNofitySetting()) {
-            controls = ArrayUtils.add(controls, this.notifySettingGroup);
-        }
-        if (AppConfig.get().isShowCondCycleTimer()) {
-            controls = ArrayUtils.add(controls, this.otherGroup);
-        }
         return ArrayUtils.addAll(controls,
                 this.commandComposite,
                 this.deck1name, this.deck2name,

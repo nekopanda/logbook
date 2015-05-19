@@ -36,7 +36,7 @@ public final class AppConfigBean {
     private boolean minimumLayout;
 
     /** 通知設定を表示 */
-    private boolean showNofitySetting = true;
+    private boolean showNotifySetting = true;
 
     /** 疲労度タイマー表示 */
     private boolean showCondCycleTimer = true;
@@ -461,17 +461,17 @@ public final class AppConfigBean {
     }
 
     /**
-     * @return showNofitySetting
+     * @return showNotifySetting
      */
-    public boolean isShowNofitySetting() {
-        return this.showNofitySetting;
+    public boolean isShowNotifySetting() {
+        return this.showNotifySetting;
     }
 
     /**
      * @param showNofitySetting セットする showNofitySetting
      */
-    public void setShowNofitySetting(boolean showNofitySetting) {
-        this.showNofitySetting = showNofitySetting;
+    public void setShowNotifySetting(boolean showNofitySetting) {
+        this.showNotifySetting = showNofitySetting;
     }
 
     /**
