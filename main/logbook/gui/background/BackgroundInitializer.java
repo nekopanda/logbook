@@ -15,6 +15,7 @@ import logbook.internal.EnemyData;
 import logbook.internal.Item;
 import logbook.internal.MasterData;
 import logbook.internal.Ship;
+import logbook.internal.ShipParameterRecord;
 import logbook.server.proxy.ProxyServer;
 
 import org.apache.logging.log4j.LogManager;
@@ -62,6 +63,7 @@ public final class BackgroundInitializer extends Thread {
             success &= Item.INIT_COMPLETE; // ItemMasterConfig
             success &= GlobalContext.INIT_COMPLETE; // ItemConfig
             success &= EnemyData.INIT_COMPLETE; // EnemyData
+            success &= ShipParameterRecord.INIT_COMPLETE; // ShipParameterRecord
             if (!success) {
                 LOG.warn("設定ファイルの読み込みに失敗したっぽい？");
             }

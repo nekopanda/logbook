@@ -149,6 +149,9 @@ public final class AppConfigBean {
     /** 更新系をログ出力するか */
     private boolean printUpdateLog = true;
 
+    /** ドロップをログ出力するか */
+    private boolean printDropLog = false;
+
     /** 遠征-1分前に通知する */
     private boolean noticeDeckmission = true;
 
@@ -1982,6 +1985,20 @@ public final class AppConfigBean {
      */
     public void setColorSupport(boolean colorSupport) {
         this.colorSupport = colorSupport;
+    }
+
+    /**
+     * @return printDropLog
+     */
+    public boolean isPrintDropLog() {
+        return this.printDropLog;
+    }
+
+    /**
+     * @param printDropLog セットする printDropLog
+     */
+    public void setPrintDropLog(boolean printDropLog) {
+        this.printDropLog = printDropLog;
     }
 
 }

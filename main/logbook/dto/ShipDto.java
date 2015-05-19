@@ -1,6 +1,7 @@
 package logbook.dto;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import javax.json.JsonObject;
@@ -98,9 +99,6 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     @Tag(40)
     private final String json;
 
-    /** */
-    private transient final int lockedEquip;
-
     /**
      * コンストラクター
      * 
@@ -112,13 +110,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
         this.id = object.getJsonNumber("api_id").intValue();
         this.locked = object.getJsonNumber("api_locked").intValue() == 1;
 
-        int charId = this.getShipId();
-        int afterShipId = this.getShipInfo().getAftershipid();
-        while (afterShipId != 0) {
-            charId = afterShipId;
-            afterShipId = Ship.get(String.valueOf(afterShipId)).getAftershipid();
-        }
-        this.charId = charId;
+        this.charId = Ship.getCharId(this.getShipInfo());
         this.sortno = object.getInt("api_sortno");
 
         this.lv = object.getJsonNumber("api_lv").intValue();
@@ -137,8 +129,45 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
         this.maxhp = this.getMax().getHP();
         this.slotnum = object.getJsonNumber("api_slotnum").intValue();
         this.onslot = JsonUtils.getIntArray(object, "api_onslot");
-        this.lockedEquip = object.getJsonNumber("api_locked_equip").intValue();
         this.json = object.toString();
+    }
+
+    /** 新規入手艦 */
+    public ShipDto(int id, ShipInfoDto shipinfo, int[] slot) {
+        super(shipinfo, slot, true);
+
+        this.id = id;
+        this.locked = false;
+        this.charId = Ship.getCharId(shipinfo);
+        this.sortno = this.getShipInfo().getSortNo();
+
+        this.lv = 1;
+        this.cond = 40;
+
+        this.docktime = 0;
+        this.dockfuel = 0;
+        this.dockmetal = 0;
+
+        this.bull = shipinfo.getMaxBull();
+        this.fuel = shipinfo.getMaxFuel();
+
+        this.exp = 0;
+        this.expraito = 0;
+        this.nowhp = this.maxhp = this.getMax().getHP();
+
+        this.slotnum = shipinfo.getSlotNum();
+        this.onslot = new int[] { 0, 0, 0, 0, 0 };
+
+        List<ItemDto> items = this.getItem2();
+        int[] maxeq = shipinfo.getMaxeq();
+        for (int i = 0; i < items.size(); ++i) {
+            ItemDto item = items.get(i);
+            if ((item != null) && item.isPlane()) {
+                this.onslot[i] = maxeq[i];
+            }
+        }
+
+        this.json = null;
     }
 
     /**
@@ -432,14 +461,6 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
      */
     public boolean isSlightDamage() {
         return ((float) this.nowhp / (float) this.maxhp) <= AppConstants.SLIGHT_DAMAGE;
-    }
-
-    /**
-     * lockedEquipを取得します。
-     * @return lockedEquip
-     */
-    public int getLockedEquip() {
-        return this.lockedEquip;
     }
 
     @Override

@@ -2,6 +2,7 @@ package logbook.internal;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -664,6 +665,26 @@ public class Ship {
      */
     public static Set<String> keySet() {
         return SHIP.keySet();
+    }
+
+    /** 敵艦名からの変換マップ */
+    public static Map<String, ShipInfoDto> getEnemyNameMap() {
+        Map<String, ShipInfoDto> nameMap = new HashMap<>();
+        for (ShipInfoDto ship : SHIP.values()) {
+            nameMap.put(ship.getFullName(), ship);
+        }
+        return nameMap;
+    }
+
+    /** 改造最終艦のID */
+    public static int getCharId(ShipInfoDto shipinfo) {
+        int charId = shipinfo.getShipId();
+        int afterShipId = shipinfo.getAftershipid();
+        while (afterShipId != 0) {
+            charId = afterShipId;
+            afterShipId = Ship.get(String.valueOf(afterShipId)).getAftershipid();
+        }
+        return charId;
     }
 
     public static void dumpCSV(OutputStreamWriter fw) throws IOException {

@@ -2,7 +2,9 @@ package logbook.internal;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -404,11 +406,11 @@ public class Item {
     /**
      * アイテムを取得します
      * 
-     * @param type ID
+     * @param id ID
      * @return アイテム
      */
-    public static ItemInfoDto get(int type) {
-        return ITEM.get(type);
+    public static ItemInfoDto get(int id) {
+        return ITEM.get(id);
     }
 
     /**
@@ -422,6 +424,24 @@ public class Item {
 
     public static Map<Integer, ItemInfoDto> getMap() {
         return ITEM;
+    }
+
+    public static List<ItemInfoDto> fromIdList(int[] slot) {
+        List<ItemInfoDto> items = new ArrayList<ItemInfoDto>();
+        for (int itemid : slot) {
+            if (-1 != itemid) {
+                ItemInfoDto item = ITEM.get(itemid);
+                if (item != null) {
+                    items.add(item);
+                } else {
+                    items.add(Item.UNKNOWN);
+                }
+            }
+            else {
+                items.add(null);
+            }
+        }
+        return items;
     }
 
     public static void dumpCSV(OutputStreamWriter fw) throws IOException {

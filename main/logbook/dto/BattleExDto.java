@@ -118,6 +118,10 @@ public class BattleExDto extends AbstractDto {
     @Tag(24)
     private String dropName;
 
+    /** ドロップ艦ID */
+    @Tag(46)
+    private int dropShipId;
+
     /** MVP艦（ゼロ始まりのインデックス） */
     @Tag(25)
     private int mvp;
@@ -410,6 +414,9 @@ public class BattleExDto extends AbstractDto {
             int enemyGauge = 0;
 
             for (int i = 0; i < numFships; i++) {
+                if ((battle.escaped != null) && battle.escaped[i])
+                    continue; // 退避艦は除外
+
                 if (this.nowFriendHp[i] > 0) {
                     ++friendNowShips;
                 }
@@ -417,6 +424,9 @@ public class BattleExDto extends AbstractDto {
             }
             if (isCombined) {
                 for (int i = 0; i < numFshipsCombined; i++) {
+                    if ((battle.escaped != null) && battle.escaped[i + 6])
+                        continue; // 退避艦は除外
+
                     if (this.nowFriendHpCombined[i] > 0) {
                         ++friendNowShips;
                     }
@@ -1008,8 +1018,10 @@ public class BattleExDto extends AbstractDto {
         this.dropItem = object.containsKey("api_get_useitem");
         if (this.dropShip || this.dropItem) {
             if (this.dropShip) {
-                this.dropType = object.getJsonObject("api_get_ship").getString("api_ship_type");
-                this.dropName = object.getJsonObject("api_get_ship").getString("api_ship_name");
+                JsonObject getShip = object.getJsonObject("api_get_ship");
+                this.dropShipId = getShip.getInt("api_ship_id");
+                this.dropType = getShip.getString("api_ship_type");
+                this.dropName = getShip.getString("api_ship_name");
             } else {
                 String name = UseItem.get(object.getJsonObject("api_get_useitem").getInt("api_useitem_id"));
                 this.dropType = "アイテム";
@@ -1142,9 +1154,9 @@ public class BattleExDto extends AbstractDto {
      * @return
      */
     public EnemyData getEnemyData(int enemyId, String enemyName) {
-        String[] enemyShips = new String[] { "", "", "", "", "", "" };
+        int[] enemyShips = new int[] { -1, -1, -1, -1, -1, -1 };
         for (int i = 0; i < this.enemy.size(); ++i) {
-            enemyShips[i] = this.enemy.get(i).getFriendlyName();
+            enemyShips[i] = this.enemy.get(i).getShipId();
         }
         return new EnemyData(enemyId, enemyName, enemyShips, this.formation[1]);
     }
@@ -1533,5 +1545,12 @@ public class BattleExDto extends AbstractDto {
      */
     public boolean[] getLostflag() {
         return this.lostflag;
+    }
+
+    /**
+     * @return shipId
+     */
+    public int getDropShipId() {
+        return this.dropShipId;
     }
 }

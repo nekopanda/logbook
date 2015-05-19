@@ -206,6 +206,9 @@ public class AppConstants {
     /** 敵データファイル  */
     public static final File ENEMY_DATA_FILE = new File("./config/KCRDB-enemyid.csv");
 
+    /** 艦パラメータファイル  */
+    public static final File SHIP_PARAMETER_FILE = new File("./config/ShipParameterRecord.csv");
+
     /** スクリプトデータファイル  */
     public static final File SCRIPT_DATA_FILE = new File("./config/scriptdata.zip");
 

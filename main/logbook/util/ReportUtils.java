@@ -102,6 +102,10 @@ public class ReportUtils {
         case COMBINED_BATTLE_MIDNIGHT:
         case COMBINED_BATTLE_SP_MIDNIGHT:
         case COMBINED_BATTLE_WATER:
+
+            // 艦娘の入手
+        case BATTLE_RESULT:
+        case COMBINED_BATTLE_RESULT:
             return true;
         }
         return false;

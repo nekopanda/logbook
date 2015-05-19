@@ -35,6 +35,12 @@ public class ItemDto extends AbstractDto {
     public ItemDto() {
     }
 
+    public ItemDto(ItemInfoDto info, int id) {
+        this.info = info;
+        this.slotitemId = info.getId();
+        this.id = id;
+    }
+
     public ItemDto(ItemInfoDto info, JsonObject object) {
         this.info = info;
         this.slotitemId = info.getId();

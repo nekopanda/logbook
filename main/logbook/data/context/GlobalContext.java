@@ -63,6 +63,7 @@ import logbook.internal.Item;
 import logbook.internal.MasterData;
 import logbook.internal.MasterData.ShipTypeDto;
 import logbook.internal.Ship;
+import logbook.internal.ShipParameterRecord.UpdateShipParameter;
 import logbook.internal.ShipStyle;
 import logbook.scripting.EventListenerProxy;
 import logbook.util.JsonUtils;
@@ -182,6 +183,15 @@ public final class GlobalContext {
 
     /** まだ削除してない轟沈艦 */
     private static List<ShipDto> sunkShips = new ArrayList<ShipDto>();
+
+    /** 次に入手した艦に割り当てるID */
+    private static int nextShipId;
+
+    /** 次に入手した装備に割り当てるID */
+    private static int nextSlotitemId;
+
+    /** ShipParameterRecord更新ハンドラ */
+    private static UpdateShipParameter updateShipParameter = new UpdateShipParameter();
 
     private static List<EventListener> eventListeners = new ArrayList<>();
 
@@ -1006,6 +1016,7 @@ public final class GlobalContext {
                 //addConsole("入渠情報を更新しました");
 
                 // 保有艦娘を更新する
+                sunkShips.clear();
                 boolean condUpdated = false;
                 boolean hpUpdated = false;
                 Map<Integer, ShipDto> oldShipMap = shipMap;
@@ -1013,7 +1024,7 @@ public final class GlobalContext {
                 JsonArray apiShip = apidata.getJsonArray("api_ship");
                 for (int i = 0; i < apiShip.size(); i++) {
                     ShipDto ship = new ShipDto((JsonObject) apiShip.get(i));
-                    shipMap.put(ship.getId(), ship);
+                    addShip(ship);
 
                     ShipDto oldShip = oldShipMap.get(ship.getId());
                     if (oldShip != null) {
@@ -1054,6 +1065,7 @@ public final class GlobalContext {
                     //addConsole("連合艦隊を更新しました");
                 }
 
+                updateShipParameter.sortieEnd();
                 state = checkDataState();
 
                 addUpdateLog("母港情報を更新しました");
@@ -1098,7 +1110,6 @@ public final class GlobalContext {
                 return;
             }
 
-            List<ShipDto> sunkShips = new ArrayList<ShipDto>();
             List<ShipDto> ships = battle.getFriends().get(0).getShips();
             int[] nowFriendHp = phase.getNowFriendHp();
 
@@ -1120,9 +1131,13 @@ public final class GlobalContext {
                         checkShipSunk(shipsCombined.get(i), nowFriendHpCombined[i], sunkShips);
                     }
                 }
+
+                if (battle.getPhaseList().size() == 1) {
+                    updateShipParameter.battleStart();
+                }
             }
 
-            addConsole("海戦情報を更新しました");
+            addUpdateLog("海戦情報を更新しました");
             if (AppConfig.get().isPrintSortieLog()) {
                 addConsole("自=" + Arrays.toString(phase.getNowFriendHp()));
                 if (battle.isCombined()) {
@@ -1137,11 +1152,16 @@ public final class GlobalContext {
                 }
             }
 
-            if (mapCellDto == null) {
-                // 出撃していない場合は出撃させる
-                for (DockDto dock : battle.getFriends()) {
-                    isSortie[Integer.parseInt(dock.getId()) - 1] = true;
+            // 出撃していない場合は出撃させる
+            boolean needToStart = false;
+            for (DockDto dock : battle.getFriends()) {
+                int index = Integer.parseInt(dock.getId()) - 1;
+                if (!isSortie[index]) {
+                    needToStart = true;
+                    isSortie[index] = true;
                 }
+            }
+            if (needToStart) {
                 ApplicationMain.main.startSortie();
             }
             ApplicationMain.main.updateBattle(battle);
@@ -1187,15 +1207,26 @@ public final class GlobalContext {
                         mapCellDto.setEnemyData(enemyData);
                     }
 
-                    // 轟沈艦
-                    boolean[] lostflag = battle.getLostflag();
-                    DockDto dock = battle.getDock();
-                    if ((lostflag != null) && (dock != null)) {
-                        for (int i = 0; i < lostflag.length; ++i) {
-                            if (lostflag[i]) {
-                                sunkShips.add(dock.getShips().get(i));
+                    // ドロップ艦を追加
+                    if (battle.isDropShip()) {
+                        ShipInfoDto shipinfo = Ship.get(String.valueOf(battle.getDropShipId()));
+                        int[] slotitemids = shipinfo.getDefaultSlot();
+                        int[] slotids = new int[slotitemids.length];
+                        for (int i = 0; i < slotitemids.length; ++i) {
+                            int slotitemid = slotitemids[i];
+                            int slotid = -1;
+                            if (slotitemid != -1) {
+                                ItemInfoDto info = Item.get(slotitemid);
+                                if (info != null) {
+                                    ItemDto item = new ItemDto(info, nextSlotitemId++);
+                                    slotid = item.getId();
+                                    itemMap.put(slotid, item);
+                                }
                             }
+                            slotids[i] = slotid;
                         }
+                        ShipDto dropShip = new ShipDto(nextShipId++, shipinfo, slotids);
+                        shipMap.put(dropShip.getId(), dropShip);
                     }
                 }
 
@@ -1205,9 +1236,17 @@ public final class GlobalContext {
                     battle.getDockCombined().setUpdate(true);
                 }
             }
+
             // 出撃を更新
             isStart = false;
             addUpdateLog("海戦結果を更新しました");
+
+            // ドロップを表示
+            if ((battle != null) && (battle.isDropShip() || battle.isDropItem())) {
+                if (AppConfig.get().isPrintDropLog()) {
+                    addConsole(battle.getDropName() + "がドロップしました");
+                }
+            }
         } catch (Exception e) {
             LOG.warn("海戦結果を更新しますに失敗しました", e);
             LOG.warn(data);
@@ -1347,7 +1386,7 @@ public final class GlobalContext {
             // 艦娘を追加します
             JsonObject apiShip = apidata.getJsonObject("api_ship");
             ShipDto ship = new ShipDto(apiShip);
-            shipMap.put(Integer.valueOf(ship.getId()), ship);
+            addShip(ship);
             // 投入資源を取得する
             GetShipDto dto = getShipResource.get(dock);
             if (dto == null) {
@@ -1427,8 +1466,6 @@ public final class GlobalContext {
                 addSlotitem(object);
             }
 
-            state = checkDataState();
-
             addUpdateLog("保有装備情報を更新しました");
         } catch (Exception e) {
             LOG.warn("保有装備を更新しますに失敗しました", e);
@@ -1467,8 +1504,6 @@ public final class GlobalContext {
                 ApplicationMain.main.updateSortieDock();
             }
 
-            battle = null;
-
             state = checkDataState();
 
             addUpdateLog("保有艦娘情報３を更新しました");
@@ -1489,8 +1524,7 @@ public final class GlobalContext {
             // 情報を破棄
             shipMap.clear();
             for (int i = 0; i < apidata.size(); i++) {
-                ShipDto ship = new ShipDto((JsonObject) apidata.get(i));
-                shipMap.put(ship.getId(), ship);
+                addShip(new ShipDto((JsonObject) apidata.get(i)));
             }
 
             // 戦闘結果がある場合、ダメージ計算があっているか検証します
@@ -1507,8 +1541,6 @@ public final class GlobalContext {
             if (battle != null) {
                 ApplicationMain.main.updateSortieDock();
             }
-
-            battle = null;
 
             addUpdateLog("保有艦娘情報２を更新しました");
         } catch (Exception e) {
@@ -2150,6 +2182,11 @@ public final class GlobalContext {
             // 出撃により疲労度が変わっているので
             condTiming.ignoreNext();
 
+            // 出撃準備
+            updateShipParameter.sortieStart();
+
+            battle = null;
+
             JsonObject obj = data.getJsonObject().getJsonObject("api_data");
 
             mapCellDto = new MapCellDto(obj, isStart);
@@ -2177,6 +2214,9 @@ public final class GlobalContext {
             JsonObject obj = data.getJsonObject().getJsonObject("api_data");
 
             mapCellDto = new MapCellDto(obj, isStart);
+
+            battle = null;
+
             ApplicationMain.main.updateMapCell(mapCellDto);
             if (AppConfig.get().isPrintSortieLog())
                 addConsole("行先 " + mapCellDto.toString());
@@ -2440,6 +2480,14 @@ public final class GlobalContext {
         return 1; // 正常
     }
 
+    /** 艦娘をshipMapに追加 */
+    private static void addShip(ShipDto ship) {
+        if (nextShipId <= ship.getId()) {
+            nextShipId = ship.getId() + 1;
+        }
+        shipMap.put(ship.getId(), ship);
+    }
+
     /** 装備アイテムをitemMapに追加 */
     private static ItemDto addSlotitem(JsonObject object) {
         int slotitemId = object.getInt("api_slotitem_id");
@@ -2447,6 +2495,9 @@ public final class GlobalContext {
         if (info != null) {
             ItemDto dto = new ItemDto(info, object);
             itemMap.put(dto.getId(), dto);
+            if (nextSlotitemId <= dto.getId()) {
+                nextSlotitemId = dto.getId() + 1;
+            }
             return dto;
         }
         return null;

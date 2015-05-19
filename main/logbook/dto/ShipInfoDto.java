@@ -2,8 +2,11 @@ package logbook.dto;
 
 import javax.json.JsonObject;
 
+import logbook.internal.ShipParameterRecord;
 import logbook.internal.ShipStyle;
 import logbook.util.JsonUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.dyuproject.protostuff.Tag;
 
@@ -24,6 +27,10 @@ public final class ShipInfoDto extends AbstractDto {
     @Tag(1)
     private int shipId;
 
+    /** 図鑑番号 */
+    @Tag(25)
+    private int sortNo;
+
     /** 艦種 */
     @Tag(3)
     private int stype;
@@ -43,6 +50,10 @@ public final class ShipInfoDto extends AbstractDto {
     /** flagshipもしくはelite (敵艦のみ) */
     @Tag(7)
     private String flagship;
+
+    /** 装備スロット数 */
+    @Tag(26)
+    private int slotNum;
 
     /** 弾 */
     @Tag(8)
@@ -98,6 +109,7 @@ public final class ShipInfoDto extends AbstractDto {
     public ShipInfoDto(JsonObject object) {
         this.name = object.getString("api_name");
         this.shipId = object.getJsonNumber("api_id").intValue();
+        this.sortNo = object.getJsonNumber("api_sortno").intValue();
         this.stype = object.getJsonNumber("api_stype").intValue();
         this.type = ShipStyle.get(this.stype);
         this.flagship = object.getString("api_yomi");
@@ -106,6 +118,7 @@ public final class ShipInfoDto extends AbstractDto {
         }
         this.afterlv = object.getJsonNumber("api_afterlv").intValue();
         this.aftershipid = Integer.parseInt(object.getString("api_aftershipid"));
+        this.slotNum = object.getInt("api_slot_num");
         this.maxBull = 0;
         if (object.containsKey("api_bull_max")) {
             this.maxBull = object.getJsonNumber("api_bull_max").intValue();
@@ -121,6 +134,21 @@ public final class ShipInfoDto extends AbstractDto {
         this.param = params[0];
         this.max = params[1];
         this.json = object.toString();
+    }
+
+    public String getFullName() {
+        if ((this.getMaxBull() == 0) && !StringUtils.isEmpty(this.flagship)) {
+            return this.name + " " + this.flagship;
+        }
+        return this.name;
+    }
+
+    public int[] getDefaultSlot() {
+        ShipParameterRecord record = ShipParameterRecord.get(this.shipId);
+        if ((record != null) && (record.getDefaultSlot() != null)) {
+            return record.getDefaultSlot();
+        }
+        return new int[] { -1, -1, -1, -1, -1 };
     }
 
     /**
@@ -327,5 +355,33 @@ public final class ShipInfoDto extends AbstractDto {
      */
     public JsonObject getJson() {
         return JsonUtils.fromString(this.json);
+    }
+
+    /**
+     * @return sortNo
+     */
+    public int getSortNo() {
+        return this.sortNo;
+    }
+
+    /**
+     * @param sortNo セットする sortNo
+     */
+    public void setSortNo(int sortNo) {
+        this.sortNo = sortNo;
+    }
+
+    /**
+     * @return slotNum
+     */
+    public int getSlotNum() {
+        return this.slotNum;
+    }
+
+    /**
+     * @param slotNum セットする slotNum
+     */
+    public void setSlotNum(int slotNum) {
+        this.slotNum = slotNum;
     }
 }
