@@ -16,8 +16,6 @@ import logbook.internal.MasterData;
 import logbook.internal.Ship;
 import logbook.util.JsonUtils;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.dyuproject.protostuff.Tag;
 
 /**
@@ -82,16 +80,25 @@ public abstract class ShipBaseDto extends AbstractDto {
      * @param shipId ship_id
      * @param slot 装備
      */
-    public ShipBaseDto(int shipId, int[] slot) {
-        this.shipInfo = Ship.get(String.valueOf(shipId));
+    public ShipBaseDto(ShipInfoDto shipinfo, int[] slot, boolean friend) {
+        this.shipInfo = shipinfo;
         this.slot = slot;
-        this.slotItem = createItemInfoList(slot);
+        if (friend) {
+            this.slotItem2 = createItemDtoList(this.slot);
+            this.slotItem = new ArrayList<ItemInfoDto>();
+            for (ItemDto dto : this.slotItem2) {
+                this.slotItem.add((dto == null) ? null : dto.getInfo());
+            }
+        }
+        else {
+            this.slotItem = Item.fromIdList(slot);
+            this.slotItem2 = createItemList(this.slotItem);
+        }
         ShipParameters[] params = ShipParameters.fromBaseAndSlotItem(
                 this.shipInfo.getParam(), this.getItem());
         this.param = params[0];
-        this.max = null;
+        this.max = this.shipInfo.getMax();
         this.slotParam = params[1];
-        this.slotItem2 = createItemList(this.slotItem);
     }
 
     /**
@@ -113,7 +120,8 @@ public abstract class ShipBaseDto extends AbstractDto {
                     dto.setInfo(Item.UNKNOWN);
                     items.add(dto);
                 }
-            } else {
+            }
+            else {
                 items.add(null);
             }
         }
@@ -133,36 +141,14 @@ public abstract class ShipBaseDto extends AbstractDto {
                 items.add(null);
             }
             else {
-                ItemDto dto = new ItemDto();
-                dto.setInfo(info);
-                items.add(dto);
+                items.add(new ItemDto(info, -1));
             }
         }
         return items;
     }
 
-    /**
-     * slotitem_id から List<ItemInfoDto> を作成
-     * 敵艦および旧データとの互換性用
-     * @param item
-     * @return
-     */
-    private static List<ItemInfoDto> createItemInfoList(int[] slot) {
-        List<ItemInfoDto> items = new ArrayList<ItemInfoDto>();
-        Map<Integer, ItemInfoDto> itemMap = Item.getMap();
-        for (int itemid : slot) {
-            if (-1 != itemid) {
-                ItemInfoDto item = itemMap.get(itemid);
-                if (item != null) {
-                    items.add(item);
-                } else {
-                    items.add(Item.UNKNOWN);
-                }
-            } else {
-                items.add(null);
-            }
-        }
-        return items;
+    public boolean isFriend() {
+        return this.shipInfo.getMaxBull() > 0;
     }
 
     /**
@@ -194,16 +180,11 @@ public abstract class ShipBaseDto extends AbstractDto {
      * @return 表示名
      */
     public String getFriendlyName() {
-        String name = this.shipInfo.getName();
-        if (this.shipInfo.getMaxBull() > 0) { // 艦娘
-            name += "(Lv." + this.getLv() + ")";
+        if (this.isFriend()) {
+            return this.shipInfo.getName() + "(Lv." + this.getLv() + ")";
         }
-        else { // 深海棲艦
-            if (!StringUtils.isEmpty(this.shipInfo.getFlagship())) {
-                name += " " + this.shipInfo.getFlagship();
-            }
-        }
-        return name;
+        // 深海棲艦
+        return this.shipInfo.getFullName();
     }
 
     /**
@@ -292,7 +273,7 @@ public abstract class ShipBaseDto extends AbstractDto {
         if (this.slotItem == null) {
             // 古いバージョンはslotItemを作るのを忘れていたのでnullの場合がある
             // 同じ番号の装備はもうない可能性があるが失われた情報なので仕方ない
-            return createItemInfoList(this.slot);
+            return Item.fromIdList(this.slot);
         }
         return this.slotItem;
     }
@@ -415,15 +396,11 @@ public abstract class ShipBaseDto extends AbstractDto {
         return false;
     }
 
-    /**
-     * 名前:装備1,装備2,...
-     * @return
-     */
-    public String getDetailedString() {
+    public static String makeDetailedString(String shipname, List<ItemInfoDto> slot) {
         StringBuilder sb = new StringBuilder();
-        sb.append(this.getFriendlyName()).append(": ");
+        sb.append(shipname).append(": ");
         int idx = 0;
-        for (ItemInfoDto item : this.getItem()) {
+        for (ItemInfoDto item : slot) {
             if (item != null) {
                 if (idx++ > 0) {
                     sb.append(", ");
@@ -432,6 +409,14 @@ public abstract class ShipBaseDto extends AbstractDto {
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * 名前:装備1,装備2,...
+     * @return
+     */
+    public String getDetailedString() {
+        return makeDetailedString(this.getFriendlyName(), this.getItem());
     }
 
     /**
@@ -584,5 +569,12 @@ public abstract class ShipBaseDto extends AbstractDto {
      */
     public ShipParameters getMax() {
         return this.max;
+    }
+
+    /**
+     * @return
+     */
+    public String getFullName() {
+        return this.shipInfo.getFullName();
     }
 }

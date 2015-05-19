@@ -3,6 +3,8 @@
  */
 package logbook.dto;
 
+import logbook.internal.Ship;
+
 import com.dyuproject.protostuff.Tag;
 
 /**
@@ -32,7 +34,7 @@ public class EnemyShipDto extends ShipBaseDto {
     private final int lv;
 
     public EnemyShipDto(int shipId, int[] slot, int[] param, int lv) {
-        super(shipId, slot);
+        super(Ship.get(String.valueOf(shipId)), slot, false);
         // ここで送られてくるパラメータは装備を含まない素の値なのであまり役に立たない
         this.karyoku = param[0];
         this.raisou = param[1];

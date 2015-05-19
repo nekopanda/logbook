@@ -14,9 +14,13 @@ import logbook.dto.BattleExDto;
 import logbook.dto.DockDto;
 import logbook.dto.MapCellDto;
 import logbook.dto.ResultRank;
+import logbook.dto.ShipBaseDto;
 import logbook.dto.ShipDto;
+import logbook.dto.ShipInfoDto;
 import logbook.gui.logic.ColorManager;
 import logbook.internal.EnemyData;
+import logbook.internal.Item;
+import logbook.internal.Ship;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Label;
@@ -113,9 +117,15 @@ public class BattleWindow extends BattleWindowBase {
             else {
                 this.infoLabels[1][0].setText("KCRDB互換データ");
             }
-            String[] ships = enemyData.getEnemyShips();
+            int[] ships = enemyData.getEnemyShipsId();
             for (int i = 0; i < 6; ++i) {
-                this.enemyLabels[i].setText(String.valueOf(i + 1) + "." + ships[i]);
+                ShipInfoDto shipinfo = Ship.get(String.valueOf(ships[i]));
+                if (shipinfo != null) {
+                    String tooltip = ShipBaseDto.makeDetailedString(
+                            shipinfo.getFullName(), Item.fromIdList(shipinfo.getDefaultSlot()));
+                    this.enemyLabels[i].setText(String.valueOf(i + 1) + "." + shipinfo.getFullName());
+                    this.enemyLabels[i].setToolTipText(tooltip);
+                }
             }
             this.infoLabels[1][1].setText(FORM_PREFIX + enemyData.getFormation());
         }

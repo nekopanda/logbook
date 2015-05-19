@@ -32,6 +32,7 @@ import logbook.internal.AkashiTimer;
 import logbook.internal.CondTiming;
 import logbook.internal.EnemyData;
 import logbook.internal.MasterData;
+import logbook.internal.ShipParameterRecord;
 import logbook.scripting.ScriptData;
 import logbook.util.SwtUtils;
 
@@ -100,6 +101,7 @@ public final class AsyncExecApplicationMain extends Thread {
                             ShipGroupConfig.store();
                             MasterData.store();
                             EnemyData.store();
+                            ShipParameterRecord.store();
                             ScriptData.store();
                         } catch (IOException e) {
                             LOG.fatal("ファイル更新に失敗しました", e);

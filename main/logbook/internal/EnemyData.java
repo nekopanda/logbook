@@ -18,8 +18,11 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import logbook.constants.AppConstants;
+import logbook.dto.ShipInfoDto;
 import logbook.gui.ApplicationMain;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -56,10 +59,12 @@ public class EnemyData {
     private final int enemyId;
     @Tag(2)
     private final String enemyName;
-    @Tag(3)
-    private final String[] enemyShips;
+    //@Tag(3)
+    //private final String[] enemyShips;
     @Tag(4)
     private final String formation;
+    @Tag(5)
+    private final int[] enemyShipsId;
 
     @Override
     public boolean equals(Object o) {
@@ -67,7 +72,7 @@ public class EnemyData {
             EnemyData e = (EnemyData) o;
             if ((e.enemyId == this.enemyId) &&
                     e.enemyName.equals(this.enemyName) &&
-                    Arrays.equals(e.enemyShips, this.enemyShips) &&
+                    Arrays.equals(e.enemyShipsId, this.enemyShipsId) &&
                     e.formation.equals(this.formation)) {
                 return true;
             }
@@ -75,10 +80,10 @@ public class EnemyData {
         return false;
     }
 
-    public EnemyData(int enemyId, String enemyName, String[] enemyShips, String formation) {
+    public EnemyData(int enemyId, String enemyName, int[] enemyShipsId, String formation) {
         this.enemyId = enemyId;
         this.enemyName = enemyName;
-        this.enemyShips = enemyShips;
+        this.enemyShipsId = enemyShipsId;
         this.formation = formation;
     }
 
@@ -118,13 +123,14 @@ public class EnemyData {
         // 変更があったときだけ書き込む
         if (modified) {
             try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(new BufferedOutputStream(
-                    new FileOutputStream(AppConstants.ENEMY_DATA_FILE)), AppConstants.CHARSET))) {
+                    new FileOutputStream(AppConstants.ENEMY_DATA_FILE)), AppConstants.CHARSET),
+                    CSVWriter.DEFAULT_SEPARATOR, CSVWriter.NO_QUOTE_CHARACTER)) {
                 List<String> flatten = new ArrayList<String>();
                 for (Entry<Integer, EnemyData> e : ENEMY.entrySet()) {
                     EnemyData data = e.getValue();
                     flatten.add(String.valueOf(data.getEnemyId()));
-                    for (String s : data.getEnemyShips()) {
-                        flatten.add(s);
+                    for (int s : data.getEnemyShipsId()) {
+                        flatten.add(String.valueOf(s));
                     }
                     flatten.add(data.getFormation());
                     if (data.getEnemyName() != null) {
@@ -141,15 +147,35 @@ public class EnemyData {
 
     public static void load() throws IOException {
         if (AppConstants.ENEMY_DATA_FILE.exists()) {
+
+            Map<String, ShipInfoDto> nameMap = Ship.getEnemyNameMap();
+
             CSVReader reader = new CSVReader(new InputStreamReader(
                     new FileInputStream(AppConstants.ENEMY_DATA_FILE), AppConstants.CHARSET));
             for (String[] entry : reader.readAll()) {
                 if (entry.length >= 8) {
-                    String[] enemyShips = new String[6];
-                    System.arraycopy(entry, 1, enemyShips, 0, 6);
                     int id = Integer.parseInt(entry[0]);
+                    int[] enemyShipsId = new int[6];
+                    for (int i = 0; i < 6; ++i) {
+                        String shipdata = entry[i + 1];
+                        int shipId = -1;
+                        if (!StringUtils.isEmpty(shipdata)) {
+                            if (NumberUtils.isNumber(shipdata)) {
+                                if (shipId > 0) {
+                                    shipId = Integer.parseInt(shipdata);
+                                }
+                            }
+                            else {
+                                ShipInfoDto shipinfo = nameMap.get(shipdata);
+                                if (shipinfo != null) {
+                                    shipId = shipinfo.getShipId();
+                                }
+                            }
+                        }
+                        enemyShipsId[i] = shipId;
+                    }
                     String name = (entry.length >= 9) ? entry[8] : null;
-                    ENEMY.put(id, new EnemyData(id, name, enemyShips, entry[7]));
+                    ENEMY.put(id, new EnemyData(id, name, enemyShipsId, entry[7]));
                 }
             }
             reader.close();
@@ -170,8 +196,21 @@ public class EnemyData {
     /**
      * @return enemyShips
      */
+    public int[] getEnemyShipsId() {
+        return this.enemyShipsId;
+    }
+
     public String[] getEnemyShips() {
-        return this.enemyShips;
+        String[] names = new String[6];
+        for (int i = 0; i < 6; ++i) {
+            String name = "";
+            ShipInfoDto shipinfo = Ship.get(String.valueOf(this.enemyShipsId[i]));
+            if (shipinfo != null) {
+                name = shipinfo.getFullName();
+            }
+            names[i] = name;
+        }
+        return names;
     }
 
     /**

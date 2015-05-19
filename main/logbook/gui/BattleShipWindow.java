@@ -9,8 +9,12 @@ import logbook.dto.BattleExDto;
 import logbook.dto.DockDto;
 import logbook.dto.EnemyShipDto;
 import logbook.dto.ItemInfoDto;
+import logbook.dto.MapCellDto;
 import logbook.dto.ShipDto;
+import logbook.dto.ShipInfoDto;
 import logbook.internal.EnemyData;
+import logbook.internal.Item;
+import logbook.internal.Ship;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
@@ -58,11 +62,12 @@ public class BattleShipWindow extends BattleWindowBase {
                 List<ItemInfoDto> slots = ship.getItem();
                 int[] onSlots = ship.getOnSlot(); // 現在の艦載機搭載数
                 int[] maxeq = ship.getShipInfo().getMaxeq(); // 艦載機最大搭載数
+                int slotnum = ship.getSlotNum();
                 for (int i = 0; i < 4; ++i) {
-                    if (i < slots.size()) {
+                    if (i < slotnum) {
                         String onSlot = "";
                         String itemName = "";
-                        ItemInfoDto item = slots.get(i);
+                        ItemInfoDto item = (i < slots.size()) ? slots.get(i) : null;
                         if (item != null) {
                             if (item.isPlane()) {
                                 String max = (maxeq == null) ? "?" : String.valueOf(maxeq[i]);
@@ -100,31 +105,60 @@ public class BattleShipWindow extends BattleWindowBase {
 
     private void enemyUpdatetSlotitem(int newIndex) {
         if (newIndex != -1) {
-            if ((this.getBattle() != null) && (newIndex < this.getBattle().getEnemy().size())) {
-                this.enemyLabels[newIndex].setFont(this.getBoldFont());
+            List<ItemInfoDto> slots;
+            ShipInfoDto shipinfo;
+            if ((this.getBattle() != null)) {
+                if (newIndex >= this.getBattle().getEnemy().size())
+                    return;
+
                 EnemyShipDto ship = this.getBattle().getEnemy().get(newIndex);
-                if (ship != null) {
-                    List<ItemInfoDto> slots = ship.getItem();
-                    int[] maxeq = ship.getShipInfo().getMaxeq(); // 艦載機最大搭載数
-                    for (int i = 0; i < 5; ++i) {
-                        if (i < slots.size()) {
-                            String onSlot = "";
-                            String itemName = "";
-                            ItemInfoDto item = slots.get(i);
-                            if (item != null) {
-                                if (item.isPlane()) {
-                                    onSlot = (maxeq == null) ? "?" : String.valueOf(maxeq[i]);
-                                }
-                                itemName = item.getName();
-                            }
-                            setLabelText(this.enemyDetail[0][i], String.valueOf(i + 1) + ":" + itemName);
-                            this.enemyDetail[1][i].setText(onSlot);
+                if (ship == null)
+                    return;
+
+                slots = ship.getItem();
+                shipinfo = ship.getShipInfo();
+            }
+            else {
+                MapCellDto dto = this.getMapCellDto();
+                if (dto == null)
+                    return;
+
+                EnemyData enemyData = dto.getEnemyData();
+                if (enemyData == null)
+                    return;
+
+                int shpid = enemyData.getEnemyShipsId()[newIndex];
+                if (shpid == -1)
+                    return;
+
+                shipinfo = Ship.get(String.valueOf(shpid));
+                if (shipinfo == null)
+                    return;
+
+                slots = Item.fromIdList(shipinfo.getDefaultSlot());
+            }
+
+            this.enemyLabels[newIndex].setFont(this.getBoldFont());
+
+            int[] maxeq = shipinfo.getMaxeq(); // 艦載機最大搭載数
+            int slotnum = shipinfo.getSlotNum();
+            for (int i = 0; i < 5; ++i) {
+                if (i < slotnum) {
+                    String onSlot = "";
+                    String itemName = "";
+                    ItemInfoDto item = (i < slots.size()) ? slots.get(i) : null;
+                    if (item != null) {
+                        if (item.isPlane()) {
+                            onSlot = (maxeq == null) ? "?" : String.valueOf(maxeq[i]);
                         }
-                        else {
-                            setLabelText(this.enemyDetail[0][i], "");
-                            this.enemyDetail[1][i].setText("");
-                        }
+                        itemName = item.getName();
                     }
+                    setLabelText(this.enemyDetail[0][i], String.valueOf(i + 1) + ":" + itemName);
+                    this.enemyDetail[1][i].setText(onSlot);
+                }
+                else {
+                    setLabelText(this.enemyDetail[0][i], "");
+                    this.enemyDetail[1][i].setText("");
                 }
             }
         }
@@ -138,7 +172,6 @@ public class BattleShipWindow extends BattleWindowBase {
                     this.enemyLabels[this.enemyCurrentIndex].setFont(this.getNormalFont());
                 }
                 this.enemyUpdatetSlotitem(newIndex);
-                this.endDraw();
                 this.enemyCurrentIndex = newIndex;
             } finally {
                 this.endDraw();
@@ -344,9 +377,17 @@ public class BattleShipWindow extends BattleWindowBase {
 
         EnemyData enemyData = this.getMapCellDto().getEnemyData();
         if (enemyData != null) {
-            String[] ships = enemyData.getEnemyShips();
+            int[] ships = enemyData.getEnemyShipsId();
             for (int i = 0; i < 6; ++i) {
-                this.enemyLabels[i].setText(String.valueOf(i + 1) + "." + ships[i]);
+                if (ships[i] != -1) {
+                    ShipInfoDto shipinfo = Ship.get(String.valueOf(ships[i]));
+                    if (shipinfo != null) {
+                        this.enemyLabels[i].setText(String.valueOf(i + 1) + "." + shipinfo.getFullName());
+                    }
+                }
+                else {
+                    this.enemyLabels[i].setText("-");
+                }
             }
         }
         this.enemyUpdatetSlotitem(this.enemyCurrentIndex);
