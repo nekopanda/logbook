@@ -204,7 +204,10 @@ public class AppConstants {
     public static final File GROUP_CONFIG_FILE = new File("./config/group.xml");
 
     /** 敵データファイル  */
-    public static final File ENEMY_DATA_FILE = new File("./config/KCRDB-enemyid.csv");
+    public static final File ENEMY_DATA_FILE = new File("./config/EnemyFleetRecord.csv");
+
+    /** 旧敵データファイル  */
+    public static final File ENEMY_DATA_OLD_FILE = new File("./config/KCRDB-enemyid.csv");
 
     /** 艦パラメータファイル  */
     public static final File SHIP_PARAMETER_FILE = new File("./config/ShipParameterRecord.csv");

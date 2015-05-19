@@ -1063,7 +1063,7 @@ public class BattleExDto extends AbstractDto {
         this.readResultJson(object);
     }
 
-    private static String toFormation(int f) {
+    public static String toFormation(int f) {
         String formation;
         switch (f) {
         case 1:
@@ -1098,6 +1098,29 @@ public class BattleExDto extends AbstractDto {
             break;
         }
         return formation;
+    }
+
+    public static int fromFormation(String f) {
+        if (f.startsWith("単縦"))
+            return 1;
+        else if (f.startsWith("複縦"))
+            return 2;
+        else if (f.startsWith("輪形"))
+            return 3;
+        else if (f.startsWith("梯形"))
+            return 4;
+        else if (f.startsWith("単横"))
+            return 5;
+        else if (f.startsWith("第一警戒"))
+            return 11;
+        else if (f.startsWith("第二警戒"))
+            return 12;
+        else if (f.startsWith("第三警戒"))
+            return 13;
+        else if (f.startsWith("第四警戒"))
+            return 14;
+        else
+            return 1;
     }
 
     private static String toMatch(int id) {

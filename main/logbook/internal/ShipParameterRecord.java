@@ -170,7 +170,7 @@ public class ShipParameterRecord {
         if (modified) {
             try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(new BufferedOutputStream(
                     new FileOutputStream(AppConstants.SHIP_PARAMETER_FILE)), AppConstants.CHARSET),
-                    CSVWriter.DEFAULT_SEPARATOR, CSVWriter.NO_QUOTE_CHARACTER, "\n")) {
+                    CSVWriter.DEFAULT_SEPARATOR, CSVWriter.NO_QUOTE_CHARACTER)) {
                 List<String> flatten = new ArrayList<String>();
                 writer.writeNext(getHeader());
                 for (Entry<Integer, ShipParameterRecord> e : SHIP.entrySet()) {
@@ -207,6 +207,9 @@ public class ShipParameterRecord {
 
                 if (entry.length >= 17) {
                     ShipParameterRecord record = new ShipParameterRecord(entry);
+                    if (SHIP.containsKey(record.shipId)) {
+                        modified = true;
+                    }
                     SHIP.put(record.shipId, record);
                 }
             }

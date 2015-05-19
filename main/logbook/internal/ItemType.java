@@ -46,6 +46,7 @@ public class ItemType {
             this.put(30, "高射装置");
             this.put(31, "対地装備");
             this.put(32, "水上艦要員");
+            this.put(33, "大型飛行艇");
         }
     };
 

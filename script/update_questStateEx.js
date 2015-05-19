@@ -1,4 +1,4 @@
-//Version:1.1.2+1.7.9
+//Version:1.3.8beta
 //Author:Nishisonic
 
 //flg + questNoでbooleanを確認（trueなら任務遂行中）
@@ -10,19 +10,10 @@ load("script/utils.js");
 load("script/ScriptData.js");
 data_prefix = "questStateEx_";
 
-//Calendar型を使う深い意味は無い
-//importPackageとJava.type()、どっちの方が良いんだろうか？
 Calendar = Java.type("java.util.Calendar");
 importPackage(Packages.logbook.data);
 ApplicationMain = Java.type("logbook.gui.ApplicationMain");
-//System = Java.type("java.lang.System");
-
-//グローバル変数はあまり好きじゃぬい
-
-//※注意 マンスリー任務で轟沈艦が発生した場合の処理は入れていません
-//轟沈した場合の処理、どうすれば良いか分かんない（例：僚艦は轟沈しても大丈夫なのか？etc.）
-//というより、普通沈めないだろjk
-//※追記 1-6の処理、どうすればいいんだろう…あ号判定がよく分からん
+System = Java.type("java.lang.System");
 
 function update(type, data){
 	var json = data.getJsonObject();
@@ -36,12 +27,12 @@ function update(type, data){
 				//for(var i = 0;parseInt(json.api_data.api_list[i]) == -1;i++){
 				for(var i = 0;i < 5;i++){
 					if(parseInt(json.api_data.api_list[i]) == -1) break;
-					var api_no = json.api_data.api_list[i].api_no;
-					var api_state = json.api_data.api_list[i].api_state;
-					var api_type = json.api_data.api_list[i].api_type;
+					var api_no = json.api_data.api_list[i].api_no.intValue();
+					var api_state = json.api_data.api_list[i].api_state.intValue();
+					var api_type = json.api_data.api_list[i].api_type.intValue();
 					setState(api_no, api_state, api_type);
-					var api_progress_flag = json.api_data.api_list[i].api_progress_flag;
-					questCountAdjustment(api_no, api_progress_flag, api_type);
+					var api_progress_flag = json.api_data.api_list[i].api_progress_flag.intValue();
+					questCountAdjustment(api_no, api_progress_flag, api_type, api_state);
 				}
 			}
 			setData("questLastUpdateTime",questLastUpdateTime);
@@ -49,13 +40,11 @@ function update(type, data){
 		//戦闘
 		case DataType.START:
 		case DataType.NEXT:
-			setData("mapAreaId",json.api_data.api_maparea_id);
-			setData("mapInfoNo",json.api_data.api_mapinfo_no);
-			setData("nextCell",json.api_data.api_no);
-			setData("eventId",json.api_data.api_event_id);
+			setData("mapAreaId",json.api_data.api_maparea_id.intValue());
+			setData("mapInfoNo",json.api_data.api_mapinfo_no.intValue());
+			setData("eventId",json.api_data.api_event_id.intValue());
 			break;
 		case DataType.BATTLE_RESULT:
-		//↓たぶん大丈夫だとは思うが、連合艦隊でどうなるかﾜｶﾝﾈ
 		case DataType.COMBINED_BATTLE_RESULT:
 			var getLastBattleDto = Packages.logbook.data.context.GlobalContext.getLastBattleDto();
 			var getEnemy = getLastBattleDto.getEnemy();
@@ -92,24 +81,23 @@ function update(type, data){
 						default :
 							break;
 					}
-					
 				}
 			}
 			//あ号作戦（出撃）
 			if(getData("flg214")) setData("cntSally214",getData("cntSally214") + 1);
 			//追記したから変な位置に
 			//あ号作戦（ボス到達）
-			if(parseInt(getData("eventId")) == 5){
+			if(getData("eventId") == 5){
 				if(getData("flg214")) setData("cntBoss214",getData("cntBoss214") + 1);
 			}
 			//敵艦隊主力を撃滅せよ！
 			if(getData("flg216")) setData("cnt216",getData("cnt216") + 1);
 			//敵艦隊を10回邀撃せよ！
 			if(getData("flg210")) setData("cnt210",getData("cnt210") + 1);
-			var winRank = json.api_data.api_win_rank;
-			if(String(winRank) == "S"|| String(winRank) == "A"|| String(winRank) == "B"){
+			var winRank = json.api_data.api_win_rank.toString();
+			if(winRank == "S"|| winRank == "A"|| winRank == "B"){
 				//あ号作戦（S勝利）
-				if(String(winRank) == "S"){
+				if(winRank == "S"){
 					if(getData("flg214")) setData("cntSWin214",getData("cntSWin214") + 1);
 				}
 				//敵艦隊を撃滅せよ！
@@ -123,17 +111,18 @@ function update(type, data){
 				//6=気のせいだった
 				//7=航空戦
 				//8=船団護衛成功
-				if(parseInt(getData("eventId")) == 5){
+				if(getData("eventId") == 5){
 					//あ号作戦（ボス勝利）
 					if(getData("flg214")) setData("cntBossWin214",getData("cntBossWin214") + 1);
-					switch(parseInt(getData("mapAreaId"))){
+					switch(getData("mapAreaId")){
 						case 1:
-							//「水雷戦隊」南西へ！
-							if(parseInt(getData("mapInfoNo")) == 4 && String(winRank) == "S"){
+							//「水雷戦隊」南西へ！(Ver1.3.3)
+							if(getData("mapInfoNo") == 4 && winRank == "S"){
 								var cntCL = 1;
 								var cntDD = 0;
+								var i; //getShips.length - 1が長いので
 								if(getShips.get(0).getType() == "軽巡洋艦"){
-									for(var i = 1;i < getShips.length;i++){
+									for(i = 1;i < getShips.length;i++){
 										if(getShips.get(i).getType() == "駆逐艦"){
 											cntDD++;
 											continue;
@@ -143,21 +132,23 @@ function update(type, data){
 											continue;
 										}
 									}
-									if(cntCL > 3 && cntDD > 0){
+									//軽巡3隻以下、駆逐1隻以上、軽巡と駆逐のみ
+									if(cntCL < 4 && cntDD > 0 && (i - 1) == (cntCL + cntDD)){
 										if(getData("flg257")) setData("cnt257",getData("cnt257") + 1);
 									}
 								}
 							}
-							if(parseInt(getData("mapInfoNo")) == 5 && String(winRank) != "B"){
+							if(getData("mapInfoNo") == 5 && winRank != "B"){
 								//海上輸送路の安全確保に努めよ！
 								if(getData("flg261")) setData("cnt261",getData("cnt261") + 1);
 								//海上護衛強化月間
 								if(getData("flg265")) setData("cnt265",getData("cnt265") + 1);
 							}
+							break;
 						case 2:
 							//南西諸島海域の制海権を握れ！
 							if(getData("flg226")) setData("cnt226",getData("cnt226") + 1);
-							if(parseInt(getData("mapInfoNo")) == 5 && String(winRank) == "S"){
+							if(getData("mapInfoNo") == 5 && winRank == "S"){
 								var check249 = 0;
 								var cntCA = 0;
 								var cntCL = 0;
@@ -181,25 +172,25 @@ function update(type, data){
 										continue;
 									}
 								}
-								//「第五戦隊」出撃せよ！
-								if(check249 == 2){
+								//「第五戦隊」出撃せよ！(Ver1.3.3)
+								if(check249 == 3){
 									if(getData("flg249")) setData("cnt249",getData("cnt249") + 1);
 								}
-								//「水上反撃部隊」突入せよ！
-								if(cntCA == 1 && cntCL == 1 && cntDD == 4){
+								//「水上反撃部隊」突入せよ！(Ver1.3.3)
+								if(cntCA == 1 && cntCL == 1 && cntDD == 4 && getShips.get(0).getType() == "駆逐艦"){
 									if(getData("flg266")) setData("cnt266",getData("cnt266") + 1);
 								}
 							}
 							break;
 						case 3:
 							//敵北方艦隊主力を撃滅せよ！
-							if(parseInt(getData("mapInfoNo")) >= 3){
+							if(getData("mapInfoNo") >= 3){
 									if(getData("flg241")) setData("cnt241",getData("cnt241") + 1);
 							}
 							break;
 						case 4:
 							//「空母機動部隊」西へ！
-							if(parseInt(getData("mapInfoNo")) == 2 && String(winRank) == "S"){
+							if(getData("mapInfoNo") == 2 && winRank == "S"){
 								var cntCV = 0;
 								var cntDD = 0;
 								for(var i = 0;i < getShips.length;i++){
@@ -221,12 +212,13 @@ function update(type, data){
 							//敵東方艦隊を撃滅せよ！
 							if(getData("flg229")) setData("cnt229",getData("cnt229") + 1);
 							//敵東方中枢艦隊を撃破せよ！
-							if(parseInt(getData("mapInfoNo")) == 4){
+							if(getData("mapInfoNo") == 4){
 								if(getData("flg242")) setData("cnt242",getData("cnt242") + 1);
 							}
+							break;
 						case 5:
 							//「水上打撃部隊」南方へ！
-							if(parseInt(getData("mapInfoNo")) == 1 && String(winRank) == "S"){
+							if(getData("mapInfoNo") == 1 && winRank == "S"){
 								var cntSlowBB = 0;
 								var cntCL = 0;
 								for(var i = 0;i < getShips.length;i++){
@@ -247,13 +239,13 @@ function update(type, data){
 								}
 							}
 							//南方海域珊瑚諸島沖の制空権を握れ！
-							if(parseInt(getData("mapInfoNo")) == 2 && String(winRank) == "S"){
+							if(getData("mapInfoNo") == 2 && winRank == "S"){
 								if(getData("flg243")) setData("cnt243",getData("cnt243") + 1);
 							}
 							break;
 						case 6:
 							//「潜水艦隊」出撃せよ！
-							if(parseInt(getData("mapInfoNo")) == 1 && String(winRank) == "S"){
+							if(getData("mapInfoNo") == 1 && winRank == "S"){
 								if(getData("flg256")) setData("cnt256",getData("cnt256") + 1);
 							}
 							break;
@@ -289,15 +281,21 @@ function update(type, data){
 			break;
 		//近代化改修
 		case DataType.POWERUP:
-			//艦の「近代化改修」を実施せよ！
-			if(getData("flg702")) setData("cnt702",getData("cnt702") + 1);
-			//「近代化改修」を進め、戦備を整えよ！
-			if(getData("flg703")) setData("cnt703",getData("cnt703") + 1);
+			var powerup_flag = json.api_data.api_powerup_flag.intValue();
+			if(powerup_flag != 0){
+				//艦の「近代化改修」を実施せよ！
+				if(getData("flg702")) setData("cnt702",getData("cnt702") + 1);
+				//「近代化改修」を進め、戦備を整えよ！
+				if(getData("flg703")) setData("cnt703",getData("cnt703") + 1);
+			}
 			break;
 		//遠征（帰還）
 		case DataType.MISSION_RESULT:
-			//0=失敗、1=成功,2=大成功
-			if(json.api_data.api_clear_result != 0){
+			//0=失敗、1=成功、2=大成功
+			var clear_result = json.api_data.api_clear_result.intValue();
+			if(clear_result != 0){
+				var quest_name = json.api_data.api_quest_name.toString();
+
 				//「遠征」を3回成功させよう！
 				if(getData("flg402")) setData("cnt402",getData("cnt402") + 1);
 				//「遠征」を10回成功させよう！
@@ -305,7 +303,7 @@ function update(type, data){
 				//大規模遠征作戦、発令！
 				if(getData("flg404")) setData("cnt404",getData("cnt404") + 1);
 				//api_no渡してこないので仕方なく
-				if(json.api_data.api_quest_name == "東京急行"|| json.api_data.api_quest_name == "東京急行(弐)"){
+				if(quest_name.indexOf("東京急行") > - 1){
 					//南方への輸送作戦を成功させよ！
 					if(getData("flg410")) setData("cnt410",getData("cnt410") + 1);
 					//南方への鼠輸送を継続実施せよ!
@@ -332,8 +330,8 @@ function update(type, data){
 		case DataType.PRACTICE_BATTLE_RESULT:
 			//「演習」で練度向上！
 			if(getData("flg303")) setData("cnt303",getData("cnt303") + 1);
-			var winRank = json.api_data.api_win_rank;
-			if(String(winRank) == "S"|| String(winRank) == "A"|| String(winRank) == "B"){
+			var PwinRank = json.api_data.api_win_rank.toString();
+			if(PwinRank == "S"|| PwinRank == "A"|| PwinRank == "B"){
 				//「演習」で他提督を圧倒せよ！
 				if(getData("flg304")) setData("cnt304",getData("cnt304") + 1);
 				//大規模演習
@@ -354,10 +352,20 @@ function updateCheck() {
 		var nowTime = Calendar.getInstance();
 		//5時間マイナスして、0時に更新したように見せる
 		nowTime.add(Calendar.HOUR_OF_DAY, -5);
-		questLastUpdateTime.add(Calendar.HOUR_OF_DAY, -5);
-		
+		questLastUpdateTime.add(Calendar.HOUR_OF_DAY, - 5);
+		//maxcountを頻繁に更新するように変更(ver1.3.0)
+		initializeMaxCount();
+		//デイリー
 		updateCheckDairy(questLastUpdateTime, nowTime);
+		//一日マイナス（こうすることによって、月曜日判定から日曜日判定に変える）
+		nowTime.add(Calendar.DAY_OF_MONTH, - 1);
+		questLastUpdateTime.add(Calendar.DAY_OF_MONTH, - 1);
+		//ウィークリー
 		updateCheckWeekly(questLastUpdateTime, nowTime);
+		//元に戻す（こうしないと月の判定がおかしくなる）
+		nowTime.add(Calendar.DAY_OF_MONTH, 1);
+		questLastUpdateTime.add(Calendar.DAY_OF_MONTH, 1);
+		//マンスリー
 		updateCheckMonthly(questLastUpdateTime, nowTime);
 	} else {
 		initializeMaxCount();
@@ -395,8 +403,8 @@ function initializeMonthlyCount() {
 	var id = [249,256,257,259,264,265,266]; //マンスリーid
 
 	for (var i = 0; i < id.length;i++) {
-		setData("cnt"+ id[i], 0);
-		setData("flg"+ id[i], false);
+		setData("cnt"+ id[i],0);
+		setData("flg"+ id[i],false);
 	}
 }
 
@@ -425,30 +433,22 @@ function updateCheckMonthly(questLastUpdateTime, nowTime) {
 
 function checkDairy(questLastUpdateTime, nowTime) {
 	//同じ日じゃないならtrue
-	if(parseInt(nowTime.get(Calendar.DAY_OF_MONTH)) != parseInt(questLastUpdateTime.get(Calendar.DAY_OF_MONTH))) return true;
+	if(nowTime.get(Calendar.DAY_OF_YEAR) != questLastUpdateTime.get(Calendar.DAY_OF_YEAR)) return true;
 	return false;
 }
 
+/* 判定方法変更:1.3.7beta */
 function checkWeekly(questLastUpdateTime, nowTime){
-	//曜日判定（月曜日判定）
-	if(parseInt(questLastUpdateTime.get(Calendar.DAY_OF_WEEK)) == 2){
-		checkDairy(questLastUpdateTime, nowTime);
-	} else {
-		//同じ週じゃないならtrue
-		if (parseInt(nowTime.get(Calendar.WEEK_OF_MONTH)) != parseInt(questLastUpdateTime.get(Calendar.WEEK_OF_MONTH))) return true;
-		return false;
-	}
+	//同じ週じゃないならtrue
+	if (nowTime.get(Calendar.WEEK_OF_YEAR) != questLastUpdateTime.get(Calendar.WEEK_OF_YEAR)) return true;
+	return false;
 }
 
+/* 判定方法変更:1.3.7beta */
 function checkMonthly(questLastUpdateTime, nowTime) {
-	//月初め判定（1日判定）
-	if (parseInt(questLastUpdateTime.get(Calendar.DAY_OF_MONTH)) == 1) {
-		checkDairy(questLastUpdateTime, nowTime);
-	} else {
-		//同じ月じゃないならtrue
-		if (parseInt(nowTime.get(Calendar.DAY_OF_MONTH)) != parseInt(questLastUpdateTime.get(Calendar.DAY_OF_MONTH))) return true;
-		return false;
-	}
+	//同じ月じゃないならtrue
+	if (nowTime.get(Calendar.MONTH) != questLastUpdateTime.get(Calendar.MONTH)) return true;
+	return false;
 }
 
 //questType
@@ -465,13 +465,13 @@ function checkMonthly(questLastUpdateTime, nowTime) {
 //3=達成
 
 function setState(questNo ,questState, questType) {
-	if(questType != 1){ //1回限りは除外（そんな影響ないけど）
-		setData("flg"+ questNo,parseInt(questState) == 2 ? true : false);
+	if (questType != 1) { //1回限りは除外（そんな影響ないけど）
+		setData("flg"+ questNo,questState == 2);
 	}
 }
 
-//地獄のべた書き選手権
-//api_noﾜｶﾝﾈ、ｻﾝｷｭｰAndanteさん
+//地獄のべた書き
+//api_noはAndanteさんのソースとスレの情報を参考にしています
 function initializeMaxCount(){
 	/* デイリー */
 	//敵艦隊を撃滅せよ！
@@ -561,30 +561,61 @@ function initializeMaxCount(){
 	setData("max257",1);
 	//「水上打撃部隊」南方へ！
 	setData("max259",1);
-	//海上護衛強化月間
-	setData("max264",10);
-	//「空母機動部隊」西へ！
-	setData("max265",1);
+	//「空母機動部隊」西へ！(ver1.2.7)
+	setData("max264",1);
+	//海上護衛強化月間(ver1.2.7)
+	setData("max265",10);
 	//「水上反撃部隊」突入せよ！
 	setData("max266",1);
 }
 
-function questCountAdjustment(questNo, questProgressFlag, questType){
+function questCountAdjustment(questNo, questProgressFlag, questType, questState){
 	//1回限りとあ号作戦を除去
-	//開発系も多少数がおかしくなるので除去（というより対策方法がない）
-	if(parseInt(questType) != 1 && parseInt(questNo) != 214 || parseInt(questNo) != 605 || parseInt(questNo) != 606 || parseInt(questNo) != 607 || parseInt(questNo) != 608){
-		switch(parseInt(questProgressFlag)){
-			case 1:
-				if(parseInt(getData("cnt" + questNo)) < Math.ceil(parseInt(getData("max" + questNo)) * 0.5)){
-					setData("cnt" + questNo,Math.ceil(parseInt(getData("max" + questNo)) / 2));
+	//開発系も多少数がおかしくなるので除去（というより対策方法がない） Ver.1.3.8追記
+	if(questType != 1 && !(questNo == 214 || questNo == 605 || questNo == 606 || questNo == 607 || questNo == 608)){
+		switch(questProgressFlag){
+			case 1: //50%
+				//カウンタが50%を下回ってるのに、「50%以上」表示になっていたら
+				if(getData("cnt" + questNo) < Math.ceil(getData("max" + questNo) * 0.5)){
+					//maxの値を半分にして切り上げ
+					setData("cnt" + questNo,Math.ceil(getData("max" + questNo) * 0.5));
+				//カウンタが80%を超えているのに、「50%以上」表示になっていたら
+				} else if(getData("cnt" + questNo) > Math.ceil(getData("max" + questNo) * 0.8)){
+					//maxの値を80%したやつを-1する
+					setData("cnt" + questNo,Math.ceil(getData("max" + questNo) * 0.8) - 1);
 				}
 				break;
-			case 2:
-				if(parseInt(getData("cnt" + questNo)) < Math.ceil(parseInt(getData("max" + questNo)) * 0.8)){
-					setData("cnt" + questNo,Math.ceil(parseInt(getData("max" + questNo)) * 0.8));
+			case 2: //80%
+				//カウンタが80%を下回ってるのに、「80%以上」表示になっていたら
+				if(getData("cnt" + questNo) < Math.ceil(getData("max" + questNo) * 0.8)){
+					//maxの値を80%にして切り上げ
+					setData("cnt" + questNo,Math.ceil(getData("max" + questNo) * 0.8));
+				//カウンタが100%を超えたのに、「80%以上」表示になっていたら
+				} else if(getData("cnt" + questNo) >= getData("max" + questNo)){
+					//maxの値を-1
+					setData("cnt" + questNo,getData("max" + questNo) - 1);
 				}
 				break;
-			default :
+			default : //それ以外
+				switch(questState){
+					//未受注
+					case 1:
+					//遂行中
+					case 2:
+						//カウンタが50%を超えたのに「50%以上」とかの表示がなかったら
+						if(getData("cnt" + questNo) >= Math.ceil(getData("max" + questNo) * 0.5)){
+							//maxの値を半分にしたやつを-1する
+							setData("cnt" + questNo,Math.ceil(getData("max" + questNo) * 0.5) - 1);
+						}
+						break;
+					//達成
+					case 3:
+						//maxの値に合わせる
+						setData("cnt" + questNo,getData("max" + questNo));
+						break;
+					default :
+						break;
+				}
 				break;
 		}
 	}

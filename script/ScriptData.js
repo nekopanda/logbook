@@ -1,27 +1,27 @@
-//ver1.1.2+1.7.9
+//ver1.3.8beta
 //Author: Nishisonic
 //        Nekopanda
 //
-// ƒf[ƒ^ƒXƒgƒA‚Ö‚ÌƒAƒNƒZƒX
-// ƒOƒ[ƒoƒ‹•Ï” data_prefix ‚ğg‚¢‚Ü‚·
-// ƒ‚ƒWƒ…[ƒ‹‚Ì–¼‘O‚È‚Ç‚Å’è‹`‚µ‚Ä‚¨‚¢‚Ä‚­‚¾‚³‚¢
+// ãƒ‡ãƒ¼ã‚¿ã‚¹ãƒˆã‚¢ã¸ã®ã‚¢ã‚¯ã‚»ã‚¹
+// ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•° data_prefix ã‚’ä½¿ã„ã¾ã™
+// ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®åå‰ãªã©ã§å®šç¾©ã—ã¦ãŠã„ã¦ãã ã•ã„
 
 ScriptData = Java.type("logbook.scripting.ScriptData");
 
-// •Û‘¶ƒf[ƒ^‚ğ“Ç‚İ‚¾‚·
+// ä¿å­˜ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿ã ã™
 function getData(key){
 	return ScriptData.getData(String(data_prefix + key));
 }
 
-// ƒf[ƒ^‚ğ•Û‘¶
-// ƒVƒŠƒAƒ‰ƒCƒY‚Å‚«‚È‚¢ƒf[ƒ^‚ÍƒGƒ‰[‚É‚È‚è‚Ü‚·
+// ãƒ‡ãƒ¼ã‚¿ã‚’ä¿å­˜
+// ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã§ããªã„ãƒ‡ãƒ¼ã‚¿ã¯ã‚¨ãƒ©ãƒ¼ã«ãªã‚Šã¾ã™
 function setData(key,value){
 	ScriptData.setData(String(data_prefix + key),value);
 }
 
-// ƒf[ƒ^‚ğˆê“I‚ÉŠi”[
-// ƒf[ƒ^‚ÍqŠC“úI—¹‚É¸‚í‚ê‚Ü‚·‚ªAƒVƒŠƒAƒ‰ƒCƒY‰ÂE•s‰Â‚ğ–â‚¢‚Ü‚¹‚ñ
-// getTmpData()‚Í‚ ‚è‚Ü‚¹‚ñBƒf[ƒ^‚Ì“Ç‚İo‚µ‚ÍgetData()BgetTmpData()‚Í‚ ‚è‚Ü‚¹‚ñB
+// ãƒ‡ãƒ¼ã‚¿ã‚’ä¸€æ™‚çš„ã«æ ¼ç´
+// ãƒ‡ãƒ¼ã‚¿ã¯èˆªæµ·æ—¥èªŒçµ‚äº†æ™‚ã«å¤±ã‚ã‚Œã¾ã™ãŒã€ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºå¯ãƒ»ä¸å¯ã‚’å•ã„ã¾ã›ã‚“
+// getTmpData()ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚ãƒ‡ãƒ¼ã‚¿ã®èª­ã¿å‡ºã—ã¯getData()ã€‚getTmpData()ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚
 function setTmpData(key,value){
 	ScriptData.setData(String(data_prefix + key),value,false);
 }

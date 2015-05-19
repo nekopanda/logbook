@@ -1,13 +1,9 @@
-//ver1.1.2+1.7.9
+//ver1.3.8beta
 //Author: Nishisonic
 //        Nekopanda
 
 load("script/utils.js");
 load("script/ScriptData.js");
-
-//Calendar型を使う深い意味は無い
-ScriptData = Java.type("logbook.scripting.ScriptData");
-Calendar = Java.type("java.util.Calendar");
 
 data_prefix = "questStateEx_";
 
@@ -62,10 +58,10 @@ function getProgress(questNo, questType, questProgressFlag) {
 
 			setData("rate" + questNo, sum214 / 100);
 			return String(sum214 + "%" +
-				" 出撃:" + cntSally214 + "/" + maxSally214 +
-				" S勝利:" + cntSWin214 + "/" + maxSWin214 +
-				" ボス戦:" + cntBoss214 + "/" + maxBoss214 +
-				" ボス勝利:" + cntBossWin214 + "/" + maxBossWin214);
+				" 出撃:" + Math.min(cntSally214,maxSally214) + "/" + maxSally214 +
+				" S勝利:" + Math.min(cntSWin214,maxSWin214) + "/" + maxSWin214 +
+				" ボス戦:" + Math.min(cntBoss214,maxBoss214) + "/" + maxBoss214 +
+				" ボス勝利:" + Math.min(cntBossWin214,maxBossWin214) + "/" + maxBossWin214);
 		}
 	}
 	else {
