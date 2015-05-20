@@ -552,9 +552,11 @@ public class WindowBase {
 
     public void hideWindow() {
         // 閉じる前に位置を記憶
-        WindowBase.this.save();
-        WindowBase.this.menuItem.setSelection(false);
-        WindowBase.this.setVisible(false);
+        this.save();
+        if (this.menuItem != null) {
+            this.menuItem.setSelection(false);
+        }
+        this.setVisible(false);
     }
 
     private void topMostChanged(boolean topMost) {

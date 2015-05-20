@@ -16,7 +16,6 @@ import logbook.data.context.TimerContext;
 import logbook.dto.DockDto;
 import logbook.dto.ItemInfoDto;
 import logbook.dto.ShipDto;
-import logbook.gui.ApplicationMain;
 import logbook.gui.logic.ColorManager;
 import logbook.gui.logic.DamageRate;
 import logbook.gui.logic.SakutekiString;
@@ -32,8 +31,6 @@ import logbook.util.SwtUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CTabFolder;
-import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.GC;
@@ -55,9 +52,9 @@ public class FleetComposite extends Composite {
     private static final Logger LOG = LogManager.getLogger(FleetComposite.class);
 
     /** 警告 */
-    private static final int WARN = 1;
+    public static final int WARN = 1;
     /** 致命的 */
-    private static final int FATAL = 2;
+    public static final int FATAL = 2;
     /** 1艦隊に編成できる艦娘の数 */
     private static final int MAXCHARA = 6;
     /** フォント大きい */
@@ -80,10 +77,6 @@ public class FleetComposite extends Composite {
     /** 経験値ゲージ色 */
     private static final RGB EXP_GAUGE = new RGB(0, 0x80, 0xff);
 
-    /** タブ */
-    private final CTabItem tab;
-    /** メイン画面 */
-    private final ApplicationMain main;
     /** 艦隊 */
     private DockDto dock;
 
@@ -138,10 +131,8 @@ public class FleetComposite extends Composite {
      * @param parent 艦隊タブの親
      * @param tabItem 艦隊タブ
      */
-    public FleetComposite(CTabFolder parent, CTabItem tabItem, ApplicationMain main) {
+    public FleetComposite(Composite parent) {
         super(parent, SWT.NONE);
-        this.tab = tabItem;
-        this.main = main;
         this.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         GridLayout glParent = new GridLayout(1, false);
         glParent.horizontalSpacing = 0;
@@ -682,8 +673,6 @@ public class FleetComposite extends Composite {
                     MessageFormat.format(AppConstants.MESSAGE_TOTAL_DAIHATSU, daihatsu, daihatsuUp), null);
         }
 
-        this.updateTabIcon();
-
         for (org.eclipse.swt.widgets.Control control : this.fleetGroup.getChildren()) {
             if (control instanceof Composite) {
                 ((Composite) control).layout();
@@ -692,25 +681,6 @@ public class FleetComposite extends Composite {
         this.fleetGroup.layout();
 
         this.getShell().setRedraw(true);
-    }
-
-    /**
-     * 艦隊タブのアイコンを更新します
-     */
-    private void updateTabIcon() {
-        if (this.state.get(FATAL)) {
-            this.tab.setImage(SWTResourceManager.getImage(FleetComposite.class,
-                    AppConfig.get().isMonoIcon()
-                            ? AppConstants.R_ICON_EXCLAMATION_MONO
-                            : AppConstants.R_ICON_EXCLAMATION));
-        } else if (this.state.get(WARN)) {
-            this.tab.setImage(SWTResourceManager.getImage(FleetComposite.class,
-                    AppConfig.get().isMonoIcon()
-                            ? AppConstants.R_ICON_ERROR_MONO
-                            : AppConstants.R_ICON_ERROR));
-        } else {
-            this.tab.setImage(null);
-        }
     }
 
     /**
@@ -838,6 +808,13 @@ public class FleetComposite extends Composite {
         int g = (int) (start.green + ((end.green - start.green) * raito));
         int b = (int) (start.blue + ((end.blue - start.blue) * raito));
         return new RGB(r, g, b);
+    }
+
+    /**
+     * @return state
+     */
+    public BitSet getState() {
+        return this.state;
     }
 
     /**

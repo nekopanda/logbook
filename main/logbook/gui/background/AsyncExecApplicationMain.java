@@ -22,6 +22,7 @@ import logbook.dto.ItemInfoDto;
 import logbook.dto.NdockDto;
 import logbook.dto.ShipDto;
 import logbook.gui.ApplicationMain;
+import logbook.gui.FleetWindow;
 import logbook.gui.logic.ColorManager;
 import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.PushNotify;
@@ -685,7 +686,6 @@ public final class AsyncExecApplicationMain extends Thread {
      */
     private static final class UpdateFleetTabTask implements Runnable {
 
-        private static String[] dockname = new String[4];
         private static CTabItem[] tabItems = new CTabItem[4];
         private static FleetComposite[] dockComposites = new FleetComposite[4];
 
@@ -756,35 +756,11 @@ public final class AsyncExecApplicationMain extends Thread {
 
             List<ShipDto> badlyDamaged = new ArrayList<>();
 
-            for (int i = 0; i < 4; i++) {
-                DockDto dock = GlobalContext.getDock(Integer.toString(i + 1));
-                if (dock != null) {
-                    FleetComposite tabComposite = dockComposites[i];
-                    CTabItem tabItem = tabItems[i];
-
-                    if (tabItem == null) {
-
-                        tabItem = new CTabItem(this.main.getTabFolder(), SWT.NONE);
-                        tabItem.setText(dock.getName());
-
-                        // メインコンポジット
-                        tabComposite = new FleetComposite(this.main.getTabFolder(), tabItem, this.main);
-                        tabItem.setControl(tabComposite);
-
-                        tabItems[i] = tabItem;
-                        dockComposites[i] = tabComposite;
-                    }
-                    if (!dock.getName().equals(dockname[i])) {
-                        dockname[i] = dock.getName();
-                    }
-
-                    tabComposite.updateFleet(dock, (i < 2) ? combinedFleetBadlyDamaed : false, badlyDamaged);
-                    tabItem.setText(dock.getName());
-                    dock.setUpdate(false);
-                }
+            FleetWindow[] fleetWindows = this.main.getFleetWindows();
+            for (int i = 0; i < fleetWindows.length; i++) {
+                fleetWindows[i].updateFleet(combinedFleetBadlyDamaed, badlyDamaged);
             }
 
             this.postFatal(badlyDamaged);
         }
-    }
-}
+    }}

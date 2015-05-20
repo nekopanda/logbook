@@ -106,7 +106,7 @@ public final class TrayItemMenuListener implements MenuDetectListener {
                 false,
         };
 
-        for (int i = 0; i < (winList.length - 1); i++) {
+        for (int i = 0; i < (winList.length - 5); i++) {
             if (hasSeparator[i]) {
                 new MenuItem(this.menu, SWT.SEPARATOR);
             }

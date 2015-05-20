@@ -88,11 +88,15 @@ public class LauncherWindow extends WindowBase {
                 "グル",
                 "資材",
                 "統計",
+                "#1",
+                "#2",
+                "#3",
+                "#4",
                 "ロー" // 最後は自分
         };
 
         RowData rowData = new RowData(40, 30);
-        for (int i = 0; i < (winList.length - 1); i++) {
+        for (int i = 0; i < (winList.length - 5); i++) {
             final WindowBase win = winList[i];
             final Button button = new Button(shell, SWT.TOGGLE);
             button.setText(nameList[i]);

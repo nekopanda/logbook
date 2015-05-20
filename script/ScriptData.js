@@ -1,4 +1,3 @@
-//ver1.3.8beta
 //Author: Nishisonic
 //        Nekopanda
 //

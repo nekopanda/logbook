@@ -211,6 +211,8 @@ public final class ApplicationMain extends WindowBase {
     private ResourceChartDialog resourceChartWindow;
     /** ツールウィンドウ */
     private LauncherWindow launcherWindow;
+    /** 艦隊1-4 */
+    private final FleetWindow[] fleetWindows = new FleetWindow[4];
 
     /** コマンドボタン */
     private Composite commandComposite;
@@ -580,6 +582,11 @@ public final class ApplicationMain extends WindowBase {
         MenuItem toolwindows = new MenuItem(etcmenu, SWT.CHECK);
         toolwindows.setText("ツール");
         this.launcherWindow = new LauncherWindow(this.dummyHolder, toolwindows);
+        // その他-艦隊タブ切り離し
+        MenuItem floatFleetItem = new MenuItem(etcmenu, SWT.CASCADE);
+        floatFleetItem.setText("艦隊タブ切り離し");
+        Menu floatFleetMenu = new Menu(floatFleetItem);
+        floatFleetItem.setMenu(floatFleetMenu);
         // その他-ウィンドウをディスプレイ内に移動
         MenuItem movewindows = new MenuItem(etcmenu, SWT.NONE);
         movewindows.setText("画面外のウィンドウを戻す(&W)\tCtrl+W");
@@ -887,6 +894,32 @@ public final class ApplicationMain extends WindowBase {
         // コンソール
         this.console = new org.eclipse.swt.widgets.List(this.mainComposite, SWT.BORDER | SWT.V_SCROLL);
         this.console.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
+
+        // 艦隊ウィンドウ
+        for (int i = 0; i < this.fleetWindows.length; ++i) {
+            MenuItem menuItem = new MenuItem(floatFleetMenu, SWT.CHECK);
+            menuItem.setText("#" + (i + 1));
+            this.fleetWindows[i] = new FleetWindow(this.dummyHolder, menuItem, this.tabFolder, i + 1);
+        }
+
+        // タブを閉じた時に艦隊ウィンドウを表示
+        this.tabFolder.setData("disable-window-menu", new Object());
+        this.tabFolder.addListener(SWT.MenuDetect, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                CTabFolder tabFolder = ApplicationMain.this.tabFolder;
+                Point point = ApplicationMain.this.display.map(null,
+                        tabFolder, new Point(event.x, event.y));
+                CTabItem item = tabFolder.getItem(point);
+                if (item != null) {
+                    Object data = item.getData();
+                    if (data instanceof FleetWindow) {
+                        FleetWindow fw = (FleetWindow) data;
+                        fw.showTabMenu();
+                    }
+                }
+            }
+        });
 
         //  ウィンドウの右クリックメニューに追加
         if (this.getPopupMenu().getItemCount() > 0) {
@@ -1212,6 +1245,10 @@ public final class ApplicationMain extends WindowBase {
                 this.shipFilterGroupWindow,
                 this.resourceChartWindow,
                 this.battleCounterWindow,
+                this.fleetWindows[0],
+                this.fleetWindows[1],
+                this.fleetWindows[2],
+                this.fleetWindows[3],
                 this.launcherWindow
         };
     }
@@ -1759,5 +1796,12 @@ public final class ApplicationMain extends WindowBase {
 
     public void updateCalcPracticeExp(PracticeUserDetailDto practiceUserExDto) {
         this.calcPracticeExpWindow.updatePracticeUser(practiceUserExDto);
+    }
+
+    /**
+     * @return fleetWindows
+     */
+    public FleetWindow[] getFleetWindows() {
+        return this.fleetWindows;
     }
 }
