@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
-import logbook.config.ItemMasterConfig;
 import logbook.dto.ItemInfoDto;
 import logbook.dto.ShipParameters;
 
@@ -392,15 +392,16 @@ public class Item {
     // 始めてアクセスがあった時に読み込む
     public static final boolean INIT_COMPLETE;
     static {
-        ItemMasterConfig.load();
-        INIT_COMPLETE = true;
+        INIT_COMPLETE = MasterData.INIT_COMPLETE;
     }
 
     /**
-     * アイテムを設定します
+     * マスターデータから更新
      */
-    public static void set(int id, ItemInfoDto item) {
-        ITEM.put(id, item);
+    public static void update() {
+        for (Entry<Integer, ItemInfoDto> entry : MasterData.get().getStart2().getItems().entrySet()) {
+            ITEM.put(entry.getKey(), entry.getValue());
+        }
     }
 
     /**

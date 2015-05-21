@@ -4,10 +4,9 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import logbook.config.ShipConfig;
 import logbook.dto.ShipInfoDto;
 import logbook.dto.ShipParameters;
 
@@ -634,8 +633,7 @@ public class Ship {
     // 始めてアクセスがあった時に読み込む
     public static final boolean INIT_COMPLETE;
     static {
-        ShipConfig.load();
-        INIT_COMPLETE = true;
+        INIT_COMPLETE = MasterData.INIT_COMPLETE;
     }
 
     /**
@@ -652,19 +650,16 @@ public class Ship {
     }
 
     /**
-     * 艦娘を設定します
+     * マスターデータから更新
      */
-    public static void set(String id, ShipInfoDto ship) {
-        SHIP.put(id, ship);
+    public static void update() {
+        for (Entry<String, ShipInfoDto> entry : MasterData.get().getStart2().getShips().entrySet()) {
+            SHIP.put(entry.getKey(), entry.getValue());
+        }
     }
 
-    /**
-     * IDの一覧を取得します
-     * 
-     * @return IDの一覧
-     */
-    public static Set<String> keySet() {
-        return SHIP.keySet();
+    public static Map<String, ShipInfoDto> get() {
+        return SHIP;
     }
 
     /** 敵艦名からの変換マップ */
@@ -695,7 +690,7 @@ public class Ship {
                 ','));
         fw.write("\n");
 
-        for (String key : Ship.keySet()) {
+        for (String key : SHIP.keySet()) {
             ShipInfoDto dto = Ship.get(key);
             ShipParameters param = dto.getParam();
             ShipParameters max = dto.getMax();

@@ -6,7 +6,6 @@ import java.util.Map;
 
 import logbook.constants.AppConstants;
 import logbook.dto.ShipFilterDto;
-import logbook.internal.CondTiming;
 
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.swt.graphics.RGB;
@@ -342,9 +341,6 @@ public final class AppConfigBean {
     /** TwitterのAccessToken */
     private String twitterToken;
     private String twitterTokenSecret;
-
-    /** Cond値更新タイミング情報 */
-    private CondTiming.TimeSpan condTimingData;
 
     private static RGB cloneRGB(RGB rgb) {
         return new RGB(rgb.red, rgb.green, rgb.blue);
@@ -1887,20 +1883,6 @@ public final class AppConfigBean {
      */
     public void setOkCond(int okCond) {
         this.okCond = okCond;
-    }
-
-    /**
-     * @return condTimingData
-     */
-    public CondTiming.TimeSpan getCondTimingData() {
-        return this.condTimingData;
-    }
-
-    /**
-     * @param condTimingData セットする condTimingData
-     */
-    public void setCondTimingData(CondTiming.TimeSpan condTimingData) {
-        this.condTimingData = condTimingData;
     }
 
     /**

@@ -15,10 +15,10 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 
-import logbook.config.ShipConfig;
 import logbook.dto.BattleExDto;
 import logbook.dto.BattlePhaseKind;
 import logbook.dto.ResultRank;
+import logbook.internal.MasterData;
 
 import org.apache.commons.io.FileUtils;
 
@@ -37,7 +37,7 @@ public class BattleRankChecker {
      * @param args
      */
     public static void main(String[] args) {
-        ShipConfig.load();
+        boolean init = MasterData.INIT_COMPLETE;
 
         File dir = new File(args[0]);
         File[] files = dir.listFiles();

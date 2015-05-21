@@ -74,10 +74,12 @@ public final class GetShipDto extends AbstractDto {
         return this.getDate;
     }
 
-    public void setShip(ShipDto ship) {
-        this.name = ship.getName();
-        this.shipId = ship.getId();
-        this.type = ship.getType();
+    public void setShip(ShipInfoDto ship) {
+        if (ship != null) {
+            this.name = ship.getName();
+            this.shipId = ship.getShipId();
+            this.type = ship.getType();
+        }
     }
 
     /**

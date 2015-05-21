@@ -2,13 +2,19 @@ package logbook.util;
 
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import javax.annotation.CheckForNull;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,26 +35,33 @@ public final class BeanUtils {
      * @throws IOException IOException
      */
     public static void writeObject(File file, Object obj) throws IOException {
-        if (file.exists()) {
-            if (file.isDirectory()) {
-                throw new IOException("File '" + file + "' exists but is a directory");
+        File main = new File(FilenameUtils.removeExtension(file.getAbsolutePath()) + ".zip");
+        if (main.exists()) {
+            if (main.isDirectory()) {
+                throw new IOException("File '" + main + "' exists but is a directory");
             }
-            if (!(file.canWrite()))
-                throw new IOException("File '" + file + "' cannot be written to");
+            if (!(main.canWrite()))
+                throw new IOException("File '" + main + "' cannot be written to");
         } else {
-            File parent = file.getParentFile();
+            File parent = main.getParentFile();
             if ((parent != null) &&
                     (!(parent.mkdirs())) && (!(parent.isDirectory()))) {
                 throw new IOException("Directory '" + parent + "' could not be created");
             }
         }
-        File backup = new File(file.getAbsolutePath() + ".backup");
-        if ((file.exists() && (file.length() > 0)) && (!backup.exists() || backup.delete())) {
+        File backup = new File(FilenameUtils.removeExtension(file.getAbsolutePath()) + ".backup.zip");
+        if ((main.exists() && (main.length() > 0)) && (!backup.exists() || backup.delete())) {
             // ファイルが存在してかつサイズが0を超える場合、バックアップを削除した後、ファイルをバックアップにリネームする
-            file.renameTo(backup);
+            main.renameTo(backup);
         }
-        try (XMLEncoder encoder = new XMLEncoder(new FileOutputStream(file))) {
-            encoder.writeObject(obj);
+        try (ZipOutputStream zos = new ZipOutputStream(
+                new BufferedOutputStream(new FileOutputStream(main))))
+        {
+            ZipEntry zipentry = new ZipEntry(file.getName());
+            zos.putNextEntry(zipentry);
+            XMLEncoder oos = new XMLEncoder(zos);
+            oos.writeObject(obj);
+            oos.close();
         }
     }
 
@@ -64,20 +77,36 @@ public final class BeanUtils {
      */
     @CheckForNull
     public static <T> T readObject(File file, Class<T> clazz) {
-        File target = file;
+        File target = new File(FilenameUtils.removeExtension(file.getAbsolutePath()) + ".zip");
 
         if (!target.canRead() || (target.length() <= 0)) {
             // ファイルが読み込めないまたはサイズがゼロの場合バックアップファイルを読み込む
             LOG.warn("次のファイルをバックアップから読み込みます: " + file.getName());
-            target = new File(file.getAbsolutePath() + ".backup");
+            target = new File(FilenameUtils.removeExtension(file.getAbsolutePath()) + ".backup.zip");
             if (!target.canRead()) {
-                // バックアップファイルも読めない場合nullを返す
-                LOG.warn("バックアップからも読み込めなかったので諦めます: " + file.getName());
-                return null;
+                LOG.warn("バックアップも読み込めないので旧形式ファイルを読み込みます: " + file.getName());
+                target = file;
+                if (!target.canRead()) {
+                    // バックアップファイルも読めない場合nullを返す
+                    LOG.warn("旧形式ファイルも読み込めなかったので諦めます: " + file.getName());
+                    return null;
+                }
+                try (XMLDecoder decoder = new XMLDecoder(new FileInputStream(target))) {
+                    Object obj = decoder.readObject();
+                    if (clazz.isInstance(obj)) {
+                        return (T) obj;
+                    }
+                    return null;
+                } catch (Exception e) {
+                    return null;
+                }
             }
         }
-        try (XMLDecoder decoder = new XMLDecoder(new FileInputStream(target))) {
-            Object obj = decoder.readObject();
+        try (ZipInputStream zis = new ZipInputStream(
+                new BufferedInputStream(new FileInputStream(target))))
+        {
+            zis.getNextEntry();
+            Object obj = (new XMLDecoder(zis).readObject());
             if (clazz.isInstance(obj)) {
                 return (T) obj;
             }

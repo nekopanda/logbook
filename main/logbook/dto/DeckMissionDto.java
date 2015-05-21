@@ -5,6 +5,7 @@ import java.util.List;
 
 import logbook.internal.Deck;
 import logbook.internal.MasterData;
+import logbook.scripting.ScriptData;
 
 /**
  * 遠征を表します
@@ -15,27 +16,27 @@ public final class DeckMissionDto extends AbstractDto {
     public static final DeckMissionDto EMPTY = new DeckMissionDto();
 
     /** 艦隊名 */
-    private final String name;
+    private String name;
 
     /** 遠征名 */
-    private final int missionId;
+    private int missionId;
 
     /** 遠征名 */
-    private final String mission;
+    private String mission;
 
     /** 帰投時間 */
-    private final Date time;
+    private Date time;
 
     /** 艦隊 */
-    private final int fleetid;
+    private int fleetid;
 
     /** 艦娘 */
-    private final List<Integer> ships;
+    private List<Integer> ships;
 
     /**
      * コンストラクター
      */
-    private DeckMissionDto() {
+    public DeckMissionDto() {
         this.name = null;
         this.missionId = -1;
         this.mission = null;
@@ -58,6 +59,17 @@ public final class DeckMissionDto extends AbstractDto {
         this.time = time;
         this.fleetid = fleetid;
         this.ships = ships;
+    }
+
+    public String getDisplayText(String parameter) {
+        String checkResult = "";
+        if (parameter != null) {
+            Object resultObj = ScriptData.getData(parameter);
+            if (resultObj != null) {
+                checkResult = resultObj.toString();
+            }
+        }
+        return checkResult + this.mission;
     }
 
     /**
@@ -106,5 +118,47 @@ public final class DeckMissionDto extends AbstractDto {
      */
     public List<Integer> getShips() {
         return this.ships;
+    }
+
+    /**
+     * @param name セットする name
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @param missionId セットする missionId
+     */
+    public void setMissionId(int missionId) {
+        this.missionId = missionId;
+    }
+
+    /**
+     * @param mission セットする mission
+     */
+    public void setMission(String mission) {
+        this.mission = mission;
+    }
+
+    /**
+     * @param time セットする time
+     */
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
+    /**
+     * @param fleetid セットする fleetid
+     */
+    public void setFleetid(int fleetid) {
+        this.fleetid = fleetid;
+    }
+
+    /**
+     * @param ships セットする ships
+     */
+    public void setShips(List<Integer> ships) {
+        this.ships = ships;
     }
 }

@@ -3,6 +3,8 @@ package logbook.internal;
 import java.util.Map;
 import java.util.TreeMap;
 
+import logbook.internal.MasterData.ShipTypeDto;
+
 /**
  * 艦種
  * 
@@ -53,11 +55,11 @@ public class ShipStyle {
     }
 
     /**
-     * 更新します
-     * @param id
-     * @param name
+     * マスターデータから更新
      */
-    public static void set(int id, String name) {
-        SHIPSTYLE.put(id, name);
+    public static void update() {
+        for (ShipTypeDto entry : MasterData.get().getStart2().getStype()) {
+            SHIPSTYLE.put(entry.getId(), entry.getName());
+        }
     }
 }

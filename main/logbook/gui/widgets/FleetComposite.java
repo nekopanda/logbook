@@ -13,6 +13,7 @@ import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.data.context.TimerContext;
+import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
 import logbook.dto.ItemInfoDto;
 import logbook.dto.ShipDto;
@@ -297,6 +298,10 @@ public class FleetComposite extends Composite {
         AkashiTimer.RepairState repairState = TimerContext.get().getAkashiRepairState(dockIndex);
         List<AkashiTimer.ShipState> repairShips = repairState.isRepairing() ? repairState.get() : null;
         boolean isSortie = GlobalContext.isSortie(dock.getId());
+        DeckMissionDto currentMission = (dockIndex == 0) ? null : GlobalContext.getDeckMissions()[dockIndex - 1];
+        DeckMissionDto previousMission = (dockIndex == 0) ? null : GlobalContext.getPreviousMissions()[dockIndex - 1];
+        boolean flagshipNeedSupply = false;
+        boolean needSupply = false;
 
         for (int i = 0; i < ships.size(); i++) {
             ShipDto ship = ships.get(i);
@@ -394,6 +399,10 @@ public class FleetComposite extends Composite {
                     // 補給橙
                     this.fuelstLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_ORANGE_COLOR));
                 }
+                needSupply = true;
+                if (i == 0) {
+                    flagshipNeedSupply = true;
+                }
             }
             // ステータス.弾
             this.bullstLabels[i].setText("弾");
@@ -412,6 +421,10 @@ public class FleetComposite extends Composite {
                     this.bullstLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_RED_COLOR));
                 } else if (bullraito <= AppConstants.LOW_SUPPLY) {
                     this.bullstLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_ORANGE_COLOR));
+                }
+                needSupply = true;
+                if (i == 0) {
+                    flagshipNeedSupply = true;
                 }
             }
 
@@ -601,7 +614,7 @@ public class FleetComposite extends Composite {
         taihaStyle.underlineColor = SWTResourceManager.getColor(SWT.COLOR_RED);
         taihaStyle.foreground = SWTResourceManager.getColor(SWT.COLOR_RED);
 
-        if (GlobalContext.isMission(this.dock.getId())) {
+        if ((currentMission != null) && (currentMission.getMission() != null)) {
             // 遠征中
             this.addStyledText(this.message, AppConstants.MESSAGE_MISSION, messageStyle);
         }
@@ -632,33 +645,42 @@ public class FleetComposite extends Composite {
             this.addStyledText(this.message, AppConstants.MESSAGE_IN_COMBINED +
                     MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BADLY_DAMAGE), taihaStyle);
         }
-        else if (isBathwater) {
-            // 入渠中
-            this.addStyledText(this.message,
-                    MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BATHWATER), messageStyle);
-        }
-        else if (repairState.isRepairing()) {
-            // 泊地修理中
-            this.addStyledText(this.message, "泊地修理中。" + AppConstants.MESSAGE_GOOD, messageStyle);
-        }
         else {
-            // 出撃可能
-            this.addStyledText(this.message, AppConstants.MESSAGE_GOOD, messageStyle);
+            if (isBathwater) {
+                // 入渠中
+                this.addStyledText(this.message,
+                        MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BATHWATER), messageStyle);
+            }
+            else if (flagshipNeedSupply) {
+                // 未補給
+                this.addStyledText(this.message, "未補給です。", messageStyle);
+            }
+            else {
+                if (repairState.isRepairing()) {
+                    // 泊地修理中
+                    this.addStyledText(this.message, "泊地修理中。", messageStyle);
+                }
+                if (needSupply) {
+                    // 一部未補給
+                    this.addStyledText(this.message, "一部未補給。", messageStyle);
+                }
+                // 出撃可能
+                this.addStyledText(this.message, AppConstants.MESSAGE_GOOD, messageStyle);
+            }
         }
         if ((Integer.parseInt(this.dock.getId()) <= 2) && GlobalContext.isCombined()) {
             // 連合艦隊
             this.addStyledText(this.message, AppConstants.MESSAGE_COMBINED, messageStyle);
         }
-        if (this.clearDate != null) {
-            this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_COND, this.clearDate), null);
-        }
-        // 索敵 計算
-        SakutekiString fleetStatus = new SakutekiString(ships, GlobalContext.hqLevel());
+        this.addStyledText(this.message, "\n", null);
         // 制空
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_SEIKU, seiku), null);
+        this.addStyledText(this.message, "\n", null);
         // 索敵
+        SakutekiString fleetStatus = new SakutekiString(ships, GlobalContext.hqLevel());
         this.addStyledText(this.message,
                 MessageFormat.format(AppConstants.MESSAGE_SAKUTEKI, fleetStatus.toString()), null);
+        this.addStyledText(this.message, "\n", null);
         // 合計Lv
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_TOTAL_LV, totallv), null);
 
@@ -671,6 +693,17 @@ public class FleetComposite extends Composite {
             // 大発合計数
             this.addStyledText(this.message,
                     MessageFormat.format(AppConstants.MESSAGE_TOTAL_DAIHATSU, daihatsu, daihatsuUp), null);
+        }
+        this.addStyledText(this.message, "\n", null);
+        if ((currentMission != null) && (currentMission.getMission() == null) && (previousMission.getMission() != null)) {
+            // 前回の遠征
+            String text = previousMission.getDisplayText("missioncheck_" + dock.getId() + "p");
+            this.addStyledText(this.message,
+                    MessageFormat.format(AppConstants.MESSAGE_PREVIOUS_MISSION, text), null);
+            this.addStyledText(this.message, "\n", null);
+        }
+        if (this.clearDate != null) {
+            this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_COND, this.clearDate), null);
         }
 
         for (org.eclipse.swt.widgets.Control control : this.fleetGroup.getChildren()) {

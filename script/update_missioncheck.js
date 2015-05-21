@@ -6,21 +6,24 @@ load("script/ScriptData.js");
 data_prefix = "missioncheck_";
 
 DataType = Java.type("logbook.data.DataType");
+GlobalContext = Java.type("logbook.data.context.GlobalContext");
 
-function doDeck(data) {
-	for(i=0; i<data.size(); ++i) {
-		var deck = data.get(i);
-		var fleetid = deck.api_id.intValue();
-		var canMission = "";
-		if(fleetid >= 2) {
-			setFleet(fleetid);
-			var id = deck.api_mission.get(1).intValue();
-			var mills = deck.api_mission.get(2).intValue();
-			if(mills > 0) {
-				canMission = getCanMission(id);
-			}
+function doCheck() {
+	var current = GlobalContext.deckMissions;
+	var previous = GlobalContext.previousMissions;
+	for(i=0; i<3; ++i) {
+		var fleetid = i+2;
+		setFleet(fleetid);
+		var canCurrent = "";
+		var canPrevious = "";
+		if(current[i].mission != null) {
+			canCurrent = getCanMission(current[i].missionId);
 		}
-		setTmpData(fleetid, canMission);
+		if(previous[i].mission != null) {
+			canPrevious = getCanMission(previous[i].missionId);
+		}
+		setTmpData(fleetid, canCurrent);
+		setTmpData(fleetid + "p", canPrevious);
 	}
 }
 
@@ -28,10 +31,11 @@ function update(type, data){
 	var json = data.getJsonObject();
 	switch(type){
 		case DataType.PORT:
-			doDeck(json.api_data.api_deck_port);
-			break;
 		case DataType.DECK:
-			doDeck(json.api_data);
+		case DataType.CHANGE:
+		case DataType.MISSION_RESULT:
+		case DataType.POWERUP:
+			doCheck();
 			break;
 	}
 }

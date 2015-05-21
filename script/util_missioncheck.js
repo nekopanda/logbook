@@ -9,28 +9,29 @@ function setFleet(fleetid) {
 	
 	//艦隊データオブジェクト初期化
 	currentDockData = {
-		"shipCount": ships.length,
-		"flgShipLv": 0,
-		"sumShipLv": 0,
-		"drumShipCount": 0,
-		"drumCount": 0,
-		"DDCount": 0,
-		"CLCount": 0,
-		"CLTCount": 0,
-		"CACount": 0,
-		"CVACount": 0,
-		"BBCount": 0,
-		"CVCount": 0,
-		"CVLCount": 0,
-		"SSCount": 0,
-		"CVSCount": 0,
-		"CVBCount": 0,
-		"TVCount": 0,
-		"AVCount": 0,
-		"ASCount": 0,
-		"LHACount": 0,
-		"ACVCount": 0,
-		"ARCount": 0
+		flgType: 0,
+		shipCount: ships.length,
+		flgShipLv: 0,
+		sumShipLv: 0,
+		drumShipCount: 0,
+		drumCount: 0,
+		DDCount: 0,
+		CLCount: 0,
+		CLTCount: 0,
+		CACount: 0,
+		CVACount: 0,
+		BBCount: 0,
+		CVCount: 0,
+		CVLCount: 0,
+		SSCount: 0,
+		CVSCount: 0,
+		CVBCount: 0,
+		TVCount: 0,
+		AVCount: 0,
+		ASCount: 0,
+		LHACount: 0,
+		ACVCount: 0,
+		ARCount: 0
 	};
 	
 	//艦隊データオブジェクト設定
@@ -48,9 +49,10 @@ function setFleet(fleetid) {
 			}
 		}
 
-		//旗艦Lv
+		//旗艦Lv, Type
 		if(i == 0){
 			currentDockData.flgShipLv = ships[i].lv;
+			currentDockData.flgType = ships[i].stype;
 		}
 		//艦隊合計Lv
 		currentDockData.sumShipLv += ships[i].lv;
@@ -83,54 +85,57 @@ function setFleet(fleetid) {
 //遠征成功判定
 function getCanMission(missionID){
 	switch(missionID){
-		case 1: return sTypeFree(2, 1); break;
-		case 2: return sTypeFree(4, 2); break;
-		case 3: return sTypeFree(3, 3); break;
-		case 4: return sTypeLock(3, 3, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0); break;
-		case 5: return sTypeLock(4, 3, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0); break;
-		case 6: return sTypeFree(4, 4); break;
-		case 7: return sTypeFree(6, 5); break;
-		case 8: return sTypeFree(6, 6); break;
-		case 9: return sTypeLock(4, 3, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0); break;
-		case 10: return sTypeLock(3, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0); break;
-		case 11: return sTypeLock(4, 6, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0); break;
-		case 12: return sTypeLock(4, 4, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0); break;
-		case 13: return sTypeLock(6, 5, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 0, 0); break;
-		case 14: return sTypeLock(6, 6, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0); break;
-		case 15: return sTypeLock(6, 9, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0); break;
-		case 16: return sTypeLock(6, 10, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0); break;
-		case 17: return sTypeLock(6, 20, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0); break;
-		case 18: return sTypeLock(6, 15, 0, 0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0); break;
-		case 19: return sTypeLock(6, 20, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0); break;
-		case 20: return sTypeLock(2, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0); break;
-		case 21: return sTypeLock(5, 15, 30, 3, 3, 1, 4, 0, 0, 0, 0, 0, 0, 0); break;
-		case 22: return sTypeLock(6, 30, 45, 0, 0, 1, 2, 0, 0, 0, 1, 0, 0, 0); break;
-		case 23: return sTypeLock(6, 50, 200, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0); break;
-		case 25: return sTypeLock(4, 25, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0); break;
-		case 26: return sTypeLock(4, 30, 0, 0, 0, 1, 2, 1, 0, 0, 0, 0, 0, 0); break;
-		case 27: return sTypeLock(2, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0); break;
-		case 28: return sTypeLock(3, 30, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0); break;
-		case 29: return sTypeLock(3, 50, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0); break;
-		case 30: return sTypeLock(4, 55, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0); break;
-		case 31: return sTypeLock(4, 60, 200, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0); break;
-		case 32: return sTypeLock(3, 5, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1); break;
-		case 33: return sTypeLock(2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0); break;
-		case 34: return sTypeLock(2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0); break;
-		case 35: return sTypeLock(6, 40, 0, 0, 0, 0, 1, 2, 0, 0, 1, 0, 0, 0); break;
-		case 36: return sTypeLock(6, 30, 0, 0, 0, 1, 1, 0, 0, 0, 0, 2, 0, 0); break;
-		case 37: return sTypeLock(6, 50, 200, 3, 4, 1, 5, 0, 0, 0, 0, 0, 0, 0); break;
-		case 38: return sTypeLock(6, 65, 240, 4, 8, 0, 5, 0, 0, 0, 0, 0, 0, 0); break;
-		case 39: return sTypeLock(5, 3, 180, 0, 0, 0, 0, 0, 0, 4, 0, 0, 1, 0); break;
+		case 1: return sTypeFree(2, 1);
+		case 2: return sTypeFree(4, 2);
+		case 3: return sTypeFree(3, 3);
+		case 4: return sTypeLock(3, 3, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0);
+		case 5: return sTypeLock(4, 3, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0);
+		case 6: return sTypeFree(4, 4);
+		case 7: return sTypeFree(6, 5);
+		case 8: return sTypeFree(6, 6);
+		case 9: return sTypeLock(4, 3, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0);
+		case 10: return sTypeLock(3, 3, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0);
+		case 11: return sTypeLock(4, 6, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0);
+		case 12: return sTypeLock(4, 4, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0);
+		case 13: return sTypeLock(6, 5, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 0, 0);
+		case 14: return sTypeLock(6, 6, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0);
+		case 15: return sTypeLock(6, 9, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0);
+		case 16: return sTypeLock(6, 10, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0);
+		case 17: return sTypeLock(6, 20, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0);
+		case 18: return sTypeLock(6, 15, 0, 0, 0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0);
+		case 19: return sTypeLock(6, 20, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0);
+		case 20: return sTypeLock(2, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0);
+		case 21: return sTypeLock(5, 15, 30, 0, 3, 3, 1, 4, 0, 0, 0, 0, 0, 0, 0);
+		case 22: return sTypeLock(6, 30, 45, 0, 0, 0, 1, 2, 0, 0, 0, 1, 0, 0, 0);
+		case 23: return sTypeLock(6, 50, 200, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0);
+		case 24: return sTypeLock(6, 50, 200, 3, 0, 0, 1, 4, 0, 0, 0, 0, 0, 0, 0); // 北方航路海上護衛
+		case 25: return sTypeLock(4, 25, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0);
+		case 26: return sTypeLock(4, 30, 0, 0, 0, 0, 1, 2, 1, 0, 0, 0, 0, 0, 0);
+		case 27: return sTypeLock(2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0);
+		case 28: return sTypeLock(3, 30, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0);
+		case 29: return sTypeLock(3, 50, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0);
+		case 30: return sTypeLock(4, 55, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0);
+		case 31: return sTypeLock(4, 60, 200, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0);
+		case 32: return sTypeLock(3, 5, 0, 21, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1);
+		case 33: return sTypeLock(2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0);
+		case 34: return sTypeLock(2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0);
+		case 35: return sTypeLock(6, 40, 0, 0, 0, 0, 0, 1, 2, 0, 0, 1, 0, 0, 0);
+		case 36: return sTypeLock(6, 30, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 2, 0, 0);
+		case 37: return sTypeLock(6, 50, 200, 0, 3, 4, 1, 5, 0, 0, 0, 0, 0, 0, 0);
+		case 38: return sTypeLock(6, 65, 240, 0, 4, 8, 0, 5, 0, 0, 0, 0, 0, 0, 0);
+		case 39: return sTypeLock(5, 3, 180, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 1, 0);
+		case 40: return sTypeLock(6, 25, 150, 3, 0, 0, 1, 2, 0, 0, 0, 0, 2, 0, 0); // 水上機前線輸送
 		default: return "?";
 	}
 }
 
 //艦種縛り他諸条件
-//艦数 旗艦Lv 合計Lv ドラム缶艦数 ドラム缶合計数 軽巡 駆逐 空母 航戦 潜水艦 重巡 水母 潜水艦母艦 練習艦
-function sTypeLock(shipCount, flgShipLv, sumShipLv, drumShipCount, drumCount, CLCount, DDCount, CVCount, CVBCount, SSCount, CACount, AVCount, ASCount, TVCount){
+//艦数 旗艦Lv 合計Lv 旗艦艦種 ドラム缶艦数 ドラム缶合計数 軽巡 駆逐 空母 航戦 潜水艦 重巡 水母 潜水艦母艦 練習艦
+function sTypeLock(shipCount, flgShipLv, sumShipLv, flgType, drumShipCount, drumCount, CLCount, DDCount, CVCount, CVBCount, SSCount, CACount, AVCount, ASCount, TVCount){
 	if(currentDockData.shipCount >= shipCount && 
 			currentDockData.flgShipLv >= flgShipLv && 
 			currentDockData.sumShipLv >= sumShipLv &&
+			(flgType == 0 || currentDockData.flgType == flgType) &&
 			currentDockData.drumShipCount >= drumShipCount &&
 			currentDockData.drumCount >= drumCount &&
 			currentDockData.CLCount >= CLCount && 

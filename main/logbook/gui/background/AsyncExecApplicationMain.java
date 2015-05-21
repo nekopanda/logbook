@@ -451,13 +451,7 @@ public final class AsyncExecApplicationMain extends Thread {
                     if ((i >= 1) && (deckMissions[i - 1].getMission() != null)) {
                         // 遠征中
                         DeckMissionDto mission = deckMissions[i - 1];
-
-                        String checkResult = "";
-                        Object resultObj = ScriptData.getData("missioncheck_" + (i + 1));
-                        if (resultObj != null) {
-                            checkResult = resultObj.toString();
-                        }
-                        dispname = dockName + " (" + checkResult + mission.getMission() + ")";
+                        dispname = dockName + " (" + mission.getDisplayText("missioncheck_" + (i + 1)) + ")";
 
                         if (mission.getTime() != null) {
                             long rest = TimeLogic.getRest(this.now, mission.getTime());
@@ -763,4 +757,5 @@ public final class AsyncExecApplicationMain extends Thread {
 
             this.postFatal(badlyDamaged);
         }
-    }}
+    }
+}

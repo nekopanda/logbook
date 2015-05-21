@@ -16,9 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 import logbook.config.AppConfig;
-import logbook.config.ItemConfig;
-import logbook.config.ItemMasterConfig;
-import logbook.config.ShipConfig;
+import logbook.config.UserDataConfig;
 import logbook.config.ShipGroupConfig;
 import logbook.config.bean.AppConfigBean;
 import logbook.constants.AppConstants;
@@ -146,10 +144,8 @@ public final class ApplicationMain extends WindowBase {
 
                 // 設定を書き込みます
                 AppConfig.store();
-                ShipConfig.store();
                 ShipGroupConfig.store();
-                ItemMasterConfig.store();
-                ItemConfig.store();
+                UserDataConfig.store();
                 MasterData.store();
                 EnemyData.store();
                 ShipParameterRecord.store();

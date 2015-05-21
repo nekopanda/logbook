@@ -7,10 +7,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
-import logbook.config.ItemMasterConfig;
 import logbook.dto.ItemInfoDto;
 import logbook.dto.ShipParameters;
 import logbook.internal.Item;
+import logbook.internal.MasterData;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,7 +25,7 @@ public class ItemInfoToCSV {
      * @throws IOException 
      */
     public static void main(String[] args) throws IOException {
-        ItemMasterConfig.load();
+        boolean init = MasterData.INIT_COMPLETE;
         OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream("itemInfo.csv"), "MS932");
 
         fw.write(StringUtils.join(new String[] {

@@ -17,16 +17,24 @@ import javax.json.JsonObject;
 import javax.json.JsonValue;
 
 import logbook.constants.AppConstants;
+import logbook.dto.ItemInfoDto;
 import logbook.dto.JsonData;
+import logbook.dto.ShipInfoDto;
 import logbook.dto.UseItemDto;
 import logbook.gui.ApplicationMain;
 import logbook.util.BeanUtils;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author Nekopanda
  *
  */
 public class MasterData {
+
+    /** ロガー */
+    private static final Logger LOG = LogManager.getLogger(MasterData.class);
 
     private static class Holder {
         public static MasterData instance = null;
@@ -52,11 +60,20 @@ public class MasterData {
     }
 
     private static void load() {
-        MasterData masterData = BeanUtils.readObject(AppConstants.MASTER_DATA_CONFIG, MasterData.class);
-        if ((masterData != null) && (masterData.getVersion() >= 1)) {
-            Holder.instance = masterData;
+        try {
+            MasterData masterData = BeanUtils.readObject(AppConstants.MASTER_DATA_CONFIG, MasterData.class);
+            if ((masterData != null) && (masterData.getVersion() >= 2)) {
+                Holder.instance = masterData;
+
+                // 更新
+                Item.update();
+                Ship.update();
+                ShipStyle.update();
+            }
+        } catch (Exception e) {
+            LOG.warn("艦娘のIDと名前の紐付けを設定ファイルから読み込みますに失敗しました", e);
         }
-        else {
+        if (Holder.instance == null) {
             Holder.instance = new MasterData();
         }
     }
@@ -70,8 +87,9 @@ public class MasterData {
     /** バージョン
      * 0: 初期
      * 1: 1.6.3以降
+     * 2: 1.8.7以降
      */
-    private int version = 1;
+    private int version = 2;
 
     private Start2Dto start2 = new Start2Dto();
 
@@ -90,6 +108,11 @@ public class MasterData {
     /** START2のマスターデータで更新 */
     public static void updateMaster(JsonObject data) {
         Holder.instance.doMater(data);
+
+        // 更新
+        Item.update();
+        Ship.update();
+        ShipStyle.update();
     }
 
     /** 出撃マップを更新 */
@@ -247,6 +270,12 @@ public class MasterData {
         /** 最終更新日時 */
         private Date time = new Date(0);
 
+        /** 艦娘 */
+        private final Map<String, ShipInfoDto> ships = new TreeMap<>();
+
+        /** アイテム */
+        private final Map<Integer, ItemInfoDto> items = new TreeMap<>();
+
         /** 1-, 2-, ... , イベント海域 */
         private final ArrayList<MapAreaDto> maparea = new ArrayList<MapAreaDto>();
 
@@ -277,6 +306,29 @@ public class MasterData {
         }
 
         private void readJson() {
+
+            // 艦娘一覧
+            JsonArray apiMstShip = this.json.getJsonArray("api_mst_ship");
+            if (apiMstShip != null) {
+                this.ships.clear();
+                for (int i = 0; i < apiMstShip.size(); i++) {
+                    JsonObject object = (JsonObject) apiMstShip.get(i);
+                    String id = object.getJsonNumber("api_id").toString();
+                    this.ships.put(id, this.toShipInfoDto(object));
+                }
+            }
+
+            // 装備一覧
+            JsonArray apiMstSlotitem = this.json.getJsonArray("api_mst_slotitem");
+            if (apiMstSlotitem != null) {
+                this.items.clear();
+                for (int i = 0; i < apiMstSlotitem.size(); i++) {
+                    JsonObject object = (JsonObject) apiMstSlotitem.get(i);
+                    ItemInfoDto item = new ItemInfoDto(object);
+                    int id = object.getJsonNumber("api_id").intValue();
+                    this.items.put(id, item);
+                }
+            }
 
             JsonArray json_maparea = this.json.getJsonArray("api_mst_maparea");
             if (json_maparea != null) {
@@ -322,6 +374,22 @@ public class MasterData {
             }
 
             this.time = new Date();
+        }
+
+        /**
+         * 艦娘を作成します
+         *
+         * @param object
+         * @return
+         */
+        private ShipInfoDto toShipInfoDto(JsonObject object) {
+            String name = object.getString("api_name");
+
+            if ("なし".equals(name)) {
+                return ShipInfoDto.EMPTY;
+            }
+
+            return new ShipInfoDto(object);
         }
 
         /** 艦種情報を取得 */
@@ -399,6 +467,20 @@ public class MasterData {
          */
         public void setTime(Date time) {
             this.time = time;
+        }
+
+        /**
+         * @return ships
+         */
+        public Map<String, ShipInfoDto> getShips() {
+            return this.ships;
+        }
+
+        /**
+         * @return items
+         */
+        public Map<Integer, ItemInfoDto> getItems() {
+            return this.items;
         }
     }
 

@@ -7,8 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
-import logbook.config.ShipConfig;
 import logbook.dto.ShipInfoDto;
+import logbook.internal.MasterData;
 import logbook.internal.Ship;
 
 import org.apache.commons.lang3.StringUtils;
@@ -24,14 +24,14 @@ public class ShipInfoToCSV {
      * @throws IOException 
      */
     public static void main(String[] args) throws IOException {
-        ShipConfig.load();
+        boolean init = MasterData.INIT_COMPLETE;
         OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream("shipInfo.csv"), "MS932");
 
         fw.write(StringUtils.join(new String[] {
                 "名前", "艦ID", "タイプID", "タイプ名", "改造Lv", "改造後の艦ID", "Flagship", "Max弾", "Max燃料" }, ','));
         fw.write("\n");
 
-        for (String key : Ship.keySet()) {
+        for (String key : Ship.get().keySet()) {
             ShipInfoDto dto = Ship.get(key);
             if (dto.getName().length() > 0) {
                 fw.write(StringUtils.join(new String[] {

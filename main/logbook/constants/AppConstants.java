@@ -185,14 +185,8 @@ public class AppConstants {
     /** アプリケーション設定ファイル  */
     public static final File APP_CONFIG_FILE = new File("./config/internal.xml");
 
-    /** 艦娘設定ファイル  */
-    public static final File SHIP_CONFIG_FILE = new File("./config/ship.xml");
-
-    /** 装備一覧設定ファイル  */
-    public static final File ITEM_CONFIG_FILE = new File("./config/item.xml");
-
-    /** 装備マスター設定ファイル  */
-    public static final File ITEM_MST_CONFIG_FILE = new File("./config/itemmst.xml");
+    /** ユーザーゲームデータファイル  */
+    public static final File USER_DATA_CONFIG = new File("./config/user.xml");
 
     /** マスターゲームデータ保存ファイル  */
     public static final File MASTER_DATA_CONFIG = new File("./config/master.xml");
@@ -352,6 +346,9 @@ public class AppConstants {
 
     /** メッセージ  大発:{0} (+{1}%) */
     public static final String MESSAGE_TOTAL_DAIHATSU = "大発:{0} (+{1}%)";
+
+    /** メッセージ  前回の遠征:{0} (+{1}%) */
+    public static final String MESSAGE_PREVIOUS_MISSION = "前回の遠征:{0}";
 
     /** タイトルバーに表示するデフォルトテキスト */
     public static final String TITLEBAR_TEXT = NAME + SUFFIX + " " + VERSION;
