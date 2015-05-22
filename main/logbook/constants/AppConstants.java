@@ -215,6 +215,9 @@ public class AppConstants {
     /** テンプレート */
     public static final File BATTLE_LOG_CSS_TMPL_FILE = new File("./templates/battle-log.css");
 
+    /** 多重起動検出用 */
+    public static final File LOCK_FILE = new File("./config/lock");
+
     /** 保有資材:燃料 */
     public static final int MATERIAL_FUEL = 1;
 

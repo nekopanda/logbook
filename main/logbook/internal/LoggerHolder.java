@@ -24,7 +24,7 @@ public class LoggerHolder {
         this.name = name;
     }
 
-    public Logger get() {
+    public synchronized Logger get() {
         if (this.logger == null) {
             if (this.clazz != null) {
                 this.logger = LogManager.getLogger(this.clazz);

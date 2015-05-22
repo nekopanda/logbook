@@ -78,9 +78,12 @@ public final class AsyncExecApplicationMain extends Thread {
 
         try {
             long nextUpdateTime = 0;
+            long counter = 1;
             final ApplicationMain main = this.main;
 
             while (true) {
+                final long current = counter++;
+
                 Display.getDefault().syncExec(new Runnable() {
                     @Override
                     public void run() {
@@ -103,6 +106,12 @@ public final class AsyncExecApplicationMain extends Thread {
                             EnemyData.store();
                             ShipParameterRecord.store();
                             ScriptData.store();
+
+                            if ((current % 10) == 0) {
+                                // メニューから終了しなかった場合を考慮して定期的にウィンドウ位置を記憶
+                                main.saveWindows();
+                            }
+
                         } catch (IOException e) {
                             LOG.get().fatal("ファイル更新に失敗しました", e);
                         }

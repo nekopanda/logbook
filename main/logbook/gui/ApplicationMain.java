@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -124,6 +126,42 @@ public final class ApplicationMain extends WindowBase {
 
     public static ApplicationMain main;
     public static boolean disableUpdate;
+    private static ApplicationLock applicationLock = new ApplicationLock();
+
+    private static final class ApplicationLock {
+        private FileOutputStream fos;
+        private FileChannel fchan;
+        private FileLock flock;
+
+        public ApplicationLock() {
+            try {
+                this.fos = new FileOutputStream(AppConstants.LOCK_FILE);
+                this.fchan = this.fos.getChannel();
+                this.flock = this.fchan.tryLock();
+            } catch (IOException e) {
+                LOG.get().warn("ファイルロックでエラー", e);
+            }
+        }
+
+        public boolean isLocked() {
+            return (this.flock != null);
+        }
+
+        public void release() {
+            try {
+                if (this.flock != null) {
+                    this.flock.release();
+                }
+                this.fchan.close();
+                this.fos.close();
+                if (this.flock != null) {
+                    AppConstants.LOCK_FILE.delete();
+                }
+            } catch (IOException e) {
+                LOG.get().warn("ファイルロック解放でエラー", e);
+            }
+        }
+    }
 
     /**
      * <p>
@@ -138,8 +176,6 @@ public final class ApplicationMain extends WindowBase {
         @Override
         public void run() {
             try {
-                // スレッドを終了する
-                endThread();
 
                 // 設定を書き込みます
                 AppConfig.store();
@@ -149,6 +185,13 @@ public final class ApplicationMain extends WindowBase {
                 EnemyData.store();
                 ShipParameterRecord.store();
                 ScriptData.store();
+
+                // スレッドを終了する
+                endThread();
+
+                // ロック解放
+                applicationLock.release();
+
             } catch (Exception e) {
                 LOG.get().fatal("シャットダウンスレッドで異常終了しました", e);
             }
@@ -286,8 +329,14 @@ public final class ApplicationMain extends WindowBase {
         try {
             // グループ化のためのアプリケーションID (Windows 7以降)
             Display.setAppName(AppConstants.NAME);
-            // 設定読み込み
             sysPrint("起動");
+            // 多重起動チェック
+            if (!applicationLock.isLocked()) {
+                printErrorMessageBox();
+                applicationLock.release();
+                return;
+            }
+            // 設定読み込み
             AppConfig.load();
             /*　static initializer に移行
             ShipConfig.load();
@@ -311,6 +360,15 @@ public final class ApplicationMain extends WindowBase {
         } finally {
             endThread();
         }
+    }
+
+    private static void printErrorMessageBox() {
+        Shell shell = new Shell(Display.getDefault(), SWT.TOOL);
+        MessageBox mes = new MessageBox(shell, SWT.ICON_WARNING | SWT.OK);
+        mes.setText(AppConstants.TITLEBAR_TEXT);
+        mes.setMessage("多重起動を検出しました。起動中の航海日誌拡張版を終了してください。");
+        mes.open();
+        shell.dispose();
     }
 
     /**
@@ -1174,7 +1232,7 @@ public final class ApplicationMain extends WindowBase {
         }
     }
 
-    private void saveWindows() {
+    public void saveWindows() {
         this.save();
         for (WindowBase window : this.getWindowList()) {
             window.save();
@@ -1285,7 +1343,9 @@ public final class ApplicationMain extends WindowBase {
      */
     private void startThread() {
         // 時間のかかる初期化を別スレッドで実行
-        new BackgroundInitializer(this.shell).start();
+        Thread backgroundInitializer = new BackgroundInitializer(this.shell);
+        backgroundInitializer.setDaemon(true);
+        backgroundInitializer.start();
 
         sysPrint("その他のスレッド起動...");
         // 非同期で画面を更新するスレッド
