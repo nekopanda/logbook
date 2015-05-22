@@ -21,9 +21,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
+import logbook.internal.LoggerHolder;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -39,7 +38,7 @@ public final class PushNotify {
     private static Queue<String[]> notifyQueue = new ArrayBlockingQueue<String[]>(10);
 
     /** ロガー */
-    private static final Logger LOG = LogManager.getLogger(PushNotify.class);
+    private static final LoggerHolder LOG = new LoggerHolder(PushNotify.class);
 
     /**
      * 通知メッセージを処理待ちキューに入れます
@@ -102,12 +101,12 @@ public final class PushNotify {
                     Node item = root.getFirstChild();
                     String childName = item.getNodeName();
                     if (!childName.equals("success")) {
-                        LOG.warn("Prowl による Push 通知に失敗しました。", result);
+                        LOG.get().warn("Prowl による Push 通知に失敗しました。", result);
                     }
                 }
             }
         } catch (Exception e) {
-            LOG.warn("Prowl による Push 通知に失敗しました。", e);
+            LOG.get().warn("Prowl による Push 通知に失敗しました。", e);
         }
 
     }
@@ -142,12 +141,12 @@ public final class PushNotify {
                     Node item = root.getFirstChild();
                     String childName = item.getNodeName();
                     if (!childName.equals("success")) {
-                        LOG.warn("NMA による Push 通知に失敗しました。", result);
+                        LOG.get().warn("NMA による Push 通知に失敗しました。", result);
                     }
                 }
             }
         } catch (Exception e) {
-            LOG.warn("NMA による Push 通知に失敗しました。", e);
+            LOG.get().warn("NMA による Push 通知に失敗しました。", e);
         }
 
     }
@@ -199,10 +198,10 @@ public final class PushNotify {
                 }
             }
             if (postflag = false) {
-                LOG.warn("ImKayac による Push 通知に失敗しました", result);
+                LOG.get().warn("ImKayac による Push 通知に失敗しました", result);
             }
         } catch (Exception e) {
-            LOG.warn("ImKayac による Push 通知に失敗しました", e);
+            LOG.get().warn("ImKayac による Push 通知に失敗しました", e);
         }
 
     }
@@ -243,11 +242,11 @@ public final class PushNotify {
                 String resultStr = response.toString();
                 return resultStr;
             } else {
-                LOG.warn("Push 通知に失敗しました。HTTPレスポンスコード:" + connection.getResponseCode());
+                LOG.get().warn("Push 通知に失敗しました。HTTPレスポンスコード:" + connection.getResponseCode());
                 return "";
             }
         } catch (Exception e) {
-            LOG.warn("Push 通知に失敗しました", e);
+            LOG.get().warn("Push 通知に失敗しました", e);
             return "";
         }
 
@@ -269,7 +268,7 @@ public final class PushNotify {
             sb.append("=");
             sb.append(URLEncoder.encode(value, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
-            LOG.warn("POSTデータの生成に失敗しました。", e);
+            LOG.get().warn("POSTデータの生成に失敗しました。", e);
         }
     }
 
@@ -280,7 +279,7 @@ public final class PushNotify {
     public static class PushNotifyThread extends Thread {
 
         /** ロガー */
-        private static final Logger LOG = LogManager.getLogger(PushNotifyThread.class);
+        private static final LoggerHolder LOG = new LoggerHolder(PushNotifyThread.class);
 
         /**
          * 通知スレッド
@@ -300,7 +299,7 @@ public final class PushNotify {
                     Thread.sleep(500);
                 }
             } catch (Exception e) {
-                LOG.fatal("スレッドが異常終了しました", e);
+                LOG.get().fatal("スレッドが異常終了しました", e);
                 throw new RuntimeException(e);
             }
         }

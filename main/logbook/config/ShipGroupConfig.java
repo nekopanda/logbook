@@ -8,10 +8,8 @@ import logbook.constants.AppConstants;
 import logbook.gui.ApplicationMain;
 import logbook.gui.logic.ShipGroupListener;
 import logbook.gui.logic.ShipGroupObserver;
+import logbook.internal.LoggerHolder;
 import logbook.util.BeanUtils;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * 所有艦娘グループを保存・復元します
@@ -19,7 +17,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class ShipGroupConfig {
     /** ロガー */
-    private static final Logger LOG = LogManager.getLogger(ShipGroupConfig.class);
+    private static final LoggerHolder LOG = new LoggerHolder(ShipGroupConfig.class);
 
     /** 所有艦娘グループ */
     private static ShipGroupListBean group;
@@ -79,7 +77,7 @@ public class ShipGroupConfig {
                 group = new ShipGroupListBean();
             }
         } catch (Exception e) {
-            LOG.warn("所有艦娘グループを読み込みますに失敗しました", e);
+            LOG.get().warn("所有艦娘グループを読み込みますに失敗しました", e);
         }
     }
 

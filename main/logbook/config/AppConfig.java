@@ -4,10 +4,8 @@ import java.io.IOException;
 
 import logbook.config.bean.AppConfigBean;
 import logbook.constants.AppConstants;
+import logbook.internal.LoggerHolder;
 import logbook.util.BeanUtils;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * アプリケーション設定を保存・復元します
@@ -15,7 +13,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class AppConfig {
     /** ロガー */
-    private static final Logger LOG = LogManager.getLogger(AppConfig.class);
+    private static final LoggerHolder LOG = new LoggerHolder(AppConfig.class);
 
     /** アプリケーション設定 */
     private static AppConfigBean configBean;
@@ -42,7 +40,7 @@ public class AppConfig {
                 configBean = new AppConfigBean();
             }
         } catch (Exception e) {
-            LOG.warn("アプリケーション設定を読み込みますに失敗しました", e);
+            LOG.get().warn("アプリケーション設定を読み込みますに失敗しました", e);
         }
     }
 

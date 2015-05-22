@@ -28,11 +28,10 @@ import logbook.gui.logic.ColorManager;
 import logbook.gui.logic.ResourceChart;
 import logbook.gui.logic.ResourceChart.ActiveLevel;
 import logbook.gui.logic.TableItemCreator;
+import logbook.internal.LoggerHolder;
 import logbook.scripting.TableItemCreatorProxy;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.MouseEvent;
@@ -76,7 +75,7 @@ import org.eclipse.swt.widgets.TableColumn;
 public final class ResourceChartDialog extends WindowBase {
 
     /** ロガー */
-    private static final Logger LOG = LogManager.getLogger(ResourceChartDialog.class);
+    private static final LoggerHolder LOG = new LoggerHolder(ResourceChartDialog.class);
 
     /** スケールテキスト */
     private static final String[] SCALE_TEXT = { "1日", "1週間", "2週間", "1ヶ月", "2ヶ月", "3ヶ月", "半年", "1年" };
@@ -442,7 +441,7 @@ public final class ResourceChartDialog extends WindowBase {
             }
         } catch (Exception e) {
             image.dispose();
-            LOG.warn("グラフの描画で例外が発生しました", e);
+            LOG.get().warn("グラフの描画で例外が発生しました", e);
         }
         return image;
     }

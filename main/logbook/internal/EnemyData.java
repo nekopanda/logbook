@@ -23,8 +23,6 @@ import logbook.dto.ShipInfoDto;
 import logbook.gui.ApplicationMain;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
@@ -38,7 +36,7 @@ import com.dyuproject.protostuff.Tag;
 public class EnemyData {
 
     /** ロガー */
-    private static final Logger LOG = LogManager.getLogger(EnemyData.class);
+    private static final LoggerHolder LOG = new LoggerHolder(EnemyData.class);
     private static Map<Integer, EnemyData> ENEMY = new TreeMap<Integer, EnemyData>();
 
     /** 変更があったか */
@@ -50,7 +48,7 @@ public class EnemyData {
         try {
             load();
         } catch (IOException e) {
-            LOG.warn("e_idと敵艦隊の対応ファイル読み込みに失敗しました", e);
+            LOG.get().warn("e_idと敵艦隊の対応ファイル読み込みに失敗しました", e);
         }
         INIT_COMPLETE = true;
     }
@@ -185,7 +183,7 @@ public class EnemyData {
                     }
                 }
             } catch (IOException e) {
-                LOG.warn("旧敵データファイル読み込み失敗", e);
+                LOG.get().warn("旧敵データファイル読み込み失敗", e);
             }
         }
     }

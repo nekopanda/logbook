@@ -20,9 +20,7 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import logbook.constants.AppConstants;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import logbook.internal.LoggerHolder;
 
 /**
  * スクリプトデータ永続化
@@ -30,7 +28,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class ScriptData {
     /** ロガー */
-    private static final Logger LOG = LogManager.getLogger("script");
+    private static final LoggerHolder LOG = new LoggerHolder("script");
 
     private static class DataObject implements Serializable {
         private static final long serialVersionUID = -115021202763582793L;
@@ -60,7 +58,7 @@ public class ScriptData {
             // 60日間アクセスがないデータを削除
             cleanup(60);
         } catch (IOException e) {
-            LOG.warn("スクリプトデータ読み込みに失敗しました", e);
+            LOG.get().warn("スクリプトデータ読み込みに失敗しました", e);
         }
     }
 
@@ -144,7 +142,7 @@ public class ScriptData {
                     oos.writeObject(data);
                     oos.flush();
                 } catch (IOException e) {
-                    LOG.warn("データの保存に失敗(" + entry.getKey() + ")", e);
+                    LOG.get().warn("データの保存に失敗(" + entry.getKey() + ")", e);
                 }
             }
             modified = false;
@@ -168,9 +166,9 @@ public class ScriptData {
                         data.persist = true;
                         dataMap.put(key, data);
                     } catch (ClassNotFoundException | ClassCastException e) {
-                        LOG.warn("データの読み込みに失敗(" + key + ")", e);
+                        LOG.get().warn("データの読み込みに失敗(" + key + ")", e);
                     } catch (IOException e) {
-                        LOG.warn("データの読み込みに失敗(" + key + ")", e);
+                        LOG.get().warn("データの読み込みに失敗(" + key + ")", e);
                     }
                 }
             }

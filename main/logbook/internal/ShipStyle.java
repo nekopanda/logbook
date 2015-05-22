@@ -11,6 +11,9 @@ import logbook.internal.MasterData.ShipTypeDto;
  */
 public class ShipStyle {
 
+    /** ロガー */
+    private static final LoggerHolder LOG = new LoggerHolder(ShipStyle.class);
+
     /**
      * 艦種プリセット値
      */
@@ -39,6 +42,15 @@ public class ShipStyle {
             this.put(21, "練習巡洋艦");
         }
     };
+
+    // 始めてアクセスがあった時に読み込む
+    static {
+        try {
+            update();
+        } catch (Exception e) {
+            LOG.get().warn(e);
+        }
+    }
 
     /**
      * 艦種を取得します

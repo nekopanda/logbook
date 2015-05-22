@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Set;
 
 import logbook.config.AppConfig;
-import logbook.config.UserDataConfig;
 import logbook.config.ShipGroupConfig;
+import logbook.config.UserDataConfig;
 import logbook.config.bean.AppConfigBean;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
@@ -40,6 +40,7 @@ import logbook.gui.widgets.FleetComposite;
 import logbook.internal.BattleResultServer;
 import logbook.internal.EnemyData;
 import logbook.internal.Item;
+import logbook.internal.LoggerHolder;
 import logbook.internal.MasterData;
 import logbook.internal.Ship;
 import logbook.internal.ShipParameterRecord;
@@ -52,8 +53,6 @@ import logbook.util.JIntellitypeWrapper;
 import logbook.util.SwtUtils;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -91,15 +90,15 @@ import com.melloware.jintellitype.HotkeyListener;
  */
 public final class ApplicationMain extends WindowBase {
 
+    private static final long startTime = System.currentTimeMillis();
+
     /** ロガー */
-    private static final Logger LOG = LogManager.getLogger(ApplicationMain.class);
+    private static final LoggerHolder LOG = new LoggerHolder(ApplicationMain.class);
 
     private static final int MAX_LOG_LINES = 200;
     private static final DateFormat LOG_DATE_FORMAT = new SimpleDateFormat(AppConstants.DATE_SHORT_FORMAT);
 
-    private static final long startTime = System.currentTimeMillis();
-
-    private static final Logger userLogger = LogManager.getLogger("user");
+    private static final LoggerHolder userLogger = new LoggerHolder("user");
 
     public static void sysPrint(String mes) {
         System.out.println(mes + ": " + (System.currentTimeMillis() - startTime) + " ms");
@@ -134,7 +133,7 @@ public final class ApplicationMain extends WindowBase {
     private static final class ShutdownHookThread implements Runnable {
 
         /** ロガー */
-        private static final Logger LOG = LogManager.getLogger(ShutdownHookThread.class);
+        private static final LoggerHolder LOG = new LoggerHolder(ShutdownHookThread.class);
 
         @Override
         public void run() {
@@ -151,7 +150,7 @@ public final class ApplicationMain extends WindowBase {
                 ShipParameterRecord.store();
                 ScriptData.store();
             } catch (Exception e) {
-                LOG.fatal("シャットダウンスレッドで異常終了しました", e);
+                LOG.get().fatal("シャットダウンスレッドで異常終了しました", e);
             }
         }
     }
@@ -289,7 +288,6 @@ public final class ApplicationMain extends WindowBase {
             Display.setAppName(AppConstants.NAME);
             // 設定読み込み
             sysPrint("起動");
-            userLogger.info(AppConstants.TITLEBAR_TEXT + " 起動しました");
             AppConfig.load();
             /*　static initializer に移行
             ShipConfig.load();
@@ -307,9 +305,9 @@ public final class ApplicationMain extends WindowBase {
             sysPrint("メインウィンドウ初期化開始");
             main.restore();
         } catch (Error e) {
-            LOG.fatal("メインスレッドが異常終了しました", e);
+            LOG.get().fatal("メインスレッドが異常終了しました", e);
         } catch (Exception e) {
-            LOG.fatal("メインスレッドが異常終了しました", e);
+            LOG.get().fatal("メインスレッドが異常終了しました", e);
         } finally {
             endThread();
         }
@@ -898,8 +896,8 @@ public final class ApplicationMain extends WindowBase {
             this.fleetWindows[i] = new FleetWindow(this.dummyHolder, menuItem, this.tabFolder, i + 1);
         }
 
-        // タブを閉じた時に艦隊ウィンドウを表示
-        this.tabFolder.setData("disable-window-menu", new Object());
+        // メニュー表示
+        this.tabFolder.setData("disable-window-menu-this", new Object());
         this.tabFolder.addListener(SWT.MenuDetect, new Listener() {
             @Override
             public void handleEvent(Event event) {
@@ -912,8 +910,11 @@ public final class ApplicationMain extends WindowBase {
                     if (data instanceof FleetWindow) {
                         FleetWindow fw = (FleetWindow) data;
                         fw.showTabMenu();
+                        return;
                     }
                 }
+                // ウィンドウメニューを表示
+                //ApplicationMain.this.getPopupMenu().setVisible(true);
             }
         });
 
@@ -1346,7 +1347,7 @@ public final class ApplicationMain extends WindowBase {
                                 try {
                                     Desktop.getDesktop().browse(AppConstants.HOME_PAGE_URI);
                                 } catch (Exception e) {
-                                    LOG.warn("ウェブサイトに移動が失敗しました", e);
+                                    LOG.get().warn("ウェブサイトに移動が失敗しました", e);
                                 }
                             }
                         }
@@ -1359,7 +1360,7 @@ public final class ApplicationMain extends WindowBase {
                 // チェックしなくてもいい設定の場合はエラーを無視する
                 if (AppConfig.get().isUpdateCheck()) {
                     // アップデートチェック失敗はクラス名のみ
-                    LOG.info(e.getClass().getName() + "が原因でアップデートチェックに失敗しました");
+                    LOG.get().info(e.getClass().getName() + "が原因でアップデートチェックに失敗しました");
                 }
             }
         }).start();
@@ -1715,7 +1716,7 @@ public final class ApplicationMain extends WindowBase {
      * @param message コンソールに表示するメッセージ
      */
     public void printMessage(final String message) {
-        this.userLogger.info(message);
+        getUserlogger().get().info(message);
         if (disableUpdate || this.console.isDisposed())
             return;
         int size = this.console.getItemCount();
@@ -1799,5 +1800,12 @@ public final class ApplicationMain extends WindowBase {
      */
     public FleetWindow[] getFleetWindows() {
         return this.fleetWindows;
+    }
+
+    /**
+     * @return userlogger
+     */
+    public static LoggerHolder getUserlogger() {
+        return userLogger;
     }
 }

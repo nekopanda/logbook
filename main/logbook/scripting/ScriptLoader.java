@@ -26,13 +26,12 @@ import javax.script.ScriptException;
 
 import logbook.constants.AppConstants;
 import logbook.gui.logic.TableItemCreator;
+import logbook.internal.LoggerHolder;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.AbstractFileFilter;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * スクリプトローダ
@@ -41,7 +40,7 @@ import org.apache.logging.log4j.Logger;
 public class ScriptLoader {
     private static ScriptLoader instance = null;
 
-    private static Logger LOG = LogManager.getLogger("script");
+    private static LoggerHolder LOG = new LoggerHolder("script");
 
     public static interface MethodInvoke {
         public Object invoke(Object arg);
@@ -68,7 +67,7 @@ public class ScriptLoader {
                 }
             } catch (ScriptException | IOException e) {
                 this.listener = null;
-                LOG.warn("スクリプトファイル " + scriptFile.getPath() + " を読み込み中にエラー", e);
+                LOG.get().warn("スクリプトファイル " + scriptFile.getPath() + " を読み込み中にエラー", e);
             }
             ScriptLoader.this.allScripts.put(scriptFile.getName(), this);
         }
@@ -91,7 +90,7 @@ public class ScriptLoader {
                 this.reload_();
             } catch (ScriptException | IOException e) {
                 this.listener = null;
-                LOG.warn("スクリプトファイル " + this.scriptFile.getPath() + "  を読み込み中にエラー", e);
+                LOG.get().warn("スクリプトファイル " + this.scriptFile.getPath() + "  を読み込み中にエラー", e);
             }
         }
 
@@ -128,9 +127,9 @@ public class ScriptLoader {
             } catch (Exception e) {
                 this.exception = true;
                 if (this.errorCounter++ < 20) {
-                    LOG.warn(this.scriptFile.getPath() + " を実行中にエラー", e);
+                    LOG.get().warn(this.scriptFile.getPath() + " を実行中にエラー", e);
                     if (this.errorCounter == 20) {
-                        LOG.warn(this.scriptFile.getPath() + " はこれ以上エラーを記録しません");
+                        LOG.get().warn(this.scriptFile.getPath() + " はこれ以上エラーを記録しません");
                     }
                 }
             }
@@ -378,7 +377,7 @@ public class ScriptLoader {
                     ignoreList.add(filename);
                 }
             } catch (IOException e) {
-                LOG.warn("除外リストファイル読み込み中にエラー", e);
+                LOG.get().warn("除外リストファイル読み込み中にエラー", e);
             }
         }
 
@@ -387,7 +386,7 @@ public class ScriptLoader {
                 @Override
                 public boolean accept(File src) {
                     if (ignoreList.contains(src.getName())) {
-                        LOG.info("除外されているためアップデートされません: " + src.getAbsolutePath());
+                        LOG.get().info("除外されているためアップデートされません: " + src.getAbsolutePath());
                         return false;
                     }
                     File dstFile = new File(AppConstants.SCRIPT_DIR.getAbsolutePath() +
@@ -403,7 +402,7 @@ public class ScriptLoader {
                 ignoreFile.createNewFile();
             }
         } catch (IOException e) {
-            LOG.warn("スクリプトをテンプレートからコピー中にエラー", e);
+            LOG.get().warn("スクリプトをテンプレートからコピー中にエラー", e);
         }
     }
 

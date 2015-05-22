@@ -32,14 +32,13 @@ import logbook.gui.widgets.FleetComposite;
 import logbook.internal.AkashiTimer;
 import logbook.internal.CondTiming;
 import logbook.internal.EnemyData;
+import logbook.internal.LoggerHolder;
 import logbook.internal.MasterData;
 import logbook.internal.ShipParameterRecord;
 import logbook.scripting.ScriptData;
 import logbook.util.SwtUtils;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.graphics.Color;
@@ -55,7 +54,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
  * 非同期にメイン画面を更新します
  */
 public final class AsyncExecApplicationMain extends Thread {
-    private static final Logger LOG = LogManager.getLogger(AsyncExecApplicationMain.class);
+    private static final LoggerHolder LOG = new LoggerHolder(AsyncExecApplicationMain.class);
 
     private static final int ONE_MINUTES = 60;
 
@@ -105,7 +104,7 @@ public final class AsyncExecApplicationMain extends Thread {
                             ShipParameterRecord.store();
                             ScriptData.store();
                         } catch (IOException e) {
-                            LOG.fatal("ファイル更新に失敗しました", e);
+                            LOG.get().fatal("ファイル更新に失敗しました", e);
                         }
                     }
                 });
@@ -119,7 +118,7 @@ public final class AsyncExecApplicationMain extends Thread {
                 Thread.sleep(nextUpdateTime - currentTime);
             }
         } catch (Exception e) {
-            LOG.fatal("スレッドが異常終了しました", e);
+            LOG.get().fatal("スレッドが異常終了しました", e);
             throw new RuntimeException(e);
         }
     }
@@ -212,7 +211,7 @@ public final class AsyncExecApplicationMain extends Thread {
      */
     private static final class UpdateDeckNdockTask implements Runnable {
 
-        private static final Logger LOG = LogManager.getLogger(UpdateDeckNdockTask.class);
+        private static final LoggerHolder LOG = new LoggerHolder(UpdateDeckNdockTask.class);
 
         private static final boolean[] FLAG_NOTICE_DECK = { false, false, false };
         private static final boolean[] FLAG_NOTICE_NDOCK = { false, false, false, false };
@@ -326,7 +325,7 @@ public final class AsyncExecApplicationMain extends Thread {
                         tip.setVisible(true);
                     }
                 } catch (Exception e) {
-                    LOG.warn("お知らせの表示に失敗しました", e);
+                    LOG.get().warn("お知らせの表示に失敗しました", e);
                 }
             }
 

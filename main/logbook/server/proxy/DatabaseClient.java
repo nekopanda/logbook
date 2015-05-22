@@ -10,9 +10,8 @@ import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.data.UndefinedData;
 import logbook.gui.ApplicationMain;
+import logbook.internal.LoggerHolder;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.client.api.Request;
@@ -27,7 +26,7 @@ import org.eclipse.swt.widgets.Display;
  * @author Nekopanda
  */
 public class DatabaseClient extends Thread {
-    private static final Logger LOG = LogManager.getLogger(DatabaseClient.class);
+    private static final LoggerHolder LOG = new LoggerHolder(DatabaseClient.class);
     private static DatabaseClient instance = null;
 
     private static final String[] sendDatabaseUrls = new String[]
@@ -93,7 +92,7 @@ public class DatabaseClient extends Thread {
                 instance.join();
                 instance = null;
             } catch (InterruptedException e) {
-                LOG.fatal("DatabaseClientスレッド終了時に何かのエラー", e);
+                LOG.get().fatal("DatabaseClientスレッド終了時に何かのエラー", e);
             }
         }
     }
@@ -189,9 +188,9 @@ public class DatabaseClient extends Thread {
                         if (retly >= 4) {
                             // リトライが多すぎたらエラーにする
                             skipCount = (errorCount++) * 4;
-                            LOG.warn("データベースへの送信に失敗しました. " + errorReason);
+                            LOG.get().warn("データベースへの送信に失敗しました. " + errorReason);
                             if (skipCount > 0) {
-                                LOG.warn("以降 " + skipCount + " 個の送信をスキップします.");
+                                LOG.get().warn("以降 " + skipCount + " 個の送信をスキップします.");
                             }
                             break;
                         }
@@ -201,14 +200,14 @@ public class DatabaseClient extends Thread {
 
         } catch (Exception e) {
             if (!this.endRequested) {
-                LOG.fatal("スレッドが異常終了しました", e);
+                LOG.get().fatal("スレッドが異常終了しました", e);
             }
         } finally {
             if (this.httpClient != null) {
                 try {
                     this.httpClient.stop();
                 } catch (Exception e) {
-                    LOG.fatal("HttpClientの終了に失敗", e);
+                    LOG.get().fatal("HttpClientの終了に失敗", e);
                 }
             }
         }

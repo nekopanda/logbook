@@ -11,11 +11,10 @@ import logbook.data.DataType;
 import logbook.dto.ShipFilterDto;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.TableItemCreator;
+import logbook.internal.LoggerHolder;
 import logbook.scripting.TableItemCreatorProxy;
 import logbook.util.ReportUtils;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -30,7 +29,7 @@ import org.eclipse.swt.widgets.Shell;
 public final class BathwaterTableDialog extends AbstractTableDialog {
 
     /** ロガー */
-    private static final Logger LOG = LogManager.getLogger(BathwaterTableDialog.class);
+    private static final LoggerHolder LOG = new LoggerHolder(BathwaterTableDialog.class);
 
     /** フィルター */
     private final ShipFilterDto filter = new ShipFilterDto();
@@ -112,7 +111,7 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
             entry.setValue(hiddenColIndex++);
         }
         if (hiddenColIndex != colMap.size()) {
-            LOG.warn("BATHTABLE_COLUMN_MAPに実際にはないカラムがあるようです");
+            LOG.get().warn("BATHTABLE_COLUMN_MAPに実際にはないカラムがあるようです");
         }
         for (int i = 0; i < order.length; ++i) {
             if (colMap.containsKey(this.headerId[i])) {

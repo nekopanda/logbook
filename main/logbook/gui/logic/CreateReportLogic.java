@@ -45,6 +45,7 @@ import logbook.dto.ShipFilterDto;
 import logbook.dto.UseItemDto;
 import logbook.internal.BattleResultFilter;
 import logbook.internal.BattleResultServer;
+import logbook.internal.LoggerHolder;
 import logbook.internal.MasterData;
 import logbook.internal.MasterData.MissionDto;
 import logbook.scripting.BattleLogProxy;
@@ -62,8 +63,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -74,7 +73,7 @@ import au.com.bytecode.opencsv.CSVReader;
 public final class CreateReportLogic {
 
     /** ロガー */
-    private static final Logger LOG = LogManager.getLogger(CreateReportLogic.class);
+    private static final LoggerHolder LOG = new LoggerHolder(CreateReportLogic.class);
 
     /**
      * ドロップ報告書のヘッダー
@@ -822,7 +821,7 @@ public final class CreateReportLogic {
                     CreateReportLogic.getBattleResultStoreHeader(),
                     CreateReportLogic.getBattleResultStoreBody(dtoList), true);
         } catch (IOException e) {
-            LOG.warn("報告書の保存に失敗しました", e);
+            LOG.get().warn("報告書の保存に失敗しました", e);
         }
     }
 
@@ -841,7 +840,7 @@ public final class CreateReportLogic {
                     CreateReportLogic.getCreateShipHeader(),
                     CreateReportLogic.getCreateShipBody(dtoList), true);
         } catch (IOException e) {
-            LOG.warn("報告書の保存に失敗しました", e);
+            LOG.get().warn("報告書の保存に失敗しました", e);
         }
     }
 
@@ -861,7 +860,7 @@ public final class CreateReportLogic {
                 reader.close();
             }
         } catch (Exception e) {
-            LOG.warn("建造報告書の読み込みに失敗しました", e);
+            LOG.get().warn("建造報告書の読み込みに失敗しました", e);
         }
         return dtoList;
     }
@@ -881,7 +880,7 @@ public final class CreateReportLogic {
                     CreateReportLogic.getCreateItemHeader(),
                     CreateReportLogic.getCreateItemBody(dtoList), true);
         } catch (IOException e) {
-            LOG.warn("報告書の保存に失敗しました", e);
+            LOG.get().warn("報告書の保存に失敗しました", e);
         }
     }
 
@@ -901,7 +900,7 @@ public final class CreateReportLogic {
                 reader.close();
             }
         } catch (Exception e) {
-            LOG.warn("開発報告書の読み込みに失敗しました", e);
+            LOG.get().warn("開発報告書の読み込みに失敗しました", e);
         }
         return dtoList;
     }
@@ -921,7 +920,7 @@ public final class CreateReportLogic {
                     CreateReportLogic.getMissionResultHeader(),
                     CreateReportLogic.getMissionResultBody(dtoList), true);
         } catch (IOException e) {
-            LOG.warn("報告書の保存に失敗しました", e);
+            LOG.get().warn("報告書の保存に失敗しました", e);
         }
     }
 
@@ -941,7 +940,7 @@ public final class CreateReportLogic {
                 reader.close();
             }
         } catch (Exception e) {
-            LOG.warn("遠征報告書の読み込みに失敗しました", e);
+            LOG.get().warn("遠征報告書の読み込みに失敗しました", e);
         }
         return dtoList;
     }
@@ -963,7 +962,7 @@ public final class CreateReportLogic {
                         CreateReportLogic.getMaterialStoreBody(dtoList), true);
             }
         } catch (IOException e) {
-            LOG.warn("報告書の保存に失敗しました", e);
+            LOG.get().warn("報告書の保存に失敗しました", e);
         }
     }
 
@@ -982,7 +981,7 @@ public final class CreateReportLogic {
                         CreateReportLogic.getLostStoreBody(dtoList), true);
             }
         } catch (IOException e) {
-            LOG.warn("報告書の保存に失敗しました", e);
+            LOG.get().warn("報告書の保存に失敗しました", e);
         }
     }
 

@@ -22,10 +22,6 @@ import logbook.dto.ItemInfoDto;
 import logbook.dto.ShipBaseDto;
 import logbook.dto.ShipDto;
 import logbook.gui.ApplicationMain;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
@@ -38,7 +34,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 public class ShipParameterRecord {
 
     /** ロガー */
-    private static final Logger LOG = LogManager.getLogger(ShipParameterRecord.class);
+    private static final LoggerHolder LOG = new LoggerHolder(ShipParameterRecord.class);
     private static Map<Integer, ShipParameterRecord> SHIP = new TreeMap<Integer, ShipParameterRecord>();
 
     /** 変更があったか */
@@ -50,7 +46,7 @@ public class ShipParameterRecord {
         try {
             load();
         } catch (IOException e) {
-            LOG.warn("艦パラメータファイル読み込みに失敗しました", e);
+            LOG.get().warn("艦パラメータファイル読み込みに失敗しました", e);
         }
         INIT_COMPLETE = true;
     }

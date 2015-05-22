@@ -37,8 +37,6 @@ import logbook.util.ReportUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.widgets.Display;
 
 import com.dyuproject.protostuff.LinkedBuffer;
@@ -52,7 +50,7 @@ import com.dyuproject.protostuff.runtime.RuntimeSchema;
  */
 public class BattleResultServer {
     /** ロガー */
-    private static final Logger LOG = LogManager.getLogger(BattleResultServer.class);
+    private static final LoggerHolder LOG = new LoggerHolder(BattleResultServer.class);
 
     private static DateFormat format = new SimpleDateFormat(AppConstants.BATTLE_LOGFILE_DATE_FORMAT);
 
@@ -197,7 +195,7 @@ public class BattleResultServer {
                 ProtostuffIOUtil.writeDelimitedTo(output, dto, schema, BattleResultServer.this.buffer);
                 BattleResultServer.this.buffer.clear();
             } catch (IOException e) {
-                LOG.warn("出撃ログの書き込みに失敗しました", e);
+                LOG.get().warn("出撃ログの書き込みに失敗しました", e);
             }
             ++this.numRecords;
         }
@@ -271,7 +269,7 @@ public class BattleResultServer {
                         }
                     }
                 } catch (IOException e) {
-                    LOG.warn("出撃ログの読み込みに失敗しました (" + file.getPath() + ")", e);
+                    LOG.get().warn("出撃ログの読み込みに失敗しました (" + file.getPath() + ")", e);
                 }
             }
             this.reloadFiles();
@@ -305,7 +303,7 @@ public class BattleResultServer {
                     }
                 }
             } catch (IOException e) {
-                LOG.warn("出撃ログの読み込みに失敗しました (" + file.getPath() + ")", e);
+                LOG.get().warn("出撃ログの読み込みに失敗しました (" + file.getPath() + ")", e);
             }
         }
         battleLogScript.end();

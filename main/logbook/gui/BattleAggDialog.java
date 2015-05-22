@@ -22,9 +22,8 @@ import logbook.gui.logic.GuiUpdator;
 import logbook.internal.BattleAggDate;
 import logbook.internal.BattleAggUnit;
 import logbook.internal.BattleResultServer;
+import logbook.internal.LoggerHolder;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -45,7 +44,7 @@ import org.eclipse.swt.widgets.TreeItem;
  */
 public class BattleAggDialog extends WindowBase {
     /** ロガー */
-    private static final Logger LOG = LogManager.getLogger(BattleAggDialog.class);
+    private static final LoggerHolder LOG = new LoggerHolder(BattleAggDialog.class);
 
     /** ヘッダー */
     private final String[] header = this.getTableHeader();
@@ -310,7 +309,7 @@ public class BattleAggDialog extends WindowBase {
 
         } catch (Exception e) {
             ApplicationMain.main.printMessage("出撃統計作成に失敗しました");
-            LOG.warn("出撃統計作成に失敗", e);
+            LOG.get().warn("出撃統計作成に失敗", e);
         }
         return aggMap;
     }

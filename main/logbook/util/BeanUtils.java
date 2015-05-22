@@ -14,9 +14,9 @@ import java.util.zip.ZipOutputStream;
 
 import javax.annotation.CheckForNull;
 
+import logbook.internal.LoggerHolder;
+
 import org.apache.commons.io.FilenameUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * JavaBeanのutilです
@@ -25,7 +25,7 @@ import org.apache.logging.log4j.Logger;
 public final class BeanUtils {
 
     /** ロガー */
-    private static final Logger LOG = LogManager.getLogger(BeanUtils.class);
+    private static final LoggerHolder LOG = new LoggerHolder(BeanUtils.class);
 
     /**
      * JavaBeanオブジェクトをXML形式でファイルに書き込みます
@@ -81,14 +81,14 @@ public final class BeanUtils {
 
         if (!target.canRead() || (target.length() <= 0)) {
             // ファイルが読み込めないまたはサイズがゼロの場合バックアップファイルを読み込む
-            LOG.warn("次のファイルをバックアップから読み込みます: " + file.getName());
+            LOG.get().warn("次のファイルをバックアップから読み込みます: " + file.getName());
             target = new File(FilenameUtils.removeExtension(file.getAbsolutePath()) + ".backup.zip");
             if (!target.canRead()) {
-                LOG.warn("バックアップも読み込めないので旧形式ファイルを読み込みます: " + file.getName());
+                LOG.get().warn("バックアップも読み込めないので旧形式ファイルを読み込みます: " + file.getName());
                 target = file;
                 if (!target.canRead()) {
                     // バックアップファイルも読めない場合nullを返す
-                    LOG.warn("旧形式ファイルも読み込めなかったので諦めます: " + file.getName());
+                    LOG.get().warn("旧形式ファイルも読み込めなかったので諦めます: " + file.getName());
                     return null;
                 }
                 try (XMLDecoder decoder = new XMLDecoder(new FileInputStream(target))) {

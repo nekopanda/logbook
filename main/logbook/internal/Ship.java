@@ -631,9 +631,8 @@ public class Ship {
     };
 
     // 始めてアクセスがあった時に読み込む
-    public static final boolean INIT_COMPLETE;
     static {
-        INIT_COMPLETE = MasterData.INIT_COMPLETE;
+        update();
     }
 
     /**

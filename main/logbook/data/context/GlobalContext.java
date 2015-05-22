@@ -59,6 +59,7 @@ import logbook.internal.BattleResultServer;
 import logbook.internal.CondTiming;
 import logbook.internal.EnemyData;
 import logbook.internal.Item;
+import logbook.internal.LoggerHolder;
 import logbook.internal.MasterData;
 import logbook.internal.Ship;
 import logbook.internal.ShipParameterRecord.UpdateShipParameter;
@@ -67,8 +68,6 @@ import logbook.util.JsonUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.ToolTip;
 
@@ -77,7 +76,7 @@ import org.eclipse.swt.widgets.ToolTip;
  */
 public final class GlobalContext {
     /** ロガー */
-    private static final Logger LOG = LogManager.getLogger(GlobalContext.class);
+    private static final LoggerHolder LOG = new LoggerHolder(GlobalContext.class);
 
     /** 装備Map */
     private static Map<Integer, ItemDto> itemMap = new TreeMap<Integer, ItemDto>();
@@ -837,8 +836,8 @@ public final class GlobalContext {
 
             FileUtils.write(file, data.getJsonObject().toString(), Charset.forName("UTF-8"));
         } catch (IOException e) {
-            LOG.warn("JSONオブジェクトを保存するに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("JSONオブジェクトを保存するに失敗しました", e);
+            LOG.get().warn(data);
         }
 
     }
@@ -876,8 +875,8 @@ public final class GlobalContext {
                 addUpdateLog("補給しました");
             }
         } catch (Exception e) {
-            LOG.warn("補給を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("補給を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -978,8 +977,8 @@ public final class GlobalContext {
             }
             addUpdateLog("編成を更新しました");
         } catch (Exception e) {
-            LOG.warn("編成を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("編成を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -1092,8 +1091,8 @@ public final class GlobalContext {
                 addUpdateLog("母港情報を更新しました");
             }
         } catch (Exception e) {
-            LOG.warn("母港を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("母港を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -1188,8 +1187,8 @@ public final class GlobalContext {
             ApplicationMain.main.updateBattle(battle);
 
         } catch (Exception e) {
-            LOG.warn("海戦情報を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("海戦情報を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -1210,7 +1209,7 @@ public final class GlobalContext {
                 // ランクが合っているかチェック
                 Phase lastPhase = battle.getLastPhase();
                 if (!battle.getRank().equals(lastPhase.getEstimatedRank())) {
-                    LOG.info("戦闘結果判定ミス: 正解ランク:" + battle.getRank() + " " + lastPhase.getRankCalcInfo(battle));
+                    LOG.get().info("戦闘結果判定ミス: 正解ランク:" + battle.getRank() + " " + lastPhase.getRankCalcInfo(battle));
                 }
 
                 if (battle.isPractice() == false) { // 演習は記録しない
@@ -1269,8 +1268,8 @@ public final class GlobalContext {
                 }
             }
         } catch (Exception e) {
-            LOG.warn("海戦結果を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("海戦結果を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -1299,8 +1298,8 @@ public final class GlobalContext {
             }
             addConsole("護衛退避しました");
         } catch (Exception e) {
-            LOG.warn("護衛退避を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("護衛退避を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -1326,8 +1325,8 @@ public final class GlobalContext {
 
             addUpdateLog("建造(投入資源)情報を更新しました");
         } catch (Exception e) {
-            LOG.warn("建造(投入資源)情報を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("建造(投入資源)情報を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -1372,8 +1371,8 @@ public final class GlobalContext {
 
             addUpdateLog("建造を更新しました");
         } catch (Exception e) {
-            LOG.warn("建造を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("建造を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -1428,8 +1427,8 @@ public final class GlobalContext {
 
             addUpdateLog("建造(入手)情報を更新しました");
         } catch (Exception e) {
-            LOG.warn("建造(入手)情報を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("建造(入手)情報を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -1468,8 +1467,8 @@ public final class GlobalContext {
 
             addUpdateLog("装備開発情報を更新しました");
         } catch (Exception e) {
-            LOG.warn("装備開発情報を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("装備開発情報を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -1490,8 +1489,8 @@ public final class GlobalContext {
 
             addUpdateLog("保有装備情報を更新しました");
         } catch (Exception e) {
-            LOG.warn("保有装備を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("保有装備を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -1530,8 +1529,8 @@ public final class GlobalContext {
 
             addUpdateLog("保有艦娘情報３を更新しました");
         } catch (Exception e) {
-            LOG.warn("保有艦娘を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("保有艦娘を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -1566,8 +1565,8 @@ public final class GlobalContext {
 
             addUpdateLog("保有艦娘情報２を更新しました");
         } catch (Exception e) {
-            LOG.warn("保有艦娘を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("保有艦娘を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -1589,8 +1588,8 @@ public final class GlobalContext {
 
             addUpdateLog("艦隊を更新しました");
         } catch (Exception e) {
-            LOG.warn("艦隊を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("艦隊を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -1689,8 +1688,8 @@ public final class GlobalContext {
 
             addUpdateLog("艦娘を解体しました");
         } catch (Exception e) {
-            LOG.warn("艦娘を解体しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("艦娘を解体しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -1714,8 +1713,8 @@ public final class GlobalContext {
             CreateReportLogic.storeLostReport(dtoList);
             addUpdateLog("装備を廃棄しました");
         } catch (Exception e) {
-            LOG.warn("装備を廃棄しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("装備を廃棄しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -1770,8 +1769,8 @@ public final class GlobalContext {
 
             addUpdateLog("近代化改修しました");
         } catch (Exception e) {
-            LOG.warn("近代化改修しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("近代化改修しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -1793,8 +1792,8 @@ public final class GlobalContext {
 
             addUpdateLog("艦娘ロックを更新しました");
         } catch (Exception e) {
-            LOG.warn("艦娘ロックを更新するに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("艦娘ロックを更新するに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -1816,8 +1815,8 @@ public final class GlobalContext {
 
             addUpdateLog("装備ロックを更新しました");
         } catch (Exception e) {
-            LOG.warn("装備ロックを更新するに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("装備ロックを更新するに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -1833,8 +1832,8 @@ public final class GlobalContext {
 
             addUpdateLog("司令部を更新しました");
         } catch (Exception e) {
-            LOG.warn("司令部を更新するに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("司令部を更新するに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -1872,8 +1871,8 @@ public final class GlobalContext {
 
             addUpdateLog("保有資材を更新しました");
         } catch (Exception e) {
-            LOG.warn("保有資材を更新するに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("保有資材を更新するに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -1963,8 +1962,8 @@ public final class GlobalContext {
 
             addUpdateLog("遠征(帰還)情報を更新しました");
         } catch (Exception e) {
-            LOG.warn("遠征(帰還)を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("遠征(帰還)を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -1980,8 +1979,8 @@ public final class GlobalContext {
 
             addUpdateLog("入渠情報を更新しました");
         } catch (Exception e) {
-            LOG.warn("入渠を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("入渠を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -2042,8 +2041,8 @@ public final class GlobalContext {
             // 高速修復出ない場合は直後にndockが送られてくる
             addUpdateLog("入渠情報を更新しました");
         } catch (Exception e) {
-            LOG.warn("入渠を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("入渠を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -2060,8 +2059,8 @@ public final class GlobalContext {
 
             addUpdateLog("バケツを使いました");
         } catch (Exception e) {
-            LOG.warn("入渠を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("入渠を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -2076,8 +2075,8 @@ public final class GlobalContext {
 
             addUpdateLog("改造しました");
         } catch (Exception e) {
-            LOG.warn("改造を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("改造を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -2092,8 +2091,8 @@ public final class GlobalContext {
 
             addUpdateLog("疲労回復アイテム使用しました");
         } catch (Exception e) {
-            LOG.warn("疲労回復アイテム使用を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("疲労回復アイテム使用を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -2154,8 +2153,8 @@ public final class GlobalContext {
             }
             addUpdateLog("任務を更新しました");
         } catch (Exception e) {
-            LOG.warn("任務を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("任務を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -2181,8 +2180,8 @@ public final class GlobalContext {
 
             addUpdateLog("任務をクリアしました");
         } catch (Exception e) {
-            LOG.warn("消化した任務を除去しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("消化した任務を除去しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -2225,8 +2224,8 @@ public final class GlobalContext {
             if (AppConfig.get().isPrintSortieLog())
                 addConsole("行先 " + mapCellDto.toString());
         } catch (Exception e) {
-            LOG.warn("出撃を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("出撃を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -2247,8 +2246,8 @@ public final class GlobalContext {
             if (AppConfig.get().isPrintSortieLog())
                 addConsole("行先 " + mapCellDto.toString());
         } catch (Exception e) {
-            LOG.warn("進撃を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("進撃を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -2266,8 +2265,8 @@ public final class GlobalContext {
 
             addConsole("マスターデータを更新しました");
         } catch (Exception e) {
-            LOG.warn("設定を更新しますに失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("設定を更新しますに失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -2307,8 +2306,8 @@ public final class GlobalContext {
                 Sound.randomWarningPlay();
             }
         } catch (Exception e) {
-            LOG.warn("マップ情報更新に失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("マップ情報更新に失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -2324,8 +2323,8 @@ public final class GlobalContext {
                 MasterData.updateMission(apidata);
             }
         } catch (Exception e) {
-            LOG.warn("任務情報更新に失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("任務情報更新に失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -2348,8 +2347,8 @@ public final class GlobalContext {
             practiceUserLastUpdate = new Date();
             addUpdateLog("演習情報を更新しました");
         } catch (Exception e) {
-            LOG.warn("演習情報更新に失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("演習情報更新に失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -2373,8 +2372,8 @@ public final class GlobalContext {
             ApplicationMain.main.updateCalcPracticeExp(dto);
             addUpdateLog("演習相手艦隊情報を更新しました");
         } catch (Exception e) {
-            LOG.warn("演習相手艦隊情報更新に失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("演習相手艦隊情報更新に失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -2395,8 +2394,8 @@ public final class GlobalContext {
             }
             addUpdateLog("連合艦隊情報を更新しました");
         } catch (Exception e) {
-            LOG.warn("連合艦隊情報更新に失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("連合艦隊情報更新に失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -2429,8 +2428,8 @@ public final class GlobalContext {
 
             addUpdateLog("装備改修情報を更新しました");
         } catch (Exception e) {
-            LOG.warn("装備改修更新に失敗しました", e);
-            LOG.warn(data);
+            LOG.get().warn("装備改修更新に失敗しました", e);
+            LOG.get().warn(data);
         }
     }
 
@@ -2447,7 +2446,7 @@ public final class GlobalContext {
             if (new_ship == null)
                 continue; // 轟沈した！
             if (new_ship.getNowhp() != nowhp[i]) {
-                LOG.warn("ダメージ計算ミスが発生しています。" + new_ship.getName() + "の現在のHPは" + new_ship.getNowhp()
+                LOG.get().warn("ダメージ計算ミスが発生しています。" + new_ship.getName() + "の現在のHPは" + new_ship.getNowhp()
                         + "ですが、ダメージ計算では" + nowhp[i] + "と計算されていました。");
                 addConsole("ダメージ計算ミス発生！（詳細はログ）");
             }

@@ -20,12 +20,11 @@ import logbook.constants.AppConstants;
 import logbook.gui.logic.LayoutLogic;
 import logbook.gui.twitter.TweetDialog;
 import logbook.gui.twitter.TwitterClient;
+import logbook.internal.LoggerHolder;
 import logbook.util.AwtUtils;
 import logbook.util.SwtUtils;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -55,7 +54,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
  */
 public final class CaptureDialog extends WindowBase {
     /** ロガー */
-    private static final Logger LOG = LogManager.getLogger(CaptureDialog.class);
+    private static final LoggerHolder LOG = new LoggerHolder(CaptureDialog.class);
 
     private final Shell parent;
     private Shell shell;
@@ -438,7 +437,7 @@ public final class CaptureDialog extends WindowBase {
             try {
                 CaptureDialog.this.captureAndSave();
             } catch (Exception e) {
-                LOG.warn("キャプチャ中に例外が発生しました", e);
+                LOG.get().warn("キャプチャ中に例外が発生しました", e);
             }
         }
     }
@@ -459,7 +458,7 @@ public final class CaptureDialog extends WindowBase {
                     tweetDialog.open();
                 }
             } catch (Exception e) {
-                LOG.warn("つぶやく途中で例外が発生しました", e);
+                LOG.get().warn("つぶやく途中で例外が発生しました", e);
             }
         }
     }

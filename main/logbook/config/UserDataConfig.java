@@ -9,10 +9,8 @@ import logbook.data.context.GlobalContext;
 import logbook.dto.DeckMissionDto;
 import logbook.dto.ItemDto;
 import logbook.internal.CondTiming;
+import logbook.internal.LoggerHolder;
 import logbook.util.BeanUtils;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * ユーザーゲームデータを保存・復元します
@@ -20,7 +18,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class UserDataConfig {
     /** ロガー */
-    private static final Logger LOG = LogManager.getLogger(UserDataConfig.class);
+    private static final LoggerHolder LOG = new LoggerHolder(UserDataConfig.class);
 
     private List<ItemDto> items;
 
@@ -52,7 +50,7 @@ public class UserDataConfig {
                 GlobalContext.load(config);
             }
         } catch (Exception e) {
-            LOG.warn("ユーザーゲームデータファイルから読み込みますに失敗しました", e);
+            LOG.get().warn("ユーザーゲームデータファイルから読み込みますに失敗しました", e);
         }
     }
 

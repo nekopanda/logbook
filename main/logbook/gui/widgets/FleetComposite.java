@@ -25,12 +25,11 @@ import logbook.gui.logic.TimeString;
 import logbook.internal.AkashiTimer;
 import logbook.internal.CondTiming;
 import logbook.internal.EvaluateExp;
+import logbook.internal.LoggerHolder;
 import logbook.internal.SeaExp;
 import logbook.util.CalcExpUtils;
 import logbook.util.SwtUtils;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
@@ -50,7 +49,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
  */
 public class FleetComposite extends Composite {
     /** ロガー */
-    private static final Logger LOG = LogManager.getLogger(FleetComposite.class);
+    private static final LoggerHolder LOG = new LoggerHolder(FleetComposite.class);
 
     /** 警告 */
     public static final int WARN = 1;

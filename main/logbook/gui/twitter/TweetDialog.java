@@ -8,10 +8,9 @@ import java.io.IOException;
 
 import logbook.gui.ApplicationMain;
 import logbook.gui.WindowBase;
+import logbook.internal.LoggerHolder;
 import logbook.util.SwtUtils;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -33,7 +32,7 @@ import twitter4j.TwitterException;
  */
 public class TweetDialog extends WindowBase {
     /** ロガー */
-    private static final Logger LOG = LogManager.getLogger(TweetDialog.class);
+    private static final LoggerHolder LOG = new LoggerHolder(TweetDialog.class);
 
     private final WindowBase parent;
     private Shell shell;

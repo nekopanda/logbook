@@ -8,13 +8,12 @@ import java.util.Date;
 import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.gui.background.AsyncExecUpdateCheck;
+import logbook.internal.LoggerHolder;
 import logbook.internal.MasterData;
 import logbook.server.proxy.Filter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
@@ -37,7 +36,7 @@ import org.eclipse.swt.widgets.Shell;
  */
 public final class VersionDialog extends WindowBase {
 
-    private static final Logger LOG = LogManager.getLogger(VersionDialog.class);
+    private static final LoggerHolder LOG = new LoggerHolder(VersionDialog.class);
 
     private static final String ADDRESS = "http://nekopandanet.sakura.ne.jp/logbook/proxy.php?ip={0}&port={1}";
 
@@ -112,7 +111,7 @@ public final class VersionDialog extends WindowBase {
 
             @Override
             public void onError(final Exception e) {
-                LOG.info(e.getClass().getName() + "が原因でアップデートチェックに失敗しました");
+                LOG.get().info(e.getClass().getName() + "が原因でアップデートチェックに失敗しました");
                 display.asyncExec(new Runnable() {
                     @Override
                     public void run() {
@@ -134,7 +133,7 @@ public final class VersionDialog extends WindowBase {
                 try {
                     Desktop.getDesktop().browse(AppConstants.HOME_PAGE_URI);
                 } catch (Exception e) {
-                    LOG.warn("ウェブサイトに移動が失敗しました", e);
+                    LOG.get().warn("ウェブサイトに移動が失敗しました", e);
                 }
             }
         });

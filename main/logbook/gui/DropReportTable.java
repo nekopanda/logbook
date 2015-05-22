@@ -25,12 +25,11 @@ import logbook.gui.logic.TableItemCreator;
 import logbook.gui.logic.TableRowHeader;
 import logbook.internal.BattleResultFilter;
 import logbook.internal.BattleResultServer;
+import logbook.internal.LoggerHolder;
 import logbook.internal.TimeSpanKind;
 import logbook.scripting.TableItemCreatorProxy;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -51,7 +50,7 @@ import org.eclipse.swt.widgets.Shell;
  */
 public final class DropReportTable extends AbstractTableDialog {
     /** ロガー */
-    private static final Logger LOG = LogManager.getLogger(DropReportTable.class);
+    private static final LoggerHolder LOG = new LoggerHolder(DropReportTable.class);
 
     private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HHmmss.SSS");
 
@@ -182,10 +181,10 @@ public final class DropReportTable extends AbstractTableDialog {
             BattleHtmlGenerator gen = new BattleHtmlGenerator();
             return gen.generateHTML(title, item, detail, forFile);
         } catch (IOException e) {
-            LOG.warn("会敵報告作成に失敗: CSSファイル読み込みに失敗しました", e);
+            LOG.get().warn("会敵報告作成に失敗: CSSファイル読み込みに失敗しました", e);
         } catch (Exception e) {
             ApplicationMain.main.printMessage("会敵報告作成に失敗しました");
-            LOG.warn("会敵報告作成に失敗", e);
+            LOG.get().warn("会敵報告作成に失敗", e);
         }
         return null;
     }

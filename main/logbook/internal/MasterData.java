@@ -24,9 +24,6 @@ import logbook.dto.UseItemDto;
 import logbook.gui.ApplicationMain;
 import logbook.util.BeanUtils;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 /**
  * @author Nekopanda
  *
@@ -34,7 +31,7 @@ import org.apache.logging.log4j.Logger;
 public class MasterData {
 
     /** ロガー */
-    private static final Logger LOG = LogManager.getLogger(MasterData.class);
+    private static final LoggerHolder LOG = new LoggerHolder(MasterData.class);
 
     private static class Holder {
         public static MasterData instance = null;
@@ -64,14 +61,9 @@ public class MasterData {
             MasterData masterData = BeanUtils.readObject(AppConstants.MASTER_DATA_CONFIG, MasterData.class);
             if ((masterData != null) && (masterData.getVersion() >= 2)) {
                 Holder.instance = masterData;
-
-                // 更新
-                Item.update();
-                Ship.update();
-                ShipStyle.update();
             }
         } catch (Exception e) {
-            LOG.warn("艦娘のIDと名前の紐付けを設定ファイルから読み込みますに失敗しました", e);
+            LOG.get().warn("艦娘のIDと名前の紐付けを設定ファイルから読み込みますに失敗しました", e);
         }
         if (Holder.instance == null) {
             Holder.instance = new MasterData();
