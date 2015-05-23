@@ -17,7 +17,7 @@ function sallyArea(area) {
 }
 
 function body(ship) {
-	if(isJsonNull(ship.json.api_sally_area))
+	if(ship.json == null || isJsonNull(ship.json.api_sally_area))
 		return null;
 	return toComparable([ sallyArea(ship.json.api_sally_area.intValue()) ]);
 }

@@ -132,19 +132,29 @@ public final class ApplicationMain extends WindowBase {
         private FileOutputStream fos;
         private FileChannel fchan;
         private FileLock flock;
+        private boolean isError;
 
         public ApplicationLock() {
             try {
+                File dir = AppConstants.LOCK_FILE.getParentFile();
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
                 this.fos = new FileOutputStream(AppConstants.LOCK_FILE);
                 this.fchan = this.fos.getChannel();
                 this.flock = this.fchan.tryLock();
             } catch (IOException e) {
+                this.isError = true;
                 LOG.get().warn("ファイルロックでエラー", e);
             }
         }
 
         public boolean isLocked() {
             return (this.flock != null);
+        }
+
+        public boolean isError() {
+            return this.isError;
         }
 
         public void release() {
@@ -331,7 +341,7 @@ public final class ApplicationMain extends WindowBase {
             Display.setAppName(AppConstants.NAME);
             sysPrint("起動");
             // 多重起動チェック
-            if (!applicationLock.isLocked()) {
+            if (!applicationLock.isError() && !applicationLock.isLocked()) {
                 printErrorMessageBox();
                 applicationLock.release();
                 return;
