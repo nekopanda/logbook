@@ -855,13 +855,16 @@ public final class GlobalContext {
                     JsonObject shipobj = (JsonObject) shipval;
 
                     int shipid = shipobj.getInt("api_id");
-                    int fuel = shipobj.getInt("api_fuel");
-                    int bull = shipobj.getInt("api_bull");
 
                     ShipDto ship = shipMap.get(shipid);
                     if (ship != null) {
+                        int fuel = shipobj.getInt("api_fuel");
+                        int bull = shipobj.getInt("api_bull");
+                        int[] onslot = JsonUtils.getIntArray(shipobj, "api_onslot");
+
                         ship.setFuel(fuel);
                         ship.setBull(bull);
+                        ship.setOnslot(onslot);
 
                         String fleetid = ship.getFleetid();
                         if (fleetid != null) {

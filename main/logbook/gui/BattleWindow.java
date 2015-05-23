@@ -22,6 +22,7 @@ import logbook.internal.EnemyData;
 import logbook.internal.Item;
 import logbook.internal.Ship;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MenuItem;
@@ -111,7 +112,7 @@ public class BattleWindow extends BattleWindowBase {
         }
         else if (enemyData != null) {
             String name = enemyData.getEnemyName();
-            if (name != null) {
+            if (!StringUtils.isEmpty(name)) {
                 this.infoLabels[1][0].setText(name);
             }
             else {

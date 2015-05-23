@@ -94,7 +94,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
 
     /** 艦載機の搭載数 */
     @Tag(27)
-    private final int[] onslot;
+    private int[] onslot;
 
     @Tag(40)
     private final String json;
@@ -562,5 +562,12 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
             return null;
 
         return JsonUtils.fromString(this.json);
+    }
+
+    /**
+     * @param onslot2
+     */
+    public void setOnslot(int[] onslot) {
+        this.onslot = onslot;
     }
 }

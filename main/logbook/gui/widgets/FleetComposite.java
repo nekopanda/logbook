@@ -301,6 +301,7 @@ public class FleetComposite extends Composite {
         DeckMissionDto previousMission = (dockIndex == 0) ? null : GlobalContext.getPreviousMissions()[dockIndex - 1];
         boolean flagshipNeedSupply = false;
         boolean needSupply = false;
+        int lostPlanes = 0;
 
         for (int i = 0; i < ships.size(); i++) {
             ShipDto ship = ships.get(i);
@@ -330,6 +331,15 @@ public class FleetComposite extends Composite {
             float fuelraito = fuelmax != 0 ? (float) fuel / (float) fuelmax : 1f;
             // 艦隊合計Lv
             totallv += ship.getLv();
+            // 損失艦載機
+            int[] maxeq = ship.getMaxeq();
+            int[] onslot = ship.getOnSlot();
+            List<ItemInfoDto> items = ship.getItem();
+            for (int c = 0; c < items.size(); ++c) {
+                if (items.get(c).isPlane()) {
+                    lostPlanes += maxeq[c] - onslot[c];
+                }
+            }
 
             // 疲労している艦娘がいる場合メッセージを表示
             final Date condClearDate = ship.getCondClearTime(condTiming, AppConfig.get().getOkCond());
@@ -674,6 +684,10 @@ public class FleetComposite extends Composite {
         this.addStyledText(this.message, "\n", null);
         // 制空
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_SEIKU, seiku), null);
+        if (lostPlanes > 0) {
+            this.addStyledText(this.message,
+                    MessageFormat.format("損失機:" + lostPlanes + "(ボーキ:" + (lostPlanes * 5) + ")", seiku), null);
+        }
         this.addStyledText(this.message, "\n", null);
         // 索敵
         SakutekiString fleetStatus = new SakutekiString(ships, GlobalContext.hqLevel());

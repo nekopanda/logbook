@@ -10,6 +10,8 @@ import javax.annotation.CheckForNull;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.FontMetrics;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Rectangle;
@@ -116,6 +118,7 @@ public final class SwtUtils {
     private static String defaultFontName = null;
     private static int defaultFontSize = 0;
     private static int defaultFontStyle = 0;
+    private static int defaultLineHeight = 0;
     private static int DPI_Y = 0;
 
     private static void checkControl(Control control) {
@@ -125,12 +128,21 @@ public final class SwtUtils {
             defaultFontSize = fd.getHeight();
             defaultFontStyle = fd.getStyle();
             DPI_Y = control.getDisplay().getDPI().y;
+
+            GC gc = new GC(control);
+            FontMetrics fm = gc.getFontMetrics();
+            defaultLineHeight = fm.getAscent() + fm.getLeading() + fm.getDescent();
+            gc.dispose();
         }
     }
 
     public static int ComputeHeaderHeight(Group group, double lineHeight) {
         checkControl(group);
         return (int) (((defaultFontSize * DPI_Y) / 72.0) * lineHeight);
+    }
+
+    public static int ComputeLineSpacing(double lineHeight) {
+        return (int) (((defaultFontSize * DPI_Y) / 72.0) * lineHeight) - defaultLineHeight;
     }
 
     /**
