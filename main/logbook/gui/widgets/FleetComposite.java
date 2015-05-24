@@ -301,6 +301,7 @@ public class FleetComposite extends Composite {
         DeckMissionDto previousMission = (dockIndex == 0) ? null : GlobalContext.getPreviousMissions()[dockIndex - 1];
         boolean flagshipNeedSupply = false;
         boolean needSupply = false;
+        boolean reqSupply = false;
         int lostPlanes = 0;
 
         for (int i = 0; i < ships.size(); i++) {
@@ -412,6 +413,9 @@ public class FleetComposite extends Composite {
                 if (i == 0) {
                     flagshipNeedSupply = true;
                 }
+                if (fuelraito == 0f) {
+                    reqSupply = true;
+                }
             }
             // ステータス.弾
             this.bullstLabels[i].setText("弾");
@@ -434,6 +438,9 @@ public class FleetComposite extends Composite {
                 needSupply = true;
                 if (i == 0) {
                     flagshipNeedSupply = true;
+                }
+                if (bullraito == 0f) {
+                    reqSupply = true;
                 }
             }
 
@@ -663,6 +670,9 @@ public class FleetComposite extends Composite {
             else if (flagshipNeedSupply) {
                 // 未補給
                 this.addStyledText(this.message, "未補給です。", messageStyle);
+                if (reqSupply) { // 空
+                    this.addStyledText(this.message, "出撃できません。", messageStyle);
+                }
             }
             else {
                 if (repairState.isRepairing()) {

@@ -153,7 +153,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
 
         this.exp = 0;
         this.expraito = 0;
-        this.nowhp = this.maxhp = this.getMax().getHP();
+        this.nowhp = this.maxhp = this.getParam().getHP();
 
         this.slotnum = shipinfo.getSlotNum();
         this.onslot = new int[] { 0, 0, 0, 0, 0 };
