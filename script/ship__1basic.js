@@ -30,7 +30,8 @@ function header() {
 				"HP1あたり", //
 				"Lv",
 				"Next",
-				"経験値"];
+				"経験値",
+				"速力"];
 }
 
 function begin(specdiff) {
@@ -45,6 +46,15 @@ function begin(specdiff) {
 
 function getPageNumber(index) {
 	return new IntegerPair((index / 10) + 1, (index % 10) + 1, "-");
+}
+
+function getSokuryoku(soku) {
+	switch(soku) {
+		case 0: return "陸上";
+		case 5: return "低速";
+		case 10: return "高速";
+		default: return "不明";
+	}
 }
 
 function body(ship) {
@@ -104,7 +114,8 @@ function body(ship) {
 					dockTime > 0 ? TimeLogic.fromSeconds(unitSeconds) : null,
 					ship.lv,
 					ship.next,
-					ship.exp]);
+					ship.exp,
+					getSokuryoku(ship.param.soku)]);
 }
 
 function end() { }
