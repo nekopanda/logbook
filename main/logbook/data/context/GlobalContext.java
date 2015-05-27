@@ -1367,6 +1367,7 @@ public final class GlobalContext {
                     getShipList.add(resource);
                     CreateReportLogic.storeCreateShipReport(resource);
                 }
+                lastBuildKdock = null;
             }
 
             // 建造ドック更新
