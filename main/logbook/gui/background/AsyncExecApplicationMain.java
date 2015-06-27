@@ -385,7 +385,9 @@ public final class AsyncExecApplicationMain extends Thread {
         private void updateNoticeCond(String dispname, int index, long rest) {
             if (this.main.getCondNotice().getSelection()) {
                 if ((rest <= 0) && !FLAG_NOTICE_COND[index]) {
-                    this.noticeCond.add(dispname + " が疲労回復しました");
+                    if ((index == 0) || !AppConfig.get().isNoticeCondOnlyMainFleet()) {
+                        this.noticeCond.add(dispname + " が疲労回復しました");
+                    }
                     FLAG_NOTICE_COND[index] = true;
                 } else if (rest > 0) {
                     FLAG_NOTICE_COND[index] = false;

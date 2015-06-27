@@ -102,4 +102,20 @@ public class BasicInfoDto extends JsonData {
     public int getSortieLose() {
         return this.json.getInt("api_st_lose");
     }
+
+    /**
+     * 提督経験値
+     * @return experience
+     */
+    public long getExperience() {
+        return this.json.getInt("api_experience");
+    }
+
+    /**
+     * 艦隊司令部Lv.
+     * @return lv
+     */
+    public long getLevel() {
+        return this.json.getInt("api_level");
+    }
 }

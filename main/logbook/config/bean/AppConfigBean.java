@@ -163,6 +163,9 @@ public final class AppConfigBean {
     /** 疲労回復時に通知する */
     private boolean noticeCond = true;
 
+    /** 疲労度回復通知を第一艦隊のみにする */
+    private boolean noticeCondOnlyMainFleet = false;
+
     /** 画面キャプチャ-保存先 */
     private String capturePath = new File("").getAbsolutePath();
 
@@ -1981,6 +1984,20 @@ public final class AppConfigBean {
      */
     public void setPrintDropLog(boolean printDropLog) {
         this.printDropLog = printDropLog;
+    }
+
+    /**
+     * @return noticeCondOnlyMainFleet
+     */
+    public boolean isNoticeCondOnlyMainFleet() {
+        return this.noticeCondOnlyMainFleet;
+    }
+
+    /**
+     * @param noticeCondOnlyMainFleet セットする noticeCondOnlyMainFleet
+     */
+    public void setNoticeCondOnlyMainFleet(boolean noticeCondOnlyMainFleet) {
+        this.noticeCondOnlyMainFleet = noticeCondOnlyMainFleet;
     }
 
 }

@@ -27,6 +27,7 @@ import java.util.regex.PatternSyntaxException;
 import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
+import logbook.dto.BasicInfoDto;
 import logbook.dto.BattleExDto;
 import logbook.dto.BattleResultDto;
 import logbook.dto.CreateItemDto;
@@ -529,32 +530,32 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getMaterialHeader() {
-        return new String[] { "No.", "日付", "直前のイベント", "燃料", "弾薬", "鋼材", "ボーキ", "高速修復材", "高速建造材", "開発資材", "改修資材" };
+        return new String[] { "No.", "日付", "直前のイベント", "燃料", "弾薬", "鋼材", "ボーキ",
+                "高速修復材", "高速建造材", "開発資材", "改修資材", "司令部Lv", "提督Exp" };
     }
 
     /**
      * @param materials 資材
      * @return 資材の内容
      */
-    public static List<Comparable[]> getMaterialStoreBody(List<MaterialDto> materials) {
+    public static List<Comparable[]> getMaterialStoreBody(MaterialDto material, BasicInfoDto basic) {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
 
-        for (int i = 0; i < materials.size(); i++) {
-            MaterialDto material = materials.get(i);
-            body.add(new Comparable[] {
-                    i + 1,
-                    new DateTimeString(material.getTime()),
-                    material.getEvent(),
-                    material.getFuel(),
-                    material.getAmmo(),
-                    material.getMetal(),
-                    material.getBauxite(),
-                    material.getBucket(), // 間違えてバーナーとバケツを逆にしちゃったけど仕方ない・・・
-                    material.getBurner(),
-                    material.getResearch(),
-                    material.getScrew()
-            });
-        }
+        body.add(new Comparable[] {
+                1,
+                new DateTimeString(material.getTime()),
+                material.getEvent(),
+                material.getFuel(),
+                material.getAmmo(),
+                material.getMetal(),
+                material.getBauxite(),
+                material.getBucket(), // 間違えてバーナーとバケツを逆にしちゃったけど仕方ない・・・
+                material.getBurner(),
+                material.getResearch(),
+                material.getScrew(),
+                basic.getLevel(),
+                basic.getExperience()
+        });
 
         return body;
     }
@@ -950,16 +951,14 @@ public final class CreateReportLogic {
      * 
      * @param material 資材
      */
-    public static void storeMaterialReport(MaterialDto material) {
+    public static void storeMaterialReport(MaterialDto material, BasicInfoDto basic) {
         try {
             if (material != null) {
-                List<MaterialDto> dtoList = Collections.singletonList(material);
-
                 File report = getStoreFile(AppConstants.LOG_RESOURCE, AppConstants.LOG_RESOURCE_ALT);
 
                 CreateReportLogic.writeCsvStripFirstColumn(report,
                         CreateReportLogic.getMaterialHeader(),
-                        CreateReportLogic.getMaterialStoreBody(dtoList), true);
+                        CreateReportLogic.getMaterialStoreBody(material, basic), true);
             }
         } catch (IOException e) {
             LOG.get().warn("報告書の保存に失敗しました", e);

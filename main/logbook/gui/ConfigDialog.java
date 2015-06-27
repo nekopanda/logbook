@@ -580,6 +580,11 @@ public final class ConfigDialog extends Dialog {
         condSpinner.setLayoutData(gdCondSpinner);
         new Label(compositeNotify, SWT.NONE);
 
+        final Button condOnlyMain = new Button(compositeNotify, SWT.CHECK);
+        condOnlyMain.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        condOnlyMain.setText("第一艦隊以外の疲労回復通知を行わない");
+        condOnlyMain.setSelection(AppConfig.get().isNoticeCondOnlyMainFleet());
+
         final Button akashiFirstStep = new Button(compositeNotify, SWT.CHECK);
         akashiFirstStep.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
         akashiFirstStep.setText("泊地修理開始から20分経過を通知する");
@@ -1079,6 +1084,7 @@ public final class ConfigDialog extends Dialog {
                 }
                 // notify
                 AppConfig.get().setOkCond(condSpinner.getSelection());
+                AppConfig.get().setNoticeCondOnlyMainFleet(condOnlyMain.getSelection());
                 AppConfig.get().setAkashiNotifyFirstStep(akashiFirstStep.getSelection());
                 AppConfig.get().setAkashiNotifyEveryStep(akashiEveryStep.getSelection());
                 AppConfig.get().setMissionRemind(remind.getSelection());
