@@ -67,6 +67,32 @@ public class ShipParameters {
     @Tag(13)
     private int leng;
 
+    public static String sokuToString(int soku) {
+        switch (soku) {
+        case 0:
+            return "陸上";
+        case 5:
+            return "低速";
+        case 10:
+            return "高速";
+        }
+        return "不明(" + soku + ")";
+    }
+
+    public static String lengToString(int leng) {
+        switch (leng) {
+        case 1:
+            return "短";
+        case 2:
+            return "中";
+        case 3:
+            return "長";
+        case 4:
+            return "超長";
+        }
+        return "不明(" + leng + ")";
+    }
+
     public ShipParameters() {
     }
 
@@ -475,6 +501,10 @@ public class ShipParameters {
         this.soku = soku;
     }
 
+    public String getSokuString() {
+        return sokuToString(this.soku);
+    }
+
     /**
      * @return leng
      */
@@ -487,6 +517,10 @@ public class ShipParameters {
      */
     public void setLeng(int leng) {
         this.leng = leng;
+    }
+
+    public String getLengString() {
+        return lengToString(this.leng);
     }
 
     /**

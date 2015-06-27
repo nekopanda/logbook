@@ -205,6 +205,10 @@ public class BattleExDto extends AbstractDto {
         @Tag(8)
         private int[] touchPlane;
 
+        /** 照明弾発射艦 */
+        @Tag(32)
+        private int[] flarePos;
+
         @Tag(9)
         private String seiku;
 
@@ -252,13 +256,16 @@ public class BattleExDto extends AbstractDto {
                 this.nowFriendHpCombined = null;
             }
 
-            // 触接
-            JsonArray jsonTouchPlane = object.getJsonArray("api_touch_plane");
-            if (jsonTouchPlane != null) {
-                this.touchPlane = new int[] {
-                        jsonTouchPlane.getInt(0),
-                        jsonTouchPlane.getInt(1)
-                };
+            // 夜間触接
+            JsonValue jsonTouchPlane = object.get("api_touch_plane");
+            if ((jsonTouchPlane != null) && (jsonTouchPlane != JsonValue.NULL)) {
+                this.touchPlane = JsonUtils.getIntArray(object, "api_touch_plane");
+            }
+
+            // 照明弾発射艦
+            JsonValue jsonFlarePos = object.get("api_flare_pos");
+            if ((jsonFlarePos != null) && (jsonFlarePos != JsonValue.NULL)) {
+                this.flarePos = JsonUtils.getIntArray(object, "api_flare_pos");
             }
 
             // 攻撃シーケンスを読み取る //
@@ -386,6 +393,8 @@ public class BattleExDto extends AbstractDto {
             ShipDto ship = ships.get(index);
             if (hp <= 0) {
                 for (ItemInfoDto item : ship.getItem()) {
+                    if (item == null)
+                        continue;
                     if (item.getId() == 42) { //応急修理要員
                         hps[index] = (int) (ship.getMaxhp() * 0.2);
                         return;
@@ -805,6 +814,20 @@ public class BattleExDto extends AbstractDto {
         public List<BattleAtackDto> getHougeki3() {
             return this.hougeki3;
         }
+
+        /**
+         * @param touchPlane セットする touchPlane
+         */
+        public void setTouchPlane(int[] touchPlane) {
+            this.touchPlane = touchPlane;
+        }
+
+        /**
+         * @return flarePos
+         */
+        public int[] getFlarePos() {
+            return this.flarePos;
+        }
     }
 
     /**
@@ -831,6 +854,7 @@ public class BattleExDto extends AbstractDto {
     public void readFromJson() {
         if (this.exVersion >= 2) {
             Phase[] phaseCopy = this.phaseList.toArray(new Phase[0]);
+            this.enemy.clear();
             this.phaseList.clear();
             for (Phase phase : phaseCopy) {
                 this.addPhase(phase.getJson(), phase.getKind());
@@ -871,15 +895,20 @@ public class BattleExDto extends AbstractDto {
                     break;
                 }
             }
-            this.friends.add(GlobalContext.getDock(dockId));
             if (object.containsKey("api_fParam_combined")) {
-                this.friends.add(GlobalContext.getDock("2"));
                 numFshipsCombined = 6;
                 for (int i = 1; i <= 6; ++i) {
                     if (maxhpsCombined.getInt(i) == -1) {
                         numFshipsCombined = i - 1;
                         break;
                     }
+                }
+            }
+
+            if (this.friends.size() == 0) { // 再読み込みの場合はスキップ
+                this.friends.add(GlobalContext.getDock(dockId));
+                if (numFshipsCombined > 0) {
+                    this.friends.add(GlobalContext.getDock("2"));
                 }
             }
 

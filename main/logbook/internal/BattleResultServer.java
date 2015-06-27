@@ -231,6 +231,7 @@ public class BattleResultServer {
             while (input.available() > 0) {
                 BattleExDto battle = schema.newMessage();
                 ProtostuffIOUtil.mergeDelimitedFrom(input, battle, schema, buffer);
+                battle.readFromJson();
                 result.add(battle);
             }
         } catch (EOFException e) {

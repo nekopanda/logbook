@@ -45,7 +45,7 @@ public class HTMLGenerator {
         this.sb.append("<title>").append(title).append("</title>").append("\r\n");
         this.sb.append("<style type=\"text/css\">").append("\r\n");
         if (AppConstants.BATTLE_LOG_CSS_FILE.exists()) {
-            String css = IOUtils.toString(new FileInputStream(AppConstants.BATTLE_LOG_CSS_FILE));
+            String css = IOUtils.toString(new FileInputStream(AppConstants.BATTLE_LOG_CSS_FILE), "UTF-8");
             this.sb.append(css);
         }
         this.sb.append("</style>").append("\r\n");

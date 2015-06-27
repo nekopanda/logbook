@@ -10,6 +10,7 @@ import javax.json.JsonObject;
 import javax.json.JsonValue;
 
 import logbook.internal.Item;
+import logbook.util.JsonUtils;
 
 import com.dyuproject.protostuff.Tag;
 
@@ -34,6 +35,11 @@ public class AirBattleDto {
     /** stage2 艦載機数 [味方ロスト, 味方全, 敵ロスト, 敵全] */
     @Tag(5)
     public int[] stage2;
+    /** 対空カットイン [発動艦0-, 種別] */
+    @Tag(8)
+    public int[] airFire;
+    @Tag(9)
+    public int[] airFireItems;
 
     private static int[] readPlaneCount(JsonObject stage) {
         return new int[] {
@@ -61,6 +67,16 @@ public class AirBattleDto {
         if ((jsonStage2 != null) && (jsonStage2 != JsonValue.NULL)) {
             JsonObject jsonStage2Obj = kouku.getJsonObject("api_stage2");
             this.stage2 = readPlaneCount(jsonStage2Obj);
+
+            JsonValue jsonAirFire = jsonStage2Obj.get("api_air_fire");
+            if ((jsonAirFire != null) && (jsonAirFire != JsonValue.NULL)) {
+                JsonObject af = jsonStage2Obj.getJsonObject("api_air_fire");
+                this.airFire = new int[] {
+                        af.getInt("api_idx"),
+                        af.getInt("api_kind")
+                };
+                this.airFireItems = JsonUtils.getIntArray(af, "api_use_items");
+            }
         }
 
         this.atacks = BattleAtackDto.makeAir(
@@ -86,6 +102,36 @@ public class AirBattleDto {
         }
     }
 
+    private static String toTaikuCutin(int id) {
+        switch (id) {
+        case 1:
+            return "高角砲x2/電探";
+        case 2:
+            return "高角砲/電探";
+        case 3:
+            return "高角砲x2";
+        case 4:
+            return "大口径主砲/三式弾/高射装置/電探";
+        case 5:
+            return "高角砲+高射装置x2/電探";
+        case 6:
+            return "大口径主砲/三式弾/高射装置";
+        case 7:
+            return "高角砲/高射装置/電探";
+        case 8:
+            return "高角砲+高射装置/電探";
+        case 9:
+            return "高角砲/高射装置";
+        case 10:
+            return "高角砲/集中機銃/電探";
+        case 11:
+            return "高角砲/集中機銃";
+        case 12:
+            return "集中機銃/機銃/電探";
+        }
+        return "不明(" + id + ")";
+    }
+
     public String[] getStage1ShortString() {
         return getNumPlaneString(this.stage1, false);
     }
@@ -100,6 +146,27 @@ public class AirBattleDto {
 
     public String[] getStage2DetailedString() {
         return getNumPlaneString(this.stage2, true);
+    }
+
+    public String getTaikuCutinString() {
+        return toTaikuCutin(this.airFire[1]);
+    }
+
+    public String getTaikuCutinItemsString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < this.airFireItems.length; ++i) {
+            ItemInfoDto item = Item.get(this.airFireItems[i]);
+            if (i > 0) {
+                sb.append("/");
+                if (item != null) {
+                    sb.append(item.getName());
+                }
+                else {
+                    sb.append("装備不明");
+                }
+            }
+        }
+        return sb.toString();
     }
 
     /**
