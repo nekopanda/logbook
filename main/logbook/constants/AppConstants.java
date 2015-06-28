@@ -24,14 +24,14 @@ public class AppConstants {
     public static final String SUFFIX = "拡張版";
 
     /** バージョン */
-    public static final String VERSION = "1.9.0";
+    public static final String VERSION = "1.9.1";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://nekopanda.blog.jp/");
 
     /** アップデートチェック先 */
     public static final URI UPDATE_CHECK_URI = URI
-            .create("https://googledrive.com/host/0B83tioTzFacPdnlSRW5vcEVFUFk/okversions.txt");
+            .create("http://nekopandanet.sakura.ne.jp/logbook/version/okversions.txt");
 
     /** 日付書式 */
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
