@@ -168,18 +168,25 @@ public class BattleHtmlGenerator extends HTMLGenerator {
 
         this.end(); // tr
 
+        boolean seikuUnknown = false;
         int totalSeiku = 0;
         int totalNowHp = 0;
         int totalMaxHp = 0;
 
         for (int i = 0; i < ships.size(); ++i) {
             SHIP ship = ships.get(i);
-            int seiku = ship.getSeiku();
+            Integer seiku = ship.getSeiku();
             SakutekiString sakuteki = new SakutekiString(ship);
             int nowhp = hp[0][i];
             int maxhp = hp[1][i];
 
-            totalSeiku += seiku;
+            if (seiku == null) {
+                seikuUnknown = true;
+            }
+            else {
+                totalSeiku += seiku;
+            }
+
             totalNowHp += nowhp;
             totalMaxHp += maxhp;
 
@@ -195,7 +202,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                 this.inline("td", "", null);
             }
 
-            this.inline("td", String.valueOf(seiku), null);
+            this.inline("td", (seiku == null) ? "?" : String.valueOf(seiku), null);
             this.inline("td", sakuteki.toString(), null);
             this.inline("td", nowhp + "/" + maxhp, null);
 
@@ -231,7 +238,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.inline("td", "", null);
         this.inline("td", "合計", null);
         this.inline("td", "", null);
-        this.inline("td", String.valueOf(totalSeiku), null);
+        this.inline("td", seikuUnknown ? "?" : String.valueOf(totalSeiku), null);
         this.inline("td", totalSakuteki.toString(), null);
         this.inline("td", totalNowHp + "/" + totalMaxHp, null);
 
@@ -286,7 +293,8 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                     if (item != null) {
                         if (item.isPlane()) {
                             String max = (maxeq == null) ? "?" : String.valueOf(maxeq[c]);
-                            onSlot = String.valueOf(onSlots[c]) + "/" + max;
+                            String cur = (onSlots == null) ? "?" : String.valueOf(onSlots[c]);
+                            onSlot = cur + "/" + max;
                         }
                         itemName += item.getFriendlyName();
                     }

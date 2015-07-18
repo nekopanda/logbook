@@ -147,7 +147,7 @@ public class SakutekiString implements Comparable<SakutekiString> {
                 if (item.getType1() == 0) { // 取得できていない
                     this.sakutekiFailed = true;
                 }
-                if ((item.getType1() == 7) && (onslot[i] > 0)) { // 7: 偵察機 (搭載数>0の場合のみ)
+                if ((item.getType1() == 7) && ((onslot != null) && (onslot[i] > 0))) { // 7: 偵察機 (搭載数>0の場合のみ)
                     this.teisatsuSakuteki += item.getParam().getSaku();
                 }
                 if (item.getType1() == 8) { // 8: 電探

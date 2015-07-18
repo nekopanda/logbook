@@ -306,17 +306,21 @@ public abstract class ShipBaseDto extends AbstractDto {
      * 制空値
      * @return 制空値
      */
-    public int getSeiku() {
+    public Integer getSeiku() {
         List<ItemInfoDto> items = this.getItem();
         int seiku = 0;
         for (int i = 0; i < items.size(); i++) {
             ItemInfoDto item = items.get(i);
             if (item != null) {
+                //6:艦上戦闘機,7:艦上爆撃機,8:艦上攻撃機,11:瑞雲系の水上偵察機の場合は制空値を計算する
                 if ((item.getType2() == 6)
                         || (item.getType2() == 7)
                         || (item.getType2() == 8)
                         || (item.getType2() == 11)) {
-                    //6:艦上戦闘機,7:艦上爆撃機,8:艦上攻撃機,11:瑞雲系の水上偵察機の場合は制空値を計算する
+                    // スロット数が分からないと計算できない
+                    if (this.getOnSlot() == null)
+                        return null;
+
                     seiku += (int) Math.floor(item.getParam().getTyku() * Math.sqrt(this.getOnSlot()[i]));
                 }
             }
