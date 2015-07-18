@@ -61,7 +61,7 @@ public class BattleShipWindow extends BattleWindowBase {
             if (ship != null) {
                 List<ItemInfoDto> slots = ship.getItem();
                 int[] onSlots = ship.getOnSlot(); // 現在の艦載機搭載数
-                int[] maxeq = ship.getShipInfo().getMaxeq(); // 艦載機最大搭載数
+                int[] maxeq = ship.getShipInfo().getMaxeq2(); // 艦載機最大搭載数
                 int slotnum = ship.getSlotNum();
                 for (int i = 0; i < 4; ++i) {
                     if (i < slotnum) {
@@ -140,7 +140,7 @@ public class BattleShipWindow extends BattleWindowBase {
 
             this.enemyLabels[newIndex].setFont(this.getBoldFont());
 
-            int[] maxeq = shipinfo.getMaxeq(); // 艦載機最大搭載数
+            int[] maxeq = shipinfo.getMaxeq2(); // 艦載機最大搭載数
             int slotnum = shipinfo.getSlotNum();
             for (int i = 0; i < 5; ++i) {
                 if (i < slotnum) {

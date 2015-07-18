@@ -61,6 +61,7 @@ public class MasterData {
             MasterData masterData = BeanUtils.readObject(AppConstants.MASTER_DATA_CONFIG, MasterData.class);
             if ((masterData != null) && (masterData.getVersion() >= 2)) {
                 Holder.instance = masterData;
+                Holder.instance.start2.loadCompleted();
             }
         } catch (Exception e) {
             LOG.get().warn("艦娘のIDと名前の紐付けを設定ファイルから読み込みますに失敗しました", e);
@@ -295,6 +296,13 @@ public class MasterData {
         public void setJsonString(String json) {
             super.setJsonString(json);
             this.readJson();
+        }
+
+        public void loadCompleted() {
+            this.readJson();
+            for (ShipInfoDto ship : this.ships.values()) {
+                ShipParameterRecord.update(ship, null);
+            }
         }
 
         private void readJson() {

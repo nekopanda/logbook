@@ -59,12 +59,12 @@ public class MapCellDto implements Comparable<MapCellDto> {
                 ret = "マップ: " + mapName + "(" + this.map[0] + "-" + this.map[1] + ") セル:" + this.map[2];
             }
         }
-        if (this.enemyId != -1) {
-            if (withBoss && this.isBoss()) {
-                ret += " (ボス)";
-            }
-            ret += " e_id:" + this.enemyId;
+        // if (this.enemyId != -1) {
+        if (withBoss && this.isBoss()) {
+            ret += " (ボス)";
         }
+        //    ret += " e_id:" + this.enemyId;
+        //}
         return ret;
     }
 

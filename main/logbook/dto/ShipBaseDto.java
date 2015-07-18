@@ -80,7 +80,7 @@ public abstract class ShipBaseDto extends AbstractDto {
      * @param shipId ship_id
      * @param slot 装備
      */
-    public ShipBaseDto(ShipInfoDto shipinfo, int[] slot, boolean friend) {
+    public ShipBaseDto(ShipInfoDto shipinfo, int[] slot, int[] param, boolean friend) {
         this.shipInfo = shipinfo;
         this.slot = slot;
         if (friend) {
@@ -95,7 +95,7 @@ public abstract class ShipBaseDto extends AbstractDto {
             this.slotItem2 = createItemList(this.slotItem);
         }
         ShipParameters[] params = ShipParameters.fromBaseAndSlotItem(
-                this.shipInfo.getParam(), this.getItem());
+                this.shipInfo.getParam(), param, this.getItem());
         this.param = params[0];
         this.max = this.shipInfo.getMax();
         this.slotParam = params[1];
@@ -148,7 +148,7 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     public boolean isFriend() {
-        return this.shipInfo.getMaxBull() > 0;
+        return !this.shipInfo.isEnemy();
     }
 
     /**
@@ -232,7 +232,7 @@ public abstract class ShipBaseDto extends AbstractDto {
      * @return 現在の艦載機搭載数
      */
     public int[] getOnSlot() {
-        return this.shipInfo.getMaxeq();
+        return this.shipInfo.getMaxeq2();
     }
 
     /**
@@ -240,7 +240,7 @@ public abstract class ShipBaseDto extends AbstractDto {
      * @return 艦載機最大搭載数
      */
     public int[] getMaxeq() {
-        return this.shipInfo.getMaxeq();
+        return this.shipInfo.getMaxeq2();
     }
 
     /**

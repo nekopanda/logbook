@@ -65,11 +65,11 @@ public final class ShipInfoDto extends AbstractDto {
 
     /** 近代化改修時のup項目 */
     @Tag(10)
-    private int[] powup = new int[4];
+    private int[] powup = null;
 
     /** スロット数最大 */
     @Tag(11)
-    private int[] maxeq = new int[5];
+    private int[] maxeq = null;
 
     /** パラメータ */
     @Tag(12)
@@ -109,35 +109,39 @@ public final class ShipInfoDto extends AbstractDto {
     public ShipInfoDto(JsonObject object) {
         this.name = object.getString("api_name");
         this.shipId = object.getJsonNumber("api_id").intValue();
-        this.sortNo = object.getJsonNumber("api_sortno").intValue();
-        this.stype = object.getJsonNumber("api_stype").intValue();
-        this.type = ShipStyle.get(this.stype);
         this.flagship = object.getString("api_yomi");
         if ("-".equals(this.flagship)) {
             this.flagship = "";
         }
-        this.afterlv = object.getJsonNumber("api_afterlv").intValue();
-        this.aftershipid = Integer.parseInt(object.getString("api_aftershipid"));
+        this.stype = object.getJsonNumber("api_stype").intValue();
         this.slotNum = object.getInt("api_slot_num");
-        this.maxBull = 0;
-        if (object.containsKey("api_bull_max")) {
+
+        if (!this.isEnemy()) {
             this.maxBull = object.getJsonNumber("api_bull_max").intValue();
-        }
-        this.maxFuel = 0;
-        if (object.containsKey("api_fuel_max")) {
             this.maxFuel = object.getJsonNumber("api_fuel_max").intValue();
         }
-        this.powup = JsonUtils.getIntArray(object, "api_powup");
-        this.maxeq = JsonUtils.getIntArray(object, "api_maxeq");
 
-        ShipParameters[] params = ShipParameters.fromMasterShip(object);
+        boolean reduced = (object.get("api_maxeq") == null);
+
+        if (!reduced) {
+            this.sortNo = object.getJsonNumber("api_sortno").intValue();
+            this.type = ShipStyle.get(this.stype);
+            this.afterlv = object.getJsonNumber("api_afterlv").intValue();
+            this.aftershipid = Integer.parseInt(object.getString("api_aftershipid"));
+            this.powup = JsonUtils.getIntArray(object, "api_powup");
+            this.maxeq = JsonUtils.getIntArray(object, "api_maxeq");
+        }
+
+        ShipParameters[] params = reduced ?
+                ShipParameters.fromMasterEnemyShip(object) :
+                ShipParameters.fromMasterShip(object);
         this.param = params[0];
         this.max = params[1];
         this.json = object.toString();
     }
 
     public String getFullName() {
-        if ((this.getMaxBull() == 0) && !StringUtils.isEmpty(this.flagship)) {
+        if (this.isEnemy() && !StringUtils.isEmpty(this.flagship)) {
             return this.name + " " + this.flagship;
         }
         return this.name;
@@ -315,6 +319,22 @@ public final class ShipInfoDto extends AbstractDto {
     }
 
     /**
+     * maxeqを取得します。
+     * このオブジェクトにデータがない場合はShipParameterRecordに問い合わせます。
+     * @return maxeq
+     */
+    public int[] getMaxeq2() {
+        if (this.maxeq != null) {
+            return this.maxeq;
+        }
+        ShipParameterRecord record = ShipParameterRecord.get(this.shipId);
+        if ((record != null) && (record.getDefaultSlot() != null)) {
+            return record.getMaxeq();
+        }
+        return null;
+    }
+
+    /**
      * maxeqを設定します。
      * @param maxeq
      */
@@ -383,5 +403,12 @@ public final class ShipInfoDto extends AbstractDto {
      */
     public void setSlotNum(int slotNum) {
         this.slotNum = slotNum;
+    }
+
+    /**
+     * @return
+     */
+    public boolean isEnemy() {
+        return this.shipId > 500;
     }
 }

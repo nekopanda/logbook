@@ -134,7 +134,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
 
     /** 新規入手艦 */
     public ShipDto(int id, ShipInfoDto shipinfo, int[] slot) {
-        super(shipinfo, slot, true);
+        super(shipinfo, slot, null, true);
 
         this.id = id;
         this.locked = false;
@@ -159,7 +159,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
         this.onslot = new int[] { 0, 0, 0, 0, 0 };
 
         List<ItemDto> items = this.getItem2();
-        int[] maxeq = shipinfo.getMaxeq();
+        int[] maxeq = shipinfo.getMaxeq2();
         for (int i = 0; i < items.size(); ++i) {
             ItemDto item = items.get(i);
             if ((item != null) && item.isPlane()) {

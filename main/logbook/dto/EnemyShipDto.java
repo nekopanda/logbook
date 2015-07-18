@@ -34,8 +34,8 @@ public class EnemyShipDto extends ShipBaseDto {
     private final int lv;
 
     public EnemyShipDto(int shipId, int[] slot, int[] param, int lv) {
-        super(Ship.get(String.valueOf(shipId)), slot, false);
-        // ここで送られてくるパラメータは装備を含まない素の値なのであまり役に立たない
+        super(Ship.get(String.valueOf(shipId)), slot, param, false);
+        // ここで送られてくるパラメータは装備を含まない素の値
         this.karyoku = param[0];
         this.raisou = param[1];
         this.taiku = param[2];

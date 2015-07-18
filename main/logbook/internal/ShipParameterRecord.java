@@ -21,6 +21,7 @@ import logbook.data.context.GlobalContext;
 import logbook.dto.ItemInfoDto;
 import logbook.dto.ShipBaseDto;
 import logbook.dto.ShipDto;
+import logbook.dto.ShipInfoDto;
 import logbook.gui.ApplicationMain;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
@@ -90,6 +91,8 @@ public class ShipParameterRecord {
     private final int[] LOS;
     private int[] defaultSlot;
     private String albumMessage;
+    private int[] maxeq;
+    private Integer seiku;
 
     private static int[] readIntegerArray(String[] data, int offset, int length) {
         int[] ret = new int[length];
@@ -116,6 +119,10 @@ public class ShipParameterRecord {
         this.LOS = readIntegerArray(data, 8, 3);
         this.defaultSlot = readIntegerArray(data, 11, 5);
         this.albumMessage = data[16];
+        if (data.length > 17) {
+            this.maxeq = readIntegerArray(data, 17, 5);
+            this.seiku = (data[22].equals("null") ? null : Integer.parseInt(data[22]));
+        }
     }
 
     public ShipParameterRecord(int shipId, String shipName) {
@@ -149,6 +156,29 @@ public class ShipParameterRecord {
         }
     }
 
+    public static void update(ShipInfoDto ship, Integer seiku) {
+        ShipParameterRecord record = SHIP.get(ship.getShipId());
+        if (record == null) {
+            record = new ShipParameterRecord(ship.getShipId(), ship.getFullName());
+        }
+        boolean updated = false;
+        int[] maxeq = ship.getMaxeq();
+        if ((maxeq != null) && (Arrays.equals(record.maxeq, maxeq) == false)) {
+            record.maxeq = maxeq;
+            updated = true;
+            ApplicationMain.main.printMessage(ship.getFullName() + "のスロット数データを更新");
+        }
+        if ((seiku != null) && (seiku.equals(record.seiku) == false)) {
+            record.seiku = seiku;
+            updated = true;
+            ApplicationMain.main.printMessage(ship.getFullName() + "の制空値データを更新");
+        }
+        if (updated) {
+            SHIP.put(ship.getShipId(), record);
+            modified = true;
+        }
+    }
+
     public static ShipParameterRecord get(int id) {
         return SHIP.get(id);
     }
@@ -157,7 +187,8 @@ public class ShipParameterRecord {
         return new String[] {
                 "艦船ID", "艦船名", "対潜初期下限", "対潜初期上限", "対潜最大",
                 "回避初期下限", "回避初期上限", "回避最大", "索敵初期下限", "索敵初期上限", "索敵最大",
-                "装備1", "装備2", "装備3", "装備4", "装備5", "図鑑説明"
+                "装備1", "装備2", "装備3", "装備4", "装備5", "図鑑説明",
+                "スロット1", "スロット2", "スロット3", "スロット4", "スロット5", "制空値"
         };
     }
 
@@ -183,6 +214,13 @@ public class ShipParameterRecord {
                         flatten.addAll(Arrays.asList(new String[] { "null", "null", "null", "null", "null" }));
                     }
                     flatten.add(data.albumMessage);
+                    if (data.maxeq != null) {
+                        addToString(flatten, data.maxeq);
+                    }
+                    else {
+                        flatten.addAll(Arrays.asList(new String[] { "null", "null", "null", "null", "null" }));
+                    }
+                    flatten.add(data.seiku != null ? String.valueOf(data.seiku) : "null");
                     writer.writeNext(flatten.toArray(new String[0]));
                     flatten.clear();
                 }
@@ -225,5 +263,12 @@ public class ShipParameterRecord {
      */
     public int[] getDefaultSlot() {
         return this.defaultSlot;
+    }
+
+    /**
+     * @return maxeq
+     */
+    public int[] getMaxeq() {
+        return this.maxeq;
     }
 }

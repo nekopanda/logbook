@@ -12,17 +12,10 @@ import logbook.dto.AirBattleDto;
 import logbook.dto.BattleAtackDto;
 import logbook.dto.BattleExDto;
 import logbook.dto.DockDto;
-import logbook.dto.MapCellDto;
 import logbook.dto.ResultRank;
-import logbook.dto.ShipBaseDto;
 import logbook.dto.ShipDto;
-import logbook.dto.ShipInfoDto;
 import logbook.gui.logic.ColorManager;
-import logbook.internal.EnemyData;
-import logbook.internal.Item;
-import logbook.internal.Ship;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MenuItem;
@@ -105,6 +98,8 @@ public class BattleWindow extends BattleWindowBase {
         if (this.getMapCellDto() == null)
             return;
 
+        // 2015/07/18 先読みできなくなった
+        /*
         MapCellDto dto = this.getMapCellDto();
         EnemyData enemyData = dto.getEnemyData();
         if (dto.getEnemyId() == -1) {
@@ -133,6 +128,7 @@ public class BattleWindow extends BattleWindowBase {
         else {
             this.infoLabels[1][0].setText("データがありません[" + dto.getEnemyId() + "]");
         }
+        */
     }
 
     // idx: 味方=0, 敵=1

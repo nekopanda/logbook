@@ -695,11 +695,12 @@ public class Ship {
             ShipParameters max = dto.getMax();
             if (dto.getName().length() > 0) {
                 String name = dto.getName();
-                if (dto.getMaxBull() == 0) { // 敵
+                if (dto.isEnemy()) { // 敵
                     if (!StringUtils.isEmpty(dto.getFlagship())) {
                         name += " " + dto.getFlagship();
                     }
                 }
+                int[] maxeq = dto.getMaxeq2();
                 fw.write(StringUtils.join(new String[] {
                         name, // 名前
                         Integer.toString(dto.getShipId()), // ID
@@ -719,10 +720,10 @@ public class Ship {
                         Integer.toString(param.getLeng()),
                         Integer.toString(param.getLuck()),
                         Integer.toString(max.getLuck()),
-                        Integer.toString(dto.getMaxeq()[0]),
-                        Integer.toString(dto.getMaxeq()[1]),
-                        Integer.toString(dto.getMaxeq()[2]),
-                        Integer.toString(dto.getMaxeq()[3]) }, ','));
+                        (maxeq != null) ? Integer.toString(maxeq[0]) : "?",
+                        (maxeq != null) ? Integer.toString(maxeq[1]) : "?",
+                        (maxeq != null) ? Integer.toString(maxeq[2]) : "?",
+                        (maxeq != null) ? Integer.toString(maxeq[3]) : "?" }, ','));
                 fw.write("\n");
             }
         }
