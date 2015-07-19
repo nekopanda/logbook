@@ -32,6 +32,10 @@ public class MapCellDto implements Comparable<MapCellDto> {
     private EnemyData enemyData;
     @Tag(10)
     private boolean start;
+    @Tag(11)
+    private int eventId = -1;
+    @Tag(12)
+    private int eventKind;
 
     public MapCellDto(JsonObject object, boolean start) {
         this.map[0] = object.getInt("api_maparea_id");
@@ -46,8 +50,47 @@ public class MapCellDto implements Comparable<MapCellDto> {
         }
         this.colorNo = object.getInt("api_color_no");
         this.bosscellNo = object.getInt("api_bosscell_no");
+        this.eventId = object.getInt("api_event_id");
+        this.eventKind = object.getInt("api_event_kind");
         this.enemyData = EnemyData.get(this.enemyId);
         this.start = start;
+    }
+
+    private String getNextKind() {
+        if (this.eventId == -1) {
+            if (this.isBoss()) {
+                return "ボス";
+            }
+            return null;
+        }
+
+        switch (this.eventId) {
+        case 2:
+            return "資源獲得";
+        case 3:
+            return "渦潮";
+        case 4:
+            return "戦闘";
+        case 5:
+            return "ボス";
+        case 6:
+            switch (this.eventKind) {
+            case 1:
+                return "敵影を見ず";
+            case 2:
+                return "能動分岐";
+            }
+            return "気のせい";
+        case 7:
+            if (this.eventKind == 0) {
+                return "航空偵察";
+            }
+            return "航空戦";
+        case 8:
+            return "船団護衛成功";
+        }
+
+        return null;
     }
 
     private String toString(boolean detailed, boolean withBoss) {
@@ -59,12 +102,12 @@ public class MapCellDto implements Comparable<MapCellDto> {
                 ret = "マップ: " + mapName + "(" + this.map[0] + "-" + this.map[1] + ") セル:" + this.map[2];
             }
         }
-        // if (this.enemyId != -1) {
-        if (withBoss && this.isBoss()) {
-            ret += " (ボス)";
+        if (withBoss) {
+            String next = this.getNextKind();
+            if (next != null) {
+                ret += " (" + next + ")";
+            }
         }
-        //    ret += " e_id:" + this.enemyId;
-        //}
         return ret;
     }
 
@@ -195,6 +238,34 @@ public class MapCellDto implements Comparable<MapCellDto> {
      */
     public void setStart(boolean start) {
         this.start = start;
+    }
+
+    /**
+     * @return eventId
+     */
+    public int getEventId() {
+        return this.eventId;
+    }
+
+    /**
+     * @param eventId セットする eventId
+     */
+    public void setEventId(int eventId) {
+        this.eventId = eventId;
+    }
+
+    /**
+     * @return eventKind
+     */
+    public int getEventKind() {
+        return this.eventKind;
+    }
+
+    /**
+     * @param eventKind セットする eventKind
+     */
+    public void setEventKind(int eventKind) {
+        this.eventKind = eventKind;
     }
 
 }
