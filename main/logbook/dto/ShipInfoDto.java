@@ -114,6 +114,7 @@ public final class ShipInfoDto extends AbstractDto {
             this.flagship = "";
         }
         this.stype = object.getJsonNumber("api_stype").intValue();
+        this.type = ShipStyle.get(this.stype);
         this.slotNum = object.getInt("api_slot_num");
 
         if (!this.isEnemy()) {
@@ -125,7 +126,6 @@ public final class ShipInfoDto extends AbstractDto {
 
         if (!reduced) {
             this.sortNo = object.getJsonNumber("api_sortno").intValue();
-            this.type = ShipStyle.get(this.stype);
             this.afterlv = object.getJsonNumber("api_afterlv").intValue();
             this.aftershipid = Integer.parseInt(object.getString("api_aftershipid"));
             this.powup = JsonUtils.getIntArray(object, "api_powup");
