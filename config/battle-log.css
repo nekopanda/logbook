@@ -9,7 +9,7 @@ div.box{
         font-size: small;
 }
 body{
-	background-color:#FAFAFA
+        background-color:#FAFAFA
 }
 h1{
         font-size: small;
@@ -55,4 +55,10 @@ table tr td{
 }
 .label-gotin{
         color:#00F
+}
+td.enemy{
+	color:#F00
+}
+td.friend{
+	color:#00F
 }
