@@ -179,9 +179,7 @@ public class BattleShipWindow extends BattleWindowBase {
         }
     }
 
-    @Override
-    protected void clearText() {
-        // 味方
+    private void clearFriendArea() {
         for (int i = 0; i < 12; ++i) {
             this.friendLabels[i].setText("-");
             for (int c = 0; c < 6; ++c) {
@@ -190,8 +188,9 @@ public class BattleShipWindow extends BattleWindowBase {
             this.friendDetail[0][i].setText("");
             this.friendDetail[1][i].setText("");
         }
+    }
 
-        // 敵
+    private void clearEnemyArea() {
         for (int i = 0; i < 6; ++i) {
             this.enemyLabels[i].setText("-");
             for (int c = 0; c < 4; ++c) {
@@ -200,6 +199,14 @@ public class BattleShipWindow extends BattleWindowBase {
             this.enemyDetail[0][i].setText("");
             this.enemyDetail[1][i].setText("");
         }
+    }
+
+    @Override
+    protected void clearText() {
+        // 味方
+        this.clearFriendArea();
+        // 敵
+        this.clearEnemyArea();
     }
 
     @Override
@@ -429,7 +436,8 @@ public class BattleShipWindow extends BattleWindowBase {
             }
             else {
                 // 移動中
-                this.printMap();
+                //this.printMap();
+                this.clearEnemyArea();
             }
         } finally {
             this.endDraw();

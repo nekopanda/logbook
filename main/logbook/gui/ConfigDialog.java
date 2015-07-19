@@ -414,8 +414,8 @@ public final class ConfigDialog extends Dialog {
         final Combo sakutekiCombo = new Combo(compositeFleetTab, SWT.READ_ONLY);
         sakutekiCombo.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
         sakutekiCombo.add("A.艦隊素の索敵値 + 装備の索敵値");
-        sakutekiCombo.add("B.ほっぼアルファVer2.0.1(艦隊素の索敵分 + 装備分 - 提督Lv分)");
-        sakutekiCombo.add("C.ほっぼアルファVer2.0.1(旧:2-5式(秋))");
+        sakutekiCombo.add("B.ほっぽアルファVer2.0.1(艦隊素の索敵分 + 装備分 - 提督Lv分)");
+        sakutekiCombo.add("C.ほっぽアルファVer2.0.1(2-5式(秋))");
         sakutekiCombo.add("D.2-5式(秋)(艦隊素の索敵分 + 装備分 - 提督Lv分)");
         sakutekiCombo.add("E.装備込みの艦隊索敵値合計(2-5式(秋))");
         sakutekiCombo.add("F.2-5式(旧)(偵察機×2 + 電探 + √(装備込みの艦隊索敵値-偵察機-電探))");

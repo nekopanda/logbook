@@ -120,7 +120,7 @@ public final class CaptureDialog extends WindowBase {
      */
     private void createContents() {
         // シェル
-        super.createContents(this.parent, SWT.CLOSE | SWT.ON_TOP | SWT.TITLE | SWT.RESIZE | SWT.TOOL, false);
+        super.createContents(this.parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.TOOL, false);
         this.getShell().setText("キャプチャ");
         this.shell = this.getShell();
         // レイアウト

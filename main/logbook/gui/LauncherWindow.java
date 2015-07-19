@@ -60,7 +60,7 @@ public class LauncherWindow extends WindowBase {
      * Create contents of the dialog.
      */
     private void createContents() {
-        super.createContents(this.parent, SWT.CLOSE | SWT.ON_TOP | SWT.TITLE | SWT.RESIZE | SWT.TOOL, false);
+        super.createContents(this.parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.TOOL, false);
         this.getShell().setText("ツール");
         Shell shell = this.getShell();
         shell.setLayout(new RowLayout(SWT.HORIZONTAL));
