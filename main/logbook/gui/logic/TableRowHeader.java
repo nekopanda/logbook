@@ -8,7 +8,7 @@ package logbook.gui.logic;
  * データを埋め込んだ番号
  */
 public class TableRowHeader implements Comparable<TableRowHeader> {
-    private final int number;
+    private int number;
     private final Object data;
 
     public TableRowHeader(int number, Object data) {
@@ -28,5 +28,19 @@ public class TableRowHeader implements Comparable<TableRowHeader> {
     @Override
     public int compareTo(TableRowHeader o) {
         return Integer.compare(this.number, o.number);
+    }
+
+    /**
+     * @return number
+     */
+    public int getNumber() {
+        return this.number;
+    }
+
+    /**
+     * @param number セットする number
+     */
+    public void setNumber(int number) {
+        this.number = number;
     }
 }

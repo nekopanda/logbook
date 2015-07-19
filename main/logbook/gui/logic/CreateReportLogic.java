@@ -185,7 +185,7 @@ public final class CreateReportLogic {
                 dropName = "※空きなし";
             }
 
-            body.add(new Comparable[] { Integer.toString(i + 1),
+            body.add(new Comparable[] { new TableRowHeader(i + 1, null),
                     new DateTimeString(battle.getBattleDate()),
                     battle.getQuestName(),
                     battle.getMapCellDto().toString(), battle.getRank(), battle.getEnemyName(), battle.getDropType(),
@@ -356,11 +356,10 @@ public final class CreateReportLogic {
 
         List<Comparable[]> body = new ArrayList<Comparable[]>();
         ItemInfoListener script = ItemInfoProxy.get();
-        int count = 0;
         script.begin();
         for (ItemInfo itemInfo : countitems) {
             body.add(ArrayUtils.addAll(new Comparable[] {
-                    new TableRowHeader(++count, itemInfo) },
+                    new TableRowHeader(1, itemInfo) },
                     script.body(itemInfo)));
         }
         script.end();
@@ -391,13 +390,12 @@ public final class CreateReportLogic {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
         ShipItemListener script = ShipItemProxy.get();
         script.begin(specdiff, filter);
-        int count = 0;
         for (ShipDto ship : GlobalContext.getShipMap().values()) {
             if ((filter != null) && !shipFilter(ship, filter, missionSet)) {
                 continue;
             }
             body.add(ArrayUtils.addAll(new Comparable[] {
-                    new TableRowHeader(++count, ship)
+                    new TableRowHeader(1, ship)
             }, script.body(ship)));
         }
         script.end();
@@ -500,7 +498,7 @@ public final class CreateReportLogic {
      */
     public static String[] getCreateQuestHeader() {
         return ArrayUtils.addAll(new String[] {
-                "No."
+                "No.", "ID"
         }, QuestProxy.get().header());
     }
 
@@ -517,7 +515,8 @@ public final class CreateReportLogic {
                 continue;
 
             body.add(ArrayUtils.addAll(new Comparable[] {
-                    new TableRowHeader(quest.getNo(), quest)
+                    new TableRowHeader(1, quest),
+                    quest.getNo()
             }, script.body(quest)));
         }
         script.end();
@@ -542,7 +541,7 @@ public final class CreateReportLogic {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
 
         body.add(new Comparable[] {
-                1,
+                new TableRowHeader(1, null),
                 new DateTimeString(material.getTime()),
                 material.getEvent(),
                 material.getFuel(),
@@ -579,7 +578,7 @@ public final class CreateReportLogic {
         for (int i = 0; i < lostList.size(); i++) {
             LostEntityDto lost = lostList.get(i);
             body.add(new Comparable[] {
-                    i + 1,
+                    new TableRowHeader(i + 1, null),
                     new DateTimeString(lost.getTime()),
                     lost.getLostEntity(),
                     lost.getEntityId(),
@@ -597,7 +596,7 @@ public final class CreateReportLogic {
      * @return ヘッダー
      */
     public static String[] getMissionHeader() {
-        return ArrayUtils.addAll(new String[] { "ID" },
+        return ArrayUtils.addAll(new String[] { "No.", "ID" },
                 MissionProxy.get().header());
     }
 
@@ -613,7 +612,8 @@ public final class CreateReportLogic {
         script.begin(fleetid);
         for (MissionDto data : MasterData.getMaster().getMission().values()) {
             body.add(ArrayUtils.addAll(new Comparable[] {
-                    new TableRowHeader(data.getId(), data)
+                    new TableRowHeader(1, data),
+                    data.getId()
             }, script.body(data)));
         }
         script.end();
