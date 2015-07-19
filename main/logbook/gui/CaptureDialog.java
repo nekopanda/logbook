@@ -1,10 +1,10 @@
 package logbook.gui;
 
+import java.awt.Desktop;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -124,7 +124,7 @@ public final class CaptureDialog extends WindowBase {
         this.getShell().setText("キャプチャ");
         this.shell = this.getShell();
         // レイアウト
-        GridLayout glShell = new GridLayout(1, false);
+        GridLayout glShell = new GridLayout(2, false);
         glShell.horizontalSpacing = 1;
         glShell.marginHeight = 1;
         glShell.marginWidth = 1;
@@ -138,6 +138,7 @@ public final class CaptureDialog extends WindowBase {
 
         // コンポジット
         Composite rangeComposite = new Composite(this.shell, SWT.NONE);
+        rangeComposite.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
         rangeComposite.setLayout(new GridLayout(2, false));
 
         // 範囲設定
@@ -153,8 +154,8 @@ public final class CaptureDialog extends WindowBase {
 
         // コンポジット
         this.composite = new Composite(this.shell, SWT.NONE);
-        GridLayout loglayout = new GridLayout(3, false);
-        this.composite.setLayout(loglayout);
+        this.composite.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        this.composite.setLayout(new GridLayout(3, false));
 
         // 周期設定
         this.interval = new Button(this.composite, SWT.CHECK);
@@ -176,9 +177,19 @@ public final class CaptureDialog extends WindowBase {
         Label label = new Label(this.composite, SWT.NONE);
         label.setText("ミリ秒");
 
+        Button openFolderButton = new Button(this.shell, SWT.NONE);
+        openFolderButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        openFolderButton.setText("保存先を開く");
+        openFolderButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                CaptureDialog.this.openCaptureDir();
+            }
+        });
+
         Composite buttonComposite = new Composite(this.shell, SWT.NONE);
+        buttonComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
         buttonComposite.setLayout(new GridLayout(2, true));
-        buttonComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
 
         this.capture = new Button(buttonComposite, SWT.NONE);
         this.capture.setFont(this.font);
@@ -311,7 +322,6 @@ public final class CaptureDialog extends WindowBase {
         public void widgetSelected(SelectionEvent e) {
             Timer timer = CaptureDialog.this.timer;
 
-            Rectangle rectangle = CaptureDialog.this.rectangle;
             boolean interval = CaptureDialog.this.interval.getSelection();
             int intervalms = CaptureDialog.this.intervalms.getSelection();
 
@@ -365,7 +375,7 @@ public final class CaptureDialog extends WindowBase {
 
     private File getSaveFile() throws IOException {
         // 時刻からファイル名を作成
-        Date now = Calendar.getInstance().getTime();
+        Date now = new Date();
 
         String dir = null;
         if (AppConfig.get().isCreateDateFolder()) {
@@ -392,6 +402,17 @@ public final class CaptureDialog extends WindowBase {
             }
         }
         return file;
+    }
+
+    private void openCaptureDir() {
+        try {
+            File file = this.getSaveFile();
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(new File(file.getParent()));
+            }
+        } catch (Exception e) {
+            LOG.get().warn("保存先を開くで例外が発生しました", e);
+        }
     }
 
     private void saveImageToFile(BufferedImage image, File file) throws IOException {
