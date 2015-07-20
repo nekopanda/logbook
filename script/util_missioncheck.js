@@ -10,7 +10,7 @@ function setFleet(fleetid) {
 	//艦隊データオブジェクト初期化
 	currentDockData = {
 		flgType: 0,
-		shipCount: ships.length,
+		shipCount: ships.size(),
 		flgShipLv: 0,
 		sumShipLv: 0,
 		drumShipCount: 0,
@@ -35,11 +35,11 @@ function setFleet(fleetid) {
 	};
 	
 	//艦隊データオブジェクト設定
-	for(var i = 0; i < ships.length; i++){
+	for(var i = 0; i < ships.size(); i++){
 	
 		//ドラム缶
 		var drumFlg = false;
-		for(var j = 0; j < ships[i].slot.length; j++){
+		for(var j = 0; j < ships[i].slot.size(); j++){
 			if(ships[i].slot[j].match(/ドラム缶\(輸送用\)/)){
 				if(!drumFlg){
 					currentDockData.drumShipCount++;
