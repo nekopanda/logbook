@@ -1,6 +1,7 @@
 package logbook.data;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.util.Calendar;
@@ -12,6 +13,8 @@ import java.util.zip.GZIPInputStream;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+
+import org.apache.commons.io.IOUtils;
 
 /**
  * 同定されていない未加工のデータ
@@ -43,6 +46,19 @@ public class UndefinedData implements Data {
         this.request = request;
         this.response = response;
         this.date = Calendar.getInstance().getTime();
+    }
+
+    public UndefinedData decode(String contentEncoding) {
+        byte[] responseDecoded = this.response;
+        // 圧縮されていたら解凍する
+        if ((contentEncoding != null) && contentEncoding.equals("gzip")) {
+            try {
+                responseDecoded = IOUtils.toByteArray(new GZIPInputStream(new ByteArrayInputStream(this.response)));
+            } catch (IOException e) {
+                //
+            }
+        }
+        return new UndefinedData(this.fullUrl, this.url, this.request, responseDecoded);
     }
 
     @Override

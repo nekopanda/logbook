@@ -1,5 +1,7 @@
 package logbook.server.proxy;
 
+import java.net.BindException;
+
 import logbook.config.AppConfig;
 import logbook.gui.ApplicationMain;
 import logbook.internal.LoggerHolder;
@@ -11,7 +13,9 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.MessageBox;
 
 /**
  * プロキシサーバーです
@@ -30,30 +34,26 @@ public final class ProxyServer {
 
     public static void start() {
         try {
-            QueuedThreadPool threadpool = new QueuedThreadPool();
-            threadpool.setMinThreads(2);
-
-            server = new Server(threadpool);
+            server = new Server();
             updateSetting();
             setConnector();
-            /*// httpsをプロキシできないので下のコードに移行
-                        ServletHandler servletHandler = new ServletHandler();
-                        servletHandler.addServletWithMapping(ReverseProxyServlet.class, "/*");
-                        servletHandler.setServer(server);
 
-                        server.setHandler(servletHandler);
-            */
             // httpsをプロキシできるようにConnectHandlerを設定
             ConnectHandler proxy = new ConnectHandler();
             server.setHandler(proxy);
 
             // httpはこっちのハンドラでプロキシ
-            ServletContextHandler context = new ServletContextHandler(proxy, "/", ServletContextHandler.SESSIONS);
-            ServletHolder proxyServlet = new ServletHolder(new ReverseProxyServlet());
-            proxyServlet.setInitParameter("timeout", "600000");
-            context.addServlet(proxyServlet, "/*");
+            ServletContextHandler context = new ServletContextHandler(proxy, "/");
+            ServletHolder holder = new ServletHolder(new ReverseProxyServlet());
+            holder.setInitParameter("maxThreads", "256");
+            holder.setInitParameter("timeout", "600000");
+            context.addServlet(holder, "/*");
 
-            server.start();
+            try {
+                server.start();
+            } catch (Exception e) {
+                handleException(e);
+            }
         } catch (Exception e) {
             LOG.get().fatal("Proxyサーバーの起動に失敗しました", e);
             throw new RuntimeException(e);
@@ -119,9 +119,31 @@ public final class ProxyServer {
     }
 
     private static void setConnector() {
-        ServerConnector connector = new ServerConnector(server, 1, 1);
+        ServerConnector connector = new ServerConnector(server);
         connector.setPort(port);
         connector.setHost(host);
         server.setConnectors(new Connector[] { connector });
+    }
+
+    private static void handleException(Exception e) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("プロキシサーバーが予期せず終了しました").append("\r\n");
+        sb.append("例外 : " + e.getClass().getName()).append("\r\n");
+        sb.append("原因 : " + e.getMessage()).append("\r\n");
+        if (e instanceof BindException) {
+            sb.append("おそらく、二重起動か同じポートを使用しているアプリケーションがあります。").append("\r\n");
+        }
+
+        final String message = sb.toString();
+
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                MessageBox box = new MessageBox(ApplicationMain.main.getShell(), SWT.YES | SWT.ICON_ERROR);
+                box.setText("プロキシサーバーが予期せず終了しました");
+                box.setMessage(message);
+                box.open();
+            }
+        });
     }
 }

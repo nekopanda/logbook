@@ -1,11 +1,9 @@
 package logbook.server.proxy;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
-import java.util.zip.GZIPInputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +15,6 @@ import logbook.data.DataType;
 import logbook.data.UndefinedData;
 import logbook.data.context.GlobalContext;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.HttpRequest;
@@ -119,30 +116,21 @@ public final class ReverseProxyServlet extends ProxyServlet {
             byte[] postField = (byte[]) request.getAttribute(Filter.REQUEST_BODY);
             ByteArrayOutputStream stream = (ByteArrayOutputStream) request.getAttribute(Filter.RESPONSE_BODY);
             if (stream != null) {
-                byte[] responseBody = stream.toByteArray();
-
-                // 圧縮されていたら解凍する
-                String contentEncoding = (String) request.getAttribute(Filter.CONTENT_ENCODING);
-                if ((contentEncoding != null) && contentEncoding.equals("gzip")) {
-                    try {
-                        responseBody = IOUtils.toByteArray(new GZIPInputStream(new ByteArrayInputStream(responseBody)));
-                    } catch (IOException e) {
-                        //
-                    }
-                }
-
                 final UndefinedData rawData = new UndefinedData(request.getRequestURL().toString(),
-                        request.getRequestURI(), postField, responseBody);
+                        request.getRequestURI(), postField, stream.toByteArray());
+                final String contentEncoding = (String) request.getAttribute(Filter.CONTENT_ENCODING);
                 final String serverName = request.getServerName();
 
                 Display.getDefault().asyncExec(new Runnable() {
                     @Override
                     public void run() {
+                        UndefinedData decodedData = rawData.decode(contentEncoding);
+
                         // 統計データベース(http://kancolle-db.net/)に送信する
-                        DatabaseClient.send(rawData);
+                        DatabaseClient.send(decodedData);
 
                         // キャプチャしたバイト配列は何のデータかを決定する
-                        Data data = rawData.toDefinedData();
+                        Data data = decodedData.toDefinedData();
                         if (data.getDataType() != DataType.UNDEFINED) {
                             // 定義済みのデータの場合にキューに追加する
                             GlobalContext.updateContext(data);
