@@ -43,7 +43,7 @@ public final class ProxyServer {
             server.setHandler(proxy);
 
             // httpはこっちのハンドラでプロキシ
-            ServletContextHandler context = new ServletContextHandler(proxy, "/");
+            ServletContextHandler context = new ServletContextHandler(proxy, "/", ServletContextHandler.SESSIONS);
             ServletHolder holder = new ServletHolder(new ReverseProxyServlet());
             holder.setInitParameter("maxThreads", "256");
             holder.setInitParameter("timeout", "600000");

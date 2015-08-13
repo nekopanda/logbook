@@ -22,6 +22,7 @@ import org.eclipse.jetty.client.api.ProxyConfiguration;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.http.HttpHeader;
+import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.proxy.ProxyServlet;
 import org.eclipse.swt.widgets.Display;
 
@@ -62,7 +63,20 @@ public final class ReverseProxyServlet extends ProxyServlet {
         proxyRequest.header(HttpHeader.X_FORWARDED_PROTO, null);
         proxyRequest.header(HttpHeader.X_FORWARDED_HOST, null);
         proxyRequest.header(HttpHeader.X_FORWARDED_SERVER, null);
-        proxyRequest.header("Origin", null);
+
+        // HTTP/1.1 ならkeep-aliveを追加します
+        if (proxyRequest.getVersion() == HttpVersion.HTTP_1_1) {
+            proxyRequest.header(HttpHeader.CONNECTION, "keep-alive");
+        }
+
+        // Pragma: no-cache はプロキシ用なので Cache-Control: no-cache に変換します
+        String pragma = proxyRequest.getHeaders().get(HttpHeader.PRAGMA);
+        if ((pragma != null) && pragma.equals("no-cache")) {
+            proxyRequest.header(HttpHeader.PRAGMA, null);
+            if (!proxyRequest.getHeaders().containsKey(HttpHeader.CACHE_CONTROL.asString())) {
+                proxyRequest.header(HttpHeader.CACHE_CONTROL, "no-cache");
+            }
+        }
 
         String queryString = ((org.eclipse.jetty.server.Request) request).getQueryString();
         fixQueryString(proxyRequest, queryString);
