@@ -791,6 +791,7 @@ public final class CreateReportLogic {
         if (filter.groupMode == 1) {
             // 艦種でフィルタ
             if ((filter.enabledType != null) &&
+                    (filter.enabledType.length > ship.getStype()) &&
                     (filter.enabledType[ship.getStype()] == false))
             {
                 return false;
