@@ -416,6 +416,7 @@ public class BattleExDto extends AbstractDto {
             int numFshipsCombined = isCombined ? this.nowFriendHpCombined.length : 0;
             int numEships = this.nowEnemyHp.length;
             // 戦闘後に残っている艦数
+            int friendEscaped = 0;
             int friendNowShips = 0;
             int enemyNowShips = 0;
             // 総ダメージ
@@ -423,9 +424,10 @@ public class BattleExDto extends AbstractDto {
             int enemyGauge = 0;
 
             for (int i = 0; i < numFships; i++) {
-                if ((battle.escaped != null) && battle.escaped[i])
-                    continue; // 退避艦は除外
-
+                if ((battle.escaped != null) && battle.escaped[i]) {
+                    ++friendEscaped; // 退避
+                    continue;
+                }
                 if (this.nowFriendHp[i] > 0) {
                     ++friendNowShips;
                 }
@@ -433,9 +435,10 @@ public class BattleExDto extends AbstractDto {
             }
             if (isCombined) {
                 for (int i = 0; i < numFshipsCombined; i++) {
-                    if ((battle.escaped != null) && battle.escaped[i + 6])
-                        continue; // 退避艦は除外
-
+                    if ((battle.escaped != null) && battle.escaped[i + 6]) {
+                        ++friendEscaped; // 退避
+                        continue;
+                    }
                     if (this.nowFriendHpCombined[i] > 0) {
                         ++friendNowShips;
                     }
@@ -443,14 +446,14 @@ public class BattleExDto extends AbstractDto {
                 }
             }
             for (int i = 0; i < numEships; i++) {
-                if (this.nowEnemyHp[i] > 0)
+                if (this.nowEnemyHp[i] > 0) {
                     ++enemyNowShips;
-
+                }
                 enemyGauge += battle.getStartEnemyHp()[i] - this.nowEnemyHp[i];
             }
 
             // 轟沈・撃沈数
-            int friendSunk = (numFships + numFshipsCombined) - friendNowShips;
+            int friendSunk = (numFships + numFshipsCombined) - (friendEscaped + friendNowShips);
             int enemySunk = numEships - enemyNowShips;
 
             this.damageRate = new double[] {
