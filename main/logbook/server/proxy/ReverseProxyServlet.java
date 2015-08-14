@@ -23,7 +23,6 @@ import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpVersion;
-import org.eclipse.jetty.proxy.ProxyServlet;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -56,13 +55,6 @@ public final class ReverseProxyServlet extends ProxyServlet {
     @Override
     protected void customizeProxyRequest(Request proxyRequest, HttpServletRequest request) {
         proxyRequest.onRequestContent(new RequestContentListener(request));
-
-        // Hop-by-Hop ヘッダーを除去します
-        proxyRequest.header(HttpHeader.VIA, null);
-        proxyRequest.header(HttpHeader.X_FORWARDED_FOR, null);
-        proxyRequest.header(HttpHeader.X_FORWARDED_PROTO, null);
-        proxyRequest.header(HttpHeader.X_FORWARDED_HOST, null);
-        proxyRequest.header(HttpHeader.X_FORWARDED_SERVER, null);
 
         // HTTP/1.1 ならkeep-aliveを追加します
         if (proxyRequest.getVersion() == HttpVersion.HTTP_1_1) {
