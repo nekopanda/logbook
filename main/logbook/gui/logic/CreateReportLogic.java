@@ -683,7 +683,7 @@ public final class CreateReportLogic {
             // 艦種
             String type = ship.getType();
             // 装備
-            List<ItemInfoDto> item = ship.getItem();
+            List<ItemDto> item = ship.getItem2();
 
             // テキストが入力されている場合処理する
             if (filter.regexp) {
@@ -703,11 +703,11 @@ public final class CreateReportLogic {
                     // 艦種で検索
                     find = find ? find : pattern.matcher(type).find();
                     // 装備で検索
-                    for (ItemInfoDto itemDto : item) {
-                        if ((itemDto == null) || (itemDto.getName() == null)) {
+                    for (ItemDto itemDto : item) {
+                        if ((itemDto == null) || (itemDto.getFriendlyName() == null)) {
                             find = find ? find : false;
                         } else {
-                            find = find ? find : pattern.matcher(itemDto.getName()).find();
+                            find = find ? find : pattern.matcher(itemDto.getFriendlyName()).find();
                         }
                     }
 
@@ -726,11 +726,11 @@ public final class CreateReportLogic {
                     // 艦種で検索
                     find = find ? find : type.indexOf(words[i]) != -1;
                     // 装備で検索
-                    for (ItemInfoDto itemDto : item) {
-                        if ((itemDto == null) || (itemDto.getName() == null)) {
+                    for (ItemDto itemDto : item) {
+                        if ((itemDto == null) || (itemDto.getFriendlyName() == null)) {
                             find = find ? find : false;
                         } else {
-                            find = find ? find : itemDto.getName().indexOf(words[i]) != -1;
+                            find = find ? find : itemDto.getFriendlyName().indexOf(words[i]) != -1;
                         }
                     }
 
