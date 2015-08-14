@@ -32,6 +32,9 @@ public class ItemDto extends AbstractDto {
     @Tag(5)
     private int level;
 
+    @Tag(6)
+    private int alv;
+
     public ItemDto() {
     }
 
@@ -52,6 +55,13 @@ public class ItemDto extends AbstractDto {
         else {
             this.locked = false;
             this.level = 0;
+        }
+
+        if (object.containsKey("api_alv")) {
+            this.alv = object.getInt("api_alv");
+        }
+        else {
+            this.alv = 0;
         }
     }
 
@@ -197,10 +207,14 @@ public class ItemDto extends AbstractDto {
      * @return
      */
     public String getFriendlyName() {
-        if (this.level > 0) {
-            return this.info.getName() + "★+" + this.level;
+        String name = this.info.getName();
+        if (this.alv > 0) {
+            name += "☆" + this.alv;
         }
-        return this.info.getName();
+        if (this.level > 0) {
+            name += "★" + this.level;
+        }
+        return name;
     }
 
     /**
@@ -209,5 +223,19 @@ public class ItemDto extends AbstractDto {
      */
     public ShipParameters getParam() {
         return this.info.getParam();
+    }
+
+    /**
+     * @return 熟練度
+     */
+    public int getAlv() {
+        return this.alv;
+    }
+
+    /**
+     * @param alv セットする 熟練度
+     */
+    public void setAlv(int alv) {
+        this.alv = alv;
     }
 }
