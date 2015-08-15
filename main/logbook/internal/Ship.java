@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import logbook.dto.ShipInfoDto;
@@ -630,11 +629,6 @@ public class Ship {
         }
     };
 
-    // 始めてアクセスがあった時に読み込む
-    static {
-        update();
-    }
-
     /**
      * 艦娘を取得します
      * 
@@ -642,29 +636,24 @@ public class Ship {
      * @return 艦娘
      */
     public static ShipInfoDto get(String id) {
-        ShipInfoDto dto = SHIP.get(id);
-        if (dto == null)
-            return ShipInfoDto.EMPTY;
+        ShipInfoDto dto = MasterData.get().getStart2().getShips().get(id);
+        if (dto == null) {
+            dto = SHIP.get(id);
+            if (dto == null) {
+                dto = ShipInfoDto.EMPTY;
+            }
+        }
         return dto;
     }
 
-    /**
-     * マスターデータから更新
-     */
-    public static void update() {
-        for (Entry<String, ShipInfoDto> entry : MasterData.get().getStart2().getShips().entrySet()) {
-            SHIP.put(entry.getKey(), entry.getValue());
-        }
-    }
-
-    public static Map<String, ShipInfoDto> get() {
-        return SHIP;
+    public static Map<String, ShipInfoDto> getMap() {
+        return MasterData.get().getStart2().getShips();
     }
 
     /** 敵艦名からの変換マップ */
     public static Map<String, ShipInfoDto> getEnemyNameMap() {
         Map<String, ShipInfoDto> nameMap = new HashMap<>();
-        for (ShipInfoDto ship : SHIP.values()) {
+        for (ShipInfoDto ship : getMap().values()) {
             nameMap.put(ship.getFullName(), ship);
         }
         return nameMap;
@@ -689,7 +678,7 @@ public class Ship {
                 ','));
         fw.write("\n");
 
-        for (String key : SHIP.keySet()) {
+        for (String key : getMap().keySet()) {
             ShipInfoDto dto = Ship.get(key);
             ShipParameters param = dto.getParam();
             ShipParameters max = dto.getMax();

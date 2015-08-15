@@ -96,6 +96,13 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     @Tag(27)
     private int[] onslot;
 
+    /** 補助装備 */
+    @Tag(34)
+    private final int slotEx;
+
+    @Tag(35)
+    private final ItemDto slotExItem;
+
     @Tag(40)
     private final String json;
 
@@ -129,6 +136,10 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
         this.maxhp = this.getMax().getHP();
         this.slotnum = object.getJsonNumber("api_slotnum").intValue();
         this.onslot = JsonUtils.getIntArray(object, "api_onslot");
+
+        this.slotEx = object.containsKey("api_slot_ex") ? object.getInt("api_slot_ex") : -1;
+        this.slotExItem = GlobalContext.getItem(this.slotEx);
+
         this.json = object.toString();
     }
 
@@ -166,6 +177,9 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
                 this.onslot[i] = maxeq[i];
             }
         }
+
+        this.slotEx = -1;
+        this.slotExItem = null;
 
         this.json = null;
     }
@@ -569,5 +583,21 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
      */
     public void setOnslot(int[] onslot) {
         this.onslot = onslot;
+    }
+
+    /**
+     * 補助装備ID
+     * @return
+     */
+    public int getSlotEx() {
+        return this.slotEx;
+    }
+
+    /**
+     * 補助装備
+     * @return
+     */
+    public ItemDto getSlotExItem() {
+        return this.slotExItem;
     }
 }

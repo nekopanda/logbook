@@ -5,7 +5,6 @@ package logbook.dto;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.json.JsonObject;
 
@@ -109,21 +108,8 @@ public abstract class ShipBaseDto extends AbstractDto {
      */
     private static List<ItemDto> createItemDtoList(int[] slot) {
         List<ItemDto> items = new ArrayList<>();
-        Map<Integer, ItemDto> itemMap = GlobalContext.getItemMap();
         for (int itemid : slot) {
-            if (-1 != itemid) {
-                ItemDto item = itemMap.get(itemid);
-                if (item != null) {
-                    items.add(item);
-                } else {
-                    ItemDto dto = new ItemDto();
-                    dto.setInfo(Item.UNKNOWN);
-                    items.add(dto);
-                }
-            }
-            else {
-                items.add(null);
-            }
+            items.add(GlobalContext.getItem(itemid));
         }
         return items;
     }

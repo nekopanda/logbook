@@ -35,10 +35,6 @@ public final class ShipInfoDto extends AbstractDto {
     @Tag(3)
     private int stype;
 
-    /** 艦種 */
-    @Tag(4)
-    private String type;
-
     /** 改レベル */
     @Tag(5)
     private int afterlv;
@@ -94,7 +90,6 @@ public final class ShipInfoDto extends AbstractDto {
      */
     public ShipInfoDto(String name, String type, String flagship, int afterlv, int maxBull, int maxFuel) {
         this.name = name;
-        this.type = type;
         this.afterlv = afterlv;
         this.flagship = flagship;
         this.maxBull = maxBull;
@@ -114,7 +109,6 @@ public final class ShipInfoDto extends AbstractDto {
             this.flagship = "";
         }
         this.stype = object.getJsonNumber("api_stype").intValue();
-        this.type = ShipStyle.get(this.stype);
         this.slotNum = object.getInt("api_slot_num");
 
         if (!this.isEnemy()) {
@@ -213,7 +207,7 @@ public final class ShipInfoDto extends AbstractDto {
      * @return 艦種
      */
     public String getType() {
-        return this.type;
+        return ShipStyle.get(this.stype);
     }
 
     /**
@@ -222,14 +216,6 @@ public final class ShipInfoDto extends AbstractDto {
      */
     public void setStype(int stype) {
         this.stype = stype;
-    }
-
-    /**
-     * 艦種を設定します。
-     * @param type 艦種
-     */
-    public void setType(String type) {
-        this.type = type;
     }
 
     /**

@@ -18,7 +18,7 @@ import logbook.gui.WindowBase;
 import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.ShipGroupListener;
 import logbook.gui.logic.ShipGroupObserver;
-import logbook.internal.ShipStyle;
+import logbook.internal.MasterData;
 import logbook.util.SwtUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -548,9 +548,9 @@ public final class ShipFilterComposite extends Composite {
                     ShipFilterComposite.this.shipTable.updateFilter(ShipFilterComposite.this.createFilter(), true);
             }
         };
-        for (Map.Entry<Integer, String> entry : ShipStyle.getMap().entrySet()) {
-            String name = entry.getValue();
-            int key = entry.getKey();
+        for (MasterData.ShipTypeDto type : MasterData.get().getStart2().getStype()) {
+            String name = type.getName();
+            int key = type.getId();
             if (AppConstants.SHIP_TYPE_INFO.containsKey(key)) {
                 name = AppConstants.SHIP_TYPE_INFO.get(key);
                 if (name.equals("#")) {

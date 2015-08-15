@@ -101,11 +101,6 @@ public class MasterData {
     /** START2のマスターデータで更新 */
     public static void updateMaster(JsonObject data) {
         Holder.instance.doMater(data);
-
-        // 更新
-        Item.update();
-        Ship.update();
-        ShipStyle.update();
     }
 
     /** 出撃マップを更新 */
@@ -292,12 +287,6 @@ public class MasterData {
             this.readJson();
         }
 
-        @Override
-        public void setJsonString(String json) {
-            super.setJsonString(json);
-            this.readJson();
-        }
-
         public void loadCompleted() {
             this.readJson();
             for (ShipInfoDto ship : this.ships.values()) {
@@ -307,14 +296,12 @@ public class MasterData {
 
         private void readJson() {
 
-            // 艦娘一覧
-            JsonArray apiMstShip = this.json.getJsonArray("api_mst_ship");
-            if (apiMstShip != null) {
-                this.ships.clear();
-                for (int i = 0; i < apiMstShip.size(); i++) {
-                    JsonObject object = (JsonObject) apiMstShip.get(i);
-                    String id = object.getJsonNumber("api_id").toString();
-                    this.ships.put(id, this.toShipInfoDto(object));
+            // 艦種
+            JsonArray json_stype = this.json.getJsonArray("api_mst_stype");
+            if (json_stype != null) {
+                this.stype.clear();
+                for (JsonValue elem : json_stype) {
+                    this.stype.add(new ShipTypeDto((JsonObject) elem));
                 }
             }
 
@@ -327,6 +314,17 @@ public class MasterData {
                     ItemInfoDto item = new ItemInfoDto(object);
                     int id = object.getJsonNumber("api_id").intValue();
                     this.items.put(id, item);
+                }
+            }
+
+            // 艦娘一覧
+            JsonArray apiMstShip = this.json.getJsonArray("api_mst_ship");
+            if (apiMstShip != null) {
+                this.ships.clear();
+                for (int i = 0; i < apiMstShip.size(); i++) {
+                    JsonObject object = (JsonObject) apiMstShip.get(i);
+                    String id = object.getJsonNumber("api_id").toString();
+                    this.ships.put(id, this.toShipInfoDto(object));
                 }
             }
 
@@ -353,14 +351,6 @@ public class MasterData {
                 for (JsonValue elem : json_mission) {
                     MissionDto dto = new MissionDto((JsonObject) elem);
                     this.mission.put(dto.getId(), dto);
-                }
-            }
-
-            JsonArray json_stype = this.json.getJsonArray("api_mst_stype");
-            if (json_stype != null) {
-                this.stype.clear();
-                for (JsonValue elem : json_stype) {
-                    this.stype.add(new ShipTypeDto((JsonObject) elem));
                 }
             }
 

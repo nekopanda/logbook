@@ -43,15 +43,6 @@ public class ShipStyle {
         }
     };
 
-    // 始めてアクセスがあった時に読み込む
-    static {
-        try {
-            update();
-        } catch (Exception e) {
-            LOG.get().warn(e);
-        }
-    }
-
     /**
      * 艦種を取得します
      * 
@@ -59,19 +50,10 @@ public class ShipStyle {
      * @return 艦種
      */
     public static String get(int id) {
-        return SHIPSTYLE.get(id);
-    }
-
-    public static Map<Integer, String> getMap() {
-        return SHIPSTYLE;
-    }
-
-    /**
-     * マスターデータから更新
-     */
-    public static void update() {
-        for (ShipTypeDto entry : MasterData.get().getStart2().getStype()) {
-            SHIPSTYLE.put(entry.getId(), entry.getName());
+        ShipTypeDto dto = MasterData.get().getStart2().getShipType(id);
+        if (dto != null) {
+            return dto.getName();
         }
+        return SHIPSTYLE.get(id);
     }
 }

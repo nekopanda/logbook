@@ -244,6 +244,24 @@ public final class GlobalContext {
     }
 
     /**
+     * アイテムIDからアイテム
+     * @param itemId
+     * @return
+     */
+    public static ItemDto getItem(int itemId) {
+        if (itemId == -1) {
+            return null;
+        }
+        ItemDto item = itemMap.get(itemId);
+        if (item == null) {
+            ItemDto dto = new ItemDto();
+            dto.setInfo(Item.UNKNOWN);
+            return dto;
+        }
+        return item;
+    }
+
+    /**
      * 艦娘Map
      * @return 艦娘Map
      */

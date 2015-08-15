@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import logbook.dto.ItemInfoDto;
@@ -389,20 +388,6 @@ public class Item {
         }
     };
 
-    // 始めてアクセスがあった時に読み込む
-    static {
-        update();
-    }
-
-    /**
-     * マスターデータから更新
-     */
-    public static void update() {
-        for (Entry<Integer, ItemInfoDto> entry : MasterData.get().getStart2().getItems().entrySet()) {
-            ITEM.put(entry.getKey(), entry.getValue());
-        }
-    }
-
     /**
      * アイテムを取得します
      * 
@@ -410,7 +395,11 @@ public class Item {
      * @return アイテム
      */
     public static ItemInfoDto get(int id) {
-        return ITEM.get(id);
+        ItemInfoDto dto = getMap().get(id);
+        if (dto == null) {
+            dto = ITEM.get(id);
+        }
+        return dto;
     }
 
     /**
@@ -419,18 +408,18 @@ public class Item {
      * @return IDの一覧
      */
     public static Set<Integer> keySet() {
-        return ITEM.keySet();
+        return getMap().keySet();
     }
 
     public static Map<Integer, ItemInfoDto> getMap() {
-        return ITEM;
+        return MasterData.get().getStart2().getItems();
     }
 
     public static List<ItemInfoDto> fromIdList(int[] slot) {
         List<ItemInfoDto> items = new ArrayList<ItemInfoDto>();
         for (int itemid : slot) {
             if (-1 != itemid) {
-                ItemInfoDto item = ITEM.get(itemid);
+                ItemInfoDto item = getMap().get(itemid);
                 if (item != null) {
                     items.add(item);
                 } else {
