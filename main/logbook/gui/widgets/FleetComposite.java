@@ -15,6 +15,7 @@ import logbook.data.context.GlobalContext;
 import logbook.data.context.TimerContext;
 import logbook.dto.DeckMissionDto;
 import logbook.dto.DockDto;
+import logbook.dto.ItemDto;
 import logbook.dto.ItemInfoDto;
 import logbook.dto.ShipDto;
 import logbook.gui.logic.ColorManager;
@@ -445,10 +446,11 @@ public class FleetComposite extends Composite {
             }
 
             // ステータス.ダメコン
-            List<ItemInfoDto> item = ship.getItem();
+            List<ItemDto> item = new ArrayList<ItemDto>(ship.getItem2());
+            item.add(ship.getSlotExItem());
             int dmgcsty = 0;
             int dmgcstm = 0;
-            for (ItemInfoDto itemDto : item) {
+            for (ItemDto itemDto : item) {
                 if (itemDto != null) {
                     if (itemDto.getName().equals("応急修理要員")) {
                         dmgcsty++;

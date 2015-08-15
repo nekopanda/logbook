@@ -137,7 +137,11 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
         this.slotnum = object.getJsonNumber("api_slotnum").intValue();
         this.onslot = JsonUtils.getIntArray(object, "api_onslot");
 
-        this.slotEx = object.containsKey("api_slot_ex") ? object.getInt("api_slot_ex") : -1;
+        int _slotEx = -1;
+        if (object.containsKey("api_slot_ex")) {
+            _slotEx = object.getInt("api_slot_ex");
+        }
+        this.slotEx = (_slotEx > 0) ? _slotEx : -1;
         this.slotExItem = GlobalContext.getItem(this.slotEx);
 
         this.json = object.toString();

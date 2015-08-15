@@ -14,6 +14,8 @@ function body(data) {
 		// この艦娘が装備している個数を計算
 		var levels = [];
 		var counts = {};
+		var alevels = [];
+		var acounts = {};
 		var itemlv = [];
 		this.count = 0;
 		for each(var item in ship.item2) {
@@ -26,13 +28,21 @@ function body(data) {
 					levels.push(item.level);
 					counts[item.level] = 1;
 				}
+				if(item.alv in acounts) {
+					acounts[item.alv]++;
+				}
+				else {
+					alevels.push(item.alv);
+					acounts[item.alv] = 1;
+				}
 				this.count++;
-				itemlv.push(item.level);
+				itemlv.push(item.level + item.alv);
 			}
 		}
 		// 降順ソート
 		itemlv.sort(function(a,b){ return b - a; });
 		levels.sort(function(a,b){ return b - a; });
+		alevels.sort(function(a,b){ return b - a; });
 
 		// ソート順作成
 		this.sortno = 0;
@@ -57,6 +67,18 @@ function body(data) {
 					sb.append(counts[level]);
 				}
 			}
+			else if(alevels[0] > 0) {
+				for(var i=0; i<alevels.length; ++i) {
+					var level = alevels[i];
+					if(level == 0) {
+						sb.append("無x");
+					}
+					else {
+						sb.append("☆").append(level).append("x");
+					}
+					sb.append(acounts[level]);
+				}
+			}
 			else {
 				sb.append("x").append(this.count | 0);
 			}
@@ -73,17 +95,17 @@ function body(data) {
 	var count = 0;
 	var sb = new StringBuilder();
 	for(var i=0; i<ships.length; ++i) {
-        if (i != 0) {
-            sb.append(",");
-        }
-        ships[i].output(sb);
+	        if (i != 0) {
+	            sb.append(",");
+	        }
+	        ships[i].output(sb);
 		count += ships[i].count;
 	}
-    // 長すぎるときは切り詰める
-    if (sb.length() > 150) {
-        sb.setLength(150);
-        sb.append("...");
-    }
+	// 長すぎるときは切り詰める
+	if (sb.length() > 150) {
+	sb.setLength(150);
+	sb.append("...");
+	}
 
 	var remain = data.items.size() - count;
 

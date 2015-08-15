@@ -274,7 +274,8 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         if (ships.size() == 0) {
             return;
         }
-        int ci = (ships.get(0) instanceof ShipDto) ? 0 : 1;
+        boolean isFriend = ships.get(0) instanceof ShipDto;
+        int ci = isFriend ? 0 : 1;
 
         this.begin("div", BOX_CLASS);
         this.begin("table", SLOTITEM_TABLE_CLASS[ci]);
@@ -283,6 +284,9 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.inline("th", "艦名", null);
         for (int c = 0; c < 5; ++c) {
             this.inline("th", getColSpan(2), "装備" + (c + 1), null);
+        }
+        if (isFriend) {
+            this.inline("th", "補助装備", null);
         }
         this.end(); // tr
 
@@ -309,6 +313,14 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                 }
                 this.inline("td", itemName, null);
                 this.inline("td", onSlot, null);
+            }
+            if (isFriend) {
+                String itemName = "";
+                ItemDto dto = ((ShipDto) ship).getSlotExItem();
+                if (dto != null) {
+                    itemName = dto.getFriendlyName();
+                }
+                this.inline("td", itemName, null);
             }
             this.end(); // tr
         }

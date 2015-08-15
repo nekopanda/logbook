@@ -12,7 +12,8 @@ function header() {
 				"装備3",
 				"艦載機3", //
 				"装備4",
-				"艦載機4"];
+				"艦載機4",
+				"補助装備" ];
 }
 
 function begin(specdiff) { }
@@ -23,6 +24,7 @@ function body(ship) {
 	var slotItems = ship.item2;
 	var slotNames = new Array(4);
 	var onSlotString = new Array(4);
+	var slotExName = (ship.slotExItem != null) ? ship.slotExItem.friendlyName : null
 	var onSlot = ship.onSlot;
 	var maxEq = ship.shipInfo.maxeq;
 	var slotNum = ship.slotNum;
@@ -48,7 +50,8 @@ function body(ship) {
 					slotNames[2],
 					onSlotString[2],
 					slotNames[3],
-					onSlotString[3] ]);
+					onSlotString[3],
+					slotExName ]);
 }
 
 function end() { }
