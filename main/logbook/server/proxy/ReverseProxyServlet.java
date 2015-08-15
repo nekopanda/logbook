@@ -56,17 +56,20 @@ public final class ReverseProxyServlet extends ProxyServlet {
     protected void customizeProxyRequest(Request proxyRequest, HttpServletRequest request) {
         proxyRequest.onRequestContent(new RequestContentListener(request));
 
-        // HTTP/1.1 ならkeep-aliveを追加します
-        if (proxyRequest.getVersion() == HttpVersion.HTTP_1_1) {
-            proxyRequest.header(HttpHeader.CONNECTION, "keep-alive");
-        }
+        if (!AppConfig.get().isUseProxy()) { // アップストリームプロキシがある場合は除外
 
-        // Pragma: no-cache はプロキシ用なので Cache-Control: no-cache に変換します
-        String pragma = proxyRequest.getHeaders().get(HttpHeader.PRAGMA);
-        if ((pragma != null) && pragma.equals("no-cache")) {
-            proxyRequest.header(HttpHeader.PRAGMA, null);
-            if (!proxyRequest.getHeaders().containsKey(HttpHeader.CACHE_CONTROL.asString())) {
-                proxyRequest.header(HttpHeader.CACHE_CONTROL, "no-cache");
+            // HTTP/1.1 ならkeep-aliveを追加します
+            if (proxyRequest.getVersion() == HttpVersion.HTTP_1_1) {
+                proxyRequest.header(HttpHeader.CONNECTION, "keep-alive");
+            }
+
+            // Pragma: no-cache はプロキシ用なので Cache-Control: no-cache に変換します
+            String pragma = proxyRequest.getHeaders().get(HttpHeader.PRAGMA);
+            if ((pragma != null) && pragma.equals("no-cache")) {
+                proxyRequest.header(HttpHeader.PRAGMA, null);
+                if (!proxyRequest.getHeaders().containsKey(HttpHeader.CACHE_CONTROL.asString())) {
+                    proxyRequest.header(HttpHeader.CACHE_CONTROL, "no-cache");
+                }
             }
         }
 
