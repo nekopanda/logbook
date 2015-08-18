@@ -7,6 +7,8 @@ import java.beans.Transient;
 
 import javax.json.JsonObject;
 
+import logbook.internal.Item;
+
 import com.dyuproject.protostuff.Tag;
 
 /**
@@ -72,6 +74,13 @@ public class ItemDto extends AbstractDto {
     // java beans はメソッドで認識するのでここに付ける必要がある
     @Transient
     public ItemInfoDto getInfo() {
+        if (this.info == null) {
+            ItemInfoDto dto = Item.get(this.slotitemId);
+            if (dto == null) {
+                dto = Item.UNKNOWN;
+            }
+            this.info = dto;
+        }
         return this.info;
     }
 
@@ -143,7 +152,7 @@ public class ItemDto extends AbstractDto {
     }
 
     public boolean isPlane() {
-        return this.info.isPlane();
+        return this.getInfo().isPlane();
     }
 
     /**
@@ -151,7 +160,7 @@ public class ItemDto extends AbstractDto {
      * @return 表示分類名
      */
     public String getTypeName() {
-        return this.info.getTypeName();
+        return this.getInfo().getTypeName();
     }
 
     /**
@@ -159,7 +168,7 @@ public class ItemDto extends AbstractDto {
      * @return type
      */
     public int[] getType() {
-        return this.info.getType();
+        return this.getInfo().getType();
     }
 
     /**
@@ -167,7 +176,7 @@ public class ItemDto extends AbstractDto {
      * @return type0
      */
     public int getType0() {
-        return this.info.getType0();
+        return this.getInfo().getType0();
     }
 
     /**
@@ -175,7 +184,7 @@ public class ItemDto extends AbstractDto {
      * @return type1
      */
     public int getType1() {
-        return this.info.getType1();
+        return this.getInfo().getType1();
     }
 
     /**
@@ -183,7 +192,7 @@ public class ItemDto extends AbstractDto {
      * @return type2
      */
     public int getType2() {
-        return this.info.getType2();
+        return this.getInfo().getType2();
     }
 
     /**
@@ -191,7 +200,7 @@ public class ItemDto extends AbstractDto {
      * @return type3
      */
     public int getType3() {
-        return this.info.getType3();
+        return this.getInfo().getType3();
     }
 
     /**
@@ -199,7 +208,7 @@ public class ItemDto extends AbstractDto {
      * @return name
      */
     public String getName() {
-        return this.info.getName();
+        return this.getInfo().getName();
     }
 
     /**
@@ -207,7 +216,7 @@ public class ItemDto extends AbstractDto {
      * @return
      */
     public String getFriendlyName() {
-        String name = this.info.getName();
+        String name = this.getInfo().getName();
         if (this.alv > 0) {
             name += "☆" + this.alv;
         }
@@ -222,7 +231,7 @@ public class ItemDto extends AbstractDto {
      * @return
      */
     public ShipParameters getParam() {
-        return this.info.getParam();
+        return this.getInfo().getParam();
     }
 
     /**

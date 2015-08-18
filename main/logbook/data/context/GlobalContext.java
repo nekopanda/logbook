@@ -212,12 +212,7 @@ public final class GlobalContext {
         Collection<ItemDto> items = config.getItems();
         if ((items != null) && (items.size() > 0)) {
             for (ItemDto item : items) {
-                int id = item.getSlotitemId();
-                ItemInfoDto info = Item.get(id);
-                if (info != null) {
-                    item.setInfo(info);
-                    GlobalContext.itemMap.put(item.getId(), item);
-                }
+                GlobalContext.itemMap.put(item.getId(), item);
             }
         }
         DeckMissionDto[] previousMissions = config.getPreviousMissions();

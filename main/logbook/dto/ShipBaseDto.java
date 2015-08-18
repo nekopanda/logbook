@@ -274,17 +274,6 @@ public abstract class ShipBaseDto extends AbstractDto {
             // その場合はItemInfoDtoから作成
             return createItemList(this.getItem());
         }
-        else {
-            // デシリアライズしたデータはiteminfoへの参照がないので作る
-            List<ItemInfoDto> slotItem = this.getItem();
-            for (int i = 0; i < slotItem.size(); ++i) {
-                ItemDto dto = this.slotItem2.get(i);
-                if ((dto != null) && (dto.getInfo() == null)) {
-                    ItemInfoDto info = slotItem.get(i);
-                    dto.setInfo((info != null) ? info : Item.UNKNOWN);
-                }
-            }
-        }
         return this.slotItem2;
     }
 
