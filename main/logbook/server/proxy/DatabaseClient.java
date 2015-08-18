@@ -35,19 +35,20 @@ public class DatabaseClient extends Thread {
             "api_get_member/kdock",
             "api_get_member/ship2",
             "api_get_member/ship3",
+            "api_get_member/slot_item",
+            "api_get_member/mapinfo",
             "api_req_hensei/change",
             "api_req_kousyou/createship",
             "api_req_kousyou/getship",
             "api_req_kousyou/createitem",
             "api_req_map/start",
             "api_req_map/next",
+            "api_req_map/select_eventmap_rank",
             "api_req_sortie/battle",
             "api_req_battle_midnight/battle",
             "api_req_battle_midnight/sp_midnight",
             "api_req_sortie/night_to_day",
             "api_req_sortie/battleresult",
-            "api_req_practice/battle",
-            "api_req_practice/battle_result",
             "api_req_combined_battle/airbattle",
             "api_req_combined_battle/battle",
             "api_req_combined_battle/midnight_battle",
@@ -118,7 +119,7 @@ public class DatabaseClient extends Thread {
         body.add("agent", "6nENnnGzRgSTVeuU652r");
         body.add("url", data.getFullUrl());
         body.add("requestbody", sendRequestBody);
-        body.add("responsebody", sendResponseBody); // 
+        body.add("responsebody", sendResponseBody); //
         return this.httpClient.POST("http://api.kancolle-db.net/2/")
                 .agent("logbook/v" + AppConstants.VERSION)
                 .content(new StringContentProvider(body.encode()), "application/x-www-form-urlencoded");
