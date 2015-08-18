@@ -81,27 +81,30 @@ public class ResourceItemDto {
         JsonArray bounus = apidata.getJsonArray("api_bounus");
         for (int i = 0; i < bounus.size(); ++i) {
             JsonObject item = bounus.getJsonObject(i);
-            int itemId = item.getJsonObject("api_item").getInt("api_id");
-            int itemCount = item.getInt("api_count");
-            switch (itemId) {
-            case 5:
-                this.items.put(AppConstants.USEITEM_BURNER,
-                        new UseItemDto(AppConstants.USEITEM_BURNER, itemCount));
-                break;
-            case 6:
-                this.items.put(AppConstants.USEITEM_BUCKET,
-                        new UseItemDto(AppConstants.USEITEM_BUCKET, itemCount));
-                break;
-            case 7:
-                this.items.put(AppConstants.USEITEM_RESEARCH,
-                        new UseItemDto(AppConstants.USEITEM_RESEARCH, itemCount));
-                break;
-            case 8:
-                this.items.put(AppConstants.USEITEM_SCREW,
-                        new UseItemDto(AppConstants.USEITEM_SCREW, itemCount));
-                break;
-            default: // 5-8以外は知らん
-                break;
+            int type = item.getInt("api_type");
+            if (type == 1) { // 1以外は知らん
+                int itemId = item.getJsonObject("api_item").getInt("api_id");
+                int itemCount = item.getInt("api_count");
+                switch (itemId) {
+                case 5:
+                    this.items.put(AppConstants.USEITEM_BURNER,
+                            new UseItemDto(AppConstants.USEITEM_BURNER, itemCount));
+                    break;
+                case 6:
+                    this.items.put(AppConstants.USEITEM_BUCKET,
+                            new UseItemDto(AppConstants.USEITEM_BUCKET, itemCount));
+                    break;
+                case 7:
+                    this.items.put(AppConstants.USEITEM_RESEARCH,
+                            new UseItemDto(AppConstants.USEITEM_RESEARCH, itemCount));
+                    break;
+                case 8:
+                    this.items.put(AppConstants.USEITEM_SCREW,
+                            new UseItemDto(AppConstants.USEITEM_SCREW, itemCount));
+                    break;
+                default: // 5-8以外は知らん
+                    break;
+                }
             }
         }
     }
