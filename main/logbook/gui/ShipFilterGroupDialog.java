@@ -62,7 +62,6 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
     private Composite mainComposite;
     private Combo shipcombo;
     private Tree tree;
-    private TreeItem treeItem;
     private Button btnAddShip;
     private Button btnRemoveShip;
 
@@ -117,20 +116,15 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
         this.tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
         this.tree.addSelectionListener(new TreeSelectionAdapter(this));
 
-        this.treeItem = new TreeItem(this.tree, SWT.NONE);
-        this.treeItem.setImage(SWTResourceManager.getImage(ShipFilterGroupDialog.class, AppConstants.R_ICON_STAR));
-        this.treeItem.setText("グループ");
-
         ShipGroupListBean shipGroupList = ShipGroupConfig.get();
 
         for (ShipGroupBean bean : shipGroupList.getGroup()) {
-            TreeItem groupItem = new TreeItem(this.treeItem, SWT.NONE);
-            groupItem.setImage(SWTResourceManager
-                    .getImage(ShipFilterGroupDialog.class, AppConstants.R_ICON_FOLDER));
+            TreeItem groupItem = new TreeItem(this.tree, SWT.NONE);
+            //groupItem.setImage(SWTResourceManager
+            //        .getImage(ShipFilterGroupDialog.class, AppConstants.R_ICON_FOLDER));
             groupItem.setText(bean.getName());
             groupItem.setData(new GroupProperty(bean, groupItem));
         }
-        this.treeItem.setExpanded(true);
 
         this.mainComposite = new Composite(this.sashForm, SWT.NONE);
         GridLayout mainLayout = new GridLayout(4, false);
@@ -361,11 +355,10 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
 
             ShipGroupBean bean = this.createNewGroup(shipGroupList);
 
-            TreeItem item = new TreeItem(this.dialog.treeItem, SWT.NONE);
-            item.setImage(SWTResourceManager.getImage(ShipFilterGroupDialog.class, AppConstants.R_ICON_FOLDER));
+            TreeItem item = new TreeItem(this.dialog.tree, SWT.NONE);
+            //item.setImage(SWTResourceManager.getImage(ShipFilterGroupDialog.class, AppConstants.R_ICON_FOLDER));
             item.setText(bean.getName());
             item.setData(new GroupProperty(bean, item));
-            this.dialog.treeItem.setExpanded(true);
 
             ShipGroupObserver.listChanged();
         }
