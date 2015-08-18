@@ -731,13 +731,7 @@ public class FleetComposite extends Composite {
             this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_COND, this.clearDate), null);
         }
 
-        for (org.eclipse.swt.widgets.Control control : this.fleetGroup.getChildren()) {
-            if (control instanceof Composite) {
-                ((Composite) control).layout();
-            }
-        }
-        this.fleetGroup.layout();
-
+        SwtUtils.layoutCompositeRecursively(this.fleetGroup);
         this.getShell().setRedraw(true);
     }
 

@@ -21,6 +21,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -54,6 +55,19 @@ public final class SwtUtils {
         if (item == null)
             item = bar.getItem(null);
         return item;
+    }
+
+    /**
+     * Composite.layout()をすべての要素で呼び出します
+     * @param composite
+     */
+    public static void layoutCompositeRecursively(Composite composite) {
+        for (org.eclipse.swt.widgets.Control control : composite.getChildren()) {
+            if (control instanceof Composite) {
+                layoutCompositeRecursively((Composite) control);
+            }
+        }
+        composite.layout();
     }
 
     private static class ButtonImagePainter implements Listener {
