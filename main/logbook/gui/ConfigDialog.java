@@ -402,6 +402,17 @@ public final class ConfigDialog extends Dialog {
         visibleOnReturnBathwater.setText("お風呂から上がる時に母港タブを表示");
         visibleOnReturnBathwater.setSelection(AppConfig.get().isVisibleOnReturnBathwater());
 
+        Label seikuLabel = new Label(compositeFleetTab, SWT.NONE);
+        seikuLabel.setText("制空計算式");
+        seikuLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+
+        final Combo seikuCombo = new Combo(compositeFleetTab, SWT.READ_ONLY);
+        seikuCombo.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+        seikuCombo.add("A.艦載機素の制空値");
+        seikuCombo.add("B.熟練度込みの制空推定値");
+        seikuCombo.add("C.熟練度込みの制空推定値(艦載機素の制空値 + 熟練度ボーナス推定値)");
+        seikuCombo.select(AppConfig.get().getSeikuMethod());
+
         Label sakutekiLabel = new Label(compositeFleetTab, SWT.NONE);
         sakutekiLabel.setText("索敵計算式");
         sakutekiLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
@@ -1075,6 +1086,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setShowCondTimer(showCondTimer.getSelection());
                 AppConfig.get().setShowAkashiTimer(showAkashiTimer.getSelection());
                 AppConfig.get().setAkashiTimerFormat(akashiFormatCombo.getSelectionIndex());
+                AppConfig.get().setSeikuMethod(seikuCombo.getSelectionIndex());
                 if (useRecommendedSakuteki.getSelection()) {
                     AppConfig.get().setUseRecommendedSakuteki(true);
                 }

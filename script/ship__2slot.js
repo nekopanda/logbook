@@ -1,5 +1,6 @@
-load("script/utils.js");
+﻿load("script/utils.js");
 HpString = Java.type("logbook.gui.logic.HpString");
+SeikuString= Java.type("logbook.gui.logic.SeikuString");
 SakutekiString = Java.type("logbook.gui.logic.SakutekiString");
 
 function header() {
@@ -41,7 +42,7 @@ function body(ship) {
 	}
 
 	return toComparable([
-					ship.seiku,
+					new SeikuString(ship),
 					new SakutekiString(ship),
 					slotNames[0],
 					onSlotString[0],
