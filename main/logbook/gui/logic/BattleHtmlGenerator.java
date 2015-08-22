@@ -176,24 +176,15 @@ public class BattleHtmlGenerator extends HTMLGenerator {
 
         this.end(); // tr
 
-        boolean seikuUnknown = false;
-        int totalSeiku = 0;
         int totalNowHp = 0;
         int totalMaxHp = 0;
 
         for (int i = 0; i < ships.size(); ++i) {
             SHIP ship = ships.get(i);
-            Integer seiku = ship.getSeiku();
+            SeikuString seiku = new SeikuString(ship);
             SakutekiString sakuteki = new SakutekiString(ship);
             int nowhp = hp[0][i];
             int maxhp = hp[1][i];
-
-            if (seiku == null) {
-                seikuUnknown = true;
-            }
-            else {
-                totalSeiku += seiku;
-            }
 
             totalNowHp += nowhp;
             totalMaxHp += maxhp;
@@ -210,7 +201,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                 this.inline("td", "", null);
             }
 
-            this.inline("td", (seiku == null) ? "?" : String.valueOf(seiku), null);
+            this.inline("td", seiku.toString(), null);
             this.inline("td", sakuteki.toString(), null);
             this.inline("td", nowhp + "/" + maxhp, null);
 
@@ -242,11 +233,12 @@ public class BattleHtmlGenerator extends HTMLGenerator {
 
         this.begin("tr", null);
 
+        SeikuString totalSeiku = new SeikuString(ships);
         SakutekiString totalSakuteki = new SakutekiString(ships, hqLv);
         this.inline("td", "", null);
         this.inline("td", "合計", null);
         this.inline("td", "", null);
-        this.inline("td", seikuUnknown ? "?" : String.valueOf(totalSeiku), null);
+        this.inline("td", totalSeiku.toString(), null);
         this.inline("td", totalSakuteki.toString(), null);
         this.inline("td", totalNowHp + "/" + totalMaxHp, null);
 

@@ -95,7 +95,7 @@ public class SeikuString implements Comparable<SeikuString> {
     public String toString() {
         int method = AppConfig.get().getSeikuMethod();
         if (this.seikuFailed) {
-            return "<ゲーム画面をリロードしてください>";
+            return "?";
         }
         int total = (int) Math.floor(this.seikuBase + this.seikuBonus);
         switch (method) {
