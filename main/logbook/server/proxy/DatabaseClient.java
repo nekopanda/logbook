@@ -53,7 +53,10 @@ public class DatabaseClient extends Thread {
             "api_req_combined_battle/battle",
             "api_req_combined_battle/midnight_battle",
             "api_req_combined_battle/sp_midnight",
-            "api_req_combined_battle/battleresult"
+            "api_req_combined_battle/battleresult",
+            "api_req_sortie/airbattle",
+            "api_req_combined_battle/battle_water",
+            "api_req_combined_battle/sp_midnight"
     };
 
     private static class QueueItem {
