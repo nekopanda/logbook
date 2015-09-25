@@ -663,7 +663,7 @@ public class Ship {
     public static int getCharId(ShipInfoDto shipinfo) {
         int charId = shipinfo.getShipId();
         int afterShipId = shipinfo.getAftershipid();
-        while (afterShipId != 0) {
+        while ((afterShipId != 0) && (afterShipId != 466)) {
             charId = afterShipId;
             afterShipId = Ship.get(String.valueOf(afterShipId)).getAftershipid();
         }
