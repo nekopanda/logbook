@@ -14,10 +14,23 @@ import logbook.dto.ShipBaseDto;
  *
  */
 public class SeikuString implements Comparable<SeikuString> {
+
+    private static int[][] alevelBonusTable = new int[][] {
+            { 0, 0, 2, 5, 9, 14, 14, 22 }, // 艦上戦闘機
+            { 0, 0, 0, 0, 0, 0, 0, 0 }, // 艦上爆撃機、艦上攻撃機
+            { 0, 0, 1, 1, 1, 3, 3, 6 }, // 水上爆撃機
+    };
+
+    private static int[] internalAlevelTable = new int[] {
+            0, 10, 25, 40, 55, 70, 85, 100, 121
+    };
+
     // 従来の数値
-    private double seikuBase;
-    // 熟練度によるボーナス
-    private double seikuBonus;
+    private int seikuBase;
+    // 熟練度ボーナス込み
+    private int seikuToalMin;
+    private int seikuToalMid;
+    private int seikuTotalMax;
 
     // 情報が不足してて計算できなかった
     private boolean seikuFailed = false;
@@ -32,8 +45,8 @@ public class SeikuString implements Comparable<SeikuString> {
         this.add(ship);
     }
 
-    private static double calcBonusSeiku(double factor, int alv) {
-        return factor * ((0.3 * alv * alv) + (1.5 * alv));
+    private static double calcBonusSeiku(int type, int alv, double internal) {
+        return alevelBonusTable[type][alv] + Math.sqrt(internal / 10);
     }
 
     private void add(ShipBaseDto ship) {
@@ -41,53 +54,70 @@ public class SeikuString implements Comparable<SeikuString> {
         for (int i = 0; i < items.size(); i++) {
             ItemDto item = items.get(i);
             if (item != null) {
+                int type;
                 switch (item.getType2()) {
                 case 6: // 艦上戦闘機
+                    type = 0;
+                    break;
                 case 7: // 艦上爆撃機
                 case 8: // 艦上攻撃機
+                    type = 1;
+                    break;
                 case 11: // 瑞雲系の水上偵察機
+                    type = 2;
+                    break;
+                default:
+                    type = -1;
+                    break;
+                }
 
+                if (type != -1) {
                     // スロット数が分からないと計算できない
                     if (ship.getOnSlot() == null) {
                         this.seikuFailed = true;
                         return;
                     }
 
-                    // 基本制空値
-                    this.seikuBase += item.getParam().getTyku() * Math.sqrt(ship.getOnSlot()[i]);
+                    double basePart = item.getParam().getTyku() * Math.sqrt(ship.getOnSlot()[i]);
 
-                    switch (item.getType2()) {
-                    case 6: // 艦上戦闘機
-                        this.seikuBonus += calcBonusSeiku(1, item.getAlv());
-                        break;
-                    case 7: // 艦上爆撃機
-                    case 8: // 艦上攻撃機
-                    case 11: // 瑞雲系の水上偵察機
-                        if (item.getParam().getTaiku() > 0) {
-                            this.seikuBonus += calcBonusSeiku(0.16, item.getAlv());
-                        }
-                        else {
-                            this.seikuBonus += calcBonusSeiku(0.12, item.getAlv());
-                        }
-                        break;
-                    }
+                    double ialvMin = internalAlevelTable[item.getAlv()];
+                    double ialvMax = internalAlevelTable[item.getAlv() + 1] - 1;
+                    double ialvMid = (ialvMin + ialvMax) / 2;
 
-                    break;
+                    double totalMin = basePart + calcBonusSeiku(type, item.getAlv(), ialvMin);
+                    double totalMid = basePart + calcBonusSeiku(type, item.getAlv(), ialvMid);
+                    double totalMax = basePart + calcBonusSeiku(type, item.getAlv(), ialvMax);
+
+                    this.seikuBase += (int) Math.floor(basePart);
+                    this.seikuToalMin += (int) Math.floor(totalMin);
+                    this.seikuToalMid += (int) Math.floor(totalMid);
+                    this.seikuTotalMax += (int) Math.floor(totalMax);
                 }
             }
         }
     }
 
-    public double getValue() {
+    public int getValue() {
         int method = AppConfig.get().getSeikuMethod();
         switch (method) {
         case 0:
-            return Math.floor(this.seikuBase);
+            return this.seikuBase;
         case 1:
         case 2:
-            return Math.floor(this.seikuBase + this.seikuBonus);
+        case 3:
+        case 4:
+            return this.seikuToalMid;
         default:
             return 0;
+        }
+    }
+
+    private String seikuTotalString() {
+        if (this.seikuToalMin == this.seikuTotalMax) {
+            return Integer.toString(this.seikuToalMin);
+        }
+        else {
+            return String.format("%d-%d", this.seikuToalMin, this.seikuTotalMax);
         }
     }
 
@@ -97,17 +127,21 @@ public class SeikuString implements Comparable<SeikuString> {
         if (this.seikuFailed) {
             return "?";
         }
-        int total = (int) Math.floor(this.seikuBase + this.seikuBonus);
         switch (method) {
         case 0: // 艦載機素の制空値
-            return Integer.toString((int) Math.floor(this.seikuBase));
-        case 1: // 熟練度込みの制空推定値
-            return Integer.toString(total);
-        case 2: // 熟練度込みの制空推定値(艦載機素の制空値 + 熟練度ボーナス推定値)
-            return String.format("%d (%.1f+%.1f)",
-                    total, this.seikuBase, this.seikuBonus);
+            return Integer.toString(this.seikuBase);
+        case 1: // 制空推定値範囲
+            return this.seikuTotalString();
+        case 2: // 制空推定値範囲(艦載機素の制空値 + 熟練度ボーナス推定値)
+            return String.format("%s (%d+%d)",
+                    this.seikuTotalString(), this.seikuBase, this.seikuToalMid - this.seikuBase);
+        case 3: // 制空推定値中央
+            return Integer.toString(this.seikuToalMid);
+        case 4: // 制空推定値中央(艦載機素の制空値 + 熟練度ボーナス推定値)
+            return String.format("%d (%d+%d)",
+                    this.seikuToalMid, this.seikuBase, this.seikuToalMid - this.seikuBase);
         }
-        return Integer.toString(total);
+        return Integer.toString(this.seikuBase);
     }
 
     @Override

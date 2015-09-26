@@ -409,8 +409,10 @@ public final class ConfigDialog extends Dialog {
         final Combo seikuCombo = new Combo(compositeFleetTab, SWT.READ_ONLY);
         seikuCombo.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
         seikuCombo.add("A.艦載機素の制空値");
-        seikuCombo.add("B.熟練度込みの制空推定値");
-        seikuCombo.add("C.熟練度込みの制空推定値(艦載機素の制空値 + 熟練度ボーナス推定値)");
+        seikuCombo.add("B.制空推定値範囲");
+        seikuCombo.add("C.制空推定値範囲(艦載機素の制空値 + 熟練度ボーナス推定値)");
+        seikuCombo.add("D.制空推定値中央");
+        seikuCombo.add("E.制空推定値中央(艦載機素の制空値 + 熟練度ボーナス推定値)");
         seikuCombo.select(AppConfig.get().getSeikuMethod());
 
         Label sakutekiLabel = new Label(compositeFleetTab, SWT.NONE);
