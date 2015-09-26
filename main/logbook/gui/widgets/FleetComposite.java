@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.CheckForNull;
 
@@ -299,12 +300,14 @@ public class FleetComposite extends Composite {
         AkashiTimer.RepairState repairState = TimerContext.get().getAkashiRepairState(dockIndex);
         List<AkashiTimer.ShipState> repairShips = repairState.isRepairing() ? repairState.get() : null;
         boolean isSortie = GlobalContext.isSortie(dock.getId());
+        Map<Integer, Date> ndockMap = GlobalContext.getNDockCompleteTimeMap();
         DeckMissionDto currentMission = (dockIndex == 0) ? null : GlobalContext.getDeckMissions()[dockIndex - 1];
         DeckMissionDto previousMission = (dockIndex == 0) ? null : GlobalContext.getPreviousMissions()[dockIndex - 1];
         boolean flagshipNeedSupply = false;
         boolean needSupply = false;
         boolean reqSupply = false;
         int lostPlanes = 0;
+        boolean isBathwater = false;
 
         for (int i = 0; i < ships.size(); i++) {
             ShipDto ship = ships.get(i);
@@ -343,9 +346,11 @@ public class FleetComposite extends Composite {
                     lostPlanes += maxeq[c] - onslot[c];
                 }
             }
+            // 入渠中?
+            isBathwater |= ndockMap.containsKey(ship.getId());
 
             // 疲労している艦娘がいる場合メッセージを表示
-            final Date condClearDate = ship.getCondClearTime(condTiming, AppConfig.get().getOkCond());
+            final Date condClearDate = ship.getCondClearTime(condTiming, ndockMap.get(ship.getId()));
             if (this.cond > cond) {
                 this.cond = cond;
                 this.clearDate = new TimeString(condClearDate).toString();
@@ -591,15 +596,8 @@ public class FleetComposite extends Composite {
             //this.bullstLabels[i].getParent().layout();
 
         }
+
         // メッセージを更新する
-        // 入渠中の艦娘を探す
-        boolean isBathwater = false;
-        for (ShipDto shipDto : ships) {
-            if (GlobalContext.isNdock(shipDto)) {
-                isBathwater = true;
-                break;
-            }
-        }
 
         // ドラム缶、大発の合計
         int dram = 0;

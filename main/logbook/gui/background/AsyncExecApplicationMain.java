@@ -447,6 +447,7 @@ public final class AsyncExecApplicationMain extends Thread {
                     this.main.getDeck3time(), this.main.getDeck4time() };
 
             DeckMissionDto[] deckMissions = GlobalContext.getDeckMissions();
+            Map<Integer, Date> ndockMap = GlobalContext.getNDockCompleteTimeMap();
 
             for (int i = 0; i < 4; i++) {
                 String time = "";
@@ -488,7 +489,8 @@ public final class AsyncExecApplicationMain extends Thread {
                         Date condClearTime = null;
                         long condRest = -1;
                         for (ShipDto ship : dock.getShips()) {
-                            Date clearTime = ship.getCondClearTime(condTiming, AppConfig.get().getOkCond());
+                            Date clearTime = ship.getCondClearTime(condTiming,
+                                    ndockMap.get(ship.getId()), AppConfig.get().getOkCond());
                             if (clearTime != null) {
                                 if ((condClearTime == null) || condClearTime.before(clearTime)) {
                                     condClearTime = clearTime;

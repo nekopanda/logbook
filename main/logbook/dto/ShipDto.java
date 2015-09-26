@@ -50,7 +50,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
 
     /** 疲労 */
     @Tag(17)
-    private final int cond;
+    private int cond;
 
     /** 入渠時間 */
     @Tag(18)
@@ -283,6 +283,13 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
+     * @param cond 疲労
+     */
+    public void setCond(int cond) {
+        this.cond = cond;
+    }
+
+    /**
      * 現在の疲労推定値（下限値）
      * @return 現在の疲労推定値（下限値）
      */
@@ -434,19 +441,19 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
      * 疲労が抜けるまでの時間
      * @return 疲労が抜けるまでの時間
      */
-    public Date getCondClearTime(CondTiming timer, int okCond) {
+    public Date getCondClearTime(CondTiming timer, Date ndockCompleteTime, int okCond) {
         if (this.cond >= okCond) {
             return null;
         }
-        return timer.calcCondClearTime(this.cond, okCond);
+        return timer.calcCondClearTime2(ndockCompleteTime, this.cond, okCond);
     }
 
     /**
      * 疲労が抜けるまでの時間
      * @return 疲労が抜けるまでの時間
      */
-    public Date getCondClearTime(CondTiming timer) {
-        return this.getCondClearTime(timer, AppConfig.get().getOkCond());
+    public Date getCondClearTime(CondTiming timer, Date ndockCompleteTime) {
+        return this.getCondClearTime(timer, ndockCompleteTime, AppConfig.get().getOkCond());
     }
 
     /**

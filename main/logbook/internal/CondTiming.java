@@ -94,20 +94,53 @@ public class CondTiming {
     /**
      * 疲労が回復する時刻を計算
      * @param latestCond 最新データの疲労度
-     * @param time 最新データの更新時間
      * @param targetCond 目標疲労度
      * @return 回復する時刻
      */
     public Date calcCondClearTime(int latestCond, int targetCond) {
+        return this.calcCondClearTime(this.from, latestCond, targetCond);
+    }
+
+    /**
+     * 疲労が回復する時刻を計算
+     * @param latestTime 最新データの時間
+     * @param latestCond 最新データの疲労度
+     * @param targetCond 目標疲労度
+     * @return 回復する時刻
+     */
+    public Date calcCondClearTime(Date latestTime, int latestCond, int targetCond) {
         if (latestCond >= targetCond) {
             return null;
         }
         int requiredCycles = (int) Math.ceil((targetCond - latestCond) / 3.0);
         if (this.updateTiming == null) {
-            return new Date((this.from.getTime() + (requiredCycles * COND_CYCLE)) - (COND_CYCLE / 2));
+            return new Date((latestTime.getTime() + (requiredCycles * COND_CYCLE)) - (COND_CYCLE / 2));
         }
-        long next = this.updateTiming.getNext(this.from);
-        return new Date(this.from.getTime() + next + ((requiredCycles - 1) * COND_CYCLE));
+        long next = this.updateTiming.getNext(latestTime);
+        return new Date(latestTime.getTime() + next + ((requiredCycles - 1) * COND_CYCLE));
+    }
+
+    /**
+     * 疲労が回復する時刻を計算（お風呂から上がる時間も考慮）
+     * @param ndockComplete お風呂から上がる時間
+     * @param latestCond 最新データの疲労度
+     * @param targetCond 目標疲労度
+     * @return 回復する時刻
+     */
+    public Date calcCondClearTime2(Date ndockComplete, int latestCond, int targetCond) {
+        Date t1 = this.calcCondClearTime(latestCond, targetCond);
+        if (ndockComplete == null) {
+            // 入渠中でない場合はそのまま
+            return t1;
+        }
+        // お風呂から上がってから回復する時間を計算
+        Date t2 = this.calcCondClearTime(ndockComplete, 40, targetCond);
+        if (t2 == null) {
+            // targetCondが40以下の場合はお風呂から上あがる時間でOK
+            t2 = ndockComplete;
+        }
+        // 早い方を返す
+        return t1.before(t2) ? t1 : t2;
     }
 
     /**
