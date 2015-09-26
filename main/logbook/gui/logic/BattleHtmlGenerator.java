@@ -775,7 +775,8 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                 int[] flarePos = phase.getFlarePos();
                 if (flarePos != null) {
                     if (flarePos[0] != -1) {
-                        flare[0] = this.getShipName(friendShips, flarePos[0] - 1);
+                        int base = phase.getKind().isHougekiSecond() ? 6 : 0;
+                        flare[0] = this.getShipName(friendShips, (flarePos[0] - 1) + base);
                     }
                     if (flarePos[1] != -1) {
                         flare[1] = this.getShipName(enemyShips, flarePos[1] - 1);
