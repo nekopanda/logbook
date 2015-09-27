@@ -85,10 +85,28 @@ public class LauncherWindow extends WindowBase {
     private void createContents() {
         super.createContents(this.parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.TOOL, false);
         this.getShell().setText("ツール");
-        Shell shell = this.getShell();
+        final Shell shell = this.getShell();
         shell.setLayout(new RowLayout(SWT.HORIZONTAL));
 
         this.recreateButtons(AppConfig.get().getToolButtons());
+
+        // 設定右クリックメニュー
+        final MenuItem configButton = new MenuItem(this.getPopupMenu(), SWT.PUSH, 0);
+        configButton.setText("ボタン設定");
+        configButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                final ConfigDialog configDialog = new ConfigDialog(ApplicationMain.main);
+                configDialog.open();
+                shell.getDisplay().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        configDialog.selectPane("ツール");
+                    }
+                });
+            }
+        });
+        new MenuItem(this.getPopupMenu(), SWT.SEPARATOR, 1);
 
         shell.layout();
     }

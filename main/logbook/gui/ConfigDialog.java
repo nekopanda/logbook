@@ -40,7 +40,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -83,10 +82,18 @@ public final class ConfigDialog extends Dialog {
         this.createContents();
         this.shell.open();
         this.shell.layout();
-        Display display = this.getParent().getDisplay();
-        while (!this.shell.isDisposed()) {
-            if (!display.readAndDispatch()) {
-                display.sleep();
+    }
+
+    /**
+     * ペインを選択
+     * @param paneName
+     */
+    public void selectPane(String paneName) {
+        for (TreeItem item : this.tree.getItems()) {
+            if (item.getText().equals(paneName)) {
+                this.tree.setSelection(item);
+                this.selectPane((Composite) item.getData());
+                break;
             }
         }
     }
@@ -1362,6 +1369,14 @@ public final class ConfigDialog extends Dialog {
                 });
     }
 
+    private void selectPane(Composite selected) {
+        for (Control control : this.composite.getChildren()) {
+            LayoutLogic.hide(control, selected != control);
+        }
+        this.composite.layout();
+        this.scrolledComposite.setMinSize(this.composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+    }
+
     /**
      * ツリーをクリックした時に呼び出されるアダプター
      *
@@ -1382,12 +1397,7 @@ public final class ConfigDialog extends Dialog {
         public void widgetSelected(SelectionEvent e) {
             Object data = e.item.getData();
             if (data instanceof Composite) {
-                Composite selected = (Composite) data;
-                for (Control control : this.dialog.composite.getChildren()) {
-                    LayoutLogic.hide(control, selected != control);
-                }
-                this.dialog.composite.layout();
-                this.dialog.scrolledComposite.setMinSize(this.dialog.composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+                this.dialog.selectPane((Composite) data);
             }
         }
     }
