@@ -392,13 +392,15 @@ public class BattleExDto extends AbstractDto {
             int hp = hps[index];
             ShipDto ship = ships.get(index);
             if (hp <= 0) {
-                for (ItemInfoDto item : ship.getItem()) {
+                List<ItemDto> items = new ArrayList<>(ship.getItem2());
+                items.add(ship.getSlotExItem());
+                for (ItemDto item : items) {
                     if (item == null)
                         continue;
-                    if (item.getId() == 42) { //応急修理要員
+                    if (item.getSlotitemId() == 42) { //応急修理要員
                         hps[index] = (int) (ship.getMaxhp() * 0.2);
                         return;
-                    } else if (item.getId() == 43) { //応急修理女神
+                    } else if (item.getSlotitemId() == 43) { //応急修理女神
                         hps[index] = ship.getMaxhp();
                         return;
                     }

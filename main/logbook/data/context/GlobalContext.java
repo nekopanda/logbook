@@ -1115,7 +1115,7 @@ public final class GlobalContext {
                 }
 
                 updateShipParameter.sortieEnd();
-                state = checkDataState();
+                state = checkDataState(endSortie);
 
                 addUpdateLog("母港情報を更新しました");
             }
@@ -2022,12 +2022,6 @@ public final class GlobalContext {
         if (ship != null) {
             // 回復させる
             ship.setNowhp(ship.getMaxhp());
-            /*
-            int estimatedCond = ship.getEstimatedCond(condTiming);
-            if (estimatedCond < 40) {
-                ship.setCond(ship.getCond() + (40 - estimatedCond));
-            }
-            */
             if (ship.getCond() < 40) {
                 ship.setCond(40);
             }
@@ -2512,6 +2506,15 @@ public final class GlobalContext {
      * @return　新しいstate
      */
     private static int checkDataState() {
+        return checkDataState(false);
+    }
+
+    /**
+     * 取得した情報に不完全なものがないかチェック
+     * @param ignoreSlotitem 艦娘の装備データチェックをスキップするか
+     * @return　新しいstate
+     */
+    private static int checkDataState(boolean ignoreSlotitem) {
         if (state == 3) {
             // アカウントが変わった場合はチェックするまでもない
             return state;
@@ -2523,11 +2526,13 @@ public final class GlobalContext {
             }
         }
         // 艦娘の装備IDが全てあるか見る
-        for (ShipDto ship : shipMap.values()) {
-            for (int itemId : ship.getItemId()) {
-                if (itemId != -1) {
-                    if (itemMap.containsKey(itemId) == false) {
-                        return 2;
+        if (!ignoreSlotitem) {
+            for (ShipDto ship : shipMap.values()) {
+                for (int itemId : ship.getItemId()) {
+                    if (itemId != -1) {
+                        if (itemMap.containsKey(itemId) == false) {
+                            return 2;
+                        }
                     }
                 }
             }

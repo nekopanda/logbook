@@ -35,7 +35,6 @@ import logbook.dto.DockDto;
 import logbook.dto.EnemyShipDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.ItemDto;
-import logbook.dto.ItemInfoDto;
 import logbook.dto.LostEntityDto;
 import logbook.dto.MaterialDto;
 import logbook.dto.MissionResultDto;
@@ -337,9 +336,11 @@ public final class CreateReportLogic {
             info.getItems().add(item);
         }
         for (ShipDto ship : GlobalContext.getShipMap().values()) {
-            for (ItemInfoDto item : ship.getItem()) {
+            List<ItemDto> items = new ArrayList<>(ship.getItem2());
+            items.add(ship.getSlotExItem());
+            for (ItemDto item : items) {
                 if (item != null) {
-                    ItemInfo info = itemCountMap.get(item.getId());
+                    ItemInfo info = itemCountMap.get(item.getSlotitemId());
                     if (info != null) {
                         info.getShips().add(ship);
                     }

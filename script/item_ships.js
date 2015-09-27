@@ -7,6 +7,13 @@ function header() {
 
 function begin() { }
 
+function allItems(ship) {
+	var ret = [];
+	for each(var item in ship.item2) ret.push(item);
+	ret.push(ship.slotExItem);
+	return ret;
+}
+
 function body(data) {
 	var slotitemId = data.info.id;
 
@@ -18,7 +25,8 @@ function body(data) {
 		var acounts = {};
 		var itemlv = [];
 		this.count = 0;
-		for each(var item in ship.item2) {
+		
+		for each(var item in allItems(ship)) {
 			if(item == null) continue;
 			if(item.slotitemId == slotitemId) {
 				if(item.level in counts) {

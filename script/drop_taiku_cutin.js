@@ -32,7 +32,10 @@ function body(battle) {
 		p1json.api_kouku.api_stage2.api_air_fire != null)
 	{
 		var air_fire = p1json.api_kouku.api_stage2.api_air_fire;
-		shipName = battle.getDock().getShips().get(air_fire.api_idx.intValue()).getFriendlyName();
+		var idx = air_fire.api_idx.intValue();
+		shipName = (idx >= 6)
+			? battle.getDockCombined().getShips().get(idx - 6).getFriendlyName()
+			: battle.getDock().getShips().get(idx).getFriendlyName();
 		kindName = getCutinName(air_fire.api_kind.intValue());
 	}
 	return toComparable([shipName, kindName]);
