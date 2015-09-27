@@ -467,4 +467,63 @@ public class AppConstants {
     public static final String QUESTTABLE_PREFIX = "quest";
 
     public static final String RESOURCECHAR_PREFIX = "resource";
+
+    /** ウィンドウ名 */
+    public static final String[] WINDOW_NAME_LIST = new String[] {
+            "キャプチャ",
+            "ドロップ報告書",
+            "建造報告書",
+            "開発報告書",
+            "遠征報告書",
+            "遠征一覧",
+            "装備一覧",
+            "艦娘一覧1",
+            "艦娘一覧2",
+            "艦娘一覧3",
+            "艦娘一覧4",
+            "お風呂に入りたい艦娘",
+            "任務一覧",
+            "戦況",
+            "戦況-横",
+            "自軍敵軍パラメータ",
+            "経験値計算機",
+            "演習経験値計算機",
+            "グループエディタ",
+            "資材チャート",
+            "出撃統計",
+            "#1",
+            "#2",
+            "#3",
+            "#4",
+            "ツール"
+    };
+
+    public static final String[] SHORT_WINDOW_NAME_LIST = new String[] {
+            "Cap",
+            "ドロ",
+            "建造",
+            "開発",
+            "遠征",
+            "一覧",
+            "装備",
+            "艦1",
+            "艦2",
+            "艦3",
+            "艦4",
+            "風呂",
+            "任務",
+            "戦況",
+            "戦横",
+            "パラ",
+            "経験",
+            "演習",
+            "グル",
+            "資材",
+            "統計",
+            "#1",
+            "#2",
+            "#3",
+            "#4",
+            "ロー"
+    };
 }

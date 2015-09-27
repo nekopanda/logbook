@@ -8,12 +8,22 @@ import java.io.InputStream;
 import javax.annotation.CheckForNull;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSource;
+import org.eclipse.swt.dnd.DragSourceAdapter;
+import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.DropTargetAdapter;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -30,6 +40,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.TaskBar;
 import org.eclipse.swt.widgets.TaskItem;
 import org.eclipse.wb.swt.SWTResourceManager;
@@ -219,5 +231,117 @@ public final class SwtUtils {
         MessageBox box1 = new MessageBox(parent, SWT.OK | SWT.ICON_INFORMATION);
         box1.setMessage(mes);
         box1.open();
+    }
+
+    public static interface TableDragAndDropListener {
+        String tableItemToString(TableItem item);
+
+        boolean canDragSource(TableItem source);
+
+        TableItem create(Table table, TableItem source, int index);
+
+        void finished(TableItem newItem);
+    }
+
+    /**
+     * テーブルにドラッグ&ドロップによるアイテムの移動機能を追加
+     * @param table
+     * @param createListener 移動先のアイテムを作るハンドラ
+     */
+    public static void addItemDragAndDropMoveSupport(final Table[] tables, final TableDragAndDropListener listener) {
+        // ドラッグ中のオブジェクトを保持（finalにする都合上配列になっているだけでオブジェクトは１つしか持たない）
+        final TableItem[] dragSourceItem = new TableItem[1];
+
+        Transfer[] types = new Transfer[] { TextTransfer.getInstance() };
+
+        for (final Table table : tables) {
+            DragSource source = new DragSource(table, DND.DROP_MOVE);
+            source.setTransfer(types);
+            source.addDragListener(new DragSourceAdapter() {
+                @Override
+                public void dragStart(DragSourceEvent event) {
+                    TableItem[] selection = table.getSelection();
+                    if ((selection.length > 0) && listener.canDragSource(selection[0])) {
+                        event.doit = true;
+                        dragSourceItem[0] = selection[0];
+                    } else {
+                        event.doit = false;
+                    }
+                }
+
+                @Override
+                public void dragSetData(DragSourceEvent event) {
+                    event.data = listener.tableItemToString(dragSourceItem[0]);
+                }
+
+                @Override
+                public void dragFinished(DragSourceEvent event) {
+                    dragSourceItem[0] = null;
+                }
+            });
+        }
+
+        for (final Table table : tables) {
+            DropTarget target = new DropTarget(table, DND.DROP_MOVE);
+            target.setTransfer(types);
+            target.addDropListener(new DropTargetAdapter() {
+                @Override
+                public void dragEnter(DropTargetEvent event) {
+                    if (dragSourceItem[0] == null) {
+                        // 他のアプリからのドロップなどは一切サポートしない
+                        event.detail = DND.DROP_NONE;
+                    }
+                }
+
+                @Override
+                public void dragOver(DropTargetEvent event) {
+                    event.feedback = DND.FEEDBACK_SCROLL;
+                    // event.itemは現在のドロップ先にあるアイテム
+                    if (dragSourceItem[0] != null) {
+                        // 移動先インジケータを表示
+                        TableItem item = (TableItem) event.item;
+                        if (item != null) {
+                            Point pt = table.getDisplay().map(null, table, event.x, event.y);
+                            Rectangle bounds = item.getBounds();
+                            if (pt.y < (bounds.y + (bounds.height / 2))) {
+                                event.feedback |= DND.FEEDBACK_INSERT_BEFORE;
+                            } else {
+                                event.feedback |= DND.FEEDBACK_INSERT_AFTER;
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void drop(DropTargetEvent event) {
+                    if (dragSourceItem[0] != null) {
+                        TableItem sourceItem = dragSourceItem[0];
+                        TableItem targetItem = (TableItem) event.item;
+                        Point pt = table.getDisplay().map(null, table, event.x, event.y);
+                        int index = table.getItemCount();
+                        if (targetItem != null) {
+                            Rectangle bounds = targetItem.getBounds();
+                            TableItem[] items = table.getItems();
+                            for (int i = 0; i < items.length; i++) {
+                                if (items[i] == targetItem) {
+                                    index = i;
+                                    break;
+                                }
+                            }
+                            if (pt.y < (bounds.y + (bounds.height / 2))) {
+                            } else {
+                                index++;
+                            }
+                        }
+
+                        TableItem item = listener.create(table, sourceItem, index);
+                        sourceItem.dispose();
+                        table.redraw();
+
+                        listener.finished(item);
+                    }
+                }
+            });
+        }
     }
 }

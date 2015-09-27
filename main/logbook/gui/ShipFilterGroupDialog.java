@@ -17,6 +17,7 @@ import logbook.constants.AppConstants;
 import logbook.data.Data;
 import logbook.data.DataType;
 import logbook.data.context.GlobalContext;
+import logbook.dto.DockDto;
 import logbook.dto.ShipDto;
 import logbook.gui.logic.ShipGroupListener;
 import logbook.gui.logic.ShipGroupObserver;
@@ -25,6 +26,8 @@ import logbook.gui.logic.TableRowHeader;
 import logbook.internal.CondTiming;
 import logbook.scripting.TableItemCreatorProxy;
 import logbook.util.ReportUtils;
+import logbook.util.SwtUtils;
+import logbook.util.SwtUtils.TableDragAndDropListener;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
@@ -44,10 +47,10 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
@@ -61,7 +64,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
     private Composite sideComposite;
     private Composite mainComposite;
     private Combo shipcombo;
-    private Tree tree;
+    private Table groupTable;
     private Button btnAddShip;
     private Button btnRemoveShip;
 
@@ -112,14 +115,60 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
         btnRemove.addSelectionListener(new RemoveGroupAdapter(this));
         btnRemove.setImage(SWTResourceManager.getImage(ShipFilterGroupDialog.class, AppConstants.R_ICON_DELETE));
 
-        this.tree = new Tree(this.sideComposite, SWT.BORDER);
-        this.tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-        this.tree.addSelectionListener(new TreeSelectionAdapter(this));
+        final Table groupTable = this.groupTable = new Table(this.sideComposite, SWT.BORDER);
+        this.groupTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+        this.groupTable.addSelectionListener(new GroupTableSelectionAdapter(this));
+        final TableColumn groupTableColumn = new TableColumn(this.groupTable, SWT.LEFT);
+        groupTableColumn.setText("グループ");
+        groupTableColumn.setMoveable(false);
+        groupTableColumn.setResizable(false);
+        this.groupTable.setHeaderVisible(false);
+        this.groupTable.addListener(SWT.Resize, new Listener() {
+            @Override
+            public void handleEvent(Event e) {
+                groupTableColumn.setWidth(groupTable.getClientArea().width);
+            }
+        });
+        SwtUtils.addItemDragAndDropMoveSupport(new Table[] { this.groupTable }, new TableDragAndDropListener() {
+
+            @Override
+            public boolean canDragSource(TableItem source) {
+                return true;
+            }
+
+            @Override
+            public TableItem create(Table table, TableItem source, int index) {
+                // 実際のリストを操作
+                List<ShipGroupBean> list = ShipGroupConfig.get().getGroup();
+                GroupProperty prop = (GroupProperty) source.getData();
+                int oldIndex = list.indexOf(prop.getShipGroupBean());
+                list.add(index, prop.getShipGroupBean());
+                list.remove(oldIndex < index ? oldIndex : oldIndex + 1);
+
+                // テーブルアイテム作成
+                TableItem item = new TableItem(groupTable, SWT.NONE, index);
+                prop.setTreeItem(item);
+                item.setText(source.getText());
+                item.setData(prop);
+                return item;
+            }
+
+            @Override
+            public void finished(TableItem newItem) {
+                ShipGroupObserver.listChanged();
+            }
+
+            @Override
+            public String tableItemToString(TableItem item) {
+                return item.getText();
+            }
+
+        });
 
         ShipGroupListBean shipGroupList = ShipGroupConfig.get();
 
         for (ShipGroupBean bean : shipGroupList.getGroup()) {
-            TreeItem groupItem = new TreeItem(this.tree, SWT.NONE);
+            TableItem groupItem = new TableItem(this.groupTable, SWT.NONE);
             //groupItem.setImage(SWTResourceManager
             //        .getImage(ShipFilterGroupDialog.class, AppConstants.R_ICON_FOLDER));
             groupItem.setText(bean.getName());
@@ -168,6 +217,74 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
             }
         });
         this.sashForm.setWeights(new int[] { 2, 5 });
+
+        new MenuItem(this.tablemenu, SWT.SEPARATOR);
+
+        final MenuItem[] addFleetShipItems = new MenuItem[4];
+        for (int i = 1; i <= 4; ++i) {
+            MenuItem addFleetMenu = addFleetShipItems[i - 1] = new MenuItem(this.tablemenu, SWT.NONE);
+            addFleetMenu.setText("第" + i + "艦隊の艦娘を追加");
+            addFleetMenu.addSelectionListener(new AddFleetShipAdapter(this, Integer.toString(i)));
+        }
+
+        this.table.addListener(SWT.MenuDetect, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                for (int i = 1; i <= 4; ++i) {
+                    DockDto dto = GlobalContext.getDock(Integer.toString(i));
+                    addFleetShipItems[i - 1].setEnabled(
+                            (ShipFilterGroupDialog.this.property != null)
+                                    && (dto != null)
+                                    && (dto.getShips().size() > 0));
+                }
+            }
+        });
+
+        SwtUtils.addItemDragAndDropMoveSupport(new Table[] { this.table }, new TableDragAndDropListener() {
+
+            @Override
+            public boolean canDragSource(TableItem source) {
+                // ソート順なし かつ １つのみ選択状態
+                return (ShipFilterGroupDialog.this.property != null) &&
+                        (ShipFilterGroupDialog.this.config.getSortKeys()[0] == null) &&
+                        (ShipFilterGroupDialog.this.table.getSelection().length == 1);
+            }
+
+            @Override
+            public TableItem create(Table table, TableItem source, int index) {
+                // 実際のリストを操作
+                if (ShipFilterGroupDialog.this.property != null) {
+                    Set<Integer> set = ShipFilterGroupDialog.this.property.getShipGroupBean().getShips();
+                    ShipDto ship = (ShipDto) source.getData();
+                    Integer[] origarray = set.toArray(new Integer[0]);
+                    set.clear();
+                    for (int i = 0; i < origarray.length; ++i) {
+                        if (i == index) {
+                            set.add(ship.getId());
+                        }
+                        if (origarray[i] != ship.getId()) {
+                            set.add(origarray[i]);
+                        }
+                    }
+                    set.add(ship.getId()); // 最後に追加する場合
+                }
+                // reloadが走るのでここではダミーを返しておく
+                return source;
+            }
+
+            @Override
+            public void finished(TableItem newItem) {
+                if (ShipFilterGroupDialog.this.property != null) {
+                    ShipGroupObserver.groupShipChanged(ShipFilterGroupDialog.this.property.getShipGroupBean());
+                }
+            }
+
+            @Override
+            public String tableItemToString(TableItem item) {
+                return ((ShipDto) item.getData()).getFullName();
+            }
+
+        });
 
         ShipGroupObserver.addListener(this);
         this.table.addListener(SWT.Dispose, new Listener() {
@@ -355,7 +472,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
 
             ShipGroupBean bean = this.createNewGroup(shipGroupList);
 
-            TreeItem item = new TreeItem(this.dialog.tree, SWT.NONE);
+            TableItem item = new TableItem(this.dialog.groupTable, SWT.NONE);
             //item.setImage(SWTResourceManager.getImage(ShipFilterGroupDialog.class, AppConstants.R_ICON_FOLDER));
             item.setText(bean.getName());
             item.setData(new GroupProperty(bean, item));
@@ -442,7 +559,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
      * ツリーをクリックした時に呼び出されるアダプター
      *
      */
-    private static final class TreeSelectionAdapter extends SelectionAdapter {
+    private static final class GroupTableSelectionAdapter extends SelectionAdapter {
 
         /** ダイアログ */
         private final ShipFilterGroupDialog dialog;
@@ -450,7 +567,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
         /**
          * コンストラクター
          */
-        public TreeSelectionAdapter(ShipFilterGroupDialog dialog) {
+        public GroupTableSelectionAdapter(ShipFilterGroupDialog dialog) {
             this.dialog = dialog;
         }
 
@@ -517,16 +634,73 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
         @Override
         public void widgetSelected(SelectionEvent e) {
             if (this.dialog.property != null) {
-                ShipGroupBean target = this.dialog.property.getShipGroupBean();
+                ShipGroupBean bean = this.dialog.property.getShipGroupBean();
                 TableItem[] items = this.dialog.table.getSelection();
+                List<Integer> ids = new ArrayList<>();
+                List<String> name = new ArrayList<>();
                 for (TableItem tableItem : items) {
-                    String text = tableItem.getText(1);
-                    if (StringUtils.isNumeric(text)) {
-                        int id = Integer.valueOf(text);
-                        target.getShips().remove(id);
+                    ShipDto ship = (ShipDto) tableItem.getData();
+                    ids.add(ship.getId());
+                    name.add(ship.getFriendlyName());
+                }
+                MessageBox box = new MessageBox(this.dialog.shell, SWT.YES | SWT.NO
+                        | SWT.ICON_QUESTION);
+                box.setText("選択した艦娘をグループから除去");
+                box.setMessage("「" + StringUtils.join(name, ",") + "」をグループから除去しますか？");
+
+                if (box.open() == SWT.YES) {
+                    for (Integer id : ids) {
+                        bean.getShips().remove(id);
+                    }
+                    ShipGroupObserver.groupShipChanged(bean);
+                }
+            }
+        }
+    }
+
+    /**
+     * 艦娘を除去するときに呼び出されるアダプター
+     *
+     */
+    private static final class AddFleetShipAdapter extends SelectionAdapter {
+
+        /** ダイアログ */
+        private final ShipFilterGroupDialog dialog;
+
+        private final String fleetid;
+
+        /**
+         * コンストラクター
+         */
+        public AddFleetShipAdapter(ShipFilterGroupDialog dialog, String fleetid) {
+            this.dialog = dialog;
+            this.fleetid = fleetid;
+        }
+
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+            if (this.dialog.property != null) {
+                ShipGroupBean bean = this.dialog.property.getShipGroupBean();
+                DockDto dto = GlobalContext.getDock(this.fleetid);
+                if ((dto != null) && (dto.getShips().size() > 0)) {
+                    List<Integer> ids = new ArrayList<>();
+                    List<String> name = new ArrayList<>();
+                    for (ShipDto ship : dto.getShips()) {
+                        ids.add(ship.getId());
+                        name.add(ship.getFriendlyName());
+                    }
+                    MessageBox box = new MessageBox(this.dialog.shell, SWT.YES | SWT.NO
+                            | SWT.ICON_QUESTION);
+                    box.setText("選択した艦娘をグループに追加");
+                    box.setMessage("「" + StringUtils.join(name, ",") + "」をグループに追加しますか？");
+
+                    if (box.open() == SWT.YES) {
+                        for (Integer id : ids) {
+                            bean.getShips().add(id);
+                        }
+                        ShipGroupObserver.groupShipChanged(bean);
                     }
                 }
-                ShipGroupObserver.groupShipChanged(target);
             }
         }
     }
@@ -541,7 +715,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
         private final ShipGroupBean shipGroup;
 
         /** TreeItem */
-        private final TreeItem item;
+        private TableItem item;
 
         /**
          * コンストラクター
@@ -549,7 +723,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
          * @param shipGroup 所有艦娘のグループ
          * @param item TreeItem
          */
-        public GroupProperty(ShipGroupBean shipGroup, TreeItem item) {
+        public GroupProperty(ShipGroupBean shipGroup, TableItem item) {
             this.shipGroup = shipGroup;
             this.item = item;
         }
@@ -567,8 +741,15 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
          * TreeItemを取得します
          * @return TreeItem
          */
-        public TreeItem getTreeItem() {
+        public TableItem getTreeItem() {
             return this.item;
+        }
+
+        /**
+         * @param item2
+         */
+        public void setTreeItem(TableItem item2) {
+            this.item = item2;
         }
 
         /**

@@ -1,7 +1,9 @@
 package logbook.config.bean;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import logbook.constants.AppConstants;
@@ -347,6 +349,9 @@ public final class AppConfigBean {
     /** TwitterのAccessToken */
     private String twitterToken;
     private String twitterTokenSecret;
+
+    /** ツールウィンドウに表示するボタン設定 */
+    private List<String> toolButtons = new ArrayList<>();
 
     private static RGB cloneRGB(RGB rgb) {
         return new RGB(rgb.red, rgb.green, rgb.blue);
@@ -2015,6 +2020,20 @@ public final class AppConfigBean {
      */
     public void setSeikuMethod(int seikuMethod) {
         this.seikuMethod = seikuMethod;
+    }
+
+    /**
+     * @return toolButtons
+     */
+    public List<String> getToolButtons() {
+        return this.toolButtons;
+    }
+
+    /**
+     * @param toolButtons セットする toolButtons
+     */
+    public void setToolButtons(List<String> toolButtons) {
+        this.toolButtons = toolButtons;
     }
 
 }

@@ -1461,6 +1461,9 @@ public final class ApplicationMain extends WindowBase {
             this.shipTableWindows[i].getMenuItem().setText(menuTitle);
             this.shipTableWindows[i].windowTitleChanged();
         }
+        // ツールウィンドウ
+        this.launcherWindow.configUpdated();
+        // 
         JIntellitypeWrapper.changeSetting(AppConfig.get().getSystemWideHotKey());
         // プロキシサーバ再起動
         ProxyServer.restart();

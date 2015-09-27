@@ -516,12 +516,16 @@ public final class ShipFilterComposite extends Composite {
                 }
             }
         };
+
         for (ShipGroupBean group : ShipGroupConfig.get().getGroup()) {
             Button button = new Button(this.groupCompo, SWT.RADIO);
             button.setText(group.getName());
             button.setData(group);
             button.addSelectionListener(listener);
             button.setMenu(this.switchMenu);
+            if (this.shipTable.getFilter().group == group) {
+                button.setSelection(true);
+            }
             this.groupButtons.add(button);
         }
         this.groupCompo.layout();

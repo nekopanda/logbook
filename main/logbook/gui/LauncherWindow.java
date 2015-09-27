@@ -3,7 +3,14 @@
  */
 package logbook.gui;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import logbook.config.AppConfig;
+import logbook.constants.AppConstants;
 import logbook.gui.logic.WindowListener;
 
 import org.eclipse.swt.SWT;
@@ -23,6 +30,8 @@ import org.eclipse.swt.widgets.Shell;
 public class LauncherWindow extends WindowBase {
 
     private final Shell parent;
+
+    private final List<Button> currentButtons = new ArrayList<>();
 
     /**
      * Create the dialog.
@@ -56,6 +65,20 @@ public class LauncherWindow extends WindowBase {
         return true;
     }
 
+    public static WindowBase[] getWindowList() {
+        WindowBase[] winList = ApplicationMain.main.getWindowList();
+        return Arrays.copyOf(winList, winList.length - 5);
+    }
+
+    public static Map<String, Integer> getWindowKeyMap() {
+        WindowBase[] winList = getWindowList();
+        Map<String, Integer> keyMap = new HashMap<>();
+        for (int i = 0; i < winList.length; i++) {
+            keyMap.put(winList[i].getWindowId(), i);
+        }
+        return keyMap;
+    }
+
     /**
      * Create contents of the dialog.
      */
@@ -65,41 +88,55 @@ public class LauncherWindow extends WindowBase {
         Shell shell = this.getShell();
         shell.setLayout(new RowLayout(SWT.HORIZONTAL));
 
-        WindowBase[] winList = ApplicationMain.main.getWindowList();
-        String[] nameList = new String[] {
-                "Cap",
-                "ドロ",
-                "建造",
-                "開発",
-                "遠征",
-                "一覧",
-                "装備",
-                "艦1",
-                "艦2",
-                "艦3",
-                "艦4",
-                "風呂",
-                "任務",
-                "戦況",
-                "戦横",
-                "パラ",
-                "経験",
-                "演習",
-                "グル",
-                "資材",
-                "統計",
-                "#1",
-                "#2",
-                "#3",
-                "#4",
-                "ロー" // 最後は自分
-        };
+        this.recreateButtons(AppConfig.get().getToolButtons());
 
+        shell.layout();
+    }
+
+    public void configUpdated() {
+        if (this.isWindowInitialized()) {
+            List<String> keys = AppConfig.get().getToolButtons();
+            if (this.isChanged(keys)) {
+                this.recreateButtons(keys);
+                this.getShell().layout();
+            }
+        }
+    }
+
+    private boolean isChanged(List<String> keys) {
+        if (keys.size() != this.currentButtons.size()) {
+            return true;
+        }
+        for (int i = 0; i < keys.size(); ++i) {
+            if (keys.get(i).equals(this.currentButtons.get(i).getData("key")) == false) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void recreateButtons(List<String> toolButtons) {
+        Shell shell = this.getShell();
+
+        // ボタンを削除
+        for (Button button : this.currentButtons) {
+            WindowBase win = (WindowBase) button.getData("window");
+            win.removeWindowListener((WindowListener) button.getData("window-listener"));
+            button.setMenu(null);
+            button.dispose();
+        }
+        this.currentButtons.clear();
+
+        // 作成
         RowData rowData = new RowData(40, 30);
-        for (int i = 0; i < (winList.length - 5); i++) {
+        WindowBase[] winList = getWindowList();
+        Map<String, Integer> keyMap = getWindowKeyMap();
+        for (String key : toolButtons) {
+            int i = keyMap.get(key);
             final WindowBase win = winList[i];
             final Button button = new Button(shell, SWT.TOGGLE);
-            button.setText(nameList[i]);
+            this.currentButtons.add(button);
+            button.setText(AppConstants.SHORT_WINDOW_NAME_LIST[i]);
             button.setSelection((win.getShell() != null) ? win.getVisible() : false);
             button.addSelectionListener(new SelectionAdapter() {
                 @Override
@@ -118,7 +155,7 @@ public class LauncherWindow extends WindowBase {
                     }
                 }
             });
-            win.addWindowListener(new WindowListener() {
+            WindowListener winListener = new WindowListener() {
                 @Override
                 public void windowShown() {
                     button.setSelection(true);
@@ -128,13 +165,17 @@ public class LauncherWindow extends WindowBase {
                 public void windowHidden() {
                     button.setSelection(false);
                 }
-            });
+            };
+            win.addWindowListener(winListener);
             // ボタンのサイズを設定
             button.setLayoutData(rowData);
             button.setData("disable-drag-move", true);
-        }
 
-        shell.layout();
+            // 関連データをストア
+            button.setData("key", key);
+            button.setData("window-listener", winListener);
+            button.setData("window", win);
+        }
     }
 
     /**
