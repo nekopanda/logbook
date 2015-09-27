@@ -432,7 +432,6 @@ public abstract class AbstractTableDialog extends WindowBase implements EventLis
             TableRowHeader rowHeader = (TableRowHeader) line[0];
             rowHeader.setNumber(i + 1); // ソート順に関係ない番号
             TableItem item = creator.create(this.table, line, i);
-            item.setData(rowHeader.get()); // TableItemに関連データをセット
         }
         creator.end();
     }
