@@ -16,7 +16,7 @@ public interface ShipItemListener extends TableScriptListener {
      * @param specdiff 「成長の余地を表示」が選択されているか
      * @param filter フィルター
      */
-    public void begin(boolean specdiff, ShipFilterDto filter);
+    public void begin(boolean specdiff, ShipFilterDto filter, int specdisp);
 
     /**
      * 艦娘データに対する拡張表示内容を返します

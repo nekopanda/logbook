@@ -88,7 +88,7 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
 
     @Override
     protected void updateTableBody() {
-        this.body = CreateReportLogic.getShipListBody(false, this.filter);
+        this.body = CreateReportLogic.getShipListBody(0, this.filter);
     }
 
     @Override

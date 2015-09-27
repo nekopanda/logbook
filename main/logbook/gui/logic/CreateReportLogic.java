@@ -385,12 +385,12 @@ public final class CreateReportLogic {
      * @param filter 鍵付きのみ
      * @return 内容
      */
-    public static List<Comparable[]> getShipListBody(boolean specdiff, ShipFilterDto filter) {
+    public static List<Comparable[]> getShipListBody(int specdisp, ShipFilterDto filter) {
         //ApplicationMain.sysPrint("ShipListBody Start");
         Set<Integer> missionSet = GlobalContext.getMissionShipSet();
         List<Comparable[]> body = new ArrayList<Comparable[]>();
         ShipItemListener script = ShipItemProxy.get();
-        script.begin(specdiff, filter);
+        script.begin(specdisp == 0, filter, specdisp);
         for (ShipDto ship : GlobalContext.getShipMap().values()) {
             if ((filter != null) && !shipFilter(ship, filter, missionSet)) {
                 continue;

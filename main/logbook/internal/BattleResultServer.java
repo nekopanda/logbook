@@ -336,7 +336,7 @@ public class BattleResultServer {
             if (battle.isDropShip() || battle.isDropItem()) {
                 this.dropShipList.add(dropName);
             }
-            this.mapList.add(new IntegerPair(map[0], map[1], "-"));
+            this.mapList.add(new IntegerPair(map[0], map[1], "%d-%d"));
             this.cellList.add(map[2]);
         }
     }
@@ -422,7 +422,7 @@ public class BattleResultServer {
                 return false;
             }
             int[] battleMap = dto.getMapCell().getMap();
-            if (filter.map.compareTo(new IntegerPair(battleMap[0], battleMap[1], "-")) != 0) {
+            if (filter.map.compareTo(new IntegerPair(battleMap[0], battleMap[1], "%d-%d")) != 0) {
                 return false;
             }
         }

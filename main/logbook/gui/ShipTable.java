@@ -52,6 +52,9 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
     /** 成長余地 */
     private boolean specdiff = false;
 
+    /** 装備上昇分分離 */
+    private boolean specseparate = false;
+
     /** フィルター */
     private ShipFilterDto filter = null;
 
@@ -59,6 +62,8 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
 
     private MenuItem switchdiff;
     private MenuItem switchdiff2;
+    private MenuItem switchseparate;
+    private MenuItem switchseparate2;
     private MenuItem addGroupCascade;
     private MenuItem removeGroupCascade;
     private FilterMenu filterMenu;
@@ -125,6 +130,12 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
                 ShipTable.this.switchSpecDiff((MenuItem) e.getSource());
             }
         };
+        SelectionListener switchSeparateListener = new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                ShipTable.this.switchSpecSeparate((MenuItem) e.getSource());
+            }
+        };
 
         this.table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         // メニューバーに追加する
@@ -136,6 +147,10 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
         this.switchdiff.setText("成長の余地を表示");
         this.switchdiff.setSelection(this.specdiff);
         this.switchdiff.addSelectionListener(switchDiffListener);
+        this.switchseparate = new MenuItem(this.opemenu, SWT.CHECK);
+        this.switchseparate.setText("装備上昇分を分離表示");
+        this.switchseparate.setSelection(this.specseparate);
+        this.switchseparate.addSelectionListener(switchSeparateListener);
 
         if (!this.isNoMenubar()) {
             // セパレータ
@@ -145,6 +160,10 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
             this.switchdiff2.setText("成長の余地を表示");
             this.switchdiff2.setSelection(this.specdiff);
             this.switchdiff2.addSelectionListener(switchDiffListener);
+            this.switchseparate2 = new MenuItem(this.tablemenu, SWT.CHECK);
+            this.switchseparate2.setText("装備上昇分を分離表示");
+            this.switchseparate2.setSelection(this.specseparate);
+            this.switchseparate2.addSelectionListener(switchSeparateListener);
         }
 
         // セパレータ
@@ -229,12 +248,26 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
         return panelConfigs[this.index];
     }
 
-    private void switchSpecDiff(MenuItem source) {
-        this.specdiff = source.getSelection();
+    private void updateSpecMenuState() {
         this.switchdiff.setSelection(this.specdiff);
+        this.switchseparate.setSelection(this.specseparate);
         if (this.switchdiff2 != null) {
             this.switchdiff2.setSelection(this.specdiff);
+            this.switchseparate2.setSelection(this.specseparate);
         }
+    }
+
+    private void switchSpecDiff(MenuItem source) {
+        this.specdiff = source.getSelection();
+        this.specseparate = false;
+        this.updateSpecMenuState();
+        this.reloadTable();
+    }
+
+    private void switchSpecSeparate(MenuItem source) {
+        this.specdiff = false;
+        this.specseparate = source.getSelection();
+        this.updateSpecMenuState();
         this.reloadTable();
     }
 
@@ -273,7 +306,8 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
 
     @Override
     protected void updateTableBody() {
-        this.body = CreateReportLogic.getShipListBody(this.specdiff, this.filter);
+        int specdisp = this.specseparate ? 2 : this.specdiff ? 1 : 0;
+        this.body = CreateReportLogic.getShipListBody(specdisp, this.filter);
     }
 
     @Override

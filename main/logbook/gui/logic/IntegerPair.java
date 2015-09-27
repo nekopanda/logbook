@@ -8,19 +8,19 @@ package logbook.gui.logic;
  * @author Nekopanda
  */
 public class IntegerPair implements Comparable<IntegerPair> {
-    private final int now;
-    private final int max;
-    private final String separator;
+    protected final int now;
+    protected final int max;
+    protected final String format;
 
-    public IntegerPair(int now, int max, String separator) {
+    public IntegerPair(int now, int max, String format) {
         this.now = now;
         this.max = max;
-        this.separator = separator;
+        this.format = format;
     }
 
     @Override
     public String toString() {
-        return String.valueOf(this.now) + this.separator + String.valueOf(this.max);
+        return String.format(this.format, this.now, this.max);
     }
 
     @Override

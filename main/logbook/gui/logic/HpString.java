@@ -10,7 +10,7 @@ package logbook.gui.logic;
 public class HpString extends IntegerPair {
 
     public HpString(int now, int max) {
-        super(now, max, "/");
+        super(now, max, "%d/%d");
     }
 
 }

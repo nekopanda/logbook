@@ -41,11 +41,11 @@ public class ShipItemProxy implements ShipItemListener {
     }
 
     @Override
-    public void begin(final boolean specdiff, final ShipFilterDto filter) {
+    public void begin(final boolean specdiff, final ShipFilterDto filter, final int specdisp) {
         this.script.invoke(new MethodInvoke() {
             @Override
             public Object invoke(Object arg) {
-                ((ShipItemListener) arg).begin(specdiff, filter);
+                ((ShipItemListener) arg).begin(specdiff, filter, specdisp);
                 return null;
             }
         });
