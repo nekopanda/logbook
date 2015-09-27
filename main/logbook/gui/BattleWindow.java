@@ -11,6 +11,7 @@ import logbook.constants.AppConstants;
 import logbook.dto.AirBattleDto;
 import logbook.dto.BattleAtackDto;
 import logbook.dto.BattleExDto;
+import logbook.dto.BattlePhaseKind;
 import logbook.dto.DockDto;
 import logbook.dto.ResultRank;
 import logbook.dto.ShipDto;
@@ -275,10 +276,14 @@ public class BattleWindow extends BattleWindowBase {
         int airDamage = 0;
         for (int i = 0; i < this.yDamages.length; ++i)
             this.yDamages[i] = 0;
-        if (phase1 != null)
+
+        // 連合艦隊夜戦の場合、MVP計算時、昼戦は考慮しない
+        if ((phase1 != null) && (lastPhase.getKind() != BattlePhaseKind.COMBINED_MIDNIGHT))
             airDamage += this.computeDamages(this.friendDamages[0], this.enemyDamages[0], this.yDamages, phase1);
+
         if (phase2 != null)
             airDamage += this.computeDamages(this.friendDamages[1], this.enemyDamages[1], this.yDamages, phase2);
+
         MVPShip[] mvp1 = this.computeMVP(Arrays.copyOf(this.yDamages, friendShips.size()), friendShips);
         MVPShip[] mvp2 = battle.isCombined() ? this.computeMVP(
                 Arrays.copyOfRange(this.yDamages, 6, 6 + friendShipsCombined.size()), friendShipsCombined) : null;
