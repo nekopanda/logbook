@@ -11,6 +11,7 @@ load("script/ScriptData.js");
 data_prefix = "questStateEx_";
 
 Calendar = Java.type("java.util.Calendar");
+TimeZone = Java.type("java.util.TimeZone");
 importPackage(Packages.logbook.data);
 ApplicationMain = Java.type("logbook.gui.ApplicationMain");
 System = Java.type("java.lang.System");
@@ -21,7 +22,7 @@ function update(type, data){
 		//任務
 		case DataType.QUEST_LIST:
 			updateCheck();
-			var questLastUpdateTime = Calendar.getInstance();
+			var questLastUpdateTime = Calendar.getInstance(TimeZone.getTimeZone("Asia/Tokyo"));
 			if(json.api_data.api_list[0] != null) {
 				//仕様変更で無限ループ起こると怖いので（起こってもいいなら↓でも良い）
 				//for(var i = 0;parseInt(json.api_data.api_list[i]) == -1;i++){
@@ -349,7 +350,7 @@ function updateCheck() {
 	//最初は絶対null取得する…はず（それをフラグにして初期化）
 	var questLastUpdateTime = getData("questLastUpdateTime");
 	if (questLastUpdateTime != null) {
-		var nowTime = Calendar.getInstance();
+		var nowTime = Calendar.getInstance(TimeZone.getTimeZone("Asia/Tokyo"));
 		//5時間マイナスして、0時に更新したように見せる
 		nowTime.add(Calendar.HOUR_OF_DAY, -5);
 		questLastUpdateTime.add(Calendar.HOUR_OF_DAY, - 5);
