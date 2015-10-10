@@ -1293,9 +1293,14 @@ public final class GlobalContext {
             addUpdateLog("海戦結果を更新しました");
 
             // ドロップを表示
-            if ((battle != null) && (battle.isDropShip() || battle.isDropItem())) {
+            if (battle != null) {
                 if (AppConfig.get().isPrintDropLog()) {
-                    addConsole(battle.getDropName() + "がドロップしました");
+                    if (battle.isDropShip()) {
+                        addConsole(battle.getDropName() + "がドロップしました");
+                    }
+                    if (battle.isDropItem()) {
+                        addConsole(battle.getDropItemName() + "がドロップしました");
+                    }
                 }
             }
         } catch (Exception e) {
