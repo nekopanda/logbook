@@ -870,6 +870,15 @@ public class BattleExDto extends AbstractDto {
             }
             this.readResultJson(JsonUtils.fromString(this.resultJson));
         }
+        else {
+            // 旧バージョンのログに対応
+            // ドロップの"アイテム"をdropItemNameに移動させる
+            if (this.dropItem && !this.dropShip && StringUtils.isEmpty(this.dropItemName)) {
+                this.dropItemName = this.dropName;
+                this.dropName = "";
+                this.dropType = "";
+            }
+        }
     }
 
     /**

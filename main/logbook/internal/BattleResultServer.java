@@ -37,6 +37,7 @@ import logbook.util.ReportUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.widgets.Display;
 
 import com.dyuproject.protostuff.LinkedBuffer;
@@ -330,10 +331,10 @@ public class BattleResultServer {
             this.lastBattleTime = battleDate;
         }
         if (battle.isPractice() == false) {
-            if (battle.isDropShip()) {
+            if (!StringUtils.isEmpty(battle.getDropName())) {
                 this.dropShipList.add(battle.getDropName());
             }
-            if (battle.isDropItem()) {
+            if (!StringUtils.isEmpty(battle.getDropItemName())) {
                 this.dropShipList.add(battle.getDropItemName());
             }
 
