@@ -122,6 +122,10 @@ public class BattleExDto extends AbstractDto {
     @Tag(46)
     private int dropShipId;
 
+    /** アイテム名 */
+    @Tag(47)
+    private String dropItemName;
+
     /** MVP艦（ゼロ始まりのインデックス） */
     @Tag(25)
     private int mvp;
@@ -1050,20 +1054,21 @@ public class BattleExDto extends AbstractDto {
         this.enemyName = object.getJsonObject("api_enemy_info").getString("api_deck_name");
         this.dropShip = object.containsKey("api_get_ship");
         this.dropItem = object.containsKey("api_get_useitem");
-        if (this.dropShip || this.dropItem) {
-            if (this.dropShip) {
-                JsonObject getShip = object.getJsonObject("api_get_ship");
-                this.dropShipId = getShip.getInt("api_ship_id");
-                this.dropType = getShip.getString("api_ship_type");
-                this.dropName = getShip.getString("api_ship_name");
-            } else {
-                String name = UseItem.get(object.getJsonObject("api_get_useitem").getInt("api_useitem_id"));
-                this.dropType = "アイテム";
-                this.dropName = StringUtils.defaultString(name);
-            }
-        } else {
+        if (this.dropShip) {
+            JsonObject getShip = object.getJsonObject("api_get_ship");
+            this.dropShipId = getShip.getInt("api_ship_id");
+            this.dropType = getShip.getString("api_ship_type");
+            this.dropName = getShip.getString("api_ship_name");
+        }
+        else {
             this.dropType = "";
             this.dropName = "";
+        }
+        if (this.dropItem) {
+            String name = UseItem.get(object.getJsonObject("api_get_useitem").getInt("api_useitem_id"));
+            this.dropItemName = StringUtils.defaultString(name);
+        } else {
+            this.dropItemName = "";
         }
         this.mvp = object.getInt("api_mvp");
         if (JsonUtils.hasKey(object, "api_mvp_combined")) {
@@ -1497,11 +1502,19 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
-     * ドロップ艦・アイテムの名前
+     * ドロップ艦の名前
      * @return dropName
      */
     public String getDropName() {
         return this.dropName;
+    }
+
+    /**
+     * ドロップアイテムの名前
+     * @return dropItemName
+     */
+    public String getDropItemName() {
+        return this.dropItemName;
     }
 
     /**

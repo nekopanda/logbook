@@ -330,12 +330,14 @@ public class BattleResultServer {
             this.lastBattleTime = battleDate;
         }
         if (battle.isPractice() == false) {
-            String dropName = battle.getDropName();
-            int[] map = battle.getMapCell().getMap();
-
-            if (battle.isDropShip() || battle.isDropItem()) {
-                this.dropShipList.add(dropName);
+            if (battle.isDropShip()) {
+                this.dropShipList.add(battle.getDropName());
             }
+            if (battle.isDropItem()) {
+                this.dropShipList.add(battle.getDropItemName());
+            }
+
+            int[] map = battle.getMapCell().getMap();
             this.mapList.add(new IntegerPair(map[0], map[1], "%d-%d"));
             this.cellList.add(map[2]);
         }
@@ -404,7 +406,9 @@ public class BattleResultServer {
         if ((filter.toTime != null) && filter.toTime.before(dto.getBattleDate())) {
             return false;
         }
-        if ((filter.dropShip != null) && (filter.dropShip.equals(dto.getDropName()) == false)) {
+        if ((filter.dropShip != null) &&
+                (filter.dropShip.equals(dto.getDropName()) == false) &&
+                (filter.dropShip.equals(dto.getDropItemName()) == false)) {
             return false;
         }
         if (filter.timeSpan != null) {

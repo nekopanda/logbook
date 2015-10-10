@@ -82,7 +82,7 @@ public final class CreateReportLogic {
      */
     public static String[] getBattleResultHeader() {
         return ArrayUtils.addAll(new String[] {
-                "No.", "日付", "海域", "マス", "出撃", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘" },
+                "No.", "日付", "海域", "マス", "出撃", "ランク", "敵艦隊", "ドロップ艦種", "ドロップ艦娘", "ドロップアイテム" },
                 BattleLogProxy.get().header());
     }
 
@@ -106,7 +106,8 @@ public final class CreateReportLogic {
                     item.getRank(),
                     item.getEnemyName(),
                     item.getDropType(),
-                    item.getScreenDropName() },
+                    item.getScreenDropName(),
+                    item.getDropItemName() },
                     item.getExtData()));
         }
         return body;

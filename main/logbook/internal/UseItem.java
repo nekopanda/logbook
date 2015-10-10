@@ -33,7 +33,11 @@ public class UseItem {
      * @param type ID
      * @return アイテム
      */
-    public static String get(int type) {
-        return USE_ITEM.get(type);
+    public static String get(int id) {
+        MasterData.UseItemInfoDto useItemDto = MasterData.getUseItem(id);
+        if (useItemDto != null) {
+            return useItemDto.getName();
+        }
+        return USE_ITEM.get(id);
     }
 }
