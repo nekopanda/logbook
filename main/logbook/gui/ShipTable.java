@@ -442,6 +442,12 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
         if (this.filter.group == group) {
             this.shell.setText(this.getTitle());
         }
+        int idx = ShipGroupConfig.get().getGroup().indexOf(group);
+        if (idx != -1) {
+            this.filterMenu.updateGroupName(idx, group.getName());
+            this.addGroupCascade.getMenu().getItems()[idx].setText(group.getName());
+            this.removeGroupCascade.getMenu().getItems()[idx].setText(group.getName());
+        }
     }
 
     @Override
@@ -617,6 +623,10 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
                 groupItem.setEnabled(false);
                 this.groupItems.add(groupItem);
             }
+        }
+
+        public void updateGroupName(int idx, String name) {
+            this.groupItems.get(idx).setText(name);
         }
 
         public void applyFilter(ShipFilterDto filter) {

@@ -45,7 +45,7 @@ function begin(specdiff) {
 }
 
 function getPageNumber(index) {
-	return new IntegerPair((index / 10) + 1, (index % 10) + 1, "-");
+	return new IntegerPair((index / 10) + 1, (index % 10) + 1, "%d-%d");
 }
 
 function getSokuryoku(soku) {
