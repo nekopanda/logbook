@@ -3,7 +3,9 @@ package logbook.internal;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import logbook.dto.ShipInfoDto;
@@ -661,9 +663,15 @@ public class Ship {
 
     /** 改造最終艦のID */
     public static int getCharId(ShipInfoDto shipinfo) {
+        Set<Integer> visitedShipIdSet = new HashSet<Integer>();
         int charId = shipinfo.getShipId();
+        visitedShipIdSet.add(charId);
         int afterShipId = shipinfo.getAftershipid();
         while ((afterShipId != 0) && (afterShipId != 466)) {
+            if (visitedShipIdSet.contains(afterShipId))
+                break;
+            else
+                visitedShipIdSet.add(afterShipId);
             charId = afterShipId;
             afterShipId = Ship.get(String.valueOf(afterShipId)).getAftershipid();
         }
