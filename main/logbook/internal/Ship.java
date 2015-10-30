@@ -662,11 +662,13 @@ public class Ship {
     /** 改造最終艦のID */
     public static int getCharId(ShipInfoDto shipinfo) {
         int charId = shipinfo.getShipId();
+
         int afterShipId = shipinfo.getAftershipid();
-        while ((afterShipId != 0) && (afterShipId != 466)) {
+        while ((afterShipId != 0) && (afterShipId != 466) && (afterShipId != 467)) {
             charId = afterShipId;
             afterShipId = Ship.get(String.valueOf(afterShipId)).getAftershipid();
         }
+
         return charId;
     }
 
