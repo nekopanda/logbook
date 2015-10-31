@@ -341,9 +341,12 @@ public class FleetComposite extends Composite {
             int[] maxeq = ship.getMaxeq();
             int[] onslot = ship.getOnSlot();
             List<ItemInfoDto> items = ship.getItem();
-            for (int c = 0; c < items.size(); ++c) {
-                if (items.get(c).isPlane()) {
-                    lostPlanes += maxeq[c] - onslot[c];
+            // 普通はnullにならないが、メンテで艦娘が追加されたあとリロードしていない場合に情報がなくてnullになることがある
+            if (maxeq != null) {
+                for (int c = 0; c < items.size(); ++c) {
+                    if (items.get(c).isPlane()) {
+                        lostPlanes += maxeq[c] - onslot[c];
+                    }
                 }
             }
             // 入渠中?
