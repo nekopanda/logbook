@@ -441,6 +441,7 @@ public final class ResourceChartDialog extends WindowBase {
             }
         } catch (Exception e) {
             image.dispose();
+            image = null;
             LOG.get().warn("グラフの描画で例外が発生しました", e);
         }
         return image;
