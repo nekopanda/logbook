@@ -192,7 +192,7 @@ public final class SwtUtils {
         Font font = SWTResourceManager.getFont(defaultFontName, heightInPoint, defaultFontStyle);
         lbl.setFont(font);
         lbl.setText(text);
-        gd.heightHint = (int) (((heightInPoint * DPI_Y) / 72.0) * lineHeight);
+        //gd.heightHint = (int) (((heightInPoint * DPI_Y) / 72.0) * lineHeight);
         lbl.setLayoutData(gd);
         return gd;
     }

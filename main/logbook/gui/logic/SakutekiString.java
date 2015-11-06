@@ -230,9 +230,6 @@ public class SakutekiString implements Comparable<SakutekiString> {
     public String toString() {
         double base = Math.sqrt(this.totalSakuteki - this.teisatsuSakuteki - this.dentanSakuteki);
         int method = AppConfig.get().getSakutekiMethod();
-        if (AppConfig.get().isUseRecommendedSakuteki()) {
-            method = 1;
-        }
         if ((method != 0) && this.sakutekiFailed) {
             return "<ゲーム画面をリロードしてください>";
         }

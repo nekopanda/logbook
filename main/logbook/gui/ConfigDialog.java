@@ -27,7 +27,6 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -442,11 +441,6 @@ public final class ConfigDialog extends Dialog {
         sakutekiLabel.setText("索敵計算式");
         sakutekiLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
 
-        final Button useRecommendedSakuteki = new Button(compositeFleetTab, SWT.CHECK);
-        useRecommendedSakuteki.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-        useRecommendedSakuteki.setText("推奨計算式を使用する");
-        useRecommendedSakuteki.setSelection(AppConfig.get().isUseRecommendedSakuteki());
-
         final Combo sakutekiCombo = new Combo(compositeFleetTab, SWT.READ_ONLY);
         sakutekiCombo.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
         sakutekiCombo.add("A.艦隊素の索敵値 + 装備の索敵値");
@@ -457,25 +451,6 @@ public final class ConfigDialog extends Dialog {
         sakutekiCombo.add("F.2-5式(旧)(偵察機×2 + 電探 + √(装備込みの艦隊索敵値-偵察機-電探))");
         sakutekiCombo.add("G.装備込みの艦隊索敵値(2-5式(旧))");
         sakutekiCombo.select(AppConfig.get().getSakutekiMethod());
-
-        SelectionListener recommendedSakutekiListener = new SelectionAdapter() {
-            int sakutekiMethod = sakutekiCombo.getSelectionIndex();
-
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (useRecommendedSakuteki.getSelection()) {
-                    this.sakutekiMethod = sakutekiCombo.getSelectionIndex();
-                    sakutekiCombo.select(1);
-                    sakutekiCombo.setEnabled(false);
-                }
-                else {
-                    sakutekiCombo.setEnabled(true);
-                    sakutekiCombo.select(this.sakutekiMethod);
-                }
-            }
-        };
-        recommendedSakutekiListener.widgetSelected(null);
-        useRecommendedSakuteki.addSelectionListener(recommendedSakutekiListener);
 
         Label mainLog = new Label(compositeFleetTab, SWT.NONE);
         mainLog.setText("母港タブのログ");
@@ -1136,13 +1111,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setShowAkashiTimer(showAkashiTimer.getSelection());
                 AppConfig.get().setAkashiTimerFormat(akashiFormatCombo.getSelectionIndex());
                 AppConfig.get().setSeikuMethod(seikuCombo.getSelectionIndex());
-                if (useRecommendedSakuteki.getSelection()) {
-                    AppConfig.get().setUseRecommendedSakuteki(true);
-                }
-                else {
-                    AppConfig.get().setUseRecommendedSakuteki(false);
-                    AppConfig.get().setSakutekiMethod(sakutekiCombo.getSelectionIndex());
-                }
+                AppConfig.get().setSakutekiMethod(sakutekiCombo.getSelectionIndex());
                 // notify
                 AppConfig.get().setOkCond(condSpinner.getSelection());
                 AppConfig.get().setNoticeCondOnlyMainFleet(condOnlyMain.getSelection());
