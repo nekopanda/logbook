@@ -409,6 +409,8 @@ public abstract class AbstractTableDialog extends WindowBase implements EventLis
             col.setText(this.header[i]);
             col.setMoveable(true);
             col.addSelectionListener(listener);
+            col.setData(i); // カラム番号を入れておく
+            col.setToolTipText(this.headerId[i]);
             if (i == 0) {
                 // No.列はソートしない
                 col.setData("unsortable", new Object());
@@ -804,14 +806,7 @@ public abstract class AbstractTableDialog extends WindowBase implements EventLis
      * @param headerColumn ソートするカラム
      */
     protected void sortTableItems(TableColumn headerColumn) {
-        int index = 0;
-        for (int i = 0; i < this.header.length; i++) {
-            if (this.header[i].equals(headerColumn.getText())) {
-                index = i;
-                break;
-            }
-        }
-        this.sortTableItems(index, headerColumn);
+        this.sortTableItems((Integer) headerColumn.getData(), headerColumn);
     }
 
     /**

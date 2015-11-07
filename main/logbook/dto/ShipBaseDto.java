@@ -31,10 +31,10 @@ public abstract class ShipBaseDto extends AbstractDto {
      * 敵艦の場合は 装備ID (slotitem_id)
      */
     @Tag(2)
-    protected final int[] slot;
+    protected int[] slot;
 
     @Tag(3)
-    protected final List<ItemInfoDto> slotItem;
+    protected List<ItemInfoDto> slotItem;
 
     /** 装備込のパラメータ */
     @Tag(4)
@@ -50,7 +50,7 @@ public abstract class ShipBaseDto extends AbstractDto {
 
     /** 装備のロックや改修値情報 */
     @Tag(7)
-    private final List<ItemDto> slotItem2;
+    private List<ItemDto> slotItem2;
 
     /**
      * 艦娘用コンストラクター
@@ -58,16 +58,9 @@ public abstract class ShipBaseDto extends AbstractDto {
      */
     public ShipBaseDto(JsonObject object) {
         int shipId = object.getJsonNumber("api_ship_id").intValue();
-        ShipInfoDto shipinfo = Ship.get(String.valueOf(shipId));
+        ShipInfoDto shipinfo = Ship.get(shipId);
         this.shipInfo = shipinfo;
-        this.slot = JsonUtils.getIntArray(object, "api_slot");
-        this.slotItem2 = createItemDtoList(this.slot);
-        this.slotItem = new ArrayList<ItemInfoDto>();
-        for (ItemDto dto : this.slotItem2) {
-            if (dto != null) {
-                this.slotItem.add(dto.getInfo());
-            }
-        }
+        this.setSlotFromJson(object);
         ShipParameters[] params = ShipParameters.fromShip(object, this.getItem(), shipinfo);
         this.param = params[0];
         this.max = params[1];
@@ -131,6 +124,21 @@ public abstract class ShipBaseDto extends AbstractDto {
             }
         }
         return items;
+    }
+
+    /**
+     * 装備を設定
+     * @param object
+     */
+    public void setSlotFromJson(JsonObject object) {
+        this.slot = JsonUtils.getIntArray(object, "api_slot");
+        this.slotItem2 = createItemDtoList(this.slot);
+        this.slotItem = new ArrayList<ItemInfoDto>();
+        for (ItemDto dto : this.slotItem2) {
+            if (dto != null) {
+                this.slotItem.add(dto.getInfo());
+            }
+        }
     }
 
     public boolean isFriend() {

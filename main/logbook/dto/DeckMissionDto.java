@@ -1,11 +1,14 @@
 package logbook.dto;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import logbook.internal.Deck;
 import logbook.internal.MasterData;
 import logbook.scripting.ScriptData;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * 遠征を表します
@@ -48,7 +51,7 @@ public final class DeckMissionDto extends AbstractDto {
     /**
      * コンストラクター
      */
-    public DeckMissionDto(String name, int missionId, Date time, int fleetid, List<Integer> ships) {
+    public DeckMissionDto(String name, int missionId, Date time, int fleetid, int[] ships) {
         this.name = name;
         this.missionId = missionId;
         String missionName = MasterData.getMaster().getMissionName(missionId);
@@ -58,7 +61,7 @@ public final class DeckMissionDto extends AbstractDto {
         this.mission = missionName;
         this.time = time;
         this.fleetid = fleetid;
-        this.ships = ships;
+        this.ships = Arrays.asList(ArrayUtils.toObject(ships));
     }
 
     public String getDisplayText(String parameter) {

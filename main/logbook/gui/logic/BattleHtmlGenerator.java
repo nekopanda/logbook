@@ -20,6 +20,8 @@ import logbook.dto.ItemDto;
 import logbook.dto.ShipBaseDto;
 import logbook.dto.ShipDto;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * @author Nekopanda
  *
@@ -948,7 +950,11 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         }
         this.begin("tr", null);
         this.inline("td", "ドロップ", null);
-        this.inline("td", (detail.isDropShip() || detail.isDropItem()) ? detail.getDropName() : "なし", null);
+        String dropText = StringUtils.join(
+                detail.getDropName(),
+                (detail.isDropShip() && detail.isDropItem()) ? "," : null,
+                detail.getDropItemName());
+        this.inline("td", StringUtils.isEmpty(dropText) ? "なし" : dropText, null);
         this.end(); // tr
         this.end(); // table
     }

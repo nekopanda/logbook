@@ -203,4 +203,19 @@ public final class DockDto extends AbstractDto {
 
         return numRepairShips;
     }
+
+    /**
+     * 泊地修理可能な編成か
+     * @return
+     */
+    public boolean isAkashiRepairEnabled() {
+        int akashiCapacity = this.getAkashiCapacity();
+        for (int p = 0; p < this.ships.size(); ++p) {
+            ShipDto ship = this.ships.get(p);
+            if ((p < akashiCapacity) && !ship.isHalfDamage() && (ship.getNowhp() != ship.getMaxhp())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

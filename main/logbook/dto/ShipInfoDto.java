@@ -27,6 +27,10 @@ public final class ShipInfoDto extends AbstractDto {
     @Tag(1)
     private int shipId;
 
+    @Tag(30)
+    /** 初期艦のID */
+    private int charId;
+
     /** 図鑑番号 */
     @Tag(25)
     private int sortNo;
@@ -42,6 +46,10 @@ public final class ShipInfoDto extends AbstractDto {
     /** 改造後の艦 */
     @Tag(6)
     private int aftershipid;
+
+    /** 改造前の艦 */
+    @Tag(31)
+    private int[] beforeshpids;
 
     /** flagshipもしくはelite (敵艦のみ) */
     @Tag(7)
@@ -77,6 +85,9 @@ public final class ShipInfoDto extends AbstractDto {
 
     @Tag(20)
     private String json;
+
+    // 探索用
+    private transient Object data = null;
 
     /**
      * コンストラクター
@@ -181,6 +192,20 @@ public final class ShipInfoDto extends AbstractDto {
     }
 
     /**
+     * @return charId
+     */
+    public int getCharId() {
+        return this.charId;
+    }
+
+    /**
+     * @param charId セットする charId
+     */
+    public void setCharId(int charId) {
+        this.charId = charId;
+    }
+
+    /**
      * 改レベルを設定します。
      * @param afterlv 改レベル
      */
@@ -193,6 +218,20 @@ public final class ShipInfoDto extends AbstractDto {
      */
     public void setAftershipid(int aftershipid) {
         this.aftershipid = aftershipid;
+    }
+
+    /**
+     * @return beforeshpids
+     */
+    public int[] getBeforeshpids() {
+        return beforeshpids;
+    }
+
+    /**
+     * @param beforeshpids セットする beforeshpids
+     */
+    public void setBeforeshpids(int[] beforeshpids) {
+        this.beforeshpids = beforeshpids;
     }
 
     /**
@@ -396,5 +435,19 @@ public final class ShipInfoDto extends AbstractDto {
      */
     public boolean isEnemy() {
         return this.shipId > 500;
+    }
+
+    /**
+     * @return data
+     */
+    public Object getData() {
+        return this.data;
+    }
+
+    /**
+     * @param data セットする data
+     */
+    public void setData(Object data) {
+        this.data = data;
     }
 }

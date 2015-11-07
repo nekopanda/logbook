@@ -13,6 +13,8 @@ public enum DataType {
     CHARGE("/kcsapi/api_req_hokyu/charge"),
     /** 編成 */
     CHANGE("/kcsapi/api_req_hensei/change"),
+    /** プリセット展開 */
+    PRESET_SELECT("/kcsapi/api_req_hensei/preset_select"),
     /** 母港 */
     PORT("/kcsapi/api_port/port"),
     /** 保有艦 */
@@ -73,6 +75,8 @@ public enum DataType {
     DESTROY_ITEM2("/kcsapi/api_req_kousyou/destroyitem2"),
     /** 近代化改修 */
     POWERUP("/kcsapi/api_req_kaisou/powerup"),
+    /** 装備位置交換 */
+    SLOT_EXCHANGE_INDEX("/kcsapi/api_req_kaisou/slot_exchange_index"),
     /** 艦娘のロック操作 */
     LOCK_SHIP("/kcsapi/api_req_hensei/lock"),
     /** 装備ロック操作 */

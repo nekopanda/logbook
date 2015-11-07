@@ -131,7 +131,7 @@ public class BattleShipWindow extends BattleWindowBase {
                 if (shpid == -1)
                     return;
 
-                shipinfo = Ship.get(String.valueOf(shpid));
+                shipinfo = Ship.get(shpid);
                 if (shipinfo == null)
                     return;
 
@@ -387,7 +387,7 @@ public class BattleShipWindow extends BattleWindowBase {
             int[] ships = enemyData.getEnemyShipsId();
             for (int i = 0; i < 6; ++i) {
                 if (ships[i] != -1) {
-                    ShipInfoDto shipinfo = Ship.get(String.valueOf(ships[i]));
+                    ShipInfoDto shipinfo = Ship.get(ships[i]);
                     if (shipinfo != null) {
                         this.enemyLabels[i].setText(String.valueOf(i + 1) + "." + shipinfo.getFullName());
                     }

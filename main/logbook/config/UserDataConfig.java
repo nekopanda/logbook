@@ -2,6 +2,7 @@ package logbook.config;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import logbook.constants.AppConstants;
@@ -26,6 +27,8 @@ public class UserDataConfig {
 
     private CondTiming.TimeSpan condTiming;
 
+    private Date akashiStartTime;
+
     /**
      * ユーザーゲームデータをファイルに書き込みます
      */
@@ -34,6 +37,7 @@ public class UserDataConfig {
         config.items = new ArrayList<ItemDto>(GlobalContext.getItemMap().values());
         config.previousMissions = GlobalContext.getPreviousMissions();
         config.condTiming = GlobalContext.getCondTiming().getUpdateTiming();
+        config.akashiStartTime = GlobalContext.getAkashiTimer().getStartTime();
         BeanUtils.writeObject(AppConstants.USER_DATA_CONFIG, config);
     }
 
@@ -94,5 +98,19 @@ public class UserDataConfig {
      */
     public void setCondTiming(CondTiming.TimeSpan condTiming) {
         this.condTiming = condTiming;
+    }
+
+    /**
+     * @return akashiStartTime
+     */
+    public Date getAkashiStartTime() {
+        return akashiStartTime;
+    }
+
+    /**
+     * @param akashiStartTime セットする akashiStartTime
+     */
+    public void setAkashiStartTime(Date akashiStartTime) {
+        this.akashiStartTime = akashiStartTime;
     }
 }

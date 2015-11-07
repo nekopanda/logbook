@@ -1,14 +1,10 @@
 package logbook.dto;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import javax.json.JsonObject;
-
 import logbook.constants.AppConstants;
-import logbook.internal.UseItem;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -44,48 +40,14 @@ public class BattleResultDto extends AbstractDto {
     /** 艦名 */
     private final String dropName;
 
+    /** アイテム名 */
+    private final String dropItemName;
+
     /** 母港の空きがない？ */
     private final boolean noSpaceForShip;
 
     /** スクリプトサポート */
     private final Comparable[] extData;
-
-    /**
-     * コンストラクター
-     * もう使われていない
-     * @param object JSON Object
-     * @param mapCellNo マップ上のマス
-     * @param mapBossCellNo　ボスマス
-     * @param eventId EventId
-     * @param isStart 出撃
-     * @param battle 戦闘
-     */
-    public BattleResultDto(JsonObject object, MapCellDto mapCell, BattleDto battle) {
-
-        this.battleDate = Calendar.getInstance().getTime();
-        this.questName = object.getString("api_quest_name");
-        this.rank = ResultRank.fromRank(object.getString("api_win_rank"));
-        this.mapCell = mapCell;
-        this.enemyName = object.getJsonObject("api_enemy_info").getString("api_deck_name");
-        this.dropShip = object.containsKey("api_get_ship");
-        this.dropItem = object.containsKey("api_get_useitem");
-        if (this.dropShip || this.dropItem) {
-            if (this.dropShip) {
-                this.dropType = object.getJsonObject("api_get_ship").getString("api_ship_type");
-                this.dropName = object.getJsonObject("api_get_ship").getString("api_ship_name");
-            } else {
-                String name = UseItem.get(object.getJsonObject("api_get_ship").getInt("api_useitem_id"));
-                this.dropType = "アイテム";
-                this.dropName = StringUtils.defaultString(name);
-            }
-        } else {
-            this.dropType = "";
-            this.dropName = "";
-        }
-
-        this.noSpaceForShip = false;
-        this.extData = null;
-    }
 
     public BattleResultDto(BattleExDto dto, Comparable[] extData) {
         this.battleDate = dto.getBattleDate();
@@ -97,6 +59,7 @@ public class BattleResultDto extends AbstractDto {
         this.dropItem = dto.isDropItem();
         this.dropType = dto.getDropType();
         this.dropName = dto.getDropName();
+        this.dropItemName = dto.getDropItemName();
         this.noSpaceForShip = (dto.getExVersion() >= 1) && (dto.getShipSpace() == 0);
         this.extData = extData;
     }
@@ -233,6 +196,14 @@ public class BattleResultDto extends AbstractDto {
             return "※空きなし";
         }
         return this.dropName;
+    }
+
+    /**
+     * アイテム名を取得します。
+     * @return 艦名
+     */
+    public String getDropItemName() {
+        return this.dropItemName;
     }
 
     /**

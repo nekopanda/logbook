@@ -22,7 +22,7 @@ public class AkashiTimer {
     public static final long REPAIR_BASE = 30 * 1000;
     public static final long AKASHI_DELAY = 30 * 1000;
 
-    private Date startTime = new Date();
+    private Date startTime = null;
 
     /** shipId -> HP */
     private final Map<Integer, ShipState> stateMap = new TreeMap<>();
@@ -129,10 +129,21 @@ public class AkashiTimer {
         this.stateMap.clear();
     }
 
+    public Date getStartTime() {
+        return this.startTime;
+    }
+
+    /**
+     * @param startTime セットする startTime
+     */
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
     /** 状態を更新 */
     public RepairState update(DockDto dock, Date now) {
         int akashiCapacity = dock.getAkashiCapacity();
-        if (akashiCapacity == 0) {
+        if ((this.startTime == null) || (akashiCapacity == 0)) {
             return new RepairState(null, 0, false); // ショートカット
         }
         List<ShipDto> ships = dock.getShips();

@@ -39,7 +39,10 @@ public final class AppConfigBean {
     /** 通知設定を表示 */
     private boolean showNotifySetting = true;
 
-    /** 疲労度タイマー表示 */
+    /** 母港タブの泊地修理タイマー表示 */
+    private boolean showAkashiGlobalTimer = true;
+
+    /** 母港タブの疲労度タイマー表示 */
     private boolean showCondCycleTimer = true;
 
     /** 音量 */
@@ -224,9 +227,6 @@ public final class AppConfigBean {
 
     /** 制空表示形式 */
     private int seikuMethod = 0;
-
-    /** 索敵表示形式 */
-    private boolean useRecommendedSakuteki = true;
 
     /** 索敵表示形式 */
     private int sakutekiMethod = 0;
@@ -451,6 +451,20 @@ public final class AppConfigBean {
      */
     public void setMinimumLayout(boolean minimumLayout) {
         this.minimumLayout = minimumLayout;
+    }
+
+    /**
+     * @return showAkashiGlobalTimer
+     */
+    public boolean isShowAkashiGlobalTimer() {
+        return this.showAkashiGlobalTimer;
+    }
+
+    /**
+     * @param showAkashiGlobalTimer セットする showAkashiGlobalTimer
+     */
+    public void setShowAkashiGlobalTimer(boolean showAkashiGlobalTimer) {
+        this.showAkashiGlobalTimer = showAkashiGlobalTimer;
     }
 
     /**
@@ -1307,20 +1321,6 @@ public final class AppConfigBean {
      */
     public void setDefaultEvaluate(String defaultEvaluate) {
         this.defaultEvaluate = defaultEvaluate;
-    }
-
-    /**
-     * @return useRecommendedSakuteki
-     */
-    public boolean isUseRecommendedSakuteki() {
-        return this.useRecommendedSakuteki;
-    }
-
-    /**
-     * @param useRecommendedSakuteki セットする useRecommendedSakuteki
-     */
-    public void setUseRecommendedSakuteki(boolean useRecommendedSakuteki) {
-        this.useRecommendedSakuteki = useRecommendedSakuteki;
     }
 
     /**

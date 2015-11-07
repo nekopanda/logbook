@@ -31,7 +31,7 @@ public class ShipInfoToCSV {
                 "名前", "艦ID", "タイプID", "タイプ名", "改造Lv", "改造後の艦ID", "Flagship", "Max弾", "Max燃料" }, ','));
         fw.write("\n");
 
-        for (String key : Ship.getMap().keySet()) {
+        for (int key : Ship.getMap().keySet()) {
             ShipInfoDto dto = Ship.get(key);
             if (dto.getName().length() > 0) {
                 fw.write(StringUtils.join(new String[] {

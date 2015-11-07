@@ -238,7 +238,7 @@ public class EnemyData {
         String[] names = new String[6];
         for (int i = 0; i < 6; ++i) {
             String name = "";
-            ShipInfoDto shipinfo = Ship.get(String.valueOf(this.enemyShipsId[i]));
+            ShipInfoDto shipinfo = Ship.get(this.enemyShipsId[i]);
             if (shipinfo != null) {
                 name = shipinfo.getFullName();
             }

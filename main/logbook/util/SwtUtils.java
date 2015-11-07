@@ -192,7 +192,9 @@ public final class SwtUtils {
         Font font = SWTResourceManager.getFont(defaultFontName, heightInPoint, defaultFontStyle);
         lbl.setFont(font);
         lbl.setText(text);
-        gd.heightHint = (int) (((heightInPoint * DPI_Y) / 72.0) * lineHeight);
+        if (!"cocoa".equals(SWT.getPlatform())) { // mac以外
+            gd.heightHint = (int) (((heightInPoint * DPI_Y) / 72.0) * lineHeight);
+        }
         lbl.setLayoutData(gd);
         return gd;
     }

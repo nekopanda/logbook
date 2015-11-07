@@ -228,6 +228,8 @@ public final class GlobalContext {
         if (condTiming != null) {
             GlobalContext.condTiming.setUpdateTiming(condTiming);
         }
+        Date akashiStartTime = config.getAkashiStartTime();
+        GlobalContext.akashiTimer.setStartTime(akashiStartTime);
     }
 
     /**
@@ -626,6 +628,10 @@ public final class GlobalContext {
         case CHANGE:
             doChange(data);
             break;
+        // 編成
+        case PRESET_SELECT:
+            doPresetSelect(data);
+            break;
         // 母港
         case PORT:
             doPort(data);
@@ -689,6 +695,10 @@ public final class GlobalContext {
         // 近代化改修
         case POWERUP:
             doPowerup(data);
+            break;
+        // 装備位置交換
+        case SLOT_EXCHANGE_INDEX:
+            doSlotExchangeIndex(data);
             break;
         // 艦娘ロック操作
         case LOCK_SHIP:
@@ -991,11 +1001,11 @@ public final class GlobalContext {
                         rdock.updateFleetIdOfShips();
                         rdock.setUpdate(true);
                     }
-                }
 
-                // 泊地修理判定
-                if (isFlagshipAkashi(dockdto) || isFlagshipAkashi(rdock)) {
-                    akashiTimer.reset();
+                    // 泊地修理判定
+                    if (isFlagshipAkashi(dockdto) || isFlagshipAkashi(rdock)) {
+                        akashiTimer.reset();
+                    }
                 }
 
                 DockDto firstdock = dock.get("1");
@@ -1009,6 +1019,44 @@ public final class GlobalContext {
             LOG.get().warn("編成を更新しますに失敗しました", e);
             LOG.get().warn(data);
         }
+    }
+
+    /**
+     * @param data
+     */
+    private static void doPresetSelect(Data data) {
+        try {
+            // 他の艦隊にいる艦娘は展開されない前提
+
+            JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+            if (apidata != null) {
+                int fleetid = apidata.getInt("api_id");
+
+                // 展開前の艦娘から艦隊情報を取り除く
+                DockDto dockdto = dock.get(String.valueOf(fleetid));
+                if (dockdto != null) {
+                    dockdto.removeFleetIdFromShips();
+                }
+
+                String name = apidata.getString("api_name");
+                int[] shipIds = JsonUtils.getIntArray(apidata, "api_ship");
+                setFleetInfo(fleetid, name, shipIds);
+            }
+
+            addUpdateLog("プリセットを展開しました");
+        } catch (Exception e) {
+            LOG.get().warn("プリセットを展開しますに失敗しました", e);
+            LOG.get().warn(data);
+        }
+    }
+
+    private static boolean isAkashiRepairEnabled() {
+        for (DockDto dock : dock.values()) {
+            if (dock.isAkashiRepairEnabled()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -1089,9 +1137,20 @@ public final class GlobalContext {
                 }
                 // 疲労回復タイミング更新
                 condTiming.onPort(condUpdated);
+
                 // 泊地修理タイマー更新
                 if (hpUpdated) {
+                    // 実際に回復があったのでリセット
                     akashiTimer.reset();
+                }
+                else if ((akashiTimer.getStartTime() != null) && (isAkashiRepairEnabled() == false)) {
+                    // 泊地修理していなくてもカウンタは回っているが、泊地修理編成でない場合回復がないので
+                    // 20分経過していたらリセットしておく
+                    // サーバ側で20分経過したかどうかは正確には分からないが知る術がない
+                    long elapsed = new Date().getTime() - akashiTimer.getStartTime().getTime();
+                    if (elapsed > AkashiTimer.MINIMUM_TIME) {
+                        akashiTimer.reset();
+                    }
                 }
 
                 JsonArray apiDeckPort = apidata.getJsonArray("api_deck_port");
@@ -1260,7 +1319,7 @@ public final class GlobalContext {
 
                     // ドロップ艦を追加
                     if (battle.isDropShip()) {
-                        ShipInfoDto shipinfo = Ship.get(String.valueOf(battle.getDropShipId()));
+                        ShipInfoDto shipinfo = Ship.get(battle.getDropShipId());
                         int[] slotitemids = shipinfo.getDefaultSlot();
                         int[] slotids = new int[slotitemids.length];
                         for (int i = 0; i < slotitemids.length; ++i) {
@@ -1293,9 +1352,14 @@ public final class GlobalContext {
             addUpdateLog("海戦結果を更新しました");
 
             // ドロップを表示
-            if ((battle != null) && (battle.isDropShip() || battle.isDropItem())) {
+            if (battle != null) {
                 if (AppConfig.get().isPrintDropLog()) {
-                    addConsole(battle.getDropName() + "がドロップしました");
+                    if (battle.isDropShip()) {
+                        addConsole(battle.getDropName() + "がドロップしました");
+                    }
+                    if (battle.isDropItem()) {
+                        addConsole(battle.getDropItemName() + "がドロップしました");
+                    }
                 }
             }
         } catch (Exception e) {
@@ -1380,7 +1444,7 @@ public final class GlobalContext {
                         JsonObject jsonkdock = (JsonObject) apidata.get(i);
                         if (jsonkdock.getInt("api_id") == kdockid) {
                             int shipId = jsonkdock.getInt("api_created_ship_id");
-                            shipinfo = Ship.get(String.valueOf(shipId));
+                            shipinfo = Ship.get(shipId);
                         }
 
                         int state = jsonkdock.getJsonNumber("api_state").intValue();
@@ -1625,6 +1689,29 @@ public final class GlobalContext {
         }
     }
 
+    private static void setFleetInfo(int fleetid, String name, int[] shipIds) {
+        String fleetidstr = String.valueOf(fleetid);
+        DockDto dockdto = new DockDto(fleetidstr, name, dock.get(fleetidstr));
+        dock.put(fleetidstr, dockdto);
+
+        for (int j = 0; j < shipIds.length; j++) {
+            int shipId = shipIds[j];
+
+            ShipDto ship = shipMap.get(shipId);
+            if (ship != null) {
+                dockdto.addShip(ship);
+
+                if ((fleetid == 1) && (j == 0)) {
+                    setSecretary(ship);
+                }
+                // 艦隊IDを設定
+                ship.setFleetid(fleetidstr);
+                ship.setFleetpos(j);
+            }
+        }
+
+    }
+
     /**
      * 艦隊と遠征の状態を更新します
      * 
@@ -1634,30 +1721,10 @@ public final class GlobalContext {
         for (int i = 0; i < apidata.size(); i++) {
             JsonObject jsonObject = (JsonObject) apidata.get(i);
             int fleetid = jsonObject.getInt("api_id");
-            String fleetidstr = String.valueOf(fleetid);
             String name = jsonObject.getString("api_name");
-            JsonArray apiship = jsonObject.getJsonArray("api_ship");
+            int[] shipIds = JsonUtils.getIntArray(jsonObject, "api_ship");
 
-            DockDto dockdto = new DockDto(fleetidstr, name, dock.get(fleetidstr));
-            List<Integer> shipIds = new ArrayList<Integer>();
-            dock.put(fleetidstr, dockdto);
-
-            for (int j = 0; j < apiship.size(); j++) {
-                int shipId = apiship.getInt(j);
-                shipIds.add(shipId);
-
-                ShipDto ship = shipMap.get(shipId);
-                if (ship != null) {
-                    dockdto.addShip(ship);
-
-                    if ((fleetid == 1) && (j == 0)) {
-                        setSecretary(ship);
-                    }
-                    // 艦隊IDを設定
-                    ship.setFleetid(fleetidstr);
-                    ship.setFleetpos(j);
-                }
-            }
+            setFleetInfo(fleetid, name, shipIds);
 
             if (fleetid >= 2) {
                 JsonArray jmission = jsonObject.getJsonArray("api_mission");
@@ -1802,6 +1869,34 @@ public final class GlobalContext {
             addUpdateLog("近代化改修しました");
         } catch (Exception e) {
             LOG.get().warn("近代化改修しますに失敗しました", e);
+            LOG.get().warn(data);
+        }
+    }
+
+    /**
+     * @param data
+     */
+    private static void doSlotExchangeIndex(Data data) {
+        try {
+            int shipId = Integer.parseInt(data.getField("api_id"));
+            ShipDto ship = shipMap.get(shipId);
+            if (ship != null) {
+                JsonObject apidata = data.getJsonObject().getJsonObject("api_data");
+                ship.setSlotFromJson(apidata);
+
+                // 次アップデート
+                String fleetid = ship.getFleetid();
+                if (fleetid != null) {
+                    DockDto dockdto = dock.get(fleetid);
+                    if (dockdto != null) {
+                        dockdto.setUpdate(true);
+                    }
+                }
+            }
+
+            addUpdateLog("装備状態を更新しました");
+        } catch (Exception e) {
+            LOG.get().warn("装備状態の更新に失敗しました", e);
             LOG.get().warn(data);
         }
     }

@@ -67,7 +67,7 @@ public final class BattleDto extends AbstractDto {
         JsonArray shipKe = object.getJsonArray("api_ship_ke");
         for (int i = 1; i < shipKe.size(); i++) {
             int id = shipKe.getInt(i);
-            ShipInfoDto dto = Ship.get(String.valueOf(id));
+            ShipInfoDto dto = Ship.get(id);
             if (dto != null) {
                 this.enemy.add(dto);
             }

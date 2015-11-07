@@ -6,7 +6,7 @@ package logbook.dto;
 import javax.json.JsonArray;
 
 import logbook.constants.AppConstants;
-import logbook.internal.MasterData;
+import logbook.internal.UseItem;
 
 /**
  * 開発資材や家具箱など、装備アイテムでない普通のアイテム
@@ -67,9 +67,9 @@ public class UseItemDto {
         if (this.useItemId == AppConstants.USEITEM_UNKNOWN) {
             return "<UNKNOWN>";
         }
-        MasterData.UseItemInfoDto useItemDto = MasterData.getUseItem(this.useItemId);
-        if (useItemDto != null) {
-            return useItemDto.getName();
+        String name = UseItem.get(this.useItemId);
+        if (name != null) {
+            return name;
         }
         return "";
     }

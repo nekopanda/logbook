@@ -301,6 +301,7 @@ public final class ApplicationMain extends WindowBase {
     private Label deck4name;
     /** 艦隊.艦隊4の帰投時間 */
     private Text deck4time;
+
     /** 入渠グループ **/
     private Group ndockGroup;
     /** 入渠.ドッグ1.艦娘の名前 **/
@@ -320,11 +321,15 @@ public final class ApplicationMain extends WindowBase {
     /** 入渠.ドッグ4.お風呂から上がる時間 **/
     private Text ndock4time;
 
-    /** その他グループ**/
-    private Composite otherGroup;
-
+    /** 疲労タイマー **/
+    private Composite condTimerGroup;
     private Label condTimerLabel;
     private Text condTimerTime;
+
+    /** 泊地修理タイマー **/
+    private Composite akashiTimerGroup;
+    private Label akashiTimerLabel;
+    private Text akashiTimerTime;
 
     /** エラー表示 **/
     private Label errorLabel;
@@ -928,15 +933,29 @@ public final class ApplicationMain extends WindowBase {
 
         // -------
 
-        this.otherGroup = new Composite(this.mainComposite, SWT.NONE);
-        this.otherGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        this.otherGroup.setLayout(SwtUtils.makeGridLayout(2, 1, 1, 3, 3));
+        this.akashiTimerGroup = new Composite(this.mainComposite, SWT.NONE);
+        this.akashiTimerGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        this.akashiTimerGroup.setLayout(SwtUtils.makeGridLayout(2, 1, 1, 3, 3));
 
-        this.condTimerLabel = new Label(this.otherGroup, SWT.NONE);
+        this.akashiTimerLabel = new Label(this.akashiTimerGroup, SWT.NONE);
+        this.akashiTimerLabel.setText("泊地修理タイマー");
+        this.akashiTimerLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        this.akashiTimerTime = new Text(this.akashiTimerGroup, SWT.SINGLE | SWT.BORDER);
+        this.akashiTimerTime.setText("泊地修理タイマーの経過時間");
+        GridData gdakashiTimerTime = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        gdakashiTimerTime.widthHint = 75;
+        this.akashiTimerTime.setLayoutData(gdakashiTimerTime);
+
+        this.condTimerGroup = new Composite(this.mainComposite, SWT.NONE);
+        this.condTimerGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        this.condTimerGroup.setLayout(SwtUtils.makeGridLayout(2, 1, 1, 3, 3));
+
+        this.condTimerLabel = new Label(this.condTimerGroup, SWT.NONE);
         this.condTimerLabel.setText("次の疲労回復まで");
         this.condTimerLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        this.condTimerTime = new Text(this.otherGroup, SWT.SINGLE | SWT.BORDER);
+        this.condTimerTime = new Text(this.condTimerGroup, SWT.SINGLE | SWT.BORDER);
         this.condTimerTime.setText("次の疲労回復までの時間");
         GridData gdconTimeTime = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
         gdconTimeTime.widthHint = 75;
@@ -995,9 +1014,13 @@ public final class ApplicationMain extends WindowBase {
         showNotifySetting.setText("通知設定を表示");
         this.bindControlToMenuItem(this.notifySettingGroup, showNotifySetting, "ShowNotifySetting");
 
+        MenuItem showAkashiTimer = new MenuItem(this.getPopupMenu(), SWT.CHECK);
+        showAkashiTimer.setText("泊地修理タイマーを表示");
+        this.bindControlToMenuItem(this.akashiTimerGroup, showAkashiTimer, "ShowAkashiGlobalTimer");
+
         MenuItem showCondTimer = new MenuItem(this.getPopupMenu(), SWT.CHECK);
         showCondTimer.setText("疲労タイマーを表示");
-        this.bindControlToMenuItem(this.otherGroup, showCondTimer, "ShowCondCycleTimer");
+        this.bindControlToMenuItem(this.condTimerGroup, showCondTimer, "ShowCondCycleTimer");
 
         // 縮小表示
         final MenuItem dispsize = new MenuItem(this.getPopupMenu(), SWT.CHECK);
@@ -1073,6 +1096,7 @@ public final class ApplicationMain extends WindowBase {
         for (Control c : new Control[] { this.commandComposite,
                 this.deckNotice, this.ndockNotice,
                 this.deck1time, this.deck2time, this.deck3time, this.deck4time,
+                this.akashiTimerTime,
                 this.ndock1time, this.ndock2time, this.ndock3time, this.ndock4time,
                 this.condTimerTime,
                 this.console }) {
@@ -1774,6 +1798,14 @@ public final class ApplicationMain extends WindowBase {
 
     public Text getCondTimerTime() {
         return this.condTimerTime;
+    }
+
+    public Label getAkashiTimerLabel() {
+        return this.akashiTimerLabel;
+    }
+
+    public Text getAkashiTimerTime() {
+        return this.akashiTimerTime;
     }
 
     /**

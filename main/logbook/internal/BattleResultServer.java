@@ -37,6 +37,7 @@ import logbook.util.ReportUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.widgets.Display;
 
 import com.dyuproject.protostuff.LinkedBuffer;
@@ -330,12 +331,14 @@ public class BattleResultServer {
             this.lastBattleTime = battleDate;
         }
         if (battle.isPractice() == false) {
-            String dropName = battle.getDropName();
-            int[] map = battle.getMapCell().getMap();
-
-            if (battle.isDropShip() || battle.isDropItem()) {
-                this.dropShipList.add(dropName);
+            if (!StringUtils.isEmpty(battle.getDropName())) {
+                this.dropShipList.add(battle.getDropName());
             }
+            if (!StringUtils.isEmpty(battle.getDropItemName())) {
+                this.dropShipList.add(battle.getDropItemName());
+            }
+
+            int[] map = battle.getMapCell().getMap();
             this.mapList.add(new IntegerPair(map[0], map[1], "%d-%d"));
             this.cellList.add(map[2]);
         }
@@ -404,7 +407,9 @@ public class BattleResultServer {
         if ((filter.toTime != null) && filter.toTime.before(dto.getBattleDate())) {
             return false;
         }
-        if ((filter.dropShip != null) && (filter.dropShip.equals(dto.getDropName()) == false)) {
+        if ((filter.dropShip != null) &&
+                (filter.dropShip.equals(dto.getDropName()) == false) &&
+                (filter.dropShip.equals(dto.getDropItemName()) == false)) {
             return false;
         }
         if (filter.timeSpan != null) {

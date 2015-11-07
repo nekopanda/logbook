@@ -91,6 +91,7 @@ public class ReportUtils {
         case LOCK_SHIP:
         case NYUKYO_START:
         case NYUKYO_SPEEDCHANGE:
+        case SLOT_EXCHANGE_INDEX:
 
             // 戦闘結果を反映させるため戦闘でも更新
         case BATTLE:

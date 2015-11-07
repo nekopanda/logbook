@@ -305,7 +305,8 @@ public class ResourceChart {
             }
             // データを必要な配列長に圧縮
             for (int j = minidx + 1; j < prevalues.length; j++) {
-                int idx = (int) ((log.time[j] - s) / this.notch);
+                // minidx+1が範囲の外側になることもあるのでマイナスにならないようにしておく
+                int idx = Math.max((int) ((log.time[j] - s) / this.notch), 0);
                 values[idx] = prevalues[j];
             }
             boolean find = false;

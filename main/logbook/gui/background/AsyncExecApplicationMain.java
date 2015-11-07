@@ -660,6 +660,25 @@ public final class AsyncExecApplicationMain extends Thread {
                 condTimerText.setToolTipText(this.format.format(nextUpdateTime));
                 condTimerText.setText(TimeLogic.toDateRestString(rest, true));
             }
+
+            // 泊地修理タイマー
+            Label akashiTimerLabel = this.main.getAkashiTimerLabel();
+            Text akashiTimerText = this.main.getAkashiTimerTime();
+
+            AkashiTimer akashiTimer = GlobalContext.getAkashiTimer();
+            if (akashiTimer.getStartTime() == null) {
+                // 不明
+                akashiTimerText.setText("???");
+                akashiTimerText.setToolTipText("十分な情報がありません");
+                akashiTimerText.setBackground(ColorManager.getColor(SWT.COLOR_WHITE));
+            }
+            else {
+                long elapsed = this.now.getTime() - akashiTimer.getStartTime().getTime();
+                String time = TimeLogic.toDateRestString(elapsed / 1000, true);
+                akashiTimerText.setText(time);
+                akashiTimerText.setToolTipText(null);
+                akashiTimerText.setBackground(ColorManager.getColor(AppConstants.AKASHI_REPAIR_COLOR));
+            }
         }
 
         /** エラー表示を更新 */
