@@ -919,6 +919,13 @@ public final class GlobalContext {
         }
     }
 
+    private static boolean isFlagshipAkashi(DockDto dock) {
+        if (dock != null) {
+            return dock.isFlagshipAkashi();
+        }
+        return false;
+    }
+
     /**
      * 編成を更新します
      * @param data
@@ -994,13 +1001,11 @@ public final class GlobalContext {
                         rdock.updateFleetIdOfShips();
                         rdock.setUpdate(true);
                     }
-                }
 
-                // 泊地修理判定
-                if (((dockdto != null) && dockdto.isAkashiRepairEnabled()) ||
-                        ((rdock != null) && rdock.isAkashiRepairEnabled()))
-                {
-                    akashiTimer.reset();
+                    // 泊地修理判定
+                    if (isFlagshipAkashi(dockdto) || isFlagshipAkashi(rdock)) {
+                        akashiTimer.reset();
+                    }
                 }
 
                 DockDto firstdock = dock.get("1");
