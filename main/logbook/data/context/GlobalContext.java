@@ -917,13 +917,6 @@ public final class GlobalContext {
         }
     }
 
-    private static boolean isFlagshipAkashi(DockDto dock) {
-        if (dock != null) {
-            return dock.isFlagshipAkashi();
-        }
-        return false;
-    }
-
     /**
      * 編成を更新します
      * @param data
@@ -1002,7 +995,7 @@ public final class GlobalContext {
                 }
 
                 // 泊地修理判定
-                if (isFlagshipAkashi(dockdto) || isFlagshipAkashi(rdock)) {
+                if (dockdto.isAkashiRepairEnabled() || rdock.isAkashiRepairEnabled()) {
                     akashiTimer.reset();
                 }
 
@@ -1046,6 +1039,15 @@ public final class GlobalContext {
             LOG.get().warn("プリセットを展開しますに失敗しました", e);
             LOG.get().warn(data);
         }
+    }
+
+    private static boolean isAkashiRepairEnabled() {
+        for (DockDto dock : dock.values()) {
+            if (dock.isAkashiRepairEnabled()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -1126,9 +1128,24 @@ public final class GlobalContext {
                 }
                 // 疲労回復タイミング更新
                 condTiming.onPort(condUpdated);
+
                 // 泊地修理タイマー更新
-                if (hpUpdated) {
+                if (akashiTimer.isStop()) {
+                    if (isAkashiRepairEnabled()) {
+                        // ストップしている場合、泊地修理可能な編成があればスタート
+                        akashiTimer.reset();
+                    }
+                }
+                else if (hpUpdated) {
+                    // 20分経過したので泊地修理してリセット
                     akashiTimer.reset();
+                }
+                else if (isAkashiRepairEnabled() == false) {
+                    long elapsed = new Date().getTime() - akashiTimer.getStartTime().getTime();
+                    if (elapsed > AkashiTimer.MINIMUM_TIME) {
+                        // 20分経過した（サーバ側で20分経過したかどうかは不明だが知るすべがない）
+                        akashiTimer.stop();
+                    }
                 }
 
                 JsonArray apiDeckPort = apidata.getJsonArray("api_deck_port");
