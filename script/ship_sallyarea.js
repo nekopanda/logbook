@@ -9,9 +9,10 @@ function begin(specdiff) { }
 function sallyArea(area) {
 	switch(area) {
 		case 0: return null;
-		case 1: return "通商破壊";
-		case 2: return "攻略作戦";
-		case 3: return "泊地攻撃";
+		case 1: return "札A";
+		case 2: return "札B";
+		case 3: return "札C";
+		case 4: return "札D";
 		default: return "不明";
 	}
 }
