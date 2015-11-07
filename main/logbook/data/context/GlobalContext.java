@@ -228,6 +228,8 @@ public final class GlobalContext {
         if (condTiming != null) {
             GlobalContext.condTiming.setUpdateTiming(condTiming);
         }
+        Date akashiStartTime = config.getAkashiStartTime();
+        GlobalContext.akashiTimer.setStartTime(akashiStartTime);
     }
 
     /**
@@ -995,7 +997,9 @@ public final class GlobalContext {
                 }
 
                 // 泊地修理判定
-                if (dockdto.isAkashiRepairEnabled() || rdock.isAkashiRepairEnabled()) {
+                if (((dockdto != null) && dockdto.isAkashiRepairEnabled()) ||
+                        ((rdock != null) && rdock.isAkashiRepairEnabled()))
+                {
                     akashiTimer.reset();
                 }
 
@@ -1130,21 +1134,17 @@ public final class GlobalContext {
                 condTiming.onPort(condUpdated);
 
                 // 泊地修理タイマー更新
-                if (akashiTimer.isStop()) {
-                    if (isAkashiRepairEnabled()) {
-                        // ストップしている場合、泊地修理可能な編成があればスタート
-                        akashiTimer.reset();
-                    }
-                }
-                else if (hpUpdated) {
-                    // 20分経過したので泊地修理してリセット
+                if (hpUpdated) {
+                    // 実際に回復があったのでリセット
                     akashiTimer.reset();
                 }
-                else if (isAkashiRepairEnabled() == false) {
+                else if ((akashiTimer.getStartTime() != null) && (isAkashiRepairEnabled() == false)) {
+                    // 泊地修理していなくてもカウンタは回っているが、泊地修理編成でない場合回復がないので
+                    // 20分経過していたらリセットしておく
+                    // サーバ側で20分経過したかどうかは正確には分からないが知る術がない
                     long elapsed = new Date().getTime() - akashiTimer.getStartTime().getTime();
                     if (elapsed > AkashiTimer.MINIMUM_TIME) {
-                        // 20分経過した（サーバ側で20分経過したかどうかは不明だが知るすべがない）
-                        akashiTimer.stop();
+                        akashiTimer.reset();
                     }
                 }
 

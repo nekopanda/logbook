@@ -129,17 +129,15 @@ public class AkashiTimer {
         this.stateMap.clear();
     }
 
-    public void stop() {
-        this.startTime = null;
-        this.stateMap.clear();
-    }
-
-    public boolean isStop() {
-        return this.startTime == null;
-    }
-
     public Date getStartTime() {
         return this.startTime;
+    }
+
+    /**
+     * @param startTime セットする startTime
+     */
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 
     /** 状態を更新 */

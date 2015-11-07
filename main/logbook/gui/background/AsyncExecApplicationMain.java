@@ -666,18 +666,17 @@ public final class AsyncExecApplicationMain extends Thread {
             Text akashiTimerText = this.main.getAkashiTimerTime();
 
             AkashiTimer akashiTimer = GlobalContext.getAkashiTimer();
-            if (akashiTimer.isStop()) {
-                // ストップ中
-                akashiTimerLabel.setText("");
-                akashiTimerText.setText("");
+            if (akashiTimer.getStartTime() == null) {
+                // 不明
+                akashiTimerText.setText("???");
+                akashiTimerText.setToolTipText("十分な情報がありません");
                 akashiTimerText.setBackground(ColorManager.getColor(SWT.COLOR_WHITE));
             }
             else {
-                // カウント中
                 long elapsed = this.now.getTime() - akashiTimer.getStartTime().getTime();
                 String time = TimeLogic.toDateRestString(elapsed / 1000, true);
-                akashiTimerLabel.setText("泊地修理中");
                 akashiTimerText.setText(time);
+                akashiTimerText.setToolTipText(null);
                 akashiTimerText.setBackground(ColorManager.getColor(AppConstants.AKASHI_REPAIR_COLOR));
             }
         }
