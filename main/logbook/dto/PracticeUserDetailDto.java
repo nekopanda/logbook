@@ -35,7 +35,7 @@ public class PracticeUserDetailDto extends PracticeUserDto {
         for (int i = 0; i < shipsinfo.size(); i++) {
             JsonObject s = shipsinfo.getJsonObject(i);
             if (s.getInt("api_id") != -1) {
-                this.ships.add(Ship.get(Integer.toString(s.getInt("api_ship_id"))));
+                this.ships.add(Ship.get(s.getInt("api_ship_id")));
                 this.shipsLevel[i] = s.getInt("api_level");
             }
         }

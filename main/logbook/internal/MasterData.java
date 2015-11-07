@@ -24,6 +24,8 @@ import logbook.dto.UseItemDto;
 import logbook.gui.ApplicationMain;
 import logbook.util.BeanUtils;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 /**
  * @author Nekopanda
  *
@@ -259,7 +261,7 @@ public class MasterData {
         private Date time = new Date(0);
 
         /** 艦娘 */
-        private final Map<String, ShipInfoDto> ships = new TreeMap<>();
+        private final Map<Integer, ShipInfoDto> ships = new TreeMap<>();
 
         /** アイテム */
         private final Map<Integer, ItemInfoDto> items = new TreeMap<>();
@@ -323,10 +325,11 @@ public class MasterData {
                 this.ships.clear();
                 for (int i = 0; i < apiMstShip.size(); i++) {
                     JsonObject object = (JsonObject) apiMstShip.get(i);
-                    String id = object.getJsonNumber("api_id").toString();
+                    int id = object.getInt("api_id");
                     this.ships.put(id, this.toShipInfoDto(object));
                 }
             }
+            this.setCharId();
 
             JsonArray json_maparea = this.json.getJsonArray("api_mst_maparea");
             if (json_maparea != null) {
@@ -364,6 +367,61 @@ public class MasterData {
             }
 
             this.time = new Date();
+        }
+
+        private void visitShip(ShipInfoDto ship, int[] charId) {
+            if ((ship != null) && (ship.getData() == null)) {
+                ship.setData(charId);
+
+                if (ship.getAftershipid() != 0) {
+                    this.visitShip(this.ships.get(ship.getAftershipid()), charId);
+                }
+                if (ship.getBeforeshpids() != null) {
+                    for (int shipid : ship.getBeforeshpids()) {
+                        this.visitShip(this.ships.get(shipid), charId);
+                    }
+                }
+            }
+        }
+
+        /**
+         * 初期艦IDを計算します
+         */
+        private void setCharId() {
+            // リセット
+            for (ShipInfoDto dto : this.ships.values()) {
+                dto.setData(null);
+                dto.setBeforeshpids(null);
+            }
+            // beforeshipidsを生成
+            for (ShipInfoDto dto : this.ships.values()) {
+                if (dto.getAftershipid() != 0) {
+                    ShipInfoDto afterShip = this.ships.get(dto.getAftershipid());
+                    if (afterShip != null) {
+                        afterShip.setBeforeshpids(ArrayUtils.add(afterShip.getBeforeshpids(), dto.getShipId()));
+                    }
+                }
+            }
+            // 同じ島に同じint[]を配置
+            for (ShipInfoDto dto : this.ships.values()) {
+                this.visitShip(dto, new int[] { -1 });
+            }
+            // 初期艦のIDを探す
+            for (ShipInfoDto dto : this.ships.values()) {
+                if (dto.getBeforeshpids() == null) {
+                    int[] charId = (int[]) dto.getData();
+                    // 複数見つかったら（普通はありえないが）小さい方にしておく
+                    if ((charId[0] == -1) || (charId[0] > dto.getShipId())) {
+                        charId[0] = dto.getShipId();
+                    }
+                }
+            }
+            // IDをセット
+            for (ShipInfoDto dto : this.ships.values()) {
+                int[] charId = (int[]) dto.getData();
+                dto.setCharId(charId[0]);
+                dto.setData(null);
+            }
         }
 
         /**
@@ -462,7 +520,7 @@ public class MasterData {
         /**
          * @return ships
          */
-        public Map<String, ShipInfoDto> getShips() {
+        public Map<Integer, ShipInfoDto> getShips() {
             return this.ships;
         }
 

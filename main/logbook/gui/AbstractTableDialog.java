@@ -411,7 +411,6 @@ public abstract class AbstractTableDialog extends WindowBase implements EventLis
             col.addSelectionListener(listener);
             col.setData(i); // カラム番号を入れておく
             col.setToolTipText(this.headerId[i]);
-            ApplicationMain.sysPrint("" + i + " : " + col.getToolTipText());
             if (i == 0) {
                 // No.列はソートしない
                 col.setData("unsortable", new Object());

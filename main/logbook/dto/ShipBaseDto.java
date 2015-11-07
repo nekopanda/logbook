@@ -58,7 +58,7 @@ public abstract class ShipBaseDto extends AbstractDto {
      */
     public ShipBaseDto(JsonObject object) {
         int shipId = object.getJsonNumber("api_ship_id").intValue();
-        ShipInfoDto shipinfo = Ship.get(String.valueOf(shipId));
+        ShipInfoDto shipinfo = Ship.get(shipId);
         this.shipInfo = shipinfo;
         this.setSlotFromJson(object);
         ShipParameters[] params = ShipParameters.fromShip(object, this.getItem(), shipinfo);

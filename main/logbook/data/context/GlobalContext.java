@@ -1314,7 +1314,7 @@ public final class GlobalContext {
 
                     // ドロップ艦を追加
                     if (battle.isDropShip()) {
-                        ShipInfoDto shipinfo = Ship.get(String.valueOf(battle.getDropShipId()));
+                        ShipInfoDto shipinfo = Ship.get(battle.getDropShipId());
                         int[] slotitemids = shipinfo.getDefaultSlot();
                         int[] slotids = new int[slotitemids.length];
                         for (int i = 0; i < slotitemids.length; ++i) {
@@ -1439,7 +1439,7 @@ public final class GlobalContext {
                         JsonObject jsonkdock = (JsonObject) apidata.get(i);
                         if (jsonkdock.getInt("api_id") == kdockid) {
                             int shipId = jsonkdock.getInt("api_created_ship_id");
-                            shipinfo = Ship.get(String.valueOf(shipId));
+                            shipinfo = Ship.get(shipId);
                         }
 
                         int state = jsonkdock.getJsonNumber("api_state").intValue();

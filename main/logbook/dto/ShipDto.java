@@ -11,7 +11,6 @@ import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.internal.CondTiming;
 import logbook.internal.ExpTable;
-import logbook.internal.Ship;
 import logbook.util.JsonUtils;
 
 import com.dyuproject.protostuff.Tag;
@@ -25,10 +24,6 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     /** 艦娘個人を識別するID */
     @Tag(10)
     private final int id;
-
-    /** キャラクタ識別ID（その艦の最終形の艦ID） */
-    @Tag(11)
-    private final int charId;
 
     @Tag(12)
     private final int sortno;
@@ -117,7 +112,6 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
         this.id = object.getJsonNumber("api_id").intValue();
         this.locked = object.getJsonNumber("api_locked").intValue() == 1;
 
-        this.charId = Ship.getCharId(this.getShipInfo());
         this.sortno = object.getInt("api_sortno");
 
         this.lv = object.getJsonNumber("api_lv").intValue();
@@ -153,7 +147,6 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
 
         this.id = id;
         this.locked = false;
-        this.charId = Ship.getCharId(shipinfo);
         this.sortno = this.getShipInfo().getSortNo();
 
         this.lv = 1;
@@ -197,11 +190,11 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
-     * 艦娘キャラを識別するID
-     * @return 艦娘キャラを識別するID
+     * 改造前初期艦のID
+     * @return 改造前初期艦のID
      */
     public int getCharId() {
-        return this.charId;
+        return this.shipInfo.getCharId();
     }
 
     /**
