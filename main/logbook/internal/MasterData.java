@@ -291,9 +291,6 @@ public class MasterData {
 
         public void loadCompleted() {
             this.readJson();
-            for (ShipInfoDto ship : this.ships.values()) {
-                ShipParameterRecord.update(ship, null);
-            }
         }
 
         private void readJson() {

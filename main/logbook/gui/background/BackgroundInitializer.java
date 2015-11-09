@@ -9,6 +9,7 @@ import logbook.data.context.GlobalContext;
 import logbook.dto.CreateItemDto;
 import logbook.dto.GetShipDto;
 import logbook.dto.MissionResultDto;
+import logbook.dto.ShipInfoDto;
 import logbook.gui.ApplicationMain;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.internal.BattleResultServer;
@@ -63,7 +64,18 @@ public final class BackgroundInitializer extends Thread {
             success &= GlobalContext.INIT_COMPLETE; // ItemConfig
             success &= EnemyData.INIT_COMPLETE; // EnemyData
             success &= ShipParameterRecord.INIT_COMPLETE; // ShipParameterRecord
-            if (!success) {
+
+            if (success) {
+                this.display.asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (ShipInfoDto ship : MasterData.getMaster().getShips().values()) {
+                            ShipParameterRecord.update(ship, null);
+                        }
+                    }
+                });
+            }
+            else {
                 LOG.get().warn("設定ファイルの読み込みに失敗したっぽい？");
             }
         } catch (Exception e) {
