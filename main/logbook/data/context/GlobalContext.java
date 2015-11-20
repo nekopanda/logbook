@@ -1162,14 +1162,7 @@ public final class GlobalContext {
                 // 連合艦隊を更新する
                 combined = false;
                 if (apidata.containsKey("api_combined_flag")) {
-                    switch (apidata.getJsonNumber("api_combined_flag").intValue()) {
-                    case 1:
-                    case 2:
-                        combined = true;
-                        break;
-                    default:
-                        break;
-                    }
+                    combined = (apidata.getInt("api_combined_flag") != 0);
                     //addConsole("連合艦隊を更新しました");
                 }
 
