@@ -10,7 +10,6 @@ import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.internal.CondTiming;
-import logbook.internal.ExpTable;
 import logbook.util.JsonUtils;
 
 import com.dyuproject.protostuff.Tag;
@@ -71,6 +70,10 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     @Tag(23)
     private final int exp;
 
+    /** 次のレベルまで */
+    @Tag(29)
+    private final int nextexp;
+
     /** 経験値ゲージの割合 */
     @Tag(30)
     private final float expraito;
@@ -124,8 +127,9 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
         this.bull = object.getJsonNumber("api_bull").intValue();
         this.fuel = object.getJsonNumber("api_fuel").intValue();
 
-        this.exp = object.getJsonArray("api_exp").getJsonNumber(0).intValue();
-        this.expraito = object.getJsonArray("api_exp").getJsonNumber(2).longValue() / 100f;
+        this.exp = object.getJsonArray("api_exp").getInt(0);
+        this.nextexp = object.getJsonArray("api_exp").getInt(1);
+        this.expraito = object.getJsonArray("api_exp").getInt(2) / 100f;
         this.nowhp = this.getParam().getHP();
         this.maxhp = this.getMax().getHP();
         this.slotnum = object.getJsonNumber("api_slotnum").intValue();
@@ -160,6 +164,7 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
         this.fuel = shipinfo.getMaxFuel();
 
         this.exp = 0;
+        this.nextexp = 100;
         this.expraito = 0;
         this.nowhp = this.maxhp = this.getParam().getHP();
 
@@ -421,13 +426,8 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
      * 次のレベルまでの経験値
      * @return 次のレベルまでの経験値
      */
-    public Integer getNext() {
-        Integer nextLvExp = ExpTable.get().get(
-                Math.min(ExpTable.MAX_LEVEL, this.lv + 1));
-        if (nextLvExp != null) {
-            return nextLvExp - this.exp;
-        }
-        return null;
+    public int getNext() {
+        return this.nextexp;
     }
 
     /**
