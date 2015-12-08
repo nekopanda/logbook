@@ -153,8 +153,8 @@ public class DatabaseClient extends Thread {
                 for (int retly = 0;; ++retly) {
                     String errorReason = null;
                     try {
-                        // 20秒でタイムアウト
-                        Request request = this.createRequest(data).timeout(20, TimeUnit.SECONDS);
+                        // 60秒でタイムアウト
+                        Request request = this.createRequest(data).timeout(60, TimeUnit.SECONDS);
                         ContentResponse response = request.send();
                         if (this.endRequested) {
                             return;
