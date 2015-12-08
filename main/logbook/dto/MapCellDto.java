@@ -88,6 +88,8 @@ public class MapCellDto implements Comparable<MapCellDto> {
             return "航空戦";
         case 8:
             return "船団護衛成功";
+        case 9:
+            return "揚陸地点";
         }
 
         return null;
