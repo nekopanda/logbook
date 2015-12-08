@@ -4,6 +4,7 @@ import java.util.List;
 
 import logbook.dto.PracticeUserDetailDto;
 import logbook.dto.ShipInfoDto;
+import logbook.internal.ExpTable;
 import logbook.internal.PracticeEvaluateExp;
 import logbook.util.CalcPracticeExpUtils;
 
@@ -101,7 +102,7 @@ public final class CalcPracticeExpDialog extends WindowBase {
         GridData gdFirstShipLevel = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
         gdFirstShipLevel.widthHint = 45;
         this.firstShipLevel.setLayoutData(gdFirstShipLevel);
-        this.firstShipLevel.setMaximum(150);
+        this.firstShipLevel.setMaximum(ExpTable.MAX_LEVEL);
         this.firstShipLevel.setMinimum(1);
         this.firstShipLevel.setSelection(this.levels[0]);
         new Label(practiceinfo, SWT.NONE).setText("Lv");
@@ -115,7 +116,7 @@ public final class CalcPracticeExpDialog extends WindowBase {
         GridData gdsecondShipLevel = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
         gdsecondShipLevel.widthHint = 45;
         this.secondShipLevel.setLayoutData(gdsecondShipLevel);
-        this.secondShipLevel.setMaximum(150);
+        this.secondShipLevel.setMaximum(ExpTable.MAX_LEVEL);
         this.secondShipLevel.setMinimum(1);
         this.secondShipLevel.setSelection(this.levels[1]);
         new Label(practiceinfo, SWT.NONE).setText("Lv");

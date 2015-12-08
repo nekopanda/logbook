@@ -20,7 +20,8 @@ public class CalcPracticeExpUtils {
      * @return 得られる経験値
      */
     public static int getExp(int firstLevel, int secondLevel, double eval, boolean isFlagship, boolean isMvp) {
-        if ((firstLevel < 1) || (firstLevel > 150) || (secondLevel < 1) || (secondLevel > 150)) {
+        if ((firstLevel < 1) || (firstLevel > ExpTable.MAX_LEVEL) || (secondLevel < 1)
+                || (secondLevel > ExpTable.MAX_LEVEL)) {
             return 0;
         }
 
@@ -58,4 +59,3 @@ public class CalcPracticeExpUtils {
         }
     }
 }
-

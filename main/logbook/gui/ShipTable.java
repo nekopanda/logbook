@@ -180,7 +180,10 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
             public void widgetSelected(SelectionEvent e) {
                 StringBuilder sb = new StringBuilder();
                 for (TableItem item : ShipTable.this.table.getSelection()) {
-                    sb.append(String.valueOf(((ShipDto) item.getData()).getId())).append(", ");
+                    if (sb.length() > 0) {
+                        sb.append(", ");
+                    }
+                    sb.append(String.valueOf(((ShipDto) item.getData()).getId()));
                 }
                 Clipboard clipboard = new Clipboard(Display.getDefault());
                 clipboard.setContents(new Object[] { sb.toString() }, new Transfer[] { TextTransfer.getInstance() });
@@ -193,7 +196,10 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
             public void widgetSelected(SelectionEvent e) {
                 StringBuilder sb = new StringBuilder();
                 for (TableItem item : ShipTable.this.table.getSelection()) {
-                    sb.append("\"").append(((ShipDto) item.getData()).getName()).append("\", ");
+                    if (sb.length() > 0) {
+                        sb.append(", ");
+                    }
+                    sb.append(((ShipDto) item.getData()).getName());
                 }
                 Clipboard clipboard = new Clipboard(Display.getDefault());
                 clipboard.setContents(new Object[] { sb.toString() }, new Transfer[] { TextTransfer.getInstance() });

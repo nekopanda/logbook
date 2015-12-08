@@ -40,7 +40,10 @@ public final class ItemTable extends AbstractTableDialog {
             public void widgetSelected(SelectionEvent e) {
                 StringBuilder sb = new StringBuilder();
                 for (TableItem item : ItemTable.this.table.getSelection()) {
-                    sb.append("\"").append(item.getText(1)).append("\", ");
+                    if (sb.length() > 0) {
+                        sb.append(", ");
+                    }
+                    sb.append(item.getText(1));
                 }
                 Clipboard clipboard = new Clipboard(Display.getDefault());
                 clipboard.setContents(new Object[] { sb.toString() }, new Transfer[] { TextTransfer.getInstance() });
