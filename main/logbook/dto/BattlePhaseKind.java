@@ -25,10 +25,14 @@ public enum BattlePhaseKind {
     NIGHT_TO_DAY(false, false, BattlePatternConstants.NON_COMBINED_PTTERN, DataType.BATTLE_NIGHT_TO_DAY),
     /** 夜戦→昼戦マスの昼戦 */
     AIR_BATTLE(false, false, BattlePatternConstants.NON_COMBINED_PTTERN, DataType.AIR_BATTLE),
+    /** 長距離空襲戦 */
+    LD_AIRBATTLE(false, false, BattlePatternConstants.NON_COMBINED_PTTERN, DataType.LD_AIRBATTLE),
     /** 連合艦隊空母機動部隊の昼戦 */
     COMBINED_BATTLE(false, false, BattlePatternConstants.BATTLE_PATTERN, DataType.COMBINED_BATTLE),
     /** 連合艦隊航空戦マス */
     COMBINED_AIR(false, false, BattlePatternConstants.BATTLE_PATTERN, DataType.COMBINED_AIR_BATTLE),
+    /** 連合艦隊長距離空襲戦 */
+    COMBINED_LD_AIR(false, false, BattlePatternConstants.BATTLE_PATTERN, DataType.COMBINED_LD_AIRBATTLE),
     /** 連合艦隊の夜戦 */
     COMBINED_MIDNIGHT(true, false, BattlePatternConstants.BATTLE_PATTERN, DataType.COMBINED_BATTLE_MIDNIGHT),
     /** 連合艦隊での夜戦マスの戦闘 */
