@@ -29,7 +29,7 @@ import java.util.zip.ZipFile;
 import logbook.constants.AppConstants;
 import logbook.dto.BattleExDto;
 import logbook.dto.BattleResultDto;
-import logbook.gui.ApplicationMain;
+import logbook.gui.logic.DateTimeString;
 import logbook.gui.logic.IntegerPair;
 import logbook.scripting.BattleLogListener;
 import logbook.scripting.BattleLogProxy;
@@ -140,6 +140,8 @@ public class BattleResultServer {
     // 一時ストア
     private List<BattleExDto> tmpDat = null;
 
+    private int failCount = 0;
+
     private abstract class DataFile {
         final File file;
         int numRecords = 0;
@@ -165,7 +167,8 @@ public class BattleResultServer {
         }
 
         List<BattleExDto> load(InputStream input) throws IOException {
-            List<BattleExDto> result = loadFromInputStream(input, BattleResultServer.this.buffer);
+            List<BattleExDto> result = BattleResultServer.this.loadFromInputStream(input,
+                    BattleResultServer.this.buffer);
             this.numRecords = result.size();
             return result;
         }
@@ -227,7 +230,7 @@ public class BattleResultServer {
         }
     }
 
-    private static List<BattleExDto> loadFromInputStream(InputStream input, LinkedBuffer buffer) throws IOException {
+    private List<BattleExDto> loadFromInputStream(InputStream input, LinkedBuffer buffer) throws IOException {
         List<BattleExDto> result = new ArrayList<BattleExDto>();
         try {
             while (input.available() > 0) {
@@ -237,7 +240,8 @@ public class BattleResultServer {
                     battle.readFromJson();
                     result.add(battle);
                 } catch (Exception e) {
-                    ApplicationMain.logPrint(battle.getBattleDate() + "の戦闘ログ読み取りに失敗");
+                    this.failCount++;
+                    LOG.get().warn("戦闘ログの読み込みに失敗しました(" + new DateTimeString(battle.getBattleDate()) + ")", e);
                 }
             }
         } catch (EOFException e) {
@@ -293,6 +297,7 @@ public class BattleResultServer {
     public void reloadFiles() {
         this.resultDateSet.clear();
         this.resultList.clear();
+        this.failCount = 0;
 
         BattleLogListener battleLogScript = BattleLogProxy.get();
 
@@ -535,5 +540,13 @@ public class BattleResultServer {
             }
         }
         alt_report.delete();
+    }
+
+    /**
+     * 読み取りに失敗した戦闘数
+     * @return failCount
+     */
+    public int getFailCount() {
+        return this.failCount;
     }
 }

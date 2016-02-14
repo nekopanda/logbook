@@ -137,11 +137,15 @@ public final class BackgroundInitializer extends Thread {
         try {
             // 出撃ログファイル読み込み
             BattleResultServer.load();
+            final int failCount = BattleResultServer.get().getFailCount();
             this.display.asyncExec(new Runnable() {
                 @Override
                 public void run() {
                     final int numLogRecord = BattleResultServer.get().size();
                     ApplicationMain.logPrint("出撃ログ読み込み完了(" + numLogRecord + "件)");
+                    if (failCount > 0) {
+                        ApplicationMain.logPrint("注意:" + failCount + "件の出撃ログ読み込みに失敗しています");
+                    }
                 }
             });
         } catch (Exception e) {
