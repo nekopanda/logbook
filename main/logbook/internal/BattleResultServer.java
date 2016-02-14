@@ -29,6 +29,7 @@ import java.util.zip.ZipFile;
 import logbook.constants.AppConstants;
 import logbook.dto.BattleExDto;
 import logbook.dto.BattleResultDto;
+import logbook.gui.ApplicationMain;
 import logbook.gui.logic.IntegerPair;
 import logbook.scripting.BattleLogListener;
 import logbook.scripting.BattleLogProxy;
@@ -232,8 +233,12 @@ public class BattleResultServer {
             while (input.available() > 0) {
                 BattleExDto battle = schema.newMessage();
                 ProtostuffIOUtil.mergeDelimitedFrom(input, battle, schema, buffer);
-                battle.readFromJson();
-                result.add(battle);
+                try {
+                    battle.readFromJson();
+                    result.add(battle);
+                } catch (Exception e) {
+                    ApplicationMain.logPrint(battle.getBattleDate() + "の戦闘ログ読み取りに失敗");
+                }
             }
         } catch (EOFException e) {
         }
