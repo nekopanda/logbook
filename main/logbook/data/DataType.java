@@ -45,8 +45,12 @@ public enum DataType {
     BATTLE_NIGHT_TO_DAY("/kcsapi/api_req_sortie/night_to_day"),
     /** 戦闘(航空戦) */
     AIR_BATTLE("/kcsapi/api_req_sortie/airbattle"),
+    /** 戦闘(長距離空襲戦) */
+    LD_AIRBATTLE("/kcsapi/api_req_sortie/ld_airbattle"),
     /** 戦闘(航空戦) */
     COMBINED_AIR_BATTLE("/kcsapi/api_req_combined_battle/airbattle"),
+    /** 戦闘(長距離空襲戦) */
+    COMBINED_LD_AIRBATTLE("/kcsapi/api_req_combined_battle/ld_airbattle"),
     /** 戦闘 */
     COMBINED_BATTLE("/kcsapi/api_req_combined_battle/battle"),
     /** 戦闘 */

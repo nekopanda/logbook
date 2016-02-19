@@ -472,59 +472,78 @@ public class BattleExDto extends AbstractDto {
             boolean equalOrMore = (enemyGaugeRate > (0.9 * friendGaugeRate));
             boolean superior = (enemyGaugeRate > 0) && (enemyGaugeRate > (2.5 * friendGaugeRate));
 
-            if (friendSunk == 0) { // 味方轟沈数ゼロ
-                if (enemyNowShips == 0) { // 敵を殲滅した
-                    if (friendGauge == 0) { // 味方ダメージゼロ
-                        return ResultRank.PERFECT;
-                    }
-                    return ResultRank.S;
+            if ((this.kind == BattlePhaseKind.LD_AIRBATTLE) ||
+                    (this.kind == BattlePhaseKind.COMBINED_LD_AIR)) {
+                // 空襲戦
+                if (friendGaugeRate == 0) {
+                    return ResultRank.PERFECT;
                 }
-                else {
-                    // 6隻の場合のみ4隻以上撃沈？
-                    if (numEships == 6) {
-                        if (enemySunk >= 4) {
+                if (friendGaugeRate <= 10) {
+                    return ResultRank.A;
+                }
+                if (friendGaugeRate <= 20) {
+                    return ResultRank.B;
+                }
+                if (friendGaugeRate <= 50) {
+                    return ResultRank.C;
+                }
+            }
+            else {
+                if (friendSunk == 0) { // 味方轟沈数ゼロ
+                    if (enemyNowShips == 0) { // 敵を殲滅した
+                        if (friendGauge == 0) { // 味方ダメージゼロ
+                            return ResultRank.PERFECT;
+                        }
+                        return ResultRank.S;
+                    }
+                    else {
+                        // 6隻の場合のみ4隻以上撃沈？
+                        if (numEships == 6) {
+                            if (enemySunk >= 4) {
+                                return ResultRank.A;
+                            }
+                        }
+                        // 半数以上撃沈？
+                        else if ((enemySunk * 2) >= numEships) {
                             return ResultRank.A;
                         }
+                        // 敵旗艦を撃沈
+                        if (this.nowEnemyHp[0] == 0) {
+                            return ResultRank.B;
+                        }
+                        // 戦果ゲージが2.5倍以上
+                        if (superior) {
+                            return ResultRank.B;
+                        }
                     }
-                    // 半数以上撃沈？
-                    else if ((enemySunk * 2) >= numEships) {
-                        return ResultRank.A;
+                }
+                else {
+                    // 敵を殲滅した
+                    if (enemyNowShips == 0) {
+                        return ResultRank.B;
                     }
-                    // 敵旗艦を撃沈
-                    if (this.nowEnemyHp[0] == 0) {
+                    // 敵旗艦を撃沈 and 味方轟沈数 < 敵撃沈数
+                    if ((this.nowEnemyHp[0] == 0) && (friendSunk < enemySunk)) {
                         return ResultRank.B;
                     }
                     // 戦果ゲージが2.5倍以上
                     if (superior) {
                         return ResultRank.B;
                     }
+                    // 敵旗艦を撃沈
+                    // TODO: 味方の轟沈艦が２隻以上ある場合、敵旗艦を撃沈してもDになる場合がある
+                    if (this.nowEnemyHp[0] == 0) {
+                        return ResultRank.C;
+                    }
+                }
+                // 敵に与えたダメージが一定以上 and 戦果ゲージが1.0倍以上
+                if (enemyGauge > 0) {
+                    if (equalOrMore) {
+                        return ResultRank.C;
+                    }
                 }
             }
-            else {
-                // 敵を殲滅した
-                if (enemyNowShips == 0) {
-                    return ResultRank.B;
-                }
-                // 敵旗艦を撃沈 and 味方轟沈数 < 敵撃沈数
-                if ((this.nowEnemyHp[0] == 0) && (friendSunk < enemySunk)) {
-                    return ResultRank.B;
-                }
-                // 戦果ゲージが2.5倍以上
-                if (superior) {
-                    return ResultRank.B;
-                }
-                // 敵旗艦を撃沈
-                // TODO: 味方の轟沈艦が２隻以上ある場合、敵旗艦を撃沈してもDになる場合がある
-                if (this.nowEnemyHp[0] == 0) {
-                    return ResultRank.C;
-                }
-            }
-            // 敵に与えたダメージが一定以上 and 戦果ゲージが1.0倍以上
-            if (enemyGauge > 0) {
-                if (equalOrMore) {
-                    return ResultRank.C;
-                }
-            }
+
             // 轟沈艦があり かつ 残った艦が１隻のみ
             if ((friendSunk > 0) && ((numFships - friendSunk) == 1)) {
                 return ResultRank.E;

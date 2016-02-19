@@ -9,6 +9,9 @@ package logbook.dto;
  */
 public enum ResultRank {
 
+    // protostuffの仕様からenumの途中への追加削除厳禁
+    // 後ろへの追加のみ可
+
     /** 完全勝利S */
     PERFECT("S", "完全勝利!!S"),
     /** 勝利S */

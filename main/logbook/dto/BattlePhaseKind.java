@@ -34,7 +34,11 @@ public enum BattlePhaseKind {
     /** 連合艦隊での夜戦マスの戦闘 */
     COMBINED_SP_MIDNIGHT(true, false, BattlePatternConstants.BATTLE_PATTERN, DataType.COMBINED_BATTLE_SP_MIDNIGHT),
     /** 連合艦隊水上打撃部隊の昼戦 */
-    COMBINED_BATTLE_WATER(false, false, BattlePatternConstants.WATER_PATTERN, DataType.COMBINED_BATTLE_WATER);
+    COMBINED_BATTLE_WATER(false, false, BattlePatternConstants.WATER_PATTERN, DataType.COMBINED_BATTLE_WATER),
+    /** 長距離空襲戦 */
+    LD_AIRBATTLE(false, false, BattlePatternConstants.NON_COMBINED_PTTERN, DataType.LD_AIRBATTLE),
+    /** 連合艦隊長距離空襲戦 */
+    COMBINED_LD_AIR(false, false, BattlePatternConstants.BATTLE_PATTERN, DataType.COMBINED_LD_AIRBATTLE);
 
     private final boolean night;
     private final boolean practice;
