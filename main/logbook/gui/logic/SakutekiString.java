@@ -234,7 +234,7 @@ public class SakutekiString implements Comparable<SakutekiString> {
                 + (p.other * 0.6);
         double fromShip = Math.sqrt(p.sakuteki);
 
-        this.calc25v4 += Math.floor(fromItem + fromShip);
+        this.calc25v4 += fromItem + fromShip;
         this.v4Item += fromItem;
         this.v4Ship += fromShip;
     }
@@ -290,7 +290,7 @@ public class SakutekiString implements Comparable<SakutekiString> {
             return String.format("%d+%d",
                     this.totalSakuteki - this.slotSakuteki, this.slotSakuteki);
         case 1: // 判定式(33)(艦素索敵分 + 装備分 + 提督Lv分 + 艦隊空き数分)
-            return String.format("%d (%.1f%+.1f%+.1f%+.1f )", (int) this.calc25v4, this.v4Ship, this.v4Item,
+            return String.format("%.1f (%.1f%+.1f%+.1f%+.1f )", this.calc25v4, this.v4Ship, this.v4Item,
                     this.v4HqLv, this.v4Space);
         case 2: // 判定式(33)(旧:2-5式(秋))
             return String.format("%d (%.1f)", (int) this.calc25v4, this.calc25v2);
