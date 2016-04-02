@@ -121,6 +121,8 @@ public enum DataType {
     REMODELING("/kcsapi/api_req_kaisou/remodeling"),
     /** 疲労度回復アイテム使用 */
     ITEMUSE_COND("/kcsapi/api_req_member/itemuse_cond"),
+    /** ログイン時の情報 */
+    REQUIRE_INFO("/kcsapi/api_get_member/require_info"),
     /** フィルタ前のデータ */
     UNDEFINED(null);
 
