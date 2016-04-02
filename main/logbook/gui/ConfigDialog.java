@@ -43,6 +43,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
@@ -1058,10 +1059,19 @@ public final class ConfigDialog extends Dialog {
             public void widgetSelected(SelectionEvent e) {
                 // 設定の保存アクション
 
-                // system
-                if (StringUtils.isNumeric(listenport.getText())) {
-                    AppConfig.get().setListenPort(Integer.parseInt(listenport.getText()));
+                // 値チェック
+                if (!StringUtils.isNumeric(listenport.getText())) {
+                    ConfigDialog.this.printErrorMessage("受信ポートには数値(0-65535)を入力してください");
+                    return;
                 }
+                int listenPort = Integer.parseInt(listenport.getText());
+                if ((listenPort < 0) || (listenPort > 65535)) {
+                    ConfigDialog.this.printErrorMessage("受信ポートには0～65535の数値を入力してください");
+                    return;
+                }
+
+                // system
+                AppConfig.get().setListenPort(listenPort);
                 AppConfig.get().setHideWindow(hidewindow.getSelection());
                 AppConfig.get().setCloseWhenMinimized(closewindow.getSelection());
                 if (ontop != null) {
@@ -1214,6 +1224,12 @@ public final class ConfigDialog extends Dialog {
         sashForm.setWeights(new int[] { 2, 5 });
         this.scrolledComposite.setContent(this.composite);
         this.scrolledComposite.setMinSize(this.composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+    }
+
+    private void printErrorMessage(String message) {
+        MessageBox mes = new MessageBox(ConfigDialog.this.shell, SWT.ICON_WARNING | SWT.OK);
+        mes.setMessage(message);
+        mes.open();
     }
 
     private Label createColorSetting(Composite chartGroup, String title, RGB currentColor, final RGB[] defaultColor) {
