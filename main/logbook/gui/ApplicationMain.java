@@ -433,7 +433,7 @@ public final class ApplicationMain extends WindowBase {
         this.shell = this.getShell();
         this.shell.setText(AppConstants.TITLEBAR_TEXT);
 
-        if (SWT.getPlatform().equals("win32")) {
+        if (AppConfig.get().isShowSubwindowHost()) {
             final Shell dummyHolder = this.dummyHolder = new Shell(this.display, SWT.NONE);
             dummyHolder.setText("サブウィンドウ - 航海日誌拡張版");
             dummyHolder.setSize(150, 50);

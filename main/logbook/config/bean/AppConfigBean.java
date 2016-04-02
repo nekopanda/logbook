@@ -229,7 +229,7 @@ public final class AppConfigBean {
     private int seikuMethod = 0;
 
     /** 索敵表示形式 */
-    private int sakutekiMethod = 0;
+    private int sakutekiMethodV4 = 0;
 
     /** タスクバー通知を使用する */
     private boolean useTaskbarNotify = true;
@@ -308,6 +308,9 @@ public final class AppConfigBean {
 
     /** ツールウィンドウのボタンをトグル方式にする */
     private boolean toggleToolButton = true;
+
+    /** サブウィンドウのホストウィンドウを表示する */
+    private boolean showSubwindowHost = true;
 
     /** 艦娘一覧ウィンドウの名前 */
     private String[] shipTableNames = new String[] {
@@ -1327,16 +1330,16 @@ public final class AppConfigBean {
      * 索敵値の表示形式を取得します。
      * @return 索敵値の表示形式
      */
-    public int getSakutekiMethod() {
-        return this.sakutekiMethod;
+    public int getSakutekiMethodV4() {
+        return this.sakutekiMethodV4;
     }
 
     /**
      * 索敵値の表示形式を設定します。
      * @param sakutekiMethod 索敵値の表示形式
      */
-    public void setSakutekiMethod(int sakutekiMethod) {
-        this.sakutekiMethod = sakutekiMethod;
+    public void setSakutekiMethodV4(int sakutekiMethod) {
+        this.sakutekiMethodV4 = sakutekiMethod;
     }
 
     /**
@@ -2034,6 +2037,20 @@ public final class AppConfigBean {
      */
     public void setToolButtons(List<String> toolButtons) {
         this.toolButtons = toolButtons;
+    }
+
+    /**
+     * @return showSubwindowHost
+     */
+    public boolean isShowSubwindowHost() {
+        return this.showSubwindowHost;
+    }
+
+    /**
+     * @param showSubwindowHost セットする showSubwindowHost
+     */
+    public void setShowSubwindowHost(boolean showSubwindowHost) {
+        this.showSubwindowHost = showSubwindowHost;
     }
 
 }
