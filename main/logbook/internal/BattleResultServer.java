@@ -450,7 +450,8 @@ public class BattleResultServer {
                 return false;
             }
         }
-        if ((filter.rank != null) && (filter.rank.equals(dto.getRank()) == false)) {
+        if ((filter.rankCombo != null) &&
+                (filter.rankCombo.indexOf(dto.getRank().rank().charAt(0)) == -1)) {
             return false;
         }
         if (filter.printPractice != null) {

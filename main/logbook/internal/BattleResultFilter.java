@@ -5,7 +5,6 @@ package logbook.internal;
 
 import java.util.Date;
 
-import logbook.dto.ResultRank;
 import logbook.gui.logic.IntegerPair;
 
 /**
@@ -20,7 +19,7 @@ public class BattleResultFilter {
     public String dropShip = null;
     public IntegerPair map = null;
     public Integer cell = null;
-    public ResultRank rank = null;
+    public String rankCombo = null;
     public Boolean printPractice = null;
 
 }
