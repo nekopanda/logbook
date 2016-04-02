@@ -58,11 +58,15 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -428,7 +432,42 @@ public final class ApplicationMain extends WindowBase {
         super.createContents(this.display, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, true);
         this.shell = this.getShell();
         this.shell.setText(AppConstants.TITLEBAR_TEXT);
-        this.dummyHolder = new Shell(this.display, SWT.TOOL);
+
+        if (SWT.getPlatform().equals("win32")) {
+            final Shell dummyHolder = this.dummyHolder = new Shell(this.display, SWT.NONE);
+            dummyHolder.setText("サブウィンドウ - 航海日誌拡張版");
+            dummyHolder.setSize(150, 50);
+            dummyHolder.setLayout(SwtUtils.makeGridLayout(1, 0, 0, 0, 0));
+            dummyHolder.setImage(SWTResourceManager.getImage(WindowBase.class, AppConstants.LOGO));
+            dummyHolder.addShellListener(new ShellAdapter() {
+                @Override
+                public void shellClosed(ShellEvent e) {
+                    e.doit = false;
+                }
+            });
+            Label dummyLabel = new Label(this.dummyHolder, SWT.CENTER);
+            SwtUtils.initLabel(dummyLabel, "航海日誌拡張版\nサブウィンドウ", 3, 2.4,
+                    new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+
+            // 基本的に画面外に表示させるが何かの拍子に画面内に移動してしまったら、
+            // クリックで画面外に移動する
+            MouseListener dummyHolderMouseListener = new MouseAdapter() {
+                @Override
+                public void mouseDown(MouseEvent e) {
+                    Rectangle displayRect = dummyHolder.getDisplay().getClientArea();
+                    Rectangle windowRect = dummyHolder.getBounds();
+                    windowRect.x = displayRect.x + displayRect.width;
+                    windowRect.y = displayRect.y + displayRect.height;
+                    dummyHolder.setBounds(windowRect);
+                }
+            };
+            dummyHolderMouseListener.mouseDown(null);
+            dummyLabel.addMouseListener(dummyHolderMouseListener);
+        }
+        else {
+            this.dummyHolder = new Shell(this.display, SWT.TOOL);
+        }
+
         GridLayout glShell = new GridLayout(1, false);
         glShell.horizontalSpacing = 1;
         glShell.marginTop = 0;
@@ -1259,6 +1298,7 @@ public final class ApplicationMain extends WindowBase {
     private void restoreWindows() {
         // まずはメインウィンドウを表示する
         this.setVisible(true);
+        this.dummyHolder.setVisible(true);
         this.shell.forceActive();
         sysPrint("メインウィンドウ表示完了");
         for (WindowBase window : this.getWindowList()) {
