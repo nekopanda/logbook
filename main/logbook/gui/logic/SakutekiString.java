@@ -243,7 +243,7 @@ public class SakutekiString implements Comparable<SakutekiString> {
         if (hqLv == 0)
             this.v4HqLv = 0;
         else
-            this.v4HqLv = -Math.floor(hqLv * 0.4);
+            this.v4HqLv = -Math.ceil(hqLv * 0.4);
 
         this.v4Space = 2 * fleetSpace;
     }
