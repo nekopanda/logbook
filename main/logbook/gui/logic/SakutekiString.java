@@ -290,10 +290,10 @@ public class SakutekiString implements Comparable<SakutekiString> {
             return String.format("%d+%d",
                     this.totalSakuteki - this.slotSakuteki, this.slotSakuteki);
         case 1: // 判定式(33)(艦素索敵分 + 装備分 + 提督Lv分 + 艦隊空き数分)
-            return String.format("%.1f (%.1f%+.1f%+.1f%+.1f )", this.calc25v4, this.v4Ship, this.v4Item,
+            return String.format("%.2f (%.1f%+.1f%+.1f%+.1f )", this.calc25v4, this.v4Ship, this.v4Item,
                     this.v4HqLv, this.v4Space);
         case 2: // 判定式(33)(旧:2-5式(秋))
-            return String.format("%d (%.1f)", (int) this.calc25v4, this.calc25v2);
+            return String.format("%.2f (%.1f)", this.calc25v4, this.calc25v2);
         case 3: // ほっぼアルファVer2.0.1(艦素索敵分 + 装備分 + 提督Lv分)
             return String.format("%d (%.1f%+.1f%+.1f)", (int) this.calc25v3, this.v3Ship, this.v3Item, this.v3HqLv);
         case 4: // ほっぼアルファVer2.0.1(旧:2-5式(秋))
