@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import logbook.data.context.GlobalContext;
+
 import com.dyuproject.protostuff.Tag;
 
 /**
@@ -212,7 +214,11 @@ public final class DockDto extends AbstractDto {
         int akashiCapacity = this.getAkashiCapacity();
         for (int p = 0; p < this.ships.size(); ++p) {
             ShipDto ship = this.ships.get(p);
-            if ((p < akashiCapacity) && !ship.isHalfDamage() && (ship.getNowhp() != ship.getMaxhp())) {
+            if ((p < akashiCapacity) && // 泊地修理範囲
+                    !GlobalContext.isNdock(ship) && // 入渠中でない
+                    !ship.isHalfDamage() && // 中破以上でない
+                    (ship.getNowhp() != ship.getMaxhp())) // 無傷でない
+            {
                 return true;
             }
         }

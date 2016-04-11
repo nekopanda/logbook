@@ -58,11 +58,15 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -211,7 +215,8 @@ public final class ApplicationMain extends WindowBase {
     /** ベースクラスの持っているshellと同じ */
     private Shell shell;
     /** 表示しない親ウィンドウ */
-    private Shell dummyHolder;
+    private Shell subwindowHost;
+    private boolean showSubwindowHost;
     /** ディスプレイ */
     private Display display;
 
@@ -404,7 +409,7 @@ public final class ApplicationMain extends WindowBase {
 
                 }
             }
-            this.dummyHolder.dispose();
+            this.subwindowHost.dispose();
         } finally {
             Tray tray = Display.getDefault().getSystemTray();
             if (tray != null) {
@@ -428,7 +433,43 @@ public final class ApplicationMain extends WindowBase {
         super.createContents(this.display, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, true);
         this.shell = this.getShell();
         this.shell.setText(AppConstants.TITLEBAR_TEXT);
-        this.dummyHolder = new Shell(this.display, SWT.TOOL);
+
+        this.showSubwindowHost = AppConfig.get().isShowSubwindowHost();
+        if (this.showSubwindowHost) {
+            final Shell dummyHolder = this.subwindowHost = new Shell(this.display, SWT.NONE);
+            dummyHolder.setText("サブウィンドウ - 航海日誌拡張版");
+            dummyHolder.setSize(150, 50);
+            dummyHolder.setLayout(SwtUtils.makeGridLayout(1, 0, 0, 0, 0));
+            dummyHolder.setImage(SWTResourceManager.getImage(WindowBase.class, AppConstants.LOGO));
+            dummyHolder.addShellListener(new ShellAdapter() {
+                @Override
+                public void shellClosed(ShellEvent e) {
+                    e.doit = false;
+                }
+            });
+            Label dummyLabel = new Label(this.subwindowHost, SWT.CENTER);
+            SwtUtils.initLabel(dummyLabel, "航海日誌拡張版\nサブウィンドウ", 3, 2.4,
+                    new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+
+            // 基本的に画面外に表示させるが何かの拍子に画面内に移動してしまったら、
+            // クリックで画面外に移動する
+            MouseListener dummyHolderMouseListener = new MouseAdapter() {
+                @Override
+                public void mouseDown(MouseEvent e) {
+                    Rectangle displayRect = dummyHolder.getDisplay().getClientArea();
+                    Rectangle windowRect = dummyHolder.getBounds();
+                    windowRect.x = displayRect.x + displayRect.width;
+                    windowRect.y = displayRect.y + displayRect.height;
+                    dummyHolder.setBounds(windowRect);
+                }
+            };
+            dummyHolderMouseListener.mouseDown(null);
+            dummyLabel.addMouseListener(dummyHolderMouseListener);
+        }
+        else {
+            this.subwindowHost = new Shell(this.display, SWT.TOOL);
+        }
+
         GridLayout glShell = new GridLayout(1, false);
         glShell.horizontalSpacing = 1;
         glShell.marginTop = 0;
@@ -467,7 +508,7 @@ public final class ApplicationMain extends WindowBase {
                     WindowBase[] windowArray = windows.toArray(new WindowBase[windows.size()]);
                     for (int i = windowArray.length - 1; i >= 0; --i) {
                         WindowBase win = windowArray[i];
-                        if (win.getVisible() && (win.getActualParent() == ApplicationMain.this.dummyHolder)) {
+                        if (win.getVisible() && (win.getActualParent() == ApplicationMain.this.subwindowHost)) {
                             windowArray[i].setBehindTo(ApplicationMain.this);
                             break;
                         }
@@ -508,34 +549,34 @@ public final class ApplicationMain extends WindowBase {
         // コマンド-キャプチャ
         MenuItem capture = new MenuItem(cmdmenu, SWT.CHECK);
         capture.setText("キャプチャ(&C)");
-        this.captureWindow = new CaptureDialog(this.dummyHolder, capture);
+        this.captureWindow = new CaptureDialog(this.subwindowHost, capture);
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // コマンド-ドロップ報告書
         MenuItem cmddrop = new MenuItem(cmdmenu, SWT.CHECK);
         cmddrop.setText("ドロップ報告書(&D)\tCtrl+D");
         cmddrop.setAccelerator(SWT.CTRL + 'D');
-        this.dropReportWindow = new DropReportTable(this.dummyHolder, cmddrop);
+        this.dropReportWindow = new DropReportTable(this.subwindowHost, cmddrop);
         // コマンド-建造報告書
         MenuItem cmdcreateship = new MenuItem(cmdmenu, SWT.CHECK);
         cmdcreateship.setText("建造報告書(&Y)\tCtrl+Y");
         cmdcreateship.setAccelerator(SWT.CTRL + 'Y');
-        this.createShipReportWindow = new CreateShipReportTable(this.dummyHolder, cmdcreateship);
+        this.createShipReportWindow = new CreateShipReportTable(this.subwindowHost, cmdcreateship);
         // コマンド-開発報告書
         MenuItem cmdcreateitem = new MenuItem(cmdmenu, SWT.CHECK);
         cmdcreateitem.setText("開発報告書(&E)\tCtrl+E");
         cmdcreateitem.setAccelerator(SWT.CTRL + 'E');
-        this.createItemReportWindow = new CreateItemReportTable(this.dummyHolder, cmdcreateitem);
+        this.createItemReportWindow = new CreateItemReportTable(this.subwindowHost, cmdcreateitem);
         // コマンド-遠征報告書
         MenuItem cmdmissionresult = new MenuItem(cmdmenu, SWT.CHECK);
         cmdmissionresult.setText("遠征報告書(&T)\tCtrl+T");
         cmdmissionresult.setAccelerator(SWT.CTRL + 'T');
-        this.missionResultWindow = new MissionResultTable(this.dummyHolder, cmdmissionresult);
+        this.missionResultWindow = new MissionResultTable(this.subwindowHost, cmdmissionresult);
 
         // コマンド-遠征一覧
         MenuItem missionlist = new MenuItem(cmdmenu, SWT.CHECK);
         missionlist.setText("遠征一覧");
-        this.missionTableWindow = new MissionTable(this.dummyHolder, missionlist);
+        this.missionTableWindow = new MissionTable(this.subwindowHost, missionlist);
 
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
@@ -543,7 +584,7 @@ public final class ApplicationMain extends WindowBase {
         MenuItem cmditemlist = new MenuItem(cmdmenu, SWT.CHECK);
         cmditemlist.setText("所有装備一覧(&X)\tCtrl+X");
         cmditemlist.setAccelerator(SWT.CTRL + 'X');
-        this.itemTableWindow = new ItemTable(this.dummyHolder, cmditemlist);
+        this.itemTableWindow = new ItemTable(this.subwindowHost, cmditemlist);
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
         // コマンド-所有艦娘一覧
@@ -555,14 +596,14 @@ public final class ApplicationMain extends WindowBase {
             else {
                 cmdshiplist.setAccelerator(SWT.CTRL + ('1' + i));
             }
-            this.shipTableWindows[i] = new ShipTable(this.dummyHolder, cmdshiplist, i);
+            this.shipTableWindows[i] = new ShipTable(this.subwindowHost, cmdshiplist, i);
         }
 
         // コマンド-お風呂に入りたい艦娘
         MenuItem cmdbathwaterlist = new MenuItem(cmdmenu, SWT.CHECK);
         cmdbathwaterlist.setText("お風呂に入りたい艦娘(&N)\tCtrl+N");
         cmdbathwaterlist.setAccelerator(SWT.CTRL + 'N');
-        this.bathwaterTablwWindow = new BathwaterTableDialog(this.dummyHolder, cmdbathwaterlist);
+        this.bathwaterTablwWindow = new BathwaterTableDialog(this.subwindowHost, cmdbathwaterlist);
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
 
@@ -570,7 +611,7 @@ public final class ApplicationMain extends WindowBase {
         MenuItem questlist = new MenuItem(cmdmenu, SWT.CHECK);
         questlist.setText("任務一覧(&Q)\tCtrl+Q");
         questlist.setAccelerator(SWT.CTRL + 'Q');
-        this.questTableWindow = new QuestTable(this.dummyHolder, questlist);
+        this.questTableWindow = new QuestTable(this.subwindowHost, questlist);
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
 
@@ -578,19 +619,19 @@ public final class ApplicationMain extends WindowBase {
         MenuItem battleWinMenu = new MenuItem(cmdmenu, SWT.CHECK);
         battleWinMenu.setText("戦況(&B)\tCtrl+B");
         battleWinMenu.setAccelerator(SWT.CTRL + 'B');
-        this.battleWindowLarge = new BattleWindowLarge(this.dummyHolder, battleWinMenu);
+        this.battleWindowLarge = new BattleWindowLarge(this.subwindowHost, battleWinMenu);
 
         // 表示-戦況ウィンドウ （小）
         MenuItem battleWinSMenu = new MenuItem(cmdmenu, SWT.CHECK);
         battleWinSMenu.setText("戦況-横(&H)\tCtrl+H");
         battleWinSMenu.setAccelerator(SWT.CTRL + 'H');
-        this.battleWindowSmall = new BattleWindowSmall(this.dummyHolder, battleWinSMenu);
+        this.battleWindowSmall = new BattleWindowSmall(this.subwindowHost, battleWinSMenu);
 
         // 表示-敵味方パラメータ
         MenuItem battleShipWinMenu = new MenuItem(cmdmenu, SWT.CHECK);
         battleShipWinMenu.setText("自軍敵軍パラメータ(&P)\tCtrl+P");
         battleShipWinMenu.setAccelerator(SWT.CTRL + 'P');
-        this.battleShipWindow = new BattleShipWindow(this.dummyHolder, battleShipWinMenu);
+        this.battleShipWindow = new BattleShipWindow(this.subwindowHost, battleShipWinMenu);
 
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
@@ -608,39 +649,39 @@ public final class ApplicationMain extends WindowBase {
         MenuItem calcexp = new MenuItem(calcmenu, SWT.CHECK);
         calcexp.setText("経験値計算機(&C)\tCtrl+C");
         calcexp.setAccelerator(SWT.CTRL + 'C');
-        this.calcExpWindow = new CalcExpDialog(this.dummyHolder, calcexp);
+        this.calcExpWindow = new CalcExpDialog(this.subwindowHost, calcexp);
 
         // 計算機-演習経験値計算
         MenuItem calcpracticeexp = new MenuItem(calcmenu, SWT.CHECK);
         calcpracticeexp.setText("演習経験値計算機(&V)\tCtrl+V");
         calcpracticeexp.setAccelerator(SWT.CTRL + 'V');
-        this.calcPracticeExpWindow = new CalcPracticeExpDialog(this.dummyHolder, calcpracticeexp);
+        this.calcPracticeExpWindow = new CalcPracticeExpDialog(this.subwindowHost, calcpracticeexp);
 
         // その他-資材チャート
         MenuItem resourceChart = new MenuItem(etcmenu, SWT.CHECK);
         resourceChart.setText("資材チャート(&R)\tCtrl+R");
         resourceChart.setAccelerator(SWT.CTRL + 'R');
-        this.resourceChartWindow = new ResourceChartDialog(this.dummyHolder, resourceChart);
+        this.resourceChartWindow = new ResourceChartDialog(this.subwindowHost, resourceChart);
 
         // コマンド-出撃統計
         MenuItem battleCounter = new MenuItem(etcmenu, SWT.CHECK);
         battleCounter.setText("出撃統計(&A)\tCtrl+A");
         battleCounter.setAccelerator(SWT.CTRL + 'A');
-        this.battleCounterWindow = new BattleAggDialog(this.dummyHolder, battleCounter);
+        this.battleCounterWindow = new BattleAggDialog(this.subwindowHost, battleCounter);
         // セパレータ
         new MenuItem(etcmenu, SWT.SEPARATOR);
         // その他-グループエディター
         MenuItem shipgroup = new MenuItem(etcmenu, SWT.CHECK);
         shipgroup.setText("グループエディター(&G)\tCtrl+G");
         shipgroup.setAccelerator(SWT.CTRL + 'G');
-        this.shipFilterGroupWindow = new ShipFilterGroupDialog(this.dummyHolder, shipgroup);
+        this.shipFilterGroupWindow = new ShipFilterGroupDialog(this.subwindowHost, shipgroup);
         // その他-自動プロキシ構成スクリプトファイル生成
         MenuItem pack = new MenuItem(etcmenu, SWT.NONE);
         pack.setText("自動プロキシ構成スクリプト");
         pack.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                new CreatePacFileDialog(ApplicationMain.this.dummyHolder).open();
+                new CreatePacFileDialog(ApplicationMain.this.subwindowHost).open();
             }
         });
         // セパレータ 
@@ -648,7 +689,7 @@ public final class ApplicationMain extends WindowBase {
         // その他-ツール
         MenuItem toolwindows = new MenuItem(etcmenu, SWT.CHECK);
         toolwindows.setText("ツール");
-        this.launcherWindow = new LauncherWindow(this.dummyHolder, toolwindows);
+        this.launcherWindow = new LauncherWindow(this.subwindowHost, toolwindows);
         // その他-艦隊タブ切り離し
         MenuItem floatFleetItem = new MenuItem(etcmenu, SWT.CASCADE);
         floatFleetItem.setText("艦隊タブ切り離し");
@@ -980,7 +1021,7 @@ public final class ApplicationMain extends WindowBase {
         for (int i = 0; i < this.fleetWindows.length; ++i) {
             MenuItem menuItem = new MenuItem(floatFleetMenu, SWT.CHECK);
             menuItem.setText("#" + (i + 1));
-            this.fleetWindows[i] = new FleetWindow(this.dummyHolder, menuItem, this.tabFolder, i + 1);
+            this.fleetWindows[i] = new FleetWindow(this.subwindowHost, menuItem, this.tabFolder, i + 1);
         }
 
         // メニュー表示
@@ -1259,6 +1300,9 @@ public final class ApplicationMain extends WindowBase {
     private void restoreWindows() {
         // まずはメインウィンドウを表示する
         this.setVisible(true);
+        if (this.showSubwindowHost) {
+            this.subwindowHost.setVisible(true);
+        }
         this.shell.forceActive();
         sysPrint("メインウィンドウ表示完了");
         for (WindowBase window : this.getWindowList()) {
@@ -1282,7 +1326,7 @@ public final class ApplicationMain extends WindowBase {
 
     // Main以外のウィンドウも連動させる
     private void childDeiconified() {
-        for (Shell shell : ApplicationMain.this.dummyHolder.getShells()) {
+        for (Shell shell : ApplicationMain.this.subwindowHost.getShells()) {
             if (shell.getData() instanceof WindowBase) {
                 WindowBase window = (WindowBase) shell.getData();
                 window.shellDeiconified();
@@ -1292,7 +1336,7 @@ public final class ApplicationMain extends WindowBase {
 
     // Main以外のウィンドウも連動させる
     private void childIconified() {
-        for (Shell shell : ApplicationMain.this.dummyHolder.getShells()) {
+        for (Shell shell : ApplicationMain.this.subwindowHost.getShells()) {
             if (shell.getData() instanceof WindowBase) {
                 WindowBase window = (WindowBase) shell.getData();
                 window.shellIconified();

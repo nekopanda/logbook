@@ -43,6 +43,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
@@ -444,13 +445,15 @@ public final class ConfigDialog extends Dialog {
         final Combo sakutekiCombo = new Combo(compositeFleetTab, SWT.READ_ONLY);
         sakutekiCombo.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
         sakutekiCombo.add("A.艦隊素の索敵値 + 装備の索敵値");
-        sakutekiCombo.add("B.ほっぽアルファVer2.0.1(艦隊素の索敵分 + 装備分 - 提督Lv分)");
-        sakutekiCombo.add("C.ほっぽアルファVer2.0.1(2-5式(秋))");
-        sakutekiCombo.add("D.2-5式(秋)(艦隊素の索敵分 + 装備分 - 提督Lv分)");
-        sakutekiCombo.add("E.装備込みの艦隊索敵値合計(2-5式(秋))");
-        sakutekiCombo.add("F.2-5式(旧)(偵察機×2 + 電探 + √(装備込みの艦隊索敵値-偵察機-電探))");
-        sakutekiCombo.add("G.装備込みの艦隊索敵値(2-5式(旧))");
-        sakutekiCombo.select(AppConfig.get().getSakutekiMethod());
+        sakutekiCombo.add("B.判定式(33)(艦隊素の索敵分 + 装備分 - 提督Lv分 + 艦隊空き数分)");
+        sakutekiCombo.add("C.判定式(33)(2-5式(秋))");
+        sakutekiCombo.add("D.ほっぽアルファVer2.0.1(艦隊素の索敵分 + 装備分 - 提督Lv分)");
+        sakutekiCombo.add("F.ほっぽアルファVer2.0.1(2-5式(秋))");
+        sakutekiCombo.add("F.2-5式(秋)(艦隊素の索敵分 + 装備分 - 提督Lv分)");
+        sakutekiCombo.add("G.装備込みの艦隊索敵値合計(2-5式(秋))");
+        sakutekiCombo.add("H.2-5式(旧)(偵察機×2 + 電探 + √(装備込みの艦隊索敵値-偵察機-電探))");
+        sakutekiCombo.add("I.装備込みの艦隊索敵値(2-5式(旧))");
+        sakutekiCombo.select(AppConfig.get().getSakutekiMethodV4());
 
         Label mainLog = new Label(compositeFleetTab, SWT.NONE);
         mainLog.setText("母港タブのログ");
@@ -768,6 +771,11 @@ public final class ConfigDialog extends Dialog {
         toggleToolButton.setSelection(AppConfig.get().isToggleToolButton());
         toggleToolButton.setText("ツールウィンドウのボタンをトグル方式にする");
 
+        final Button showSubwindowHost = new Button(compositeWindow, SWT.CHECK);
+        showSubwindowHost.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        showSubwindowHost.setSelection(AppConfig.get().isShowSubwindowHost());
+        showSubwindowHost.setText("サブウィンドウホストを表示する(Windows10デスクトップ切り替え対応)*");
+
         Group opaqueIntervalGroup = new Group(compositeWindow, SWT.NONE);
         opaqueIntervalGroup.setText("マウスが離れてから元の透明度に戻るまでの時間");
         opaqueIntervalGroup.setLayout(new GridLayout(2, false));
@@ -1058,10 +1066,19 @@ public final class ConfigDialog extends Dialog {
             public void widgetSelected(SelectionEvent e) {
                 // 設定の保存アクション
 
-                // system
-                if (StringUtils.isNumeric(listenport.getText())) {
-                    AppConfig.get().setListenPort(Integer.parseInt(listenport.getText()));
+                // 値チェック
+                if (!StringUtils.isNumeric(listenport.getText())) {
+                    ConfigDialog.this.printErrorMessage("受信ポートには数値(0-65535)を入力してください");
+                    return;
                 }
+                int listenPort = Integer.parseInt(listenport.getText());
+                if ((listenPort < 0) || (listenPort > 65535)) {
+                    ConfigDialog.this.printErrorMessage("受信ポートには0～65535の数値を入力してください");
+                    return;
+                }
+
+                // system
+                AppConfig.get().setListenPort(listenPort);
                 AppConfig.get().setHideWindow(hidewindow.getSelection());
                 AppConfig.get().setCloseWhenMinimized(closewindow.getSelection());
                 if (ontop != null) {
@@ -1111,7 +1128,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setShowAkashiTimer(showAkashiTimer.getSelection());
                 AppConfig.get().setAkashiTimerFormat(akashiFormatCombo.getSelectionIndex());
                 AppConfig.get().setSeikuMethod(seikuCombo.getSelectionIndex());
-                AppConfig.get().setSakutekiMethod(sakutekiCombo.getSelectionIndex());
+                AppConfig.get().setSakutekiMethodV4(sakutekiCombo.getSelectionIndex());
                 // notify
                 AppConfig.get().setOkCond(condSpinner.getSelection());
                 AppConfig.get().setNoticeCondOnlyMainFleet(condOnlyMain.getSelection());
@@ -1147,6 +1164,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setNoMenubar(noMenubar.getSelection());
                 AppConfig.get().setDisableWindowMenu(diableWindowMenu.getSelection());
                 AppConfig.get().setToggleToolButton(toggleToolButton.getSelection());
+                AppConfig.get().setShowSubwindowHost(showSubwindowHost.getSelection());
                 for (int i = 0; i < 4; ++i) {
                     AppConfig.get().getShipTableNames()[i] = shipTableNameText[i].getText();
                 }
@@ -1214,6 +1232,12 @@ public final class ConfigDialog extends Dialog {
         sashForm.setWeights(new int[] { 2, 5 });
         this.scrolledComposite.setContent(this.composite);
         this.scrolledComposite.setMinSize(this.composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+    }
+
+    private void printErrorMessage(String message) {
+        MessageBox mes = new MessageBox(ConfigDialog.this.shell, SWT.ICON_WARNING | SWT.OK);
+        mes.setMessage(message);
+        mes.open();
     }
 
     private Label createColorSetting(Composite chartGroup, String title, RGB currentColor, final RGB[] defaultColor) {

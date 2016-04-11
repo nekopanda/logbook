@@ -25,6 +25,7 @@ import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -40,6 +41,9 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class BattleFilterDialog extends WindowBase {
 
+    private static final String ALL_RANKS = "SABCDE";
+    private static final String SELECT_RANK = "SELECT";
+
     private final DropReportTable parent;
 
     private List<IntegerPair> mapList;
@@ -51,7 +55,7 @@ public class BattleFilterDialog extends WindowBase {
     private List<String> shipList;
     private CheckAndCombo shipCombo;
 
-    private List<ResultRank> rankList;
+    private List<String> rankList;
     private CheckAndCombo rankCombo;
 
     private List<Boolean> kindList;
@@ -62,6 +66,10 @@ public class BattleFilterDialog extends WindowBase {
 
     private LabelAndCalender fromDate;
     private LabelAndCalender toDate;
+
+    private Composite rankCompo;
+    private Label rankPlaceholder;
+    private List<Button> rankCheckboxList;
 
     public BattleFilterDialog(DropReportTable parent) {
         super.createContents(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE, false);
@@ -101,13 +109,14 @@ public class BattleFilterDialog extends WindowBase {
     private void createContents() {
         Shell shell = this.getShell();
         shell.setText("フィルター");
-        GridLayout glShell = new GridLayout(4, false);
+        GridLayout glShell = new GridLayout(5, false);
         shell.setLayout(glShell);
 
         SelectionListener listener = new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 BattleFilterDialog.this.updateCalenderVisible();
+                BattleFilterDialog.this.updateRankCheckboxVisible();
                 BattleFilterDialog.this.parent.updateFilter(BattleFilterDialog.this.createFilter());
             }
         };
@@ -120,17 +129,47 @@ public class BattleFilterDialog extends WindowBase {
         this.cellCombo = new CheckAndCombo(shell, "マス", 1);
         this.cellCombo.initState(listener);
 
+        // ランクチェックボックス
+        this.rankCompo = new Composite(shell, SWT.NONE);
+        this.rankCompo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 5));
+        RowLayout rankCompoLayout = new RowLayout(SWT.VERTICAL);
+        rankCompoLayout.wrap = false;
+        this.rankCompo.setLayout(rankCompoLayout);
+        this.rankCheckboxList = new ArrayList<Button>();
+        for (char rank : ALL_RANKS.toCharArray()) {
+            Button checkbox = new Button(this.rankCompo, SWT.CHECK);
+            this.rankCheckboxList.add(checkbox);
+            checkbox.setText(String.valueOf(rank));
+            checkbox.setData(rank);
+            checkbox.addSelectionListener(listener);
+        }
+        this.rankPlaceholder = new Label(shell, SWT.NONE);
+        this.rankPlaceholder.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 5));
+
         // ドロップ艦
         this.shipCombo = new CheckAndCombo(shell, "ドロップ", 1);
         this.shipCombo.initState(listener);
 
         // ランク
-        this.rankList = new ArrayList<ResultRank>();
-        this.rankCombo = new CheckAndCombo(shell, "ランク", 1);
-        for (ResultRank rank : ResultRank.values()) {
-            this.rankCombo.combo.add(rank.toString());
-            this.rankList.add(rank);
+        this.rankList = new ArrayList<String>();
+        for (char rank : ALL_RANKS.toCharArray()) {
+            this.rankList.add(String.valueOf(rank));
         }
+        this.rankList.add("SAB");
+        this.rankList.add("CDE");
+        this.rankList.add(SELECT_RANK);
+        this.rankCombo = new CheckAndCombo(shell, "ランク", 1);
+        for (String rankString : this.rankList) {
+            if (rankString.length() == 1) {
+                this.rankCombo.combo.add(ResultRank.fromRank(rankString).toString());
+            }
+            else {
+                break;
+            }
+        }
+        this.rankCombo.combo.add("勝利(S,A,B)");
+        this.rankCombo.combo.add("敗北(C,D,E)");
+        this.rankCombo.combo.add("右から選択");
         this.rankCombo.initState(listener);
 
         // 戦闘種別
@@ -142,7 +181,7 @@ public class BattleFilterDialog extends WindowBase {
         this.kindList.add(true);
         this.kindCombo.initState(listener);
 
-        // ランク
+        // 期間
         this.timeList = new ArrayList<TimeSpanKind>();
         this.timeCombo = new CheckAndCombo(shell, "期間", 1);
         for (TimeSpanKind time : TimeSpanKind.values()) {
@@ -165,7 +204,15 @@ public class BattleFilterDialog extends WindowBase {
             int mapIdx = (filter.map == null) ? -1 : this.mapList.indexOf(filter.map);
             int cellIdx = (filter.cell == null) ? -1 : this.cellList.indexOf(filter.cell);
             int dtopShipIdx = (filter.dropShip == null) ? -1 : this.shipList.indexOf(filter.dropShip);
-            int mapComboIdx = (filter.rank == null) ? -1 : this.rankList.indexOf(filter.rank);
+
+            int rankIdx = -1;
+            if ((filter.rankCombo != null) && (filter.rankCombo.length() == 1)) {
+                rankIdx = this.rankList.indexOf(filter.rankCombo);
+                if (rankIdx == -1) {
+                    rankIdx = this.rankList.indexOf(SELECT_RANK);
+                }
+            }
+
             int kindIdx =
                     (filter.printPractice == null) ? -1 :
                             filter.printPractice ? 1 : 0;
@@ -180,9 +227,10 @@ public class BattleFilterDialog extends WindowBase {
             if (dtopShipIdx != -1) {
                 this.shipCombo.select(dtopShipIdx);
             }
-            if (mapComboIdx != -1) {
-                this.rankCombo.select(mapComboIdx);
+            if (rankIdx != -1) {
+                this.rankCombo.select(rankIdx);
             }
+
             if (kindIdx != -1) {
                 this.kindCombo.select(kindIdx);
             }
@@ -198,6 +246,7 @@ public class BattleFilterDialog extends WindowBase {
         }
 
         this.updateCalenderVisible();
+        this.updateRankCheckboxVisible();
         shell.pack();
 
         // データの更新を受け取る
@@ -242,7 +291,16 @@ public class BattleFilterDialog extends WindowBase {
         filter.map = (IntegerPair) getSelectedItem(this.mapCombo, this.mapList);
         filter.cell = (Integer) getSelectedItem(this.cellCombo, this.cellList);
         filter.dropShip = (String) getSelectedItem(this.shipCombo, this.shipList);
-        filter.rank = (ResultRank) getSelectedItem(this.rankCombo, this.rankList);
+        filter.rankCombo = (String) getSelectedItem(this.rankCombo, this.rankList);
+        if ((filter.rankCombo != null) && filter.rankCombo.equals(SELECT_RANK)) {
+            filter.rankCombo = "";
+            for (Button check : this.rankCheckboxList) {
+                if (check.getSelection()) {
+                    Character rank = (Character) check.getData();
+                    filter.rankCombo += rank;
+                }
+            }
+        }
         filter.printPractice = (Boolean) getSelectedItem(this.kindCombo, this.kindList);
         TimeSpanKind timeSpan = (TimeSpanKind) getSelectedItem(this.timeCombo, this.timeList);
         if (timeSpan == TimeSpanKind.MANUAL) {
@@ -275,6 +333,18 @@ public class BattleFilterDialog extends WindowBase {
             this.fromDate.setVisible(isManual);
             this.toDate.setVisible(isManual);
             if (isManual) {
+                this.getShell().pack();
+            }
+        }
+    }
+
+    private void updateRankCheckboxVisible() {
+        String selected = (String) getSelectedItem(this.rankCombo, this.rankList);
+        boolean isSelect = ((selected != null) && selected.equals(SELECT_RANK));
+        if (isSelect ^ this.rankCompo.getVisible()) {
+            LayoutLogic.hide(this.rankCompo, !isSelect);
+            LayoutLogic.hide(this.rankPlaceholder, isSelect);
+            if (isSelect) {
                 this.getShell().pack();
             }
         }
