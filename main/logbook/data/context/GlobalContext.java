@@ -848,6 +848,10 @@ public final class GlobalContext {
         case REQUIRE_INFO:
             doRequireInfo(data, apidata);
             break;
+        // 基地航空隊出撃
+        case START_AIR_BASE:
+            doStartAirBase(data, apidata);
+            break;
         default:
             break;
         }
@@ -2425,6 +2429,25 @@ public final class GlobalContext {
             }
         } catch (Exception e) {
             LOG.get().warn("進撃を更新しますに失敗しました", e);
+            LOG.get().warn(data);
+        }
+    }
+
+    /**
+     * 基地航空隊出撃を更新します
+     *
+     * @param data
+     */
+    private static void doStartAirBase(Data data, JsonValue json) {
+        try {
+            for (int i = 1; i <= 4; ++i) {
+                String strikePoint = data.getField("api_strike_point_" + i);
+                if (strikePoint != null) {
+                    addConsole("基地航空隊 " + i + " -> " + strikePoint);
+                }
+            }
+        } catch (Exception e) {
+            LOG.get().warn("基地航空隊出撃しますに失敗しました", e);
             LOG.get().warn(data);
         }
     }

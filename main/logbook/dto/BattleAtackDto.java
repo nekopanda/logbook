@@ -147,9 +147,10 @@ public class BattleAtackDto {
     }
 
     private static BattleAtackDto makeAir(boolean friendAtack,
-            JsonArray plane_from, JsonArray dam_list, JsonArray cdam_list, JsonArray cl_list, JsonArray ccl_list) {
+            JsonArray plane_from, JsonArray dam_list, JsonArray cdam_list, JsonArray cl_list, JsonArray ccl_list,
+            boolean isBase) {
         BattleAtackDto dto = new BattleAtackDto();
-        dto.kind = AtackKind.AIR;
+        dto.kind = isBase ? AtackKind.AIRBASE : AtackKind.AIR;
         dto.friendAtack = friendAtack;
 
         int idx = 0;
@@ -228,7 +229,8 @@ public class BattleAtackDto {
      * @param combined
      * @return
      */
-    public static List<BattleAtackDto> makeAir(JsonValue plane_from, JsonValue raigeki, JsonValue combined) {
+    public static List<BattleAtackDto> makeAir(JsonValue plane_from, JsonValue raigeki, JsonValue combined,
+            boolean isBase) {
         if ((raigeki == null) || (raigeki == JsonValue.NULL) || (plane_from == null) || (plane_from == JsonValue.NULL))
             return null;
 
@@ -246,7 +248,12 @@ public class BattleAtackDto {
                 raigeki_obj.getJsonArray("api_edam"),
                 null,
                 raigeki_obj.getJsonArray("api_ecl_flag"),
-                null);
+                null,
+                isBase);
+
+        if (isBase) {
+            return Arrays.asList(new BattleAtackDto[] { fatack });
+        }
 
         BattleAtackDto eatack = makeAir(
                 false,
@@ -254,7 +261,8 @@ public class BattleAtackDto {
                 raigeki_obj.getJsonArray("api_fdam"),
                 fdamCombined,
                 raigeki_obj.getJsonArray("api_fcl_flag"),
-                fclCombined);
+                fclCombined,
+                false);
 
         return Arrays.asList(new BattleAtackDto[] { fatack, eatack });
     }

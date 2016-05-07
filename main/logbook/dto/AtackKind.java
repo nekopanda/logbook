@@ -15,5 +15,6 @@ public enum AtackKind {
     AIR,
     SUPPORT,
     HOUGEKI,
-    RAIGEKI;
+    RAIGEKI,
+    AIRBASE;
 }

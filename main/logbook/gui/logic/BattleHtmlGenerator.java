@@ -11,6 +11,7 @@ import java.util.List;
 
 import logbook.constants.AppConstants;
 import logbook.dto.AirBattleDto;
+import logbook.dto.AtackKind;
 import logbook.dto.BattleAtackDto;
 import logbook.dto.BattleExDto;
 import logbook.dto.BattleExDto.Phase;
@@ -638,23 +639,25 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                 textClass = TEXT_CLASS[1];
             }
 
-            this.begin("div", BOX_CLASS);
-            this.inline("span", text[0] + ": 攻撃に参加した艦", null);
-            this.begin("table", tableClass[0]);
-            if (atack.origin.length == 0) {
-                this.begin("tr", null);
-                this.inline("td", "なし", null);
-                this.end(); // tr
-            }
-            else {
-                for (int i = 0; i < atack.origin.length; ++i) {
+            if (atack.kind != AtackKind.AIRBASE) { // 基地航空隊の攻撃機表示は未実装
+                this.begin("div", BOX_CLASS);
+                this.inline("span", text[0] + ": 攻撃に参加した艦", null);
+                this.begin("table", tableClass[0]);
+                if (atack.origin.length == 0) {
                     this.begin("tr", null);
-                    this.inline("td", this.getShipName(origin, atack.origin[i]), textClass[0]);
+                    this.inline("td", "なし", null);
                     this.end(); // tr
                 }
+                else {
+                    for (int i = 0; i < atack.origin.length; ++i) {
+                        this.begin("tr", null);
+                        this.inline("td", this.getShipName(origin, atack.origin[i]), textClass[0]);
+                        this.end(); // tr
+                    }
+                }
+                this.end(); // table
+                this.end(); // p
             }
-            this.end(); // table
-            this.end(); // p
 
             this.begin("div", BOX_CLASS);
             this.inline("span", text[1], null);
@@ -746,6 +749,16 @@ public class BattleHtmlGenerator extends HTMLGenerator {
             hougekiList.add(phase.getHougeki2());
         if (phase.getHougeki3() != null)
             hougekiList.add(phase.getHougeki3());
+
+        // 基地航空隊
+        List<AirBattleDto> airBaseList = phase.getAirBase();
+        if (airBaseList != null) {
+            for (int i = 0; i < airBaseList.size(); ++i) {
+                AirBattleDto attack = airBaseList.get(i);
+                this.genAirBattle(attack, "基地航空隊攻撃(" + (i + 1) + "/" + airBaseList.size() + ")",
+                        friendShips, enemyShips, friendHp, enemyHp);
+            }
+        }
 
         // 航空戦 → 支援艦隊による攻撃 →　開幕 → 航空戦２回目
         for (int i = 0; i < airList.size(); ++i) {
