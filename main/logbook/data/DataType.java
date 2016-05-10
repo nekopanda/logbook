@@ -91,6 +91,8 @@ public enum DataType {
     START("/kcsapi/api_req_map/start"),
     /** 進撃 */
     NEXT("/kcsapi/api_req_map/next"),
+    /** 出撃 */
+    START_AIR_BASE("/kcsapi/api_req_map/start_air_base"),
     /** 任務一覧 */
     QUEST_LIST("/kcsapi/api_get_member/questlist"),
     /** 任務消化 */
