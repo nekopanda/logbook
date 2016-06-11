@@ -16,8 +16,8 @@ import logbook.dto.ShipBaseDto;
 public class SeikuString implements Comparable<SeikuString> {
 
     private static int[][] alevelBonusTable = new int[][] {
-            { 0, 0, 2, 5, 9, 14, 14, 22 }, // 艦上戦闘機
-            { 0, 0, 0, 0, 0, 0, 0, 0 }, // 艦上爆撃機、艦上攻撃機、水上戦闘機
+            { 0, 0, 2, 5, 9, 14, 14, 22 }, // 艦上戦闘機、水上戦闘機
+            { 0, 0, 0, 0, 0, 0, 0, 0 }, // 艦上爆撃機、艦上攻撃機
             { 0, 0, 1, 1, 1, 3, 3, 6 }, // 水上爆撃機
     };
 
@@ -57,11 +57,11 @@ public class SeikuString implements Comparable<SeikuString> {
                 int type;
                 switch (item.getType2()) {
                 case 6: // 艦上戦闘機
+                case 45: // 水上戦闘機
                     type = 0;
                     break;
                 case 7: // 艦上爆撃機
                 case 8: // 艦上攻撃機
-                case 45: // 水上戦闘機
                     type = 1;
                     break;
                 case 11: // 水上爆撃機
