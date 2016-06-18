@@ -49,6 +49,9 @@ public class ItemType {
             this.put(33, "大型飛行艇");
             this.put(34, "戦闘食料");
             this.put(35, "洋上補給");
+            this.put(36, "特型内火艇");
+            this.put(37, "陸上攻撃機");
+            this.put(38, "局地戦闘機");
         }
     };
 
