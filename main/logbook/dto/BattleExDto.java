@@ -229,6 +229,8 @@ public class BattleExDto extends AbstractDto {
         private AirBattleDto air2 = null;
         @Tag(13)
         private List<BattleAtackDto> support = null;
+        @Tag(50)
+        private List<BattleAtackDto> openingTaisen = null;
         @Tag(14)
         private List<BattleAtackDto> opening = null;
         @Tag(15)
@@ -325,6 +327,9 @@ public class BattleExDto extends AbstractDto {
             if (kouku2 != null)
                 this.air2 = new AirBattleDto(kouku2, isCombined, false);
 
+            // 開幕対潜
+            this.openingTaisen = BattleAtackDto.makeHougeki(object.get("api_opening_taisen"), kind.isOpeningSecond());
+
             // 開幕
             this.opening = BattleAtackDto.makeRaigeki(object.get("api_opening_atack"), kind.isOpeningSecond());
 
@@ -347,6 +352,7 @@ public class BattleExDto extends AbstractDto {
             this.doAtack(this.support);
             if (this.air2 != null)
                 this.doAtack(this.air2.atacks);
+            this.doAtack(this.openingTaisen);
             this.doAtack(this.opening);
             this.doAtack(this.hougeki);
             this.doAtack(this.hougeki1);
@@ -641,6 +647,7 @@ public class BattleExDto extends AbstractDto {
                     this.support == null ? null : this.toArray(this.support),
                     ((this.air2 == null) || (this.air2.atacks == null)) ? null :
                             this.toArray(this.air2.atacks),
+                    this.openingTaisen == null ? null : this.toArray(this.openingTaisen),
                     this.opening == null ? null : this.toArray(this.opening),
                     this.hougeki == null ? null : this.toArray(this.hougeki),
                     this.hougeki1 == null ? null : this.toArray(this.hougeki1),
@@ -822,6 +829,14 @@ public class BattleExDto extends AbstractDto {
          */
         public List<BattleAtackDto> getSupport() {
             return this.support;
+        }
+
+        /**
+         * 開幕対潜
+         * @return openingTaisen
+         */
+        public List<BattleAtackDto> getOpeningTaisen() {
+            return this.openingTaisen;
         }
 
         /**
