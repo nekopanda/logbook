@@ -600,24 +600,49 @@ public class FleetComposite extends Composite {
 
         }
 
-        // メッセージを更新する
-
-        // ドラム缶、大発の合計
+        // ドラム缶の合計
         int dram = 0;
         int dramKanmusu = 0;
-        int daihatsu = 0;
         for (ShipDto shipDto : ships) {
             if (shipDto.getDram() > 0) {
                 dramKanmusu++;
                 dram += shipDto.getDram();
             }
-            daihatsu += shipDto.getDaihatsu();
+        }
+
+        //大発による遠征効率UP
+        int daihatsu = 0;
+        int daihatsuLevel = 0;
+        double daihatsuUp = 0;
+        for (ShipDto shipDto : ships) {
+            for (ItemDto item : shipDto.getItem2()) {
+                if (item != null) {
+                    if (item.getName().equals("大発動艇")) {
+                        daihatsuUp += 5.0;
+                        ++daihatsu;
+                        daihatsuLevel += item.getLevel();
+                    }
+                    else if (item.getName().equals("大発動艇(八九式中戦車&陸戦隊)")) {
+                        daihatsuUp += 2.0;
+                        ++daihatsu;
+                        daihatsuLevel += item.getLevel();
+                    }
+                    else if (item.getName().equals("特二式内火艇")) {
+                        daihatsuUp += 1.0;
+                        ++daihatsu;
+                        daihatsuLevel += item.getLevel();
+                    }
+                }
+            }
         }
         //大発による遠征効率UPの上限
-        int daihatsuUp = daihatsu * 5;
         if (daihatsuUp > 20) {
             daihatsuUp = 20;
         }
+        // 改修による補正
+        daihatsuUp += (0.01 * daihatsuUp * daihatsuLevel) / daihatsu;
+
+        // メッセージを更新する
 
         StyleRange messageStyle = new StyleRange();
         messageStyle.fontStyle = SWT.BOLD;
