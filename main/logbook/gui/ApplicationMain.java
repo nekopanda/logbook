@@ -17,47 +17,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import logbook.config.AppConfig;
-import logbook.config.ShipGroupConfig;
-import logbook.config.UserDataConfig;
-import logbook.config.bean.AppConfigBean;
-import logbook.constants.AppConstants;
-import logbook.data.context.GlobalContext;
-import logbook.dto.BattleExDto;
-import logbook.dto.DockDto;
-import logbook.dto.MapCellDto;
-import logbook.dto.PracticeUserDetailDto;
-import logbook.gui.background.AsyncExecApplicationMain;
-import logbook.gui.background.AsyncExecUpdateCheck;
-import logbook.gui.background.BackgroundInitializer;
-import logbook.gui.listener.HelpEventListener;
-import logbook.gui.listener.MainShellAdapter;
-import logbook.gui.listener.TrayItemMenuListener;
-import logbook.gui.listener.TraySelectionListener;
-import logbook.gui.logic.ColorManager;
-import logbook.gui.logic.LayoutLogic;
-import logbook.gui.logic.PushNotify;
-import logbook.gui.logic.Sound;
-import logbook.gui.widgets.FleetComposite;
-import logbook.internal.BattleResultServer;
-import logbook.internal.EnemyData;
-import logbook.internal.Item;
-import logbook.internal.LoggerHolder;
-import logbook.internal.MasterData;
-import logbook.internal.Ship;
-import logbook.internal.ShipParameterRecord;
-import logbook.scripting.ScriptData;
-import logbook.server.proxy.DatabaseClient;
-import logbook.server.proxy.ProxyServer;
-import logbook.thread.ThreadManager;
-import logbook.thread.ThreadStateObserver;
-import logbook.util.JIntellitypeWrapper;
-import logbook.util.SwtUtils;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -90,6 +56,44 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.melloware.jintellitype.HotkeyListener;
 
+import logbook.config.AppConfig;
+import logbook.config.ShipGroupConfig;
+import logbook.config.UserDataConfig;
+import logbook.config.bean.AppConfigBean;
+import logbook.constants.AppConstants;
+import logbook.data.context.GlobalContext;
+import logbook.dto.BattleExDto;
+import logbook.dto.DockDto;
+import logbook.dto.MapCellDto;
+import logbook.dto.PracticeUserDetailDto;
+import logbook.gui.background.AsyncExecApplicationMain;
+import logbook.gui.background.AsyncExecUpdateCheck;
+import logbook.gui.background.BackgroundInitializer;
+import logbook.gui.listener.HelpEventListener;
+import logbook.gui.listener.MainShellAdapter;
+import logbook.gui.listener.TrayItemMenuListener;
+import logbook.gui.listener.TraySelectionListener;
+import logbook.gui.logic.ColorManager;
+import logbook.gui.logic.DeckBuilder;
+import logbook.gui.logic.LayoutLogic;
+import logbook.gui.logic.PushNotify;
+import logbook.gui.logic.Sound;
+import logbook.gui.widgets.FleetComposite;
+import logbook.internal.BattleResultServer;
+import logbook.internal.EnemyData;
+import logbook.internal.Item;
+import logbook.internal.LoggerHolder;
+import logbook.internal.MasterData;
+import logbook.internal.Ship;
+import logbook.internal.ShipParameterRecord;
+import logbook.scripting.ScriptData;
+import logbook.server.proxy.DatabaseClient;
+import logbook.server.proxy.ProxyServer;
+import logbook.thread.ThreadManager;
+import logbook.thread.ThreadStateObserver;
+import logbook.util.JIntellitypeWrapper;
+import logbook.util.SwtUtils;
+
 /**
  * メイン画面
  *
@@ -117,8 +121,7 @@ public final class ApplicationMain extends WindowBase {
     public static void logPrint(final String mes) {
         if (main.display.getThread() == Thread.currentThread()) {
             main.printMessage(mes);
-        }
-        else {
+        } else {
             main.display.asyncExec(new Runnable() {
                 @Override
                 public void run() {
@@ -465,8 +468,7 @@ public final class ApplicationMain extends WindowBase {
             };
             dummyHolderMouseListener.mouseDown(null);
             dummyLabel.addMouseListener(dummyHolderMouseListener);
-        }
-        else {
+        } else {
             this.subwindowHost = new Shell(this.display, SWT.TOOL);
         }
 
@@ -592,8 +594,7 @@ public final class ApplicationMain extends WindowBase {
             MenuItem cmdshiplist = new MenuItem(cmdmenu, SWT.CHECK);
             if (i == 0) {
                 cmdshiplist.setAccelerator(SWT.CTRL + ('S'));
-            }
-            else {
+            } else {
                 cmdshiplist.setAccelerator(SWT.CTRL + ('1' + i));
             }
             this.shipTableWindows[i] = new ShipTable(this.subwindowHost, cmdshiplist, i);
@@ -615,7 +616,7 @@ public final class ApplicationMain extends WindowBase {
         // セパレータ
         new MenuItem(cmdmenu, SWT.SEPARATOR);
 
-        // 表示-戦況ウィンドウ 
+        // 表示-戦況ウィンドウ
         MenuItem battleWinMenu = new MenuItem(cmdmenu, SWT.CHECK);
         battleWinMenu.setText("戦況(&B)\tCtrl+B");
         battleWinMenu.setAccelerator(SWT.CTRL + 'B');
@@ -684,7 +685,7 @@ public final class ApplicationMain extends WindowBase {
                 new CreatePacFileDialog(ApplicationMain.this.subwindowHost).open();
             }
         });
-        // セパレータ 
+        // セパレータ
         new MenuItem(etcmenu, SWT.SEPARATOR);
         // その他-ツール
         MenuItem toolwindows = new MenuItem(etcmenu, SWT.CHECK);
@@ -773,8 +774,7 @@ public final class ApplicationMain extends WindowBase {
         this.display.addFilter(SWT.KeyDown, new Listener() {
             @Override
             public void handleEvent(Event e) {
-                if ((e.stateMask & (SWT.CTRL | SWT.SHIFT)) == (SWT.CTRL | SWT.SHIFT))
-                {
+                if ((e.stateMask & (SWT.CTRL | SWT.SHIFT)) == (SWT.CTRL | SWT.SHIFT)) {
                     ApplicationMain.this.shortcutKeyPushed(e.keyCode);
                 }
             }
@@ -1094,8 +1094,7 @@ public final class ApplicationMain extends WindowBase {
                     // 他のウィンドウを連動させる
                     if (minimum) {
                         ApplicationMain.this.childIconified();
-                    }
-                    else {
+                    } else {
                         ApplicationMain.this.childDeiconified();
                     }
                 }
@@ -1132,6 +1131,100 @@ public final class ApplicationMain extends WindowBase {
                 AppConfig.get().setMinimumLayout(minimum);
             }
         });
+
+        final MenuItem rootCopyDeckBuilder = new MenuItem(this.getPopupMenu(), SWT.CASCADE);
+        rootCopyDeckBuilder.setText("艦隊シミュレーター＆デッキビルダー");
+        Menu copyDeckBuilderMenu = new Menu(rootCopyDeckBuilder);
+        /*
+        final MenuItem copyDeckBuilderFormat = new MenuItem(copyDeckBuilderMenu, SWT.PUSH);
+        copyDeckBuilderFormat.setText("フォーマットをクリップボードにコピー");
+        
+        copyDeckBuilderFormat.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                boolean[] isUseCopyDeckBuilder = {
+                        AppConfig.get().isUseCopyDeckBuilder1(),
+                        AppConfig.get().isUseCopyDeckBuilder2(),
+                        AppConfig.get().isUseCopyDeckBuilder3(),
+                        AppConfig.get().isUseCopyDeckBuilder4() };
+                if (GlobalContext.getState() == 1) {
+                    Clipboard clipboard = new Clipboard(Display.getDefault());
+                    clipboard.setContents(new Object[] { new DeckBuilder().getDeckBuilderFormat(isUseCopyDeckBuilder) },
+                            new Transfer[] { TextTransfer.getInstance() });
+                } else {
+                    Shell shell = new Shell(Display.getDefault(), SWT.TOOL);
+                    MessageBox mes = new MessageBox(shell, SWT.ICON_WARNING | SWT.OK);
+                    mes.setText(AppConstants.TITLEBAR_TEXT);
+                    mes.setMessage("母港情報が不足しています。母港画面に遷移してデータを読み込んでください。");
+                    mes.open();
+                    shell.dispose();
+                }
+            }
+        });*/
+        final MenuItem copyDeckBuilderURL = new MenuItem(copyDeckBuilderMenu, SWT.PUSH);
+        copyDeckBuilderURL.setText("URLをクリップボードにコピー");
+
+        copyDeckBuilderURL.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                boolean[] isUseCopyDeckBuilder = {
+                        AppConfig.get().isUseCopyDeckBuilder1(),
+                        AppConfig.get().isUseCopyDeckBuilder2(),
+                        AppConfig.get().isUseCopyDeckBuilder3(),
+                        AppConfig.get().isUseCopyDeckBuilder4() };
+                if (GlobalContext.getState() == 1) {
+                    Clipboard clipboard = new Clipboard(Display.getDefault());
+                    clipboard.setContents(new Object[] { new DeckBuilder().getDeckBuilderURL(isUseCopyDeckBuilder) },
+                            new Transfer[] { TextTransfer.getInstance() });
+                } else {
+                    Shell shell = new Shell(Display.getDefault(), SWT.TOOL);
+                    MessageBox mes = new MessageBox(shell, SWT.ICON_WARNING | SWT.OK);
+                    mes.setText(AppConstants.TITLEBAR_TEXT);
+                    mes.setMessage("母港情報が不足しています。母港画面に遷移してデータを読み込んでください。");
+                    mes.open();
+                    shell.dispose();
+                }
+            }
+        });
+        new MenuItem(copyDeckBuilderMenu, SWT.SEPARATOR);
+        final MenuItem copyDeckBuilder1 = new MenuItem(copyDeckBuilderMenu, SWT.CHECK);
+        copyDeckBuilder1.setText("第一艦隊");
+        copyDeckBuilder1.setSelection(AppConfig.get().isUseCopyDeckBuilder1());
+        copyDeckBuilder1.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                AppConfig.get().setUseCopyDeckBuilder1(copyDeckBuilder1.getSelection());
+            }
+        });
+        final MenuItem copyDeckBuilder2 = new MenuItem(copyDeckBuilderMenu, SWT.CHECK);
+        copyDeckBuilder2.setText("第二艦隊");
+        copyDeckBuilder2.setSelection(AppConfig.get().isUseCopyDeckBuilder2());
+        copyDeckBuilder2.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                AppConfig.get().setUseCopyDeckBuilder2(copyDeckBuilder2.getSelection());
+            }
+        });
+        final MenuItem copyDeckBuilder3 = new MenuItem(copyDeckBuilderMenu, SWT.CHECK);
+        copyDeckBuilder3.setText("第三艦隊");
+        copyDeckBuilder3.setSelection(AppConfig.get().isUseCopyDeckBuilder3());
+        copyDeckBuilder3.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                AppConfig.get().setUseCopyDeckBuilder3(copyDeckBuilder3.getSelection());
+            }
+        });
+        final MenuItem copyDeckBuilder4 = new MenuItem(copyDeckBuilderMenu, SWT.CHECK);
+        copyDeckBuilder4.setText("第四艦隊");
+        copyDeckBuilder4.setSelection(AppConfig.get().isUseCopyDeckBuilder4());
+        copyDeckBuilder4.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                AppConfig.get().setUseCopyDeckBuilder4(copyDeckBuilder4.getSelection());
+            }
+        });
+
+        rootCopyDeckBuilder.setMenu(copyDeckBuilderMenu);
 
         // 選択する項目はドラックで移動できないようにする
         for (Control c : new Control[] { this.commandComposite,
@@ -1388,7 +1481,7 @@ public final class ApplicationMain extends WindowBase {
 
     /**
      * トレイアイコンを追加します
-     * 
+     *
      * @param display
      * @return
      */
@@ -1405,7 +1498,7 @@ public final class ApplicationMain extends WindowBase {
 
     /**
      * 縮小表示と通常表示とを切り替えます
-     * 
+     *
      * @param minimum
      * @param controls 隠すコントロール
      */
@@ -1531,7 +1624,7 @@ public final class ApplicationMain extends WindowBase {
         }
         // ツールウィンドウ
         this.launcherWindow.configUpdated();
-        // 
+        //
         JIntellitypeWrapper.changeSetting(AppConfig.get().getSystemWideHotKey());
         // プロキシサーバ再起動
         ProxyServer.restart();
