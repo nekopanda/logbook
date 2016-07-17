@@ -23,16 +23,6 @@ public class DeckBuilder {
     public final int FORMAT_VERSION = 4;
 
     /**
-     * 最小艦隊数
-     */
-    public final int MIN_FLEET = 1;
-
-    /**
-     * 最大艦隊数
-     */
-    public final int MAX_FLEET = 4;
-
-    /**
      * 艦隊シミュレーター＆デッキビルダーのURL
      */
     public final String URL = "http://kancolle-calc.net/deckbuilder.html";
@@ -49,24 +39,6 @@ public class DeckBuilder {
      */
     public int getFormatVersion() {
         return this.FORMAT_VERSION;
-    }
-
-    /**
-     * 最小艦隊数を返します
-     *
-     * @return MIN_FLEET
-     */
-    public int getMinFleet() {
-        return this.MIN_FLEET;
-    }
-
-    /**
-     * 最大艦隊数を返します
-     *
-     * @return MAX_FLEET
-     */
-    public int getMaxFleet() {
-        return this.MAX_FLEET;
     }
 
     /**
@@ -98,7 +70,7 @@ public class DeckBuilder {
         JsonObjectBuilder deck = Json.createObjectBuilder();
         deck.add("version", this.FORMAT_VERSION);
         try {
-            IntStream.rangeClosed(this.MIN_FLEET, this.MAX_FLEET)
+            IntStream.rangeClosed(1, GlobalContext.getBasicInfo().getDeckCount())
                     .filter(dockId -> needsUsedDock[dockId - 1])
                     .boxed()
                     .collect(Collectors.toMap(dockId -> dockId,
