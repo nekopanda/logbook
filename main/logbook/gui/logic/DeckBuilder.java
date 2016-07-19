@@ -76,41 +76,44 @@ public class DeckBuilder {
                     .collect(Collectors.toMap(dockId -> dockId,
                             dockId -> GlobalContext.getDock(dockId.toString()).getShips()))
                     .forEach((dockId, ships) -> {
-                        int shipIdx;
-                        int itemIdx;
                         JsonObjectBuilder fleet = Json.createObjectBuilder();
 
-                        for (shipIdx = 0; shipIdx < ships.size(); shipIdx++) {
+                        IntStream.range(0, ships.size()).forEach(shipIdx -> {
                             JsonObjectBuilder ship = Json.createObjectBuilder();
                             ship.add("id", ships.get(shipIdx).getShipInfo().getShipId());
                             ship.add("lv", ships.get(shipIdx).getLv());
                             ship.add("luck", ships.get(shipIdx).getLucky());
                             JsonObjectBuilder items = Json.createObjectBuilder();
                             List<ItemDto> item2 = ships.get(shipIdx).getItem2();
-                            for (itemIdx = 0; (itemIdx < item2.size()) && (item2.get(itemIdx) != null); itemIdx++) {
+                            int slotNum = ships.get(shipIdx).getSlotNum();
+
+                            IntStream.range(0, slotNum)
+                                    .filter(itemIdx -> Optional.ofNullable(item2.get(itemIdx)).isPresent())
+                                    .boxed()
+                                    .collect(Collectors.toMap(itemIdx -> itemIdx, itemIdx -> item2.get(itemIdx)))
+                                    .forEach((itemIdx, itemDto) -> {
+                                        JsonObjectBuilder item = Json.createObjectBuilder();
+                                        item.add("id", item2.get(itemIdx).getSlotitemId());
+                                        item.add("rf", item2.get(itemIdx).getLevel());
+                                        item.add("mas", item2.get(itemIdx).getAlv());
+                                        items.add("i" + (itemIdx + 1), item);
+                                    });
+
+                            Optional.ofNullable(ships.get(shipIdx).getSlotExItem()).ifPresent(slotExItem -> {
                                 JsonObjectBuilder item = Json.createObjectBuilder();
-                                item.add("id", item2.get(itemIdx).getSlotitemId());
-                                item.add("rf", item2.get(itemIdx).getLevel());
-                                item.add("mas", item2.get(itemIdx).getAlv());
-                                items.add("i" + (itemIdx + 1), item);
-                            }
-                            if (ships.get(shipIdx).getSlotExItem() != null) {
-                                JsonObjectBuilder item = Json.createObjectBuilder();
-                                ItemDto slotExItem = ships.get(shipIdx).getSlotExItem();
                                 item.add("id", slotExItem.getSlotitemId());
                                 item.add("rf", slotExItem.getLevel());
                                 item.add("mas", slotExItem.getAlv());
-                                int slotNum = ships.get(shipIdx).getSlotNum();
                                 if (slotNum < 4) {
                                     items.add("i" + (slotNum + 1), item);
                                 } else {
                                     items.add("ix", item);
                                 }
-                            }
+                            });
                             ship.add("items", items);
 
                             fleet.add("s" + (shipIdx + 1), ship);
-                        }
+                        });
                         deck.add("f" + dockId, fleet);
                     });
             return deck.build().toString();
