@@ -1180,7 +1180,7 @@ public final class ApplicationMain extends WindowBase {
                     Shell shell = new Shell(Display.getDefault(), SWT.TOOL);
                     MessageBox mes = new MessageBox(shell, SWT.ICON_WARNING | SWT.OK);
                     mes.setText(AppConstants.TITLEBAR_TEXT);
-                    mes.setMessage("母港情報が不足しています。母港画面に遷移してデータを読み込んでください。");
+                    mes.setMessage("情報が不足しています。艦これをリロードしてデータを読み込んでください。");
                     mes.open();
                     shell.dispose();
                 }
