@@ -19,6 +19,7 @@ import logbook.gui.logic.TableItemCreator;
 import logbook.gui.widgets.ShipFilterComposite;
 import logbook.scripting.TableItemCreatorProxy;
 import logbook.util.ReportUtils;
+import logbook.util.SwtUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
@@ -302,7 +303,7 @@ public final class ShipTable extends AbstractTableDialog implements ShipGroupLis
 
     @Override
     protected Point getSize() {
-        return new Point(600, 350);
+        return SwtUtils.DPIAwareSize(new Point(600, 350));
     }
 
     @Override

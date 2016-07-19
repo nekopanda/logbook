@@ -89,8 +89,8 @@ public class TweetDialog extends WindowBase {
 
         final Text text = new Text(this.shell, SWT.MULTI | SWT.BORDER | SWT.WRAP);
         GridData gdText = new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1);
-        gdText.widthHint = 300;
-        gdText.heightHint = 80;
+        gdText.widthHint = SwtUtils.DPIAwareWidth(300);
+        gdText.heightHint = SwtUtils.DPIAwareHeight(80);
         text.setLayoutData(gdText);
 
         Label userName = new Label(this.shell, SWT.NONE);
@@ -115,7 +115,7 @@ public class TweetDialog extends WindowBase {
 
         Button tweet = new Button(this.shell, SWT.NONE);
         GridData gdTweet = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
-        gdTweet.widthHint = 100;
+        gdTweet.widthHint = SwtUtils.DPIAwareWidth(100);
         tweet.setLayoutData(gdTweet);
         tweet.setText("つぶやく");
         tweet.addSelectionListener(new SelectionAdapter() {

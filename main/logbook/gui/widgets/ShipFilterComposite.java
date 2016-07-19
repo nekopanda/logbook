@@ -299,8 +299,8 @@ public final class ShipFilterComposite extends Composite {
 
         Button btnRight = new Button(this, SWT.NONE);
         GridData gdBtnRight = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
-        gdBtnRight.widthHint = 24;
-        gdBtnRight.heightHint = 24;
+        gdBtnRight.widthHint = SwtUtils.DPIAwareWidth(24);
+        gdBtnRight.heightHint = SwtUtils.DPIAwareHeight(24);
         btnRight.setLayoutData(gdBtnRight);
         btnRight.addSelectionListener(arrowButtonListener);
         SwtUtils.setButtonImage(btnRight, SWTResourceManager.getImage(WindowBase.class, AppConstants.R_ICON_RIGHT));

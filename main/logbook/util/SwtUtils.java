@@ -141,11 +141,34 @@ public final class SwtUtils {
         return rl;
     }
 
+    private final static int DPI_BASE = 96;
     private static String defaultFontName = null;
     private static int defaultFontSize = 0;
     private static int defaultFontStyle = 0;
     private static int defaultLineHeight = 0;
-    private static int DPI_Y = 0;
+    private static Point DPI = Display.getDefault().getDPI();
+
+    /**
+     * DPIを考慮したサイズを返す
+     * @param width
+     * @return
+     */
+    public static int DPIAwareWidth(int width) {
+        return (width * DPI.x) / DPI_BASE;
+    }
+
+    /**
+     * DPIを考慮したサイズを返す
+     * @param height
+     * @return
+     */
+    public static int DPIAwareHeight(int height) {
+        return (height * DPI.y) / DPI_BASE;
+    }
+
+    public static Point DPIAwareSize(Point size) {
+        return new Point(DPIAwareWidth(size.x), DPIAwareHeight(size.y));
+    }
 
     private static void checkControl(Control control) {
         if (defaultFontName == null) {
@@ -153,7 +176,6 @@ public final class SwtUtils {
             defaultFontName = fd.getName();
             defaultFontSize = fd.getHeight();
             defaultFontStyle = fd.getStyle();
-            DPI_Y = control.getDisplay().getDPI().y;
 
             GC gc = new GC(control);
             FontMetrics fm = gc.getFontMetrics();
@@ -164,11 +186,11 @@ public final class SwtUtils {
 
     public static int ComputeHeaderHeight(Group group, double lineHeight) {
         checkControl(group);
-        return (int) (((defaultFontSize * DPI_Y) / 72.0) * lineHeight);
+        return (int) (((defaultFontSize * DPI.y) / 72.0) * lineHeight);
     }
 
     public static int ComputeLineSpacing(double lineHeight) {
-        return (int) (((defaultFontSize * DPI_Y) / 72.0) * lineHeight) - defaultLineHeight;
+        return (int) (((defaultFontSize * DPI.y) / 72.0) * lineHeight) - defaultLineHeight;
     }
 
     /**
@@ -193,7 +215,7 @@ public final class SwtUtils {
         lbl.setFont(font);
         lbl.setText(text);
         if (!"cocoa".equals(SWT.getPlatform())) { // mac以外
-            gd.heightHint = (int) (((heightInPoint * DPI_Y) / 72.0) * lineHeight);
+            gd.heightHint = (int) (((heightInPoint * DPI.y) / 72.0) * lineHeight);
         }
         lbl.setLayoutData(gd);
         return gd;

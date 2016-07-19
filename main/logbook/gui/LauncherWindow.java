@@ -12,6 +12,7 @@ import java.util.Map;
 import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.gui.logic.WindowListener;
+import logbook.util.SwtUtils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -211,6 +212,6 @@ public class LauncherWindow extends WindowBase {
      */
     @Override
     protected Point getDefaultSize() {
-        return new Point(500, 80);
+        return SwtUtils.DPIAwareSize(new Point(500, 80));
     }
 }

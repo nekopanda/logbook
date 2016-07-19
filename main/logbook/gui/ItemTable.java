@@ -6,6 +6,7 @@ import logbook.data.DataType;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.TableItemCreator;
 import logbook.scripting.TableItemCreatorProxy;
+import logbook.util.SwtUtils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
@@ -59,7 +60,7 @@ public final class ItemTable extends AbstractTableDialog {
 
     @Override
     protected Point getSize() {
-        return new Point(600, 350);
+        return SwtUtils.DPIAwareSize(new Point(600, 350));
     }
 
     @Override

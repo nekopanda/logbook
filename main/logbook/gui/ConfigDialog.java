@@ -27,6 +27,7 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -103,7 +104,7 @@ public final class ConfigDialog extends Dialog {
      */
     private void createContents() {
         this.shell = new Shell(this.getParent(), this.getStyle());
-        this.shell.setSize(600, 400);
+        this.shell.setSize(SwtUtils.DPIAwareSize(new Point(600, 400)));
         this.shell.setText(this.getText());
         this.shell.setLayout(new GridLayout(1, false));
 
@@ -181,7 +182,7 @@ public final class ConfigDialog extends Dialog {
 
         final Text listenport = new Text(compositeConnection, SWT.BORDER);
         GridData gdListenport = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
-        gdListenport.widthHint = 90;
+        gdListenport.widthHint = SwtUtils.DPIAwareWidth(90);
         listenport.setLayoutData(gdListenport);
         listenport.setText(Integer.toString(AppConfig.get().getListenPort()));
         new Label(compositeConnection, SWT.NONE);
@@ -223,7 +224,7 @@ public final class ConfigDialog extends Dialog {
 
         final Text proxyHostText = new Text(compositeConnection, SWT.BORDER);
         GridData gdProxyHostText = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdProxyHostText.widthHint = 100;
+        gdProxyHostText.widthHint = SwtUtils.DPIAwareWidth(100);
         proxyHostText.setLayoutData(gdProxyHostText);
         proxyHostText.setText(AppConfig.get().getProxyHost());
 
@@ -236,7 +237,7 @@ public final class ConfigDialog extends Dialog {
         proxyPortSpinner.setMinimum(1);
         proxyPortSpinner.setSelection(AppConfig.get().getProxyPort());
         GridData gdProxyPortSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdProxyPortSpinner.widthHint = 55;
+        gdProxyPortSpinner.widthHint = SwtUtils.DPIAwareWidth(55);
         proxyPortSpinner.setLayoutData(gdProxyPortSpinner);
 
         final Button sendDatabaseButton = new Button(compositeConnection, SWT.CHECK);
@@ -250,7 +251,7 @@ public final class ConfigDialog extends Dialog {
 
         final Text accessKeyText = new Text(compositeConnection, SWT.BORDER);
         GridData gdAccessKeyText = new GridData(SWT.FILL, SWT.CENTER, false, false, 3, 1);
-        // gdAccessKeyText.widthHint = 300;
+        // gdAccessKeyText.widthHint = SwtUtils.DPIAwareWidth(300);
         accessKeyText.setLayoutData(gdAccessKeyText);
         accessKeyText.setText(AppConfig.get().getAccessKey());
 
@@ -326,7 +327,7 @@ public final class ConfigDialog extends Dialog {
 
         final Text reportDir = new Text(compositeReport, SWT.BORDER);
         GridData gdReportDir = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
-        gdReportDir.widthHint = 120;
+        gdReportDir.widthHint = SwtUtils.DPIAwareWidth(120);
         reportDir.setLayoutData(gdReportDir);
         reportDir.setText(AppConfig.get().getReportPath());
 
@@ -351,7 +352,7 @@ public final class ConfigDialog extends Dialog {
 
         final Text battlelogDir = new Text(compositeReport, SWT.BORDER);
         GridData gdBattlelogDir = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
-        gdBattlelogDir.widthHint = 120;
+        gdBattlelogDir.widthHint = SwtUtils.DPIAwareWidth(120);
         battlelogDir.setLayoutData(gdBattlelogDir);
         battlelogDir.setText(AppConfig.get().getBattleLogPath());
 
@@ -379,7 +380,7 @@ public final class ConfigDialog extends Dialog {
         materialintervalSpinner.setMinimum(10);
         materialintervalSpinner.setSelection(AppConfig.get().getMaterialLogInterval());
         GridData gdMaterialIntervalSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdMaterialIntervalSpinner.widthHint = 55;
+        gdMaterialIntervalSpinner.widthHint = SwtUtils.DPIAwareWidth(55);
         materialintervalSpinner.setLayoutData(gdMaterialIntervalSpinner);
         new Label(compositeReport, SWT.NONE);
 
@@ -571,7 +572,7 @@ public final class ConfigDialog extends Dialog {
 
         final Text soundlevel = new Text(compositeNotify, SWT.BORDER);
         GridData gdSoundlevel = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
-        gdSoundlevel.widthHint = 90;
+        gdSoundlevel.widthHint = SwtUtils.DPIAwareWidth(90);
         soundlevel.setLayoutData(gdSoundlevel);
         soundlevel.setText(Integer.toString((int) (AppConfig.get().getSoundLevel() * 100)));
         new Label(compositeNotify, SWT.NONE);
@@ -590,7 +591,7 @@ public final class ConfigDialog extends Dialog {
         condSpinner.setMinimum(0);
         condSpinner.setSelection(AppConfig.get().getOkCond());
         GridData gdCondSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdCondSpinner.widthHint = 55;
+        gdCondSpinner.widthHint = SwtUtils.DPIAwareWidth(55);
         condSpinner.setLayoutData(gdCondSpinner);
         new Label(compositeNotify, SWT.NONE);
 
@@ -623,7 +624,7 @@ public final class ConfigDialog extends Dialog {
         intervalSpinner.setMinimum(10);
         intervalSpinner.setSelection(AppConfig.get().getRemindInterbal());
         GridData gdIntervalSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdIntervalSpinner.widthHint = 55;
+        gdIntervalSpinner.widthHint = SwtUtils.DPIAwareWidth(55);
         intervalSpinner.setLayoutData(gdIntervalSpinner);
 
         new Label(compositeNotify, SWT.NONE);
@@ -642,7 +643,7 @@ public final class ConfigDialog extends Dialog {
         fullySpinner.setMinimum(0);
         fullySpinner.setSelection(AppConfig.get().getNotifyFully());
         GridData gdFullySpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdFullySpinner.widthHint = 55;
+        gdFullySpinner.widthHint = SwtUtils.DPIAwareWidth(55);
         fullySpinner.setLayoutData(gdFullySpinner);
 
         Label fullyLabel2 = new Label(compositeNotify, SWT.NONE);
@@ -688,7 +689,7 @@ public final class ConfigDialog extends Dialog {
 
         final Text captureDir = new Text(compositeCapture, SWT.BORDER);
         GridData gdCaptureDir = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
-        gdCaptureDir.widthHint = 120;
+        gdCaptureDir.widthHint = SwtUtils.DPIAwareWidth(120);
         captureDir.setLayoutData(gdCaptureDir);
         captureDir.setText(AppConfig.get().getCapturePath());
 
@@ -786,7 +787,7 @@ public final class ConfigDialog extends Dialog {
         opaqueIntervalSpinner.setMinimum(0);
         opaqueIntervalSpinner.setSelection(AppConfig.get().getOpaqueInterval());
         GridData gdopaqueIntervalSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdopaqueIntervalSpinner.widthHint = 65;
+        gdopaqueIntervalSpinner.widthHint = SwtUtils.DPIAwareWidth(65);
         opaqueIntervalSpinner.setLayoutData(gdopaqueIntervalSpinner);
 
         Label opaqueIntervalSuffix = new Label(opaqueIntervalGroup, SWT.NONE);
@@ -826,7 +827,7 @@ public final class ConfigDialog extends Dialog {
 
         final Text prowlAPIKey = new Text(compositePushNotify, SWT.BORDER);
         GridData gdprowlAPIKey = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
-        gdprowlAPIKey.widthHint = 200;
+        gdprowlAPIKey.widthHint = SwtUtils.DPIAwareWidth(200);
         prowlAPIKey.setLayoutData(gdprowlAPIKey);
         prowlAPIKey.setText(AppConfig.get().getProwlAPIKey());
 
@@ -841,7 +842,7 @@ public final class ConfigDialog extends Dialog {
 
         final Text nmaAPIKey = new Text(compositePushNotify, SWT.BORDER);
         GridData gdnmaAPIKey = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
-        gdnmaAPIKey.widthHint = 200;
+        gdnmaAPIKey.widthHint = SwtUtils.DPIAwareWidth(200);
         nmaAPIKey.setLayoutData(gdnmaAPIKey);
         nmaAPIKey.setText(AppConfig.get().getNMAAPIKey());
 
@@ -856,7 +857,7 @@ public final class ConfigDialog extends Dialog {
 
         final Text imkayacUserName = new Text(compositePushNotify, SWT.BORDER);
         GridData gdimkayacUserName = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
-        gdimkayacUserName.widthHint = 200;
+        gdimkayacUserName.widthHint = SwtUtils.DPIAwareWidth(200);
         imkayacUserName.setLayoutData(gdimkayacUserName);
         imkayacUserName.setText(AppConfig.get().getImKayacUserName());
 
@@ -866,7 +867,7 @@ public final class ConfigDialog extends Dialog {
 
         final Text imkayacPasswd = new Text(compositePushNotify, SWT.PASSWORD | SWT.BORDER);
         GridData gdimkayacPasswd = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
-        gdimkayacPasswd.widthHint = 200;
+        gdimkayacPasswd.widthHint = SwtUtils.DPIAwareWidth(200);
         imkayacPasswd.setLayoutData(gdimkayacPasswd);
         imkayacPasswd.setText(AppConfig.get().getImKayacPasswd());
 
@@ -876,7 +877,7 @@ public final class ConfigDialog extends Dialog {
 
         final Text imkayacPrivateKey = new Text(compositePushNotify, SWT.BORDER);
         GridData gdimkayacPrivateKey = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
-        gdimkayacPrivateKey.widthHint = 200;
+        gdimkayacPrivateKey.widthHint = SwtUtils.DPIAwareWidth(200);
         imkayacPrivateKey.setLayoutData(gdimkayacUserName);
         imkayacPrivateKey.setText(AppConfig.get().getImKayacPrivateKey());
 
@@ -1018,7 +1019,7 @@ public final class ConfigDialog extends Dialog {
 
         final Text jsonpath = new Text(compositeDevelopment, SWT.BORDER);
         GridData gdJsonpath = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdJsonpath.widthHint = 120;
+        gdJsonpath.widthHint = SwtUtils.DPIAwareWidth(120);
         jsonpath.setLayoutData(gdJsonpath);
         jsonpath.setText(AppConfig.get().getStoreJsonPath());
 
@@ -1275,8 +1276,8 @@ public final class ConfigDialog extends Dialog {
     private Table createToolButtonTable(Composite parent) {
         final Table table = new Table(parent, SWT.NONE);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
-        gd.heightHint = 230;
-        gd.widthHint = 150;
+        gd.heightHint = SwtUtils.DPIAwareWidth(230);
+        gd.widthHint = SwtUtils.DPIAwareHeight(150);
         table.setLayoutData(gd);
         table.setHeaderVisible(false);
         final TableColumn column = new TableColumn(table, SWT.NONE);

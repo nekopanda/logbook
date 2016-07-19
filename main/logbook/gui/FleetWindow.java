@@ -13,6 +13,7 @@ import logbook.dto.DockDto;
 import logbook.dto.ShipDto;
 import logbook.gui.logic.WindowListener;
 import logbook.gui.widgets.FleetComposite;
+import logbook.util.SwtUtils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -139,7 +140,7 @@ public class FleetWindow extends WindowBase {
      */
     @Override
     protected Point getDefaultSize() {
-        return new Point(280, 350);
+        return SwtUtils.DPIAwareSize(new Point(280, 350));
     }
 
     public void updateFleet(boolean combinedFleetBadlyDamaed, List<ShipDto> badlyDamaged) {

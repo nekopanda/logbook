@@ -7,6 +7,7 @@ import logbook.data.context.GlobalContext;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.TableItemCreator;
 import logbook.scripting.TableItemCreatorProxy;
+import logbook.util.SwtUtils;
 
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.MenuItem;
@@ -36,7 +37,7 @@ public final class CreateShipReportTable extends AbstractTableDialog {
 
     @Override
     protected Point getSize() {
-        return new Point(600, 350);
+        return SwtUtils.DPIAwareSize(new Point(600, 350));
     }
 
     @Override

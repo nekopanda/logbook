@@ -144,7 +144,7 @@ public final class CaptureDialog extends WindowBase {
         // 範囲設定
         this.text = new Text(rangeComposite, SWT.BORDER | SWT.READ_ONLY);
         GridData gdText = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-        gdText.widthHint = 120;
+        gdText.widthHint = SwtUtils.DPIAwareWidth(120);
         this.text.setLayoutData(gdText);
         this.text.setText("範囲が未設定です");
 
@@ -194,7 +194,7 @@ public final class CaptureDialog extends WindowBase {
         this.capture = new Button(buttonComposite, SWT.NONE);
         this.capture.setFont(this.font);
         GridData gdCapture = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
-        gdCapture.heightHint = 64;
+        gdCapture.heightHint = SwtUtils.DPIAwareHeight(64);
         this.capture.setLayoutData(gdCapture);
         this.capture.setEnabled(false);
         this.capture.setText(getCaptureButtonText(false, this.interval.getSelection()));

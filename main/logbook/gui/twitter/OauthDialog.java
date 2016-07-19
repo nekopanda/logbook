@@ -87,7 +87,7 @@ public class OauthDialog extends WindowBase {
 
         Button launchWeb = new Button(this.shell, SWT.NONE);
         GridData gdLaunchWeb = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
-        gdLaunchWeb.widthHint = 80;
+        gdLaunchWeb.widthHint = SwtUtils.DPIAwareWidth(80);
         launchWeb.setLayoutData(gdLaunchWeb);
         launchWeb.setText("起動");
         launchWeb.addSelectionListener(new SelectionAdapter() {
@@ -114,7 +114,7 @@ public class OauthDialog extends WindowBase {
 
         final Text text = new Text(this.shell, SWT.BORDER);
         GridData gdText = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-        gdText.widthHint = 120;
+        gdText.widthHint = SwtUtils.DPIAwareWidth(120);
         text.setLayoutData(gdText);
         text.setText("");
 

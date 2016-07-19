@@ -15,6 +15,7 @@ import logbook.gui.logic.OpacityAnimation;
 import logbook.gui.logic.OpacityAnimationClient;
 import logbook.gui.logic.WindowListener;
 import logbook.gui.logic.WindowNativeSupport;
+import logbook.util.SwtUtils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
@@ -1056,7 +1057,7 @@ public class WindowBase {
      * @return
      */
     protected Point getDefaultSize() {
-        return new Point(100, 100);
+        return SwtUtils.DPIAwareSize(new Point(100, 100));
     }
 
     /**

@@ -23,6 +23,7 @@ import logbook.internal.BattleAggDate;
 import logbook.internal.BattleAggUnit;
 import logbook.internal.BattleResultServer;
 import logbook.internal.LoggerHolder;
+import logbook.util.SwtUtils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -196,7 +197,7 @@ public class BattleAggDialog extends WindowBase {
      */
     @Override
     protected Point getDefaultSize() {
-        return new Point(600, 350);
+        return SwtUtils.DPIAwareSize(new Point(600, 350));
     }
 
     protected TableConfigBean getConfig() {

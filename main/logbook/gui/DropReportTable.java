@@ -28,6 +28,7 @@ import logbook.internal.BattleResultServer;
 import logbook.internal.LoggerHolder;
 import logbook.internal.TimeSpanKind;
 import logbook.scripting.TableItemCreatorProxy;
+import logbook.util.SwtUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.swt.SWT;
@@ -273,7 +274,7 @@ public final class DropReportTable extends AbstractTableDialog {
 
     @Override
     protected Point getSize() {
-        return new Point(600, 350);
+        return SwtUtils.DPIAwareSize(new Point(600, 350));
     }
 
     @Override

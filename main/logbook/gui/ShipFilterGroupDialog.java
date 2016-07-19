@@ -307,7 +307,7 @@ public final class ShipFilterGroupDialog extends AbstractTableDialog implements 
 
     @Override
     protected Point getSize() {
-        return new Point(600, 350);
+        return SwtUtils.DPIAwareSize(new Point(600, 350));
     }
 
     @Override

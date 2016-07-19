@@ -1,8 +1,11 @@
 package logbook.gui;
 
+import logbook.util.SwtUtils;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -53,7 +56,7 @@ public final class SelectVisibleColumnDialog extends WindowBase {
      */
     private void createContents() {
         this.shell = this.getShell();
-        this.shell.setSize(300, 275);
+        this.shell.setSize(SwtUtils.DPIAwareSize(new Point(300, 275)));
         this.shell.setText("列の表示非表示");
         this.shell.setLayout(new FillLayout(SWT.HORIZONTAL));
 

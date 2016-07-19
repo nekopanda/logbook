@@ -12,6 +12,7 @@ import logbook.data.Data;
 import logbook.data.DataType;
 import logbook.data.TestData;
 import logbook.data.context.GlobalContext;
+import logbook.util.SwtUtils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
@@ -83,7 +84,7 @@ public class TestDataFeeder extends WindowBase {
         this.filepathText = new Text(shell, SWT.BORDER);
         GridData gd = new GridData(
                 GridData.FILL_HORIZONTAL, SWT.CENTER, true, false, 1, 1);
-        gd.widthHint = 250;
+        gd.widthHint = SwtUtils.DPIAwareWidth(250);
         this.filepathText.setLayoutData(gd);
         this.filepathText.setText("<よく分からないときは使わないでね>");
 

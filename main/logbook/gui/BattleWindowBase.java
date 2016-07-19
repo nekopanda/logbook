@@ -12,6 +12,7 @@ import logbook.dto.EnemyShipDto;
 import logbook.dto.MapCellDto;
 import logbook.dto.ShipDto;
 import logbook.gui.logic.LayoutLogic;
+import logbook.util.SwtUtils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
@@ -212,7 +213,7 @@ public class BattleWindowBase extends WindowBase {
     protected void addVerticalSeparator(int span) {
         Label label = new Label(this.currentCompo, SWT.SEPARATOR | SWT.VERTICAL);
         GridData gd = new GridData(SWT.CENTER, SWT.FILL, false, false, 1, span);
-        gd.widthHint = 10;
+        gd.widthHint = SwtUtils.DPIAwareWidth(10);
         label.setLayoutData(gd);
         if (this.combinedMode) {
             this.labelsForCombined.add(label);

@@ -6,6 +6,7 @@ import java.text.MessageFormat;
 
 import logbook.config.AppConfig;
 import logbook.server.proxy.Filter;
+import logbook.util.SwtUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -95,7 +96,7 @@ public final class CreatePacFileDialog extends Dialog {
 
             final Text text = new Text(manualgroup, SWT.BORDER);
             GridData gdip = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-            gdip.widthHint = 150;
+            gdip.widthHint = SwtUtils.DPIAwareWidth(150);
             text.setLayoutData(gdip);
             text.setText("0.0.0.0");
             text.addModifyListener(new ModifyListener() {
@@ -124,7 +125,7 @@ public final class CreatePacFileDialog extends Dialog {
 
         this.iePath = new Text(addrgroup, SWT.BORDER);
         GridData gdIePath = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-        gdIePath.widthHint = 380;
+        gdIePath.widthHint = SwtUtils.DPIAwareWidth(380);
         this.iePath.setLayoutData(gdIePath);
 
         Label fxAddrLabel = new Label(addrgroup, SWT.NONE);
@@ -132,7 +133,7 @@ public final class CreatePacFileDialog extends Dialog {
 
         this.firefoxPath = new Text(addrgroup, SWT.BORDER);
         GridData gdFxPath = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-        gdFxPath.widthHint = 380;
+        gdFxPath.widthHint = SwtUtils.DPIAwareWidth(380);
         this.firefoxPath.setLayoutData(gdFxPath);
 
         this.shell.pack();

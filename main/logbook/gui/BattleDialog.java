@@ -13,6 +13,7 @@ import logbook.dto.DockDto;
 import logbook.dto.ItemInfoDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipInfoDto;
+import logbook.util.SwtUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -131,35 +132,35 @@ public final class BattleDialog extends Dialog {
             lblfItem1.setFont(SWTResourceManager.getFont(fontName, size, SWT.BOLD));
             lblfItem1.setText("装備1");
             GridData gdfItem1 = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-            gdfItem1.widthHint = 100;
+            gdfItem1.widthHint = SwtUtils.DPIAwareWidth(100);
             lblfItem1.setLayoutData(gdfItem1);
 
             Label lblfItem2 = new Label(fComposite, SWT.NONE);
             lblfItem2.setFont(SWTResourceManager.getFont(fontName, size, SWT.BOLD));
             lblfItem2.setText("装備2");
             GridData gdfItem2 = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-            gdfItem2.widthHint = 100;
+            gdfItem2.widthHint = SwtUtils.DPIAwareWidth(100);
             lblfItem2.setLayoutData(gdfItem2);
 
             Label lblfItem3 = new Label(fComposite, SWT.NONE);
             lblfItem3.setFont(SWTResourceManager.getFont(fontName, size, SWT.BOLD));
             lblfItem3.setText("装備3");
             GridData gdfItem3 = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-            gdfItem3.widthHint = 100;
+            gdfItem3.widthHint = SwtUtils.DPIAwareWidth(100);
             lblfItem3.setLayoutData(gdfItem3);
 
             Label lblfItem4 = new Label(fComposite, SWT.NONE);
             lblfItem4.setFont(SWTResourceManager.getFont(fontName, size, SWT.BOLD));
             lblfItem4.setText("装備4");
             GridData gdfItem4 = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-            gdfItem4.widthHint = 100;
+            gdfItem4.widthHint = SwtUtils.DPIAwareWidth(100);
             lblfItem4.setLayoutData(gdfItem4);
 
             Label lblfItem5 = new Label(fComposite, SWT.NONE);
             lblfItem5.setFont(SWTResourceManager.getFont(fontName, size, SWT.BOLD));
             lblfItem5.setText("装備5");
             GridData gdfItem5 = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-            gdfItem5.widthHint = 100;
+            gdfItem5.widthHint = SwtUtils.DPIAwareWidth(100);
             lblfItem5.setLayoutData(gdfItem5);
 
             for (int j = 0; j < ships.size(); j++) {
@@ -210,35 +211,35 @@ public final class BattleDialog extends Dialog {
         lbleItem1.setFont(SWTResourceManager.getFont(fontName, size, SWT.BOLD));
         lbleItem1.setText("装備1");
         GridData gdeItem1 = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdeItem1.widthHint = 100;
+        gdeItem1.widthHint = SwtUtils.DPIAwareWidth(100);
         lbleItem1.setLayoutData(gdeItem1);
 
         Label lbleItem2 = new Label(eComposite, SWT.NONE);
         lbleItem2.setFont(SWTResourceManager.getFont(fontName, size, SWT.BOLD));
         lbleItem2.setText("装備2");
         GridData gdeItem2 = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdeItem2.widthHint = 100;
+        gdeItem2.widthHint = SwtUtils.DPIAwareWidth(100);
         lbleItem2.setLayoutData(gdeItem2);
 
         Label lbleItem3 = new Label(eComposite, SWT.NONE);
         lbleItem3.setFont(SWTResourceManager.getFont(fontName, size, SWT.BOLD));
         lbleItem3.setText("装備3");
         GridData gdeItem3 = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdeItem3.widthHint = 100;
+        gdeItem3.widthHint = SwtUtils.DPIAwareWidth(100);
         lbleItem3.setLayoutData(gdeItem3);
 
         Label lbleItem4 = new Label(eComposite, SWT.NONE);
         lbleItem4.setFont(SWTResourceManager.getFont(fontName, size, SWT.BOLD));
         lbleItem4.setText("装備4");
         GridData gdeItem4 = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdeItem4.widthHint = 100;
+        gdeItem4.widthHint = SwtUtils.DPIAwareWidth(100);
         lbleItem4.setLayoutData(gdeItem4);
 
         Label lbleItem5 = new Label(eComposite, SWT.NONE);
         lbleItem5.setFont(SWTResourceManager.getFont(fontName, size, SWT.BOLD));
         lbleItem5.setText("装備5");
         GridData gdeItem5 = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdeItem5.widthHint = 100;
+        gdeItem5.widthHint = SwtUtils.DPIAwareWidth(100);
         lbleItem5.setLayoutData(gdeItem5);
 
         List<ShipInfoDto> enemyships = battle.getEnemy();

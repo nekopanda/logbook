@@ -30,6 +30,7 @@ import logbook.gui.logic.ResourceChart.ActiveLevel;
 import logbook.gui.logic.TableItemCreator;
 import logbook.internal.LoggerHolder;
 import logbook.scripting.TableItemCreatorProxy;
+import logbook.util.SwtUtils;
 
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.swt.SWT;
@@ -163,7 +164,7 @@ public final class ResourceChartDialog extends WindowBase {
         this.getShell().setText("資材チャート");
         this.shell = this.getShell();
         this.shell.setMinimumSize(450, 300);
-        this.shell.setSize(800, 650);
+        this.shell.setSize(SwtUtils.DPIAwareSize(new Point(800, 650)));
         this.shell.addListener(SWT.Dispose, new Listener() {
             @Override
             public void handleEvent(Event event) {

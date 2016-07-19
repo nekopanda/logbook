@@ -18,6 +18,7 @@ import logbook.internal.EvaluateExp;
 import logbook.internal.ExpTable;
 import logbook.internal.SeaExp;
 import logbook.util.CalcExpUtils;
+import logbook.util.SwtUtils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
@@ -130,7 +131,7 @@ public final class CalcExpDialog extends WindowBase {
         label1.setText("今のレベル");
         this.beforelv = new Spinner(plan, SWT.BORDER);
         GridData gdBeforelv = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdBeforelv.widthHint = 45;
+        gdBeforelv.widthHint = SwtUtils.DPIAwareWidth(45);
         this.beforelv.setLayoutData(gdBeforelv);
         this.beforelv.setMaximum(ExpTable.MAX_LEVEL);
         this.beforelv.setMinimum(1);
@@ -138,7 +139,7 @@ public final class CalcExpDialog extends WindowBase {
         label2.setText("Lv");
         this.beforexp = new Text(plan, SWT.BORDER | SWT.READ_ONLY);
         GridData gdBeforexp = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdBeforexp.widthHint = 60;
+        gdBeforexp.widthHint = SwtUtils.DPIAwareWidth(60);
         this.beforexp.setLayoutData(gdBeforexp);
         this.beforexp.setText("0");
         Label label3 = new Label(plan, SWT.NONE);
@@ -148,7 +149,7 @@ public final class CalcExpDialog extends WindowBase {
         label4.setText("目標レベル");
         this.afterlv = new Spinner(plan, SWT.BORDER);
         GridData gdAfterlv = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdAfterlv.widthHint = 45;
+        gdAfterlv.widthHint = SwtUtils.DPIAwareWidth(45);
         this.afterlv.setLayoutData(gdAfterlv);
         this.afterlv.setMaximum(ExpTable.MAX_LEVEL);
         this.afterlv.setMinimum(1);
@@ -156,7 +157,7 @@ public final class CalcExpDialog extends WindowBase {
         label5.setText("Lv");
         this.afterexp = new Text(plan, SWT.BORDER | SWT.READ_ONLY);
         GridData gdAfterexp = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdAfterexp.widthHint = 60;
+        gdAfterexp.widthHint = SwtUtils.DPIAwareWidth(60);
         this.afterexp.setLayoutData(gdAfterexp);
         this.afterexp.setText("0");
         Label label6 = new Label(plan, SWT.NONE);
@@ -198,7 +199,7 @@ public final class CalcExpDialog extends WindowBase {
         label10.setText("1回あたり");
         this.getexp = new Text(result, SWT.BORDER | SWT.READ_ONLY);
         GridData gdGetexp = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdGetexp.widthHint = 55;
+        gdGetexp.widthHint = SwtUtils.DPIAwareWidth(55);
         this.getexp.setLayoutData(gdGetexp);
         new Label(result, SWT.NONE);
         new Label(result, SWT.NONE);
@@ -206,13 +207,13 @@ public final class CalcExpDialog extends WindowBase {
         label11.setText("必要経験値");
         this.needexp = new Text(result, SWT.BORDER | SWT.READ_ONLY);
         GridData gdNeedexp = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdNeedexp.widthHint = 55;
+        gdNeedexp.widthHint = SwtUtils.DPIAwareWidth(55);
         this.needexp.setLayoutData(gdNeedexp);
         Label label12 = new Label(result, SWT.NONE);
         label12.setText("戦闘回数");
         this.battlecount = new Text(result, SWT.BORDER | SWT.READ_ONLY);
         GridData gdBattlecount = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdBattlecount.widthHint = 55;
+        gdBattlecount.widthHint = SwtUtils.DPIAwareWidth(55);
         this.battlecount.setLayoutData(gdBattlecount);
 
         // 海域のインデックス値を復元

@@ -178,7 +178,7 @@ public class FleetComposite extends Composite {
             // アイコン
             Label iconlabel = new Label(this.fleetGroup, SWT.NONE);
             GridData gdIconlabel = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 2);
-            gdIconlabel.widthHint = 16;
+            gdIconlabel.widthHint = SwtUtils.DPIAwareWidth(16);
             iconlabel.setLayoutData(gdIconlabel);
 
             // 上段

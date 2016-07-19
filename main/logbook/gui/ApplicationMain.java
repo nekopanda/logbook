@@ -17,6 +17,44 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import logbook.config.AppConfig;
+import logbook.config.ShipGroupConfig;
+import logbook.config.UserDataConfig;
+import logbook.config.bean.AppConfigBean;
+import logbook.constants.AppConstants;
+import logbook.data.context.GlobalContext;
+import logbook.dto.BattleExDto;
+import logbook.dto.DockDto;
+import logbook.dto.MapCellDto;
+import logbook.dto.PracticeUserDetailDto;
+import logbook.gui.background.AsyncExecApplicationMain;
+import logbook.gui.background.AsyncExecUpdateCheck;
+import logbook.gui.background.BackgroundInitializer;
+import logbook.gui.listener.HelpEventListener;
+import logbook.gui.listener.MainShellAdapter;
+import logbook.gui.listener.TrayItemMenuListener;
+import logbook.gui.listener.TraySelectionListener;
+import logbook.gui.logic.ColorManager;
+import logbook.gui.logic.DeckBuilder;
+import logbook.gui.logic.LayoutLogic;
+import logbook.gui.logic.PushNotify;
+import logbook.gui.logic.Sound;
+import logbook.gui.widgets.FleetComposite;
+import logbook.internal.BattleResultServer;
+import logbook.internal.EnemyData;
+import logbook.internal.Item;
+import logbook.internal.LoggerHolder;
+import logbook.internal.MasterData;
+import logbook.internal.Ship;
+import logbook.internal.ShipParameterRecord;
+import logbook.scripting.ScriptData;
+import logbook.server.proxy.DatabaseClient;
+import logbook.server.proxy.ProxyServer;
+import logbook.thread.ThreadManager;
+import logbook.thread.ThreadStateObserver;
+import logbook.util.JIntellitypeWrapper;
+import logbook.util.SwtUtils;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -55,44 +93,6 @@ import org.eclipse.swt.widgets.TrayItem;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.melloware.jintellitype.HotkeyListener;
-
-import logbook.config.AppConfig;
-import logbook.config.ShipGroupConfig;
-import logbook.config.UserDataConfig;
-import logbook.config.bean.AppConfigBean;
-import logbook.constants.AppConstants;
-import logbook.data.context.GlobalContext;
-import logbook.dto.BattleExDto;
-import logbook.dto.DockDto;
-import logbook.dto.MapCellDto;
-import logbook.dto.PracticeUserDetailDto;
-import logbook.gui.background.AsyncExecApplicationMain;
-import logbook.gui.background.AsyncExecUpdateCheck;
-import logbook.gui.background.BackgroundInitializer;
-import logbook.gui.listener.HelpEventListener;
-import logbook.gui.listener.MainShellAdapter;
-import logbook.gui.listener.TrayItemMenuListener;
-import logbook.gui.listener.TraySelectionListener;
-import logbook.gui.logic.ColorManager;
-import logbook.gui.logic.DeckBuilder;
-import logbook.gui.logic.LayoutLogic;
-import logbook.gui.logic.PushNotify;
-import logbook.gui.logic.Sound;
-import logbook.gui.widgets.FleetComposite;
-import logbook.internal.BattleResultServer;
-import logbook.internal.EnemyData;
-import logbook.internal.Item;
-import logbook.internal.LoggerHolder;
-import logbook.internal.MasterData;
-import logbook.internal.Ship;
-import logbook.internal.ShipParameterRecord;
-import logbook.scripting.ScriptData;
-import logbook.server.proxy.DatabaseClient;
-import logbook.server.proxy.ProxyServer;
-import logbook.thread.ThreadManager;
-import logbook.thread.ThreadStateObserver;
-import logbook.util.JIntellitypeWrapper;
-import logbook.util.SwtUtils;
 
 /**
  * メイン画面
@@ -441,7 +441,7 @@ public final class ApplicationMain extends WindowBase {
         if (this.showSubwindowHost) {
             final Shell dummyHolder = this.subwindowHost = new Shell(this.display, SWT.NONE);
             dummyHolder.setText("サブウィンドウ - 航海日誌拡張版");
-            dummyHolder.setSize(150, 50);
+            dummyHolder.setSize(SwtUtils.DPIAwareSize(new Point(150, 50)));
             dummyHolder.setLayout(SwtUtils.makeGridLayout(1, 0, 0, 0, 0));
             dummyHolder.setImage(SWTResourceManager.getImage(WindowBase.class, AppConstants.LOGO));
             dummyHolder.addShellListener(new ShellAdapter() {
@@ -893,7 +893,7 @@ public final class ApplicationMain extends WindowBase {
         this.deck1time = new Text(this.deckGroup, SWT.SINGLE | SWT.BORDER);
         this.deck1time.setText("艦隊1の帰投時間");
         GridData gddeck1time = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gddeck1time.widthHint = 75;
+        gddeck1time.widthHint = SwtUtils.DPIAwareWidth(75);
         this.deck1time.setLayoutData(gddeck1time);
 
         this.deck2name = new Label(this.deckGroup, SWT.NONE);
@@ -903,7 +903,7 @@ public final class ApplicationMain extends WindowBase {
         this.deck2time = new Text(this.deckGroup, SWT.SINGLE | SWT.BORDER);
         this.deck2time.setText("艦隊2の帰投時間");
         GridData gddeck2time = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gddeck2time.widthHint = 75;
+        gddeck2time.widthHint = SwtUtils.DPIAwareWidth(75);
         this.deck2time.setLayoutData(gddeck2time);
 
         this.deck3name = new Label(this.deckGroup, SWT.NONE);
@@ -913,7 +913,7 @@ public final class ApplicationMain extends WindowBase {
         this.deck3time = new Text(this.deckGroup, SWT.SINGLE | SWT.BORDER);
         this.deck3time.setText("艦隊3の帰投時間");
         GridData gddeck3time = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gddeck3time.widthHint = 75;
+        gddeck3time.widthHint = SwtUtils.DPIAwareWidth(75);
         this.deck3time.setLayoutData(gddeck3time);
 
         this.deck4name = new Label(this.deckGroup, SWT.NONE);
@@ -923,7 +923,7 @@ public final class ApplicationMain extends WindowBase {
         this.deck4time = new Text(this.deckGroup, SWT.SINGLE | SWT.BORDER);
         this.deck4time.setText("艦隊4の帰投時間");
         GridData gddeck4time = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gddeck4time.widthHint = 75;
+        gddeck4time.widthHint = SwtUtils.DPIAwareWidth(75);
         this.deck4time.setLayoutData(gddeck4time);
 
         // 入渠
@@ -939,7 +939,7 @@ public final class ApplicationMain extends WindowBase {
         this.ndock1time = new Text(this.ndockGroup, SWT.SINGLE | SWT.BORDER);
         this.ndock1time.setText("お風呂から上がる時間");
         GridData gdndock1time = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdndock1time.widthHint = 75;
+        gdndock1time.widthHint = SwtUtils.DPIAwareWidth(75);
         this.ndock1time.setLayoutData(gdndock1time);
 
         this.ndock2name = new Label(this.ndockGroup, SWT.NONE);
@@ -949,7 +949,7 @@ public final class ApplicationMain extends WindowBase {
         this.ndock2time = new Text(this.ndockGroup, SWT.SINGLE | SWT.BORDER);
         this.ndock2time.setText("お風呂から上がる時間");
         GridData gdndock2time = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdndock2time.widthHint = 75;
+        gdndock2time.widthHint = SwtUtils.DPIAwareWidth(75);
         this.ndock2time.setLayoutData(gdndock2time);
 
         this.ndock3name = new Label(this.ndockGroup, SWT.NONE);
@@ -959,7 +959,7 @@ public final class ApplicationMain extends WindowBase {
         this.ndock3time = new Text(this.ndockGroup, SWT.SINGLE | SWT.BORDER);
         this.ndock3time.setText("お風呂から上がる時間");
         GridData gdndock3time = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdndock3time.widthHint = 75;
+        gdndock3time.widthHint = SwtUtils.DPIAwareWidth(75);
         this.ndock3time.setLayoutData(gdndock3time);
 
         this.ndock4name = new Label(this.ndockGroup, SWT.NONE);
@@ -969,7 +969,7 @@ public final class ApplicationMain extends WindowBase {
         this.ndock4time = new Text(this.ndockGroup, SWT.SINGLE | SWT.BORDER);
         this.ndock4time.setText("お風呂から上がる時間");
         GridData gdndock4time = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdndock4time.widthHint = 75;
+        gdndock4time.widthHint = SwtUtils.DPIAwareWidth(75);
         this.ndock4time.setLayoutData(gdndock4time);
 
         // -------
@@ -985,7 +985,7 @@ public final class ApplicationMain extends WindowBase {
         this.akashiTimerTime = new Text(this.akashiTimerGroup, SWT.SINGLE | SWT.BORDER);
         this.akashiTimerTime.setText("泊地修理タイマーの経過時間");
         GridData gdakashiTimerTime = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdakashiTimerTime.widthHint = 75;
+        gdakashiTimerTime.widthHint = SwtUtils.DPIAwareWidth(75);
         this.akashiTimerTime.setLayoutData(gdakashiTimerTime);
 
         this.condTimerGroup = new Composite(this.mainComposite, SWT.NONE);
@@ -999,7 +999,7 @@ public final class ApplicationMain extends WindowBase {
         this.condTimerTime = new Text(this.condTimerGroup, SWT.SINGLE | SWT.BORDER);
         this.condTimerTime.setText("次の疲労回復までの時間");
         GridData gdconTimeTime = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdconTimeTime.widthHint = 75;
+        gdconTimeTime.widthHint = SwtUtils.DPIAwareWidth(75);
         this.condTimerTime.setLayoutData(gdconTimeTime);
 
         // -------
@@ -1604,7 +1604,7 @@ public final class ApplicationMain extends WindowBase {
 
     @Override
     protected Point getDefaultSize() {
-        return new Point(280, 420);
+        return SwtUtils.DPIAwareSize(new Point(280, 420));
     }
 
     /**

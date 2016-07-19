@@ -14,6 +14,7 @@ import logbook.gui.logic.TableItemCreator;
 import logbook.internal.LoggerHolder;
 import logbook.scripting.TableItemCreatorProxy;
 import logbook.util.ReportUtils;
+import logbook.util.SwtUtils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -78,7 +79,7 @@ public final class BathwaterTableDialog extends AbstractTableDialog {
 
     @Override
     protected Point getSize() {
-        return new Point(600, 350);
+        return SwtUtils.DPIAwareSize(new Point(600, 350));
     }
 
     @Override
