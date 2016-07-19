@@ -114,6 +114,7 @@ public class BattleAtackDto {
         }
         dto.origin = new int[idx];
         dto.ydam = new int[idx];
+        dto.critical = new int[idx];
         dto.ot = new int[idx];
 
         idx = 0;
@@ -124,7 +125,6 @@ public class BattleAtackDto {
         }
         dto.target = new int[idx];
         dto.damage = new int[idx];
-        dto.critical = new int[idx];
 
         for (int i = 0; i < 6; ++i) {
             int rai = rai_list.getInt(i + 1);
@@ -134,12 +134,12 @@ public class BattleAtackDto {
             if (rai > 0) {
                 dto.origin[originMap[i]] = i;
                 dto.ydam[originMap[i]] = ydam;
+                dto.critical[originMap[i]] = cl;
                 dto.ot[originMap[i]] = targetMap[rai - 1];
             }
             if (targetEnabled[i]) {
                 dto.target[targetMap[i]] = i;
                 dto.damage[targetMap[i]] = dam;
-                dto.critical[targetMap[i]] = cl;
             }
         }
 
@@ -283,7 +283,7 @@ public class BattleAtackDto {
                 true,
                 raigeki_obj.getJsonArray("api_frai"),
                 raigeki_obj.getJsonArray("api_edam"),
-                raigeki_obj.getJsonArray("api_ecl"),
+                raigeki_obj.getJsonArray("api_fcl"),
                 raigeki_obj.getJsonArray("api_fydam"));
 
         if (second) {
@@ -294,7 +294,7 @@ public class BattleAtackDto {
                 false,
                 raigeki_obj.getJsonArray("api_erai"),
                 raigeki_obj.getJsonArray("api_fdam"),
-                raigeki_obj.getJsonArray("api_fcl"),
+                raigeki_obj.getJsonArray("api_ecl"),
                 raigeki_obj.getJsonArray("api_eydam"));
 
         if (second) {
