@@ -1,5 +1,7 @@
 package logbook.gui.logic;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -143,7 +145,7 @@ public class DeckBuilder {
     public String getDeckBuilderURL(boolean[] needsUsedDock) {
         Optional<String> formatOpt = Optional.ofNullable(this.getDeckBuilderFormat(needsUsedDock));
         if (formatOpt.isPresent()) {
-            return this.URL + this.SUFFIX + formatOpt.get();
+            return this.URL + this.SUFFIX + encodeURIComponent(formatOpt.get());
         } else {
             return null;
         }
@@ -158,6 +160,20 @@ public class DeckBuilder {
     public String getDeckBuilderURL() {
         boolean[] b = { true, true, true, true };
         return this.getDeckBuilderURL(b);
+    }
+
+    private static String encodeURIComponent(String s) {
+        try {
+            return URLEncoder.encode(s, "UTF-8")
+                    .replaceAll("\\+", "%20")
+                    .replaceAll("\\%21", "!")
+                    .replaceAll("\\%27", "'")
+                    .replaceAll("\\%28", "(")
+                    .replaceAll("\\%29", ")")
+                    .replaceAll("\\%7E", "~");
+        } catch (UnsupportedEncodingException e) {
+            return null;
+        }
     }
 
 }
