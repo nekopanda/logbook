@@ -79,7 +79,19 @@ public class SeikuString implements Comparable<SeikuString> {
                         return;
                     }
 
-                    double basePart = item.getParam().getTyku() * Math.sqrt(ship.getOnSlot()[i]);
+                    double tyku = item.getParam().getTyku();
+
+                    // 改修効果 艦戦は★×0.2、爆戦は★×0.25
+                    switch (type) {
+                    case 0: // 艦上戦闘機 （水上戦闘機は不明だけど一応入れておく）
+                        tyku += item.getLevel() * 0.2;
+                        break;
+                    case 1: // 爆戦（爆戦でない艦上爆撃機や艦上攻撃機は不明だけど一応入れておく）
+                        tyku += item.getLevel() * 0.25;
+                        break;
+                    }
+
+                    double basePart = tyku * Math.sqrt(ship.getOnSlot()[i]);
 
                     double ialvMin = internalAlevelTable[item.getAlv()];
                     double ialvMax = internalAlevelTable[item.getAlv() + 1] - 1;
