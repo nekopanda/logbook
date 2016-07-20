@@ -145,7 +145,7 @@ public class DeckBuilder {
     public String getDeckBuilderURL(boolean[] needsUsedDock) {
         Optional<String> formatOpt = Optional.ofNullable(this.getDeckBuilderFormat(needsUsedDock));
         if (formatOpt.isPresent()) {
-            return this.URL + this.SUFFIX + encodeURIComponent(formatOpt.get());
+            return this.URL + this.SUFFIX + formatOpt.get();
         } else {
             return null;
         }
