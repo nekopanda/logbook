@@ -368,6 +368,9 @@ public final class AppConfigBean {
     /** 第四艦隊のデータをデッキビルダーの生成に使うか */
     private boolean useCopyDeckBuilder4 = true;
 
+    /** 所持艦隊晒しの対象をロックしている艦限定にするか */
+    private boolean useLockedOnlyFleetFormat = false;
+
     private static RGB cloneRGB(RGB rgb) {
         return new RGB(rgb.red, rgb.green, rgb.blue);
     }
@@ -2119,6 +2122,20 @@ public final class AppConfigBean {
      */
     public void setUseCopyDeckBuilder4(boolean useCopyDeckBuilder4) {
         this.useCopyDeckBuilder4 = useCopyDeckBuilder4;
+    }
+
+    /**
+     * @return useLockedOnlyFleetFormat
+     */
+    public boolean isUseLockedOnlyFleetFormat() {
+        return this.useLockedOnlyFleetFormat;
+    }
+
+    /**
+     * @param useLockedOnlyFleetFormat セットする useLockedOnlyFleetFormat
+     */
+    public void setUseLockedOnlyFleetFormat(boolean useLockedOnlyFleetFormat) {
+        this.useLockedOnlyFleetFormat = useLockedOnlyFleetFormat;
     }
 
 }

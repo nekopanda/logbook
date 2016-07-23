@@ -1227,14 +1227,20 @@ public final class ApplicationMain extends WindowBase {
 
         rootCopyDeckBuilder.setMenu(copyDeckBuilderMenu);
 
-        final MenuItem fleetFormatter = new MenuItem(this.getPopupMenu(), SWT.PUSH);
-        fleetFormatter.setText("所持艦隊晒し用ページのフォーマットをコピー");
-        fleetFormatter.addSelectionListener(new SelectionAdapter() {
+        final MenuItem rootFleetFormatter = new MenuItem(this.getPopupMenu(), SWT.CASCADE);
+        rootFleetFormatter.setText("所持艦隊晒し用ページ");
+        Menu copyFleetFormatterMenu = new Menu(rootFleetFormatter);
+
+        final MenuItem copyFleetFormat = new MenuItem(copyFleetFormatterMenu, SWT.PUSH);
+        copyFleetFormat.setText("フォーマットをクリップボードにコピー");
+
+        copyFleetFormat.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                boolean isLockedOnlyFleetFormat = AppConfig.get().isUseLockedOnlyFleetFormat();
                 if (GlobalContext.getState() == 1) {
                     Clipboard clipboard = new Clipboard(Display.getDefault());
-                    clipboard.setContents(new Object[] { new FleetFormatter().get() },
+                    clipboard.setContents(new Object[] { new FleetFormatter().get(isLockedOnlyFleetFormat) },
                             new Transfer[] { TextTransfer.getInstance() });
                 } else {
                     Shell shell = new Shell(Display.getDefault(), SWT.TOOL);
@@ -1246,6 +1252,32 @@ public final class ApplicationMain extends WindowBase {
                 }
             }
         });
+
+        final MenuItem copyFleetFormatURL = new MenuItem(copyFleetFormatterMenu, SWT.PUSH);
+        copyFleetFormatURL.setText("サイトURLをクリップボードにコピー");
+
+        copyFleetFormatURL.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                Clipboard clipboard = new Clipboard(Display.getDefault());
+                clipboard.setContents(new Object[] { "http://kancolle-calc.net/kanmusu_list.html" },
+                        new Transfer[] { TextTransfer.getInstance() });
+            }
+        });
+
+        new MenuItem(copyFleetFormatterMenu, SWT.SEPARATOR);
+        final MenuItem isLockedOnlyFleetFormat = new MenuItem(copyFleetFormatterMenu, SWT.CHECK);
+        isLockedOnlyFleetFormat.setText("ロックしている艦限定");
+        isLockedOnlyFleetFormat.setSelection(AppConfig.get().isUseLockedOnlyFleetFormat());
+        ;
+        isLockedOnlyFleetFormat.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                AppConfig.get().setUseLockedOnlyFleetFormat(isLockedOnlyFleetFormat.getSelection());
+            }
+        });
+
+        rootFleetFormatter.setMenu(copyFleetFormatterMenu);
 
         // 選択する項目はドラックで移動できないようにする
         for (Control c : new Control[] { this.commandComposite,
