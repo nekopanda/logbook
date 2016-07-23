@@ -8,14 +8,14 @@ import java.util.List;
 
 import javax.json.JsonObject;
 
+import com.dyuproject.protostuff.Tag;
+
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.internal.Item;
 import logbook.internal.MasterData;
 import logbook.internal.Ship;
 import logbook.util.JsonUtils;
-
-import com.dyuproject.protostuff.Tag;
 
 /**
  * @author Nekopanda
@@ -81,8 +81,7 @@ public abstract class ShipBaseDto extends AbstractDto {
             for (ItemDto dto : this.slotItem2) {
                 this.slotItem.add((dto == null) ? null : dto.getInfo());
             }
-        }
-        else {
+        } else {
             this.slotItem = Item.fromIdList(slot);
             this.slotItem2 = createItemList(this.slotItem);
         }
@@ -118,8 +117,7 @@ public abstract class ShipBaseDto extends AbstractDto {
         for (ItemInfoDto info : iteminfo) {
             if (info == null) {
                 items.add(null);
-            }
-            else {
+            } else {
                 items.add(new ItemDto(info, -1));
             }
         }
@@ -563,5 +561,35 @@ public abstract class ShipBaseDto extends AbstractDto {
      */
     public String getFullName() {
         return this.shipInfo.getFullName();
+    }
+
+    /*
+     * 艦隊晒しの作成の過程で勘違いして作ってしまいました
+     * メソッド名は適当なので好きに変えてください
+     */
+
+    private int getFinalShipId(ShipInfoDto afterShipinfo) {
+        int afterShipId = afterShipinfo.getAftershipid();
+        if ((afterShipId == 0) || (Ship.get(afterShipId).getBeforeshpids().length > Ship.get(afterShipinfo.getShipId())
+                .getBeforeshpids().length)) {
+            return afterShipinfo.getShipId();
+        }
+        return this.getFinalShipId(Ship.get(afterShipId));
+
+    }
+
+    /**
+     * 最終改造状態のidを取得します(甲、乙などと付いている場合はそちらを優先)
+     *
+     * @return 最終改造状態のid
+     */
+    public int getFinalShipId() {
+        int afterShipId = this.shipInfo.getAftershipid();
+
+        if (afterShipId == 0) {
+            return this.shipInfo.getShipId();
+        }
+        return this.getFinalShipId(Ship.get(afterShipId));
+
     }
 }

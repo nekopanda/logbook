@@ -17,44 +17,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import logbook.config.AppConfig;
-import logbook.config.ShipGroupConfig;
-import logbook.config.UserDataConfig;
-import logbook.config.bean.AppConfigBean;
-import logbook.constants.AppConstants;
-import logbook.data.context.GlobalContext;
-import logbook.dto.BattleExDto;
-import logbook.dto.DockDto;
-import logbook.dto.MapCellDto;
-import logbook.dto.PracticeUserDetailDto;
-import logbook.gui.background.AsyncExecApplicationMain;
-import logbook.gui.background.AsyncExecUpdateCheck;
-import logbook.gui.background.BackgroundInitializer;
-import logbook.gui.listener.HelpEventListener;
-import logbook.gui.listener.MainShellAdapter;
-import logbook.gui.listener.TrayItemMenuListener;
-import logbook.gui.listener.TraySelectionListener;
-import logbook.gui.logic.ColorManager;
-import logbook.gui.logic.DeckBuilder;
-import logbook.gui.logic.LayoutLogic;
-import logbook.gui.logic.PushNotify;
-import logbook.gui.logic.Sound;
-import logbook.gui.widgets.FleetComposite;
-import logbook.internal.BattleResultServer;
-import logbook.internal.EnemyData;
-import logbook.internal.Item;
-import logbook.internal.LoggerHolder;
-import logbook.internal.MasterData;
-import logbook.internal.Ship;
-import logbook.internal.ShipParameterRecord;
-import logbook.scripting.ScriptData;
-import logbook.server.proxy.DatabaseClient;
-import logbook.server.proxy.ProxyServer;
-import logbook.thread.ThreadManager;
-import logbook.thread.ThreadStateObserver;
-import logbook.util.JIntellitypeWrapper;
-import logbook.util.SwtUtils;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -93,6 +55,45 @@ import org.eclipse.swt.widgets.TrayItem;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.melloware.jintellitype.HotkeyListener;
+
+import logbook.config.AppConfig;
+import logbook.config.ShipGroupConfig;
+import logbook.config.UserDataConfig;
+import logbook.config.bean.AppConfigBean;
+import logbook.constants.AppConstants;
+import logbook.data.context.GlobalContext;
+import logbook.dto.BattleExDto;
+import logbook.dto.DockDto;
+import logbook.dto.MapCellDto;
+import logbook.dto.PracticeUserDetailDto;
+import logbook.gui.background.AsyncExecApplicationMain;
+import logbook.gui.background.AsyncExecUpdateCheck;
+import logbook.gui.background.BackgroundInitializer;
+import logbook.gui.listener.HelpEventListener;
+import logbook.gui.listener.MainShellAdapter;
+import logbook.gui.listener.TrayItemMenuListener;
+import logbook.gui.listener.TraySelectionListener;
+import logbook.gui.logic.ColorManager;
+import logbook.gui.logic.DeckBuilder;
+import logbook.gui.logic.FleetFormatter;
+import logbook.gui.logic.LayoutLogic;
+import logbook.gui.logic.PushNotify;
+import logbook.gui.logic.Sound;
+import logbook.gui.widgets.FleetComposite;
+import logbook.internal.BattleResultServer;
+import logbook.internal.EnemyData;
+import logbook.internal.Item;
+import logbook.internal.LoggerHolder;
+import logbook.internal.MasterData;
+import logbook.internal.Ship;
+import logbook.internal.ShipParameterRecord;
+import logbook.scripting.ScriptData;
+import logbook.server.proxy.DatabaseClient;
+import logbook.server.proxy.ProxyServer;
+import logbook.thread.ThreadManager;
+import logbook.thread.ThreadStateObserver;
+import logbook.util.JIntellitypeWrapper;
+import logbook.util.SwtUtils;
 
 /**
  * メイン画面
@@ -1225,6 +1226,58 @@ public final class ApplicationMain extends WindowBase {
         });
 
         rootCopyDeckBuilder.setMenu(copyDeckBuilderMenu);
+
+        final MenuItem rootFleetFormatter = new MenuItem(this.getPopupMenu(), SWT.CASCADE);
+        rootFleetFormatter.setText("所持艦隊晒し用ページ");
+        Menu copyFleetFormatterMenu = new Menu(rootFleetFormatter);
+
+        final MenuItem copyFleetFormat = new MenuItem(copyFleetFormatterMenu, SWT.PUSH);
+        copyFleetFormat.setText("フォーマットをクリップボードにコピー");
+
+        copyFleetFormat.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                boolean isLockedOnlyFleetFormat = AppConfig.get().isUseLockedOnlyFleetFormat();
+                if (GlobalContext.getState() == 1) {
+                    Clipboard clipboard = new Clipboard(Display.getDefault());
+                    clipboard.setContents(new Object[] { new FleetFormatter().get(isLockedOnlyFleetFormat) },
+                            new Transfer[] { TextTransfer.getInstance() });
+                } else {
+                    Shell shell = new Shell(Display.getDefault(), SWT.TOOL);
+                    MessageBox mes = new MessageBox(shell, SWT.ICON_WARNING | SWT.OK);
+                    mes.setText(AppConstants.TITLEBAR_TEXT);
+                    mes.setMessage("情報が不足しています。艦これをリロードしてデータを読み込んでください。");
+                    mes.open();
+                    shell.dispose();
+                }
+            }
+        });
+
+        final MenuItem copyFleetFormatURL = new MenuItem(copyFleetFormatterMenu, SWT.PUSH);
+        copyFleetFormatURL.setText("サイトURLをクリップボードにコピー");
+
+        copyFleetFormatURL.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                Clipboard clipboard = new Clipboard(Display.getDefault());
+                clipboard.setContents(new Object[] { "http://kancolle-calc.net/kanmusu_list.html" },
+                        new Transfer[] { TextTransfer.getInstance() });
+            }
+        });
+
+        new MenuItem(copyFleetFormatterMenu, SWT.SEPARATOR);
+        final MenuItem isLockedOnlyFleetFormat = new MenuItem(copyFleetFormatterMenu, SWT.CHECK);
+        isLockedOnlyFleetFormat.setText("ロックしている艦限定");
+        isLockedOnlyFleetFormat.setSelection(AppConfig.get().isUseLockedOnlyFleetFormat());
+        ;
+        isLockedOnlyFleetFormat.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                AppConfig.get().setUseLockedOnlyFleetFormat(isLockedOnlyFleetFormat.getSelection());
+            }
+        });
+
+        rootFleetFormatter.setMenu(copyFleetFormatterMenu);
 
         // 選択する項目はドラックで移動できないようにする
         for (Control c : new Control[] { this.commandComposite,
