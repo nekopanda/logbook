@@ -1,5 +1,6 @@
 package logbook.gui.logic;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,37 +35,39 @@ public class FleetFormatter {
 
     private Map<Integer, StringBuilder> getLockedOnlyFormat() {
         Map<Integer, StringBuilder> format = new HashMap<Integer, StringBuilder>();
-        GlobalContext.getShipMap().values().stream().filter(ShipDto::getLocked).forEach(ship -> {
-            int charId = ship.getCharId();
-            int lv = ship.getLv();
-            int shipId = ship.getShipId();
-            int lvSuffix = this.getLvSuffix(charId, shipId);
+        GlobalContext.getShipMap().values().stream().sorted(Comparator.comparing(ShipDto::getLv).reversed())
+                .filter(ShipDto::getLocked).forEach(ship -> {
+                    int charId = ship.getCharId();
+                    int lv = ship.getLv();
+                    int shipId = ship.getShipId();
+                    int lvSuffix = this.getLvSuffix(charId, shipId);
 
-            if (format.containsKey(charId)) {
-                format.put(charId, format.get(charId).append(","));
-            } else {
-                format.put(charId, new StringBuilder());
-            }
-            format.put(charId, format.get(charId).append(lv + "." + lvSuffix));
-        });
+                    if (format.containsKey(charId)) {
+                        format.put(charId, format.get(charId).append(","));
+                    } else {
+                        format.put(charId, new StringBuilder());
+                    }
+                    format.put(charId, format.get(charId).append(lv + "." + lvSuffix));
+                });
         return format;
     }
 
     private Map<Integer, StringBuilder> getFreeFormat() {
         Map<Integer, StringBuilder> format = new HashMap<Integer, StringBuilder>();
-        GlobalContext.getShipMap().values().stream().forEach(ship -> {
-            int charId = ship.getCharId();
-            int lv = ship.getLv();
-            int shipId = ship.getShipId();
-            int lvSuffix = this.getLvSuffix(charId, shipId);
+        GlobalContext.getShipMap().values().stream().sorted(Comparator.comparing(ShipDto::getLv).reversed())
+                .forEach(ship -> {
+                    int charId = ship.getCharId();
+                    int lv = ship.getLv();
+                    int shipId = ship.getShipId();
+                    int lvSuffix = this.getLvSuffix(charId, shipId);
 
-            if (format.containsKey(charId)) {
-                format.put(charId, format.get(charId).append(","));
-            } else {
-                format.put(charId, new StringBuilder());
-            }
-            format.put(charId, format.get(charId).append(lv + "." + lvSuffix));
-        });
+                    if (format.containsKey(charId)) {
+                        format.put(charId, format.get(charId).append(","));
+                    } else {
+                        format.put(charId, new StringBuilder());
+                    }
+                    format.put(charId, format.get(charId).append(lv + "." + lvSuffix));
+                });
         return format;
     }
 
