@@ -2478,33 +2478,35 @@ public final class GlobalContext {
      */
     private static void doMapInfo(Data data, JsonValue json) {
         try {
-            if (json instanceof JsonArray) {
-                JsonArray apidata = (JsonArray) json;
-                MasterData.updateMapInfo(apidata);
+            if (json instanceof JsonObject) {
+                JsonValue api_map_info = ((JsonObject) json).get("api_map_info");
+                if (api_map_info instanceof JsonArray) {
+                    JsonArray apidata = (JsonArray) api_map_info;
 
-                int shipSpace = maxChara - shipMap.size();
-                int itemSpace = maxSlotitem - itemMap.size();
-                // 装備の空き枠が少ない時はバルーンを出す
-                if (AppConfig.get().isEnableItemFullBalloonNotify() &&
-                        (itemSpace <= AppConfig.get().getItemFullBalloonNotify())) {
-                    ToolTip tip = new ToolTip(ApplicationMain.main.getShell(), SWT.BALLOON
-                            | SWT.ICON_ERROR);
-                    tip.setText("装備の空き枠警告");
-                    tip.setMessage("装備の空き枠があと" + itemSpace + "個しかありません");
-                    ApplicationMain.main.getTrayItem().setToolTip(tip);
-                    tip.setVisible(true);
-                    Sound.randomWarningPlay();
-                }
-                // 艦娘の空き枠が少ない時はバルーンを出す
-                else if (AppConfig.get().isEnableShipFullBalloonNotify() &&
-                        (shipSpace <= AppConfig.get().getShipFullBalloonNotify())) {
-                    ToolTip tip = new ToolTip(ApplicationMain.main.getShell(), SWT.BALLOON
-                            | SWT.ICON_ERROR);
-                    tip.setText("母港の空き警告");
-                    tip.setMessage("母港の空きがあと" + shipSpace + "隻分しかありません");
-                    ApplicationMain.main.getTrayItem().setToolTip(tip);
-                    tip.setVisible(true);
-                    Sound.randomWarningPlay();
+                    int shipSpace = maxChara - shipMap.size();
+                    int itemSpace = maxSlotitem - itemMap.size();
+                    // 装備の空き枠が少ない時はバルーンを出す
+                    if (AppConfig.get().isEnableItemFullBalloonNotify() &&
+                            (itemSpace <= AppConfig.get().getItemFullBalloonNotify())) {
+                        ToolTip tip = new ToolTip(ApplicationMain.main.getShell(), SWT.BALLOON
+                                | SWT.ICON_ERROR);
+                        tip.setText("装備の空き枠警告");
+                        tip.setMessage("装備の空き枠があと" + itemSpace + "個しかありません");
+                        ApplicationMain.main.getTrayItem().setToolTip(tip);
+                        tip.setVisible(true);
+                        Sound.randomWarningPlay();
+                    }
+                    // 艦娘の空き枠が少ない時はバルーンを出す
+                    else if (AppConfig.get().isEnableShipFullBalloonNotify() &&
+                            (shipSpace <= AppConfig.get().getShipFullBalloonNotify())) {
+                        ToolTip tip = new ToolTip(ApplicationMain.main.getShell(), SWT.BALLOON
+                                | SWT.ICON_ERROR);
+                        tip.setText("母港の空き警告");
+                        tip.setMessage("母港の空きがあと" + shipSpace + "隻分しかありません");
+                        ApplicationMain.main.getTrayItem().setToolTip(tip);
+                        tip.setVisible(true);
+                        Sound.randomWarningPlay();
+                    }
                 }
             }
         } catch (Exception e) {
