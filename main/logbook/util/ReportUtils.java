@@ -103,6 +103,8 @@ public class ReportUtils {
         case COMBINED_BATTLE_MIDNIGHT:
         case COMBINED_BATTLE_SP_MIDNIGHT:
         case COMBINED_BATTLE_WATER:
+        case COMBINED_EC_BATTLE:
+        case COMBINED_EC_BATTLE_MIDNIGHT:
 
             // 艦娘の入手
         case BATTLE_RESULT:
