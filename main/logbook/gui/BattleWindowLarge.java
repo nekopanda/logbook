@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * @author Nekopanda
- * 戦況ウィンドウ通常版
+ * 戦況ウィンドウ（通常サイズ）
  */
 public class BattleWindowLarge extends BattleWindow {
 
@@ -28,7 +28,7 @@ public class BattleWindowLarge extends BattleWindow {
     private final Label[] friendLabels = new Label[12];
     // 0,1: 開始前, 2,3,4: 昼戦後, 5,6,7: 夜戦後
     private final Label[][] friendHpLabels = new Label[8][12];
-    private final Label[][] enemyHpLabels = new Label[8][6];
+    private final Label[][] enemyHpLabels = new Label[8][12];
 
     private final Label[] hpLabels = new Label[2];
 
@@ -95,6 +95,9 @@ public class BattleWindowLarge extends BattleWindow {
             labels[10] = this.addLabel("000→000");
             labels[11] = this.addLabel("000→000");
             break;
+        default:
+            this.skipSlot();
+            this.skipSlot();
         }
     }
 
@@ -205,20 +208,28 @@ public class BattleWindowLarge extends BattleWindow {
         this.addHorizontalSeparator(numColumns);
 
         // 敵エリア
-        for (int i = 0; i < 6; ++i) {
+        for (int i = 0; i < 12; ++i) {
+            if (i == 6) {
+                this.beginEnemyCombined();
+            }
             if (i == 0) {
                 this.addLabelWithSpan("敵", 1, 6); //1
-                this.addVerticalSeparator(6); //2
             }
+            if (i == 6) {
+                this.addLabelWithSpan("", 1, 6); //1
+            }
+            if ((i == 0) || (i == 6))
+                this.addVerticalSeparator(6); //2
             this.addEnemyInfoLabel(this.infoLabels[1], i);//3-4
-            if (i == 0)
-                this.addVerticalSeparator(6); //5
+            if ((i == 0) || (i == 6))
+                this.addVerticalSeparator(6);//5
             this.enemyLabels[i] = this.addLabel("艦名" + (i + 1), SWT.LEFT, nameWidth); //6
             this.enemyHpLabels[1][i] = this.enemyHpLabels[0][i] =
                     this.addLabelWithSpan("0000", 2, 1); //10 HP
             this.createHpLabels(this.enemyHpLabels, i); // 10-17
         }
 
+        this.endEnemyCombined();
         this.addHorizontalSeparator(numColumns);
 
         // 最後
@@ -247,7 +258,7 @@ public class BattleWindowLarge extends BattleWindow {
         }
 
         // 敵
-        for (int i = 0; i < 6; ++i) {
+        for (int i = 0; i < 12; ++i) {
             for (int c = 0; c < 8; ++c) {
                 setLabelText(this.enemyHpLabels[c][i], "");
                 if ((c == 4) || (c == 7))
@@ -368,12 +379,22 @@ public class BattleWindowLarge extends BattleWindow {
 
         // 敵
         List<EnemyShipDto> enemyShips = battle.getEnemy();
-        int[] maxEnemyHp = battle.getMaxEnemyHp();
-        for (int i = 0; i < enemyShips.size(); ++i) {
-            EnemyShipDto ship = enemyShips.get(i);
-            this.enemyLabels[i].setText(String.valueOf(i + 1) + "." + ship.getFriendlyName());
-            this.enemyLabels[i].setToolTipText(ship.getDetailedString());
-            this.enemyHpLabels[0][i].setText(String.valueOf(maxEnemyHp[i]) + "/" + maxEnemyHp[i]);
+        List<EnemyShipDto> enemyShipsCombined = battle.getEnemyCombined();
+        int[][] enemyMaxHp = new int[][] { battle.getMaxEnemyHp(), battle.getMaxEnemyHpCombined() };
+        for (int i = 0; i < enemyMaxHp.length; ++i) {
+            if ((i == 1) && (battle.isEnemyCombined() == false))
+                break;
+
+            List<EnemyShipDto> ships = (i == 0) ? enemyShips : enemyShipsCombined;
+            int[] maxHp = enemyMaxHp[i];
+
+            for (int c = 0; c < ships.size(); ++c) {
+                EnemyShipDto ship = ships.get(c);
+                int index = (i * 6) + c;
+                this.enemyLabels[index].setText(String.valueOf(index + 1) + "." + ship.getFriendlyName());
+                this.enemyLabels[index].setToolTipText(ship.getDetailedString());
+                this.enemyHpLabels[0][index].setText(String.valueOf(maxHp[c]) + "/" + maxHp[c]);
+            }
         }
 
         // 昼戦後HP
@@ -383,7 +404,11 @@ public class BattleWindowLarge extends BattleWindow {
             printHp(this.friendHpLabels, 2, 6, this.friendDamages[0],
                     phase1.getNowFriendHpCombined(), friendMaxHp[1], docks.get(1).getEscaped(), true);
         }
-        printHp(this.enemyHpLabels, 2, 0, this.enemyDamages[0], phase1.getNowEnemyHp(), maxEnemyHp, null, false);
+        printHp(this.enemyHpLabels, 2, 0, this.enemyDamages[0], phase1.getNowEnemyHp(), enemyMaxHp[0], null, false);
+        if (battle.isEnemyCombined()) {
+            printHp(this.enemyHpLabels, 2, 6, this.enemyDamages[0],
+                    phase1.getNowEnemyHpCombined(), enemyMaxHp[1], null, false);
+        }
 
         // 夜戦後HP
         if (phase2 != null) {
@@ -393,7 +418,14 @@ public class BattleWindowLarge extends BattleWindow {
                 printHp(this.friendHpLabels, 5, 6, this.friendDamages[1],
                         phase2.getNowFriendHpCombined(), friendMaxHp[1], docks.get(1).getEscaped(), true);
             }
-            printHp(this.enemyHpLabels, 5, 0, this.enemyDamages[1], phase2.getNowEnemyHp(), maxEnemyHp, null, false);
+            printHp(this.enemyHpLabels, 5, 0, this.enemyDamages[1], phase2.getNowEnemyHp(), enemyMaxHp[0], null, false);
+            if (battle.isEnemyCombined()) {
+                printHp(this.enemyHpLabels, 5, 6, this.enemyDamages[1],
+                        phase2.getNowEnemyHpCombined(), enemyMaxHp[1], null, false);
+            }
         }
+
+        // 敵連合艦隊用レイアウトセット
+        this.setEnemyCombinedMode(battle.isEnemyCombined());
     }
 }

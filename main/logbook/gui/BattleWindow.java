@@ -16,6 +16,7 @@ import logbook.dto.DockDto;
 import logbook.dto.ResultRank;
 import logbook.dto.ShipDto;
 import logbook.gui.logic.ColorManager;
+import logbook.internal.LoggerHolder;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Label;
@@ -27,11 +28,13 @@ import org.eclipse.swt.widgets.Shell;
  *
  */
 public class BattleWindow extends BattleWindowBase {
+    /** ロガー */
+    private static final LoggerHolder LOG = new LoggerHolder(BattleWindow.class);
 
     protected Label title;
 
     // 名前
-    protected final Label[] enemyLabels = new Label[6];
+    protected final Label[] enemyLabels = new Label[12];
 
     protected final Label[][] infoLabels = new Label[2][12];
 
@@ -40,7 +43,7 @@ public class BattleWindow extends BattleWindowBase {
 
     protected final int[] yDamages = new int[12];
     protected final int[][] friendDamages = new int[2][12];
-    protected final int[][] enemyDamages = new int[2][6];
+    protected final int[][] enemyDamages = new int[2][12];
 
     protected static String AFTER_DAY = "昼戦後";
     protected static String AFTER_NIGHT = "夜戦後";
@@ -65,7 +68,7 @@ public class BattleWindow extends BattleWindowBase {
         }
 
         // 敵
-        for (int i = 0; i < 6; ++i) {
+        for (int i = 0; i < 12; ++i) {
             setLabelText(this.enemyLabels[i], "-", "");
         }
 
@@ -372,6 +375,8 @@ public class BattleWindow extends BattleWindowBase {
                 // 移動中
                 this.printMap();
             }
+        } catch (Exception e) {
+            LOG.get().warn("戦況ウィンドウの更新に失敗しました", e);
         } finally {
             this.endDraw();
         }

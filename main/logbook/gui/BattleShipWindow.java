@@ -27,19 +27,19 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * @author Nekopanda
- *
+ * 自軍敵軍パラメータ
  */
 public class BattleShipWindow extends BattleWindowBase {
 
     // 名前
     private final Label[] friendLabels = new Label[12];
-    private final Label[] enemyLabels = new Label[6];
+    private final Label[] enemyLabels = new Label[12];
     // 0:火力 1:雷装 2:対空 3:装甲 4:cond, 5:燃料, 6:弾薬
     private final Label[][] fStatusLabels = new Label[6][12];
-    private final Label[][] eStatusLabels = new Label[4][6];
+    private final Label[][] eStatusLabels = new Label[4][12];
 
     private final Label[][] friendDetail = new Label[2][12];
-    private final Label[][] enemyDetail = new Label[2][6];
+    private final Label[][] enemyDetail = new Label[2][12];
 
     private int friendCurrentIndex = -1;
     private boolean friendSelected = false;
@@ -108,10 +108,7 @@ public class BattleShipWindow extends BattleWindowBase {
             List<ItemInfoDto> slots;
             ShipInfoDto shipinfo;
             if ((this.getBattle() != null)) {
-                if (newIndex >= this.getBattle().getEnemy().size())
-                    return;
-
-                EnemyShipDto ship = this.getBattle().getEnemy().get(newIndex);
+                EnemyShipDto ship = this.getEnemyShips()[newIndex];
                 if (ship == null)
                     return;
 
@@ -191,7 +188,7 @@ public class BattleShipWindow extends BattleWindowBase {
     }
 
     private void clearEnemyArea() {
-        for (int i = 0; i < 6; ++i) {
+        for (int i = 0; i < 12; ++i) {
             this.enemyLabels[i].setText("-");
             for (int c = 0; c < 4; ++c) {
                 this.eStatusLabels[c][i].setText("");
@@ -274,20 +271,27 @@ public class BattleShipWindow extends BattleWindowBase {
         this.addHorizontalSeparator(numColumns);
 
         // 敵エリア
-        for (int i = 0; i < 6; ++i) {
+        for (int i = 0; i < 12; ++i) {
+            if (i == 6) {
+                this.beginEnemyCombined();
+            }
             if (i == 0) {
                 this.addLabelWithSpan("敵", 1, 6); //1
-                this.addVerticalSeparator(6); //2
             }
+            if (i == 6) {
+                this.addLabelWithSpan("", 1, 6); //1
+            }
+            if ((i == 0) || (i == 6))
+                this.addVerticalSeparator(6); //2
             this.enemyDetail[0][i] = this.addLabel("詳細" + (i + 1), SWT.LEFT, slotitemWidth); //3 詳細
             this.enemyDetail[1][i] = this.addLabel("000"); //3 詳細
-            if (i == 0)
+            if ((i == 0) || (i == 6))
                 this.addVerticalSeparator(6); //5
             this.enemyLabels[i] = this.addLabel("艦名" + (i + 1), SWT.LEFT, nameWidth);//5
-            if (i == 0)
+            if ((i == 0) || (i == 6))
                 this.addVerticalSeparator(6); //5
             this.addLabelWithSpan("", 2, 1); //6
-            if (i == 0)
+            if ((i == 0) || (i == 6))
                 this.addVerticalSeparator(6); //5
             this.eStatusLabels[0][i] = this.addLabel("0000"); //8 燃料
             this.eStatusLabels[1][i] = this.addLabel("0000"); //9 弾薬
@@ -322,32 +326,30 @@ public class BattleShipWindow extends BattleWindowBase {
                     }
                 }
             });
-            if (i < 6) {
-                // このラベルでのウィンドウのドラックを無効化
-                this.enemyLabels[i].setData("disable-drag-move", true);
-                this.enemyLabels[i].setData("disable-window-menu", true);
-                this.enemyLabels[i].addMouseMoveListener(new MouseMoveListener() {
-                    @Override
-                    public void mouseMove(MouseEvent e) {
-                        if (BattleShipWindow.this.enemySelected == false) { // 未選択時のみ
-                            BattleShipWindow.this.enemySelectedIndexChanged(currentIndex);
-                        }
+            // このラベルでのウィンドウのドラックを無効化
+            this.enemyLabels[i].setData("disable-drag-move", true);
+            this.enemyLabels[i].setData("disable-window-menu", true);
+            this.enemyLabels[i].addMouseMoveListener(new MouseMoveListener() {
+                @Override
+                public void mouseMove(MouseEvent e) {
+                    if (BattleShipWindow.this.enemySelected == false) { // 未選択時のみ
+                        BattleShipWindow.this.enemySelectedIndexChanged(currentIndex);
                     }
-                });
-                this.enemyLabels[i].addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseUp(MouseEvent e) {
-                        if (e.button == 1) {
-                            BattleShipWindow.this.enemySelected = true;
-                            BattleShipWindow.this.enemySelectedIndexChanged(currentIndex);
-                        }
-                        else if (e.button == 3) {
-                            BattleShipWindow.this.enemySelected = false;
-                            BattleShipWindow.this.enemySelectedIndexChanged(-1);
-                        }
+                }
+            });
+            this.enemyLabels[i].addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseUp(MouseEvent e) {
+                    if (e.button == 1) {
+                        BattleShipWindow.this.enemySelected = true;
+                        BattleShipWindow.this.enemySelectedIndexChanged(currentIndex);
                     }
-                });
-            }
+                    else if (e.button == 3) {
+                        BattleShipWindow.this.enemySelected = false;
+                        BattleShipWindow.this.enemySelectedIndexChanged(-1);
+                    }
+                }
+            });
         }
     }
 
@@ -406,14 +408,24 @@ public class BattleShipWindow extends BattleWindowBase {
             return;
 
         List<EnemyShipDto> enemyShips = battle.getEnemy();
-        for (int i = 0; i < enemyShips.size(); ++i) {
-            EnemyShipDto ship = enemyShips.get(i);
-            setLabelText(this.enemyLabels[i], String.valueOf(i + 1) + "." + ship.getFriendlyName(), "");
-            this.eStatusLabels[0][i].setText(String.valueOf(ship.getKaryoku()));
-            this.eStatusLabels[1][i].setText(String.valueOf(ship.getRaisou()));
-            this.eStatusLabels[2][i].setText(String.valueOf(ship.getTaiku()));
-            this.eStatusLabels[3][i].setText(String.valueOf(ship.getSoukou()));
+        List<EnemyShipDto> enemyShipsCombined = battle.getEnemyCombined();
+        for (int i = 0; i < 2; ++i) {
+            List<EnemyShipDto> ships = ((i == 0) ? enemyShips : enemyShipsCombined);
+            if (ships != null) {
+                for (int c = 0; c < ships.size(); ++c) {
+                    EnemyShipDto ship = ships.get(c);
+                    int index = (i * 6) + c;
+                    setLabelText(this.enemyLabels[index], String.valueOf(index + 1) + "." + ship.getFriendlyName(), "");
+                    this.eStatusLabels[0][index].setText(String.valueOf(ship.getKaryoku()));
+                    this.eStatusLabels[1][index].setText(String.valueOf(ship.getRaisou()));
+                    this.eStatusLabels[2][index].setText(String.valueOf(ship.getTaiku()));
+                    this.eStatusLabels[3][index].setText(String.valueOf(ship.getSoukou()));
+                }
+            }
         }
+
+        // 敵連合艦隊用レイアウトセット
+        this.setEnemyCombinedMode(battle.isEnemyCombined());
     }
 
     @Override

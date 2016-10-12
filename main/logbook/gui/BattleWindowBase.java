@@ -4,6 +4,7 @@
 package logbook.gui;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import logbook.dto.BattleExDto;
@@ -46,15 +47,17 @@ public class BattleWindowBase extends WindowBase {
      *  連合艦隊の第二艦隊用のラベル
      */
     private final List<Label> labelsForCombined = new ArrayList<Label>();
+    private final List<Label> labelsForEnemyCombined = new ArrayList<Label>();
     /**
      *  最初の表示で大きさを決定するラベルたち
      *  SWT.DEFAULTで追加されたLabelは最初の表示でサイズを決定しその後サイズを変えない
      */
     private final List<Label> fixedSizedLabels = new ArrayList<Label>();
     private boolean combinedMode = false;
+    private boolean enemyCombinedMode = false;
 
     private final ShipDto[] friendShips = new ShipDto[12];
-    private final EnemyShipDto[] enemyShips = new EnemyShipDto[6];
+    private final EnemyShipDto[] enemyShips = new EnemyShipDto[12];
 
     private List<DockDto> docks;
     private MapCellDto mapCellDto;
@@ -87,6 +90,8 @@ public class BattleWindowBase extends WindowBase {
             this.createContentsAfter();
             this.combinedMode = true;
             this.setCombinedMode(false);
+            this.enemyCombinedMode = true;
+            this.setEnemyCombinedMode(false);
             this.getShell().pack();
             this.setWindowInitialized(true);
             this.setVisible(true);
@@ -169,11 +174,22 @@ public class BattleWindowBase extends WindowBase {
         this.combinedMode = false;
     }
 
+    protected void beginEnemyCombined() {
+        this.enemyCombinedMode = true;
+    }
+
+    protected void endEnemyCombined() {
+        this.enemyCombinedMode = false;
+    }
+
     protected Label addLabel(String text, int width, int textalign, int align, boolean excess,
             int horizontalSpan, int verticalSpan) {
         Label label = new Label(this.currentCompo, SWT.NONE);
         if (this.combinedMode) {
             this.labelsForCombined.add(label);
+        }
+        else if (this.enemyCombinedMode) {
+            this.labelsForEnemyCombined.add(label);
         }
         label.setAlignment(textalign);
         GridData gd = new GridData(align, SWT.CENTER, excess, false, horizontalSpan, verticalSpan);
@@ -208,6 +224,9 @@ public class BattleWindowBase extends WindowBase {
         if (this.combinedMode) {
             this.labelsForCombined.add(label);
         }
+        else if (this.enemyCombinedMode) {
+            this.labelsForEnemyCombined.add(label);
+        }
     }
 
     protected void addVerticalSeparator(int span) {
@@ -218,6 +237,9 @@ public class BattleWindowBase extends WindowBase {
         if (this.combinedMode) {
             this.labelsForCombined.add(label);
         }
+        else if (this.enemyCombinedMode) {
+            this.labelsForEnemyCombined.add(label);
+        }
     }
 
     protected void skipSlot() {
@@ -225,6 +247,9 @@ public class BattleWindowBase extends WindowBase {
         label.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
         if (this.combinedMode) {
             this.labelsForCombined.add(label);
+        }
+        else if (this.enemyCombinedMode) {
+            this.labelsForEnemyCombined.add(label);
         }
     }
 
@@ -241,12 +266,8 @@ public class BattleWindowBase extends WindowBase {
         this.mapCellDto = null;
         this.battle = null;
         this.docks = null;
-        for (int i = 0; i < this.friendShips.length; ++i) {
-            this.friendShips[i] = null;
-        }
-        for (int i = 0; i < this.enemyShips.length; ++i) {
-            this.enemyShips[i] = null;
-        }
+        Arrays.fill(this.friendShips, null);
+        Arrays.fill(this.enemyShips, null);
         if (this.isWindowInitialized() && this.getVisible()) {
             this.updateData(false);
         }
@@ -278,9 +299,16 @@ public class BattleWindowBase extends WindowBase {
 
     public void updateBattle(BattleExDto data) {
         this.battle = data;
+        Arrays.fill(this.enemyShips, null);
         List<EnemyShipDto> enemyShips = data.getEnemy();
         for (int i = 0; i < enemyShips.size(); ++i) {
             this.enemyShips[i] = enemyShips.get(i);
+        }
+        List<EnemyShipDto> enemyShipsCombined = data.getEnemyCombined();
+        if (enemyShipsCombined != null) {
+            for (int i = 0; i < enemyShipsCombined.size(); ++i) {
+                this.enemyShips[i + 6] = enemyShipsCombined.get(i);
+            }
         }
         if (this.isWindowInitialized() && this.getVisible()) {
             this.updateData(false);
@@ -293,6 +321,15 @@ public class BattleWindowBase extends WindowBase {
                 LayoutLogic.hide(label, !combined);
             }
             this.combinedMode = combined;
+        }
+    }
+
+    protected void setEnemyCombinedMode(boolean combined) {
+        if (this.enemyCombinedMode != combined) {
+            for (Label label : this.labelsForEnemyCombined) {
+                LayoutLogic.hide(label, !combined);
+            }
+            this.enemyCombinedMode = combined;
         }
     }
 
