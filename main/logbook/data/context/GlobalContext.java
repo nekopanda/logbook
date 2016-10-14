@@ -2488,6 +2488,7 @@ public final class GlobalContext {
                 JsonValue api_map_info = ((JsonObject) json).get("api_map_info");
                 if (api_map_info instanceof JsonArray) {
                     JsonArray apidata = (JsonArray) api_map_info;
+                    MasterData.updateMapInfo(apidata);
 
                     int shipSpace = maxChara - shipMap.size();
                     int itemSpace = maxSlotitem - itemMap.size();
