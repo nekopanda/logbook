@@ -385,7 +385,9 @@ public class BattleAtackDto {
         dto.friendAtack = true;
 
         int idx = 0;
-        for (int i = 0; i < 6; ++i) {
+        // dam_listの要素数は敵が連合艦隊の場合、艦数+1=13
+        int elems = dam_list.size();
+        for (int i = 0; i < elems-1; ++i) {
             int dam = dam_list.getInt(i + 1);
             if (dam > 0) {
                 idx++;
@@ -394,7 +396,7 @@ public class BattleAtackDto {
         dto.target = new int[idx];
         dto.damage = new int[idx];
         idx = 0;
-        for (int i = 0; i < 6; ++i) {
+        for (int i = 0; i < elems-1; ++i) {
             int dam = dam_list.getInt(i + 1);
             if (dam > 0) {
                 dto.target[idx] = i;
