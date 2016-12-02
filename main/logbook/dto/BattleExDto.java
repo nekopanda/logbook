@@ -219,6 +219,10 @@ public class BattleExDto extends AbstractDto {
         @Tag(22)
         private final boolean isEnemySecond;
 
+        /** 自分は連合艦隊編成か？（第二艦隊が存在するか？） */
+        @Tag(100)
+        private final boolean isFriendSecond;
+
         /** 支援攻撃のタイプ */
         @Tag(7)
         private String supportType;
@@ -273,6 +277,11 @@ public class BattleExDto extends AbstractDto {
             // 敵は連合艦隊の第二艦隊か？（敵連合艦隊夜戦で第二艦隊が相手の場合のみ）
             this.isEnemySecond = (object.containsKey("api_active_deck")
                     ? (object.getJsonArray("api_active_deck").getInt(1) == 2) : false);
+
+            // 自分は連合艦隊の第二艦隊か？（自連合艦隊 vs 敵連合艦隊の夜戦で
+            // 自分が第二艦隊であることの確認）
+            this.isFriendSecond = (object.containsKey("api_active_deck") ?
+                    (object.getJsonArray("api_active_deck").getInt(0) == 2) : false);
 
             this.kind = kind;
             this.isNight = kind.isNight();
@@ -351,8 +360,14 @@ public class BattleExDto extends AbstractDto {
             this.opening = BattleAtackDto.makeRaigeki(object.get("api_opening_atack"), kind.isOpeningSecond());
 
             // 砲撃
-            this.hougeki = BattleAtackDto.makeHougeki(object.get("api_hougeki"),
-                    kind.isHougekiSecond(), this.isEnemySecond); // 夜戦
+            if (this.isFriendSecond) {
+                this.hougeki = BattleAtackDto.makeHougeki(object.get("api_hougeki"),
+                        true, this.isEnemySecond); // 自分が連合艦隊の場合の夜戦
+            }
+            else {
+                this.hougeki = BattleAtackDto.makeHougeki(object.get("api_hougeki"),
+                        kind.isHougekiSecond(), this.isEnemySecond); // 夜戦
+            }
             this.hougeki1 = BattleAtackDto.makeHougeki(object.get("api_hougeki1"),
                     kind.isHougeki1Second(), this.isEnemySecond);
             this.hougeki2 = BattleAtackDto.makeHougeki(object.get("api_hougeki2"),
