@@ -71,6 +71,9 @@ public class BattleRankChecker {
                 else if (fileName.endsWith("COMBINED_AIR_BATTLE.json")) {
                     kind = BattlePhaseKind.COMBINED_AIR;
                 }
+                else if (fileName.endsWith("COMBINED_EACH_BATTLE.json")) {
+                    kind = BattlePhaseKind.COMBINED_EACH_BATTLE;
+                }
                 else if (fileName.endsWith("PRACTICE_BATTLE_MIDNIGHT.json")) {
                     kind = BattlePhaseKind.MIDNIGHT;
                 }
