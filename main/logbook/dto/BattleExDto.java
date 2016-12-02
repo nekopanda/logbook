@@ -537,15 +537,19 @@ public class BattleExDto extends AbstractDto {
                 if (friendGaugeRate == 0) {
                     return ResultRank.PERFECT;
                 }
-                if (friendGaugeRate <= 10) {
+                if (friendGaugeRate < 10) {
                     return ResultRank.A;
                 }
-                if (friendGaugeRate <= 20) {
+                if (friendGaugeRate < 20) {
                     return ResultRank.B;
                 }
-                if (friendGaugeRate <= 50) {
+                if (friendGaugeRate < 50) {
                     return ResultRank.C;
                 }
+                if (friendGaugeRate < 80) {
+                    return ResultRank.D;
+                }
+                return ResultRank.E;
             } else {
                 // PHASE1:轟沈艦なし かつ 敵艦全滅
                 if ((friendSunk == 0) && (enemySunk == numStartEships)) {
@@ -556,7 +560,8 @@ public class BattleExDto extends AbstractDto {
                     }
                 }
                 // PHASE2:轟沈艦なし かつ 敵艦隊の戦闘開始時の数が1隻以上(必要?) かつ 敵艦の撃沈数が7割以上
-                else if ((friendSunk == 0) && (numStartEships > 1) && (enemySunk >= Math.floor(0.7 * numStartEships))) {
+                else if ((friendSunk == 0) && (numStartEships >= 1)
+                        && (enemySunk >= Math.floor(0.7 * numStartEships))) {
                     return ResultRank.A;
                 }
                 // PHASE3:自艦隊の轟沈数より敵艦隊の撃沈数の方が多い かつ 敵旗艦撃沈
@@ -575,13 +580,15 @@ public class BattleExDto extends AbstractDto {
                 else if (enemyGaugeRate > (0.9 * friendGaugeRate)) {
                     return ResultRank.C;
                 }
+                // PHASE7:開始時2隻以上 かつ 旗艦以外全滅
+                else if ((numStartFships > 1) && ((numStartFships - 1) == friendSunk)) {
+                    return ResultRank.E;
+                }
+                // 残りはD
+                else {
+                    return ResultRank.D;
+                }
             }
-            // PHASE7:開始時2隻以上 かつ 旗艦以外全滅
-            if ((numStartFships > 1) && ((numStartFships - 1) == friendSunk)) {
-                return ResultRank.E;
-            }
-            // 残りはD
-            return ResultRank.D;
         }
 
         // ダメージを反映
