@@ -766,6 +766,9 @@ public final class GlobalContext {
         case COMBINED_EC_BATTLE_MIDNIGHT:
             doBattle(data, apidata, BattlePhaseKind.COMBINED_EC_BATTLE_MIDNIGHT);
             break;
+        case COMBINED_EACH_BATTLE:
+            doBattle(data, apidata, BattlePhaseKind.COMBINED_EACH_BATTLE);
+            break;
         // 海戦結果
         case BATTLE_RESULT:
             doBattleresult(data, apidata);
