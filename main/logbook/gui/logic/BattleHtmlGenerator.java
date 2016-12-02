@@ -727,12 +727,13 @@ public class BattleHtmlGenerator extends HTMLGenerator {
 
     /**
      * １回目の砲撃の後、雷撃を行う戦闘か？
-     * 空母機動部隊の昼戦、および、敵連合艦隊戦の昼戦の場合
+     * 空母機動部隊の昼戦、および、敵連合艦隊戦の昼戦
+     * および、連合艦隊(機動部隊)の昼戦の場合
      * @param kind
      * @return
      */
     private static boolean isCombinedMidRaigekiBattle(BattlePhaseKind kind) {
-        return (kind == BattlePhaseKind.COMBINED_BATTLE) || (kind == BattlePhaseKind.COMBINED_EC_BATTLE);
+        return (kind == BattlePhaseKind.COMBINED_BATTLE) || (kind == BattlePhaseKind.COMBINED_EC_BATTLE) || (kind == BattlePhaseKind.COMBINED_EACH_BATTLE);
     }
 
     /**
