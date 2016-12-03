@@ -14,14 +14,14 @@ import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
-import org.apache.commons.lang3.StringUtils;
-
-import com.dyuproject.protostuff.Tag;
-
 import logbook.data.context.GlobalContext;
 import logbook.internal.EnemyData;
 import logbook.internal.UseItem;
 import logbook.util.JsonUtils;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.dyuproject.protostuff.Tag;
 
 /**
  * １回の会敵情報
@@ -402,10 +402,12 @@ public class BattleExDto extends AbstractDto {
         public void battleDamage(BattleExDto battle) {
             int numFships = this.nowFriendHp.length;
             int numEships = this.nowEnemyHp.length;
+            DockDto dock = battle.getDock();
+            DockDto dockCombined = battle.getDockCombined();
 
             // HP0以下を0にする
             for (int i = 0; i < numFships; i++) {
-                this.nextHp(i, this.nowFriendHp, battle.getDock().getShips());
+                this.nextHp(i, this.nowFriendHp, (dock != null) ? dock.getShips() : null);
             }
             for (int i = 0; i < numEships; i++) {
                 if (this.nowEnemyHp[i] <= 0)
@@ -413,7 +415,7 @@ public class BattleExDto extends AbstractDto {
             }
             if (this.nowFriendHpCombined != null) {
                 for (int i = 0; i < this.nowFriendHpCombined.length; i++) {
-                    this.nextHp(i, this.nowFriendHpCombined, battle.getDockCombined().getShips());
+                    this.nextHp(i, this.nowFriendHpCombined, (dockCombined != null) ? dockCombined.getShips() : null);
                 }
             }
             if (this.nowEnemyHpCombined != null) {
@@ -455,6 +457,12 @@ public class BattleExDto extends AbstractDto {
 
         private void nextHp(int index, int[] hps, List<ShipDto> ships) {
             int hp = hps[index];
+            if (ships == null) {
+                if (hp <= 0) {
+                    hps[index] = 0;
+                }
+                return;
+            }
             ShipDto ship = ships.get(index);
             if (hp <= 0) {
                 List<ItemDto> items = new ArrayList<>(ship.getItem2());
@@ -492,7 +500,7 @@ public class BattleExDto extends AbstractDto {
 
             // 自艦隊の戦闘終了時のHPの合計(A)
             int friendGauge = IntStream.range(0, numFships)
-                    .filter(i -> (battle.escaped == null) || !battle.escaped[i])
+                    .filter(i -> !((battle.escaped != null) && battle.escaped[i]))
                     .map(i -> nowFriendHp[i]).sum();
 
             // 自艦隊の戦闘開始時のHPの合計(B)
@@ -504,15 +512,15 @@ public class BattleExDto extends AbstractDto {
             // 連合艦隊(自艦隊)
             if (isFriendCombined) {
                 friendGauge += IntStream.range(0, numFshipsCombined)
-                        .filter(i -> (battle.escaped == null) || !battle.escaped[i + 6])
+                        .filter(i -> !((battle.escaped != null) && battle.escaped[i + 6]))
                         .map(i -> nowFriendHpCombined[i]).sum();
                 friendNowShips += (int) Arrays.stream(nowFriendHpCombined).filter(hp -> hp > 0).count();
                 friendEscaped = (int) (battle.escaped != null ? IntStream.range(0, battle.escaped.length)
                         .mapToObj(i -> battle.escaped[i]).filter(escaped -> escaped).count() : 0);
             }
 
-            // 自艦隊の轟沈数(C)
-            int friendSunk = (numFships + numFshipsCombined) - (friendEscaped + friendNowShips);
+            // 自艦隊の轟沈数(C) (生存艦には退避した艦も含まれていることに注意)
+            int friendSunk = (numFships + numFshipsCombined) - friendNowShips;
 
             // 敵艦隊の戦闘終了時のHPの合計(D)
             int enemyGauge = Arrays.stream(nowEnemyHp).sum();
@@ -584,7 +592,7 @@ public class BattleExDto extends AbstractDto {
                     return ResultRank.B;
                 }
                 // PHASE4:自艦隊が1隻のみ かつ 自旗艦大破
-                else if ((numStartFships == 1) && ((nowFriendHp[0] / battle.getMaxFriendHp()[0]) <= 0.25)) {
+                else if ((numStartFships == 1) && (((double) nowFriendHp[0] / battle.getMaxFriendHp()[0]) <= 0.25)) {
                     return ResultRank.D;
                 }
                 // PHASE5:敵艦隊の損害率が自艦隊の損害率を2.5倍しても上なら
@@ -1173,7 +1181,10 @@ public class BattleExDto extends AbstractDto {
                     }
                 }
                 for (int i = 0; i < 2; ++i) {
-                    this.friends.get(i).setEscaped(Arrays.copyOfRange(this.escaped, i * 6, (i + 1) * 6));
+                    DockDto dock = this.friends.get(i);
+                    if (dock != null) {
+                        dock.setEscaped(Arrays.copyOfRange(this.escaped, i * 6, (i + 1) * 6));
+                    }
                 }
             }
         }
