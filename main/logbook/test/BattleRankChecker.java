@@ -8,8 +8,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -33,19 +36,46 @@ import com.dyuproject.protostuff.runtime.RuntimeSchema;
  */
 public class BattleRankChecker {
 
+    private static class FileName {
+        public String path;
+        public String name;
+
+        public FileName(String path, String name) {
+            this.path = path;
+            this.name = name;
+        }
+    }
+
+    private static void listFiles(String path, List<FileName> list)
+    {
+        File dir = new File(path);
+        for (String filename : dir.list()) {
+            String filepath = path + File.separator + filename;
+            File file = new File(filepath);
+            if (file.isDirectory()) {
+                listFiles(filepath, list);
+            }
+            else {
+                list.add(new FileName(file.getAbsolutePath(), file.getName()));
+            }
+        }
+    }
+
     /**
      * @param args
      */
     public static void main(String[] args) {
         boolean init = MasterData.INIT_COMPLETE;
 
-        File dir = new File(args[0]);
-        File[] files = dir.listFiles();
-        String[] fileNameList = new String[files.length];
-        for (int i = 0; i < files.length; ++i) {
-            fileNameList[i] = files[i].getAbsolutePath();
-        }
-        Arrays.sort(fileNameList);
+        List<FileName> fileNameList = new ArrayList<FileName>();
+        listFiles(args[0], fileNameList);
+        fileNameList.sort(new Comparator<FileName>() {
+            @Override
+            public int compare(FileName arg0, FileName arg1) {
+                return arg0.name.compareTo(arg1.name);
+            }
+        });
+
         int resultCount = 0;
         int[] rankCount = new int[10];
         try {
@@ -53,8 +83,8 @@ public class BattleRankChecker {
             Schema<BattleExDto> schema = RuntimeSchema.getSchema(BattleExDto.class);
             LinkedBuffer buffer = LinkedBuffer.allocate(128 * 1024);
             BattleExDto battle = null;
-            for (int i = 0; i < fileNameList.length; ++i) {
-                String fileName = fileNameList[i];
+            for (FileName file : fileNameList) {
+                String fileName = file.path;
                 boolean ignore = false;
                 boolean isBattleResult = false;
                 BattlePhaseKind kind = BattlePhaseKind.BATTLE;
@@ -102,6 +132,14 @@ public class BattleRankChecker {
                     isBattleResult = true;
                 }
                 else {
+                    if (fileName.endsWith("PORT.json")) {
+                        // 母港に戻ったのでリセット
+                        battle = null;
+                    }
+                    else if (fileName.endsWith("NEXT.json")) {
+                        // 移動したのでリセット
+                        battle = null;
+                    }
                     ignore = true;
                 }
 
@@ -116,14 +154,17 @@ public class BattleRankChecker {
                         if (battle == null) {
                             battle = new BattleExDto(new Date());
                         }
+                        if (resultCount == 10540) {
+                            System.out.println("!!!");
+                        }
                         battle.addPhase(data, kind);
                     }
                     else if (battle != null) {
                         battle.setResult(data, null);
                         // ランクが合っているかチェック
                         ResultRank estimatedRank = battle.getLastPhase().getEstimatedRank();
-                        if (!battle.getRank().equals(estimatedRank.rank())) {
-                            System.out.println("戦闘結果判定ミス: 正解ランク:" + battle.getRank() + " "
+                        if (!battle.getRank().rank().equals(estimatedRank.rank())) {
+                            System.out.println("戦闘結果判定ミス[" + resultCount + "]: 正解ランク:" + battle.getRank() + " "
                                     + battle.getLastPhase().getRankCalcInfo(battle));
                         }
 
