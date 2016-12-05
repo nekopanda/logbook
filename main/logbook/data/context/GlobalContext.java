@@ -761,10 +761,13 @@ public final class GlobalContext {
             doBattle(data, apidata, BattlePhaseKind.COMBINED_BATTLE_WATER);
             break;
         case COMBINED_EC_BATTLE:
-            //doBattle(data, apidata, BattlePhaseKind.COMBINED_EC_BATTLE);
+            doBattle(data, apidata, BattlePhaseKind.COMBINED_EC_BATTLE);
             break;
         case COMBINED_EC_BATTLE_MIDNIGHT:
-            //doBattle(data, apidata, BattlePhaseKind.COMBINED_EC_BATTLE_MIDNIGHT);
+            doBattle(data, apidata, BattlePhaseKind.COMBINED_EC_BATTLE_MIDNIGHT);
+            break;
+        case COMBINED_EACH_BATTLE:
+            doBattle(data, apidata, BattlePhaseKind.COMBINED_EACH_BATTLE);
             break;
         // 海戦結果
         case BATTLE_RESULT:
@@ -2488,6 +2491,7 @@ public final class GlobalContext {
                 JsonValue api_map_info = ((JsonObject) json).get("api_map_info");
                 if (api_map_info instanceof JsonArray) {
                     JsonArray apidata = (JsonArray) api_map_info;
+                    MasterData.updateMapInfo(apidata);
 
                     int shipSpace = maxChara - shipMap.size();
                     int itemSpace = maxSlotitem - itemMap.size();

@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * @author Nekopanda
- * 戦況ウィンドウ縮小版
+ * 戦況（横）ウィンドウ
  */
 public class BattleWindowSmall extends BattleWindow {
 
@@ -129,6 +129,8 @@ public class BattleWindowSmall extends BattleWindow {
                 this.addVerticalSeparator(this.damageCompo, 6);
             this.createHpLabels(this.enemyHpLabels, i);
             this.enemyLabels[i] = this.addLabel("-", SWT.LEFT, nameWidth);
+            // 表示しないのでダミーで入れておく
+            this.enemyLabels[i + 6] = this.enemyLabels[i];
         }
 
         this.currentCompo = this.getShell();
@@ -361,6 +363,9 @@ public class BattleWindowSmall extends BattleWindow {
         else {
             this.resultCompo.setBackground(null);
         }
+
+        // 敵連合艦隊用レイアウトセット
+        this.setEnemyCombinedMode(battle.isEnemyCombined());
 
         this.resultCompo.layout();
     }
