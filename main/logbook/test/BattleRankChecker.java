@@ -98,11 +98,17 @@ public class BattleRankChecker {
                 else if (fileName.endsWith("COMBINED_BATTLE.json")) {
                     kind = BattlePhaseKind.COMBINED_BATTLE;
                 }
+                else if (fileName.endsWith("COMBINED_BATTLE_WATER.json")) {
+                    kind = BattlePhaseKind.COMBINED_BATTLE_WATER;
+                }
                 else if (fileName.endsWith("COMBINED_AIR_BATTLE.json")) {
                     kind = BattlePhaseKind.COMBINED_AIR;
                 }
                 else if (fileName.endsWith("COMBINED_EACH_BATTLE.json")) {
                     kind = BattlePhaseKind.COMBINED_EACH_BATTLE;
+                }
+                else if (fileName.endsWith("COMBINED_EACH_BATTLE_WATER.json")) {
+                    kind = BattlePhaseKind.COMBINED_EACH_BATTLE_WATER;
                 }
                 else if (fileName.endsWith("PRACTICE_BATTLE_MIDNIGHT.json")) {
                     kind = BattlePhaseKind.MIDNIGHT;
