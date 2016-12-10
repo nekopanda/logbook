@@ -14,14 +14,14 @@ import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.dyuproject.protostuff.Tag;
+
 import logbook.data.context.GlobalContext;
 import logbook.internal.EnemyData;
 import logbook.internal.UseItem;
 import logbook.util.JsonUtils;
-
-import org.apache.commons.lang3.StringUtils;
-
-import com.dyuproject.protostuff.Tag;
 
 /**
  * １回の会敵情報
@@ -280,8 +280,8 @@ public class BattleExDto extends AbstractDto {
 
             // 自分は連合艦隊の第二艦隊か？（自連合艦隊 vs 敵連合艦隊の夜戦で
             // 自分が第二艦隊であることの確認）
-            this.isFriendSecond = (object.containsKey("api_active_deck") ?
-                    (object.getJsonArray("api_active_deck").getInt(0) == 2) : false);
+            this.isFriendSecond = (object.containsKey("api_active_deck")
+                    ? (object.getJsonArray("api_active_deck").getInt(0) == 2) : false);
 
             this.kind = kind;
             this.isNight = kind.isNight();
@@ -363,8 +363,7 @@ public class BattleExDto extends AbstractDto {
             if (this.isFriendSecond) {
                 this.hougeki = BattleAtackDto.makeHougeki(object.get("api_hougeki"),
                         true, this.isEnemySecond); // 自分が連合艦隊の場合の夜戦
-            }
-            else {
+            } else {
                 this.hougeki = BattleAtackDto.makeHougeki(object.get("api_hougeki"),
                         kind.isHougekiSecond(), this.isEnemySecond); // 夜戦
             }
@@ -557,7 +556,8 @@ public class BattleExDto extends AbstractDto {
             if ((this.kind == BattlePhaseKind.LD_AIRBATTLE) ||
                     (this.kind == BattlePhaseKind.COMBINED_LD_AIR)) {
                 // 空襲戦
-                if (friendGaugeRate == 0) {
+                // S勝利は発生しないと思われる(完全勝利Sのみ)
+                if (friendGaugeMax <= friendGauge) {
                     return ResultRank.PERFECT;
                 }
                 if (friendGaugeRate < 10) {
@@ -576,7 +576,9 @@ public class BattleExDto extends AbstractDto {
             } else {
                 // PHASE1:轟沈艦なし かつ 敵艦全滅
                 if ((friendSunk == 0) && (enemySunk == numStartEships)) {
-                    if (friendGaugeRate == 0) { //受けたダメージが0
+                    // 戦闘終了時のHPが戦闘開始時のHP以上の場合、完全勝利S判定にする
+                    // ソースはscenes/BattleResultMain.swfのgetTweenShowRank()参照
+                    if (friendGaugeMax <= friendGauge) {
                         return ResultRank.PERFECT;
                     } else {
                         return ResultRank.S;
