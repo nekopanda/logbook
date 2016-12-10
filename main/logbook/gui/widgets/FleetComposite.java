@@ -20,6 +20,7 @@ import logbook.dto.ItemDto;
 import logbook.dto.ItemInfoDto;
 import logbook.dto.ShipDto;
 import logbook.gui.logic.ColorManager;
+import logbook.gui.logic.DaihatsuString;
 import logbook.gui.logic.DamageRate;
 import logbook.gui.logic.SakutekiString;
 import logbook.gui.logic.SeikuString;
@@ -611,36 +612,7 @@ public class FleetComposite extends Composite {
         }
 
         //大発による遠征効率UP
-        int daihatsu = 0;
-        int daihatsuLevel = 0;
-        double daihatsuUp = 0;
-        for (ShipDto shipDto : ships) {
-            for (ItemDto item : shipDto.getItem2()) {
-                if (item != null) {
-                    if (item.getName().equals("大発動艇")) {
-                        daihatsuUp += 5.0;
-                        ++daihatsu;
-                        daihatsuLevel += item.getLevel();
-                    }
-                    else if (item.getName().equals("大発動艇(八九式中戦車&陸戦隊)")) {
-                        daihatsuUp += 2.0;
-                        ++daihatsu;
-                        daihatsuLevel += item.getLevel();
-                    }
-                    else if (item.getName().equals("特二式内火艇")) {
-                        daihatsuUp += 1.0;
-                        ++daihatsu;
-                        daihatsuLevel += item.getLevel();
-                    }
-                }
-            }
-        }
-        //大発による遠征効率UPの上限
-        if (daihatsuUp > 20) {
-            daihatsuUp = 20;
-        }
-        // 改修による補正
-        daihatsuUp += (0.01 * daihatsuUp * daihatsuLevel) / daihatsu;
+        DaihatsuString daihatsu = new DaihatsuString(ships);
 
         // メッセージを更新する
 
@@ -737,10 +709,9 @@ public class FleetComposite extends Composite {
             this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_TOTAL_DRAM, dram, dramKanmusu),
                     null);
         }
-        if (daihatsu > 0) {
+        if (daihatsu.getUp() > 0.0) {
             // 大発合計数
-            this.addStyledText(this.message,
-                    MessageFormat.format(AppConstants.MESSAGE_TOTAL_DAIHATSU, daihatsu, daihatsuUp), null);
+            this.addStyledText(this.message, daihatsu.toString(), null);
         }
         this.addStyledText(this.message, "\n", null);
         if ((currentMission != null) && (currentMission.getMission() == null) && (previousMission.getMission() != null)) {
