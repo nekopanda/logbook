@@ -13,13 +13,35 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.FileUtils;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
+
 import logbook.constants.AppConstants;
 import logbook.data.Data;
 import logbook.data.DataType;
+import logbook.data.context.GlobalContext;
 import logbook.dto.BattleExDto;
 import logbook.dto.BattleResultDto;
+import logbook.dto.ShipDto;
 import logbook.gui.logic.BattleHtmlGenerator;
 import logbook.gui.logic.CreateReportLogic;
+import logbook.gui.logic.DeckBuilder;
 import logbook.gui.logic.GuiUpdator;
 import logbook.gui.logic.TableItemCreator;
 import logbook.gui.logic.TableRowHeader;
@@ -29,21 +51,6 @@ import logbook.internal.LoggerHolder;
 import logbook.internal.TimeSpanKind;
 import logbook.scripting.TableItemCreatorProxy;
 import logbook.util.SwtUtils;
-
-import org.apache.commons.io.FileUtils;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.Shell;
 
 /**
  * ドロップ報告書
@@ -112,8 +119,7 @@ public final class DropReportTable extends AbstractTableDialog {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (DropReportTable.this.battleFilterDialog == null)
-                    DropReportTable.this.battleFilterDialog =
-                            new BattleFilterDialog(DropReportTable.this);
+                    DropReportTable.this.battleFilterDialog = new BattleFilterDialog(DropReportTable.this);
                 DropReportTable.this.battleFilterDialog.open();
             }
         };
@@ -124,6 +130,37 @@ public final class DropReportTable extends AbstractTableDialog {
             filter.setAccelerator(SWT.CTRL + 'F');
             filter.addSelectionListener(filterListener);
         }
+        SelectionListener deckbuilderListener = new SelectionAdapter() {
+            @SuppressWarnings("unchecked")
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                int selected = DropReportTable.this.table.getSelectionIndex();
+                if (selected != -1) {
+                    BattleResultDto result = DropReportTable.this.getItemFromIndex(selected);
+                    BattleExDto detail = BattleResultServer.get().getBattleDetail(result);
+                    String data = null;
+
+                    List<ShipDto> ships = detail.getDock().getShips();
+                    if (detail.isCombined()) {
+                        List<ShipDto> shipsCombined = detail.getDockCombined().getShips();
+                        data = new DeckBuilder().getDeckBuilderURL(ships, shipsCombined);
+                    } else {
+                        data = new DeckBuilder().getDeckBuilderURL(ships);
+                    }
+                    if (GlobalContext.getState() == 1) {
+                        Clipboard clipboard = new Clipboard(Display.getDefault());
+                        clipboard.setContents(new Object[] { data }, new Transfer[] { TextTransfer.getInstance() });
+                    } else {
+                        Shell shell = new Shell(Display.getDefault(), SWT.TOOL);
+                        MessageBox mes = new MessageBox(shell, SWT.ICON_WARNING | SWT.OK);
+                        mes.setText(AppConstants.TITLEBAR_TEXT);
+                        mes.setMessage("情報が不足しています。艦これをリロードしてデータを読み込んでください。");
+                        mes.open();
+                        shell.dispose();
+                    }
+                }
+            }
+        };
         // セパレータ
         new MenuItem(this.tablemenu, SWT.SEPARATOR);
         // 右クリックメニューに追加する
@@ -149,6 +186,11 @@ public final class DropReportTable extends AbstractTableDialog {
                 BattleResultServer.removeListener(listener);
             }
         });
+        // セパレータ
+        new MenuItem(this.tablemenu, SWT.SEPARATOR);
+        final MenuItem deckbuilder = new MenuItem(this.tablemenu, SWT.NONE);
+        deckbuilder.setText("艦隊シミュレーター＆デッキビルダー用にコピー");
+        deckbuilder.addSelectionListener(deckbuilderListener);
     }
 
     private BattleResultDto getItemFromIndex(int index) {
@@ -167,8 +209,7 @@ public final class DropReportTable extends AbstractTableDialog {
         String rank = item.getRank().toString();
         if (item.isPractice()) {
             return dateFormat.format(item.getBattleDate()) + "演習" + rank;
-        }
-        else {
+        } else {
             int[] map = item.getMapCell().getMap();
             return dateFormat.format(item.getBattleDate()) +
                     " " + map[0] + "-" + map[1] + "-" + map[2] + " " + rank;
@@ -221,8 +262,7 @@ public final class DropReportTable extends AbstractTableDialog {
                     } catch (ZipException e) {
                         failedList.add(fileName);
                     }
-                }
-                else {
+                } else {
                     failedList.add(fileName);
                 }
             }
@@ -315,8 +355,7 @@ public final class DropReportTable extends AbstractTableDialog {
                 // ２つ以上選択されているときはzip出力
                 dialog.setFileName(fileName + ".zip");
                 dialog.setFilterExtensions(new String[] { "*.zip" });
-            }
-            else {
+            } else {
                 dialog.setFileName(fileName + ".html");
                 dialog.setFilterExtensions(new String[] { "*.html" });
             }
@@ -334,8 +373,7 @@ public final class DropReportTable extends AbstractTableDialog {
                 }
                 if (selectedItems.size() > 1) {
                     DropReportTable.this.writeToZipFile(selectedItems, file);
-                }
-                else {
+                } else {
                     DropReportTable.this.writeToFile(selectedItems.get(0), file);
                 }
             }
