@@ -59,11 +59,13 @@ public class AirBattleDto {
             JsonObject jsonStage1Obj = kouku.getJsonObject("api_stage1");
             this.stage1 = readPlaneCount(jsonStage1Obj);
             JsonArray jsonTouchPlane = jsonStage1Obj.getJsonArray("api_touch_plane");
-            this.touchPlane = new int[] {
+            if ((jsonTouchPlane != null) && (jsonTouchPlane != JsonValue.NULL)) {
+                this.touchPlane = new int[] {
                     jsonTouchPlane.getInt(0),
                     jsonTouchPlane.getInt(1)
-            };
-            this.seiku = toSeiku(jsonStage1Obj.getInt("api_disp_seiku"));
+                };
+                this.seiku = toSeiku(jsonStage1Obj.getInt("api_disp_seiku"));
+            }
         }
 
         JsonValue jsonStage2 = kouku.get("api_stage2");
