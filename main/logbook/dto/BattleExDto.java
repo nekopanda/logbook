@@ -245,10 +245,14 @@ public class BattleExDto extends AbstractDto {
         /** 攻撃シーケンス */
         @Tag(35)
         private List<AirBattleDto> airBase = null;
+        @Tag(102)
+        private AirBattleDto airBase2 = null;
         @Tag(11)
         private AirBattleDto air = null;
         @Tag(12)
         private AirBattleDto air2 = null;
+        @Tag(103)
+        private AirBattleDto air3 = null;
         @Tag(13)
         private List<BattleAtackDto> support = null;
         @Tag(50)
@@ -313,6 +317,18 @@ public class BattleExDto extends AbstractDto {
                     JsonObject obj = (JsonObject) elem;
                     this.airBase.add(new AirBattleDto(obj, isFriendCombined || isEnemyCombined, true));
                 }
+            }
+
+            // 基地航空隊（墳式強襲）
+            JsonObject air_base_injection = object.getJsonObject("api_air_base_injection");
+            if (air_base_injection != null) {
+                this.airBase2 = new AirBattleDto(air_base_injection, isFriendCombined || isEnemyCombined, true);
+            }
+
+            // 航空戦（墳式強襲）
+            JsonObject injection_kouku = object.getJsonObject("api_injection_kouku");
+            if (injection_kouku != null) {
+                this.air3 = new AirBattleDto(injection_kouku, isFriendCombined || isEnemyCombined, false);
             }
 
             // 航空戦（通常）
@@ -382,11 +398,15 @@ public class BattleExDto extends AbstractDto {
             if (this.airBase != null)
                 for (AirBattleDto attack : this.airBase)
                     this.doAtack(attack.atacks);
+            if (this.airBase2 != null)
+                    this.doAtack(this.airBase2.atacks);
             if (this.air != null)
                 this.doAtack(this.air.atacks);
             this.doAtack(this.support);
             if (this.air2 != null)
                 this.doAtack(this.air2.atacks);
+            if (this.air3 != null)
+                this.doAtack(this.air3.atacks);
             this.doAtack(this.openingTaisen);
             this.doAtack(this.opening);
             this.doAtack(this.hougeki);
@@ -678,14 +698,29 @@ public class BattleExDto extends AbstractDto {
             return arr.toArray(new BattleAtackDto[0]);
         }
 
+        private BattleAtackDto[] getAirBase2BattlesArray() {
+            if (this.airBase2 == null) {
+                return null;
+            }
+            List<BattleAtackDto> arr = new ArrayList<>();
+            AirBattleDto dto = this.airBase2;
+            if (dto.atacks != null) {
+                arr.addAll(dto.atacks);
+            }
+            
+            return arr.toArray(new BattleAtackDto[0]);
+        }
+
         /**
          * 攻撃の全シーケンスを取得
-         * [ 基地航空隊航空戦, 航空戦1, 支援艦隊の攻撃, 航空戦2, 開幕, 夜戦, 砲撃戦1, 雷撃, 砲撃戦2, 砲撃戦3 ]
+         * [ 噴式基地航空隊航空戦, 噴式航空戦, 基地航空隊航空戦, 航空戦1, 支援艦隊の攻撃, 航空戦2, 開幕, 夜戦, 砲撃戦1, 雷撃, 砲撃戦2, 砲撃戦3 ]
          * 各戦闘がない場合はnullになる
          * @return
          */
         public BattleAtackDto[][] getAtackSequence() {
             return new BattleAtackDto[][] {
+                    this.getAirBase2BattlesArray(),
+                    ((this.air3 == null) || (this.air3.atacks == null)) ? null : this.toArray(this.air3.atacks),
                     this.getAirBaseBattlesArray(),
                     ((this.air == null) || (this.air.atacks == null)) ? null : this.toArray(this.air.atacks),
                     this.support == null ? null : this.toArray(this.support),
