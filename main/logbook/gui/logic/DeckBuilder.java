@@ -12,6 +12,7 @@ import javax.json.JsonObjectBuilder;
 
 import logbook.data.context.GlobalContext;
 import logbook.dto.ItemDto;
+import logbook.dto.ShipDto;
 
 /**
  * 艦載機厨氏の艦隊シミュレーター＆デッキビルダーのフォーマットを作成するクラス
@@ -125,6 +126,68 @@ public class DeckBuilder {
     }
 
     /**
+     * 艦載機厨氏の艦隊シミュレーター＆デッキビルダーのフォーマットを返します
+     * ただし、データが出揃っていない場合はnullが返されます
+     *
+     * @param fleets 艦隊
+     * @return format フォーマット
+     */
+    @SuppressWarnings("unchecked")
+    public String getDeckBuilderFormat(List<ShipDto>... fleets) {
+        JsonObjectBuilder deck = Json.createObjectBuilder();
+        deck.add("version", this.FORMAT_VERSION);
+        try {
+            IntStream.rangeClosed(1, fleets.length)
+                    .boxed()
+                    .collect(Collectors.toMap(dockId -> dockId, dockId -> fleets[dockId - 1]))
+                    .forEach((dockId, ships) -> {
+                        JsonObjectBuilder fleet = Json.createObjectBuilder();
+
+                        IntStream.range(0, ships.size()).forEach(shipIdx -> {
+                            JsonObjectBuilder ship = Json.createObjectBuilder();
+                            ship.add("id", ships.get(shipIdx).getShipInfo().getShipId());
+                            ship.add("lv", ships.get(shipIdx).getLv());
+                            ship.add("luck", ships.get(shipIdx).getLucky());
+                            JsonObjectBuilder items = Json.createObjectBuilder();
+                            List<ItemDto> item2 = ships.get(shipIdx).getItem2();
+                            int slotNum = ships.get(shipIdx).getSlotNum();
+
+                            IntStream.range(0, slotNum)
+                                    .filter(itemIdx -> Optional.ofNullable(item2.get(itemIdx)).isPresent())
+                                    .boxed()
+                                    .collect(Collectors.toMap(itemIdx -> itemIdx, itemIdx -> item2.get(itemIdx)))
+                                    .forEach((itemIdx, itemDto) -> {
+                                        JsonObjectBuilder item = Json.createObjectBuilder();
+                                        item.add("id", item2.get(itemIdx).getSlotitemId());
+                                        item.add("rf", item2.get(itemIdx).getLevel());
+                                        item.add("mas", item2.get(itemIdx).getAlv());
+                                        items.add("i" + (itemIdx + 1), item);
+                                    });
+
+                            Optional.ofNullable(ships.get(shipIdx).getSlotExItem()).ifPresent(slotExItem -> {
+                                JsonObjectBuilder item = Json.createObjectBuilder();
+                                item.add("id", slotExItem.getSlotitemId());
+                                item.add("rf", slotExItem.getLevel());
+                                item.add("mas", slotExItem.getAlv());
+                                if (slotNum < 4) {
+                                    items.add("i" + (slotNum + 1), item);
+                                } else {
+                                    items.add("ix", item);
+                                }
+                            });
+                            ship.add("items", items);
+
+                            fleet.add("s" + (shipIdx + 1), ship);
+                        });
+                        deck.add("f" + dockId, fleet);
+                    });
+            return deck.build().toString();
+        } catch (NullPointerException e) {
+            return null;
+        }
+    }
+
+    /**
      * 艦載機厨氏の艦隊シミュレーター＆デッキビルダーのフォーマットを返します(全艦隊)
      * ただし、データが出揃っていない場合はnullが返されます
      *
@@ -133,6 +196,23 @@ public class DeckBuilder {
     public String getDeckBuilderFormat() {
         boolean[] b = { true, true, true, true };
         return this.getDeckBuilderFormat(b);
+    }
+
+    /**
+     * 艦載機厨氏の艦隊シミュレーター＆デッキビルダーのURLを作成します
+     * ただし、データが出揃っていない場合はnullが返されます
+     *
+     * @param fleets 艦隊
+     * @return url URL
+     */
+    @SuppressWarnings("unchecked")
+    public String getDeckBuilderURL(List<ShipDto>... fleets) {
+        Optional<String> formatOpt = Optional.ofNullable(this.getDeckBuilderFormat(fleets));
+        if (formatOpt.isPresent()) {
+            return this.URL + this.SUFFIX + formatOpt.get();
+        } else {
+            return null;
+        }
     }
 
     /**
