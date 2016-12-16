@@ -1,3 +1,4 @@
+
 /**
  *
  */
@@ -7,6 +8,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -157,8 +159,8 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.inline("th", "cond.", null);
         this.inline("th", "制空", null);
         this.inline("th", "索敵", null);
-        this.inline("th", "割合撃墜", null);
-        this.inline("th", "固定撃墜<br>(対空CI補正前)", null);
+        this.inline("th", "加重対空値", null);
+        this.inline("th", "艦隊防空値", null);
         this.inline("th", "開始時", null);
         for (int i = 0; i < numPhases; ++i) {
             this.inline("th", "", null);
@@ -182,12 +184,13 @@ public class BattleHtmlGenerator extends HTMLGenerator {
 
         int totalNowHp = 0;
         int totalMaxHp = 0;
+        CalcTaiku calcTaiku = new CalcTaiku();
+        int formationNo = BattleExDto.fromFormation(formation[isFriend ? 0 : 1]);
 
         for (int i = 0; i < ships.size(); ++i) {
             SHIP ship = ships.get(i);
             SeikuString seiku = new SeikuString(ship);
             SakutekiString sakuteki = new SakutekiString(ship);
-            CalcTaiku calcTaiku = new CalcTaiku();
             int nowhp = hp[0][i];
             int maxhp = hp[1][i];
 
@@ -207,11 +210,9 @@ public class BattleHtmlGenerator extends HTMLGenerator {
 
             this.inline("td", seiku.toString(), null);
             this.inline("td", sakuteki.toString(), null);
-            this.inline("td", String.format("%.2f%%", calcTaiku.getProportionalShootDown(ship) * 100), null);
-            this.inline("td", String.format("%d",
-                    calcTaiku.getFixedShootDown(ship, allShips,
-                            BattleExDto.fromFormation(formation[isFriend ? 0 : 1]))),
-                    null);
+            this.inline("td", String.format("%d", calcTaiku.getKajuuValue(ship)), null);
+            this.inline("td", String.format("+%.2f",
+                    calcTaiku.getKantaiValue(new ArrayList<SHIP>(Arrays.asList(ship)), formationNo)), null);
             this.inline("td", nowhp + "/" + maxhp, null);
 
             for (int p = 1; p <= numPhases; ++p) {
@@ -250,7 +251,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.inline("td", totalSeiku.toString(), null);
         this.inline("td", totalSakuteki.toString(), null);
         this.inline("td", "", null);
-        this.inline("td", "", null);
+        this.inline("td", String.format("%.2f", calcTaiku.getKantaiValue(allShips, formationNo)), null);
         this.inline("td", totalNowHp + "/" + totalMaxHp, null);
 
         for (int i = 0; i < numPhases; ++i) {
