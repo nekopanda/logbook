@@ -94,8 +94,8 @@ public class CalcTaiku {
             List<ItemDto> items = ship.getItem2();
 
             // 各艦の艦隊対空ボーナス値
-            int shipBonus = (int) items.stream().filter(item -> item != null)
-                    .mapToDouble(item -> {
+            int shipBonus = items.stream().filter(item -> item != null)
+                    .mapToInt(item -> {
                         // 種別
                         int type3 = item.getType3();
                         // 装備倍率
@@ -107,8 +107,9 @@ public class CalcTaiku {
                         // 装備改修値
                         int level = item.getLevel();
 
-                        return (magnification * taik) + (factor * Math.sqrt(level));
-                    }).sum();
+                        // 浮動小数点の合算で誤差が生じるため、100倍してから100で割る
+                        return (int) (((magnification * taik) + (factor * Math.sqrt(level))) * 100);
+                    }).sum() / 100;
             return shipBonus;
         }).sum();
 
