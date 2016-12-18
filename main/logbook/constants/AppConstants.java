@@ -177,7 +177,7 @@ public class AppConstants {
     public static final float EMPTY_SUPPLY = 0.33f;
 
     /** 艦載機装備アイテムのタイプID */
-    public static final int[] PLANE_ITEM_TYPES = new int[] { 6, 7, 8, 9, 10, 11, 25, 26, 41 };
+    public static final int[] PLANE_ITEM_TYPES = new int[] { 6, 7, 8, 9, 10, 11, 25, 26, 41, 45, 57 };
 
     /** 文字コード(Shift_JIS) */
     public static final Charset CHARSET = Charset.forName("MS932");
