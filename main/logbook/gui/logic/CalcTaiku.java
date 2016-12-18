@@ -94,8 +94,8 @@ public class CalcTaiku {
             List<ItemDto> items = ship.getItem2();
 
             // 各艦の艦隊対空ボーナス値
-            int shipBonus = (int) items.stream().filter(item -> item != null)
-                    .mapToDouble(item -> {
+            int shipBonus = items.stream().filter(item -> item != null)
+                    .mapToInt(item -> {
                         // 種別
                         int type3 = item.getType3();
                         // 装備倍率
@@ -107,8 +107,9 @@ public class CalcTaiku {
                         // 装備改修値
                         int level = item.getLevel();
 
-                        return (magnification * taik) + (factor * Math.sqrt(level));
-                    }).sum();
+                        // 浮動小数点の合算で誤差が生じるため、100倍してから100で割る
+                        return (int) (((magnification * taik) + (factor * Math.sqrt(level))) * 100);
+                    }).sum() / 100;
             return shipBonus;
         }).sum();
 
@@ -159,7 +160,18 @@ public class CalcTaiku {
     }
 
     /**
-     * 割合撃墜数を返します。
+     * 割合撃墜数を返します。(連合艦隊専用)
+     *
+     * @param ship 艦娘
+     * @param combinedKind 連合艦隊の種類(水上:10の位が1、機動:10の位が2、輸送:10の位が3。あと、第1艦隊ならば一の位に1、第2なら2。例:水上第1艦隊の場合、11
+     * @return value 割合撃墜数
+     */
+    public <SHIP extends ShipBaseDto> double getProportionalShootDownCombined(SHIP ship, int combinedKind) {
+        return this.getProportionalShootDownCombined(this.getKajuuValue(ship), combinedKind);
+    }
+
+    /**
+     * 割合撃墜数を返します。(通常艦隊専用)
      *
      * @param ship 艦娘
      * @return value 割合撃墜数
@@ -169,18 +181,48 @@ public class CalcTaiku {
     }
 
     /**
-     * 割合撃墜数を返します。
+     * 割合撃墜数を返します。(連合艦隊専用)
+     *
+     * @param kajuu 加重対空値
+     * @param combinedKind 連合艦隊の種類(水上:10の位が1、機動:10の位が2、輸送:10の位が3。あと、第1艦隊ならば一の位に1、第2なら2。例:水上第1艦隊の場合、11
+     * @return value 割合撃墜数
+     */
+    public double getProportionalShootDownCombined(int kajuu, int combinedKind) {
+        return (kajuu * this.getCombinedBonus(combinedKind)) / 400.0;
+    }
+
+    /**
+     * 割合撃墜数を返します。(通常艦隊専用)
      *
      * @param kajuu 加重対空値
      * @return value 割合撃墜数
      */
     public double getProportionalShootDown(int kajuu) {
-        return kajuu / 400.0;
+        return this.getProportionalShootDownCombined(kajuu, -1);
     }
 
     /**
-     * 固定撃墜数を返します。
-     * 連合艦隊の場合は、shipsに全艦入れる。
+     * 固定撃墜数を返します。(連合艦隊専用)
+     *
+     * @param ship 艦娘
+     * @param allShips 艦隊(第二艦隊も一緒に入れる)
+     * @param formation 陣形(単縦:1,複縦:2,輪形:3,梯形:4,単横:5,第一:11,第二:12,第三:13,第四:14)
+     * @param cutinKind 対空カットインの種別
+     * @param combinedKind 連合艦隊の種類(水上:10の位が1、機動:10の位が2、輸送:10の位が3。あと、第1艦隊ならば一の位に1、第2なら2。例:水上第1艦隊の場合、11
+     * @return value 固定撃墜数
+     */
+    public <SHIP extends ShipBaseDto> int getFixedShootDownCombined(SHIP ship, List<SHIP> allShips,
+            int formation,
+            int cutinKind,
+            int combinedKind) {
+
+        return this.getFixedShootDownCombined(this.getKajuuValue(ship), this.getKantaiValue(allShips, formation),
+                cutinKind,
+                combinedKind);
+    }
+
+    /**
+     * 固定撃墜数を返します。(通常艦隊専用)
      *
      * @param ship 艦娘
      * @param ships 艦隊
@@ -189,13 +231,27 @@ public class CalcTaiku {
      * @return value 固定撃墜数
      */
     public <SHIP extends ShipBaseDto> int getFixedShootDown(SHIP ship, List<SHIP> ships, int formation, int cutinKind) {
-        return (int) ((this.getKajuuValue(ship) + this.getKantaiValue(ships, formation))
-                * this.getTaikuCutinVariableBonus(cutinKind)) / 10;
+        return this.getFixedShootDown(this.getKajuuValue(ship), this.getKantaiValue(ships, formation), cutinKind);
     }
 
     /**
-     * 固定撃墜数を返します。
-     * 連合艦隊の場合は、shipsに全艦入れる。
+     * 固定撃墜数を返します。(連合艦隊専用)
+     *
+     * @param ship 艦娘
+     * @param allShips 艦隊(第二艦隊も一緒に入れる)
+     * @param formation 陣形(単縦:1,複縦:2,輪形:3,梯形:4,単横:5,第一:11,第二:12,第三:13,第四:14)
+     * @param combinedKind 連合艦隊の種類(水上:10の位が1、機動:10の位が2、輸送:10の位が3。あと、第1艦隊ならば一の位に1、第2なら2。例:水上第1艦隊の場合、11
+     * @return value 固定撃墜数
+     */
+    public <SHIP extends ShipBaseDto> int getFixedShootDownCombind(SHIP ship, List<SHIP> allShips,
+            int formation, int combinedKind) {
+
+        return this.getFixedShootDownCombined(this.getKajuuValue(ship), this.getKantaiValue(allShips, formation), -1,
+                combinedKind);
+    }
+
+    /**
+     * 固定撃墜数を返します。(通常艦隊専用)
      *
      * @param ship 艦娘
      * @param ships 艦隊
@@ -203,20 +259,44 @@ public class CalcTaiku {
      * @return value 固定撃墜数
      */
     public <SHIP extends ShipBaseDto> int getFixedShootDown(SHIP ship, List<SHIP> ships, int formation) {
-        return (int) ((this.getKajuuValue(ship) + this.getKantaiValue(ships, formation))
-                * this.getTaikuCutinVariableBonus(0)) / 10;
+        return this.getFixedShootDown(this.getKajuuValue(ship), this.getKantaiValue(ships, formation), -1);
     }
 
     /**
-     * 固定撃墜数を返します。
+     * 固定撃墜数を返します。(連合艦隊専用)
+     *
+     * @param kajuu 加重対空値
+     * @param kantai 艦隊防空値
+     * @param cutinKind 対空カットインの種別
+     * @param combinedKind 連合艦隊の種類(水上:10の位が1、機動:10の位が2、輸送:10の位が3。あと、第1艦隊ならば一の位に1、第2なら2。例:水上第1艦隊の場合、11
+     * @return value 固定撃墜数
+     */
+    public int getFixedShootDownCombined(int kajuu, double kantai, int cutinKind, int combinedKind) {
+        return (int) ((kajuu + kantai) * this.getCombinedBonus(combinedKind)
+                * this.getTaikuCutinVariableBonus(cutinKind)) / 10;
+    }
+
+    /**
+     * 固定撃墜数を返します。(通常艦隊専用)
      *
      * @param kajuu 加重対空値
      * @param kantai 艦隊防空値
      * @param cutinKind 対空カットインの種別
      * @return value 固定撃墜数
      */
-    public int getFixedShootDown(int kajuu, int kantai, int cutinKind) {
-        return (int) ((kajuu + kantai) * this.getTaikuCutinVariableBonus(cutinKind)) / 10;
+    public int getFixedShootDown(int kajuu, double kantai, int cutinKind) {
+        return this.getFixedShootDownCombined(kajuu, kantai, cutinKind, -1);
+    }
+
+    /**
+     * 固定撃墜数を返します。(通常艦隊専用)
+     *
+     * @param kajuu 加重対空値
+     * @param kantai 艦隊防空値
+     * @return value 固定撃墜数
+     */
+    public int getFixedShootDown(int kajuu, double kantai) {
+        return this.getFixedShootDown(kajuu, kantai, -1);
     }
 
     /**
@@ -236,6 +316,18 @@ public class CalcTaiku {
      */
     public int getSecurity() {
         return 1;
+    }
+
+    // 連合艦隊補正
+    private double getCombinedBonus(int kind) {
+        switch (kind) {
+        case 11: // 水上第一艦隊
+            return 0.8 * 0.9;
+        case 12: // 水上第二艦隊
+            return 0.8 * 0.6;
+        default:
+            return 1.0;
+        }
     }
 
     // 対空カットイン変動ボーナス(七四式準拠)
