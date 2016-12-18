@@ -14,14 +14,14 @@ import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
-import org.apache.commons.lang3.StringUtils;
-
-import com.dyuproject.protostuff.Tag;
-
 import logbook.data.context.GlobalContext;
 import logbook.internal.EnemyData;
 import logbook.internal.UseItem;
 import logbook.util.JsonUtils;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.dyuproject.protostuff.Tag;
 
 /**
  * １回の会敵情報
@@ -243,16 +243,16 @@ public class BattleExDto extends AbstractDto {
         private double[] damageRate;
 
         /** 攻撃シーケンス */
+        @Tag(36)
+        private AirBattleDto airBaseInjection = null;
         @Tag(35)
         private List<AirBattleDto> airBase = null;
-        @Tag(102)
-        private AirBattleDto airBase2 = null;
+        @Tag(37)
+        private AirBattleDto airInjection = null;
         @Tag(11)
         private AirBattleDto air = null;
         @Tag(12)
         private AirBattleDto air2 = null;
-        @Tag(103)
-        private AirBattleDto air3 = null;
         @Tag(13)
         private List<BattleAtackDto> support = null;
         @Tag(50)
@@ -322,13 +322,13 @@ public class BattleExDto extends AbstractDto {
             // 基地航空隊（墳式強襲）
             JsonObject air_base_injection = object.getJsonObject("api_air_base_injection");
             if (air_base_injection != null) {
-                this.airBase2 = new AirBattleDto(air_base_injection, isFriendCombined || isEnemyCombined, true);
+                this.airBaseInjection = new AirBattleDto(air_base_injection, isFriendCombined || isEnemyCombined, true);
             }
 
             // 航空戦（墳式強襲）
             JsonObject injection_kouku = object.getJsonObject("api_injection_kouku");
             if (injection_kouku != null) {
-                this.air3 = new AirBattleDto(injection_kouku, isFriendCombined || isEnemyCombined, false);
+                this.airInjection = new AirBattleDto(injection_kouku, isFriendCombined || isEnemyCombined, false);
             }
 
             // 航空戦（通常）
@@ -395,18 +395,18 @@ public class BattleExDto extends AbstractDto {
 
             // ダメージを反映 //
 
+            if (this.airBaseInjection != null)
+                this.doAtack(this.airBaseInjection.atacks);
             if (this.airBase != null)
                 for (AirBattleDto attack : this.airBase)
                     this.doAtack(attack.atacks);
-            if (this.airBase2 != null)
-                    this.doAtack(this.airBase2.atacks);
+            if (this.airInjection != null)
+                this.doAtack(this.airInjection.atacks);
             if (this.air != null)
                 this.doAtack(this.air.atacks);
             this.doAtack(this.support);
             if (this.air2 != null)
                 this.doAtack(this.air2.atacks);
-            if (this.air3 != null)
-                this.doAtack(this.air3.atacks);
             this.doAtack(this.openingTaisen);
             this.doAtack(this.opening);
             this.doAtack(this.hougeki);
@@ -698,30 +698,19 @@ public class BattleExDto extends AbstractDto {
             return arr.toArray(new BattleAtackDto[0]);
         }
 
-        private BattleAtackDto[] getAirBase2BattlesArray() {
-            if (this.airBase2 == null) {
-                return null;
-            }
-            List<BattleAtackDto> arr = new ArrayList<>();
-            AirBattleDto dto = this.airBase2;
-            if (dto.atacks != null) {
-                arr.addAll(dto.atacks);
-            }
-            
-            return arr.toArray(new BattleAtackDto[0]);
-        }
-
         /**
          * 攻撃の全シーケンスを取得
-         * [ 噴式基地航空隊航空戦, 噴式航空戦, 基地航空隊航空戦, 航空戦1, 支援艦隊の攻撃, 航空戦2, 開幕, 夜戦, 砲撃戦1, 雷撃, 砲撃戦2, 砲撃戦3 ]
+         * [ 噴式基地航空隊航空戦, 基地航空隊航空戦, 噴式航空戦, 航空戦1, 支援艦隊の攻撃, 航空戦2, 開幕, 夜戦, 砲撃戦1, 雷撃, 砲撃戦2, 砲撃戦3 ]
          * 各戦闘がない場合はnullになる
          * @return
          */
         public BattleAtackDto[][] getAtackSequence() {
             return new BattleAtackDto[][] {
-                    this.getAirBase2BattlesArray(),
-                    ((this.air3 == null) || (this.air3.atacks == null)) ? null : this.toArray(this.air3.atacks),
+                    ((this.airBaseInjection == null) || (this.airBaseInjection.atacks == null)) ? null : this
+                            .toArray(this.airBaseInjection.atacks),
                     this.getAirBaseBattlesArray(),
+                    ((this.airInjection == null) || (this.airInjection.atacks == null)) ? null : this
+                            .toArray(this.airInjection.atacks),
                     ((this.air == null) || (this.air.atacks == null)) ? null : this.toArray(this.air.atacks),
                     this.support == null ? null : this.toArray(this.support),
                     ((this.air2 == null) || (this.air2.atacks == null)) ? null : this.toArray(this.air2.atacks),
@@ -902,6 +891,13 @@ public class BattleExDto extends AbstractDto {
         }
 
         /**
+         * @return airInjection
+         */
+        public AirBattleDto getAirInjection() {
+            return this.airInjection;
+        }
+
+        /**
          * 航空戦1
          * @return air
          */
@@ -993,6 +989,13 @@ public class BattleExDto extends AbstractDto {
          */
         public int[] getFlarePos() {
             return this.flarePos;
+        }
+
+        /**
+         * @return airBaseInjection
+         */
+        public AirBattleDto getAirBaseInjection() {
+            return this.airBaseInjection;
         }
 
         /**

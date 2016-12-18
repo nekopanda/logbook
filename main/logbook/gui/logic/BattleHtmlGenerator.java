@@ -1,4 +1,3 @@
-
 /**
  *
  */
@@ -10,8 +9,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
 
 import logbook.constants.AppConstants;
 import logbook.dto.AirBattleDto;
@@ -25,6 +22,8 @@ import logbook.dto.EnemyShipDto;
 import logbook.dto.ItemDto;
 import logbook.dto.ShipBaseDto;
 import logbook.dto.ShipDto;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Nekopanda
@@ -761,6 +760,13 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         if (phase.getHougeki3() != null)
             hougekiList.add(phase.getHougeki3());
 
+        // 基地航空隊(噴式)
+        AirBattleDto airBaseInjection = phase.getAirBaseInjection();
+        if (airBaseInjection != null) {
+            this.genAirBattle(airBaseInjection, "噴式強襲基地航空隊攻撃",
+                    friendShips, enemyShips, friendHp, enemyHp);
+        }
+
         // 基地航空隊
         List<AirBattleDto> airBaseList = phase.getAirBase();
         if (airBaseList != null) {
@@ -769,6 +775,13 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                 this.genAirBattle(attack, "基地航空隊攻撃(" + (i + 1) + "/" + airBaseList.size() + ")",
                         friendShips, enemyShips, friendHp, enemyHp);
             }
+        }
+
+        // 航空戦(噴式)
+        AirBattleDto airInjection = phase.getAirInjection();
+        if (airInjection != null) {
+            this.genAirBattle(airInjection, "噴式強襲航空戦)",
+                    friendShips, enemyShips, friendHp, enemyHp);
         }
 
         // 航空戦 → 支援艦隊による攻撃 →　開幕対潜 → 開幕 → 航空戦２回目
