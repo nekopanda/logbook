@@ -183,6 +183,10 @@ public class BattleExDto extends AbstractDto {
     @Tag(51)
     private String resultJson;
 
+    /** 連合艦隊の種類 */
+    @Tag(52)
+    private int combinedKind = 0;
+
     /////////////////////////////////////////////////
 
     /**
@@ -1087,6 +1091,7 @@ public class BattleExDto extends AbstractDto {
                 }
             }
             if (isFriendCombined) {
+                this.combinedKind = GlobalContext.getCombinedKind();
                 numFshipsCombined = 6;
                 for (int i = 1; i <= 6; ++i) {
                     if (maxhpsCombined.getInt(i) == -1) {
@@ -1875,5 +1880,13 @@ public class BattleExDto extends AbstractDto {
      */
     public int getDropShipId() {
         return this.dropShipId;
+    }
+
+    /**
+     * 連合艦隊の種類を取得します
+     * @return 連合艦隊の種類(0:未結成、1:機動部隊、2:水上部隊、3:輸送部隊、-x:強制解隊)
+     */
+    public int getCombinedKind() {
+        return this.combinedKind;
     }
 }
