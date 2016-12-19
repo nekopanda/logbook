@@ -348,7 +348,7 @@ public class AppConstants {
     public static final String MESSAGE_TOTAL_DRAM = "ドラム缶:{0} ({1}隻)。";
 
     /** メッセージ  大発:{0} (+{1}%) */
-    public static final String MESSAGE_TOTAL_DAIHATSU = "大発:{0} (+{1}%)";
+    public static final String MESSAGE_TOTAL_DAIHATSU = "大発:{0} (+{1}%)。";
 
     /** メッセージ  前回の遠征:{0} (+{1}%) */
     public static final String MESSAGE_PREVIOUS_MISSION = "前回の遠征:{0}";
