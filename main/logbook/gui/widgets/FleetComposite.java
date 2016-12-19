@@ -10,6 +10,19 @@ import java.util.Map;
 
 import javax.annotation.CheckForNull;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.wb.swt.SWTResourceManager;
+
 import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
@@ -24,6 +37,7 @@ import logbook.gui.logic.DaihatsuString;
 import logbook.gui.logic.DamageRate;
 import logbook.gui.logic.SakutekiString;
 import logbook.gui.logic.SeikuString;
+import logbook.gui.logic.TPString;
 import logbook.gui.logic.TimeLogic;
 import logbook.gui.logic.TimeString;
 import logbook.internal.AkashiTimer;
@@ -33,19 +47,6 @@ import logbook.internal.LoggerHolder;
 import logbook.internal.SeaExp;
 import logbook.util.CalcExpUtils;
 import logbook.util.SwtUtils;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyleRange;
-import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
  * 艦隊タブのウィジェットです
@@ -366,8 +367,7 @@ public class FleetComposite extends Composite {
                 this.hpmsgLabels[i].setText("退避");
                 this.hpmsgLabels[i].setBackground(ColorManager.getColor(AppConstants.ESCAPED_SHIP_COLOR));
                 this.hpmsgLabels[i].setForeground(null);
-            }
-            else {
+            } else {
                 DamageRate rate = DamageRate.fromHP(nowhp, maxhp);
                 this.hpmsgLabels[i].setText(rate.toString());
                 this.hpmsgLabels[i].setBackground(rate.getBackground());
@@ -383,8 +383,7 @@ public class FleetComposite extends Composite {
                     if (isSortie) {
                         badlyDamaged.add(ship);
                     }
-                }
-                else if (rate == DamageRate.TYUHA) {
+                } else if (rate == DamageRate.TYUHA) {
                     if (AppConfig.get().isWarnByHalfDamage()) {
                         // 中破で警告アイコン
                         this.state.set(WARN);
@@ -496,8 +495,7 @@ public class FleetComposite extends Composite {
             if (isRepairing && AppConfig.get().isShowAkashiTimer()) {
                 // 泊地修理中
                 updator = new AkashiTimerUpdator(timeLabel, dockIndex, i);
-            }
-            else if (!isSortie && (condClearDate != null) && AppConfig.get().isShowCondTimer()) {
+            } else if (!isSortie && (condClearDate != null) && AppConfig.get().isShowCondTimer()) {
                 updator = new Runnable() {
                     @Override
                     public void run() {
@@ -508,8 +506,7 @@ public class FleetComposite extends Composite {
                         if (reststr != null) {
                             str = "疲労あと" + reststr;
                             tip = format.format(condClearDate);
-                        }
-                        else {
+                        } else {
                             str = "疲労まもなく回復";
                         }
                         timeLabel.setText(str);
@@ -522,8 +519,7 @@ public class FleetComposite extends Composite {
             if (updator != null) {
                 updator.run();
                 this.updators.add(updator);
-            }
-            else {
+            } else {
                 timeLabel.setText("");
                 timeLabel.setForeground(null);
                 timeLabel.setToolTipText(null);
@@ -629,48 +625,40 @@ public class FleetComposite extends Composite {
         if ((currentMission != null) && (currentMission.getMission() != null)) {
             // 遠征中
             this.addStyledText(this.message, AppConstants.MESSAGE_MISSION, messageStyle);
-        }
-        else if (GlobalContext.isSortie(this.dock.getId())) {
+        } else if (GlobalContext.isSortie(this.dock.getId())) {
             // 出撃中
             this.addStyledText(this.message, AppConstants.MESSAGE_SORTIE, messageStyle);
             if (this.badlyDamage) {
                 // 大破
                 this.addStyledText(this.message, AppConstants.MESSAGE_STOP_SORTIE, taihaStyle);
-            }
-            else if (combinedFleetBadlyDamaed) {
+            } else if (combinedFleetBadlyDamaed) {
                 // 連合艦隊の他の艦隊に大破艦がある
                 this.addStyledText(this.message, AppConstants.MESSAGE_IN_COMBINED + AppConstants.MESSAGE_STOP_SORTIE,
                         taihaStyle);
-            }
-            else {
+            } else {
                 // 進撃可能
                 this.addStyledText(this.message, AppConstants.MESSAGE_GO_NEXT, messageStyle);
             }
-        }
-        else if (this.badlyDamage) {
+        } else if (this.badlyDamage) {
             // 大破
             this.addStyledText(this.message,
                     MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BADLY_DAMAGE), taihaStyle);
-        }
-        else if (combinedFleetBadlyDamaed) {
+        } else if (combinedFleetBadlyDamaed) {
             // 連合艦隊の他の艦隊に大破艦がある
             this.addStyledText(this.message, AppConstants.MESSAGE_IN_COMBINED +
                     MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BADLY_DAMAGE), taihaStyle);
-        }
-        else {
+        } else {
             if (isBathwater) {
                 // 入渠中
                 this.addStyledText(this.message,
                         MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BATHWATER), messageStyle);
-            }
-            else if (flagshipNeedSupply) {
+            } else if (flagshipNeedSupply) {
                 // 未補給
                 this.addStyledText(this.message, "未補給です。", messageStyle);
                 if (reqSupply) { // 空
                     this.addStyledText(this.message, "出撃できません。", messageStyle);
                 }
-            }
-            else {
+            } else {
                 if (repairState.isRepairing()) {
                     // 泊地修理中
                     this.addStyledText(this.message, "泊地修理中。", messageStyle);
@@ -690,7 +678,8 @@ public class FleetComposite extends Composite {
         this.addStyledText(this.message, "\n", null);
         // 制空
         SeikuString seikuString = new SeikuString(ships);
-        this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_SEIKU, seikuString.toString()), null);
+        this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_SEIKU, seikuString.toString()),
+                null);
         if (lostPlanes > 0) {
             this.addStyledText(this.message,
                     MessageFormat.format("損失機:{0}(ボーキ:{1})", lostPlanes, lostPlanes * 5), null);
@@ -713,8 +702,13 @@ public class FleetComposite extends Composite {
             // 大発合計数
             this.addStyledText(this.message, daihatsu.toString(), null);
         }
+
+        // TP獲得量
+        this.addStyledText(this.message, new TPString(ships).toString(), null);
+
         this.addStyledText(this.message, "\n", null);
-        if ((currentMission != null) && (currentMission.getMission() == null) && (previousMission.getMission() != null)) {
+        if ((currentMission != null) && (currentMission.getMission() == null)
+                && (previousMission.getMission() != null)) {
             // 前回の遠征
             String text = previousMission.getDisplayText("missioncheck_" + dock.getId() + "p");
             this.addStyledText(this.message,
@@ -816,7 +810,7 @@ public class FleetComposite extends Composite {
 
     /**
      * 複数の色の中間色を取得する
-     * 
+     *
      * @param raito 割合
      * @param rgbs 色たち
      * @return 色
@@ -843,7 +837,7 @@ public class FleetComposite extends Composite {
 
     /**
      * 2つの色の中間色を取得する
-     * 
+     *
      * @param raito 割合
      * @param start 開始色
      * @param end 終了色
@@ -906,16 +900,14 @@ public class FleetComposite extends Composite {
                         }
                         if (showRemain) {
                             str = "修理あと" + reststr;
-                        }
-                        else {
+                        } else {
                             str = "次回復まで" + nextstr;
                         }
                         tip = "現在までに+" + state.getCurrentGain() + "回復\n" +
                                 "次の回復まで" + nextstr + "\n" +
                                 "全回復まで" + reststr +
                                 "(" + format.format(state.getFinish()) + ")";
-                    }
-                    else {
+                    } else {
                         str = "修理まもなく完了";
                     }
                 }
