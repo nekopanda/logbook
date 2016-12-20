@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package logbook.gui.logic;
 
@@ -17,7 +17,7 @@ public class SeikuString implements Comparable<SeikuString> {
 
     private static int[][] alevelBonusTable = new int[][] {
             { 0, 0, 2, 5, 9, 14, 14, 22 }, // 艦上戦闘機、水上戦闘機
-            { 0, 0, 0, 0, 0, 0, 0, 0 }, // 艦上爆撃機、艦上攻撃機
+            { 0, 0, 0, 0, 0, 0, 0, 0 }, // 艦上爆撃機、艦上攻撃機、噴式戦闘爆撃機
             { 0, 0, 1, 1, 1, 3, 3, 6 }, // 水上爆撃機
     };
 
@@ -62,6 +62,7 @@ public class SeikuString implements Comparable<SeikuString> {
                     break;
                 case 7: // 艦上爆撃機
                 case 8: // 艦上攻撃機
+                case 57: // 噴式戦闘爆撃機
                     type = 1;
                     break;
                 case 11: // 水上爆撃機
@@ -86,7 +87,7 @@ public class SeikuString implements Comparable<SeikuString> {
                     case 0: // 艦上戦闘機 （水上戦闘機は不明だけど一応入れておく）
                         tyku += item.getLevel() * 0.2;
                         break;
-                    case 1: // 爆戦（爆戦でない艦上爆撃機や艦上攻撃機は不明だけど一応入れておく）
+                    case 1: // 爆戦（爆戦でない艦上爆撃機や艦上攻撃機、噴式戦闘爆撃機は不明だけど一応入れておく）
                         tyku += item.getLevel() * 0.25;
                         break;
                     }
@@ -128,8 +129,7 @@ public class SeikuString implements Comparable<SeikuString> {
     private String seikuTotalString() {
         if (this.seikuToalMin == this.seikuTotalMax) {
             return Integer.toString(this.seikuToalMin);
-        }
-        else {
+        } else {
             return String.format("%d-%d", this.seikuToalMin, this.seikuTotalMax);
         }
     }
