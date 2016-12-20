@@ -80,32 +80,38 @@ public class SeikuString implements Comparable<SeikuString> {
                         return;
                     }
 
-                    double tyku = item.getParam().getTyku();
+                    // 搭載機数
+                    int onslot = ship.getOnSlot()[i];
 
-                    // 改修効果 艦戦は★×0.2、爆戦は★×0.25
-                    switch (type) {
-                    case 0: // 艦上戦闘機 （水上戦闘機は不明だけど一応入れておく）
-                        tyku += item.getLevel() * 0.2;
-                        break;
-                    case 1: // 爆戦（爆戦でない艦上爆撃機や艦上攻撃機、噴式戦闘爆撃機は不明だけど一応入れておく）
-                        tyku += item.getLevel() * 0.25;
-                        break;
+                    // 搭載機数が0だと制空値はなくなる
+                    if (onslot > 0) {
+                        double tyku = item.getParam().getTyku();
+
+                        // 改修効果 艦戦は★×0.2、爆戦は★×0.25
+                        switch (type) {
+                        case 0: // 艦上戦闘機 （水上戦闘機は不明だけど一応入れておく）
+                            tyku += item.getLevel() * 0.2;
+                            break;
+                        case 1: // 爆戦（爆戦でない艦上爆撃機や艦上攻撃機、噴式戦闘爆撃機は不明だけど一応入れておく）
+                            tyku += item.getLevel() * 0.25;
+                            break;
+                        }
+
+                        double basePart = tyku * Math.sqrt(onslot);
+
+                        double ialvMin = internalAlevelTable[item.getAlv()];
+                        double ialvMax = internalAlevelTable[item.getAlv() + 1] - 1;
+                        double ialvMid = (ialvMin + ialvMax) / 2;
+
+                        double totalMin = basePart + calcBonusSeiku(type, item.getAlv(), ialvMin);
+                        double totalMid = basePart + calcBonusSeiku(type, item.getAlv(), ialvMid);
+                        double totalMax = basePart + calcBonusSeiku(type, item.getAlv(), ialvMax);
+
+                        this.seikuBase += (int) Math.floor(basePart);
+                        this.seikuToalMin += (int) Math.floor(totalMin);
+                        this.seikuToalMid += (int) Math.floor(totalMid);
+                        this.seikuTotalMax += (int) Math.floor(totalMax);
                     }
-
-                    double basePart = tyku * Math.sqrt(ship.getOnSlot()[i]);
-
-                    double ialvMin = internalAlevelTable[item.getAlv()];
-                    double ialvMax = internalAlevelTable[item.getAlv() + 1] - 1;
-                    double ialvMid = (ialvMin + ialvMax) / 2;
-
-                    double totalMin = basePart + calcBonusSeiku(type, item.getAlv(), ialvMin);
-                    double totalMid = basePart + calcBonusSeiku(type, item.getAlv(), ialvMid);
-                    double totalMax = basePart + calcBonusSeiku(type, item.getAlv(), ialvMax);
-
-                    this.seikuBase += (int) Math.floor(basePart);
-                    this.seikuToalMin += (int) Math.floor(totalMin);
-                    this.seikuToalMid += (int) Math.floor(totalMid);
-                    this.seikuTotalMax += (int) Math.floor(totalMax);
                 }
             }
         }
