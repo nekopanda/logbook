@@ -233,7 +233,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                 this.inline("td", String.format("%d", calcTaiku.getFriendKajuuValue(ship)), null);
                 if (battle.isCombined()) {
                     int combinedKind = battle.getCombinedKind();
-                    if (combinedKind == 1) { // 水上打撃部隊のみ判明しているため、それ以外は不明にしておく
+                    if (combinedKind == 2) { // 水上打撃部隊のみ判明しているため、それ以外は不明にしておく
                         this.inline("td",
                                 String.format("%.2f%%", calcTaiku.getFriendProportionalShootDownCombined(ship,
                                         (combinedKind * 10) + (isSecond ? 2 : 1)) * 100),
