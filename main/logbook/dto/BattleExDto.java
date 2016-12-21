@@ -588,8 +588,8 @@ public class BattleExDto extends AbstractDto {
                         return ResultRank.S;
                     }
                 }
-                // PHASE2:轟沈艦なし かつ 敵艦隊の戦闘開始時の数が1隻以上(必要?) かつ 敵艦の撃沈数が7割以上
-                else if ((friendSunk == 0) && (numStartEships >= 1)
+                // PHASE2:轟沈艦なし かつ 敵艦隊の戦闘開始時の数が1隻より上 かつ 敵艦の撃沈数が7割以上
+                else if ((friendSunk == 0) && (numStartEships > 1)
                         && (enemySunk >= Math.floor(0.7 * numStartEships))) {
                     return ResultRank.A;
                 }
