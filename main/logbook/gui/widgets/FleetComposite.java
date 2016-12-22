@@ -455,17 +455,94 @@ public class FleetComposite extends Composite {
                 }
             }
 
-            // ステータス.ダメコン
+            // ステータス.ダメコン, 補給物資, 対空機銃, バルジなど
             List<ItemDto> item = new ArrayList<ItemDto>(ship.getItem2());
             item.add(ship.getSlotExItem());
             int dmgcsty = 0;
             int dmgcstm = 0;
+            int yjhokyu = 0;
+            int ryosyok = 0;
+            int candume = 0;
+            int kj7_7mm = 0;
+            int kj12_7mm_ts = 0;
+            int kj25mm_ts = 0;
+            int kj25mm_rs = 0;
+            int kj25mm_3rs = 0;
+            int bsk_40mm = 0;
+            int FlaK_38 = 0;
+            int Fnsn_12cm30rs = 0;
+            int FlaK_M42 = 0;
+            int kj25mm_syuch = 0;
+            int QF_2pounds = 0;
+            int Bofors_40mm = 0;
+            int bulge_mid = 0;
+            int bulge_lrg = 0;
+            int bulge_lrg_knpn = 0;
             for (ItemDto itemDto : item) {
                 if (itemDto != null) {
-                    if (itemDto.getName().equals("応急修理要員")) {
-                        dmgcsty++;
-                    } else if (itemDto.getName().equals("応急修理女神")) {
-                        dmgcstm++;
+                    switch (itemDto.getName()) {
+                        case "応急修理要員":
+                            dmgcsty++;
+                            break;
+                        case "応急修理女神":
+                            dmgcstm++;
+                            break;
+                        case "洋上補給":
+                            yjhokyu++;
+                            break;
+                        case "戦闘糧食":
+                            ryosyok++;
+                            break;
+                        case "秋刀魚の缶詰":
+                            candume++;
+                            break;
+                        case "7.7mm機銃":
+                            kj7_7mm++;
+                            break;
+                        case "12.7mm単装機銃":
+                            kj12_7mm_ts++;
+                            break;
+                        case "25mm単装機銃":
+                            kj25mm_ts++;
+                            break;
+                        case "25mm連装機銃":
+                            kj25mm_rs++;
+                            break;
+                        case "25mm三連装機銃":
+                            kj25mm_3rs++;
+                            break;
+                        case "毘式40mm連装機銃":
+                            bsk_40mm++;
+                            break;
+                        case "2cm 四連装FlaK 38":
+                            FlaK_38++;
+                            break;
+                        case "12cm30連装噴進砲":
+                            Fnsn_12cm30rs++;
+                            break;
+                        case "3.7cm FlaK M42":
+                            FlaK_M42++;
+                            break;
+                        case "25mm三連装機銃 集中配備":
+                            kj25mm_syuch++;
+                            break;
+                        case "QF 2ポンド8連装ポンポン砲":
+                            QF_2pounds++;
+                            break;
+                        case "Bofors 40mm四連装機関砲":
+                            Bofors_40mm++;
+                            break;
+                        case "増設バルジ(中型艦)":
+                            bulge_mid++;
+                            break;
+                        case "増設バルジ(大型艦)":
+                            bulge_lrg++;
+                            break;
+                        case "艦本新設計 増設バルジ(大型艦)":
+                            bulge_lrg_knpn++;
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
@@ -475,6 +552,60 @@ public class FleetComposite extends Composite {
             }
             if (dmgcstm > 0) {
                 dmgcstr += "女神x" + dmgcstm + " ";
+            }
+            if (yjhokyu > 0) {
+                dmgcstr += "補給x" + yjhokyu + " ";
+            }
+            if (ryosyok > 0) {
+                dmgcstr += "糧食x" + ryosyok + " ";
+            }
+            if (candume > 0) {
+                dmgcstr += "缶詰x" + candume + " ";
+            }
+            if (kj7_7mm > 0) {
+                dmgcstr += "7.7mm機銃x" + kj7_7mm + " ";
+            }
+            if (kj12_7mm_ts > 0) {
+                dmgcstr += "12.7mm単装機銃x" + kj12_7mm_ts + " ";
+            }
+            if (kj25mm_ts > 0) {
+                dmgcstr += "25mm単装機銃x" + kj25mm_ts + " ";
+            }
+            if (kj25mm_rs > 0) {
+                dmgcstr += "25mm連装機銃x" + kj25mm_rs + " ";
+            }
+            if (kj25mm_3rs > 0) {
+                dmgcstr += "25mm三連装機銃x" + kj25mm_3rs + " ";
+            }
+            if (bsk_40mm > 0) {
+                dmgcstr += "毘式40mm連装機銃x" + bsk_40mm + " ";
+            }
+            if (FlaK_38 > 0) {
+                dmgcstr += "2cm 四連装FlaK 38x" + FlaK_38 + " ";
+            }
+            if (Fnsn_12cm30rs > 0) {
+                dmgcstr += "12cm30連装噴進砲x" + Fnsn_12cm30rs + " ";
+            }
+            if (FlaK_M42 > 0) {
+                dmgcstr += "3.7cm FlaK M42x" + FlaK_M42 + " ";
+            }
+            if (kj25mm_syuch > 0) {
+                dmgcstr += "25mm三連装機銃 集中配備x" + kj25mm_syuch + " ";
+            }
+            if (QF_2pounds > 0) {
+                dmgcstr += "QF 2ポンド8連装ポンポン砲x" + QF_2pounds + " ";
+            }
+            if (Bofors_40mm > 0) {
+                dmgcstr += "Bofors 40mm四連装機関砲x" + Bofors_40mm + " ";
+            }
+            if (bulge_mid > 0) {
+                dmgcstr += "増設バルジ(中型艦)x" + bulge_mid + " ";
+            }
+            if (bulge_lrg > 0) {
+                dmgcstr += "増設バルジ(大型艦)x" + bulge_lrg + " ";
+            }
+            if (bulge_lrg_knpn > 0) {
+                dmgcstr += "艦本新設計 増設バルジ(大型艦)x" + bulge_lrg_knpn + " ";
             }
             this.dmgcLabels[i].setText(dmgcstr);
             this.dmgcLabels[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN));
