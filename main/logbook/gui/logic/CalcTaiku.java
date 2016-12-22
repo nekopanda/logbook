@@ -4,10 +4,12 @@
 package logbook.gui.logic;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import logbook.dto.ItemDto;
 import logbook.dto.ShipBaseDto;
+import logbook.dto.ShipDto;
 import logbook.dto.ShipParameters;
 
 /**
@@ -22,9 +24,11 @@ public final class CalcTaiku {
      * @param ship 艦娘
      * @return kajuu 加重対空値
      */
-    public <SHIP extends ShipBaseDto> int getFriendKajuuValue(SHIP ship) {
+    public int getFriendKajuuValue(ShipDto ship) {
         // 装備
-        List<ItemDto> items = ship.getItem2();
+        List<ItemDto> items = new ArrayList<ItemDto>();
+        items.addAll(ship.getItem2());
+        items.add(ship.getSlotExItem());
 
         // 艦娘の素の対空値
         int taiku = ship.getTaiku() - items.stream().filter(item -> item != null)
@@ -122,9 +126,11 @@ public final class CalcTaiku {
      * @param formation 陣形(単縦:1,複縦:2,輪形:3,梯形:4,単横:5,第一:11,第二:12,第三:13,第四:14)
      * @return kantai 艦隊防空値
      */
-    public <SHIP extends ShipBaseDto> double getFriendKantaiValue(List<SHIP> ships, int formation) {
+    public double getFriendKantaiValue(List<ShipDto> ships, int formation) {
         int kantaiBonus = ships.stream().mapToInt(ship -> {
-            List<ItemDto> items = ship.getItem2();
+            List<ItemDto> items = new ArrayList<ItemDto>();
+            items.addAll(ship.getItem2());
+            items.add(ship.getSlotExItem());
 
             // 各艦の艦隊対空ボーナス値
             int shipBonus = items.stream().filter(item -> item != null)
@@ -228,8 +234,7 @@ public final class CalcTaiku {
      * @param combinedKind 連合艦隊の種類(機動:10の位が1、水上:10の位が2、輸送:10の位が3。あと、第1艦隊ならば一の位に1、第2なら2。例:水上第1艦隊の場合、11)
      * @return value 割合撃墜数
      */
-    public <SHIP extends ShipBaseDto> double getFriendProportionalShootDownCombined(SHIP ship,
-            int combinedKind) {
+    public double getFriendProportionalShootDownCombined(ShipDto ship, int combinedKind) {
         return this.getFriendProportionalShootDownCombined(this.getFriendKajuuValue(ship), combinedKind);
     }
 
@@ -250,7 +255,7 @@ public final class CalcTaiku {
      * @param ship 艦娘
      * @return value 割合撃墜数
      */
-    public <SHIP extends ShipBaseDto> double getFriendProportionalShootDown(SHIP ship) {
+    public double getFriendProportionalShootDown(ShipDto ship) {
         return this.getFriendProportionalShootDown(this.getFriendKajuuValue(ship));
     }
 
@@ -316,7 +321,7 @@ public final class CalcTaiku {
      * @param combinedKind 連合艦隊の種類(機動:10の位が1、水上:10の位が2、輸送:10の位が3。あと、第1艦隊ならば一の位に1、第2なら2。例:水上第1艦隊の場合、11)
      * @return value 固定撃墜数
      */
-    public <SHIP extends ShipBaseDto> int getFriendFixedShootDownCombined(SHIP ship, List<SHIP> allShips,
+    public int getFriendFixedShootDownCombined(ShipDto ship, List<ShipDto> allShips,
             int formation,
             int cutinKind,
             int combinedKind) {
@@ -357,7 +362,7 @@ public final class CalcTaiku {
      * @param cutinKind 対空カットインの種別
      * @return value 固定撃墜数
      */
-    public <SHIP extends ShipBaseDto> int getFriendFixedShootDown(SHIP ship, List<SHIP> ships, int formation,
+    public int getFriendFixedShootDown(ShipDto ship, List<ShipDto> ships, int formation,
             int cutinKind) {
         return this.getFriendFixedShootDown(this.getFriendKajuuValue(ship), this.getFriendKantaiValue(ships, formation),
                 cutinKind);
@@ -387,7 +392,7 @@ public final class CalcTaiku {
      * @param combinedKind 連合艦隊の種類(機動:10の位が1、水上:10の位が2、輸送:10の位が3。あと、第1艦隊ならば一の位に1、第2なら2。例:水上第1艦隊の場合、11)
      * @return value 固定撃墜数
      */
-    public <SHIP extends ShipBaseDto> int getFriendFixedShootDownCombind(SHIP ship, List<SHIP> allShips,
+    public int getFriendFixedShootDownCombind(ShipDto ship, List<ShipDto> allShips,
             int formation, int combinedKind) {
 
         return this.getFriendFixedShootDownCombined(this.getFriendKajuuValue(ship),
@@ -422,7 +427,7 @@ public final class CalcTaiku {
      * @param formation 陣形(単縦:1,複縦:2,輪形:3,梯形:4,単横:5,第一:11,第二:12,第三:13,第四:14)
      * @return value 固定撃墜数
      */
-    public <SHIP extends ShipBaseDto> int getFriendFixedShootDown(SHIP ship, List<SHIP> ships, int formation) {
+    public int getFriendFixedShootDown(ShipDto ship, List<ShipDto> ships, int formation) {
         return this.getFriendFixedShootDown(this.getFriendKajuuValue(ship), this.getFriendKantaiValue(ships, formation),
                 -1);
     }

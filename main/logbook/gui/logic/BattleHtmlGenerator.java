@@ -128,6 +128,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
      * @param hp
      * @param phaseName
      */
+    @SuppressWarnings("unchecked")
     private <SHIP extends ShipBaseDto> void genParmeters(String tableTitle,
             List<SHIP> ships, int[][] hp, String[] phaseName, int hqLv, boolean isSecond, String[] formation,
             List<SHIP> allShips, BattleExDto battle) {
@@ -153,7 +154,8 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.begin("table", PARAM_TABLE_CLASS[ci]);
         String kantaiValueString;
         if (isFriend) {
-            kantaiValueString = String.format("　(艦隊防空値:%.2f)", calcTaiku.getFriendKantaiValue(allShips, formationNo));
+            kantaiValueString = String.format("　(艦隊防空値:%.2f)",
+                    calcTaiku.getFriendKantaiValue((List<ShipDto>) allShips, formationNo));
         } else {
             kantaiValueString = String.format("　(艦隊防空値:%d)", calcTaiku.getEnemyKantaiValue(allShips, formationNo));
         }
@@ -230,22 +232,24 @@ public class BattleHtmlGenerator extends HTMLGenerator {
             String fixedShootDown = "";
 
             if (isFriend) {
-                this.inline("td", String.format("%d", calcTaiku.getFriendKajuuValue(ship)), null);
+                this.inline("td", String.format("%d", calcTaiku.getFriendKajuuValue((ShipDto) ship)), null);
                 if (battle.isCombined()) {
                     int combinedKind = battle.getCombinedKind();
                     if (combinedKind == 2) { // 水上打撃部隊のみ判明しているため、それ以外は不明にしておく
                         this.inline("td",
-                                String.format("%.2f%%", calcTaiku.getFriendProportionalShootDownCombined(ship,
+                                String.format("%.2f%%", calcTaiku.getFriendProportionalShootDownCombined((ShipDto) ship,
                                         (combinedKind * 10) + (isSecond ? 2 : 1)) * 100),
                                 null);
                         fixedShootDown = String.join("/", airList.stream()
                                 .mapToInt(air -> air.airFire != null ? air.airFire[1] : 0)
-                                .map(kind -> calcTaiku.getFriendFixedShootDownCombined(ship, allShips, formationNo,
+                                .map(kind -> calcTaiku.getFriendFixedShootDownCombined((ShipDto) ship,
+                                        (List<ShipDto>) allShips, formationNo,
                                         kind, (combinedKind * 10) + (isSecond ? 2 : 1)))
                                 .mapToObj(value -> String.valueOf(value))
                                 .toArray(String[]::new));
                         if (fixedShootDown.length() == 0) {
-                            fixedShootDown += calcTaiku.getFriendFixedShootDownCombined(ship, allShips, formationNo, -1,
+                            fixedShootDown += calcTaiku.getFriendFixedShootDownCombined((ShipDto) ship,
+                                    (List<ShipDto>) allShips, formationNo, -1,
                                     (combinedKind * 10) + (isSecond ? 2 : 1));
                         }
                     } else {
@@ -254,15 +258,17 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                     }
                 } else {
                     this.inline("td",
-                            String.format("%.2f%%", calcTaiku.getFriendProportionalShootDown(ship) * 100),
+                            String.format("%.2f%%", calcTaiku.getFriendProportionalShootDown((ShipDto) ship) * 100),
                             null);
                     fixedShootDown = String.join("/", airList.stream()
                             .mapToInt(air -> air.airFire != null ? air.airFire[1] : 0)
-                            .map(kind -> calcTaiku.getFriendFixedShootDown(ship, allShips, formationNo, kind))
+                            .map(kind -> calcTaiku.getFriendFixedShootDown((ShipDto) ship, (List<ShipDto>) allShips,
+                                    formationNo, kind))
                             .mapToObj(value -> String.valueOf(value))
                             .toArray(String[]::new));
                     if (fixedShootDown.length() == 0) {
-                        fixedShootDown += calcTaiku.getFriendFixedShootDown(ship, allShips, formationNo);
+                        fixedShootDown += calcTaiku.getFriendFixedShootDown((ShipDto) ship, (List<ShipDto>) allShips,
+                                formationNo);
                     }
                 }
                 this.inline("td", fixedShootDown, null);
