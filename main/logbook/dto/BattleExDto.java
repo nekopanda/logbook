@@ -296,9 +296,12 @@ public class BattleExDto extends AbstractDto {
             this.nowEnemyHpCombined = isEnemyCombined ? beforeEnemyHpCombined.clone() : null;
 
             // 夜間触接
-            JsonValue jsonTouchPlane = object.get("api_touch_plane");
-            if ((jsonTouchPlane != null) && (jsonTouchPlane != JsonValue.NULL)) {
-                this.touchPlane = JsonUtils.getIntArray(object, "api_touch_plane");
+            JsonArray jsonTouchPlane = object.getJsonArray("api_touch_plane");
+            if (jsonTouchPlane != null) {
+                this.touchPlane = new int[] {
+                        Integer.parseInt(jsonTouchPlane.get(0).toString()),
+                        Integer.parseInt(jsonTouchPlane.get(1).toString()),
+                };
             }
 
             // 照明弾発射艦
