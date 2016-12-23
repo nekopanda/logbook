@@ -359,14 +359,16 @@ public class BattleExDto extends AbstractDto {
                     if (edam != null) {
                         this.support = BattleAtackDto.makeSupport(edam);
                     }
-                } else if ((support_air != null) && (support_air != JsonValue.NULL)) {
+                }
+                else if ((support_air != null) && (support_air != JsonValue.NULL)) {
                     JsonValue stage3 = ((JsonObject) support_air).get("api_stage3");
                     if ((stage3 != null) && (stage3 != JsonValue.NULL)) {
                         this.support = BattleAtackDto.makeSupport(((JsonObject) stage3).getJsonArray("api_edam"));
                     }
                 }
                 this.supportType = toSupport(support_flag.intValue());
-            } else {
+            }
+            else {
                 this.supportType = "";
             }
 
@@ -386,7 +388,8 @@ public class BattleExDto extends AbstractDto {
             if (this.isFriendSecond) {
                 this.hougeki = BattleAtackDto.makeHougeki(object.get("api_hougeki"),
                         true, this.isEnemySecond); // 自分が連合艦隊の場合の夜戦
-            } else {
+            }
+            else {
                 this.hougeki = BattleAtackDto.makeHougeki(object.get("api_hougeki"),
                         kind.isHougekiSecond(), this.isEnemySecond); // 夜戦
             }
@@ -499,7 +502,8 @@ public class BattleExDto extends AbstractDto {
                     if (item.getSlotitemId() == 42) { //応急修理要員
                         hps[index] = (int) (ship.getMaxhp() * 0.2);
                         return;
-                    } else if (item.getSlotitemId() == 43) { //応急修理女神
+                    }
+                    else if (item.getSlotitemId() == 43) { //応急修理女神
                         hps[index] = ship.getMaxhp();
                         return;
                     }
@@ -600,14 +604,16 @@ public class BattleExDto extends AbstractDto {
                     return ResultRank.D;
                 }
                 return ResultRank.E;
-            } else {
+            }
+            else {
                 // PHASE1:轟沈艦なし かつ 敵艦全滅
                 if ((friendSunk == 0) && (enemySunk == numStartEships)) {
                     // 戦闘終了時のHPが戦闘開始時のHP以上の場合、完全勝利S判定にする
                     // ソースはscenes/BattleResultMain.swfのgetTweenShowRank()参照
                     if (friendGaugeMax <= friendGauge) {
                         return ResultRank.PERFECT;
-                    } else {
+                    }
+                    else {
                         return ResultRank.S;
                     }
                 }
@@ -655,13 +661,16 @@ public class BattleExDto extends AbstractDto {
                     if (dto.friendAtack) {
                         if (target < 6) {
                             this.nowEnemyHp[target] -= damage;
-                        } else {
+                        }
+                        else {
                             this.nowEnemyHpCombined[target - 6] -= damage;
                         }
-                    } else {
+                    }
+                    else {
                         if (target < 6) {
                             this.nowFriendHp[target] -= damage;
-                        } else {
+                        }
+                        else {
                             this.nowFriendHpCombined[target - 6] -= damage;
                         }
                     }
@@ -1049,7 +1058,8 @@ public class BattleExDto extends AbstractDto {
                 this.addPhase(phase.getJson(), phase.getKind());
             }
             this.readResultJson(JsonUtils.fromString(this.resultJson));
-        } else {
+        }
+        else {
             // 旧バージョンのログに対応
             // ドロップの"アイテム"をdropItemNameに移動させる
             if (this.dropItem && !this.dropShip && StringUtils.isEmpty(this.dropItemName)) {
@@ -1073,7 +1083,8 @@ public class BattleExDto extends AbstractDto {
 
             if (object.containsKey("api_dock_id")) {
                 dockId = object.get("api_dock_id").toString();
-            } else {
+            }
+            else {
                 dockId = object.get("api_deck_id").toString();
             }
 
@@ -1094,7 +1105,6 @@ public class BattleExDto extends AbstractDto {
                 }
             }
             if (isFriendCombined) {
-                this.combinedKind = GlobalContext.getCombinedKind();
                 numFshipsCombined = 6;
                 for (int i = 1; i <= 6; ++i) {
                     if (maxhpsCombined.getInt(i) == -1) {
@@ -1147,13 +1157,15 @@ public class BattleExDto extends AbstractDto {
             if (isFriendCombined) {
                 this.startFriendHpCombined = new int[numFshipsCombined];
                 this.maxFriendHpCombined = new int[numFshipsCombined];
-            } else {
+            }
+            else {
                 this.maxFriendHpCombined = null;
             }
             if (isEnemyCombined) {
                 this.startEnemyHpCombined = new int[numEshipsCombined];
                 this.maxEnemyHpCombined = new int[numEshipsCombined];
-            } else {
+            }
+            else {
                 this.maxEnemyHpCombined = null;
             }
 
@@ -1190,7 +1202,8 @@ public class BattleExDto extends AbstractDto {
                         this.maxFriendHp[i - 1] = maxHp;
                         this.friendGaugeMax += this.startFriendHp[i - 1] = hp;
                     }
-                } else {
+                }
+                else {
                     if ((i - 6) <= numEships) {
                         this.maxEnemyHp[i - 1 - 6] = maxHp;
                         this.enemyGaugeMax += this.startEnemyHp[i - 1 - 6] = hp;
@@ -1206,7 +1219,8 @@ public class BattleExDto extends AbstractDto {
                             this.maxFriendHpCombined[i - 1] = maxHp;
                             this.friendGaugeMax += this.startFriendHpCombined[i - 1] = hp;
                         }
-                    } else {
+                    }
+                    else {
                         if ((i - 6) <= numEshipsCombined) {
                             this.maxEnemyHpCombined[i - 1 - 6] = maxHp;
                             this.enemyGaugeMax += this.startEnemyHpCombined[i - 1 - 6] = hp;
@@ -1244,7 +1258,8 @@ public class BattleExDto extends AbstractDto {
                             phase.getNowFriendHp(), phase.getNowFriendHpCombined(),
                             phase.getNowEnemyHp(), phase.getNowEnemyHpCombined()),
                     kind);
-        } else {
+        }
+        else {
             this.completeDamageAndAddPhase(new Phase(this, object, kind,
                     this.startFriendHp, this.startFriendHpCombined,
                     this.startEnemyHp, this.startEnemyHpCombined), kind);
@@ -1255,7 +1270,8 @@ public class BattleExDto extends AbstractDto {
     private void completeDamageAndAddPhase(Phase phase, BattlePhaseKind kind) {
         if (kind.isPractice()) {
             phase.practiceDamage(this);
-        } else {
+        }
+        else {
             phase.battleDamage(this);
         }
         this.phaseList.add(phase);
@@ -1264,7 +1280,8 @@ public class BattleExDto extends AbstractDto {
     private void readResultJson(JsonObject object) {
         if (object.get("api_quest_name") != null) {
             this.questName = object.getString("api_quest_name");
-        } else {
+        }
+        else {
             // 演習の場合はない
             this.questName = null;
         }
@@ -1282,14 +1299,16 @@ public class BattleExDto extends AbstractDto {
             this.dropShipId = getShip.getInt("api_ship_id");
             this.dropType = getShip.getString("api_ship_type");
             this.dropName = getShip.getString("api_ship_name");
-        } else {
+        }
+        else {
             this.dropType = "";
             this.dropName = "";
         }
         if (this.dropItem) {
             String name = UseItem.get(object.getJsonObject("api_get_useitem").getInt("api_useitem_id"));
             this.dropItemName = StringUtils.defaultString(name);
-        } else {
+        }
+        else {
             this.dropItemName = "";
         }
         this.mvp = object.getInt("api_mvp");
@@ -1502,7 +1521,8 @@ public class BattleExDto extends AbstractDto {
             if (this.mapCellDto == null) {
                 return false;
             }
-        } else {
+        }
+        else {
             // 演習の場合
         }
         return (this.friends != null) && (this.getDock() != null) &&
@@ -1891,5 +1911,9 @@ public class BattleExDto extends AbstractDto {
      */
     public int getCombinedKind() {
         return this.combinedKind;
+    }
+
+    public void setCombinedKind(int combinedKind) {
+        this.combinedKind = combinedKind;
     }
 }
