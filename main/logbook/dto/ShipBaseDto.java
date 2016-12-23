@@ -293,11 +293,13 @@ public abstract class ShipBaseDto extends AbstractDto {
         for (int i = 0; i < items.size(); i++) {
             ItemInfoDto item = items.get(i);
             if (item != null) {
-                //6:艦上戦闘機,7:艦上爆撃機,8:艦上攻撃機,11:瑞雲系の水上偵察機の場合は制空値を計算する
+                //6:艦上戦闘機,7:艦上爆撃機,8:艦上攻撃機,11:水上爆撃機,45:水上戦闘機,57:噴式戦闘爆撃機の場合は制空値を計算する
                 if ((item.getType2() == 6)
                         || (item.getType2() == 7)
                         || (item.getType2() == 8)
-                        || (item.getType2() == 11)) {
+                        || (item.getType2() == 11)
+                        || (item.getType2() == 45)
+                        || (item.getType2() == 57)) {
                     // スロット数が分からないと計算できない
                     if (this.getOnSlot() == null)
                         return null;
