@@ -3,6 +3,7 @@
  */
 package logbook.gui.logic;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,7 @@ public class TPString implements Comparable<TPString> {
         public int stype;
 
         ShipParam(ShipDto ship) {
-            List<ItemDto> items = ship.getItem2();
+            List<ItemDto> items = new ArrayList<ItemDto>(ship.getItem2());
             items.add(ship.getSlotExItem());
 
             this.itemCountMap = items.stream().filter(item -> item != null)
