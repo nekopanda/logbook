@@ -6,11 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FilenameUtils;
-import org.eclipse.swt.graphics.RGB;
-
 import logbook.constants.AppConstants;
 import logbook.dto.ShipFilterDto;
+
+import org.apache.commons.io.FilenameUtils;
+import org.eclipse.swt.graphics.RGB;
 
 /**
  * アプリケーションの設定
@@ -206,6 +206,9 @@ public final class AppConfigBean {
 
     /** モノクロアイコンを使用する */
     private boolean monoIcon;
+
+    /** 機銃やバルジの装備数を表示 */
+    private boolean showGunAndBulge = true;
 
     /** 疲労タイマーを表示する */
     private boolean showCondTimer = true;
@@ -1263,6 +1266,20 @@ public final class AppConfigBean {
      */
     public void setMonoIcon(boolean monoIcon) {
         this.monoIcon = monoIcon;
+    }
+
+    /**
+     * @return showGunAndBulge
+     */
+    public boolean isShowGunAndBulge() {
+        return this.showGunAndBulge;
+    }
+
+    /**
+     * @param showGunAndBulge セットする showGunAndBulge
+     */
+    public void setShowGunAndBulge(boolean showGunAndBulge) {
+        this.showGunAndBulge = showGunAndBulge;
     }
 
     /**

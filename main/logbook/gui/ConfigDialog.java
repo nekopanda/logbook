@@ -540,6 +540,11 @@ public final class ConfigDialog extends Dialog {
         useMonoIcon.setText("モノクロアイコンを使用");
         useMonoIcon.setSelection(AppConfig.get().isMonoIcon());
 
+        final Button showGunAndBulge = new Button(compositeFleetDetail, SWT.CHECK);
+        showGunAndBulge.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        showGunAndBulge.setText("機銃やバルジの装備数を表示");
+        showGunAndBulge.setSelection(AppConfig.get().isShowGunAndBulge());
+
         final Button showCondTimer = new Button(compositeFleetDetail, SWT.CHECK);
         showCondTimer.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         showCondTimer.setText("疲労回復タイマーを表示");
@@ -1125,6 +1130,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setVisibleOnReturnMission(visibleOnReturnMission.getSelection());
                 AppConfig.get().setVisibleOnReturnBathwater(visibleOnReturnBathwater.getSelection());
                 AppConfig.get().setMonoIcon(useMonoIcon.getSelection());
+                AppConfig.get().setShowGunAndBulge(showGunAndBulge.getSelection());
                 AppConfig.get().setShowCondTimer(showCondTimer.getSelection());
                 AppConfig.get().setShowAkashiTimer(showAkashiTimer.getSelection());
                 AppConfig.get().setAkashiTimerFormat(akashiFormatCombo.getSelectionIndex());

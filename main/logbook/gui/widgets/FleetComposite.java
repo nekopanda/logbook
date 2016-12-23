@@ -7,21 +7,9 @@ import java.util.BitSet;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.annotation.CheckForNull;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyleRange;
-import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.wb.swt.SWTResourceManager;
 
 import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
@@ -47,6 +35,19 @@ import logbook.internal.LoggerHolder;
 import logbook.internal.SeaExp;
 import logbook.util.CalcExpUtils;
 import logbook.util.SwtUtils;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
  * 艦隊タブのウィジェットです
@@ -367,7 +368,8 @@ public class FleetComposite extends Composite {
                 this.hpmsgLabels[i].setText("退避");
                 this.hpmsgLabels[i].setBackground(ColorManager.getColor(AppConstants.ESCAPED_SHIP_COLOR));
                 this.hpmsgLabels[i].setForeground(null);
-            } else {
+            }
+            else {
                 DamageRate rate = DamageRate.fromHP(nowhp, maxhp);
                 this.hpmsgLabels[i].setText(rate.toString());
                 this.hpmsgLabels[i].setBackground(rate.getBackground());
@@ -383,7 +385,8 @@ public class FleetComposite extends Composite {
                     if (isSortie) {
                         badlyDamaged.add(ship);
                     }
-                } else if (rate == DamageRate.TYUHA) {
+                }
+                else if (rate == DamageRate.TYUHA) {
                     if (AppConfig.get().isWarnByHalfDamage()) {
                         // 中破で警告アイコン
                         this.state.set(WARN);
@@ -397,7 +400,8 @@ public class FleetComposite extends Composite {
             this.condstLabels[i].setText("疲");
             if (cond >= 49) {
                 this.condstLabels[i].setEnabled(false);
-            } else {
+            }
+            else {
                 this.condstLabels[i].setEnabled(true);
             }
             // ステータス.燃料
@@ -405,7 +409,8 @@ public class FleetComposite extends Composite {
             if (fuelraito >= 1f) {
                 this.fuelstLabels[i].setEnabled(false);
                 this.fuelstLabels[i].setForeground(null);
-            } else {
+            }
+            else {
                 if (AppConfig.get().isWarnByNeedSupply()) {
                     // 補給不足で警告アイコン
                     this.state.set(WARN);
@@ -415,7 +420,8 @@ public class FleetComposite extends Composite {
                 if (fuelraito <= AppConstants.EMPTY_SUPPLY) {
                     // 補給赤
                     this.fuelstLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_RED_COLOR));
-                } else if (fuelraito <= AppConstants.LOW_SUPPLY) {
+                }
+                else if (fuelraito <= AppConstants.LOW_SUPPLY) {
                     // 補給橙
                     this.fuelstLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_ORANGE_COLOR));
                 }
@@ -433,7 +439,8 @@ public class FleetComposite extends Composite {
                 this.bullstLabels[i].setEnabled(false);
                 this.bullstLabels[i].setBackground(null);
                 this.bullstLabels[i].setForeground(null);
-            } else {
+            }
+            else {
                 if (AppConfig.get().isWarnByNeedSupply()) {
                     // 補給不足で警告アイコン
                     this.state.set(WARN);
@@ -442,7 +449,8 @@ public class FleetComposite extends Composite {
                 this.bullstLabels[i].setEnabled(true);
                 if (bullraito <= AppConstants.EMPTY_SUPPLY) {
                     this.bullstLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_RED_COLOR));
-                } else if (bullraito <= AppConstants.LOW_SUPPLY) {
+                }
+                else if (bullraito <= AppConstants.LOW_SUPPLY) {
                     this.bullstLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_ORANGE_COLOR));
                 }
                 needSupply = true;
@@ -455,157 +463,40 @@ public class FleetComposite extends Composite {
             }
 
             // ステータス.ダメコン, 補給物資, 対空機銃, バルジなど
+            Map<String, Integer> exmap = new TreeMap<>();
+
             List<ItemDto> item = new ArrayList<ItemDto>(ship.getItem2());
             item.add(ship.getSlotExItem());
-            int dmgcsty = 0;
-            int dmgcstm = 0;
-            int yjhokyu = 0;
-            int ryosyok = 0;
-            int candume = 0;
-            int kj7_7mm = 0;
-            int kj12_7mm_ts = 0;
-            int kj25mm_ts = 0;
-            int kj25mm_rs = 0;
-            int kj25mm_3rs = 0;
-            int bsk_40mm = 0;
-            int FlaK_38 = 0;
-            int Fnsn_12cm30rs = 0;
-            int FlaK_M42 = 0;
-            int kj25mm_syuch = 0;
-            int QF_2pounds = 0;
-            int Bofors_40mm = 0;
-            int bulge_mid = 0;
-            int bulge_lrg = 0;
-            int bulge_lrg_knpn = 0;
             for (ItemDto itemDto : item) {
                 if (itemDto != null) {
-                    switch (itemDto.getName()) {
-                        case "応急修理要員":
-                            dmgcsty++;
-                            break;
-                        case "応急修理女神":
-                            dmgcstm++;
-                            break;
-                        case "洋上補給":
-                            yjhokyu++;
-                            break;
-                        case "戦闘糧食":
-                            ryosyok++;
-                            break;
-                        case "秋刀魚の缶詰":
-                            candume++;
-                            break;
-                        case "7.7mm機銃":
-                            kj7_7mm++;
-                            break;
-                        case "12.7mm単装機銃":
-                            kj12_7mm_ts++;
-                            break;
-                        case "25mm単装機銃":
-                            kj25mm_ts++;
-                            break;
-                        case "25mm連装機銃":
-                            kj25mm_rs++;
-                            break;
-                        case "25mm三連装機銃":
-                            kj25mm_3rs++;
-                            break;
-                        case "毘式40mm連装機銃":
-                            bsk_40mm++;
-                            break;
-                        case "2cm 四連装FlaK 38":
-                            FlaK_38++;
-                            break;
-                        case "12cm30連装噴進砲":
-                            Fnsn_12cm30rs++;
-                            break;
-                        case "3.7cm FlaK M42":
-                            FlaK_M42++;
-                            break;
-                        case "25mm三連装機銃 集中配備":
-                            kj25mm_syuch++;
-                            break;
-                        case "QF 2ポンド8連装ポンポン砲":
-                            QF_2pounds++;
-                            break;
-                        case "Bofors 40mm四連装機関砲":
-                            Bofors_40mm++;
-                            break;
-                        case "増設バルジ(中型艦)":
-                            bulge_mid++;
-                            break;
-                        case "増設バルジ(大型艦)":
-                            bulge_lrg++;
-                            break;
-                        case "艦本新設計 増設バルジ(大型艦)":
-                            bulge_lrg_knpn++;
-                            break;
-                        default:
-                            break;
+                    if (itemDto.canEqipExslot()) {
+                        String name = itemDto.getName();
+                        Integer old = exmap.get(name);
+                        exmap.put(name, (old != null) ? (old + 1) : 1);
                     }
                 }
             }
             String dmgcstr = "";
-            if (dmgcsty > 0) {
-                dmgcstr += "要員x" + dmgcsty + " ";
+            String[][] namemap = new String[][] {
+                    new String[] { "応急修理要員", "要員" },
+                    new String[] { "応急修理女神", "女神" },
+                    new String[] { "洋上補給", "補給" },
+                    new String[] { "戦闘糧食", "糧食" },
+                    new String[] { "秋刀魚の缶詰", "缶詰" },
+            };
+            for (String[] map : namemap) {
+                String key = map[0];
+                if (exmap.containsKey(key)) {
+                    dmgcstr += map[1] + "x" + exmap.get(key) + " ";
+                    exmap.remove(key);
+                }
             }
-            if (dmgcstm > 0) {
-                dmgcstr += "女神x" + dmgcstm + " ";
+            if (AppConfig.get().isShowGunAndBulge()) {
+                for (Map.Entry<String, Integer> entry : exmap.entrySet()) {
+                    dmgcstr += entry.getKey() + "x" + entry.getValue() + " ";
+                }
             }
-            if (yjhokyu > 0) {
-                dmgcstr += "補給x" + yjhokyu + " ";
-            }
-            if (ryosyok > 0) {
-                dmgcstr += "糧食x" + ryosyok + " ";
-            }
-            if (candume > 0) {
-                dmgcstr += "缶詰x" + candume + " ";
-            }
-            if (kj7_7mm > 0) {
-                dmgcstr += "7.7mm機銃x" + kj7_7mm + " ";
-            }
-            if (kj12_7mm_ts > 0) {
-                dmgcstr += "12.7mm単装機銃x" + kj12_7mm_ts + " ";
-            }
-            if (kj25mm_ts > 0) {
-                dmgcstr += "25mm単装機銃x" + kj25mm_ts + " ";
-            }
-            if (kj25mm_rs > 0) {
-                dmgcstr += "25mm連装機銃x" + kj25mm_rs + " ";
-            }
-            if (kj25mm_3rs > 0) {
-                dmgcstr += "25mm三連装機銃x" + kj25mm_3rs + " ";
-            }
-            if (bsk_40mm > 0) {
-                dmgcstr += "毘式40mm連装機銃x" + bsk_40mm + " ";
-            }
-            if (FlaK_38 > 0) {
-                dmgcstr += "2cm 四連装FlaK 38x" + FlaK_38 + " ";
-            }
-            if (Fnsn_12cm30rs > 0) {
-                dmgcstr += "12cm30連装噴進砲x" + Fnsn_12cm30rs + " ";
-            }
-            if (FlaK_M42 > 0) {
-                dmgcstr += "3.7cm FlaK M42x" + FlaK_M42 + " ";
-            }
-            if (kj25mm_syuch > 0) {
-                dmgcstr += "25mm三連装機銃 集中配備x" + kj25mm_syuch + " ";
-            }
-            if (QF_2pounds > 0) {
-                dmgcstr += "QF 2ポンド8連装ポンポン砲x" + QF_2pounds + " ";
-            }
-            if (Bofors_40mm > 0) {
-                dmgcstr += "Bofors 40mm四連装機関砲x" + Bofors_40mm + " ";
-            }
-            if (bulge_mid > 0) {
-                dmgcstr += "増設バルジ(中型艦)x" + bulge_mid + " ";
-            }
-            if (bulge_lrg > 0) {
-                dmgcstr += "増設バルジ(大型艦)x" + bulge_lrg + " ";
-            }
-            if (bulge_lrg_knpn > 0) {
-                dmgcstr += "艦本新設計 増設バルジ(大型艦)x" + bulge_lrg_knpn + " ";
-            }
+
             this.dmgcLabels[i].setText(dmgcstr);
             this.dmgcLabels[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN));
 
@@ -626,7 +517,8 @@ public class FleetComposite extends Composite {
             if (isRepairing && AppConfig.get().isShowAkashiTimer()) {
                 // 泊地修理中
                 updator = new AkashiTimerUpdator(timeLabel, dockIndex, i);
-            } else if (!isSortie && (condClearDate != null) && AppConfig.get().isShowCondTimer()) {
+            }
+            else if (!isSortie && (condClearDate != null) && AppConfig.get().isShowCondTimer()) {
                 updator = new Runnable() {
                     @Override
                     public void run() {
@@ -637,7 +529,8 @@ public class FleetComposite extends Composite {
                         if (reststr != null) {
                             str = "疲労あと" + reststr;
                             tip = format.format(condClearDate);
-                        } else {
+                        }
+                        else {
                             str = "疲労まもなく回復";
                         }
                         timeLabel.setText(str);
@@ -650,7 +543,8 @@ public class FleetComposite extends Composite {
             if (updator != null) {
                 updator.run();
                 this.updators.add(updator);
-            } else {
+            }
+            else {
                 timeLabel.setText("");
                 timeLabel.setForeground(null);
                 timeLabel.setToolTipText(null);
@@ -666,7 +560,8 @@ public class FleetComposite extends Composite {
                 }
                 this.condLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_RED_COLOR));
                 this.condstLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_RED_COLOR));
-            } else if (cond < AppConstants.COND_ORANGE) {
+            }
+            else if (cond < AppConstants.COND_ORANGE) {
                 // 疲労29以下
                 if (AppConfig.get().isWarnByCondState()) {
                     // 疲労状態で警告アイコン
@@ -675,15 +570,18 @@ public class FleetComposite extends Composite {
                 }
                 this.condLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_ORANGE_COLOR));
                 this.condstLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_ORANGE_COLOR));
-            } else if ((cond >= AppConstants.COND_DARK_GREEN) && (cond < AppConstants.COND_GREEN)) {
+            }
+            else if ((cond >= AppConstants.COND_DARK_GREEN) && (cond < AppConstants.COND_GREEN)) {
                 // 疲労50以上
                 this.condLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_DARK_GREEN_COLOR));
                 this.condstLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_DARK_GREEN_COLOR));
-            } else if (cond >= AppConstants.COND_GREEN) {
+            }
+            else if (cond >= AppConstants.COND_GREEN) {
                 // 疲労53以上
                 this.condLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_GREEN_COLOR));
                 this.condstLabels[i].setForeground(ColorManager.getColor(AppConstants.COND_GREEN_COLOR));
-            } else {
+            }
+            else {
                 this.condLabels[i].setForeground(null);
                 this.condstLabels[i].setForeground(null);
             }
@@ -694,12 +592,14 @@ public class FleetComposite extends Composite {
                         AppConfig.get().isMonoIcon()
                                 ? AppConstants.R_ICON_EXCLAMATION_MONO
                                 : AppConstants.R_ICON_EXCLAMATION));
-            } else if (shipstatus.get(WARN)) {
+            }
+            else if (shipstatus.get(WARN)) {
                 this.iconLabels[i].setImage(SWTResourceManager.getImage(FleetComposite.class,
                         AppConfig.get().isMonoIcon()
                                 ? AppConstants.R_ICON_ERROR_MONO
                                 : AppConstants.R_ICON_ERROR));
-            } else {
+            }
+            else {
                 this.iconLabels[i].setImage(null);
             }
 
@@ -756,40 +656,48 @@ public class FleetComposite extends Composite {
         if ((currentMission != null) && (currentMission.getMission() != null)) {
             // 遠征中
             this.addStyledText(this.message, AppConstants.MESSAGE_MISSION, messageStyle);
-        } else if (GlobalContext.isSortie(this.dock.getId())) {
+        }
+        else if (GlobalContext.isSortie(this.dock.getId())) {
             // 出撃中
             this.addStyledText(this.message, AppConstants.MESSAGE_SORTIE, messageStyle);
             if (this.badlyDamage) {
                 // 大破
                 this.addStyledText(this.message, AppConstants.MESSAGE_STOP_SORTIE, taihaStyle);
-            } else if (combinedFleetBadlyDamaed) {
+            }
+            else if (combinedFleetBadlyDamaed) {
                 // 連合艦隊の他の艦隊に大破艦がある
                 this.addStyledText(this.message, AppConstants.MESSAGE_IN_COMBINED + AppConstants.MESSAGE_STOP_SORTIE,
                         taihaStyle);
-            } else {
+            }
+            else {
                 // 進撃可能
                 this.addStyledText(this.message, AppConstants.MESSAGE_GO_NEXT, messageStyle);
             }
-        } else if (this.badlyDamage) {
+        }
+        else if (this.badlyDamage) {
             // 大破
             this.addStyledText(this.message,
                     MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BADLY_DAMAGE), taihaStyle);
-        } else if (combinedFleetBadlyDamaed) {
+        }
+        else if (combinedFleetBadlyDamaed) {
             // 連合艦隊の他の艦隊に大破艦がある
             this.addStyledText(this.message, AppConstants.MESSAGE_IN_COMBINED +
                     MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BADLY_DAMAGE), taihaStyle);
-        } else {
+        }
+        else {
             if (isBathwater) {
                 // 入渠中
                 this.addStyledText(this.message,
                         MessageFormat.format(AppConstants.MESSAGE_BAD, AppConstants.MESSAGE_BATHWATER), messageStyle);
-            } else if (flagshipNeedSupply) {
+            }
+            else if (flagshipNeedSupply) {
                 // 未補給
                 this.addStyledText(this.message, "未補給です。", messageStyle);
                 if (reqSupply) { // 空
                     this.addStyledText(this.message, "出撃できません。", messageStyle);
                 }
-            } else {
+            }
+            else {
                 if (repairState.isRepairing()) {
                     // 泊地修理中
                     this.addStyledText(this.message, "泊地修理中。", messageStyle);
@@ -1031,14 +939,16 @@ public class FleetComposite extends Composite {
                         }
                         if (showRemain) {
                             str = "修理あと" + reststr;
-                        } else {
+                        }
+                        else {
                             str = "次回復まで" + nextstr;
                         }
                         tip = "現在までに+" + state.getCurrentGain() + "回復\n" +
                                 "次の回復まで" + nextstr + "\n" +
                                 "全回復まで" + reststr +
                                 "(" + format.format(state.getFinish()) + ")";
-                    } else {
+                    }
+                    else {
                         str = "修理まもなく完了";
                     }
                 }

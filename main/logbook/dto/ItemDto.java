@@ -155,6 +155,10 @@ public class ItemDto extends AbstractDto {
         return this.getInfo().isPlane();
     }
 
+    public boolean canEqipExslot() {
+        return this.getInfo().canEqipExslot();
+    }
+
     /**
      * 表示分類名
      * @return 表示分類名

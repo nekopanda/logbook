@@ -93,6 +93,15 @@ public final class ItemInfoDto extends AbstractDto {
         return false;
     }
 
+    public boolean canEqipExslot() {
+        for (int i = 0; i < AppConstants.EXSLOT_ITEM_TYPES.length; ++i) {
+            if (this.type[2] == AppConstants.EXSLOT_ITEM_TYPES[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * @return 表示分類名
      */
