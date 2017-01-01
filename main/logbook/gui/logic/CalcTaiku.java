@@ -133,13 +133,13 @@ public final class CalcTaiku {
      * @return kantai 艦隊防空値
      */
     public double getFriendKantaiValue(List<ShipDto> ships, int formation) {
-        int kantaiBonus = ships.stream().mapToInt(ship -> {
+        int kantaiBonus = ships.stream().map(ship -> {
             List<ItemDto> items = new ArrayList<ItemDto>();
             items.addAll(ship.getItem2());
             items.add(ship.getSlotExItem());
 
             // 各艦の艦隊対空ボーナス値
-            int shipBonus = items.stream().filter(item -> item != null)
+            BigDecimal shipBonus = items.stream().filter(item -> item != null)
                     .map(item -> {
                         // 種別
                         int type3 = item.getType3();
@@ -154,9 +154,9 @@ public final class CalcTaiku {
 
                         return magnification.multiply(taik)
                                 .add(factor.multiply(new BigDecimal(Math.sqrt(level))));
-                    }).reduce(BigDecimal.ZERO, BigDecimal::add).intValue();
+                    }).reduce(BigDecimal.ZERO, BigDecimal::add);
             return shipBonus;
-        }).sum();
+        }).reduce(BigDecimal.ZERO, BigDecimal::add).intValue();
 
         return Math.floor(this.getFormationBonus(formation) * kantaiBonus) * (2 / 1.3);
     }
@@ -170,10 +170,10 @@ public final class CalcTaiku {
      * @return kantai 艦隊防空値
      */
     public <SHIP extends ShipBaseDto> int getEnemyKantaiValue(List<SHIP> ships, int formation) {
-        int kantaiBonus = ships.stream().mapToInt(ship -> {
+        int kantaiBonus = ships.stream().map(ship -> {
             List<ItemDto> items = ship.getItem2();
 
-            int shipBonus = items.stream().filter(item -> item != null)
+            BigDecimal shipBonus = items.stream().filter(item -> item != null)
                     .map(item -> {
                         // 種別
                         int type3 = item.getType3();
@@ -183,9 +183,9 @@ public final class CalcTaiku {
                         BigDecimal taik = new BigDecimal(item.getParam().getTaiku());
 
                         return magnification.multiply(taik);
-                    }).reduce(BigDecimal.ZERO, BigDecimal::add).intValue();
+                    }).reduce(BigDecimal.ZERO, BigDecimal::add);
             return shipBonus;
-        }).sum();
+        }).reduce(BigDecimal.ZERO, BigDecimal::add).intValue();
 
         return (int) (Math.floor(this.getFormationBonus(formation) * kantaiBonus) * 2);
     }
