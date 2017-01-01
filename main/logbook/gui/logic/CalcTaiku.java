@@ -94,7 +94,7 @@ public final class CalcTaiku {
                     return magnification.multiply(taik);
                 }).reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return (int) (Math.floor(2 * Math.floor(Math.sqrt(taiku))) + itemTotal.doubleValue());
+        return (int) (Math.floor(2 * Math.sqrt(taiku)) + itemTotal.doubleValue());
     }
 
     // 装備倍率(加重対空)
