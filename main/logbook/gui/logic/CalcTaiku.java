@@ -13,8 +13,14 @@ import logbook.dto.ShipDto;
 import logbook.dto.ShipParameters;
 
 /**
- * @author Nishisonic
+ * 対空関連を扱うクラス。
+ * ソースは関連事項を参照。
  *
+ * @see <a href="http://wikiwiki.jp/kancolle/?%B9%D2%B6%F5%C0%EF">wiki 航空戦</a>
+ * @see <a href="https://github.com/andanteyk/ElectronicObserver/blob/30fd425c41299370a947abc9005fe50682b868ab/ElectronicObserver/Utility/Data/Calculator.cs">七四式 ソース</a>
+ * @see <a href="https://twitter.com/galpokopii/status/812180211416502272">対空カットイン変動ボーナス・高射装置の艦隊防空への改修効果係数検証</a>
+ * @see <a href="https://twitter.com/KennethWWKK/status/780793591387959297">艦これ改のソフトって解析翻訳</a>
+ * @author Nishisonic
  */
 public final class CalcTaiku {
 
@@ -88,7 +94,7 @@ public final class CalcTaiku {
                     return magnification.multiply(taik);
                 }).reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return (int) (Math.floor(2 * Math.floor(Math.sqrt(taiku))) + itemTotal.doubleValue());
+        return (int) (Math.floor(2 * Math.sqrt(taiku)) + itemTotal.doubleValue());
     }
 
     // 装備倍率(加重対空)
@@ -127,13 +133,13 @@ public final class CalcTaiku {
      * @return kantai 艦隊防空値
      */
     public double getFriendKantaiValue(List<ShipDto> ships, int formation) {
-        int kantaiBonus = ships.stream().mapToInt(ship -> {
+        int kantaiBonus = ships.stream().map(ship -> {
             List<ItemDto> items = new ArrayList<ItemDto>();
             items.addAll(ship.getItem2());
             items.add(ship.getSlotExItem());
 
             // 各艦の艦隊対空ボーナス値
-            int shipBonus = items.stream().filter(item -> item != null)
+            BigDecimal shipBonus = items.stream().filter(item -> item != null)
                     .map(item -> {
                         // 種別
                         int type3 = item.getType3();
@@ -148,9 +154,9 @@ public final class CalcTaiku {
 
                         return magnification.multiply(taik)
                                 .add(factor.multiply(new BigDecimal(Math.sqrt(level))));
-                    }).reduce(BigDecimal.ZERO, BigDecimal::add).intValue();
+                    }).reduce(BigDecimal.ZERO, BigDecimal::add);
             return shipBonus;
-        }).sum();
+        }).reduce(BigDecimal.ZERO, BigDecimal::add).intValue();
 
         return Math.floor(this.getFormationBonus(formation) * kantaiBonus) * (2 / 1.3);
     }
@@ -164,10 +170,10 @@ public final class CalcTaiku {
      * @return kantai 艦隊防空値
      */
     public <SHIP extends ShipBaseDto> int getEnemyKantaiValue(List<SHIP> ships, int formation) {
-        int kantaiBonus = ships.stream().mapToInt(ship -> {
+        int kantaiBonus = ships.stream().map(ship -> {
             List<ItemDto> items = ship.getItem2();
 
-            int shipBonus = items.stream().filter(item -> item != null)
+            BigDecimal shipBonus = items.stream().filter(item -> item != null)
                     .map(item -> {
                         // 種別
                         int type3 = item.getType3();
@@ -177,9 +183,9 @@ public final class CalcTaiku {
                         BigDecimal taik = new BigDecimal(item.getParam().getTaiku());
 
                         return magnification.multiply(taik);
-                    }).reduce(BigDecimal.ZERO, BigDecimal::add).intValue();
+                    }).reduce(BigDecimal.ZERO, BigDecimal::add);
             return shipBonus;
-        }).sum();
+        }).reduce(BigDecimal.ZERO, BigDecimal::add).intValue();
 
         return (int) (Math.floor(this.getFormationBonus(formation) * kantaiBonus) * 2);
     }
@@ -204,6 +210,8 @@ public final class CalcTaiku {
         switch (type3) {
         case 16: // 高角砲
             return 3.0;
+        case 30: // 高射装置
+            return 2.0;
         case 11: // 電探
             return 1.5;
         default:
@@ -559,7 +567,7 @@ public final class CalcTaiku {
         }
     }
 
-    // 対空カットイン変動ボーナス(七四式準拠)
+    // 対空カットイン変動ボーナス
     private double getTaikuCutinVariableBonus(int kind) {
         switch (kind) {
         case 1: // 高角砲x2/電探(秋月型)
@@ -573,7 +581,7 @@ public final class CalcTaiku {
         case 5: // 高角砲+高射装置x2/電探
             return 1.5;
         case 6: // 大口径主砲/三式弾/高射装置
-            return 1.5;
+            return 1.45;
         case 7: // 高角砲/高射装置/電探
             return 1.35;
         case 8: // 高角砲+高射装置/電探
@@ -589,13 +597,13 @@ public final class CalcTaiku {
         case 13: // 高角砲/集中機銃/電探(摩耶改二不可)
             return 1.35;
         case 14: // 高角砲/機銃/電探(五十鈴改二)
-            return 1.0;
+            return 1.45;
         case 15: // 高角砲/機銃(五十鈴改二)
-            return 1.0;
+            return 1.3;
         case 16: // 高角砲/機銃/電探(霞改二乙)
-            return 1.0;
+            return 1.4;
         case 17: // 高角砲/機銃(霞改二乙)
-            return 1.0;
+            return 1.25;
         case 18: // 集中機銃(皐月改二)
             return 1.2;
         case 19: // 高角砲(非高射装置)/集中機銃(鬼怒改二)
@@ -607,7 +615,7 @@ public final class CalcTaiku {
         }
     }
 
-    // 対空カットイン固定ボーナス(七四式準拠)
+    // 対空カットイン固定ボーナス
     private int getTaikuCutinFixedBonus(int kind) {
         switch (kind) {
         case 1: // 高角砲x2/電探(秋月型)
