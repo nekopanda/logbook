@@ -2552,15 +2552,18 @@ public final class GlobalContext {
      */
     private static void doPractice(Data data, JsonValue json) {
         try {
-            if (json instanceof JsonArray) {
-                JsonArray apidata = (JsonArray) json;
-                for (int i = 0; i < apidata.size(); ++i) {
-                    PracticeUserDto dto = new PracticeUserDto((JsonObject) apidata.get(i));
-                    if ((practiceUser[i] == null) || (practiceUser[i].getId() != dto.getId()))
-                        practiceUser[i] = dto;
-                    else
-                        // stateだけ更新
-                        practiceUser[i].setState(dto.getState());
+            if (json instanceof JsonObject) {
+                JsonValue api_list = ((JsonObject) json).get("api_list");
+                if (api_list instanceof JsonArray) {
+                    JsonArray apidata = (JsonArray) api_list;
+                    for (int i = 0; i < apidata.size(); ++i) {
+                        PracticeUserDto dto = new PracticeUserDto((JsonObject) apidata.get(i));
+                        if ((practiceUser[i] == null) || (practiceUser[i].getId() != dto.getId()))
+                            practiceUser[i] = dto;
+                        else
+                            // stateだけ更新
+                            practiceUser[i].setState(dto.getState());
+                    }
                 }
                 practiceUserLastUpdate = new Date();
                 addUpdateLog("演習情報を更新しました");
