@@ -27,7 +27,7 @@ function body(ship) {
 	var slotNames = new Array(4);
 	var onSlotString = new Array(4);
 	var slotExName = (ship.slotExItem != null) ? ship.slotExItem.friendlyName : null;
-	var slotEx = (ship.slotExNo != 0) ? slotEx = "◎" : slotEx = "×";
+	var slotEx = ship.hasSlotEx() ? "◎" : "×";
 	var onSlot = ship.onSlot;
 	var maxEq = ship.shipInfo.maxeq;
 	var slotNum = ship.slotNum;

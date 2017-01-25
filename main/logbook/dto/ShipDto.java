@@ -6,13 +6,13 @@ import java.util.Map;
 
 import javax.json.JsonObject;
 
-import com.dyuproject.protostuff.Tag;
-
 import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.internal.CondTiming;
 import logbook.util.JsonUtils;
+
+import com.dyuproject.protostuff.Tag;
 
 /**
  * 艦娘を表します
@@ -104,9 +104,6 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     @Tag(40)
     private final String json;
 
-    @Tag(41)
-    private int slotExNo;
-
     /**
      * コンストラクター
      * 
@@ -142,9 +139,8 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
         if (object.containsKey("api_slot_ex")) {
             _slotEx = object.getInt("api_slot_ex");
         }
-        this.slotExNo = object.getInt("api_slot_ex");
-        this.slotEx = (_slotEx > 0) ? _slotEx : -1;
-        this.slotExItem = GlobalContext.getItem(this.slotEx);
+        this.slotEx = _slotEx;
+        this.slotExItem = GlobalContext.getItem(this.getSlotEx());
 
         this.json = object.toString();
     }
@@ -594,19 +590,19 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     }
 
     /**
+     * 補助装備の穴を開けているか
+     * @return
+     */
+    public boolean hasSlotEx() {
+        return this.slotEx != 0;
+    }
+
+    /**
      * 補助装備ID
      * @return
      */
     public int getSlotEx() {
-        return this.slotEx;
-    }
-
-    /**
-     * 補助装備ID2
-     * @return
-     */
-    public int getSlotExNo() {
-        return this.slotExNo;
+        return this.slotEx > 0 ? this.slotEx : -1;
     }
 
     /**
