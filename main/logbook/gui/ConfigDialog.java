@@ -237,7 +237,15 @@ public final class ConfigDialog extends Dialog {
         proxyPortSpinner.setMinimum(1);
         proxyPortSpinner.setSelection(AppConfig.get().getProxyPort());
         GridData gdProxyPortSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdProxyPortSpinner.widthHint = SwtUtils.DPIAwareWidth(55);
+        if (logbook.data.context.GlobalContext.GTK3)
+        {
+            gdProxyPortSpinner.widthHint = SwtUtils.DPIAwareWidth(110);
+            gdProxyPortSpinner.heightHint = SwtUtils.DPIAwareHeight(36);
+        }
+        else
+        {
+            gdProxyPortSpinner.widthHint = SwtUtils.DPIAwareWidth(55);
+        }
         proxyPortSpinner.setLayoutData(gdProxyPortSpinner);
 
         final Button sendDatabaseButton = new Button(compositeConnection, SWT.CHECK);
@@ -380,7 +388,15 @@ public final class ConfigDialog extends Dialog {
         materialintervalSpinner.setMinimum(10);
         materialintervalSpinner.setSelection(AppConfig.get().getMaterialLogInterval());
         GridData gdMaterialIntervalSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdMaterialIntervalSpinner.widthHint = SwtUtils.DPIAwareWidth(55);
+        if (logbook.data.context.GlobalContext.GTK3)
+        {
+            gdMaterialIntervalSpinner.widthHint = SwtUtils.DPIAwareWidth(110);
+            gdMaterialIntervalSpinner.heightHint = SwtUtils.DPIAwareHeight(36);
+        }
+        else
+        {
+            gdMaterialIntervalSpinner.widthHint = SwtUtils.DPIAwareWidth(55);
+        }
         materialintervalSpinner.setLayoutData(gdMaterialIntervalSpinner);
         new Label(compositeReport, SWT.NONE);
 
@@ -596,7 +612,15 @@ public final class ConfigDialog extends Dialog {
         condSpinner.setMinimum(0);
         condSpinner.setSelection(AppConfig.get().getOkCond());
         GridData gdCondSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdCondSpinner.widthHint = SwtUtils.DPIAwareWidth(55);
+        if (logbook.data.context.GlobalContext.GTK3)
+        {
+            gdCondSpinner.widthHint = SwtUtils.DPIAwareWidth(110);
+            gdCondSpinner.heightHint = SwtUtils.DPIAwareHeight(36);
+        }
+        else
+        {
+            gdCondSpinner.widthHint = SwtUtils.DPIAwareWidth(55);
+        }
         condSpinner.setLayoutData(gdCondSpinner);
         new Label(compositeNotify, SWT.NONE);
 
@@ -629,7 +653,16 @@ public final class ConfigDialog extends Dialog {
         intervalSpinner.setMinimum(10);
         intervalSpinner.setSelection(AppConfig.get().getRemindInterbal());
         GridData gdIntervalSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdIntervalSpinner.widthHint = SwtUtils.DPIAwareWidth(55);
+        if (logbook.data.context.GlobalContext.GTK3)
+        {
+            gdIntervalSpinner.widthHint = SwtUtils.DPIAwareWidth(110);
+            gdIntervalSpinner.heightHint = SwtUtils.DPIAwareHeight(36);
+        }
+        else
+        {
+            gdIntervalSpinner.widthHint = SwtUtils.DPIAwareWidth(55);
+        }
+
         intervalSpinner.setLayoutData(gdIntervalSpinner);
 
         new Label(compositeNotify, SWT.NONE);
@@ -648,7 +681,15 @@ public final class ConfigDialog extends Dialog {
         fullySpinner.setMinimum(0);
         fullySpinner.setSelection(AppConfig.get().getNotifyFully());
         GridData gdFullySpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdFullySpinner.widthHint = SwtUtils.DPIAwareWidth(55);
+        if (logbook.data.context.GlobalContext.GTK3)
+        {
+            gdFullySpinner.widthHint = SwtUtils.DPIAwareWidth(110);
+            gdFullySpinner.heightHint = SwtUtils.DPIAwareHeight(36);
+        }
+        else
+        {
+            gdFullySpinner.widthHint = SwtUtils.DPIAwareWidth(55);
+        }
         fullySpinner.setLayoutData(gdFullySpinner);
 
         Label fullyLabel2 = new Label(compositeNotify, SWT.NONE);
@@ -792,7 +833,15 @@ public final class ConfigDialog extends Dialog {
         opaqueIntervalSpinner.setMinimum(0);
         opaqueIntervalSpinner.setSelection(AppConfig.get().getOpaqueInterval());
         GridData gdopaqueIntervalSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdopaqueIntervalSpinner.widthHint = SwtUtils.DPIAwareWidth(65);
+        if (logbook.data.context.GlobalContext.GTK3)
+        {
+            gdopaqueIntervalSpinner.widthHint = SwtUtils.DPIAwareWidth(130);
+            gdopaqueIntervalSpinner.heightHint = SwtUtils.DPIAwareHeight(36);
+        }
+        else
+        {
+            gdopaqueIntervalSpinner.widthHint = SwtUtils.DPIAwareWidth(65);
+        }
         opaqueIntervalSpinner.setLayoutData(gdopaqueIntervalSpinner);
 
         Label opaqueIntervalSuffix = new Label(opaqueIntervalGroup, SWT.NONE);

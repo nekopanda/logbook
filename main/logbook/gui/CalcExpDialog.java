@@ -131,7 +131,15 @@ public final class CalcExpDialog extends WindowBase {
         label1.setText("今のレベル");
         this.beforelv = new Spinner(plan, SWT.BORDER);
         GridData gdBeforelv = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdBeforelv.widthHint = SwtUtils.DPIAwareWidth(45);
+        if (logbook.data.context.GlobalContext.GTK3)
+        {
+            gdBeforelv.widthHint = SwtUtils.DPIAwareWidth(110);
+            gdBeforelv.heightHint = SwtUtils.DPIAwareHeight(36);
+        }
+        else
+        {
+            gdBeforelv.widthHint = SwtUtils.DPIAwareWidth(45);
+        }
         this.beforelv.setLayoutData(gdBeforelv);
         this.beforelv.setMaximum(ExpTable.MAX_LEVEL);
         this.beforelv.setMinimum(1);
@@ -149,7 +157,15 @@ public final class CalcExpDialog extends WindowBase {
         label4.setText("目標レベル");
         this.afterlv = new Spinner(plan, SWT.BORDER);
         GridData gdAfterlv = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdAfterlv.widthHint = SwtUtils.DPIAwareWidth(45);
+        if (logbook.data.context.GlobalContext.GTK3)
+        {
+            gdAfterlv.widthHint = SwtUtils.DPIAwareWidth(110);
+            gdAfterlv.heightHint = SwtUtils.DPIAwareHeight(36);
+        }
+        else
+        {
+            gdAfterlv.widthHint = SwtUtils.DPIAwareWidth(45);
+        }
         this.afterlv.setLayoutData(gdAfterlv);
         this.afterlv.setMaximum(ExpTable.MAX_LEVEL);
         this.afterlv.setMinimum(1);

@@ -101,7 +101,15 @@ public final class CalcPracticeExpDialog extends WindowBase {
         this.shipNameLabels[0].setLayoutData(gdFirstShipName);
         this.firstShipLevel = new Spinner(practiceinfo, SWT.BORDER);
         GridData gdFirstShipLevel = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdFirstShipLevel.widthHint = SwtUtils.DPIAwareWidth(45);
+        if (logbook.data.context.GlobalContext.GTK3)
+        {
+            gdFirstShipLevel.widthHint = SwtUtils.DPIAwareWidth(110);
+            gdFirstShipLevel.heightHint = SwtUtils.DPIAwareHeight(36);
+        }
+        else
+        {
+            gdFirstShipLevel.widthHint = SwtUtils.DPIAwareWidth(45);
+        }
         this.firstShipLevel.setLayoutData(gdFirstShipLevel);
         this.firstShipLevel.setMaximum(ExpTable.MAX_LEVEL);
         this.firstShipLevel.setMinimum(1);
@@ -115,7 +123,15 @@ public final class CalcPracticeExpDialog extends WindowBase {
         this.shipNameLabels[1].setLayoutData(gdSecondShipName);
         this.secondShipLevel = new Spinner(practiceinfo, SWT.BORDER);
         GridData gdsecondShipLevel = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdsecondShipLevel.widthHint = SwtUtils.DPIAwareWidth(45);
+        if (logbook.data.context.GlobalContext.GTK3)
+        {
+            gdsecondShipLevel.widthHint = SwtUtils.DPIAwareWidth(110);
+            gdsecondShipLevel.heightHint = SwtUtils.DPIAwareHeight(36);
+        }
+        else
+        {
+            gdsecondShipLevel.widthHint = SwtUtils.DPIAwareWidth(45);
+        }
         this.secondShipLevel.setLayoutData(gdsecondShipLevel);
         this.secondShipLevel.setMaximum(ExpTable.MAX_LEVEL);
         this.secondShipLevel.setMinimum(1);
