@@ -201,6 +201,22 @@ public final class GlobalContext {
         INIT_COMPLETE = true;
     }
 
+    // Linux において gtk3 packageの有無により動作を変えるための設定。
+    // OSの環境変数 GTK3PKG は logbook.sh 起動前に手動で設定しておくこと。
+    // gtk3 packageが存在する場合の設定例. # export GTK3PKG=true
+    public static final boolean GTK3;
+    static {
+        String VAR_NAME = System.getenv("GTK3PKG");
+        if (VAR_NAME.equals("true"))
+        {
+            GTK3 = true;
+        }
+        else
+        {
+            GTK3 = false;
+        }
+    }
+
     private static enum MATERIAL_DIFF {
         NEW_VALUE, OBTAINED, CONSUMED, NONE;
     }
