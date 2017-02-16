@@ -829,16 +829,21 @@ public class BattleHtmlGenerator extends HTMLGenerator {
     }
 
     /**
-     * １回目の砲撃の後、雷撃を行う戦闘か？
-     * 空母機動部隊の昼戦、および、敵連合艦隊戦の昼戦
-     * および、連合艦隊(機動部隊)の昼戦、および、連合艦隊(水上部隊)の昼戦の場合
+     * 何回目の砲撃の後で雷撃を行うか。最後に行う場合は-1が返る
      * @param kind
      * @return
      */
-    private static boolean isCombinedMidRaigekiBattle(BattlePhaseKind kind) {
-        return (kind == BattlePhaseKind.COMBINED_BATTLE) || (kind == BattlePhaseKind.COMBINED_EC_BATTLE)
-                || (kind == BattlePhaseKind.COMBINED_EACH_BATTLE)
-                || (kind == BattlePhaseKind.COMBINED_EACH_BATTLE_WATER);
+    private static int getRaigekiOrder(BattlePhaseKind kind)
+    {
+        switch (kind) {
+        case COMBINED_BATTLE:
+        case COMBINED_EC_BATTLE:
+            return 1;
+        case COMBINED_EACH_BATTLE:
+            return 2;
+        default:
+            return -1;
+        }
     }
 
     /**
@@ -960,21 +965,24 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         }
 
         // 砲撃+雷撃
+        int raigekiOrder = getRaigekiOrder(phase.getKind());
+        boolean doneRaigeki = false;
+
         for (int i = 0; i < hougekiList.size(); ++i) {
+
+            if (i == raigekiOrder) {
+                this.genRaigekiBattle(phase.getRaigeki(), "雷撃戦",
+                        friendShips, enemyShips, friendHp, enemyHp);
+                doneRaigeki = true;
+            }
+
             this.inline("h3", "砲撃(" + (i + 1) + "/" + hougekiList.size() + ")", null);
             this.begin("table", null);
             this.genHougekiTableContent(hougekiList.get(i), friendShips, enemyShips, friendHp, enemyHp);
             this.end(); // table
-
-            if ((i == 0) && isCombinedMidRaigekiBattle(phase.getKind())) {
-                // 空母機動部隊の昼戦の場合はここで雷撃
-                this.genRaigekiBattle(phase.getRaigeki(), "雷撃戦",
-                        friendShips, enemyShips, friendHp, enemyHp);
-            }
         }
 
-        // 空母機動部隊の昼戦以外の雷撃
-        if (isCombinedMidRaigekiBattle(phase.getKind()) == false) {
+        if (doneRaigeki == false) {
             this.genRaigekiBattle(phase.getRaigeki(), "雷撃戦",
                     friendShips, enemyShips, friendHp, enemyHp);
         }
