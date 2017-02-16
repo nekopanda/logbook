@@ -130,9 +130,8 @@ public final class CalcExpDialog extends WindowBase {
         Label label1 = new Label(plan, SWT.NONE);
         label1.setText("今のレベル");
         this.beforelv = new Spinner(plan, SWT.BORDER);
-        GridData gdBeforelv = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdBeforelv.widthHint = SwtUtils.DPIAwareWidth(45);
-        this.beforelv.setLayoutData(gdBeforelv);
+        this.beforelv.setLayoutData(SwtUtils.initSpinner(45,
+                new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1)));
         this.beforelv.setMaximum(ExpTable.MAX_LEVEL);
         this.beforelv.setMinimum(1);
         Label label2 = new Label(plan, SWT.NONE);
@@ -148,9 +147,8 @@ public final class CalcExpDialog extends WindowBase {
         Label label4 = new Label(plan, SWT.NONE);
         label4.setText("目標レベル");
         this.afterlv = new Spinner(plan, SWT.BORDER);
-        GridData gdAfterlv = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdAfterlv.widthHint = SwtUtils.DPIAwareWidth(45);
-        this.afterlv.setLayoutData(gdAfterlv);
+        this.afterlv.setLayoutData(SwtUtils.initSpinner(45,
+                new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1)));
         this.afterlv.setMaximum(ExpTable.MAX_LEVEL);
         this.afterlv.setMinimum(1);
         Label label5 = new Label(plan, SWT.NONE);

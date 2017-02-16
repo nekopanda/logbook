@@ -100,9 +100,8 @@ public final class CalcPracticeExpDialog extends WindowBase {
         gdFirstShipName.widthHint = SwtUtils.DPIAwareWidth(60);
         this.shipNameLabels[0].setLayoutData(gdFirstShipName);
         this.firstShipLevel = new Spinner(practiceinfo, SWT.BORDER);
-        GridData gdFirstShipLevel = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdFirstShipLevel.widthHint = SwtUtils.DPIAwareWidth(45);
-        this.firstShipLevel.setLayoutData(gdFirstShipLevel);
+        this.firstShipLevel.setLayoutData(SwtUtils.initSpinner(45,
+                new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1)));
         this.firstShipLevel.setMaximum(ExpTable.MAX_LEVEL);
         this.firstShipLevel.setMinimum(1);
         this.firstShipLevel.setSelection(this.levels[0]);
@@ -114,9 +113,8 @@ public final class CalcPracticeExpDialog extends WindowBase {
         gdSecondShipName.widthHint = SwtUtils.DPIAwareWidth(60);
         this.shipNameLabels[1].setLayoutData(gdSecondShipName);
         this.secondShipLevel = new Spinner(practiceinfo, SWT.BORDER);
-        GridData gdsecondShipLevel = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdsecondShipLevel.widthHint = SwtUtils.DPIAwareWidth(45);
-        this.secondShipLevel.setLayoutData(gdsecondShipLevel);
+        this.secondShipLevel.setLayoutData(SwtUtils.initSpinner(45,
+                new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1)));
         this.secondShipLevel.setMaximum(ExpTable.MAX_LEVEL);
         this.secondShipLevel.setMinimum(1);
         this.secondShipLevel.setSelection(this.levels[1]);

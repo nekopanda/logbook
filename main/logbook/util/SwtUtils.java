@@ -147,6 +147,7 @@ public final class SwtUtils {
     private static int defaultFontStyle = 0;
     private static int defaultLineHeight = 0;
     private static Point DPI = Display.getDefault().getDPI();
+    private static boolean isGTK = "gtk".equals(SWT.getPlatform());
 
     /**
      * DPIを考慮したサイズを返す
@@ -221,6 +222,19 @@ public final class SwtUtils {
         return gd;
     }
 
+    public static GridData initSpinner(int width, GridData gd)
+    {
+        if (isGTK) {
+            // GTK3は表示が違うので大きくする
+            gd.widthHint = DPIAwareWidth(64 + width);
+            gd.heightHint = DPIAwareHeight(36);
+        }
+        else {
+            gd.widthHint = DPIAwareWidth(width);
+        }
+        return gd;
+    }
+
     public static Image makeImage(File file) throws IOException {
         InputStream stream = new FileInputStream(file);
         try {
@@ -288,7 +302,8 @@ public final class SwtUtils {
                     if ((selection.length > 0) && listener.canDragSource(selection[0])) {
                         event.doit = true;
                         dragSourceItem[0] = selection[0];
-                    } else {
+                    }
+                    else {
                         event.doit = false;
                     }
                 }
@@ -329,7 +344,8 @@ public final class SwtUtils {
                             Rectangle bounds = item.getBounds();
                             if (pt.y < (bounds.y + (bounds.height / 2))) {
                                 event.feedback |= DND.FEEDBACK_INSERT_BEFORE;
-                            } else {
+                            }
+                            else {
                                 event.feedback |= DND.FEEDBACK_INSERT_AFTER;
                             }
                         }
@@ -353,7 +369,8 @@ public final class SwtUtils {
                                 }
                             }
                             if (pt.y < (bounds.y + (bounds.height / 2))) {
-                            } else {
+                            }
+                            else {
                                 index++;
                             }
                         }

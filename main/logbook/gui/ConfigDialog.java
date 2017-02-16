@@ -236,9 +236,8 @@ public final class ConfigDialog extends Dialog {
         proxyPortSpinner.setMaximum(65535);
         proxyPortSpinner.setMinimum(1);
         proxyPortSpinner.setSelection(AppConfig.get().getProxyPort());
-        GridData gdProxyPortSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdProxyPortSpinner.widthHint = SwtUtils.DPIAwareWidth(55);
-        proxyPortSpinner.setLayoutData(gdProxyPortSpinner);
+        proxyPortSpinner.setLayoutData(SwtUtils.initSpinner(55,
+                new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1)));
 
         final Button sendDatabaseButton = new Button(compositeConnection, SWT.CHECK);
         sendDatabaseButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
@@ -379,9 +378,8 @@ public final class ConfigDialog extends Dialog {
         materialintervalSpinner.setMaximum(60 * 60 * 24);
         materialintervalSpinner.setMinimum(10);
         materialintervalSpinner.setSelection(AppConfig.get().getMaterialLogInterval());
-        GridData gdMaterialIntervalSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdMaterialIntervalSpinner.widthHint = SwtUtils.DPIAwareWidth(55);
-        materialintervalSpinner.setLayoutData(gdMaterialIntervalSpinner);
+        materialintervalSpinner.setLayoutData(SwtUtils.initSpinner(55,
+                new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1)));
         new Label(compositeReport, SWT.NONE);
 
         final Button detailMaterial = new Button(compositeReport, SWT.CHECK);
@@ -595,9 +593,8 @@ public final class ConfigDialog extends Dialog {
         condSpinner.setMaximum(49);
         condSpinner.setMinimum(0);
         condSpinner.setSelection(AppConfig.get().getOkCond());
-        GridData gdCondSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdCondSpinner.widthHint = SwtUtils.DPIAwareWidth(55);
-        condSpinner.setLayoutData(gdCondSpinner);
+        condSpinner.setLayoutData(SwtUtils.initSpinner(55,
+                new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1)));
         new Label(compositeNotify, SWT.NONE);
 
         final Button condOnlyMain = new Button(compositeNotify, SWT.CHECK);
@@ -628,9 +625,8 @@ public final class ConfigDialog extends Dialog {
         intervalSpinner.setMaximum(60 * 60);
         intervalSpinner.setMinimum(10);
         intervalSpinner.setSelection(AppConfig.get().getRemindInterbal());
-        GridData gdIntervalSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdIntervalSpinner.widthHint = SwtUtils.DPIAwareWidth(55);
-        intervalSpinner.setLayoutData(gdIntervalSpinner);
+        intervalSpinner.setLayoutData(SwtUtils.initSpinner(55,
+                new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1)));
 
         new Label(compositeNotify, SWT.NONE);
 
@@ -647,9 +643,8 @@ public final class ConfigDialog extends Dialog {
         fullySpinner.setMaximum(Math.max(100, GlobalContext.maxChara()));
         fullySpinner.setMinimum(0);
         fullySpinner.setSelection(AppConfig.get().getNotifyFully());
-        GridData gdFullySpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdFullySpinner.widthHint = SwtUtils.DPIAwareWidth(55);
-        fullySpinner.setLayoutData(gdFullySpinner);
+        fullySpinner.setLayoutData(SwtUtils.initSpinner(55,
+                new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1)));
 
         Label fullyLabel2 = new Label(compositeNotify, SWT.NONE);
         fullyLabel2.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
@@ -791,9 +786,8 @@ public final class ConfigDialog extends Dialog {
         opaqueIntervalSpinner.setMaximum(60 * 60 * 10);
         opaqueIntervalSpinner.setMinimum(0);
         opaqueIntervalSpinner.setSelection(AppConfig.get().getOpaqueInterval());
-        GridData gdopaqueIntervalSpinner = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdopaqueIntervalSpinner.widthHint = SwtUtils.DPIAwareWidth(65);
-        opaqueIntervalSpinner.setLayoutData(gdopaqueIntervalSpinner);
+        opaqueIntervalSpinner.setLayoutData(SwtUtils.initSpinner(65,
+                new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1)));
 
         Label opaqueIntervalSuffix = new Label(opaqueIntervalGroup, SWT.NONE);
         opaqueIntervalSuffix.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
