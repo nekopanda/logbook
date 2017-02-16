@@ -24,7 +24,7 @@ public class AppConstants {
     public static final String SUFFIX = "拡張版";
 
     /** バージョン */
-    public static final String VERSION = "2.3.3";
+    public static final String VERSION = "2.3.4";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://nekopanda.blog.jp/");
