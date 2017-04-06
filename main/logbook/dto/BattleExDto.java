@@ -5,8 +5,10 @@ package logbook.dto;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.stream.IntStream;
 
 import javax.json.JsonArray;
@@ -186,6 +188,15 @@ public class BattleExDto extends AbstractDto {
     /** 連合艦隊の種類 */
     @Tag(52)
     private int combinedKind = 0;
+
+    private static Date date20170405;
+
+    static {
+        // 敵艦IDが+1000された日時
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Tokyo"));
+        calendar.set(2017, 3, 5, 15, 0);
+        date20170405 = calendar.getTime();
+    }
 
     /////////////////////////////////////////////////
 
@@ -1054,8 +1065,9 @@ public class BattleExDto extends AbstractDto {
             this.enemy.clear();
             this.enemyCombined.clear();
             this.phaseList.clear();
+            boolean emulateOld = this.battleDate.before(date20170405);
             for (Phase phase : phaseCopy) {
-                this.addPhase(phase.getJson(), phase.getKind());
+                this.addPhase(phase.getJson(), phase.getKind(), emulateOld);
             }
             this.readResultJson(JsonUtils.fromString(this.resultJson));
         }
@@ -1067,6 +1079,14 @@ public class BattleExDto extends AbstractDto {
                 this.dropName = "";
                 this.dropType = "";
             }
+
+            // 敵艦ID+1000前のエミュレーションをON
+            for (ShipBaseDto eship : this.enemy) {
+                eship.getShipInfo().setBefore20170405(true);
+            }
+            for (ShipBaseDto eship : this.enemyCombined) {
+                eship.getShipInfo().setBefore20170405(true);
+            }
         }
     }
 
@@ -1076,7 +1096,7 @@ public class BattleExDto extends AbstractDto {
      * @param kind 戦闘の種別
      * @return 作成されたPhaseオブジェクト
      */
-    public Phase addPhase(JsonObject object, BattlePhaseKind kind) {
+    public Phase addPhase(JsonObject object, BattlePhaseKind kind, boolean before20170405) {
         if (this.phaseList.size() == 0) {
             // 最初のフェーズ
             String dockId;
@@ -1128,6 +1148,9 @@ public class BattleExDto extends AbstractDto {
             for (int i = 1; i < shipKe.size(); i++) {
                 int id = shipKe.getInt(i);
                 if (id != -1) {
+                    if (before20170405) {
+                        id += 1000;
+                    }
                     int[] slot = JsonUtils.toIntArray(eSlots.getJsonArray(i - 1));
                     int[] param = JsonUtils.toIntArray(eParams.getJsonArray(i - 1));
                     this.enemy.add(new EnemyShipDto(id, slot, param, eLevel.getInt(i)));
@@ -1141,6 +1164,9 @@ public class BattleExDto extends AbstractDto {
                 for (int i = 1; i < shipKeCombined.size(); i++) {
                     int id = shipKeCombined.getInt(i);
                     if (id != -1) {
+                        if (before20170405) {
+                            id += 1000;
+                        }
                         int[] slot = JsonUtils.toIntArray(eSlotsCombined.getJsonArray(i - 1));
                         int[] param = JsonUtils.toIntArray(eParamsCombined.getJsonArray(i - 1));
                         this.enemyCombined.add(new EnemyShipDto(id, slot, param, eLevelCombined.getInt(i)));

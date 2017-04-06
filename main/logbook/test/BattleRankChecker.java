@@ -163,7 +163,7 @@ public class BattleRankChecker {
                         if (resultCount == 10540) {
                             System.out.println("!!!");
                         }
-                        battle.addPhase(data, kind);
+                        battle.addPhase(data, kind, true);
                     }
                     else if (battle != null) {
                         battle.setResult(data, null);

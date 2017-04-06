@@ -1251,7 +1251,7 @@ public final class GlobalContext {
                     battle.setBasicInfo(maxChara - shipMap.size(), maxSlotitem - itemMap.size());
                     battle.setCombinedKind(combinedKind);
                 }
-                BattleExDto.Phase phase = battle.addPhase(apidata, phaseKind);
+                BattleExDto.Phase phase = battle.addPhase(apidata, phaseKind, false);
 
                 if (battle.getDock() == null) { // 情報が不足しているので処理しない
                     battle = null;

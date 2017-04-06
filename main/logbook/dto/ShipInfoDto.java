@@ -89,6 +89,8 @@ public final class ShipInfoDto extends AbstractDto {
     // 探索用
     private transient Object data = null;
 
+    private transient boolean before20170405;
+
     /**
      * コンストラクター
      */
@@ -224,7 +226,7 @@ public final class ShipInfoDto extends AbstractDto {
      * @return beforeshpids
      */
     public int[] getBeforeshpids() {
-        return beforeshpids;
+        return this.beforeshpids;
     }
 
     /**
@@ -434,7 +436,9 @@ public final class ShipInfoDto extends AbstractDto {
      * @return
      */
     public boolean isEnemy() {
-        return this.shipId > 500;
+        if (this.before20170405)
+            return this.shipId > 500;
+        return this.shipId > 1500;
     }
 
     /**
@@ -449,5 +453,19 @@ public final class ShipInfoDto extends AbstractDto {
      */
     public void setData(Object data) {
         this.data = data;
+    }
+
+    /**
+     * @return before20170405
+     */
+    public boolean isBefore20170405() {
+        return before20170405;
+    }
+
+    /**
+     * @param before20170405 セットする before20170405
+     */
+    public void setBefore20170405(boolean before20170405) {
+        this.before20170405 = before20170405;
     }
 }
