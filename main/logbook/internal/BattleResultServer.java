@@ -235,13 +235,21 @@ public class BattleResultServer {
         try {
             while (input.available() > 0) {
                 BattleExDto battle = schema.newMessage();
-                ProtostuffIOUtil.mergeDelimitedFrom(input, battle, schema, buffer);
                 try {
+                    ProtostuffIOUtil.mergeDelimitedFrom(input, battle, schema, buffer);
                     battle.readFromJson();
                     result.add(battle);
                 } catch (Exception e) {
                     this.failCount++;
-                    LOG.get().warn("戦闘ログの読み込みに失敗しました(" + new DateTimeString(battle.getBattleDate()) + ")", e);
+                    if (this.failCount <= 1) {
+                        Date battleDate = battle.getBattleDate();
+                        if (battleDate != null) {
+                            LOG.get().warn("戦闘ログの読み込みに失敗しました(" + new DateTimeString(battle.getBattleDate()) + ")", e);
+                        }
+                        else {
+                            LOG.get().warn("戦闘ログの読み込みに失敗しました", e);
+                        }
+                    }
                 }
             }
         } catch (EOFException e) {
