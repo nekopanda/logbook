@@ -418,7 +418,7 @@ public class AppConstants {
     /** 艦種に関する表示情報 */
     public static final Map<Integer, String> SHIP_TYPE_INFO = new TreeMap<Integer, String>() {
         {
-            this.put(1, "#"); // "#"は非表示
+            // this.put(1, "#"); // "#"は非表示
             this.put(8, "巡洋戦艦");
             this.put(12, "#");
             this.put(15, "#");
