@@ -54,6 +54,10 @@ public class ItemType {
             this.put(38, "局地戦闘機");
             this.put(39, "噴式戦闘爆撃機");
             this.put(40, "噴式戦闘爆撃機");
+            this.put(41, "輸送機材");
+            this.put(42, "潜水艦装備");
+            this.put(43, "水上戦闘機");
+            this.put(44, "陸軍戦闘機");
         }
     };
 
