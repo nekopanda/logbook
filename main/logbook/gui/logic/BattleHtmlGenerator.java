@@ -877,6 +877,13 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                     friendShips, enemyShips, friendHp, enemyHp);
         }
 
+        // 航空戦(噴式)
+        AirBattleDto airInjection = phase.getAirInjection();
+        if (airInjection != null) {
+            this.genAirBattle(airInjection, "噴式強襲航空戦",
+                    friendShips, enemyShips, friendHp, enemyHp);
+        }
+
         // 基地航空隊
         List<AirBattleDto> airBaseList = phase.getAirBase();
         if (airBaseList != null) {
@@ -885,13 +892,6 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                 this.genAirBattle(attack, "基地航空隊攻撃(" + (i + 1) + "/" + airBaseList.size() + ")",
                         friendShips, enemyShips, friendHp, enemyHp);
             }
-        }
-
-        // 航空戦(噴式)
-        AirBattleDto airInjection = phase.getAirInjection();
-        if (airInjection != null) {
-            this.genAirBattle(airInjection, "噴式強襲航空戦",
-                    friendShips, enemyShips, friendHp, enemyHp);
         }
 
         // 航空戦 → 支援艦隊による攻撃 →　開幕対潜 → 開幕 → 航空戦２回目
