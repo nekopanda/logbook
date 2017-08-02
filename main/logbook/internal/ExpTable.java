@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class ExpTable {
 
-    public static final int MAX_LEVEL = 155;
+    public static final int MAX_LEVEL = 165;
 
     /**
      * 経験値テーブルプリセット値
