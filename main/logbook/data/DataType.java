@@ -89,6 +89,8 @@ public enum DataType {
     POWERUP("/kcsapi/api_req_kaisou/powerup"),
     /** 装備位置交換 */
     SLOT_EXCHANGE_INDEX("/kcsapi/api_req_kaisou/slot_exchange_index"),
+    /** 装備譲渡 */
+    SLOT_DEPRIVE("/kcsapi/api_req_kaisou/slot_deprive"),
     /** 艦娘のロック操作 */
     LOCK_SHIP("/kcsapi/api_req_hensei/lock"),
     /** 装備ロック操作 */
