@@ -192,6 +192,9 @@ public class AppConstants {
     /** 文字コード(Shift_JIS) */
     public static final Charset CHARSET = Charset.forName("MS932");
 
+    /** 報告書出力用文字コード(UTF-8) */
+    public static final Charset OUTPUT_REPORT_CHARSET = Charset.forName("UTF-8");
+
     /** アプリケーション設定ファイル  */
     public static final File APP_CONFIG_FILE = new File("./config/internal.xml");
 
