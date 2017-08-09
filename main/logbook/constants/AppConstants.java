@@ -181,6 +181,7 @@ public class AppConstants {
 
     /** 補強増設に装備できるアイテムのタイプID */
     public static final int[] EXSLOT_ITEM_TYPES = new int[] {
+            4,  // 高角砲
             21, // 機銃
             23, // ダメコン
             27, // バルジ
