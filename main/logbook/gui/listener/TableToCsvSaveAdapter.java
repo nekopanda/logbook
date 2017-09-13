@@ -2,6 +2,7 @@ package logbook.gui.listener;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,7 +76,7 @@ public final class TableToCsvSaveAdapter extends SelectionAdapter {
                     body.add(colums);
                 }
 
-                CreateReportLogic.writeCsv(file, this.header, body, false);
+                CreateReportLogic.writeCsv(file, this.header, body, false, Charset.forName("UTF-8"));
             } catch (IOException e) {
                 MessageBox messageBox = new MessageBox(this.shell, SWT.ICON_ERROR);
                 messageBox.setText("書き込めませんでした");
