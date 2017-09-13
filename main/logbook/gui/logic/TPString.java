@@ -117,6 +117,8 @@ public class TPString implements Comparable<TPString> {
             return 8;
         case 166: // 大発動艇(八九式中戦車＆陸戦隊)
             return 8;
+        case 230: // 特大発動艇+戦車第11連隊
+            return 8;
         case 167: // 特二式内火艇
             return 2;
         case 145: // 戦闘糧食

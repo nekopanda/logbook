@@ -830,6 +830,14 @@ public class BattleExDto extends AbstractDto {
         }
 
         /**
+         * 処理対象の艦隊は連合艦隊の第二艦隊か？
+         * @return isFriendSecond
+         */
+        public boolean getisFriendSecond() {
+            return this.isFriendSecond;
+        }
+
+        /**
          * この戦闘フェーズ後の味方艦HP（連合艦隊の時は第一艦隊）
          * @return nowFriendHp
          */

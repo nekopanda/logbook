@@ -181,6 +181,7 @@ public class AppConstants {
 
     /** 補強増設に装備できるアイテムのタイプID */
     public static final int[] EXSLOT_ITEM_TYPES = new int[] {
+            4,  // 高角砲
             21, // 機銃
             23, // ダメコン
             27, // バルジ
@@ -191,6 +192,9 @@ public class AppConstants {
 
     /** 文字コード(Shift_JIS) */
     public static final Charset CHARSET = Charset.forName("MS932");
+
+    /** 報告書出力用文字コード(UTF-8) */
+    public static final Charset OUTPUT_REPORT_CHARSET = Charset.forName("UTF-8");
 
     /** アプリケーション設定ファイル  */
     public static final File APP_CONFIG_FILE = new File("./config/internal.xml");
