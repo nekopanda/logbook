@@ -124,7 +124,7 @@ public final class ShipInfoDto extends AbstractDto {
         this.stype = object.getJsonNumber("api_stype").intValue();
         this.slotNum = object.getInt("api_slot_num");
 
-        if (!this.isEnemy()) {
+        if (this.isKanmusu()) {
             this.maxBull = object.getJsonNumber("api_bull_max").intValue();
             this.maxFuel = object.getJsonNumber("api_fuel_max").intValue();
         }
@@ -442,6 +442,16 @@ public final class ShipInfoDto extends AbstractDto {
     }
 
     /**
+     * id=788以降に敵と同じデータ形式の艦娘がいるため追加
+     * @return 通常の艦娘データかどうか
+     */
+    public boolean isKanmusu() {
+        if (this.before20170405)
+            return !this.isEnemy();
+        return this.shipId < 760;
+    }
+
+    /**
      * @return data
      */
     public Object getData() {
@@ -459,7 +469,7 @@ public final class ShipInfoDto extends AbstractDto {
      * @return before20170405
      */
     public boolean isBefore20170405() {
-        return before20170405;
+        return this.before20170405;
     }
 
     /**
