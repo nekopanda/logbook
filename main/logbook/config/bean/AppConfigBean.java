@@ -93,6 +93,15 @@ public final class AppConfigBean {
     /** ImKayac による Push 通知 Password */
     private String ImKayacPrivateKey = "";
 
+    /** Pushover による Push 通知設定 */
+    private boolean NotifyPushover = false;
+
+    /** Pushover による Push 通知 UserKey */
+    private String PushoverUserKey = "";
+
+    /** Pushover による Push 通知 Apitoken */
+    private String PushoverApitoken = "";
+
     /** 遠征Push通知のPriority */
     private int PushPriorityMission = 0;
 
@@ -714,6 +723,48 @@ public final class AppConfigBean {
      */
     public void setImKayacPrivateKey(String privatekey) {
         this.ImKayacPrivateKey = privatekey;
+    }
+
+    /** Pushover による Push 通知の設定を取得します
+     * @return ImPushover による Push 通知の設定
+     */
+    public boolean getNotifyPushover() {
+        return this.NotifyPushover;
+    }
+
+    /** Pushover による Push 通知の UserKey を取得します
+     * @return UserKey
+     */
+    public String getPushoverUserKey() {
+        return this.PushoverUserKey;
+    }
+
+    /** Pushover による Push 通知の Apitoken を取得します
+     * @return Apitoken
+     */
+    public String getPushoverApitoken() {
+        return this.PushoverApitoken;
+    }
+
+    /** Pushover による Push 通知を設定します
+     * @param ImPushover による Push 通知
+     */
+    public void setNotifyPushover(boolean impocflg) {
+        this.NotifyPushover = impocflg;
+    }
+
+    /** Pushover による Push 通知の UserKey を設定します
+     * @param UserKey
+     */
+    public void setPushoverUserKey(String userkey) {
+        this.PushoverUserKey = userkey;
+    }
+
+    /** Pushover による Push 通知の Apitoken を設定します
+     * @param Apitoken
+     */
+    public void setPushoverApitoken(String apitoken) {
+        this.PushoverApitoken = apitoken;
     }
 
     /** 遠征帰投時にPush通知する を取得します
