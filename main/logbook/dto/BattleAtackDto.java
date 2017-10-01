@@ -427,6 +427,8 @@ public class BattleAtackDto {
             return "カットイン(主砲/徹甲)";
         case 6:
             return "カットイン(主砲/主砲)";
+        case 7:
+            return "カットイン(空母)";
         }
         return "不明(" + this.type + ")";
     }

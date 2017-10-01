@@ -83,7 +83,7 @@ public class DeckBuilder {
 
                         IntStream.range(0, ships.size()).forEach(shipIdx -> {
                             JsonObjectBuilder ship = Json.createObjectBuilder();
-                            ship.add("id", ships.get(shipIdx).getShipInfo().getShipId());
+                            ship.add("id", Integer.toString(ships.get(shipIdx).getShipInfo().getShipId()));
                             ship.add("lv", ships.get(shipIdx).getLv());
                             ship.add("luck", ships.get(shipIdx).getLucky());
                             JsonObjectBuilder items = Json.createObjectBuilder();
@@ -97,8 +97,13 @@ public class DeckBuilder {
                                     .forEach((itemIdx, itemDto) -> {
                                         JsonObjectBuilder item = Json.createObjectBuilder();
                                         item.add("id", item2.get(itemIdx).getSlotitemId());
-                                        item.add("rf", item2.get(itemIdx).getLevel());
-                                        item.add("mas", item2.get(itemIdx).getAlv());
+                                        if (item2.get(itemIdx).getLevel() > 0)
+                                        {
+                                            item.add("rf", Integer.toString(item2.get(itemIdx).getLevel()));
+                                        } else {
+                                            item.add("rf", 0);
+                                        }
+                                        item.add("mas", Integer.toString(item2.get(itemIdx).getAlv()));
                                         items.add("i" + (itemIdx + 1), item);
                                     });
 
@@ -145,7 +150,7 @@ public class DeckBuilder {
 
                         IntStream.range(0, ships.size()).forEach(shipIdx -> {
                             JsonObjectBuilder ship = Json.createObjectBuilder();
-                            ship.add("id", ships.get(shipIdx).getShipInfo().getShipId());
+                            ship.add("id", Integer.toString(ships.get(shipIdx).getShipInfo().getShipId()));
                             ship.add("lv", ships.get(shipIdx).getLv());
                             ship.add("luck", ships.get(shipIdx).getLucky());
                             JsonObjectBuilder items = Json.createObjectBuilder();
@@ -159,16 +164,26 @@ public class DeckBuilder {
                                     .forEach((itemIdx, itemDto) -> {
                                         JsonObjectBuilder item = Json.createObjectBuilder();
                                         item.add("id", item2.get(itemIdx).getSlotitemId());
-                                        item.add("rf", item2.get(itemIdx).getLevel());
-                                        item.add("mas", item2.get(itemIdx).getAlv());
+                                        if (item2.get(itemIdx).getLevel() > 0)
+                                        {
+                                            item.add("rf", Integer.toString(item2.get(itemIdx).getLevel()));
+                                        } else {
+                                            item.add("rf", 0);
+                                        }
+                                        item.add("mas", Integer.toString(item2.get(itemIdx).getAlv()));
                                         items.add("i" + (itemIdx + 1), item);
                                     });
 
                             Optional.ofNullable(ships.get(shipIdx).getSlotExItem()).ifPresent(slotExItem -> {
                                 JsonObjectBuilder item = Json.createObjectBuilder();
                                 item.add("id", slotExItem.getSlotitemId());
-                                item.add("rf", slotExItem.getLevel());
-                                item.add("mas", slotExItem.getAlv());
+                                if (slotExItem.getLevel() > 0)
+                                {
+                                    item.add("rf", Integer.toString(slotExItem.getLevel()));
+                                } else {
+                                    item.add("rf", 0);
+                                }                               
+                                item.add("mas", Integer.toString(slotExItem.getAlv()));
                                 if (slotNum < 4) {
                                     items.add("i" + (slotNum + 1), item);
                                 } else {

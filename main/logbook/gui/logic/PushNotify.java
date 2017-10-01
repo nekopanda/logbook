@@ -69,6 +69,10 @@ public final class PushNotify {
         if (AppConfig.get().getNotifyImKayac()) {
             pushImKayac(msg);
         }
+
+        if (AppConfig.get().getNotifyPushover()) {
+            pushPushover(msg);
+        }
     }
 
     /**
@@ -202,6 +206,49 @@ public final class PushNotify {
             }
         } catch (Exception e) {
             LOG.get().warn("ImKayac による Push 通知に失敗しました", e);
+        }
+
+    }
+
+    /**
+     * Pushoverによる通知
+     * 
+     * @param String 通知メッセージ
+     */
+    private static void pushPushover(String msg[]) {
+
+        StringBuilder postdata = new StringBuilder();
+        String result = null;
+
+        try {
+                addPOSTData(postdata, "token", AppConfig.get().getPushoverApitoken());
+                addPOSTData(postdata, "user", AppConfig.get().getPushoverUserKey());
+                addPOSTData(postdata, "message", msg[0]);
+                addPOSTData(postdata, "title", msg[1]);
+                addPOSTData(postdata, "priority", msg[2]);
+                if (msg[2].equals("2")) {
+                        addPOSTData(postdata, "expire", "1800");
+                        addPOSTData(postdata, "retry", "300");
+                }
+
+                result = HttpPOSTRequest(AppConstants.PUSH_NOTIFY_PUSHOVER_URI ,
+                        postdata);
+            
+            JsonParser parser = Json.createParser(new StringReader(result));
+            boolean postflag = false;
+            while (parser.hasNext()) {
+                JsonParser.Event event = parser.next();
+                if (event == VALUE_STRING) {
+                    if (parser.getString() == "posted") {
+                        postflag = true;
+                    }
+                }
+            }
+            if (postflag = false) {
+                LOG.get().warn("Pushover による Push 通知に失敗しました", result);
+            }
+        } catch (Exception e) {
+            LOG.get().warn("Pushover による Push 通知に失敗しました", e);
         }
 
     }

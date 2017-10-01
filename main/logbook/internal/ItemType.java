@@ -59,6 +59,7 @@ public class ItemType {
             this.put(43, "水上戦闘機");
             this.put(44, "陸軍戦闘機");
             this.put(45, "夜間戦闘機");
+            this.put(46, "夜間攻撃機");
         }
     };
 

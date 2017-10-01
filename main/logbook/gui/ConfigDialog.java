@@ -880,6 +880,32 @@ public final class ConfigDialog extends Dialog {
         imkayacPrivateKey.setLayoutData(gdimkayacUserName);
         imkayacPrivateKey.setText(AppConfig.get().getImKayacPrivateKey());
 
+        final Button pushover = new Button(compositePushNotify, SWT.CHECK);
+        pushover.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        pushover.setText("Pushover によるPush通知");
+        pushover.setSelection(AppConfig.get().getNotifyPushover());
+
+
+        Label label18 = new Label(compositePushNotify, SWT.NONE);
+        label18.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        label18.setText("Pushover UserKey");
+
+        final Text PushoverUserKey = new Text(compositePushNotify, SWT.BORDER);
+        GridData gdPushoverUserKey = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
+        gdPushoverUserKey.widthHint = SwtUtils.DPIAwareWidth(200);
+        PushoverUserKey.setLayoutData(gdPushoverUserKey);
+        PushoverUserKey.setText(AppConfig.get().getPushoverUserKey());
+
+        Label label19 = new Label(compositePushNotify, SWT.NONE);
+        label19.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        label19.setText("Pushover API Token");
+
+        final Text PushoverApitoken = new Text(compositePushNotify, SWT.PASSWORD | SWT.BORDER);
+        GridData gdPushoverApitoken = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
+        gdPushoverApitoken.widthHint = SwtUtils.DPIAwareWidth(200);
+        PushoverApitoken.setLayoutData(gdPushoverApitoken);
+        PushoverApitoken.setText(AppConfig.get().getPushoverApitoken());
+
         String pushName[] = new String[] {
                 "遠征帰投を通知",
                 "入渠完了を通知",
@@ -944,6 +970,9 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setImKayacUserName(imkayacUserName.getText());
                 AppConfig.get().setImKayacPasswd(imkayacPasswd.getText());
                 AppConfig.get().setImKayacPrivateKey(imkayacPrivateKey.getText());
+                AppConfig.get().setNotifyPushover(pushover.getSelection());
+                AppConfig.get().setPushoverUserKey(PushoverUserKey.getText());
+                AppConfig.get().setPushoverApitoken(PushoverApitoken.getText());
                 AppConfig.get().setPushMission(pushNotifyMission.getSelection());
                 AppConfig.get().setPushNdock(pushNotifyNdock.getSelection());
                 AppConfig.get().setPushPriorityMission(pushPriorityMissionCombo.getSelectionIndex() - 2);
@@ -968,6 +997,9 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setImKayacUserName(imkayacUserName.getText());
                 AppConfig.get().setImKayacPasswd(imkayacPasswd.getText());
                 AppConfig.get().setImKayacPrivateKey(imkayacPrivateKey.getText());
+                AppConfig.get().setNotifyPushover(pushover.getSelection());
+                AppConfig.get().setPushoverUserKey(PushoverUserKey.getText());
+                AppConfig.get().setPushoverApitoken(PushoverApitoken.getText());
                 AppConfig.get().setPushMission(pushNotifyMission.getSelection());
                 AppConfig.get().setPushNdock(pushNotifyNdock.getSelection());
                 AppConfig.get().setPushPriorityMission(pushPriorityMissionCombo.getSelectionIndex() - 2);
@@ -1185,6 +1217,9 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setImKayacUserName(imkayacUserName.getText());
                 AppConfig.get().setImKayacPasswd(imkayacPasswd.getText());
                 AppConfig.get().setImKayacPrivateKey(imkayacPrivateKey.getText());
+                AppConfig.get().setNotifyPushover(pushover.getSelection());
+                AppConfig.get().setPushoverUserKey(PushoverUserKey.getText());
+                AppConfig.get().setPushoverApitoken(PushoverApitoken.getText());
                 AppConfig.get().setPushMission(pushNotifyMission.getSelection());
                 AppConfig.get().setPushNdock(pushNotifyNdock.getSelection());
                 AppConfig.get().setPushAkashi(pushNotifyAkashi.getSelection());
