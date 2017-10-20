@@ -103,6 +103,10 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
 
     @Tag(40)
     private final String json;
+    
+    /** 対潜値 */
+    @Tag(41)
+    private final int taisen;
 
     /**
      * コンストラクター
@@ -143,6 +147,8 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
         this.slotExItem = GlobalContext.getItem(this.getSlotEx());
 
         this.json = object.toString();
+
+        this.taisen = object.getJsonArray("api_taisen").getJsonNumber(0).intValue();
     }
 
     /** 新規入手艦 */
@@ -184,6 +190,8 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
         this.slotExItem = null;
 
         this.json = null;
+
+        this.taisen = 0;
     }
 
     /**
@@ -270,6 +278,15 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     @Override
     public int getLv() {
         return this.lv;
+    }
+
+    /**
+     * 対潜
+     * @return 対潜
+     */
+    @Override
+    public int getTaisen() {
+        return this.taisen;
     }
 
     /**

@@ -297,6 +297,8 @@ public class FleetComposite extends Composite {
         }
         // 艦隊合計Lv
         int totallv = 0;
+        // 艦隊合計対潜値(装備込)
+        int totaltaisen = 0;
 
         int dockIndex = Integer.parseInt(dock.getId()) - 1;
         CondTiming condTiming = GlobalContext.getCondTiming();
@@ -340,6 +342,8 @@ public class FleetComposite extends Composite {
             float fuelraito = fuelmax != 0 ? (float) fuel / (float) fuelmax : 1f;
             // 艦隊合計Lv
             totallv += ship.getLv();
+            // 艦隊合計対潜値(装備込)
+            totaltaisen += ship.getTaisen();
             // 損失艦載機
             int[] maxeq = ship.getMaxeq();
             int[] onslot = ship.getOnSlot();
@@ -727,7 +731,10 @@ public class FleetComposite extends Composite {
         // 索敵
         SakutekiString sakutekiString = new SakutekiString(ships, GlobalContext.hqLevel());
         this.addStyledText(this.message,
-                MessageFormat.format(AppConstants.MESSAGE_SAKUTEKI, sakutekiString.toString()), null);
+                MessageFormat.format(AppConstants.MESSAGE_SAKUTEKI, sakutekiString.toString()), null);        
+        this.addStyledText(this.message, "\n", null);
+        // 合計対潜値(装備込)
+        this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_TAISEN, totaltaisen), null);
         this.addStyledText(this.message, "\n", null);
         // 合計Lv
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_TOTAL_LV, totallv), null);
