@@ -24,7 +24,7 @@ public class AppConstants {
     public static final String SUFFIX = "拡張版";
 
     /** バージョン */
-    public static final String VERSION = "2.4.0";
+    public static final String VERSION = "2.4.1";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://nekopanda.blog.jp/");
@@ -358,7 +358,7 @@ public class AppConstants {
     /** im.kayac.com のアクセス先 URI */
     public static final String PUSH_NOTIFY_IMKAYAC_URI = "http://im.kayac.com/api/post/";
 
-   /** Pushover のアクセス先 URI */
+    /** Pushover のアクセス先 URI */
     public static final String PUSH_NOTIFY_PUSHOVER_URI = "https://api.pushover.net/1/messages.json";
 
     /** メッセージ  ドラム缶:{0} ({1}隻) */
