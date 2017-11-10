@@ -299,6 +299,8 @@ public class FleetComposite extends Composite {
         int totallv = 0;
         // 艦隊合計対潜値(装備込)
         int totaltaisen = 0;
+        // 艦隊合計対空値(装備込)
+        int totaltaiku = 0;
 
         int dockIndex = Integer.parseInt(dock.getId()) - 1;
         CondTiming condTiming = GlobalContext.getCondTiming();
@@ -344,6 +346,8 @@ public class FleetComposite extends Composite {
             totallv += ship.getLv();
             // 艦隊合計対潜値(装備込)
             totaltaisen += ship.getTaisen();
+            // 艦隊合計対空値(装備込)
+            totaltaiku += ship.getTaiku();
             // 損失艦載機
             int[] maxeq = ship.getMaxeq();
             int[] onslot = ship.getOnSlot();
@@ -735,6 +739,9 @@ public class FleetComposite extends Composite {
         this.addStyledText(this.message, "\n", null);
         // 合計対潜値(装備込)
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_TAISEN, totaltaisen), null);
+        this.addStyledText(this.message, "\n", null);
+        // 合計対空値(装備込)
+        this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_TAIKU, totaltaiku), null);
         this.addStyledText(this.message, "\n", null);
         // 合計Lv
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_TOTAL_LV, totallv), null);
