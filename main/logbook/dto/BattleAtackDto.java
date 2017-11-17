@@ -157,23 +157,32 @@ public class BattleAtackDto {
     }
 
     private static BattleAtackDto makeAir(int baseidx, boolean friendAtack,
-            JsonArray plane_from, JsonArray dam_list, JsonArray cdam_list, JsonArray cl_list, JsonArray ccl_list,
+            JsonValue plane_from_obj, JsonArray dam_list, JsonArray cdam_list, JsonArray cl_list, JsonArray ccl_list,
             boolean isBase) {
+
+        JsonArray plane_from = ((plane_from_obj != null) && (plane_from_obj != JsonValue.NULL))
+                ? ((JsonArray) plane_from_obj)
+                : null;
+
         int elems = dam_list.size() - baseidx;
         BattleAtackDto dto = new BattleAtackDto();
         dto.kind = isBase ? AtackKind.AIRBASE : AtackKind.AIR;
         dto.friendAtack = friendAtack;
 
         int idx = 0;
-        for (int i = 0; i < plane_from.size(); ++i) {
-            if (plane_from.getInt(i) != -1)
-                ++idx;
+        if (plane_from != null) {
+            for (int i = 0; i < plane_from.size(); ++i) {
+                if (plane_from.getInt(i) != -1)
+                    ++idx;
+            }
         }
         dto.origin = new int[idx];
         idx = 0;
-        for (int i = 0; i < plane_from.size(); ++i) {
-            if (plane_from.getInt(i) != -1)
-                dto.origin[idx++] = (plane_from.getInt(i) - baseidx);
+        if (plane_from != null) {
+            for (int i = 0; i < plane_from.size(); ++i) {
+                if (plane_from.getInt(i) != -1)
+                    dto.origin[idx++] = (plane_from.getInt(i) - baseidx);
+            }
         }
         idx = 0;
         for (int i = 0; i < elems; ++i) {
@@ -267,7 +276,7 @@ public class BattleAtackDto {
         BattleAtackDto fatack = makeAir(
                 baseidx,
                 true,
-                ((JsonArray) plane_from).getJsonArray(0),
+                ((JsonArray) plane_from).get(0),
                 raigeki_obj.getJsonArray("api_edam"),
                 edamCombined,
                 raigeki_obj.getJsonArray("api_ecl_flag"),
@@ -281,7 +290,7 @@ public class BattleAtackDto {
         BattleAtackDto eatack = makeAir(
                 baseidx,
                 false,
-                ((JsonArray) plane_from).getJsonArray(1),
+                ((JsonArray) plane_from).get(1),
                 raigeki_obj.getJsonArray("api_fdam"),
                 fdamCombined,
                 raigeki_obj.getJsonArray("api_fcl_flag"),
