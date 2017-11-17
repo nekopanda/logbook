@@ -1452,6 +1452,9 @@ public class BattleExDto extends AbstractDto {
         case 5:
             formation = "単横陣";
             break;
+        case 6:
+            formation = "警戒陣";
+            break;
         case 11:
             formation = "第一警戒航行序列";
             break;
@@ -1465,7 +1468,7 @@ public class BattleExDto extends AbstractDto {
             formation = "第四警戒航行序列";
             break;
         default:
-            formation = "単縦陣";
+            formation = "不明(" + f + ")";
             break;
         }
         return formation;
