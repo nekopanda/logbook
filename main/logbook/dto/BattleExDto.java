@@ -189,6 +189,10 @@ public class BattleExDto extends AbstractDto {
     @Tag(52)
     private int combinedKind = 0;
 
+    /** 新旧API */
+    @Tag(91)
+    private int baseidx = 0;
+
     private static Date date20170405;
 
     static {
@@ -290,6 +294,7 @@ public class BattleExDto extends AbstractDto {
 
         public Phase(BattleExDto battle, JsonObject object, BattlePhaseKind kind,
                 int[] beforeFriendHp, int[] beforeFriendHpCombined, int[] beforeEnemyHp, int[] beforeEnemyHpCombined) {
+            int baseidx = battle.baseidx;
             boolean isFriendCombined = (beforeFriendHpCombined != null);
             boolean isEnemyCombined = (beforeEnemyHpCombined != null);
 
@@ -333,26 +338,28 @@ public class BattleExDto extends AbstractDto {
                 this.airBase = new ArrayList<>();
                 for (JsonValue elem : (JsonArray) air_base_attack) {
                     JsonObject obj = (JsonObject) elem;
-                    this.airBase.add(new AirBattleDto(obj, isFriendCombined || isEnemyCombined, true));
+                    this.airBase.add(new AirBattleDto(baseidx, obj, isFriendCombined || isEnemyCombined, true));
                 }
             }
 
             // 基地航空隊（墳式強襲）
             JsonObject air_base_injection = object.getJsonObject("api_air_base_injection");
             if (air_base_injection != null) {
-                this.airBaseInjection = new AirBattleDto(air_base_injection, isFriendCombined || isEnemyCombined, true);
+                this.airBaseInjection = new AirBattleDto(baseidx, air_base_injection, isFriendCombined
+                        || isEnemyCombined, true);
             }
 
             // 航空戦（墳式強襲）
             JsonObject injection_kouku = object.getJsonObject("api_injection_kouku");
             if (injection_kouku != null) {
-                this.airInjection = new AirBattleDto(injection_kouku, isFriendCombined || isEnemyCombined, false);
+                this.airInjection = new AirBattleDto(baseidx, injection_kouku, isFriendCombined || isEnemyCombined,
+                        false);
             }
 
             // 航空戦（通常）
             JsonObject kouku = object.getJsonObject("api_kouku");
             if (kouku != null) {
-                this.air = new AirBattleDto(kouku, isFriendCombined || isEnemyCombined, false);
+                this.air = new AirBattleDto(baseidx, kouku, isFriendCombined || isEnemyCombined, false);
                 // 昼戦の触接はここ
                 this.touchPlane = this.air.touchPlane;
                 // 制空はここから取る
@@ -386,33 +393,36 @@ public class BattleExDto extends AbstractDto {
             // 航空戦（連合艦隊のみ？）
             JsonObject kouku2 = object.getJsonObject("api_kouku2");
             if (kouku2 != null)
-                this.air2 = new AirBattleDto(kouku2, isFriendCombined || isEnemyCombined, false);
+                this.air2 = new AirBattleDto(baseidx, kouku2, isFriendCombined || isEnemyCombined, false);
 
             // 開幕対潜
-            this.openingTaisen = BattleAtackDto.makeHougeki(object.get("api_opening_taisen"), kind.isOpeningSecond(),
+            this.openingTaisen = BattleAtackDto.makeHougeki(baseidx, object.get("api_opening_taisen"),
+                    kind.isOpeningSecond(),
                     this.isEnemySecond);
 
             // 開幕
-            this.opening = BattleAtackDto.makeRaigeki(object.get("api_opening_atack"), kind.isOpeningSecond());
+            this.opening = BattleAtackDto.makeRaigeki(baseidx, object.get("api_opening_atack"),
+                    kind.isOpeningSecond());
 
             // 砲撃
             if (this.isFriendSecond) {
-                this.hougeki = BattleAtackDto.makeHougeki(object.get("api_hougeki"),
+                this.hougeki = BattleAtackDto.makeHougeki(baseidx, object.get("api_hougeki"),
                         true, this.isEnemySecond); // 自分が連合艦隊の場合の夜戦
             }
             else {
-                this.hougeki = BattleAtackDto.makeHougeki(object.get("api_hougeki"),
+                this.hougeki = BattleAtackDto.makeHougeki(baseidx, object.get("api_hougeki"),
                         kind.isHougekiSecond(), this.isEnemySecond); // 夜戦
             }
-            this.hougeki1 = BattleAtackDto.makeHougeki(object.get("api_hougeki1"),
+            this.hougeki1 = BattleAtackDto.makeHougeki(baseidx, object.get("api_hougeki1"),
                     kind.isHougeki1Second(), this.isEnemySecond);
-            this.hougeki2 = BattleAtackDto.makeHougeki(object.get("api_hougeki2"),
+            this.hougeki2 = BattleAtackDto.makeHougeki(baseidx, object.get("api_hougeki2"),
                     kind.isHougeki2Second(), this.isEnemySecond);
-            this.hougeki3 = BattleAtackDto.makeHougeki(object.get("api_hougeki3"),
+            this.hougeki3 = BattleAtackDto.makeHougeki(baseidx, object.get("api_hougeki3"),
                     kind.isHougeki3Second(), this.isEnemySecond);
 
             // 雷撃
-            this.raigeki = BattleAtackDto.makeRaigeki(object.get("api_raigeki"), kind.isRaigekiSecond());
+            this.raigeki = BattleAtackDto.makeRaigeki(baseidx, object.get("api_raigeki"),
+                    kind.isRaigekiSecond());
 
             // ダメージを反映 //
 
@@ -1116,28 +1126,53 @@ public class BattleExDto extends AbstractDto {
                 dockId = object.get("api_deck_id").toString();
             }
 
+            // 新API
+            JsonArray fnowhps = object.getJsonArray("api_f_nowhps");
+            JsonArray enowhps = object.getJsonArray("api_e_nowhps");
+            JsonArray fmaxhps = object.getJsonArray("api_f_maxhps");
+            JsonArray emaxhps = object.getJsonArray("api_e_maxhps");
+
+            // 新API予想・・・
+            JsonArray fnowhpsCombined = object.getJsonArray("api_f_nowhps_combined");
+            JsonArray enowhpsCombined = object.getJsonArray("api_e_nowhps_combined");
+            JsonArray fmaxhpsCombined = object.getJsonArray("api_f_maxhps_combined");
+            JsonArray emaxhpsCombined = object.getJsonArray("api_e_maxhps_combined");
+
+            // 旧API
             JsonArray nowhps = object.getJsonArray("api_nowhps");
             JsonArray maxhps = object.getJsonArray("api_maxhps");
             JsonArray nowhpsCombined = object.getJsonArray("api_nowhps_combined");
             JsonArray maxhpsCombined = object.getJsonArray("api_maxhps_combined");
+
             boolean isFriendCombined = object.containsKey("api_fParam_combined");
             boolean isEnemyCombined = object.containsKey("api_eParam_combined");
 
             int numFships = 6;
             int numFshipsCombined = 0;
 
-            for (int i = 1; i <= 6; ++i) {
-                if (maxhps.getInt(i) == -1) {
-                    numFships = i - 1;
-                    break;
+            int baseidx = this.baseidx = (fnowhps != null) ? 0 : 1;
+            if (fnowhps != null) {
+                // 新API
+                numFships = fnowhps.size();
+                if (isFriendCombined) {
+                    numFshipsCombined = fnowhpsCombined.size();
                 }
             }
-            if (isFriendCombined) {
-                numFshipsCombined = 6;
-                for (int i = 1; i <= 6; ++i) {
-                    if (maxhpsCombined.getInt(i) == -1) {
-                        numFshipsCombined = i - 1;
+            else {
+                // 旧API
+                for (int i = baseidx; i <= 6; ++i) {
+                    if (maxhps.getInt(i) == -1) {
+                        numFships = i - baseidx;
                         break;
+                    }
+                }
+                if (isFriendCombined) {
+                    numFshipsCombined = 6;
+                    for (int i = this.baseidx; i <= 6; ++i) {
+                        if (maxhpsCombined.getInt(i) == -1) {
+                            numFshipsCombined = i - baseidx;
+                            break;
+                        }
                     }
                 }
             }
@@ -1153,14 +1188,14 @@ public class BattleExDto extends AbstractDto {
             JsonArray eSlots = object.getJsonArray("api_eSlot");
             JsonArray eParams = object.getJsonArray("api_eParam");
             JsonArray eLevel = object.getJsonArray("api_ship_lv");
-            for (int i = 1; i < shipKe.size(); i++) {
+            for (int i = baseidx; i < shipKe.size(); i++) {
                 int id = shipKe.getInt(i);
                 if (id != -1) {
                     if (before20170405) {
                         id += 1000;
                     }
-                    int[] slot = JsonUtils.toIntArray(eSlots.getJsonArray(i - 1));
-                    int[] param = JsonUtils.toIntArray(eParams.getJsonArray(i - 1));
+                    int[] slot = JsonUtils.toIntArray(eSlots.getJsonArray(i - baseidx));
+                    int[] param = JsonUtils.toIntArray(eParams.getJsonArray(i - baseidx));
                     this.enemy.add(new EnemyShipDto(id, slot, param, eLevel.getInt(i)));
                 }
             }
@@ -1169,14 +1204,14 @@ public class BattleExDto extends AbstractDto {
                 JsonArray eSlotsCombined = object.getJsonArray("api_eSlot_combined");
                 JsonArray eParamsCombined = object.getJsonArray("api_eParam_combined");
                 JsonArray eLevelCombined = object.getJsonArray("api_ship_lv_combined");
-                for (int i = 1; i < shipKeCombined.size(); i++) {
+                for (int i = baseidx; i < shipKeCombined.size(); i++) {
                     int id = shipKeCombined.getInt(i);
                     if (id != -1) {
                         if (before20170405) {
                             id += 1000;
                         }
-                        int[] slot = JsonUtils.toIntArray(eSlotsCombined.getJsonArray(i - 1));
-                        int[] param = JsonUtils.toIntArray(eParamsCombined.getJsonArray(i - 1));
+                        int[] slot = JsonUtils.toIntArray(eSlotsCombined.getJsonArray(i - baseidx));
+                        int[] param = JsonUtils.toIntArray(eParamsCombined.getJsonArray(i - baseidx));
                         this.enemyCombined.add(new EnemyShipDto(id, slot, param, eLevelCombined.getInt(i)));
                     }
                 }
@@ -1228,36 +1263,58 @@ public class BattleExDto extends AbstractDto {
             }
 
             // この戦闘の開始前HPを取得
-            for (int i = 1; i < nowhps.size(); i++) {
-                int hp = nowhps.getInt(i);
-                int maxHp = maxhps.getInt(i);
-                if (i <= 6) {
-                    if (i <= numFships) {
-                        this.maxFriendHp[i - 1] = maxHp;
-                        this.friendGaugeMax += this.startFriendHp[i - 1] = hp;
-                    }
+            if (fnowhps != null) {
+                // 新API
+                for (int i = 0; i < numFships; i++) {
+                    this.maxFriendHp[i] = fmaxhps.getInt(i);
+                    this.friendGaugeMax += this.startFriendHp[i] = fnowhps.getInt(i);
                 }
-                else {
-                    if ((i - 6) <= numEships) {
-                        this.maxEnemyHp[i - 1 - 6] = maxHp;
-                        this.enemyGaugeMax += this.startEnemyHp[i - 1 - 6] = hp;
-                    }
+                for (int i = 0; i < numEships; i++) {
+                    this.maxEnemyHp[i] = emaxhps.getInt(i);
+                    this.enemyGaugeMax += this.startEnemyHp[i] = enowhps.getInt(i);
+                }
+                for (int i = 0; i < numFshipsCombined; i++) {
+                    this.maxFriendHpCombined[i] = fmaxhpsCombined.getInt(i);
+                    this.friendGaugeMax += this.startFriendHpCombined[i] = fnowhpsCombined.getInt(i);
+                }
+                for (int i = 0; i < numEshipsCombined; i++) {
+                    this.maxEnemyHpCombined[i] = emaxhpsCombined.getInt(i);
+                    this.enemyGaugeMax += this.startEnemyHpCombined[i] = enowhpsCombined.getInt(i);
                 }
             }
-            if (isFriendCombined || isEnemyCombined) {
-                for (int i = 1; i < nowhpsCombined.size(); i++) {
-                    int hp = nowhpsCombined.getInt(i);
-                    int maxHp = maxhpsCombined.getInt(i);
+            else {
+                // 旧API
+                for (int i = baseidx; i < nowhps.size(); i++) {
+                    int hp = nowhps.getInt(i);
+                    int maxHp = maxhps.getInt(i);
                     if (i <= 6) {
-                        if (i <= numFshipsCombined) {
-                            this.maxFriendHpCombined[i - 1] = maxHp;
-                            this.friendGaugeMax += this.startFriendHpCombined[i - 1] = hp;
+                        if (i <= numFships) {
+                            this.maxFriendHp[i - baseidx] = maxHp;
+                            this.friendGaugeMax += this.startFriendHp[i - baseidx] = hp;
                         }
                     }
                     else {
-                        if ((i - 6) <= numEshipsCombined) {
-                            this.maxEnemyHpCombined[i - 1 - 6] = maxHp;
-                            this.enemyGaugeMax += this.startEnemyHpCombined[i - 1 - 6] = hp;
+                        if ((i - 6) <= numEships) {
+                            this.maxEnemyHp[i - baseidx - 6] = maxHp;
+                            this.enemyGaugeMax += this.startEnemyHp[i - baseidx - 6] = hp;
+                        }
+                    }
+                }
+                if (isFriendCombined || isEnemyCombined) {
+                    for (int i = baseidx; i < nowhpsCombined.size(); i++) {
+                        int hp = nowhpsCombined.getInt(i);
+                        int maxHp = maxhpsCombined.getInt(i);
+                        if (i <= 6) {
+                            if (i <= numFshipsCombined) {
+                                this.maxFriendHpCombined[i - baseidx] = maxHp;
+                                this.friendGaugeMax += this.startFriendHpCombined[i - baseidx] = hp;
+                            }
+                        }
+                        else {
+                            if ((i - 6) <= numEshipsCombined) {
+                                this.maxEnemyHpCombined[i - baseidx - 6] = maxHp;
+                                this.enemyGaugeMax += this.startEnemyHpCombined[i - baseidx - 6] = hp;
+                            }
                         }
                     }
                 }
@@ -1268,12 +1325,12 @@ public class BattleExDto extends AbstractDto {
                 this.escaped = new boolean[12];
                 if (JsonUtils.hasKey(object, "api_escape_idx")) {
                     for (JsonValue jsonShip : object.getJsonArray("api_escape_idx")) {
-                        this.escaped[((JsonNumber) jsonShip).intValue() - 1] = true;
+                        this.escaped[((JsonNumber) jsonShip).intValue() - baseidx] = true;
                     }
                 }
                 if (JsonUtils.hasKey(object, "api_escape_idx_combined")) {
                     for (JsonValue jsonShip : object.getJsonArray("api_escape_idx_combined")) {
-                        this.escaped[(((JsonNumber) jsonShip).intValue() - 1) + 6] = true;
+                        this.escaped[(((JsonNumber) jsonShip).intValue() - baseidx) + 6] = true;
                     }
                 }
                 for (int i = 0; i < 2; ++i) {
@@ -1353,15 +1410,15 @@ public class BattleExDto extends AbstractDto {
         if (JsonUtils.hasKey(object, "api_escape")) {
             JsonObject jsonEscape = object.getJsonObject("api_escape");
             this.escapeInfo = new int[] {
-                    jsonEscape.getJsonArray("api_escape_idx").getInt(0) - 1,
-                    jsonEscape.getJsonArray("api_tow_idx").getInt(0) - 1
+                    jsonEscape.getJsonArray("api_escape_idx").getInt(0) - this.baseidx,
+                    jsonEscape.getJsonArray("api_tow_idx").getInt(0) - this.baseidx
             };
         }
         if (JsonUtils.hasKey(object, "api_lost_flag")) {
             this.lostflag = new boolean[6];
             JsonArray jsonLostflag = object.getJsonArray("api_lost_flag");
-            for (int i = 1; i < jsonLostflag.size(); i++) {
-                this.lostflag[i - 1] = (jsonLostflag.getInt(i) != 0);
+            for (int i = this.baseidx; i < jsonLostflag.size(); i++) {
+                this.lostflag[i - this.baseidx] = (jsonLostflag.getInt(i) != 0);
             }
         }
     }

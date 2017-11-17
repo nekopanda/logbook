@@ -53,7 +53,7 @@ public class AirBattleDto {
         };
     }
 
-    public AirBattleDto(JsonObject kouku, boolean isCombined, boolean isBase) {
+    public AirBattleDto(int baseidx, JsonObject kouku, boolean isCombined, boolean isBase) {
         JsonValue jsonStage1 = kouku.get("api_stage1");
         if ((jsonStage1 != null) && (jsonStage1 != JsonValue.NULL)) {
             JsonObject jsonStage1Obj = kouku.getJsonObject("api_stage1");
@@ -61,8 +61,8 @@ public class AirBattleDto {
             JsonArray jsonTouchPlane = jsonStage1Obj.getJsonArray("api_touch_plane");
             if ((jsonTouchPlane != null) && (jsonTouchPlane != JsonValue.NULL)) {
                 this.touchPlane = new int[] {
-                    jsonTouchPlane.getInt(0),
-                    jsonTouchPlane.getInt(1)
+                        jsonTouchPlane.getInt(0),
+                        jsonTouchPlane.getInt(1)
                 };
                 this.seiku = toSeiku(jsonStage1Obj.getInt("api_disp_seiku"));
             }
@@ -85,6 +85,7 @@ public class AirBattleDto {
         }
 
         this.atacks = BattleAtackDto.makeAir(
+                baseidx,
                 kouku.get("api_plane_from"),
                 kouku.get("api_stage3"),
                 isCombined ? kouku.get("api_stage3_combined") : null,
