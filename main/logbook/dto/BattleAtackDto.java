@@ -159,6 +159,7 @@ public class BattleAtackDto {
     private static BattleAtackDto makeAir(int baseidx, boolean friendAtack,
             JsonArray plane_from, JsonArray dam_list, JsonArray cdam_list, JsonArray cl_list, JsonArray ccl_list,
             boolean isBase) {
+        int elems = dam_list.size() - baseidx;
         BattleAtackDto dto = new BattleAtackDto();
         dto.kind = isBase ? AtackKind.AIRBASE : AtackKind.AIR;
         dto.friendAtack = friendAtack;
@@ -172,17 +173,17 @@ public class BattleAtackDto {
         idx = 0;
         for (int i = 0; i < plane_from.size(); ++i) {
             if (plane_from.getInt(i) != -1)
-                dto.origin[idx++] = (plane_from.getInt(i) - baseidx) % 6;
+                dto.origin[idx++] = (plane_from.getInt(i) - baseidx);
         }
         idx = 0;
-        for (int i = 0; i < 6; ++i) {
+        for (int i = 0; i < elems; ++i) {
             int dam = dam_list.getInt(i + baseidx);
             if (dam > 0) {
                 idx++;
             }
         }
         if (cdam_list != null) {
-            for (int i = 0; i < 6; ++i) {
+            for (int i = 0; i < elems; ++i) {
                 int dam = cdam_list.getInt(i + baseidx);
                 if (dam > 0) {
                     idx++;
@@ -193,7 +194,7 @@ public class BattleAtackDto {
         dto.damage = new int[idx];
         dto.critical = new int[idx];
         idx = 0;
-        for (int i = 0; i < 6; ++i) {
+        for (int i = 0; i < elems; ++i) {
             int dam = dam_list.getInt(i + baseidx);
             int cl = cl_list.getInt(i + baseidx);
             if (dam > 0) {
@@ -205,7 +206,7 @@ public class BattleAtackDto {
             }
         }
         if (cdam_list != null) {
-            for (int i = 0; i < 6; ++i) {
+            for (int i = 0; i < elems; ++i) {
                 int dam = cdam_list.getInt(i + baseidx);
                 int cl = ccl_list.getInt(i + baseidx);
                 if (dam > 0) {
