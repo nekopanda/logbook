@@ -313,37 +313,49 @@ public class BattleAtackDto {
 
         JsonObject raigeki_obj = (JsonObject) raigeki;
 
-        BattleAtackDto fatack = makeRaigeki(
-                baseidx,
-                true,
-                raigeki_obj.getJsonArray("api_frai"),
-                raigeki_obj.getJsonArray("api_edam"),
-                raigeki_obj.getJsonArray("api_fcl"),
-                raigeki_obj.getJsonArray("api_fydam"));
+        List<BattleAtackDto> attaks = new ArrayList<BattleAtackDto>();
 
-        if (fatack.combineEnabled == false) {
-            // 味方の随伴艦のみが雷撃を行う場合(6-5実装以前の連合艦隊はこれ。6-5実装以降の連合艦隊は不明)
-            if (isFriendSecond) {
-                fatack.makeOriginCombined();
+        BattleAtackDto fatack = null;
+        BattleAtackDto eatack = null;
+
+        if (raigeki_obj.get("api_frai") != JsonValue.NULL) {
+
+            fatack = makeRaigeki(
+                    baseidx,
+                    true,
+                    raigeki_obj.getJsonArray("api_frai"),
+                    raigeki_obj.getJsonArray("api_edam"),
+                    raigeki_obj.getJsonArray("api_fcl"),
+                    raigeki_obj.getJsonArray("api_fydam"));
+
+            if (fatack.combineEnabled == false) {
+                // 味方の随伴艦のみが雷撃を行う場合(6-5実装以前の連合艦隊はこれ。6-5実装以降の連合艦隊は不明)
+                if (isFriendSecond) {
+                    fatack.makeOriginCombined();
+                }
             }
+            attaks.add(fatack);
         }
 
-        BattleAtackDto eatack = makeRaigeki(
-                baseidx,
-                false,
-                raigeki_obj.getJsonArray("api_erai"),
-                raigeki_obj.getJsonArray("api_fdam"),
-                raigeki_obj.getJsonArray("api_ecl"),
-                raigeki_obj.getJsonArray("api_eydam"));
+        if (raigeki_obj.get("api_erai") != JsonValue.NULL) {
+            eatack = makeRaigeki(
+                    baseidx,
+                    false,
+                    raigeki_obj.getJsonArray("api_erai"),
+                    raigeki_obj.getJsonArray("api_fdam"),
+                    raigeki_obj.getJsonArray("api_ecl"),
+                    raigeki_obj.getJsonArray("api_eydam"));
 
-        if (fatack.combineEnabled == false) {
-            // 味方の随伴艦のみが雷撃を受ける場合(6-5実装以前の連合艦隊はこれ。6-5実装以降の連合艦隊は不明)
-            if (isFriendSecond) {
-                eatack.makeTargetCombined();
+            if ((fatack != null) && (fatack.combineEnabled == false)) {
+                // 味方の随伴艦のみが雷撃を受ける場合(6-5実装以前の連合艦隊はこれ。6-5実装以降の連合艦隊は不明)
+                if (isFriendSecond) {
+                    eatack.makeTargetCombined();
+                }
             }
+            attaks.add(eatack);
         }
 
-        return Arrays.asList(new BattleAtackDto[] { fatack, eatack });
+        return attaks;
     }
 
     /**
@@ -356,6 +368,9 @@ public class BattleAtackDto {
             return null;
 
         JsonObject hougeki_obj = (JsonObject) hougeki;
+
+        if (hougeki_obj.get("api_damage") == JsonValue.NULL)
+            return null;
 
         List<BattleAtackDto> seq = makeHougeki(
                 baseidx,
