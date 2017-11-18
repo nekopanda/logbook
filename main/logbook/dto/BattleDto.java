@@ -26,13 +26,13 @@ public final class BattleDto extends AbstractDto {
     private final List<ItemInfoDto[]> enemySlot = new ArrayList<>();
 
     /** 味方HP */
-    private final int[] nowFriendHp = new int[6];
+    private final int[] nowFriendHp = new int[7];
 
     /** 敵HP */
     private final int[] nowEnemyHp = new int[6];
 
     /** 味方MaxHP */
-    private final int[] maxFriendHp = new int[6];
+    private final int[] maxFriendHp = new int[7];
 
     /** 敵MaxHP */
     private final int[] maxEnemyHp = new int[6];
@@ -55,7 +55,8 @@ public final class BattleDto extends AbstractDto {
 
         if (object.containsKey("api_dock_id")) {
             dockId = object.get("api_dock_id").toString();
-        } else {
+        }
+        else {
             dockId = object.get("api_deck_id").toString();
         }
         this.friends.add(GlobalContext.getDock(dockId));
@@ -87,7 +88,8 @@ public final class BattleDto extends AbstractDto {
         for (int i = 1; i < nowhps.size(); i++) {
             if (i <= 6) {
                 this.nowFriendHp[i - 1] = nowhps.getJsonNumber(i).intValue();
-            } else {
+            }
+            else {
                 this.nowEnemyHp[i - 1 - 6] = nowhps.getJsonNumber(i).intValue();
             }
         }
@@ -96,7 +98,8 @@ public final class BattleDto extends AbstractDto {
         for (int i = 1; i < maxhps.size(); i++) {
             if (i <= 6) {
                 this.maxFriendHp[i - 1] = maxhps.getJsonNumber(i).intValue();
-            } else {
+            }
+            else {
                 this.maxEnemyHp[i - 1 - 6] = maxhps.getJsonNumber(i).intValue();
             }
         }
@@ -127,7 +130,8 @@ public final class BattleDto extends AbstractDto {
             default:
                 this.intercept = toIntercept(Integer.parseInt(formation.getString(2)));
             }
-        } else {
+        }
+        else {
             this.friendFormation = "陣形不明";
             this.enemyFormation = "陣形不明";
             this.intercept = "不明";

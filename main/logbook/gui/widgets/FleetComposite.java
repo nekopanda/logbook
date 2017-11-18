@@ -62,7 +62,7 @@ public class FleetComposite extends Composite {
     /** 致命的 */
     public static final int FATAL = 2;
     /** 1艦隊に編成できる艦娘の数 */
-    private static final int MAXCHARA = 6;
+    private static final int MAXCHARA = 7;
     /** フォント大きい */
     private final static int LARGE = 2;
     /** フォント小さい */
@@ -731,7 +731,7 @@ public class FleetComposite extends Composite {
         // 索敵
         SakutekiString sakutekiString = new SakutekiString(ships, GlobalContext.hqLevel());
         this.addStyledText(this.message,
-                MessageFormat.format(AppConstants.MESSAGE_SAKUTEKI, sakutekiString.toString()), null);        
+                MessageFormat.format(AppConstants.MESSAGE_SAKUTEKI, sakutekiString.toString()), null);
         this.addStyledText(this.message, "\n", null);
         // 合計対潜値(装備込)
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_TAISEN, totaltaisen), null);

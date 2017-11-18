@@ -181,7 +181,8 @@ public class BattleAtackDto {
         if (plane_from != null) {
             for (int i = 0; i < plane_from.size(); ++i) {
                 if (plane_from.getInt(i) != -1)
-                    dto.origin[idx++] = (plane_from.getInt(i) - baseidx);
+                    // api_plane_fromは1始まりのまま
+                    dto.origin[idx++] = (plane_from.getInt(i) - 1);
             }
         }
         idx = 0;

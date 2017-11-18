@@ -162,9 +162,10 @@ public final class CreateReportLogic {
             if (docks != null) {
                 DockDto dock = docks.get(0);
                 List<ShipDto> friendships = dock.getShips();
+                int outfships = (6 < friendships.size()) ? 6 : friendships.size();
                 int[] fnowhps = battle.getNowFriendHp();
                 int[] fmaxhps = battle.getMaxFriendHp();
-                for (int j = 0; j < friendships.size(); j++) {
+                for (int j = 0; j < outfships; j++) {
                     ShipDto ship = friendships.get(j);
                     friend[j] = ship.getName() + "(Lv" + ship.getLv() + ")";
                     friendHp[j] = fnowhps[j] + "/" + fmaxhps[j];
