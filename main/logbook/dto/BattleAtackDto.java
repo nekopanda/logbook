@@ -412,16 +412,16 @@ public class BattleAtackDto {
      * @param dam_list
      * @return
      */
-    public static List<BattleAtackDto> makeSupport(JsonArray dam_list) {
+    public static List<BattleAtackDto> makeSupport(int baseidx, JsonArray dam_list) {
         BattleAtackDto dto = new BattleAtackDto();
         dto.kind = AtackKind.SUPPORT;
         dto.friendAtack = true;
 
         int idx = 0;
         // dam_listの要素数は敵が連合艦隊の場合、艦数+1=13
-        int elems = dam_list.size() - 1;
+        int elems = dam_list.size() - baseidx;
         for (int i = 0; i < elems; ++i) {
-            int dam = dam_list.getInt(i + 1);
+            int dam = dam_list.getInt(i + baseidx);
             if (dam > 0) {
                 idx++;
             }
@@ -430,7 +430,7 @@ public class BattleAtackDto {
         dto.damage = new int[idx];
         idx = 0;
         for (int i = 0; i < elems; ++i) {
-            int dam = dam_list.getInt(i + 1);
+            int dam = dam_list.getInt(i + baseidx);
             if (dam > 0) {
                 dto.target[idx] = i;
                 dto.damage[idx] = dam;

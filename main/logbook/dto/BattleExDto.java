@@ -375,13 +375,14 @@ public class BattleExDto extends AbstractDto {
                 if ((support_hourai != null) && (support_hourai != JsonValue.NULL)) {
                     JsonArray edam = ((JsonObject) support_hourai).getJsonArray("api_damage");
                     if (edam != null) {
-                        this.support = BattleAtackDto.makeSupport(edam);
+                        this.support = BattleAtackDto.makeSupport(baseidx, edam);
                     }
                 }
                 else if ((support_air != null) && (support_air != JsonValue.NULL)) {
                     JsonValue stage3 = ((JsonObject) support_air).get("api_stage3");
                     if ((stage3 != null) && (stage3 != JsonValue.NULL)) {
-                        this.support = BattleAtackDto.makeSupport(((JsonObject) stage3).getJsonArray("api_edam"));
+                        this.support = BattleAtackDto.makeSupport(baseidx,
+                                ((JsonObject) stage3).getJsonArray("api_edam"));
                     }
                 }
                 this.supportType = toSupport(support_flag.intValue());
