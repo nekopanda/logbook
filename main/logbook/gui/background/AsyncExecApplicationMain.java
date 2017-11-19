@@ -87,17 +87,25 @@ public final class AsyncExecApplicationMain extends Thread {
                 Display.getDefault().syncExec(new Runnable() {
                     @Override
                     public void run() {
-                        // タイマー更新
-                        TimerContext.get().update();
+                        try {
+                            // タイマー更新
+                            TimerContext.get().update();
+                        } catch (Exception e) {
+                            LOG.get().warn("タイマー更新でエラー", e);
+                        }
 
-                        // 保有アイテム数を更新する
-                        new UpdateItemCountTask(main).run();
-                        // 保有艦娘数を更新する
-                        new UpdateShipCountTask(main).run();
-                        // 艦隊タブを更新する
-                        new UpdateFleetTabTask(main).run();
-                        // 遠征と入渠を更新する
-                        new UpdateDeckNdockTask(main).run();
+                        try {
+                            // 保有アイテム数を更新する
+                            new UpdateItemCountTask(main).run();
+                            // 保有艦娘数を更新する
+                            new UpdateShipCountTask(main).run();
+                            // 艦隊タブを更新する
+                            new UpdateFleetTabTask(main).run();
+                            // 遠征と入渠を更新する
+                            new UpdateDeckNdockTask(main).run();
+                        } catch (Exception e) {
+                            LOG.get().warn("GUI更新で不明なエラー", e);
+                        }
 
                         try {
                             // 更新日時が実装されているファイルたちはすぐに保存
@@ -151,12 +159,16 @@ public final class AsyncExecApplicationMain extends Thread {
             if (this.main.getShell().isDisposed()) {
                 return;
             }
-            Button itemList = this.main.getItemList();
-            String setText = "所有装備(" + GlobalContext.getItemMap().size() + "/"
-                    + GlobalContext.maxSlotitem() + ")";
-            if (!setText.equals(itemList.getText())) {
-                itemList.setText(setText);
-                itemList.getParent().layout();
+            try {
+                Button itemList = this.main.getItemList();
+                String setText = "所有装備(" + GlobalContext.getItemMap().size() + "/"
+                        + GlobalContext.maxSlotitem() + ")";
+                if (!setText.equals(itemList.getText())) {
+                    itemList.setText(setText);
+                    itemList.getParent().layout();
+                }
+            } catch (Exception e) {
+                LOG.get().warn("保有アイテム数更新でエラー", e);
             }
         }
     }
@@ -180,37 +192,42 @@ public final class AsyncExecApplicationMain extends Thread {
             if (this.main.getShell().isDisposed()) {
                 return;
             }
-            Button shipList = this.main.getShipList();
-            String setText = "所有艦娘(" + GlobalContext.getShipMap().size() + "/" + GlobalContext.maxChara()
-                    + ")";
-            if (setText.equals(shipList.getText())) {
-                return;
-            }
+            try {
+                Button shipList = this.main.getShipList();
+                String setText = "所有艦娘(" + GlobalContext.getShipMap().size() + "/" + GlobalContext.maxChara()
+                        + ")";
+                if (setText.equals(shipList.getText())) {
+                    return;
+                }
 
-            shipList.setText(setText);
-            shipList.getParent().layout();
+                shipList.setText(setText);
+                shipList.getParent().layout();
 
-            if (AppConfig.get().isUseTaskbarNotify()) {
-                TaskItem item = SwtUtils.getTaskBarItem(this.main.getShell());
-                if (item != null) {
-                    int max = GlobalContext.maxChara();
-                    int size = GlobalContext.getShipMap().size();
-                    int locked = 0;
-                    for (Entry<Integer, ShipDto> entry : GlobalContext.getShipMap().entrySet()) {
-                        if (entry.getValue().getLocked()) {
-                            locked++;
+                if (AppConfig.get().isUseTaskbarNotify()) {
+                    TaskItem item = SwtUtils.getTaskBarItem(this.main.getShell());
+                    if (item != null) {
+                        int max = GlobalContext.maxChara();
+                        int size = GlobalContext.getShipMap().size();
+                        int locked = 0;
+                        for (Entry<Integer, ShipDto> entry : GlobalContext.getShipMap().entrySet()) {
+                            if (entry.getValue().getLocked()) {
+                                locked++;
+                            }
+                        }
+                        int r = Math.round(((float) (size - locked) / (float) (max - locked)) * 100);
+
+                        item.setProgress(r);
+
+                        if (max <= (size + AppConfig.get().getNotifyFully())) {
+                            item.setProgressState(SWT.PAUSED);
+                        }
+                        else {
+                            item.setProgressState(SWT.NORMAL);
                         }
                     }
-                    int r = Math.round(((float) (size - locked) / (float) (max - locked)) * 100);
-
-                    item.setProgress(r);
-
-                    if (max <= (size + AppConfig.get().getNotifyFully())) {
-                        item.setProgressState(SWT.PAUSED);
-                    } else {
-                        item.setProgressState(SWT.NORMAL);
-                    }
                 }
+            } catch (Exception e) {
+                LOG.get().warn("保有艦娘数更新でエラー", e);
             }
         }
     }
@@ -256,90 +273,94 @@ public final class AsyncExecApplicationMain extends Thread {
             if (this.main.getShell().isDisposed()) {
                 return;
             }
-            // 現在時刻
-            boolean visibleHome = false;
-            // 遠征を更新する
-            this.updateDeck();
-            // 入渠を更新する
-            this.updateNdock();
-            // その他の時間を更新
-            this.updateOtherTimer();
+            try {
+                // 現在時刻
+                boolean visibleHome = false;
+                // 遠征を更新する
+                this.updateDeck();
+                // 入渠を更新する
+                this.updateNdock();
+                // その他の時間を更新
+                this.updateOtherTimer();
 
-            // 遠征通知
-            if (this.noticeMission.size() > 0) {
-                Sound.randomExpeditionSoundPlay();
-                visibleHome |= AppConfig.get().isVisibleOnReturnMission();
+                // 遠征通知
+                if (this.noticeMission.size() > 0) {
+                    Sound.randomExpeditionSoundPlay();
+                    visibleHome |= AppConfig.get().isVisibleOnReturnMission();
 
-                // Push通知 遠征
-                if (AppConfig.get().getPushMission()) {
-                    PushNotify.add(StringUtils.join(this.noticeMission, "\r\n"), "遠征",
-                            AppConfig.get().getPushPriorityMission());
-                }
-            }
-
-            // 入渠通知
-            if (this.noticeNdock.size() > 0) {
-                Sound.randomDockSoundPlay();
-                visibleHome |= AppConfig.get().isVisibleOnReturnBathwater();
-
-                // Push通知 入渠
-                if (AppConfig.get().getPushNdock()) {
-                    PushNotify.add(StringUtils.join(this.noticeNdock, "\r\n"), "入渠",
-                            AppConfig.get().getPushPriorityNdock());
-                }
-            }
-
-            // 疲労回復通知
-            if (this.noticeCond.size() > 0) {
-                Sound.randomCondSoundPlay();
-
-                // Push通知 疲労回復
-                if (AppConfig.get().isPushCond()) {
-                    PushNotify.add(StringUtils.join(this.noticeCond, "\r\n"), "疲労回復",
-                            AppConfig.get().getPushPriorityCond());
-                }
-            }
-
-            // 泊地修理通知
-            if (this.noticeAkashi.size() > 0) {
-                Sound.randomAkashiSoundPlay();
-
-                // Push通知 泊地修理
-                if (AppConfig.get().isPushAkashi()) {
-                    PushNotify.add(StringUtils.join(this.noticeAkashi, "\r\n"), "泊地修理",
-                            AppConfig.get().getPushPriorityAkashi());
-                }
-            }
-
-            if (visibleHome) {
-                this.main.getTabFolder().setSelection(0);
-            }
-
-            if (AppConfig.get().isUseBalloon()) {
-                // バルーンツールチップを表示する
-                try {
-                    // 遠征・入渠のお知らせ
-                    List<String> title = new ArrayList<String>();
-                    List<String> notice = new ArrayList<String>();
-                    this.addNotice(notice, title, this.noticeMission, "遠征");
-                    this.addNotice(notice, title, this.noticeNdock, "入渠");
-                    this.addNotice(notice, title, this.noticeCond, "疲労回復");
-                    this.addNotice(notice, title, this.noticeAkashi, "泊地修理");
-                    if (notice.size() > 0) {
-                        ToolTip tip = new ToolTip(this.main.getShell(), SWT.BALLOON
-                                | SWT.ICON_INFORMATION);
-                        tip.setText(StringUtils.join(title, "・"));
-                        tip.setMessage(StringUtils.join(notice, "\r\n"));
-                        this.main.getTrayItem().setToolTip(tip);
-                        tip.setVisible(true);
+                    // Push通知 遠征
+                    if (AppConfig.get().getPushMission()) {
+                        PushNotify.add(StringUtils.join(this.noticeMission, "\r\n"), "遠征",
+                                AppConfig.get().getPushPriorityMission());
                     }
-                } catch (Exception e) {
-                    LOG.get().warn("お知らせの表示に失敗しました", e);
                 }
-            }
 
-            // エラー表示を更新（入渠遠征とは関係ないけど）
-            this.updateErrorLabel();
+                // 入渠通知
+                if (this.noticeNdock.size() > 0) {
+                    Sound.randomDockSoundPlay();
+                    visibleHome |= AppConfig.get().isVisibleOnReturnBathwater();
+
+                    // Push通知 入渠
+                    if (AppConfig.get().getPushNdock()) {
+                        PushNotify.add(StringUtils.join(this.noticeNdock, "\r\n"), "入渠",
+                                AppConfig.get().getPushPriorityNdock());
+                    }
+                }
+
+                // 疲労回復通知
+                if (this.noticeCond.size() > 0) {
+                    Sound.randomCondSoundPlay();
+
+                    // Push通知 疲労回復
+                    if (AppConfig.get().isPushCond()) {
+                        PushNotify.add(StringUtils.join(this.noticeCond, "\r\n"), "疲労回復",
+                                AppConfig.get().getPushPriorityCond());
+                    }
+                }
+
+                // 泊地修理通知
+                if (this.noticeAkashi.size() > 0) {
+                    Sound.randomAkashiSoundPlay();
+
+                    // Push通知 泊地修理
+                    if (AppConfig.get().isPushAkashi()) {
+                        PushNotify.add(StringUtils.join(this.noticeAkashi, "\r\n"), "泊地修理",
+                                AppConfig.get().getPushPriorityAkashi());
+                    }
+                }
+
+                if (visibleHome) {
+                    this.main.getTabFolder().setSelection(0);
+                }
+
+                if (AppConfig.get().isUseBalloon()) {
+                    // バルーンツールチップを表示する
+                    try {
+                        // 遠征・入渠のお知らせ
+                        List<String> title = new ArrayList<String>();
+                        List<String> notice = new ArrayList<String>();
+                        this.addNotice(notice, title, this.noticeMission, "遠征");
+                        this.addNotice(notice, title, this.noticeNdock, "入渠");
+                        this.addNotice(notice, title, this.noticeCond, "疲労回復");
+                        this.addNotice(notice, title, this.noticeAkashi, "泊地修理");
+                        if (notice.size() > 0) {
+                            ToolTip tip = new ToolTip(this.main.getShell(), SWT.BALLOON
+                                    | SWT.ICON_INFORMATION);
+                            tip.setText(StringUtils.join(title, "・"));
+                            tip.setMessage(StringUtils.join(notice, "\r\n"));
+                            this.main.getTrayItem().setToolTip(tip);
+                            tip.setVisible(true);
+                        }
+                    } catch (Exception e) {
+                        LOG.get().warn("お知らせの表示に失敗しました", e);
+                    }
+                }
+
+                // エラー表示を更新（入渠遠征とは関係ないけど）
+                this.updateErrorLabel();
+            } catch (Exception e) {
+                LOG.get().warn("遠征と入渠の更新でエラー", e);
+            }
         }
 
         private static Color getBackgroundColor(long rest) {
@@ -347,10 +368,12 @@ public final class AsyncExecApplicationMain extends Thread {
             if (rest <= (ONE_MINUTES * 5)) {
                 return ColorManager
                         .getColor(AppConstants.TIME_IN_5_MIN);
-            } else if (rest <= (ONE_MINUTES * 10)) {
+            }
+            else if (rest <= (ONE_MINUTES * 10)) {
                 return ColorManager
                         .getColor(AppConstants.TIME_IN_10_MIN);
-            } else if (rest <= (ONE_MINUTES * 20)) {
+            }
+            else if (rest <= (ONE_MINUTES * 20)) {
                 return ColorManager
                         .getColor(AppConstants.TIME_IN_20_MIN);
             }
@@ -370,14 +393,17 @@ public final class AsyncExecApplicationMain extends Thread {
                 if ((rest <= ONE_MINUTES) && !FLAG_NOTICE_DECK[index]) {
                     this.noticeMission.add(dispname + " がまもなく帰投します");
                     FLAG_NOTICE_DECK[index] = true;
-                } else if (AppConfig.get().isMissionRemind() && (rest < -1)
+                }
+                else if (AppConfig.get().isMissionRemind() && (rest < -1)
                         && ((rest % AppConfig.get().getRemindInterbal()) == 0)) {
                     // 定期的にリマインドする
                     this.noticeMission.add(dispname + " がまもなく帰投します");
-                } else if (rest > ONE_MINUTES) {
+                }
+                else if (rest > ONE_MINUTES) {
                     FLAG_NOTICE_DECK[index] = false;
                 }
-            } else {
+            }
+            else {
                 FLAG_NOTICE_DECK[index] = false;
             }
         }
@@ -389,10 +415,12 @@ public final class AsyncExecApplicationMain extends Thread {
                         this.noticeCond.add(dispname + " が疲労回復しました");
                     }
                     FLAG_NOTICE_COND[index] = true;
-                } else if (rest > 0) {
+                }
+                else if (rest > 0) {
                     FLAG_NOTICE_COND[index] = false;
                 }
-            } else {
+            }
+            else {
                 FLAG_NOTICE_COND[index] = false;
             }
         }
@@ -566,10 +594,12 @@ public final class AsyncExecApplicationMain extends Thread {
                 if ((rest <= ONE_MINUTES) && !FLAG_NOTICE_NDOCK[index]) {
                     this.noticeNdock.add(name + " がまもなくお風呂からあがります");
                     FLAG_NOTICE_NDOCK[index] = true;
-                } else if (rest > ONE_MINUTES) {
+                }
+                else if (rest > ONE_MINUTES) {
                     FLAG_NOTICE_NDOCK[index] = false;
                 }
-            } else {
+            }
+            else {
                 FLAG_NOTICE_NDOCK[index] = false;
             }
         }
@@ -615,7 +645,8 @@ public final class AsyncExecApplicationMain extends Thread {
                             time = "まもなくお風呂からあがります";
                         }
                     }
-                } else {
+                }
+                else {
                     ndockTimeTexts[i].setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
                     ndockTimeTexts[i].setToolTipText(null);
                 }
@@ -764,29 +795,33 @@ public final class AsyncExecApplicationMain extends Thread {
             if (this.main.getShell().isDisposed()) {
                 return;
             }
-            // タブを更新する
-            CTabItem maintab = this.main.getTabFolder().getItem(0);
-            maintab.setToolTipText(
-                    "装備:" + GlobalContext.getItemMap().size() + "/"
-                            + GlobalContext.maxSlotitem()
-                            + " 艦娘:" + GlobalContext.getShipMap().size() + "/"
-                            + GlobalContext.maxChara());
+            try {
+                // タブを更新する
+                CTabItem maintab = this.main.getTabFolder().getItem(0);
+                maintab.setToolTipText(
+                        "装備:" + GlobalContext.getItemMap().size() + "/"
+                                + GlobalContext.maxSlotitem()
+                                + " 艦娘:" + GlobalContext.getShipMap().size() + "/"
+                                + GlobalContext.maxChara());
 
-            boolean combinedFleetBadlyDamaed = false;
-            if (GlobalContext.isCombined()) {
-                combinedFleetBadlyDamaed =
-                        GlobalContext.getDock("1").isBadlyDamaged() ||
-                                GlobalContext.getDock("2").isBadlyDamaged();
+                boolean combinedFleetBadlyDamaed = false;
+                if (GlobalContext.isCombined()) {
+                    combinedFleetBadlyDamaed =
+                            GlobalContext.getDock("1").isBadlyDamaged() ||
+                                    GlobalContext.getDock("2").isBadlyDamaged();
+                }
+
+                List<ShipDto> badlyDamaged = new ArrayList<>();
+
+                FleetWindow[] fleetWindows = this.main.getFleetWindows();
+                for (int i = 0; i < fleetWindows.length; i++) {
+                    fleetWindows[i].updateFleet(combinedFleetBadlyDamaed, badlyDamaged);
+                }
+
+                this.postFatal(badlyDamaged);
+            } catch (Exception e) {
+                LOG.get().warn("艦隊ウィンドウ更新に失敗", e);
             }
-
-            List<ShipDto> badlyDamaged = new ArrayList<>();
-
-            FleetWindow[] fleetWindows = this.main.getFleetWindows();
-            for (int i = 0; i < fleetWindows.length; i++) {
-                fleetWindows[i].updateFleet(combinedFleetBadlyDamaed, badlyDamaged);
-            }
-
-            this.postFatal(badlyDamaged);
         }
     }
 }

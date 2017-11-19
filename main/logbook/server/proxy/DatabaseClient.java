@@ -167,10 +167,14 @@ public class DatabaseClient extends Thread {
                                 Display.getDefault().asyncExec(new Runnable() {
                                     @Override
                                     public void run() {
-                                        if (!ApplicationMain.main.getShell().isDisposed()) {
-                                            String url = data.getUrl();
-                                            ApplicationMain.main.printMessage("DBへ送信しました("
-                                                    + url.substring(url.lastIndexOf('/') + 1) + ")");
+                                        try {
+                                            if (!ApplicationMain.main.getShell().isDisposed()) {
+                                                String url = data.getUrl();
+                                                ApplicationMain.main.printMessage("DBへ送信しました("
+                                                        + url.substring(url.lastIndexOf('/') + 1) + ")");
+                                            }
+                                        } catch (Exception e) {
+                                            LOG.get().warn("DB送信でエラー", e);
                                         }
                                     }
                                 });

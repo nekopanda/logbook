@@ -162,7 +162,12 @@ public class BattleAggDialog extends WindowBase {
         final Runnable listener = new GuiUpdator(new Runnable() {
             @Override
             public void run() {
-                BattleAggDialog.this.reloadTable();
+                try {
+                    BattleAggDialog.this.reloadTable();
+                }
+                catch (Exception e) {
+                    LOG.get().warn("出撃統計の更新に失敗", e);
+                }
             }
         });
         BattleResultServer.addListener(listener);

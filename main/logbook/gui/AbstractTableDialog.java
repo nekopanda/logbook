@@ -468,7 +468,8 @@ public abstract class AbstractTableDialog extends WindowBase implements EventLis
                 else {
                     columns[i].setWidth(widths[i]);
                 }
-            } else {
+            }
+            else {
                 columns[i].setWidth(0);
             }
         }
@@ -856,7 +857,8 @@ public abstract class AbstractTableDialog extends WindowBase implements EventLis
             if (orderflg) {
                 this.table.setSortColumn(headerColumn);
                 this.table.setSortDirection(SWT.UP);
-            } else {
+            }
+            else {
                 this.table.setSortColumn(headerColumn);
                 this.table.setSortDirection(SWT.DOWN);
             }
@@ -989,7 +991,8 @@ public abstract class AbstractTableDialog extends WindowBase implements EventLis
         private <T extends Comparable<? super T>> int compareTo(T o1, T o2, boolean order) {
             if (this.order) {
                 return o1.compareTo(o2);
-            } else {
+            }
+            else {
                 return o2.compareTo(o1);
             }
         }
@@ -1030,7 +1033,8 @@ public abstract class AbstractTableDialog extends WindowBase implements EventLis
         public void widgetSelected(SelectionEvent e) {
             if (this.menuitem.getSelection()) {
                 AbstractTableDialog.this.enableCyclicReload();
-            } else {
+            }
+            else {
                 AbstractTableDialog.this.disableCyclicReload();
             }
         }
@@ -1056,15 +1060,20 @@ public abstract class AbstractTableDialog extends WindowBase implements EventLis
             this.dialog.display.asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    if (!CyclicReloadTask.this.dialog.shell.isDisposed()) {
-                        // 見えているときだけ処理する
-                        if (CyclicReloadTask.this.dialog.shell.isVisible()) {
-                            CyclicReloadTask.this.dialog.reloadTable();
+                    try {
+                        if (!CyclicReloadTask.this.dialog.shell.isDisposed()) {
+                            // 見えているときだけ処理する
+                            if (CyclicReloadTask.this.dialog.shell.isVisible()) {
+                                CyclicReloadTask.this.dialog.reloadTable();
+                            }
+                        }
+                        else {
+                            // ウインドウが消えていたらタスクをキャンセルする
+                            CyclicReloadTask.this.cancel();
                         }
                     }
-                    else {
-                        // ウインドウが消えていたらタスクをキャンセルする
-                        CyclicReloadTask.this.cancel();
+                    catch (Exception e) {
+                        LOG.get().warn("テーブル更新でエラー", e);
                     }
                 }
             });

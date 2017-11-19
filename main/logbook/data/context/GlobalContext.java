@@ -616,261 +616,265 @@ public final class GlobalContext {
             doStoreJson(data);
         }
 
-        JsonValue apidata = data.getJsonObject().get("api_data");
-        switch (data.getDataType()) {
-        // 補給
-        case CHARGE:
-            doCharge(data, apidata);
-            break;
-        // 編成
-        case CHANGE:
-            doChange(data, apidata);
-            break;
-        // 編成
-        case PRESET_SELECT:
-            doPresetSelect(data, apidata);
-            break;
-        // 母港
-        case PORT:
-            doPort(data, apidata);
-            break;
-        // 保有装備
-        case SLOTITEM_MEMBER:
-            doSlotitemMember(data, apidata);
-            break;
-        // 保有艦
-        case SHIP3:
-            doShipDeck(data, apidata);
-            break;
-        // 保有艦
-        case SHIP2:
-            doShip2(data, apidata);
-            break;
-        // 出撃中の更新
-        case SHIP_DECK:
-            doShipDeck(data, apidata);
-            break;
-        // 基本
-        case BASIC:
-            doBasic(data, apidata);
-            break;
-        // 資材
-        case MATERIAL:
-            doMaterial(data, apidata);
-            break;
-        // 遠征(帰還)
-        case MISSION_RESULT:
-            doMissionResult(data, apidata);
-            break;
-        // 入渠
-        case NDOCK:
-            doNdock(data, apidata);
-            break;
-        // 建造
-        case CREATE_SHIP:
-            doCreateship(data, apidata);
-            break;
-        // 建造ドック
-        case KDOCK:
-            doKdock(data, apidata);
-            break;
-        // 建造(入手)
-        case GET_SHIP:
-            doGetship(data, apidata);
-            break;
-        // 装備開発
-        case CREATE_ITEM:
-            doCreateitem(data, apidata);
-            break;
-        // 解体
-        case DESTROY_SHIP:
-            doDestroyShip(data, apidata);
-            break;
-        // 廃棄
-        case DESTROY_ITEM2:
-            doDestroyItem2(data, apidata);
-            break;
-        // 近代化改修
-        case POWERUP:
-            doPowerup(data, apidata);
-            break;
-        // 装備位置交換
-        case SLOT_EXCHANGE_INDEX:
-            doSlotExchangeIndex(data, apidata);
-            break;
-        // 艦娘ロック操作
-        case LOCK_SHIP:
-            doLockShip(data, apidata);
-            break;
-        // 装備ロック操作
-        case LOCK_SLOTITEM:
-            doLockSlotitem(data, apidata);
-            break;
-        // 装備改修
-        case REMODEL_SLOT:
-            doRemodelSlot(data, apidata);
-            break;
-        // 海戦
-        case BATTLE:
-            doBattle(data, apidata, BattlePhaseKind.BATTLE);
-            break;
-        // 海戦
-        case BATTLE_MIDNIGHT:
-            doBattle(data, apidata, BattlePhaseKind.MIDNIGHT);
-            break;
-        // 海戦
-        case BATTLE_SP_MIDNIGHT:
-            doBattle(data, apidata, BattlePhaseKind.SP_MIDNIGHT);
-            break;
-        // 海戦
-        case BATTLE_NIGHT_TO_DAY:
-            doBattle(data, apidata, BattlePhaseKind.NIGHT_TO_DAY);
-            break;
-        // 海戦
-        case AIR_BATTLE:
-            doBattle(data, apidata, BattlePhaseKind.AIR_BATTLE);
-            break;
-        // 海戦
-        case LD_AIRBATTLE:
-            doBattle(data, apidata, BattlePhaseKind.LD_AIRBATTLE);
-            break;
-        // 海戦
-        case COMBINED_AIR_BATTLE:
-            doBattle(data, apidata, BattlePhaseKind.COMBINED_AIR);
-            break;
-        // 海戦
-        case COMBINED_LD_AIRBATTLE:
-            doBattle(data, apidata, BattlePhaseKind.COMBINED_LD_AIR);
-            break;
-        // 海戦
-        case COMBINED_BATTLE:
-            doBattle(data, apidata, BattlePhaseKind.COMBINED_BATTLE);
-            break;
-        // 海戦
-        case COMBINED_BATTLE_MIDNIGHT:
-            doBattle(data, apidata, BattlePhaseKind.COMBINED_MIDNIGHT);
-            break;
-        // 海戦
-        case COMBINED_BATTLE_SP_MIDNIGHT:
-            doBattle(data, apidata, BattlePhaseKind.COMBINED_SP_MIDNIGHT);
-            break;
-        case COMBINED_BATTLE_WATER:
-            doBattle(data, apidata, BattlePhaseKind.COMBINED_BATTLE_WATER);
-            break;
-        case COMBINED_EC_BATTLE:
-            doBattle(data, apidata, BattlePhaseKind.COMBINED_EC_BATTLE);
-            break;
-        case COMBINED_EC_BATTLE_MIDNIGHT:
-            doBattle(data, apidata, BattlePhaseKind.COMBINED_EC_BATTLE_MIDNIGHT);
-            break;
-        case COMBINED_EACH_BATTLE:
-            doBattle(data, apidata, BattlePhaseKind.COMBINED_EACH_BATTLE);
-            break;
-        case COMBINED_EACH_BATTLE_WATER:
-            doBattle(data, apidata, BattlePhaseKind.COMBINED_EACH_BATTLE_WATER);
-            break;
-        // 海戦結果
-        case BATTLE_RESULT:
-            doBattleresult(data, apidata);
-            break;
-        // 海戦結果
-        case COMBINED_BATTLE_RESULT:
-            doBattleresult(data, apidata);
-            break;
-        // 退避した
-        case COMBINED_BATTLE_GOBACK_PORT:
-            doBattleGobackPort(data, apidata);
-            break;
-        // 演習
-        case PRACTICE_BATTLE:
-            doBattle(data, apidata, BattlePhaseKind.PRACTICE_BATTLE);
-            break;
-        // 演習
-        case PRACTICE_BATTLE_MIDNIGHT:
-            doBattle(data, apidata, BattlePhaseKind.PRACTICE_MIDNIGHT);
-            break;
-        // 演習結果
-        case PRACTICE_BATTLE_RESULT:
-            doBattleresult(data, apidata);
-            break;
-        // 艦隊
-        case DECK:
-            doDeck(data, apidata);
-            break;
-        // 出撃
-        case START:
-            doStart(data, apidata);
-            break;
-        // 進撃
-        case NEXT:
-            doNext(data, apidata);
-            break;
-        // 任務
-        case QUEST_LIST:
-            doQuest(data, apidata);
-            break;
-        // 任務消化
-        case QUEST_CLEAR:
-            doQuestClear(data, apidata);
-            break;
-        // 設定
-        case START2:
-            doStart2(data, apidata);
-            break;
-        // マップ情報
-        case MAPINFO:
-            doMapInfo(data, apidata);
-            break;
-        // 任務情報
-        case MISSION:
-            doMission(data, apidata);
-            break;
-        // 演習
-        case PRACTICE:
-            doPractice(data, apidata);
-            break;
-        // 演習情報
-        case PRACTICE_ENEMYINFO:
-            doPracticeEnemyinfo(data, apidata);
-            break;
-        // 連合艦隊
-        case COMBINED:
-            doCombined(data, apidata);
-            break;
-        // 入渠開始
-        case NYUKYO_START:
-            doNyukyoStart(data, apidata);
-            break;
-        // 高速修復
-        case NYUKYO_SPEEDCHANGE:
-            doSpeedChange(data, apidata);
-            break;
-        // 改造
-        case REMODELING:
-            doRemodeling(data, apidata);
-            break;
-        // 疲労度回復アイテム使用
-        case ITEMUSE_COND:
-            doItemuseCond(data, apidata);
-            break;
-        // ログイン時のユーザ情報
-        case REQUIRE_INFO:
-            doRequireInfo(data, apidata);
-            break;
-        // 基地航空隊出撃
-        case START_AIR_BASE:
-            doStartAirBase(data, apidata);
-            break;
-        default:
-            break;
-        }
-        ++updateCounter;
+        try {
+            JsonValue apidata = data.getJsonObject().get("api_data");
+            switch (data.getDataType()) {
+            // 補給
+            case CHARGE:
+                doCharge(data, apidata);
+                break;
+            // 編成
+            case CHANGE:
+                doChange(data, apidata);
+                break;
+            // 編成
+            case PRESET_SELECT:
+                doPresetSelect(data, apidata);
+                break;
+            // 母港
+            case PORT:
+                doPort(data, apidata);
+                break;
+            // 保有装備
+            case SLOTITEM_MEMBER:
+                doSlotitemMember(data, apidata);
+                break;
+            // 保有艦
+            case SHIP3:
+                doShipDeck(data, apidata);
+                break;
+            // 保有艦
+            case SHIP2:
+                doShip2(data, apidata);
+                break;
+            // 出撃中の更新
+            case SHIP_DECK:
+                doShipDeck(data, apidata);
+                break;
+            // 基本
+            case BASIC:
+                doBasic(data, apidata);
+                break;
+            // 資材
+            case MATERIAL:
+                doMaterial(data, apidata);
+                break;
+            // 遠征(帰還)
+            case MISSION_RESULT:
+                doMissionResult(data, apidata);
+                break;
+            // 入渠
+            case NDOCK:
+                doNdock(data, apidata);
+                break;
+            // 建造
+            case CREATE_SHIP:
+                doCreateship(data, apidata);
+                break;
+            // 建造ドック
+            case KDOCK:
+                doKdock(data, apidata);
+                break;
+            // 建造(入手)
+            case GET_SHIP:
+                doGetship(data, apidata);
+                break;
+            // 装備開発
+            case CREATE_ITEM:
+                doCreateitem(data, apidata);
+                break;
+            // 解体
+            case DESTROY_SHIP:
+                doDestroyShip(data, apidata);
+                break;
+            // 廃棄
+            case DESTROY_ITEM2:
+                doDestroyItem2(data, apidata);
+                break;
+            // 近代化改修
+            case POWERUP:
+                doPowerup(data, apidata);
+                break;
+            // 装備位置交換
+            case SLOT_EXCHANGE_INDEX:
+                doSlotExchangeIndex(data, apidata);
+                break;
+            // 艦娘ロック操作
+            case LOCK_SHIP:
+                doLockShip(data, apidata);
+                break;
+            // 装備ロック操作
+            case LOCK_SLOTITEM:
+                doLockSlotitem(data, apidata);
+                break;
+            // 装備改修
+            case REMODEL_SLOT:
+                doRemodelSlot(data, apidata);
+                break;
+            // 海戦
+            case BATTLE:
+                doBattle(data, apidata, BattlePhaseKind.BATTLE);
+                break;
+            // 海戦
+            case BATTLE_MIDNIGHT:
+                doBattle(data, apidata, BattlePhaseKind.MIDNIGHT);
+                break;
+            // 海戦
+            case BATTLE_SP_MIDNIGHT:
+                doBattle(data, apidata, BattlePhaseKind.SP_MIDNIGHT);
+                break;
+            // 海戦
+            case BATTLE_NIGHT_TO_DAY:
+                doBattle(data, apidata, BattlePhaseKind.NIGHT_TO_DAY);
+                break;
+            // 海戦
+            case AIR_BATTLE:
+                doBattle(data, apidata, BattlePhaseKind.AIR_BATTLE);
+                break;
+            // 海戦
+            case LD_AIRBATTLE:
+                doBattle(data, apidata, BattlePhaseKind.LD_AIRBATTLE);
+                break;
+            // 海戦
+            case COMBINED_AIR_BATTLE:
+                doBattle(data, apidata, BattlePhaseKind.COMBINED_AIR);
+                break;
+            // 海戦
+            case COMBINED_LD_AIRBATTLE:
+                doBattle(data, apidata, BattlePhaseKind.COMBINED_LD_AIR);
+                break;
+            // 海戦
+            case COMBINED_BATTLE:
+                doBattle(data, apidata, BattlePhaseKind.COMBINED_BATTLE);
+                break;
+            // 海戦
+            case COMBINED_BATTLE_MIDNIGHT:
+                doBattle(data, apidata, BattlePhaseKind.COMBINED_MIDNIGHT);
+                break;
+            // 海戦
+            case COMBINED_BATTLE_SP_MIDNIGHT:
+                doBattle(data, apidata, BattlePhaseKind.COMBINED_SP_MIDNIGHT);
+                break;
+            case COMBINED_BATTLE_WATER:
+                doBattle(data, apidata, BattlePhaseKind.COMBINED_BATTLE_WATER);
+                break;
+            case COMBINED_EC_BATTLE:
+                doBattle(data, apidata, BattlePhaseKind.COMBINED_EC_BATTLE);
+                break;
+            case COMBINED_EC_BATTLE_MIDNIGHT:
+                doBattle(data, apidata, BattlePhaseKind.COMBINED_EC_BATTLE_MIDNIGHT);
+                break;
+            case COMBINED_EACH_BATTLE:
+                doBattle(data, apidata, BattlePhaseKind.COMBINED_EACH_BATTLE);
+                break;
+            case COMBINED_EACH_BATTLE_WATER:
+                doBattle(data, apidata, BattlePhaseKind.COMBINED_EACH_BATTLE_WATER);
+                break;
+            // 海戦結果
+            case BATTLE_RESULT:
+                doBattleresult(data, apidata);
+                break;
+            // 海戦結果
+            case COMBINED_BATTLE_RESULT:
+                doBattleresult(data, apidata);
+                break;
+            // 退避した
+            case COMBINED_BATTLE_GOBACK_PORT:
+                doBattleGobackPort(data, apidata);
+                break;
+            // 演習
+            case PRACTICE_BATTLE:
+                doBattle(data, apidata, BattlePhaseKind.PRACTICE_BATTLE);
+                break;
+            // 演習
+            case PRACTICE_BATTLE_MIDNIGHT:
+                doBattle(data, apidata, BattlePhaseKind.PRACTICE_MIDNIGHT);
+                break;
+            // 演習結果
+            case PRACTICE_BATTLE_RESULT:
+                doBattleresult(data, apidata);
+                break;
+            // 艦隊
+            case DECK:
+                doDeck(data, apidata);
+                break;
+            // 出撃
+            case START:
+                doStart(data, apidata);
+                break;
+            // 進撃
+            case NEXT:
+                doNext(data, apidata);
+                break;
+            // 任務
+            case QUEST_LIST:
+                doQuest(data, apidata);
+                break;
+            // 任務消化
+            case QUEST_CLEAR:
+                doQuestClear(data, apidata);
+                break;
+            // 設定
+            case START2:
+                doStart2(data, apidata);
+                break;
+            // マップ情報
+            case MAPINFO:
+                doMapInfo(data, apidata);
+                break;
+            // 任務情報
+            case MISSION:
+                doMission(data, apidata);
+                break;
+            // 演習
+            case PRACTICE:
+                doPractice(data, apidata);
+                break;
+            // 演習情報
+            case PRACTICE_ENEMYINFO:
+                doPracticeEnemyinfo(data, apidata);
+                break;
+            // 連合艦隊
+            case COMBINED:
+                doCombined(data, apidata);
+                break;
+            // 入渠開始
+            case NYUKYO_START:
+                doNyukyoStart(data, apidata);
+                break;
+            // 高速修復
+            case NYUKYO_SPEEDCHANGE:
+                doSpeedChange(data, apidata);
+                break;
+            // 改造
+            case REMODELING:
+                doRemodeling(data, apidata);
+                break;
+            // 疲労度回復アイテム使用
+            case ITEMUSE_COND:
+                doItemuseCond(data, apidata);
+                break;
+            // ログイン時のユーザ情報
+            case REQUIRE_INFO:
+                doRequireInfo(data, apidata);
+                break;
+            // 基地航空隊出撃
+            case START_AIR_BASE:
+                doStartAirBase(data, apidata);
+                break;
+            default:
+                break;
+            }
+            ++updateCounter;
 
-        // ユーザスクリプト呼び出し
-        EventListenerProxy.get().update(data.getDataType(), data);
-        // 登録リスナ呼び出し
-        for (EventListener listener : eventListeners) {
-            listener.update(data.getDataType(), data);
+            // ユーザスクリプト呼び出し
+            EventListenerProxy.get().update(data.getDataType(), data);
+            // 登録リスナ呼び出し
+            for (EventListener listener : eventListeners) {
+                listener.update(data.getDataType(), data);
+            }
+        } catch (Exception e) {
+            LOG.get().warn("JSON処理でエラー", e);
         }
     }
 

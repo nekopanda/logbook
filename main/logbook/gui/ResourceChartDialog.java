@@ -617,15 +617,20 @@ public final class ResourceChartDialog extends WindowBase {
             ResourceChartDialog.this.shell.getDisplay().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    if (!ResourceChartDialog.this.shell.isDisposed()) {
-                        // 見えているときだけ処理する
-                        if (ResourceChartDialog.this.shell.isVisible()) {
-                            ResourceChartDialog.this.updateContents();
+                    try {
+                        if (!ResourceChartDialog.this.shell.isDisposed()) {
+                            // 見えているときだけ処理する
+                            if (ResourceChartDialog.this.shell.isVisible()) {
+                                ResourceChartDialog.this.updateContents();
+                            }
+                        }
+                        else {
+                            // ウインドウが消えていたらタスクをキャンセルする
+                            CyclicReloadTask.this.cancel();
                         }
                     }
-                    else {
-                        // ウインドウが消えていたらタスクをキャンセルする
-                        CyclicReloadTask.this.cancel();
+                    catch (Exception e) {
+                        LOG.get().warn("資材チャートの更新に失敗", e);
                     }
                 }
             });

@@ -1,5 +1,7 @@
 package logbook.gui.listener;
 
+import logbook.internal.LoggerHolder;
+
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -9,6 +11,9 @@ import org.eclipse.swt.widgets.Shell;
  * トレイアイコンをクリックした場合の動作
  */
 public final class TraySelectionListener implements Listener {
+
+    /** ロガー */
+    private static final LoggerHolder LOG = new LoggerHolder(TraySelectionListener.class);
 
     private final Shell shell;
 
@@ -50,6 +55,8 @@ public final class TraySelectionListener implements Listener {
                 this.shell.setActive();
                 this.shell.forceActive();
             } catch (InterruptedException e) {
+            } catch (Exception e) {
+                LOG.get().warn("不明なエラー", e);
             }
         }
     }

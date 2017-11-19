@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import logbook.config.AppConfig;
+import logbook.internal.LoggerHolder;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -18,6 +19,8 @@ import org.eclipse.swt.widgets.Listener;
  * 透明度アニメーションのロジック
  */
 public class OpacityAnimation {
+    /** ロガー */
+    private static final LoggerHolder LOG = new LoggerHolder(OpacityAnimation.class);
 
     private static int ALPHA_MAX = 255;
     private static int STEP_TIME = 30;
@@ -89,18 +92,22 @@ public class OpacityAnimation {
                 Display.getDefault().timerExec(STEP_TIME, new Runnable() {
                     @Override
                     public void run() {
-                        boolean active = false;
-                        for (OpacityAnimation client : OpacityAnimationServer.this.clients) {
-                            if (client.nowAnimating) {
-                                client.animateProc();
-                                active = true;
+                        try {
+                            boolean active = false;
+                            for (OpacityAnimation client : OpacityAnimationServer.this.clients) {
+                                if (client.nowAnimating) {
+                                    client.animateProc();
+                                    active = true;
+                                }
                             }
-                        }
-                        if (active) {
-                            Display.getDefault().timerExec(STEP_TIME, this);
-                        }
-                        else {
-                            OpacityAnimationServer.this.nowAnimating = false;
+                            if (active) {
+                                Display.getDefault().timerExec(STEP_TIME, this);
+                            }
+                            else {
+                                OpacityAnimationServer.this.nowAnimating = false;
+                            }
+                        } catch (Exception e) {
+                            LOG.get().warn("OpacityAnimatorでエラー", e);
                         }
                     }
                 });

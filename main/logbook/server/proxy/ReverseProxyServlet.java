@@ -14,6 +14,7 @@ import logbook.data.Data;
 import logbook.data.DataType;
 import logbook.data.UndefinedData;
 import logbook.data.context.GlobalContext;
+import logbook.internal.LoggerHolder;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.client.HttpClient;
@@ -30,6 +31,9 @@ import org.eclipse.swt.widgets.Display;
  *
  */
 public final class ReverseProxyServlet extends ProxyServlet {
+
+    /** ロガー */
+    private static final LoggerHolder LOG = new LoggerHolder(ReverseProxyServlet.class);
 
     /** ライブラリバグ対応 (HttpRequest#queryを上書きする) */
     private static final Field QUERY_FIELD = getDeclaredField(HttpRequest.class, "query");
@@ -133,21 +137,30 @@ public final class ReverseProxyServlet extends ProxyServlet {
                 Display.getDefault().asyncExec(new Runnable() {
                     @Override
                     public void run() {
-                        UndefinedData decodedData = rawData.decode(contentEncoding);
+                        try {
+                            UndefinedData decodedData = rawData.decode(contentEncoding);
 
-                        // 統計データベース(http://kancolle-db.net/)に送信する
-                        DatabaseClient.send(decodedData);
+                            // 統計データベース(http://kancolle-db.net/)に送信する
+                            DatabaseClient.send(decodedData);
 
-                        // キャプチャしたバイト配列は何のデータかを決定する
-                        Data data = decodedData.toDefinedData();
-                        if (data.getDataType() != DataType.UNDEFINED) {
-                            // 定義済みのデータの場合にキューに追加する
-                            GlobalContext.updateContext(data);
+                            // キャプチャしたバイト配列は何のデータかを決定する
+                            Data data = decodedData.toDefinedData();
+                            if (data.getDataType() != DataType.UNDEFINED) {
+                                try {
+                                    // 定義済みのデータの場合にキューに追加する
+                                    GlobalContext.updateContext(data);
 
-                            // サーバー名が不明の場合、サーバー名をセットする
-                            if (!Filter.isServerDetected()) {
-                                Filter.setServerName(serverName);
+                                } catch (Exception e) {
+                                    LOG.get().warn("データ更新に失敗", e);
+                                }
+
+                                // サーバー名が不明の場合、サーバー名をセットする
+                                if (!Filter.isServerDetected()) {
+                                    Filter.setServerName(serverName);
+                                }
                             }
+                        } catch (Exception e) {
+                            LOG.get().warn("受信データ処理に失敗", e);
                         }
                     }
                 });

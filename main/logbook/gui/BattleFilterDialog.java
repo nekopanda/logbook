@@ -9,11 +9,13 @@ import java.util.Date;
 import java.util.List;
 
 import logbook.dto.ResultRank;
+import logbook.gui.background.AsyncExecApplicationMain;
 import logbook.gui.logic.GuiUpdator;
 import logbook.gui.logic.IntegerPair;
 import logbook.gui.logic.LayoutLogic;
 import logbook.internal.BattleResultFilter;
 import logbook.internal.BattleResultServer;
+import logbook.internal.LoggerHolder;
 import logbook.internal.TimeSpanKind;
 import logbook.util.ReportUtils;
 
@@ -40,6 +42,7 @@ import org.eclipse.swt.widgets.Shell;
  *
  */
 public class BattleFilterDialog extends WindowBase {
+    private static final LoggerHolder LOG = new LoggerHolder(AsyncExecApplicationMain.class);
 
     private static final String ALL_RANKS = "SABCDE";
     private static final String SELECT_RANK = "SELECT";
@@ -253,7 +256,12 @@ public class BattleFilterDialog extends WindowBase {
         final Runnable datalistener = new GuiUpdator(new Runnable() {
             @Override
             public void run() {
-                BattleFilterDialog.this.updateContents();
+                try {
+                    BattleFilterDialog.this.updateContents();
+                }
+                catch (Exception e) {
+                    LOG.get().warn("フィルタの更新に失敗", e);
+                }
             }
         });
         BattleResultServer.addListener(datalistener);

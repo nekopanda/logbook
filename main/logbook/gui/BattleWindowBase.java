@@ -13,6 +13,7 @@ import logbook.dto.EnemyShipDto;
 import logbook.dto.MapCellDto;
 import logbook.dto.ShipDto;
 import logbook.gui.logic.LayoutLogic;
+import logbook.internal.LoggerHolder;
 import logbook.util.SwtUtils;
 
 import org.eclipse.swt.SWT;
@@ -31,6 +32,9 @@ import org.eclipse.wb.swt.SWTResourceManager;
  *
  */
 public class BattleWindowBase extends WindowBase {
+
+    /** ロガー */
+    private static final LoggerHolder LOG = new LoggerHolder(BattleWindowBase.class);
 
     /** addLabel の対象となる Composite */
     protected Composite currentCompo;
@@ -101,24 +105,29 @@ public class BattleWindowBase extends WindowBase {
             this.getShell().getDisplay().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    // 最初の表示で大きさを固定する
-                    for (Label label : BattleWindowBase.this.fixedSizedLabels) {
-                        Object data = label.getLayoutData();
-                        if (data instanceof GridData) {
-                            GridData gd = (GridData) data;
-                            gd.widthHint = label.getSize().x;
+                    try {
+                        // 最初の表示で大きさを固定する
+                        for (Label label : BattleWindowBase.this.fixedSizedLabels) {
+                            Object data = label.getLayoutData();
+                            if (data instanceof GridData) {
+                                GridData gd = (GridData) data;
+                                gd.widthHint = label.getSize().x;
+                            }
                         }
-                    }
 
-                    //        BattleWindowBase.this.clearText();
-                    // ウィンドウサイズ復元
-                    Point winSize = BattleWindowBase.this.getWindowConfig().getSize();
-                    if ((winSize.x != -1) && (winSize.y != -1)) {
-                        BattleWindowBase.this.getShell().setSize(winSize);
-                    }
+                        //        BattleWindowBase.this.clearText();
+                        // ウィンドウサイズ復元
+                        Point winSize = BattleWindowBase.this.getWindowConfig().getSize();
+                        if ((winSize.x != -1) && (winSize.y != -1)) {
+                            BattleWindowBase.this.getShell().setSize(winSize);
+                        }
 
-                    BattleWindowBase.this.clearText();
-                    BattleWindowBase.this.updateData(false);
+                        BattleWindowBase.this.clearText();
+                        BattleWindowBase.this.updateData(false);
+                    }
+                    catch (Exception e) {
+                        LOG.get().warn("戦況の更新に失敗", e);
+                    }
                 }
             });
         }

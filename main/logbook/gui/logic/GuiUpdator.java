@@ -3,6 +3,8 @@
  */
 package logbook.gui.logic;
 
+import logbook.internal.LoggerHolder;
+
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -10,6 +12,9 @@ import org.eclipse.swt.widgets.Display;
  * @author Nekopanda
  */
 public class GuiUpdator implements Runnable {
+    /** ロガー */
+    private static final LoggerHolder LOG = new LoggerHolder(GuiUpdator.class);
+
     private boolean needUpdate = false;
 
     private final Runnable exec;
@@ -19,7 +24,11 @@ public class GuiUpdator implements Runnable {
             @Override
             public void run() {
                 if (GuiUpdator.this.needUpdate) {
-                    listener.run();
+                    try {
+                        listener.run();
+                    } catch (Exception e) {
+                        LOG.get().warn("GuiUpdatorでエラー", e);
+                    }
                     GuiUpdator.this.needUpdate = false;
                 }
             }
