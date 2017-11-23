@@ -228,7 +228,8 @@ public class BattleWindowSmall extends BattleWindow {
         if (docks == null)
             return;
 
-        this.setCombinedMode(docks.size() == 2);
+        // 7隻以上ならCombinedModeにする
+        this.setCombinedMode((docks.size() == 2) || (docks.get(0).getShips().size() >= 7));
         for (int i = 0; i < docks.size(); ++i) {
             DockDto dock = docks.get(i);
             this.printDock(dock, i * 6);

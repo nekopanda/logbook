@@ -456,6 +456,9 @@ public class AppConstants {
             new int[] { 1, 12, 15, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30 }, // その他
     };
 
+    /** 1艦隊に編成できる艦娘の数 */
+    public static final int MAXCHARA = 7;
+
     /** ドロップ報告書用スクリプト */
     public static final File SCRIPT_DIR = new File("./script");
 

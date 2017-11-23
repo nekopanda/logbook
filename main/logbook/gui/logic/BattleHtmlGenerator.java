@@ -30,6 +30,8 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class BattleHtmlGenerator extends HTMLGenerator {
 
+    private static final int MAXCHARA = AppConstants.MAXCHARA;
+
     private static String getRowSpan(int span) {
         return "rowspan=\"" + span + "\"";
     }
@@ -930,17 +932,17 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                 int[] flarePos = phase.getFlarePos();
                 if (flarePos != null) {
                     if (flarePos[0] != -1) {
-			// int base = phase.getKind().isHougekiSecond() ? 6 : 0;
-			// isHougekiSecond()が通常艦隊編成(自艦隊)の設定値を返してしまうため、
-			// 連合艦隊編成(自艦隊)の場合、正常に動作しない。
-			// 通常艦隊編成(自艦隊)の設定値を返す理由：敵連合艦隊夜戦用のAPI
-			// (COMBINED_EC_BATTLE_MIDNIGHT)が通常艦隊編成(自艦隊)と連合艦隊編成(自艦隊)
-			// で同一のため。
-                        int base = phase.getisFriendSecond() ? 6 : 0;
+                        // int base = phase.getKind().isHougekiSecond() ? MAXCHARA : 0;
+                        // isHougekiSecond()が通常艦隊編成(自艦隊)の設定値を返してしまうため、
+                        // 連合艦隊編成(自艦隊)の場合、正常に動作しない。
+                        // 通常艦隊編成(自艦隊)の設定値を返す理由：敵連合艦隊夜戦用のAPI
+                        // (COMBINED_EC_BATTLE_MIDNIGHT)が通常艦隊編成(自艦隊)と連合艦隊編成(自艦隊)
+                        // で同一のため。
+                        int base = phase.getisFriendSecond() ? MAXCHARA : 0;
                         flare[0] = this.getShipName(friendShips, (flarePos[0] - 1) + base);
                     }
                     if (flarePos[1] != -1) {
-                        int base = phase.isEnemySecond() ? 6 : 0;
+                        int base = phase.isEnemySecond() ? MAXCHARA : 0;
                         flare[1] = this.getShipName(enemyShips, (flarePos[1] - 1) + base);
                     }
                 }
@@ -1049,7 +1051,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
      * @return
      */
     private int[][][] calcHP(BattleExDto battle) {
-        int[][][] hp = new int[4][2 + (battle.getPhaseList().size() * 2)][6];
+        int[][][] hp = new int[4][2 + (battle.getPhaseList().size() * 2)][MAXCHARA];
         int[][] startHp = new int[][] {
                 battle.getStartFriendHp(),
                 battle.getStartFriendHpCombined(),
@@ -1065,15 +1067,15 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         hp[2][1] = battle.getMaxEnemyHp();
         hp[3][1] = battle.getMaxEnemyHpCombined();
 
-        int[] friendDamages = new int[12];
-        int[] enemyDamages = new int[12];
+        int[] friendDamages = new int[MAXCHARA * 2];
+        int[] enemyDamages = new int[MAXCHARA * 2];
         for (int pi = 0; pi < battle.getPhaseList().size(); ++pi) {
             BattleExDto.Phase phase = battle.getPhaseList().get(pi);
             this.computeDamages(friendDamages, enemyDamages, phase);
             this.storeDamageAndHp(startHp[0], friendDamages, 0, hp[0][(pi * 2) + 2], hp[0][(pi * 2) + 3]);
-            this.storeDamageAndHp(startHp[1], friendDamages, 6, hp[1][(pi * 2) + 2], hp[1][(pi * 2) + 3]);
+            this.storeDamageAndHp(startHp[1], friendDamages, MAXCHARA, hp[1][(pi * 2) + 2], hp[1][(pi * 2) + 3]);
             this.storeDamageAndHp(startHp[2], enemyDamages, 0, hp[2][(pi * 2) + 2], hp[2][(pi * 2) + 3]);
-            this.storeDamageAndHp(startHp[3], enemyDamages, 6, hp[3][(pi * 2) + 2], hp[3][(pi * 2) + 3]);
+            this.storeDamageAndHp(startHp[3], enemyDamages, MAXCHARA, hp[3][(pi * 2) + 2], hp[3][(pi * 2) + 3]);
             startHp = new int[][] {
                     hp[0][(pi * 2) + 3], hp[1][(pi * 2) + 3],
                     hp[2][(pi * 2) + 3], hp[3][(pi * 2) + 3] };
@@ -1220,12 +1222,12 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         copyToOffset(battle.getStartFriendHp(), friendHp, 0);
         copyToOffset(battle.getStartEnemyHp(), enemyHp, 0);
         if (battle.isCombined()) {
-            copyToOffset(battle.getDockCombined().getShips(), friendShips, 6);
-            copyToOffset(battle.getStartFriendHpCombined(), friendHp, 6);
+            copyToOffset(battle.getDockCombined().getShips(), friendShips, MAXCHARA);
+            copyToOffset(battle.getStartFriendHpCombined(), friendHp, MAXCHARA);
         }
         if (battle.isEnemyCombined()) {
-            copyToOffset(battle.getEnemyCombined(), enemyShips, 6);
-            copyToOffset(battle.getStartEnemyHpCombined(), enemyHp, 6);
+            copyToOffset(battle.getEnemyCombined(), enemyShips, MAXCHARA);
+            copyToOffset(battle.getStartEnemyHpCombined(), enemyHp, MAXCHARA);
         }
 
         int numPhases = battle.getPhaseList().size();

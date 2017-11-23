@@ -19,6 +19,8 @@ import javax.json.JsonValue;
 public class JsonUtils {
 
     public static int[] toIntArray(JsonArray jsonArray) {
+        if (jsonArray == null)
+            return new int[0];
         int[] ret = new int[jsonArray.size()];
         for (int i = 0; i < jsonArray.size(); i++) {
             ret[i] = ((JsonNumber) jsonArray.get(i)).intValue();
@@ -27,7 +29,7 @@ public class JsonUtils {
     }
 
     public static int[] getIntArray(JsonObject object, String name) {
-        return toIntArray(object.getJsonArray(name));
+        return toIntArray(getJsonArray(object, name));
     }
 
     public static boolean hasKey(JsonObject object, String name) {
@@ -36,6 +38,35 @@ public class JsonUtils {
             return false;
         }
         return true;
+    }
+
+    // null対応
+    public static JsonArray getJsonArray(JsonObject object, String name) {
+        if (hasKey(object, name)) {
+            return object.getJsonArray(name);
+        }
+        return null;
+    }
+
+    // null対応
+    public static JsonArray getJsonArray(JsonArray object, int index) {
+        if (object == null)
+            return null;
+        if (object.size() <= index)
+            return null;
+        JsonValue value = object.get(index);
+        if ((value == null) || (value == JsonValue.NULL)) {
+            return null;
+        }
+        return object.getJsonArray(index);
+    }
+
+    // null対応
+    public static JsonObject getJsonObject(JsonObject object, String name) {
+        if (hasKey(object, name)) {
+            return object.getJsonObject(name);
+        }
+        return null;
     }
 
     public static JsonObject fromString(String str) {
