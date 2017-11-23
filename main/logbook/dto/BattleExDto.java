@@ -32,8 +32,6 @@ import com.dyuproject.protostuff.Tag;
  */
 public class BattleExDto extends AbstractDto {
 
-    private static final int MAXCHARA = AppConstants.MAXCHARA;
-
     /** 日付 */
     @Tag(1)
     private final Date battleDate;
@@ -196,6 +194,9 @@ public class BattleExDto extends AbstractDto {
     @Tag(91)
     private int baseidx = 0;
 
+    @Tag(92)
+    private int secondBase = 0;
+
     private static Date date20170405;
 
     static {
@@ -241,7 +242,7 @@ public class BattleExDto extends AbstractDto {
         @Tag(22)
         private final boolean isEnemySecond;
 
-        /** 自分は連合艦隊編成か？（第二艦隊が存在するか？） */
+        /** 自分は連合艦隊の第二艦隊か？*/
         @Tag(100)
         private final boolean isFriendSecond;
 
@@ -341,28 +342,30 @@ public class BattleExDto extends AbstractDto {
                 this.airBase = new ArrayList<>();
                 for (JsonValue elem : (JsonArray) air_base_attack) {
                     JsonObject obj = (JsonObject) elem;
-                    this.airBase.add(new AirBattleDto(baseidx, obj, isFriendCombined || isEnemyCombined, true));
+                    this.airBase.add(new AirBattleDto(baseidx, battle.secondBase,
+                            obj, isFriendCombined || isEnemyCombined, true));
                 }
             }
 
             // 基地航空隊（墳式強襲）
             JsonObject air_base_injection = object.getJsonObject("api_air_base_injection");
             if (air_base_injection != null) {
-                this.airBaseInjection = new AirBattleDto(baseidx, air_base_injection, isFriendCombined
-                        || isEnemyCombined, true);
+                this.airBaseInjection = new AirBattleDto(baseidx, battle.secondBase,
+                        air_base_injection, isFriendCombined || isEnemyCombined, true);
             }
 
             // 航空戦（墳式強襲）
             JsonObject injection_kouku = object.getJsonObject("api_injection_kouku");
             if (injection_kouku != null) {
-                this.airInjection = new AirBattleDto(baseidx, injection_kouku, isFriendCombined || isEnemyCombined,
-                        false);
+                this.airInjection = new AirBattleDto(baseidx, battle.secondBase,
+                        injection_kouku, isFriendCombined || isEnemyCombined, false);
             }
 
             // 航空戦（通常）
             JsonObject kouku = object.getJsonObject("api_kouku");
             if (kouku != null) {
-                this.air = new AirBattleDto(baseidx, kouku, isFriendCombined || isEnemyCombined, false);
+                this.air = new AirBattleDto(baseidx, battle.secondBase,
+                        kouku, isFriendCombined || isEnemyCombined, false);
                 // 昼戦の触接はここ
                 this.touchPlane = this.air.touchPlane;
                 // 制空はここから取る
@@ -397,59 +400,67 @@ public class BattleExDto extends AbstractDto {
             // 航空戦（連合艦隊のみ？）
             JsonObject kouku2 = object.getJsonObject("api_kouku2");
             if (kouku2 != null)
-                this.air2 = new AirBattleDto(baseidx, kouku2, isFriendCombined || isEnemyCombined, false);
+                this.air2 = new AirBattleDto(baseidx, battle.secondBase,
+                        kouku2, isFriendCombined || isEnemyCombined, false);
 
             // 開幕対潜
-            this.openingTaisen = BattleAtackDto.makeHougeki(baseidx,
+            this.openingTaisen = BattleAtackDto.makeHougeki(baseidx, battle.secondBase,
                     JsonUtils.getJsonObject(object, "api_opening_taisen"),
                     kind.isOpeningSecond(),
                     this.isEnemySecond);
 
             // 開幕
-            this.opening = BattleAtackDto.makeRaigeki(baseidx, JsonUtils.getJsonObject(object, "api_opening_atack"),
+            this.opening = BattleAtackDto.makeRaigeki(baseidx, battle.secondBase,
+                    JsonUtils.getJsonObject(object, "api_opening_atack"),
                     kind.isOpeningSecond());
 
             // 砲撃
             if (this.isFriendSecond) {
-                this.hougeki = BattleAtackDto.makeHougeki(baseidx, JsonUtils.getJsonObject(object, "api_hougeki"),
+                this.hougeki = BattleAtackDto.makeHougeki(baseidx, battle.secondBase,
+                        JsonUtils.getJsonObject(object, "api_hougeki"),
                         true, this.isEnemySecond); // 自分が連合艦隊の場合の夜戦
             }
             else {
-                this.hougeki = BattleAtackDto.makeHougeki(baseidx, JsonUtils.getJsonObject(object, "api_hougeki"),
+                this.hougeki = BattleAtackDto.makeHougeki(baseidx, battle.secondBase,
+                        JsonUtils.getJsonObject(object, "api_hougeki"),
                         kind.isHougekiSecond(), this.isEnemySecond); // 夜戦
             }
-            this.hougeki1 = BattleAtackDto.makeHougeki(baseidx, JsonUtils.getJsonObject(object, "api_hougeki1"),
+            this.hougeki1 = BattleAtackDto.makeHougeki(baseidx, battle.secondBase,
+                    JsonUtils.getJsonObject(object, "api_hougeki1"),
                     kind.isHougeki1Second(), this.isEnemySecond);
-            this.hougeki2 = BattleAtackDto.makeHougeki(baseidx, JsonUtils.getJsonObject(object, "api_hougeki2"),
+            this.hougeki2 = BattleAtackDto.makeHougeki(baseidx, battle.secondBase,
+                    JsonUtils.getJsonObject(object, "api_hougeki2"),
                     kind.isHougeki2Second(), this.isEnemySecond);
-            this.hougeki3 = BattleAtackDto.makeHougeki(baseidx, JsonUtils.getJsonObject(object, "api_hougeki3"),
+            this.hougeki3 = BattleAtackDto.makeHougeki(baseidx, battle.secondBase,
+                    JsonUtils.getJsonObject(object, "api_hougeki3"),
                     kind.isHougeki3Second(), this.isEnemySecond);
 
             // 雷撃
-            this.raigeki = BattleAtackDto.makeRaigeki(baseidx, JsonUtils.getJsonObject(object, "api_raigeki"),
+            this.raigeki = BattleAtackDto.makeRaigeki(baseidx, battle.secondBase,
+                    JsonUtils.getJsonObject(object, "api_raigeki"),
                     kind.isRaigekiSecond());
 
             // ダメージを反映 //
 
             if (this.airBaseInjection != null)
-                this.doAtack(this.airBaseInjection.atacks);
+                this.doAtack(this.airBaseInjection.atacks, battle.secondBase);
             if (this.airBase != null)
                 for (AirBattleDto attack : this.airBase)
-                    this.doAtack(attack.atacks);
+                    this.doAtack(attack.atacks, battle.secondBase);
             if (this.airInjection != null)
-                this.doAtack(this.airInjection.atacks);
+                this.doAtack(this.airInjection.atacks, battle.secondBase);
             if (this.air != null)
-                this.doAtack(this.air.atacks);
-            this.doAtack(this.support);
+                this.doAtack(this.air.atacks, battle.secondBase);
+            this.doAtack(this.support, battle.secondBase);
             if (this.air2 != null)
-                this.doAtack(this.air2.atacks);
-            this.doAtack(this.openingTaisen);
-            this.doAtack(this.opening);
-            this.doAtack(this.hougeki);
-            this.doAtack(this.hougeki1);
-            this.doAtack(this.raigeki);
-            this.doAtack(this.hougeki2);
-            this.doAtack(this.hougeki3);
+                this.doAtack(this.air2.atacks, battle.secondBase);
+            this.doAtack(this.openingTaisen, battle.secondBase);
+            this.doAtack(this.opening, battle.secondBase);
+            this.doAtack(this.hougeki, battle.secondBase);
+            this.doAtack(this.hougeki1, battle.secondBase);
+            this.doAtack(this.raigeki, battle.secondBase);
+            this.doAtack(this.hougeki2, battle.secondBase);
+            this.doAtack(this.hougeki3, battle.secondBase);
 
             this.json = object.toString();
         }
@@ -568,7 +579,7 @@ public class BattleExDto extends AbstractDto {
             // 連合艦隊(自艦隊)
             if (isFriendCombined) {
                 friendGauge += IntStream.range(0, numFshipsCombined)
-                        .filter(i -> !((battle.escaped != null) && battle.escaped[i + MAXCHARA]))
+                        .filter(i -> !((battle.escaped != null) && battle.escaped[i + 6]))
                         .map(i -> nowFriendHpCombined[i]).sum();
                 friendNowShips += (int) Arrays.stream(nowFriendHpCombined).filter(hp -> hp > 0).count();
                 friendEscaped = (int) (battle.escaped != null ? IntStream.range(0, battle.escaped.length)
@@ -676,7 +687,7 @@ public class BattleExDto extends AbstractDto {
         }
 
         // ダメージを反映
-        private void doAtack(List<BattleAtackDto> seq) {
+        private void doAtack(List<BattleAtackDto> seq, int secondBase) {
             if (seq == null)
                 return;
 
@@ -685,19 +696,19 @@ public class BattleExDto extends AbstractDto {
                     int target = dto.target[i];
                     int damage = dto.damage[i];
                     if (dto.friendAtack) {
-                        if (target < MAXCHARA) {
+                        if (target < secondBase) {
                             this.nowEnemyHp[target] -= damage;
                         }
                         else {
-                            this.nowEnemyHpCombined[target - MAXCHARA] -= damage;
+                            this.nowEnemyHpCombined[target - secondBase] -= damage;
                         }
                     }
                     else {
-                        if (target < MAXCHARA) {
+                        if (target < secondBase) {
                             this.nowFriendHp[target] -= damage;
                         }
                         else {
-                            this.nowFriendHpCombined[target - MAXCHARA] -= damage;
+                            this.nowFriendHpCombined[target - secondBase] -= damage;
                         }
                     }
                 }
@@ -1152,8 +1163,10 @@ public class BattleExDto extends AbstractDto {
             boolean isFriendCombined = object.containsKey("api_fParam_combined");
             boolean isEnemyCombined = object.containsKey("api_eParam_combined");
 
-            int numFships = MAXCHARA;
+            int numFships = 6; // 旧API用初期値
             int numFshipsCombined = 0;
+
+            this.secondBase = 6;
 
             int baseidx = this.baseidx = (fnowhps != null) ? 0 : 1;
             if (fnowhps != null) {
@@ -1180,6 +1193,11 @@ public class BattleExDto extends AbstractDto {
                         }
                     }
                 }
+            }
+
+            // 第一艦隊が6隻より大きかったらsecondBaseも大きくする
+            if (this.secondBase < numFships) {
+                this.secondBase = numFships;
             }
 
             if (this.friends.size() == 0) { // 再読み込みの場合はスキップ
@@ -1326,8 +1344,8 @@ public class BattleExDto extends AbstractDto {
             }
 
             if (isFriendCombined) {
-                // 退避
-                this.escaped = new boolean[MAXCHARA * 2];
+                // 退避（連合艦隊は今の所最大が6+6=12隻なのでそれで固定）
+                this.escaped = new boolean[12];
                 // 退避艦は1始まりの模様
                 if (JsonUtils.hasKey(object, "api_escape_idx")) {
                     for (JsonValue jsonShip : JsonUtils.getJsonArray(object, "api_escape_idx")) {
@@ -1336,13 +1354,13 @@ public class BattleExDto extends AbstractDto {
                 }
                 if (JsonUtils.hasKey(object, "api_escape_idx_combined")) {
                     for (JsonValue jsonShip : JsonUtils.getJsonArray(object, "api_escape_idx_combined")) {
-                        this.escaped[(((JsonNumber) jsonShip).intValue() - 1) + MAXCHARA] = true;
+                        this.escaped[(((JsonNumber) jsonShip).intValue() - 1) + 6] = true;
                     }
                 }
                 for (int i = 0; i < 2; ++i) {
                     DockDto dock = this.friends.get(i);
                     if (dock != null) {
-                        dock.setEscaped(Arrays.copyOfRange(this.escaped, i * MAXCHARA, (i + 1) * MAXCHARA));
+                        dock.setEscaped(Arrays.copyOfRange(this.escaped, i * 6, (i + 1) * 6));
                     }
                 }
             }
@@ -1422,7 +1440,7 @@ public class BattleExDto extends AbstractDto {
             };
         }
         if (JsonUtils.hasKey(object, "api_lost_flag")) {
-            this.lostflag = new boolean[MAXCHARA];
+            this.lostflag = new boolean[AppConstants.MAXCHARA];
             JsonArray jsonLostflag = JsonUtils.getJsonArray(object, "api_lost_flag");
             for (int i = this.baseidx; i < jsonLostflag.size(); i++) {
                 this.lostflag[i - this.baseidx] = (jsonLostflag.getInt(i) != 0);
@@ -1908,7 +1926,7 @@ public class BattleExDto extends AbstractDto {
     }
 
     /**
-     * MVP艦が何番目の艦か (0～)
+     * MVP艦が何番目の艦か (1～)
      * MVPがいない時は-1
      * @return mvp
      */
@@ -2016,5 +2034,17 @@ public class BattleExDto extends AbstractDto {
 
     public void setCombinedKind(int combinedKind) {
         this.combinedKind = combinedKind;
+    }
+
+    /**
+     * 第一艦隊の最大隻数＝第2艦隊のベースインデックス
+     * @return numFirstMax
+     */
+    public int getSecondBase() {
+        if (this.secondBase == 0) {
+            // 旧データ対応
+            return 6;
+        }
+        return this.secondBase;
     }
 }

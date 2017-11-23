@@ -52,7 +52,7 @@ public class AirBattleDto {
         };
     }
 
-    public AirBattleDto(int baseidx, JsonObject kouku, boolean isCombined, boolean isBase) {
+    public AirBattleDto(int baseidx, int secondBase, JsonObject kouku, boolean isCombined, boolean isBase) {
         JsonObject jsonStage1 = JsonUtils.getJsonObject(kouku, "api_stage1");
         if (jsonStage1 != null) {
             this.stage1 = readPlaneCount(jsonStage1);
@@ -81,7 +81,7 @@ public class AirBattleDto {
         }
 
         this.atacks = BattleAtackDto.makeAir(
-                baseidx,
+                baseidx, secondBase,
                 JsonUtils.getJsonArray(kouku, "api_plane_from"),
                 JsonUtils.getJsonObject(kouku, "api_stage3"),
                 isCombined ? JsonUtils.getJsonObject(kouku, "api_stage3_combined") : null,
