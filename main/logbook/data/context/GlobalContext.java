@@ -770,6 +770,9 @@ public final class GlobalContext {
             case COMBINED_EACH_BATTLE_WATER:
                 doBattle(data, apidata, BattlePhaseKind.COMBINED_EACH_BATTLE_WATER);
                 break;
+            case COMBINED_EC_NIGHT_TO_DAY:
+                doBattle(data, apidata, BattlePhaseKind.COMBINED_EC_NIGHT_TO_DAY);
+                break;
             // 海戦結果
             case BATTLE_RESULT:
                 doBattleresult(data, apidata);

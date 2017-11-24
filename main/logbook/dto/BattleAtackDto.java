@@ -108,16 +108,18 @@ public class BattleAtackDto {
 
     private static BattleAtackDto makeRaigeki(int baseidx, boolean friendAtack,
             JsonArray rai_list, JsonArray dam_list, JsonArray cl_list, JsonArray ydam_list) {
-        int elems = rai_list.size() - baseidx; // 6 or 12
-        int[] originMap = new int[elems];
-        int[] targetMap = new int[elems];
-        boolean[] targetEnabled = new boolean[elems];
+        // originとtargetの個数が違うようになった
+        int oelems = rai_list.size() - baseidx;
+        int telems = dam_list.size() - baseidx;
+        int[] originMap = new int[oelems];
+        int[] targetMap = new int[telems];
+        boolean[] targetEnabled = new boolean[telems];
         BattleAtackDto dto = new BattleAtackDto();
         dto.kind = AtackKind.RAIGEKI;
         dto.friendAtack = friendAtack;
 
         int idx = 0;
-        for (int i = 0; i < elems; ++i) {
+        for (int i = 0; i < oelems; ++i) {
             int rai = rai_list.getInt(i + baseidx);
             if (rai >= baseidx) {
                 originMap[i] = idx++;
@@ -130,7 +132,7 @@ public class BattleAtackDto {
         dto.ot = new int[idx];
 
         idx = 0;
-        for (int i = 0; i < elems; ++i) {
+        for (int i = 0; i < telems; ++i) {
             if (targetEnabled[i]) {
                 targetMap[i] = idx++;
             }
@@ -138,9 +140,8 @@ public class BattleAtackDto {
         dto.target = new int[idx];
         dto.damage = new int[idx];
 
-        for (int i = 0; i < elems; ++i) {
+        for (int i = 0; i < oelems; ++i) {
             int rai = rai_list.getInt(i + baseidx);
-            int dam = dam_list.getInt(i + baseidx);
             int cl = cl_list.getInt(i + baseidx);
             int ydam = ydam_list.getInt(i + baseidx);
             if (rai >= baseidx) {
@@ -149,6 +150,9 @@ public class BattleAtackDto {
                 dto.critical[originMap[i]] = cl;
                 dto.ot[originMap[i]] = targetMap[rai - baseidx];
             }
+        }
+        for (int i = 0; i < telems; ++i) {
+            int dam = dam_list.getInt(i + baseidx);
             if (targetEnabled[i]) {
                 dto.target[targetMap[i]] = i;
                 dto.damage[targetMap[i]] = dam;
@@ -157,7 +161,7 @@ public class BattleAtackDto {
 
         // 連合艦隊を考慮した配列構成になっているか
         // （6-5敵連合艦隊実装まで連合艦隊の雷撃は随伴艦隊だけが受けることになっていたのでelems==6だったが6-5敵連合艦隊では敵の全艦が攻撃を受ける対象となったのでelems==12になった）
-        dto.combineEnabled = (elems == 12);
+        dto.combineEnabled = ((oelems > 6) || (telems > 6));
 
         return dto;
     }
@@ -329,8 +333,8 @@ public class BattleAtackDto {
                     JsonUtils.getJsonArray(raigeki, "api_fcl"),
                     JsonUtils.getJsonArray(raigeki, "api_fydam"));
 
-            if (fatack.combineEnabled == false) {
-                // 味方の随伴艦のみが雷撃を行う場合(6-5実装以前の連合艦隊はこれ。6-5実装以降の連合艦隊は不明)
+            if ((baseidx == 1) && (fatack.combineEnabled == false)) {
+                // 旧APIとの互換性: 味方の随伴艦のみが雷撃を行う場合(6-5実装以前の連合艦隊はこれ。6-5実装以降の連合艦隊は不明)
                 if (isFriendSecond) {
                     fatack.makeOriginCombined(secondBase);
                 }
@@ -347,8 +351,8 @@ public class BattleAtackDto {
                     JsonUtils.getJsonArray(raigeki, "api_ecl"),
                     JsonUtils.getJsonArray(raigeki, "api_eydam"));
 
-            if ((fatack != null) && (fatack.combineEnabled == false)) {
-                // 味方の随伴艦のみが雷撃を受ける場合(6-5実装以前の連合艦隊はこれ。6-5実装以降の連合艦隊は不明)
+            if ((baseidx == 1) && (fatack != null) && (fatack.combineEnabled == false)) {
+                // 旧APIとの互換性: 味方の随伴艦のみが雷撃を受ける場合(6-5実装以前の連合艦隊はこれ。6-5実装以降の連合艦隊は不明)
                 if (isFriendSecond) {
                     eatack.makeTargetCombined(secondBase);
                 }
@@ -384,8 +388,8 @@ public class BattleAtackDto {
                 JsonUtils.getJsonArray(hougeki, "api_cl_list"),
                 JsonUtils.getJsonArray(hougeki, "api_damage"));
 
-        // 味方連合艦隊を反映
-        if (isFriendSecond) {
+        // 旧APIとの互換性: 味方連合艦隊を反映
+        if ((baseidx == 1) && isFriendSecond) {
             for (BattleAtackDto dto : seq) {
                 if (dto.friendAtack) {
                     dto.makeOriginCombined(secondBase);
@@ -395,8 +399,8 @@ public class BattleAtackDto {
                 }
             }
         }
-        // 敵連合艦隊を反映（現状夜戦のみに適用）
-        if (isEnemySecond) {
+        // 旧APIとの互換性: 敵連合艦隊を反映（現状夜戦のみに適用）
+        if ((baseidx == 1) && isEnemySecond) {
             for (BattleAtackDto dto : seq) {
                 if (!dto.friendAtack) {
                     dto.makeOriginCombined(secondBase);

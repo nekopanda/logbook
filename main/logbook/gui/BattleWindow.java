@@ -41,9 +41,10 @@ public class BattleWindow extends BattleWindowBase {
     protected Label matchLabel;
     protected final Label resultLabel[] = new Label[3];
 
-    protected final int[] yDamages = new int[12];
-    protected final int[][] friendDamages = new int[2][12];
-    protected final int[][] enemyDamages = new int[2][12];
+    // ダメージ計算に使われる
+    protected final int[] yDamages = new int[AppConstants.MAXCHARA * 2];
+    protected final int[][] friendDamages = new int[2][AppConstants.MAXCHARA * 2];
+    protected final int[][] enemyDamages = new int[2][AppConstants.MAXCHARA * 2];
 
     protected static String AFTER_DAY = "昼戦後";
     protected static String AFTER_NIGHT = "夜戦後";
@@ -276,6 +277,7 @@ public class BattleWindow extends BattleWindowBase {
             return;
 
         // ダメージ計算
+        int secondBase = battle.getSecondBase();
         int airDamage = 0;
         for (int i = 0; i < this.yDamages.length; ++i)
             this.yDamages[i] = 0;
@@ -289,7 +291,8 @@ public class BattleWindow extends BattleWindowBase {
 
         MVPShip[] mvp1 = this.computeMVP(Arrays.copyOf(this.yDamages, friendShips.size()), friendShips);
         MVPShip[] mvp2 = battle.isCombined() ? this.computeMVP(
-                Arrays.copyOfRange(this.yDamages, 6, 6 + friendShipsCombined.size()), friendShipsCombined) : null;
+                Arrays.copyOfRange(this.yDamages, secondBase, secondBase + friendShipsCombined.size()),
+                friendShipsCombined) : null;
 
         // 情報表示
         String[] formation = battle.getFormation();
