@@ -374,6 +374,8 @@ public class BattleExDto extends AbstractDto {
 
             // 支援艦隊
             JsonNumber support_flag = object.getJsonNumber("api_support_flag");
+            JsonNumber support_n_flag = object.getJsonNumber("api_n_support_flag");
+        
             if ((support_flag != null) && (support_flag.intValue() != 0)) {
                 JsonObject support = JsonUtils.getJsonObject(object, "api_support_info");
                 JsonObject support_hourai = JsonUtils.getJsonObject(support, "api_support_hourai");
@@ -392,6 +394,25 @@ public class BattleExDto extends AbstractDto {
                     }
                 }
                 this.supportType = toSupport(support_flag.intValue());
+            }
+            else if ((support_n_flag != null) && (support_n_flag.intValue() != 0)) {
+                         JsonObject support = JsonUtils.getJsonObject(object, "api_n_support_info");
+                JsonObject support_hourai = JsonUtils.getJsonObject(support, "api_support_hourai");
+                JsonObject support_air = JsonUtils.getJsonObject(support, "api_support_airatack");
+                if (support_hourai != null) {
+                    JsonArray edam = JsonUtils.getJsonArray(support_hourai, "api_damage");
+                    if (edam != null) {
+                        this.support = BattleAtackDto.makeSupport(baseidx, edam);
+                    }
+                }
+                else if (support_air != null) {
+                    JsonObject stage3 = JsonUtils.getJsonObject(support_air, "api_stage3");
+                    if (stage3 != null) {
+                        this.support = BattleAtackDto.makeSupport(baseidx,
+                                JsonUtils.getJsonArray(stage3, "api_edam"));
+                    }
+                }
+                this.supportType = toSupport(support_n_flag.intValue());       
             }
             else {
                 this.supportType = "";
