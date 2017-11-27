@@ -79,7 +79,7 @@ function setFleet(fleetid) {
 
 			if((ships[i].slot[j].match(/^九八式水上偵察機\(夜偵\)$/)) || (ships[i].slot[j].match(/^OS2U$/)) || (ships[i].slot[j].match(/^二式大艇$/)) || (ships[i].slot[j].match(/^Ro.44水上戦闘機$/)) || (ships[i].slot[j].match(/^二式水戦改$/)) || (ships[i].slot[j].match(/^Ro.44水上戦闘機bis$/)) || (ships[i].slot[j].match(/^二式水戦改\(熟練\)$/))) {
 				currentDockData.sumMinusTaisen = currentDockData.sumMinusTaisen + 1;
-			} else if ((ships[i].slot[j].match(/^La/)) || (ships[i].slot[j].match(/^瑞雲\(六三一空\)$/)) || (ships[i].slot[j].match(/^Ro.43水偵$/)) || (ships[i].slot[j].match(/^零式水上偵察機$/)) || (ships[i].slot[j].match(/^紫雲$/)) || (ships[i].slot[j].match(/^PBY-5A Catalina$/))){
+			} else if ((ships[i].slot[j].match(/^Lat$/)) || (ships[i].slot[j].match(/^瑞雲\(六三一空\)$/)) || (ships[i].slot[j].match(/^Ro.43水偵$/)) || (ships[i].slot[j].match(/^零式水上偵察機$/)) || (ships[i].slot[j].match(/^紫雲$/)) || (ships[i].slot[j].match(/^PBY-5A Catalina$/))){
 				currentDockData.sumMinusTaisen = currentDockData.sumMinusTaisen + 2;
 			} else if (ships[i].slot[j].match(/^晴嵐\(六三一空\)$/)) {
 				currentDockData.sumMinusTaisen = currentDockData.sumMinusTaisen + 3;
@@ -124,11 +124,11 @@ function setFleet(fleetid) {
 			case 20: currentDockData.ASCount++; break;
 			case 21: currentDockData.TVCount++; break;
 		}
-		if ((ships[i].stype == 7) && (!(ships[i].name.match(/大鷹/))))
+		if ((ships[i].stype == 7) && (!(ships[i].name.match(/^大鷹$/))))
 		{
 			currentDockData.CVLCount++;
 		}
-		else if ((ships[i].stype == 7) && (ships[i].name.match(/大鷹/)))
+		else if ((ships[i].stype == 7) && (ships[i].name.match(/^大鷹$/)))
 		{
 			currentDockData.ECCount++;
 		}
@@ -200,7 +200,7 @@ function sTypeLock(shipCount, flgShipLv, sumShipLv, flgType, drumShipCount, drum
 			currentDockData.drumCount >= drumCount &&
 			currentDockData.CLCount >= CLCount && 
 			currentDockData.DDCount >= DDCount && 
-			(currentDockData.CVCount + currentDockData.CVLCount + currentDockData.ACVCount + currentDockData.AVCount) >= CVCount &&
+			(currentDockData.CVCount + currentDockData.CVLCount + currentDockData.ACVCount + currentDockData.AVCount + currentDockData.ECCount) >= CVCount &&
 			currentDockData.CVBCount >= CVBCount &&
 			(currentDockData.SSCount + currentDockData.CVSCount) >= SSCount &&
 			currentDockData.CACount >= CACount &&
