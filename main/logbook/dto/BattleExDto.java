@@ -246,6 +246,9 @@ public class BattleExDto extends AbstractDto {
         @Tag(100)
         private final boolean isFriendSecond;
 
+        /** 払暁戦（夜戦から始まり昼戦へ移行）か？*/
+        private final boolean isNightToDay;
+
         /** 支援攻撃のタイプ */
         @Tag(7)
         private String supportType;
@@ -293,6 +296,10 @@ public class BattleExDto extends AbstractDto {
         @Tag(19)
         private List<BattleAtackDto> hougeki3 = null;
 
+        private List<BattleAtackDto> hougeki_n_1 = null;
+
+        private List<BattleAtackDto> hougeki_n_2 = null;
+
         @Tag(30)
         private final String json;
 
@@ -310,6 +317,10 @@ public class BattleExDto extends AbstractDto {
             // 自分が第二艦隊であることの確認）
             this.isFriendSecond = (object.containsKey("api_active_deck")
                     ? (object.getJsonArray("api_active_deck").getInt(0) == 2) : false);
+            
+            // 払暁戦か？
+            this.isNightToDay = (object.containsKey("api_day_flag")
+                    ? (object.getInt("api_day_flag") == 1) : false);
 
             this.kind = kind;
             this.isNight = kind.isNight();
@@ -375,7 +386,7 @@ public class BattleExDto extends AbstractDto {
             // 支援艦隊
             JsonNumber support_flag = object.getJsonNumber("api_support_flag");
             JsonNumber support_n_flag = object.getJsonNumber("api_n_support_flag");
-        
+
             if ((support_flag != null) && (support_flag.intValue() != 0)) {
                 JsonObject support = JsonUtils.getJsonObject(object, "api_support_info");
                 JsonObject support_hourai = JsonUtils.getJsonObject(support, "api_support_hourai");
@@ -412,7 +423,7 @@ public class BattleExDto extends AbstractDto {
                                 JsonUtils.getJsonArray(stage3, "api_edam"));
                     }
                 }
-                this.supportType = toSupport(support_n_flag.intValue());       
+                this.supportType = toSupport(support_n_flag.intValue());
             }
             else {
                 this.supportType = "";
@@ -446,6 +457,14 @@ public class BattleExDto extends AbstractDto {
                         JsonUtils.getJsonObject(object, "api_hougeki"),
                         kind.isHougekiSecond(), this.isEnemySecond); // 夜戦
             }
+            if (this.isNightToDay) {
+            	this.hougeki_n_1 = BattleAtackDto.makeHougeki(baseidx, battle.secondBase,
+                        JsonUtils.getJsonObject(object, "api_n_hougeki1"),
+                            false, true);
+                this.hougeki_n_2 = BattleAtackDto.makeHougeki(baseidx, battle.secondBase,
+                        JsonUtils.getJsonObject(object, "api_n_hougeki2"),
+                            false, false);
+            }
             this.hougeki1 = BattleAtackDto.makeHougeki(baseidx, battle.secondBase,
                     JsonUtils.getJsonObject(object, "api_hougeki1"),
                     kind.isHougeki1Second(), this.isEnemySecond);
@@ -477,6 +496,8 @@ public class BattleExDto extends AbstractDto {
                 this.doAtack(this.air2.atacks, battle.secondBase);
             this.doAtack(this.openingTaisen, battle.secondBase);
             this.doAtack(this.opening, battle.secondBase);
+            this.doAtack(this.hougeki_n_1, battle.secondBase);
+            this.doAtack(this.hougeki_n_2, battle.secondBase);
             this.doAtack(this.hougeki, battle.secondBase);
             this.doAtack(this.hougeki1, battle.secondBase);
             this.doAtack(this.raigeki, battle.secondBase);
@@ -717,11 +738,13 @@ public class BattleExDto extends AbstractDto {
                     int target = dto.target[i];
                     int damage = dto.damage[i];
                     if (dto.friendAtack) {
-                        if (target < secondBase) {
+                        // 敵艦隊の艦数は現在のところ1艦隊あたり最大6なので、味方艦隊との差分を調整する
+                        int sabun = secondBase % 6;
+                        if (target < (secondBase - sabun)) {
                             this.nowEnemyHp[target] -= damage;
                         }
                         else {
-                            this.nowEnemyHpCombined[target - secondBase] -= damage;
+                            this.nowEnemyHpCombined[target - secondBase + sabun] -= damage;
                         }
                     }
                     else {
@@ -774,7 +797,7 @@ public class BattleExDto extends AbstractDto {
 
         /**
          * 攻撃の全シーケンスを取得
-         * [ 噴式基地航空隊航空戦, 基地航空隊航空戦, 噴式航空戦, 航空戦1, 支援艦隊の攻撃, 航空戦2, 開幕対潜, 開幕, 夜戦, 砲撃戦1, 雷撃, 砲撃戦2, 砲撃戦3 ]
+         * [ 噴式基地航空隊航空戦, 基地航空隊航空戦, 噴式航空戦, 航空戦1, 支援艦隊の攻撃, 航空戦2, 開幕対潜, 開幕, 夜戦の砲撃戦1, 夜戦の砲撃戦2, 夜戦, 砲撃戦1, 雷撃, 砲撃戦2, 砲撃戦3 ]
          * 各戦闘がない場合はnullになる
          * @return
          */
@@ -790,6 +813,8 @@ public class BattleExDto extends AbstractDto {
                     ((this.air2 == null) || (this.air2.atacks == null)) ? null : this.toArray(this.air2.atacks),
                     this.openingTaisen == null ? null : this.toArray(this.openingTaisen),
                     this.opening == null ? null : this.toArray(this.opening),
+                    this.hougeki_n_1 == null ? null : this.toArray(this.hougeki_n_1),
+                    this.hougeki_n_2 == null ? null : this.toArray(this.hougeki_n_2),
                     this.hougeki == null ? null : this.toArray(this.hougeki),
                     this.hougeki1 == null ? null : this.toArray(this.hougeki1),
                     this.raigeki == null ? null : this.toArray(this.raigeki),
