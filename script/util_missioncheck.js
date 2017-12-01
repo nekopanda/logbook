@@ -223,7 +223,7 @@ function sTypeLock2(shipCount, flgShipLv, sumShipLv, flgType, drumShipCount, dru
 			(flgType == 0 || currentDockData.flgType == flgType) &&
 			currentDockData.drumShipCount >= drumShipCount &&
 			currentDockData.drumCount >= drumCount &&
-			(((currentDockData.CLCount >= CLCount) && (currentDockData.DDCount >= DDCount))  || (currentDockData.DDCount==1 && currentDockData.DECount==3) || (currentDockData.CLCount >= 1 && currentDockData.DECount >= 2) || (currentDockData.TVCount >= 1 && currentDockData.DECount >= 2) || (currentDockData.ECCount >= 1 && currentDockData.DECount >= 2) || (currentDockData.ECCount >= 1 && currentDockData.DDCount >= 2)) && 
+			(((currentDockData.CLCount >= CLCount) && (currentDockData.DDCount >= DDCount))  || (currentDockData.DDCount >= 1 && currentDockData.DECount >= 3) || (currentDockData.CLCount >= 1 && currentDockData.DECount >= 2) || (currentDockData.TVCount >= 1 && currentDockData.DECount >= 2) || (currentDockData.ECCount >= 1 && currentDockData.DECount >= 2) || (currentDockData.ECCount >= 1 && currentDockData.DDCount >= 2)) && 
 			(currentDockData.CVCount + currentDockData.CVLCount + currentDockData.ACVCount + currentDockData.AVCount) >= CVCount &&
 			currentDockData.CVBCount >= CVBCount &&
 			(currentDockData.SSCount + currentDockData.CVSCount) >= SSCount &&
