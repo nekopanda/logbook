@@ -277,7 +277,7 @@ public class BattleWindow extends BattleWindowBase {
             return;
 
         // ダメージ計算
-        int secondBase = battle.getSecondBase();
+        int friendSecondBase = battle.getFriendSecondBase();
         int airDamage = 0;
         for (int i = 0; i < this.yDamages.length; ++i)
             this.yDamages[i] = 0;
@@ -291,7 +291,7 @@ public class BattleWindow extends BattleWindowBase {
 
         MVPShip[] mvp1 = this.computeMVP(Arrays.copyOf(this.yDamages, friendShips.size()), friendShips);
         MVPShip[] mvp2 = battle.isCombined() ? this.computeMVP(
-                Arrays.copyOfRange(this.yDamages, secondBase, secondBase + friendShipsCombined.size()),
+                Arrays.copyOfRange(this.yDamages, friendSecondBase, friendSecondBase + friendShipsCombined.size()),
                 friendShipsCombined) : null;
 
         // 情報表示

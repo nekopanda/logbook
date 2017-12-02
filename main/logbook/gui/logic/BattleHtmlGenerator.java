@@ -936,11 +936,11 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                         // 通常艦隊編成(自艦隊)の設定値を返す理由：敵連合艦隊夜戦用のAPI
                         // (COMBINED_EC_BATTLE_MIDNIGHT)が通常艦隊編成(自艦隊)と連合艦隊編成(自艦隊)
                         // で同一のため。
-                        int base = phase.getisFriendSecond() ? battle.getSecondBase() : 0;
+                        int base = phase.getisFriendSecond() ? battle.getFriendSecondBase() : 0;
                         flare[0] = this.getShipName(friendShips, (flarePos[0] - 1) + base);
                     }
                     if (flarePos[1] != -1) {
-                        int base = phase.isEnemySecond() ? battle.getSecondBase() : 0;
+                        int base = phase.isEnemySecond() ? battle.getEnemySecondBase() : 0;
                         flare[1] = this.getShipName(enemyShips, (flarePos[1] - 1) + base);
                     }
                 }
@@ -1049,7 +1049,8 @@ public class BattleHtmlGenerator extends HTMLGenerator {
      * @return
      */
     private int[][][] calcHP(BattleExDto battle) {
-        int[][][] hp = new int[4][2 + (battle.getPhaseList().size() * 2)][battle.getSecondBase()];
+        int maxShips = Math.max(battle.getFriendSecondBase(), battle.getEnemySecondBase());
+        int[][][] hp = new int[4][2 + (battle.getPhaseList().size() * 2)][maxShips];
         int[][] startHp = new int[][] {
                 battle.getStartFriendHp(),
                 battle.getStartFriendHpCombined(),
@@ -1065,16 +1066,16 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         hp[2][1] = battle.getMaxEnemyHp();
         hp[3][1] = battle.getMaxEnemyHpCombined();
 
-        int[] friendDamages = new int[battle.getSecondBase() * 2];
-        int[] enemyDamages = new int[battle.getSecondBase() * 2];
+        int[] friendDamages = new int[battle.getFriendSecondBase() * 2];
+        int[] enemyDamages = new int[battle.getFriendSecondBase() * 2];
         for (int pi = 0; pi < battle.getPhaseList().size(); ++pi) {
             BattleExDto.Phase phase = battle.getPhaseList().get(pi);
             this.computeDamages(friendDamages, enemyDamages, phase);
             this.storeDamageAndHp(startHp[0], friendDamages, 0, hp[0][(pi * 2) + 2], hp[0][(pi * 2) + 3]);
-            this.storeDamageAndHp(startHp[1], friendDamages, battle.getSecondBase(), hp[1][(pi * 2) + 2],
+            this.storeDamageAndHp(startHp[1], friendDamages, battle.getFriendSecondBase(), hp[1][(pi * 2) + 2],
                     hp[1][(pi * 2) + 3]);
             this.storeDamageAndHp(startHp[2], enemyDamages, 0, hp[2][(pi * 2) + 2], hp[2][(pi * 2) + 3]);
-            this.storeDamageAndHp(startHp[3], enemyDamages, battle.getSecondBase(), hp[3][(pi * 2) + 2],
+            this.storeDamageAndHp(startHp[3], enemyDamages, battle.getFriendSecondBase(), hp[3][(pi * 2) + 2],
                     hp[3][(pi * 2) + 3]);
             startHp = new int[][] {
                     hp[0][(pi * 2) + 3], hp[1][(pi * 2) + 3],
@@ -1212,22 +1213,22 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.genFormation(battle);
 
         // フェイズ //
-        ShipBaseDto[] friendShips = new ShipBaseDto[battle.getSecondBase() * 2];
-        ShipBaseDto[] enemyShips = new ShipBaseDto[battle.getSecondBase() * 2];
-        int[] friendHp = new int[battle.getSecondBase() * 2];
-        int[] enemyHp = new int[battle.getSecondBase() * 2];
+        ShipBaseDto[] friendShips = new ShipBaseDto[battle.getFriendSecondBase() * 2];
+        ShipBaseDto[] enemyShips = new ShipBaseDto[battle.getEnemySecondBase() * 2];
+        int[] friendHp = new int[battle.getFriendSecondBase() * 2];
+        int[] enemyHp = new int[battle.getEnemySecondBase() * 2];
 
         copyToOffset(battle.getDock().getShips(), friendShips, 0);
         copyToOffset(battle.getEnemy(), enemyShips, 0);
         copyToOffset(battle.getStartFriendHp(), friendHp, 0);
         copyToOffset(battle.getStartEnemyHp(), enemyHp, 0);
         if (battle.isCombined()) {
-            copyToOffset(battle.getDockCombined().getShips(), friendShips, battle.getSecondBase());
-            copyToOffset(battle.getStartFriendHpCombined(), friendHp, battle.getSecondBase());
+            copyToOffset(battle.getDockCombined().getShips(), friendShips, battle.getFriendSecondBase());
+            copyToOffset(battle.getStartFriendHpCombined(), friendHp, battle.getFriendSecondBase());
         }
         if (battle.isEnemyCombined()) {
-            copyToOffset(battle.getEnemyCombined(), enemyShips, battle.getSecondBase());
-            copyToOffset(battle.getStartEnemyHpCombined(), enemyHp, battle.getSecondBase());
+            copyToOffset(battle.getEnemyCombined(), enemyShips, battle.getEnemySecondBase());
+            copyToOffset(battle.getStartEnemyHpCombined(), enemyHp, battle.getEnemySecondBase());
         }
 
         int numPhases = battle.getPhaseList().size();

@@ -20,6 +20,8 @@ import com.dyuproject.protostuff.Tag;
  */
 public class BattleAtackDto {
 
+    private static final int ENEMY_SECOND_BASE = 6;
+
     /** 攻撃の種類 */
     @Tag(1)
     public AtackKind kind;
@@ -166,7 +168,7 @@ public class BattleAtackDto {
         return dto;
     }
 
-    private static BattleAtackDto makeAir(int baseidx, int secondBase, boolean friendAtack,
+    private static BattleAtackDto makeAir(int baseidx, int originSecondBase, int targetSecondBase, boolean friendAtack,
             JsonArray plane_from, JsonArray dam_list, JsonArray cdam_list, JsonArray cl_list, JsonArray ccl_list,
             boolean isBase) {
 
@@ -188,7 +190,7 @@ public class BattleAtackDto {
             for (int i = 0; i < plane_from.size(); ++i) {
                 if (plane_from.getInt(i) != -1)
                     // api_plane_fromは1始まりのまま
-                    dto.origin[idx++] = (plane_from.getInt(i) - 1) % secondBase;
+                    dto.origin[idx++] = (plane_from.getInt(i) - 1) % originSecondBase;
             }
         }
         idx = 0;
@@ -226,7 +228,7 @@ public class BattleAtackDto {
                 int dam = cdam_list.getInt(i + baseidx);
                 int cl = ccl_list.getInt(i + baseidx);
                 if (dam > 0) {
-                    dto.target[idx] = i + secondBase;
+                    dto.target[idx] = i + targetSecondBase;
                     dto.damage[idx] = dam;
                     // クリティカルフラグを砲撃と合わせる
                     dto.critical[idx] = cl + 1;
@@ -257,7 +259,7 @@ public class BattleAtackDto {
      * @param combined
      * @return
      */
-    public static List<BattleAtackDto> makeAir(int baseidx, int secondBase,
+    public static List<BattleAtackDto> makeAir(int baseidx, int friendSecondBase,
             JsonArray plane_from, JsonObject raigeki,
             JsonObject combined,
             boolean isBase) {
@@ -280,7 +282,7 @@ public class BattleAtackDto {
         }
 
         BattleAtackDto fatack = makeAir(
-                baseidx, secondBase,
+                baseidx, friendSecondBase, ENEMY_SECOND_BASE,
                 true,
                 JsonUtils.getJsonArray(plane_from, 0),
                 JsonUtils.getJsonArray(raigeki, "api_edam"),
@@ -294,7 +296,7 @@ public class BattleAtackDto {
         }
 
         BattleAtackDto eatack = makeAir(
-                baseidx, secondBase,
+                baseidx, ENEMY_SECOND_BASE, friendSecondBase,
                 false,
                 JsonUtils.getJsonArray(plane_from, 1),
                 JsonUtils.getJsonArray(raigeki, "api_fdam"),
@@ -313,7 +315,7 @@ public class BattleAtackDto {
      * @return
      */
     public static List<BattleAtackDto> makeRaigeki(
-            int baseidx, int secondBase,
+            int baseidx, int friendSecondBase,
             JsonObject raigeki, boolean isFriendSecond) {
         if (raigeki == null)
             return null;
@@ -336,7 +338,7 @@ public class BattleAtackDto {
             if ((baseidx == 1) && (fatack.combineEnabled == false)) {
                 // 旧APIとの互換性: 味方の随伴艦のみが雷撃を行う場合(6-5実装以前の連合艦隊はこれ。6-5実装以降の連合艦隊は不明)
                 if (isFriendSecond) {
-                    fatack.makeOriginCombined(secondBase);
+                    fatack.makeOriginCombined(friendSecondBase);
                 }
             }
             attaks.add(fatack);
@@ -354,7 +356,7 @@ public class BattleAtackDto {
             if ((baseidx == 1) && (fatack != null) && (fatack.combineEnabled == false)) {
                 // 旧APIとの互換性: 味方の随伴艦のみが雷撃を受ける場合(6-5実装以前の連合艦隊はこれ。6-5実装以降の連合艦隊は不明)
                 if (isFriendSecond) {
-                    eatack.makeTargetCombined(secondBase);
+                    eatack.makeTargetCombined(friendSecondBase);
                 }
             }
             attaks.add(eatack);
@@ -366,11 +368,11 @@ public class BattleAtackDto {
     /**
      * api_hougeki* を読み込む
      * @param baseidx 基点(0 or 1)
-     * @param secondBase 最初の艦隊の最大艦数(6 or 7)
+     * @param friendSecondBase 最初の艦隊の最大艦数(6 or 7)
      * @param hougeki
      */
     public static List<BattleAtackDto> makeHougeki(
-            int baseidx, int secondBase,
+            int baseidx, int friendSecondBase,
             JsonObject hougeki,
             boolean isFriendSecond, boolean isEnemySecond) {
         if (hougeki == null)
@@ -392,10 +394,10 @@ public class BattleAtackDto {
         if ((baseidx == 1) && isFriendSecond) {
             for (BattleAtackDto dto : seq) {
                 if (dto.friendAtack) {
-                    dto.makeOriginCombined(secondBase);
+                    dto.makeOriginCombined(friendSecondBase);
                 }
                 else {
-                    dto.makeTargetCombined(secondBase);
+                    dto.makeTargetCombined(friendSecondBase);
                 }
             }
         }
@@ -403,10 +405,10 @@ public class BattleAtackDto {
         if ((baseidx == 1) && isEnemySecond) {
             for (BattleAtackDto dto : seq) {
                 if (!dto.friendAtack) {
-                    dto.makeOriginCombined(secondBase);
+                    dto.makeOriginCombined(ENEMY_SECOND_BASE);
                 }
                 else {
-                    dto.makeTargetCombined(secondBase);
+                    dto.makeTargetCombined(ENEMY_SECOND_BASE);
                 }
             }
         }
