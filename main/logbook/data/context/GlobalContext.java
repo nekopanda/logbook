@@ -1826,25 +1826,45 @@ public final class GlobalContext {
      */
     private static void doDestroyShip(Data data, JsonValue json) {
         try {
-            int shipid = Integer.valueOf(data.getField("api_ship_id"));
-            ShipDto ship = shipMap.get(shipid);
-            if (ship != null) {
-                // レポート
-                CreateReportLogic.storeLostReport(LostEntityDto.make(ship, "艦娘の解体"));
+            // POSTのForm dataで送信される艦娘のIDはカンマで区切られ、複数の場合がある。
+            String shipid_strg = String.valueOf(data.getField("api_ship_id"));
+            String[] shipids = shipid_strg.split(",",0);
+            // 一度に解体処理される艦の最大数は10
+            int shipid[] = {0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0};
+            // 0:装備保管　1:装備解体
+            int slot_flg = Integer.valueOf(data.getField("api_slot_dest_flag"));
+            
+            for (int i=0; i < shipids.length; i++) {
+                shipid[i] = Integer.parseInt(shipids[i]);
+                ShipDto ship = shipMap.get(shipid[i]);
+                if (ship != null) {
+                    if (slot_flg == 1) {
+                        // 装備解体
+                        // レポート
+                        CreateReportLogic.storeLostReport(LostEntityDto.make(ship, "艦娘の解体(装備解体)"));
 
-                // 持っている装備を廃棄する
-                for (int item : ship.getItemId()) {
-                    itemMap.remove(item);
-                }
-                // 艦娘を外す
-                shipMap.remove(ship.getId());
-                // 艦隊からも外す
-                String fleetid = ship.getFleetid();
-                if (fleetid != null) {
-                    DockDto dockdto = dock.get(fleetid);
-                    if (dockdto != null) {
-                        dockdto.removeShip(ship);
-                        dockdto.setUpdate(true);
+                        // 持っている装備を廃棄する
+                        for (int item : ship.getItemId()) {
+                            itemMap.remove(item);
+                        }
+                    }
+                    else {
+                        // 装備保管
+                        // レポート
+                        CreateReportLogic.storeLostReport(LostEntityDto.make(ship, "艦娘の解体(装備保管)"));
+                        // 艦娘が装備していたアイテムは艦の解体時に自動的に取り外され、保管される。
+                        // そのときに実行が必要な処理を以下に記述する（もしあれば）
+                    }
+                    // 艦娘を外す
+                    shipMap.remove(ship.getId());
+                    // 艦隊からも外す
+                    String fleetid = ship.getFleetid();
+                    if (fleetid != null) {
+                        DockDto dockdto = dock.get(fleetid);
+                        if (dockdto != null) {
+                            dockdto.removeShip(ship);
+                            dockdto.setUpdate(true);
+                        }
                     }
                 }
             }
