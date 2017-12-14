@@ -699,6 +699,10 @@ public final class GlobalContext {
             case SLOT_EXCHANGE_INDEX:
                 doSlotExchangeIndex(data, apidata);
                 break;
+            // 他艦娘装備中装備交換
+            case SLOT_DEPRIVE:
+                doSlotDeprive(data, apidata);
+                break;
             // 艦娘ロック操作
             case LOCK_SHIP:
                 doLockShip(data, apidata);
@@ -1984,6 +1988,60 @@ public final class GlobalContext {
             addUpdateLog("装備状態を更新しました");
         } catch (Exception e) {
             LOG.get().warn("装備状態の更新に失敗しました", e);
+            LOG.get().warn(data);
+        }
+    }
+
+    /**
+     * @param data
+     */
+    private static void doSlotDeprive(Data data, JsonValue json) {
+        try {
+            // 装備中の装備を取り外される艦の処理
+            int unset_shipId = Integer.parseInt(data.getField("api_unset_ship"));
+            ShipDto unset_ship = shipMap.get(unset_shipId);
+            if (unset_ship != null) {
+                if (json instanceof JsonObject) {
+                    JsonObject apidata = (JsonObject) json;
+                    JsonObject shipdata = apidata.getJsonObject("api_ship_data");
+                    JsonObject unsetship = shipdata.getJsonObject("api_unset_ship");
+                    unset_ship.setSlotFromJson(unsetship);
+
+                    // 次アップデート
+                    String unset_fleetid = unset_ship.getFleetid();
+                    if (unset_fleetid != null) {
+                        DockDto unset_dockdto = dock.get(unset_fleetid);
+                        if (unset_dockdto != null) {
+                            unset_dockdto.setUpdate(true);
+                        }
+                    }
+                }
+            }
+
+            // 取り外された装備を装備する艦の処理
+            int set_shipId = Integer.parseInt(data.getField("api_set_ship"));
+            ShipDto set_ship = shipMap.get(set_shipId);
+            if (set_ship != null) {
+                if (json instanceof JsonObject) {
+                    JsonObject apidata = (JsonObject) json;
+                    JsonObject shipdata = apidata.getJsonObject("api_ship_data");
+                    JsonObject setship = shipdata.getJsonObject("api_set_ship");
+                    set_ship.setSlotFromJson(setship);
+
+                    // 次アップデート
+                    String set_fleetid = set_ship.getFleetid();
+                    if (set_fleetid != null) {
+                        DockDto set_dockdto = dock.get(set_fleetid);
+                        if (set_dockdto != null) {
+                            set_dockdto.setUpdate(true);
+                        }
+                    }
+                }
+            }
+
+            addUpdateLog("他艦娘装備中装備の交換後、装備状態を更新しました");
+        } catch (Exception e) {
+            LOG.get().warn("他艦娘装備中装備の交換後、装備状態の更新に失敗しました", e);
             LOG.get().warn(data);
         }
     }
