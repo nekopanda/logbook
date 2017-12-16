@@ -699,10 +699,6 @@ public final class GlobalContext {
             case SLOT_EXCHANGE_INDEX:
                 doSlotExchangeIndex(data, apidata);
                 break;
-            // 他艦娘装備中装備交換
-            case SLOT_DEPRIVE:
-                doSlotDeprive(data, apidata);
-                break;
             // 艦娘ロック操作
             case LOCK_SHIP:
                 doLockShip(data, apidata);
