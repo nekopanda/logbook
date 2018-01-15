@@ -92,7 +92,6 @@ public class ReportUtils {
         case NYUKYO_START:
         case NYUKYO_SPEEDCHANGE:
         case SLOT_EXCHANGE_INDEX:
-        case SLOT_DEPRIVE:
 
             // 戦闘結果を反映させるため戦闘でも更新
         case BATTLE:
