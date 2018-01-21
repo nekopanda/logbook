@@ -1699,18 +1699,8 @@ public final class GlobalContext {
         try {
             if (json instanceof JsonArray) {
                 JsonArray apidata = (JsonArray) json;
-                // 情報を破棄
-                shipMap.clear();
                 for (int i = 0; i < apidata.size(); i++) {
                     addShip(new ShipDto((JsonObject) apidata.get(i)));
-                }
-
-                // 戦闘結果がある場合、ダメージ計算があっているか検証します
-                if ((battle != null) && (battle.getDock() != null) && (battle.isPractice() == false)) {
-                    checkBattleDamage(battle.getDock().getShips(), battle.getNowFriendHp());
-                    if (battle.isCombined()) {
-                        checkBattleDamage(battle.getDockCombined().getShips(), battle.getNowFriendHpCombined());
-                    }
                 }
 
                 // 艦隊を設定
@@ -1828,13 +1818,13 @@ public final class GlobalContext {
         try {
             // POSTのForm dataで送信される艦娘のIDはカンマで区切られ、複数の場合がある。
             String shipid_strg = String.valueOf(data.getField("api_ship_id"));
-            String[] shipids = shipid_strg.split(",",0);
+            String[] shipids = shipid_strg.split(",", 0);
             // 一度に解体処理される艦の最大数は10
-            int shipid[] = {0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0};
+            int shipid[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
             // 0:装備保管　1:装備解体
             int slot_flg = Integer.valueOf(data.getField("api_slot_dest_flag"));
-            
-            for (int i=0; i < shipids.length; i++) {
+
+            for (int i = 0; i < shipids.length; i++) {
                 shipid[i] = Integer.parseInt(shipids[i]);
                 ShipDto ship = shipMap.get(shipid[i]);
                 if (ship != null) {
