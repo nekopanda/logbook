@@ -11,10 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author Nekopanda
@@ -149,6 +146,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         this.begin("tr", null);
 
         this.inline("th", "", null);
+        this.inline("th", "ID", null);
         this.inline("th", "艦名", null);
         this.inline("th", "cond.", null);
         this.inline("th", "制空", null);
@@ -194,6 +192,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
             this.begin("tr", null);
 
             this.inline("td", String.valueOf(i + (isSecond ? 7 : 1)), null);
+            this.inline("td", String.valueOf(ship.getShipId()), null);
             this.inline("td", ship.getFriendlyName(), null);
 
             if (isFriend) {
@@ -265,7 +264,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
         SakutekiString totalSakuteki = new SakutekiString(ships,
                 hqLv);
         this.inline("td", "", null);
-        this.inline("td", "合計", null);
+        this.inline("td", getColSpan(2), "合計", null);
         this.inline("td", "", null);
         this.inline("td", totalSeiku.toString(), null);
         this.inline("td", totalSakuteki.toString(), null);
@@ -280,9 +279,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
             this.inline("td", getColSpan(3), phaseName[i], null);
         }
 
-        this.inline("td",
-
-                getColSpan(10), "", null);
+        this.inline("td", getColSpan(10), "", null);
 
         this.end(); // tr
 
@@ -324,6 +321,7 @@ public class BattleHtmlGenerator extends HTMLGenerator {
             for (int c = 0; c < 5; ++c) {
                 String onSlot = "";
                 String itemName = "";
+                String tooltip = "";
                 int[] onSlots = ship.getOnSlot(); // 現在の艦載機搭載数
                 int[] maxeq = ship.getShipInfo().getMaxeq2(); // 艦載機最大搭載数
                 if (c < items.size()) {
@@ -335,24 +333,50 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                             onSlot = cur + "/" + max;
                         }
                         itemName += item.getFriendlyName();
+                        tooltip += getItemParamTooltipContents(item);
                     }
                 }
-                this.inline("td", itemName, null);
+                this.inline("td title='" + tooltip + "'", itemName, null);
                 this.inline("td", onSlot, null);
             }
             if (isFriend) {
                 String itemName = "";
+                String tooltip = "";
                 ItemDto dto = ((ShipDto) ship).getSlotExItem();
                 if (dto != null) {
                     itemName = dto.getFriendlyName();
+                    tooltip = getItemParamTooltipContents(dto);
                 }
-                this.inline("td", itemName, null);
+                this.inline("td title='" + tooltip + "'", itemName, null);
             }
             this.end(); // tr
         }
 
         this.end(); // table
         this.end(); // p
+    }
+
+    private String getItemParamTooltipContents(ItemDto item){
+        String description = "";
+        if(Objects.nonNull(item)){
+            description += "ID:" + item.getSlotitemId() + " " + item.getName() + "&#x0A;";
+            ShipParameters itemParam = item.getParam();
+            Map<String,Integer> itemParams = new LinkedHashMap<>();
+            itemParams.put("火力",itemParam.getKaryoku());
+            itemParams.put("雷装",itemParam.getRaisou());
+            itemParams.put("対空",itemParam.getTaiku());
+            itemParams.put("対潜",itemParam.getTaisen());
+            itemParams.put("爆装",itemParam.getBaku());
+            itemParams.put(item.getType2() == 48 ? "対爆" : "命中",itemParam.getHoum());
+            itemParams.put(item.getType2() == 48 ? "迎撃" : "回避",itemParam.getKaihi());
+            itemParams.put("索敵",itemParam.getSakuteki());
+            itemParams.put("装甲",itemParam.getSoukou());
+            description += String.join("&#x0A;", itemParams.entrySet().stream()
+                    .filter(e -> e.getValue() != 0)
+                    .map(e -> e.getKey() + " " + (e.getValue() > 0 ? "+" : "") + e.getValue())
+                    .toArray(String[]::new));
+        }
+        return description;
     }
 
     /**
