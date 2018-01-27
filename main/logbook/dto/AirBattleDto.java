@@ -121,53 +121,53 @@ public class AirBattleDto {
     private static String toTaikuCutin(int id) {
         switch (id) {
             case 1:
-                return "高角砲x2/電探";
+                return "1:高角砲x2/電探";
             case 2:
-                return "高角砲/電探";
+                return "2:高角砲/電探";
             case 3:
-                return "高角砲x2";
+                return "3:高角砲x2";
             case 4:
-                return "大口径主砲/三式弾/高射装置/電探";
+                return "4:大口径主砲/三式弾/高射装置/電探";
             case 5:
-                return "高角砲+高射装置x2/電探";
+                return "5:高角砲+高射装置x2/電探";
             case 6:
-                return "大口径主砲/三式弾/高射装置";
+                return "6:大口径主砲/三式弾/高射装置";
             case 7:
-                return "高角砲/高射装置/電探";
+                return "7:高角砲/高射装置/電探";
             case 8:
-                return "高角砲+高射装置/電探";
+                return "8:高角砲+高射装置/電探";
             case 9:
-                return "高角砲/高射装置";
+                return "9:高角砲/高射装置";
             case 10:
-                return "高角砲/集中機銃/電探";
+                return "10:高角砲/集中機銃/電探";
             case 11:
-                return "高角砲/集中機銃";
+                return "11:高角砲/集中機銃";
             case 12:
-                return "集中機銃/機銃/電探";
+                return "12:集中機銃/機銃/電探";
             case 13:
-                return "高角砲/集中機銃/電探";
+                return "13:高角砲/集中機銃/電探";
             case 14:
-                return "高角砲/機銃/電探";
+                return "14:高角砲/機銃/電探";
             case 15:
-                return "高角砲/機銃";
+                return "15:高角砲/機銃";
             case 16:
-                return "高角砲/機銃/電探";
+                return "16:高角砲/機銃/電探";
             case 17:
-                return "高角砲/機銃";
+                return "17:高角砲/機銃";
             case 18:
-                return "集中機銃";
+                return "18:集中機銃";
             case 19:
-                return "高角砲(非高射装置)/集中機銃";
+                return "19:高角砲(非高射装置)/集中機銃";
             case 20:
-                return "集中機銃";
+                return "20:集中機銃";
             case 21:
-                return "高角砲/電探";
+                return "21:高角砲/電探";
             case 22:
-                return "集中機銃";
+                return "22:集中機銃";
             case 23:
-                return "機銃(非集中)";
+                return "23:機銃(非集中)";
             case 24:
-                return "高角砲/機銃(非集中)";
+                return "24:高角砲/機銃(非集中)";
         }
         return "不明(" + id + ")";
     }
