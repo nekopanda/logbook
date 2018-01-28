@@ -222,6 +222,9 @@ public final class AppConfigBean {
     /** 機銃やバルジの装備数を表示 */
     private boolean showGunAndBulge = true;
 
+    /** 対空項目を表示 */
+    private boolean showAA = false;
+
     /** 疲労タイマーを表示する */
     private boolean showCondTimer = true;
 
@@ -1340,6 +1343,16 @@ public final class AppConfigBean {
      */
     public void setShowGunAndBulge(boolean showGunAndBulge) {
         this.showGunAndBulge = showGunAndBulge;
+    }
+
+
+
+    public boolean isShowAA() {
+        return showAA;
+    }
+
+    public void setShowAA(boolean showAA) {
+        this.showAA = showAA;
     }
 
     /**

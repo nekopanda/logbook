@@ -20,14 +20,7 @@ import logbook.dto.DockDto;
 import logbook.dto.ItemDto;
 import logbook.dto.ItemInfoDto;
 import logbook.dto.ShipDto;
-import logbook.gui.logic.ColorManager;
-import logbook.gui.logic.DaihatsuString;
-import logbook.gui.logic.DamageRate;
-import logbook.gui.logic.SakutekiString;
-import logbook.gui.logic.SeikuString;
-import logbook.gui.logic.TPString;
-import logbook.gui.logic.TimeLogic;
-import logbook.gui.logic.TimeString;
+import logbook.gui.logic.*;
 import logbook.internal.AkashiTimer;
 import logbook.internal.CondTiming;
 import logbook.internal.EvaluateExp;
@@ -62,7 +55,7 @@ public class FleetComposite extends Composite {
     /** 致命的 */
     public static final int FATAL = 2;
     /** 1艦隊に編成できる艦娘の数 */
-    private static final int MAXCHARA = AppConstants.MAXCHARA;;
+    private static final int MAXCHARA = AppConstants.MAXCHARA;
     /** フォント大きい */
     private final static int LARGE = 2;
     /** フォント小さい */
@@ -121,6 +114,8 @@ public class FleetComposite extends Composite {
     private final Label[] fuelstLabels = new Label[MAXCHARA];
     /** ダメコン */
     private final Label[] dmgcLabels = new Label[MAXCHARA];
+    /** 対空項目 */
+    private final Label[] aaLabels = new Label[MAXCHARA];
     /** レベリング  */
     private final Label[] nextLabels = new Label[MAXCHARA];
     /** 泊地修理 or 疲労回復 */
@@ -216,7 +211,7 @@ public class FleetComposite extends Composite {
 
             // ステータス
             Composite stateComposite = new Composite(downsideBase, SWT.NONE);
-            stateComposite.setLayout(SwtUtils.makeGridLayout(6, 0, 0, 0, 0));
+            stateComposite.setLayout(SwtUtils.makeGridLayout(7, 0, 0, 0, 0));
             stateComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
             Label condst = new Label(stateComposite, SWT.NONE);
@@ -227,6 +222,8 @@ public class FleetComposite extends Composite {
             SwtUtils.initLabel(bullst, "弾", new GridData());
             Label dmgc = new Label(stateComposite, SWT.NONE);
             SwtUtils.initLabel(dmgc, "ダ", new GridData());
+            Label aa = new Label(stateComposite, SWT.NONE);
+            SwtUtils.initLabel(aa, "対空", new GridData());
             Label next = new Label(stateComposite, SWT.NONE);
             SwtUtils.initLabel(next, "next", new GridData());
             Label time = new Label(stateComposite, SWT.NONE);
@@ -247,6 +244,7 @@ public class FleetComposite extends Composite {
             this.bullstLabels[i] = bullst;
             this.fuelstLabels[i] = fuelst;
             this.dmgcLabels[i] = dmgc;
+            this.aaLabels[i] = aa;
             this.nextLabels[i] = next;
             this.timeLabels[i] = time;
         }
@@ -292,6 +290,7 @@ public class FleetComposite extends Composite {
             this.bullstLabels[i].setText("");
             this.fuelstLabels[i].setText("");
             this.dmgcLabels[i].setText("");
+            this.aaLabels[i].setText("");
             this.nextLabels[i].setText("");
             this.timeLabels[i].setText("");
         }
@@ -507,6 +506,31 @@ public class FleetComposite extends Composite {
 
             this.dmgcLabels[i].setText(dmgcstr);
             this.dmgcLabels[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN));
+
+            // 対空項目
+            String aaString = "";
+            if(AppConfig.get().isShowAA()){
+                CalcAA calcAA = new CalcAA();
+                List<ShipDto> aaShips = new ArrayList<>();
+                aaShips.addAll(ships);
+                boolean isCombined = GlobalContext.isCombined();
+                if(isCombined){
+                    switch (dockIndex){
+                        case 0:
+                            aaShips.addAll(GlobalContext.getDock("2").getShips());
+                            break;
+                        case 1:
+                            aaShips.addAll(GlobalContext.getDock("1").getShips());
+                            break;
+                    }
+                }
+                aaString += String.format("加:%.2f 割:%.2f%% 固:%d ",
+                        calcAA.getFinalWeightedAirValue(ship,aaShips,true,1),
+                        calcAA.getPropShotDown(ship,true,isCombined,dockIndex == 1) * 100,
+                        calcAA.getFixedShotDown(ship,aaShips,true,isCombined,dockIndex == 1,1,0));
+            }
+            this.aaLabels[i].setText(aaString);
+            this.aaLabels[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_RED));
 
             // ステータス.あと何回
             String statusstr = "";
@@ -742,9 +766,29 @@ public class FleetComposite extends Composite {
         this.addStyledText(this.message,
                 MessageFormat.format(AppConstants.MESSAGE_SAKUTEKI, sakutekiString.toString()), null);
         this.addStyledText(this.message, "\n", null);
+        // 対空
+        if(AppConfig.get().isShowAA()){
+            CalcAA calcAA = new CalcAA();
+            List<ShipDto> aaShips = new ArrayList<>();
+            aaShips.addAll(ships);
+            boolean isCombined = GlobalContext.isCombined();
+            if(isCombined){
+                switch (dockIndex){
+                    case 0:
+                        aaShips.addAll(GlobalContext.getDock("2").getShips());
+                        break;
+                    case 1:
+                        aaShips.addAll(GlobalContext.getDock("1").getShips());
+                        break;
+                }
+            }
+            this.addStyledText(this.message,
+                    MessageFormat.format(AppConstants.MESSAGE_AA, calcAA.getFleetAirDefenseValue(aaShips,true,1)), null);
+            this.addStyledText(this.message, "\n", null);
+        }
         // 合計対潜値(装備込)
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_TAISEN, totaltaisen), null);
-        this.addStyledText(this.message, "\n", null);
+        this.addStyledText(this.message, "", null);
         // 合計対空値(装備込)
         this.addStyledText(this.message, MessageFormat.format(AppConstants.MESSAGE_TAIKU, totaltaiku), null);
         this.addStyledText(this.message, "\n", null);
