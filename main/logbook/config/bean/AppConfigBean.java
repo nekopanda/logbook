@@ -45,6 +45,9 @@ public final class AppConfigBean {
     /** 母港タブの疲労度タイマー表示 */
     private boolean showCondCycleTimer = true;
 
+    /** 母港タブの戦果表示 */
+    private boolean showResultRecord = true;
+
     /** 音量 */
     private float soundLevel = 0.85f;
 
@@ -510,6 +513,12 @@ public final class AppConfigBean {
     public void setShowCondCycleTimer(boolean showCondTimer) {
         this.showCondCycleTimer = showCondTimer;
     }
+
+
+
+    public boolean isShowResultRecord() { return showResultRecord; }
+
+    public void setShowResultRecord(boolean showResultRecord) { this.showResultRecord = showResultRecord; }
 
     /**
      * @return showNotifySetting

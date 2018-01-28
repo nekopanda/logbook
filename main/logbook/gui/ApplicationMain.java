@@ -346,6 +346,11 @@ public final class ApplicationMain extends WindowBase {
     private Label akashiTimerLabel;
     private Text akashiTimerTime;
 
+    /** 戦果 **/
+    private Composite resultRecordGroup;
+    private Label resultRecordLabel;
+    private Label admiralExpLabel;
+
     /** エラー表示 **/
     private Label errorLabel;
     /** コンソール **/
@@ -1011,6 +1016,20 @@ public final class ApplicationMain extends WindowBase {
         gdconTimeTime.widthHint = SwtUtils.DPIAwareWidth(75);
         this.condTimerTime.setLayoutData(gdconTimeTime);
 
+        this.resultRecordGroup = new Composite(this.mainComposite,SWT.NONE);
+        this.resultRecordGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        this.resultRecordGroup.setLayout(SwtUtils.makeGridLayout(2, 1, 1, 3, 3));
+
+        this.resultRecordLabel = new Label(this.resultRecordGroup, SWT.NONE);
+        this.resultRecordLabel.setText(String.format("戦果　今回: %8.2f / 今日: %8.2f / 今月: %8.2f",0.0,0.0,0.0));
+        this.resultRecordLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        this.admiralExpLabel = new Label(this.resultRecordGroup, SWT.RIGHT);
+        this.admiralExpLabel.setText(String.format("%d exp.",0));
+        GridData gdAdmiralExp = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+        gdAdmiralExp.widthHint = SwtUtils.DPIAwareWidth(75);
+        this.admiralExpLabel.setLayoutData(gdAdmiralExp);
+
         // -------
 
         // エラー表示
@@ -1071,6 +1090,10 @@ public final class ApplicationMain extends WindowBase {
         MenuItem showCondTimer = new MenuItem(this.getPopupMenu(), SWT.CHECK);
         showCondTimer.setText("疲労タイマーを表示");
         this.bindControlToMenuItem(this.condTimerGroup, showCondTimer, "ShowCondCycleTimer");
+
+        MenuItem showResultRecord = new MenuItem(this.getPopupMenu(), SWT.CHECK);
+        showResultRecord.setText("戦果を表示");
+        this.bindControlToMenuItem(this.resultRecordGroup, showResultRecord, "ShowResultRecord");
 
         // 縮小表示
         final MenuItem dispsize = new MenuItem(this.getPopupMenu(), SWT.CHECK);
@@ -2014,6 +2037,10 @@ public final class ApplicationMain extends WindowBase {
     public Text getAkashiTimerTime() {
         return this.akashiTimerTime;
     }
+
+    public Label getResultRecordLabel() { return this.resultRecordLabel; }
+
+    public Label getAdmiralExpLabel(){ return this.admiralExpLabel; }
 
     /**
      * エラーラベルを取得

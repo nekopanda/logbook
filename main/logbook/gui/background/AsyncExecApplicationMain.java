@@ -2,11 +2,7 @@ package logbook.gui.background;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
@@ -29,12 +25,7 @@ import logbook.gui.logic.PushNotify;
 import logbook.gui.logic.Sound;
 import logbook.gui.logic.TimeLogic;
 import logbook.gui.widgets.FleetComposite;
-import logbook.internal.AkashiTimer;
-import logbook.internal.CondTiming;
-import logbook.internal.EnemyData;
-import logbook.internal.LoggerHolder;
-import logbook.internal.MasterData;
-import logbook.internal.ShipParameterRecord;
+import logbook.internal.*;
 import logbook.scripting.ScriptData;
 import logbook.util.SwtUtils;
 
@@ -710,6 +701,22 @@ public final class AsyncExecApplicationMain extends Thread {
                 akashiTimerText.setToolTipText(null);
                 akashiTimerText.setBackground(ColorManager.getColor(AppConstants.AKASHI_REPAIR_COLOR));
             }
+
+            // 戦果
+            Label resultRecordLabel = this.main.getResultRecordLabel();
+            ResultRecord r = GlobalContext.getResultRecord();
+            String resultRecordTooltipText = String.format("今回: +%d exp. / 戦果 %.2f \r\n今日: +%d exp. / 戦果 %.2f \r\n今月: +%d exp. / 戦果 %.2f ",
+                    r.getAcquiredAdmiralExpOfHalfDay(),r.getAcquiredValueOfHalfDay(),
+                    r.getAcquiredAdmiralExpOfDay(),r.getAcquiredValueOfDay(),
+                    r.getAcquiredAdmiralExpOfMonth(),r.getAcquiredValueOfMonth());
+            resultRecordLabel.setText(String.format("戦果　今回: %8.2f / 今日: %8.2f / 今月: %8.2f",
+                    r.getAcquiredValueOfHalfDay(),
+                    r.getAcquiredValueOfDay(),
+                    r.getAcquiredValueOfMonth()));
+            resultRecordLabel.setToolTipText(resultRecordTooltipText);
+            Label admiralExpLabel = this.main.getAdmiralExpLabel();
+            admiralExpLabel.setText(String.format("%d exp.",r.getNowAdmiralExp()));
+            admiralExpLabel.setToolTipText(resultRecordTooltipText);
         }
 
         /** エラー表示を更新 */

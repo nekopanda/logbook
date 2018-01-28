@@ -4,17 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.CheckForNull;
@@ -54,13 +44,7 @@ import logbook.dto.ShipInfoDto;
 import logbook.gui.ApplicationMain;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.Sound;
-import logbook.internal.AkashiTimer;
-import logbook.internal.BattleResultServer;
-import logbook.internal.CondTiming;
-import logbook.internal.Item;
-import logbook.internal.LoggerHolder;
-import logbook.internal.MasterData;
-import logbook.internal.Ship;
+import logbook.internal.*;
 import logbook.internal.ShipParameterRecord.UpdateShipParameter;
 import logbook.scripting.EventListenerProxy;
 import logbook.util.JsonUtils;
@@ -180,6 +164,9 @@ public final class GlobalContext {
     /** 泊地修理タイマー */
     private static AkashiTimer akashiTimer = new AkashiTimer();
 
+    /** 戦果 */
+    private static ResultRecord resultRecord = new ResultRecord();
+
     /** まだ削除してない轟沈艦 */
     private static List<ShipDto> sunkShips = new ArrayList<ShipDto>();
 
@@ -227,6 +214,7 @@ public final class GlobalContext {
         }
         Date akashiStartTime = config.getAkashiStartTime();
         GlobalContext.akashiTimer.setStartTime(akashiStartTime);
+        GlobalContext.resultRecord = Optional.ofNullable(config.getResultRecord()).orElse(new ResultRecord());
     }
 
     /**
@@ -588,6 +576,9 @@ public final class GlobalContext {
     public static AkashiTimer getAkashiTimer() {
         return akashiTimer;
     }
+
+
+    public static ResultRecord getResultRecord() { return resultRecord; }
 
     /**
      * リクエスト・レスポンスを受け取るEventListener登録
@@ -2049,7 +2040,9 @@ public final class GlobalContext {
                 if ((old != null) && (old.getMemberId() != basic.getMemberId())) {
                     // アカウントが変わった
                     state = 3;
+                    resultRecord.reset();
                 }
+                Optional.ofNullable(basic).map(BasicInfoDto::getExperience).ifPresent(exp -> resultRecord.update(exp));
             }
         } catch (Exception e) {
             LOG.get().warn("司令部を更新するに失敗しました", e);
