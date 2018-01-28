@@ -346,6 +346,9 @@ public final class AppConfigBean {
     /** 艦娘一覧ウィンドウのフィルタパネル表示・非表示 */
     private ShipFilterPanelConfigBean[] shipTablePanelVisibles = new ShipFilterPanelConfigBean[4];
 
+    /** 分岐点係数 */
+    private double bunkitenKeisu = 1;
+
     /** 保存したJSONを読み込ませてテストするためのウィンドウメニューを表示するかどうか */
     private boolean enableTestWindow = false;
 
@@ -2226,6 +2229,14 @@ public final class AppConfigBean {
      */
     public void setUseLockedOnlyFleetFormat(boolean useLockedOnlyFleetFormat) {
         this.useLockedOnlyFleetFormat = useLockedOnlyFleetFormat;
+    }
+
+    public double getBunkitenKeisu(){
+        return bunkitenKeisu;
+    }
+
+    public void setBunkitenKeisu(double keisu){
+        this.bunkitenKeisu = keisu;
     }
 
 }

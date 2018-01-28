@@ -454,6 +454,16 @@ public final class ConfigDialog extends Dialog {
         sakutekiCombo.add("I.装備込みの艦隊索敵値(2-5式(旧))");
         sakutekiCombo.select(AppConfig.get().getSakutekiMethodV4());
 
+        Label labelBunkiten = new Label(compositeFleetTab, SWT.NONE);
+        labelBunkiten.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        labelBunkiten.setText("分岐点係数");
+
+        final Text bunkiten = new Text(compositeFleetTab, SWT.BORDER);
+        GridData gdBunkiten = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+        gdBunkiten.widthHint = SwtUtils.DPIAwareWidth(180);
+        bunkiten.setLayoutData(gdBunkiten);
+        bunkiten.setText(Double.toString(AppConfig.get().getBunkitenKeisu()));
+
         Label mainLog = new Label(compositeFleetTab, SWT.NONE);
         mainLog.setText("母港タブのログ");
         mainLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
@@ -1169,6 +1179,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setAkashiTimerFormat(akashiFormatCombo.getSelectionIndex());
                 AppConfig.get().setSeikuMethod(seikuCombo.getSelectionIndex());
                 AppConfig.get().setSakutekiMethodV4(sakutekiCombo.getSelectionIndex());
+                AppConfig.get().setBunkitenKeisu(Double.valueOf(bunkiten.getText()));
                 // notify
                 AppConfig.get().setOkCond(condSpinner.getSelection());
                 AppConfig.get().setNoticeCondOnlyMainFleet(condOnlyMain.getSelection());
