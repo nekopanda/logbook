@@ -709,10 +709,15 @@ public final class AsyncExecApplicationMain extends Thread {
                     r.getAcquiredAdmiralExpOfHalfDay(),r.getAcquiredValueOfHalfDay(),
                     r.getAcquiredAdmiralExpOfDay(),r.getAcquiredValueOfDay(),
                     r.getAcquiredAdmiralExpOfMonth(),r.getAcquiredValueOfMonth());
-            resultRecordLabel.setText(String.format("戦果　今回: %8.2f / 今日: %8.2f / 今月: %8.2f",
-                    r.getAcquiredValueOfHalfDay(),
-                    r.getAcquiredValueOfDay(),
-                    r.getAcquiredValueOfMonth()));
+            // 縮小表示にした際、大きくレイアウトが崩れるため表示変更
+            if(AppConfig.get().isMinimumLayout()){
+                resultRecordLabel.setText("戦果");
+            } else {
+                resultRecordLabel.setText(String.format("戦果　今回: %8.2f / 今日: %8.2f / 今月: %8.2f",
+                        r.getAcquiredValueOfHalfDay(),
+                        r.getAcquiredValueOfDay(),
+                        r.getAcquiredValueOfMonth()));
+            }
             resultRecordLabel.setToolTipText(resultRecordTooltipText);
             Label admiralExpLabel = this.main.getAdmiralExpLabel();
             admiralExpLabel.setText(String.format("%d exp.",r.getNowAdmiralExp()));

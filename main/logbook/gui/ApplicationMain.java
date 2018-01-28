@@ -1146,6 +1146,9 @@ public final class ApplicationMain extends WindowBase {
                         }
                     }
 
+                    // 付随しないため
+                    resultRecordLabel.setText("戦果");
+
                     shell.pack();
 
                     ApplicationMain.this.tabFolder.setSingle(false);
