@@ -120,7 +120,7 @@ public class SakutekiString implements Comparable<SakutekiString> {
                         break;
                     case 13: // 大型電探
                         this.oogataDentan += saku;
-                        this.dentanKaisyu += 1.25 * Math.sqrt(lv);
+                        this.dentanKaisyu += 1.4 * Math.sqrt(lv);
                         break;
                     case 29: // 探照灯
                         this.tansyouto += saku;
