@@ -12,17 +12,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -465,6 +455,11 @@ public class BattleResultServer {
         if (filter.printPractice != null) {
             // 排他的論理和です
             if (dto.isPractice() ^ filter.printPractice) {
+                return false;
+            }
+        }
+        if (Objects.nonNull(filter.printBoss)){
+            if (dto.isBoss() ^ filter.printBoss) {
                 return false;
             }
         }
