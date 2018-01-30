@@ -168,6 +168,10 @@ public class AirBattleDto {
                 return "23:機銃(非集中)";
             case 24:
                 return "24:高角砲/機銃(非集中)";
+            case 25:
+                return "25:新噴進砲/対空電探/三式弾";
+            case 28:
+                return "28:新噴進砲/対空電探";
         }
         return "不明(" + id + ")";
     }

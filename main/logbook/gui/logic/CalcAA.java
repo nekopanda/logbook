@@ -13,8 +13,6 @@ import java.util.stream.Collectors;
  * 艦これ改+検証内容をミックスしたものになっているため、wikiの計算方法とは異なります。
  *
  * @author Nishisonic
- * @see <a href="http://wikiwiki.jp/kancolle/?%B9%D2%B6%F5%C0%EF">wiki 航空戦</a>
- * @see <a href="https://twitter.com/KennethWWKK/status/780793591387959297">艦これ改のソフトって解析翻訳</a>
  */
 public class CalcAA {
 
@@ -40,7 +38,7 @@ public class CalcAA {
             this.put(10, new AA_CI(8, 1.65)); // 高角砲/特殊機銃/対空電探(摩耶改二)
             this.put(11, new AA_CI(6, 1.5));  // 高角砲/特殊機銃(摩耶改二)
             this.put(12, new AA_CI(3, 1.25)); // 特殊機銃/機銃(非特殊機銃)/電探
-            this.put(13, new AA_CI(4, 1.35)); // 高角砲/特殊機銃/電探(摩耶改二不可)
+            this.put(13, new AA_CI(4, 1.35)); // 高角砲/特殊機銃/対空電探(摩耶改二不可)
             this.put(14, new AA_CI(4, 1.45)); // 高角砲/機銃/対空電探(五十鈴改二)
             this.put(15, new AA_CI(3, 1.3));  // 高角砲/機銃(五十鈴改二)
             this.put(16, new AA_CI(4, 1.4));  // 高角砲/機銃/対空電探(霞改二乙)
@@ -52,6 +50,10 @@ public class CalcAA {
             this.put(22, new AA_CI(2, 1.2));  // 特殊機銃(文月改二)
             this.put(23, new AA_CI(1, 1.05)); // 機銃(非特殊機銃)(UIT-25/伊504)
             this.put(24, new AA_CI(3, 1.25)); // 高角砲/機銃(非特殊機銃)(龍田改二)
+            this.put(25, new AA_CI(7, 1.55)); // 新噴進砲/対空電探/三式弾(伊勢型改)
+            this.put(26, new AA_CI(0, 1));    //
+            this.put(27, new AA_CI(0, 1));    //
+            this.put(28, new AA_CI(4, 1.4));  // 新噴進砲/対空電探(伊勢型改/武蔵改)
         }
     };
 
