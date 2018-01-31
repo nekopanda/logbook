@@ -53,7 +53,7 @@ public class ResultRecord {
      */
     public void update(long nowAdmiralExp) {
         ZonedDateTime nowTime = ZonedDateTime.now(TIME_ZONE);
-        if(Objects.nonNull(lastUpdateTimeString)){
+        if (Objects.nonNull(lastUpdateTimeString)) {
             // 分以下は邪魔なため、0に整える
             ZonedDateTime border = ZonedDateTime.parse(lastUpdateTimeString).withMinute(0).withSecond(0).withNano(0);
             // 現在時刻が最後に艦これのデータを読み込んだ時刻の戦果締切時刻を過ぎていないか調べる
@@ -66,7 +66,8 @@ public class ResultRecord {
                 this.admiralExpAtBeggingOfDay = nowAdmiralExp;
             }
             // 一月戦果:最終日22時時点
-            if (border.withDayOfMonth(border.toLocalDate().lengthOfMonth()).withHour(22).isBefore(nowTime)) {
+            border = border.plusHours(24 - ((2 + border.getHour()) % 24));
+            if (border.withDayOfMonth(border.toLocalDate().lengthOfMonth()).isBefore(nowTime)) {
                 this.admiralExpAtBeggingOfMonth = nowAdmiralExp;
             }
         } else {
@@ -162,7 +163,6 @@ public class ResultRecord {
     public void setAdmiralExpAtBeggingOfMonth(long admiralExpAtBeggingOfMonth) {
         this.admiralExpAtBeggingOfMonth = admiralExpAtBeggingOfMonth;
     }
-
 
     /**
      * 現在の提督経験値
