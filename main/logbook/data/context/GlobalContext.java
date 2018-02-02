@@ -8,39 +8,15 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.CheckForNull;
-import javax.json.JsonArray;
-import javax.json.JsonNumber;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
+import javax.json.*;
 
 import logbook.config.AppConfig;
 import logbook.config.UserDataConfig;
 import logbook.constants.AppConstants;
 import logbook.data.Data;
 import logbook.data.EventListener;
-import logbook.dto.BasicInfoDto;
-import logbook.dto.BattleExDto;
+import logbook.dto.*;
 import logbook.dto.BattleExDto.Phase;
-import logbook.dto.BattlePhaseKind;
-import logbook.dto.BattleResultDto;
-import logbook.dto.CreateItemDto;
-import logbook.dto.DeckMissionDto;
-import logbook.dto.DockDto;
-import logbook.dto.GetShipDto;
-import logbook.dto.ItemDto;
-import logbook.dto.ItemInfoDto;
-import logbook.dto.KdockDto;
-import logbook.dto.LostEntityDto;
-import logbook.dto.MapCellDto;
-import logbook.dto.MaterialDto;
-import logbook.dto.MissionResultDto;
-import logbook.dto.NdockDto;
-import logbook.dto.PracticeUserDetailDto;
-import logbook.dto.PracticeUserDto;
-import logbook.dto.QuestDto;
-import logbook.dto.ResourceItemDto;
-import logbook.dto.ShipDto;
-import logbook.dto.ShipInfoDto;
 import logbook.gui.ApplicationMain;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.Sound;
@@ -175,6 +151,9 @@ public final class GlobalContext {
 
     /** 次に入手した装備に割り当てるID */
     private static int nextSlotitemId;
+
+    /** 基地航空隊 */
+    private static AirbaseDto airbase;
 
     /** ShipParameterRecord更新ハンドラ */
     private static UpdateShipParameter updateShipParameter = new UpdateShipParameter();
@@ -856,6 +835,25 @@ public final class GlobalContext {
             case START_AIR_BASE:
                 doStartAirBase(data, apidata);
                 break;
+            // 基地航空隊情報
+            case BASE_AIR_CORPS:
+                doBaseAirCorps(data, apidata);
+            // 基地航空隊:中隊設定
+            case SET_PLANE:
+                doSetPlane(data, apidata);
+                break;
+            // 基地航空隊:行動指示変更
+            case SET_ACTION:
+                doSetAction(data, apidata);
+                break;
+            //基地航空隊:補給
+            case SUPPLY:
+                doSupply(data , apidata);
+                break;
+            // 基地航空隊:名前変更
+            case CHANGE_NAME:
+                doChangeName(data, apidata);
+                break;
             default:
                 break;
             }
@@ -969,6 +967,14 @@ public final class GlobalContext {
             return dock.isFlagshipAkashi();
         }
         return false;
+    }
+
+    /**
+     * 基地航空隊を取得
+     * @return airbase
+     */
+    public static AirbaseDto getAirbase() {
+        return airbase;
     }
 
     /**
@@ -2043,6 +2049,7 @@ public final class GlobalContext {
                     resultRecord.reset();
                 }
                 Optional.ofNullable(basic).map(BasicInfoDto::getExperience).ifPresent(exp -> resultRecord.update(exp));
+                ApplicationMain.main.updateResultRecord();
             }
         } catch (Exception e) {
             LOG.get().warn("司令部を更新するに失敗しました", e);
@@ -2211,7 +2218,7 @@ public final class GlobalContext {
 
     /**
      * 入渠開始
-     * @param apidata
+     * @param data
      */
     private static void doNyukyoStart(Data data, JsonValue json) {
         try {
@@ -2244,7 +2251,7 @@ public final class GlobalContext {
 
     /**
      * 入渠中に高速修復を使った
-     * @param apidata
+     * @param data
      */
     private static void doSpeedChange(Data data, JsonValue json) {
         try {
@@ -2531,6 +2538,12 @@ public final class GlobalContext {
                         Sound.randomWarningPlay();
                     }
                 }
+                JsonValue api_air_base = ((JsonObject) json).get("api_air_base");
+                if (api_air_base instanceof JsonArray) {
+                    JsonArray apidata = (JsonArray) api_air_base;
+                    airbase = new AirbaseDto(apidata);
+                    ApplicationMain.main.updateAirbase();
+                }
             }
         } catch (Exception e) {
             LOG.get().warn("マップ情報更新に失敗しました", e);
@@ -2661,6 +2674,98 @@ public final class GlobalContext {
             addUpdateLog("装備改修情報を更新しました");
         } catch (Exception e) {
             LOG.get().warn("装備改修更新に失敗しました", e);
+            LOG.get().warn(data);
+        }
+    }
+
+    private static void doBaseAirCorps(Data data, JsonValue json){
+        // 処理ちゃんと分かってないので保留
+    }
+
+    private static void doSetPlane(Data data, JsonValue json){
+        try {
+            if (json instanceof JsonObject) {
+                JsonObject apidata = (JsonObject) json;
+                if(Objects.nonNull(airbase)){
+                    int area = Integer.parseInt(data.getField("api_area_id"));
+                    int base = Integer.parseInt(data.getField("api_base_id"));
+                    if(airbase.get().containsKey(area)){
+                        if(airbase.get().get(area).containsKey(base)){
+                            airbase.get().get(area).get(base).setPlane(apidata);
+                            ApplicationMain.main.updateAirbase();
+                        }
+                    }
+                }
+            }
+            addUpdateLog("基地航空隊情報を更新しました");
+        } catch (Exception e) {
+            LOG.get().warn("基地航空隊更新に失敗しました", e);
+            LOG.get().warn(data);
+        }
+    }
+
+    private static void doSetAction(Data data, JsonValue json){
+        try {
+            if(Objects.nonNull(airbase)){
+                int area = Integer.parseInt(data.getField("api_area_id"));
+                int[] bases = Arrays.stream(data.getField("api_base_id").split(",")).mapToInt(Integer::parseInt).toArray();
+                int[] actionKinds = Arrays.stream(data.getField("api_action_kind").split(",")).mapToInt(Integer::parseInt).toArray();
+                if(airbase.get().containsKey(area)){
+                    for(int i = 0;i < bases.length;i++){
+                        int base = bases[i];
+                        int actionKind = actionKinds[i];
+                        if(airbase.get().get(area).containsKey(base)){
+                            airbase.get().get(area).get(base).setActionKind(actionKind);
+                            ApplicationMain.main.updateAirbase();
+                        }
+                    }
+                }
+            }
+            addUpdateLog("基地航空隊情報を更新しました");
+        } catch (Exception e) {
+            LOG.get().warn("基地航空隊更新に失敗しました", e);
+            LOG.get().warn(data);
+        }
+    }
+
+    private static void doSupply(Data data, JsonValue json){
+        try {
+            if (json instanceof JsonObject) {
+                JsonObject apidata = (JsonObject) json;
+                if(Objects.nonNull(airbase)){
+                    int area = Integer.parseInt(data.getField("api_area_id"));
+                    int base = Integer.parseInt(data.getField("api_base_id"));
+                    if(airbase.get().containsKey(area)){
+                        if(airbase.get().get(area).containsKey(base)){
+                            airbase.get().get(area).get(base).supply(apidata);
+                            ApplicationMain.main.updateAirbase();
+                        }
+                    }
+                }
+            }
+            addUpdateLog("基地航空隊情報を更新しました");
+        } catch (Exception e) {
+            LOG.get().warn("基地航空隊更新に失敗しました", e);
+            LOG.get().warn(data);
+        }
+    }
+
+    private static void doChangeName(Data data, JsonValue json){
+        try {
+            if(Objects.nonNull(airbase)){
+                int area = Integer.parseInt(data.getField("api_area_id"));
+                int base = Integer.parseInt(data.getField("api_base_id"));
+                String name = data.getField("api_name");
+                if(airbase.get().containsKey(area)){
+                    if(airbase.get().get(area).containsKey(base)){
+                        airbase.get().get(area).get(base).setName(name);
+                        ApplicationMain.main.updateAirbase();
+                    }
+                }
+            }
+            addUpdateLog("基地航空隊情報を更新しました");
+        } catch (Exception e) {
+            LOG.get().warn("基地航空隊更新に失敗しました", e);
             LOG.get().warn(data);
         }
     }

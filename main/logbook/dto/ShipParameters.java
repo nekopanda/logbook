@@ -67,6 +67,10 @@ public class ShipParameters {
     @Tag(13)
     private int leng;
 
+    /** 航続距離(装備専用) */
+    @Tag(14)
+    private int distance;
+
     public static String sokuToString(int soku) {
         switch (soku) {
         case 0:
@@ -97,7 +101,13 @@ public class ShipParameters {
     }
 
     public ShipParameters(int taik, int houg, int houm, int raig, int baku, int tyku, int souk,
-            int kaih, int tais, int saku, int luck, int soku, int leng) {
+                          int kaih, int tais, int saku, int luck, int soku, int leng) {
+        this(taik, houg, houm, raig, baku, tyku, souk, kaih, tais, saku, luck, soku, leng, 0);
+    }
+
+
+    public ShipParameters(int taik, int houg, int houm, int raig, int baku, int tyku, int souk,
+                          int kaih, int tais, int saku, int luck, int soku, int leng, int distance) {
         this.taik = taik;
         this.houg = houg;
         this.houm = houm;
@@ -112,6 +122,7 @@ public class ShipParameters {
         this.tais = tais;
         this.tyku = tyku;
         this.kaih = kaih;
+        this.distance = distance;
     }
 
     /** マスターデータ用 */
@@ -130,6 +141,7 @@ public class ShipParameters {
         param.taik = object.getInt("api_taik");
         param.tais = object.getInt("api_tais");
         param.tyku = object.getInt("api_tyku");
+        param.distance = object.containsKey("api_distance") ? object.getInt("api_distance") : 0;
         return param;
     }
 
@@ -149,6 +161,7 @@ public class ShipParameters {
             //param.tais = object.getJsonArray("api_tais").getInt(i);
             //param.saku = object.getJsonArray("api_saku").getInt(i);
             param.luck = object.getJsonArray("api_luck").getInt(i);
+            param.distance = 0;
             ret[i] = param;
         }
         return ret;
@@ -159,6 +172,7 @@ public class ShipParameters {
         for (int i = 0; i < 2; ++i) {
             ShipParameters param = new ShipParameters();
             param.soku = object.getJsonNumber("api_soku").intValue();
+            param.distance = 0;
             ret[i] = param;
         }
         return ret;
@@ -185,6 +199,7 @@ public class ShipParameters {
             param.tais = object.getJsonArray("api_taisen").getInt(i);
             param.saku = object.getJsonArray("api_sakuteki").getInt(i);
             param.luck = object.getJsonArray("api_lucky").getInt(i);
+            param.distance = 0;
             ret[i] = param;
         }
 
@@ -242,6 +257,7 @@ public class ShipParameters {
         this.luck += o.luck;
         this.leng = Math.max(this.leng, o.leng);
         this.soku = Math.max(this.soku, o.soku);
+        this.distance = Math.min(this.distance, o.distance);
     }
 
     /**
@@ -262,6 +278,7 @@ public class ShipParameters {
         this.luck += o.luck;
         this.leng = Math.max(this.leng, o.leng);
         this.soku = Math.max(this.soku, o.soku);
+        this.distance = Math.min(this.distance, o.distance);
     }
 
     /**
@@ -281,12 +298,13 @@ public class ShipParameters {
         this.luck -= o.luck;
         this.leng = Math.max(this.leng, o.leng);
         this.soku = Math.max(this.soku, o.soku);
+        this.distance = Math.min(this.distance, o.distance);
     }
 
     @Override
     public int hashCode() {
         return this.taik + this.houg + this.houm + this.leng + this.raig + this.baku +
-                this.tyku + this.soku + this.souk + this.kaih + this.tais + this.saku + this.luck;
+                this.tyku + this.soku + this.souk + this.kaih + this.tais + this.saku + this.luck + this.distance;
     }
 
     @Override
@@ -305,7 +323,8 @@ public class ShipParameters {
                     (this.kaih == o.kaih) &&
                     (this.tais == o.tais) &&
                     (this.saku == o.saku) &&
-                    (this.luck == o.luck)) {
+                    (this.luck == o.luck) &&
+                    (this.distance == o.distance)) {
                 return true;
             }
         }
@@ -585,4 +604,8 @@ public class ShipParameters {
     public void setBaku(int baku) {
         this.baku = baku;
     }
+
+    public int getDistance() { return this.distance; }
+
+    public void setDistance(int distance) { this.distance = distance; }
 }

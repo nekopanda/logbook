@@ -46,7 +46,10 @@ public final class AppConfigBean {
     private boolean showCondCycleTimer = true;
 
     /** 母港タブの戦果表示 */
-    private boolean showResultRecord = true;
+    private boolean showResultRecord = false;
+
+    /** 母港タブの基地航空隊表示 */
+    private boolean showAirbase = false;
 
     /** 音量 */
     private float soundLevel = 0.85f;
@@ -519,8 +522,6 @@ public final class AppConfigBean {
     public void setShowCondCycleTimer(boolean showCondTimer) {
         this.showCondCycleTimer = showCondTimer;
     }
-
-
 
     public boolean isShowResultRecord() { return showResultRecord; }
 
@@ -2239,4 +2240,12 @@ public final class AppConfigBean {
         this.bunkitenKeisu = keisu;
     }
 
+
+    public boolean isShowAirbase() {
+        return showAirbase;
+    }
+
+    public void setShowAirbase(boolean showAirbase) {
+        this.showAirbase = showAirbase;
+    }
 }

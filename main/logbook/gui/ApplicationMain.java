@@ -12,10 +12,9 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import logbook.config.AppConfig;
 import logbook.config.ShipGroupConfig;
@@ -23,10 +22,7 @@ import logbook.config.UserDataConfig;
 import logbook.config.bean.AppConfigBean;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
-import logbook.dto.BattleExDto;
-import logbook.dto.DockDto;
-import logbook.dto.MapCellDto;
-import logbook.dto.PracticeUserDetailDto;
+import logbook.dto.*;
 import logbook.gui.background.AsyncExecApplicationMain;
 import logbook.gui.background.AsyncExecUpdateCheck;
 import logbook.gui.background.BackgroundInitializer;
@@ -41,13 +37,8 @@ import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.PushNotify;
 import logbook.gui.logic.Sound;
 import logbook.gui.widgets.FleetComposite;
-import logbook.internal.BattleResultServer;
-import logbook.internal.EnemyData;
+import logbook.internal.*;
 import logbook.internal.Item;
-import logbook.internal.LoggerHolder;
-import logbook.internal.MasterData;
-import logbook.internal.Ship;
-import logbook.internal.ShipParameterRecord;
 import logbook.scripting.ScriptData;
 import logbook.server.proxy.DatabaseClient;
 import logbook.server.proxy.ProxyServer;
@@ -63,34 +54,14 @@ import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.ShellAdapter;
-import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Tray;
-import org.eclipse.swt.widgets.TrayItem;
+import org.eclipse.swt.widgets.*;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.melloware.jintellitype.HotkeyListener;
@@ -350,6 +321,10 @@ public final class ApplicationMain extends WindowBase {
     private Composite resultRecordGroup;
     private Label resultRecordLabel;
     private Label admiralExpLabel;
+
+    /** 基地航空隊 **/
+    private Composite airbaseGroup;
+    private Combo airbaseCombo;
 
     /** エラー表示 **/
     private Label errorLabel;
@@ -1030,6 +1005,21 @@ public final class ApplicationMain extends WindowBase {
         gdAdmiralExp.widthHint = SwtUtils.DPIAwareWidth(75);
         this.admiralExpLabel.setLayoutData(gdAdmiralExp);
 
+        this.airbaseGroup = new Composite(this.mainComposite,SWT.NONE);
+        this.airbaseGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        this.airbaseGroup.setLayout(SwtUtils.makeGridLayout(1, 1, 1, 3, 3));
+
+        this.airbaseCombo = new Combo(this.airbaseGroup, SWT.DROP_DOWN | SWT.READ_ONLY);
+        this.airbaseCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        this.airbaseCombo.add("基地航空隊");
+        this.airbaseCombo.select(0);
+        this.airbaseCombo.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                updateAirbase();
+            }
+        });
+
         // -------
 
         // エラー表示
@@ -1095,6 +1085,10 @@ public final class ApplicationMain extends WindowBase {
         showResultRecord.setText("戦果を表示");
         this.bindControlToMenuItem(this.resultRecordGroup, showResultRecord, "ShowResultRecord");
 
+        MenuItem showAirbase = new MenuItem(this.getPopupMenu(), SWT.CHECK);
+        showAirbase.setText("基地航空隊を表示");
+        this.bindControlToMenuItem(this.airbaseGroup, showAirbase, "ShowAirbase");
+
         // 縮小表示
         final MenuItem dispsize = new MenuItem(this.getPopupMenu(), SWT.CHECK);
         dispsize.setText("縮小表示(&M)\tCtrl+M");
@@ -1132,6 +1126,10 @@ public final class ApplicationMain extends WindowBase {
                     }
                 }
 
+                // 付随しないため
+                updateResultRecord(minimum);
+                updateAirbase(minimum);
+
                 // ウインドウサイズを調節
                 if (minimum) {
                     // ウィンドウのサイズを記憶
@@ -1145,9 +1143,6 @@ public final class ApplicationMain extends WindowBase {
                             LayoutLogic.hide(control, true);
                         }
                     }
-
-                    // 付随しないため
-                    resultRecordLabel.setText("戦果");
 
                     shell.pack();
 
@@ -2045,6 +2040,8 @@ public final class ApplicationMain extends WindowBase {
 
     public Label getAdmiralExpLabel(){ return this.admiralExpLabel; }
 
+    public Combo getAirbaseCombo(){ return this.airbaseCombo; }
+
     /**
      * エラーラベルを取得
      * @return
@@ -2135,6 +2132,90 @@ public final class ApplicationMain extends WindowBase {
 
     public void updateCalcPracticeExp(PracticeUserDetailDto practiceUserExDto) {
         this.calcPracticeExpWindow.updatePracticeUser(practiceUserExDto);
+    }
+
+    public void updateResultRecord(){
+        updateResultRecord(AppConfig.get().isMinimumLayout());
+    }
+
+    public void updateResultRecord(boolean isMinimumLayout){
+        // 戦果
+        ResultRecord r = GlobalContext.getResultRecord();
+        String resultRecordTooltipText = String.format("今回: +%d exp. / 戦果 %.2f \r\n今日: +%d exp. / 戦果 %.2f \r\n今月: +%d exp. / 戦果 %.2f ",
+                r.getAcquiredAdmiralExpOfHalfDay(), r.getAcquiredValueOfHalfDay(),
+                r.getAcquiredAdmiralExpOfDay(), r.getAcquiredValueOfDay(),
+                r.getAcquiredAdmiralExpOfMonth(), r.getAcquiredValueOfMonth());
+        // 縮小表示にした際、大きくレイアウトが崩れるため表示変更
+        if (isMinimumLayout) {
+            resultRecordLabel.setText("戦果");
+        } else {
+            resultRecordLabel.setText(String.format("戦果　今回: %8.2f / 今日: %8.2f / 今月: %8.2f",
+                    r.getAcquiredValueOfHalfDay(),
+                    r.getAcquiredValueOfDay(),
+                    r.getAcquiredValueOfMonth()));
+        }
+        resultRecordLabel.setToolTipText(resultRecordTooltipText);
+        admiralExpLabel.setText(String.format("%d exp.", r.getNowAdmiralExp()));
+        admiralExpLabel.setToolTipText(resultRecordTooltipText);
+    }
+
+    public void updateAirbase(){
+        updateAirbase(AppConfig.get().isMinimumLayout());
+    }
+
+    public void updateAirbase(boolean isMinimumLayout){
+        Optional.ofNullable(GlobalContext.getAirbase()).ifPresent(airbase -> {
+            int select = this.airbaseCombo.getSelectionIndex();
+            this.airbaseCombo.removeAll();
+            airbase.get().forEach((key, value) -> {
+                String result = "#" + key + " - " + String.join(" ", value.values().stream()
+                        .map(v -> "[" + v.getActionKindString() + "/" + v.getDistance() + "]:" + v.getAirPower().toString())
+                        .toArray(String[]::new));
+                String miniResult = "#" + key + " - " + String.join(" ", value.values().stream()
+                        .map(v -> "[" + v.getActionKindString().substring(0,1) + "/" + v.getDistance() + "]")
+                        .toArray(String[]::new));
+                this.airbaseCombo.add(isMinimumLayout ? miniResult : result);
+            });
+            if(airbase.get().size() > 0){
+                this.airbaseCombo.select(select < 0 && select < airbase.get().size() ? 0 : select);
+            }
+
+            String result = "";
+            int area = Integer.parseInt(this.airbaseCombo.getItem(this.airbaseCombo.getSelectionIndex()).replaceAll("#(\\d*).*","$1"));
+            Map<Integer, AirbaseDto.AirCorpsDto> airCorps = airbase.get().get(area);
+            for(final int airId : airCorps.keySet().stream().sorted().collect(Collectors.toList())){
+                AirbaseDto.AirCorpsDto airCorp = airCorps.get(airId);
+                result += "#" + area + "-" + airId + " " + "[" + airCorp.getActionKindString() + "]" + airCorp.getName() + "\r\n";
+                result += "制空値:" + airCorp.getAirPower() + " 半径:" + airCorp.getDistance() + "\r\n";
+                for(final int sqId : airCorp.getSquadrons().keySet().stream().sorted().collect(Collectors.toList())){
+                    int now = airCorp.getSquadrons().get(sqId).getCount();
+                    int max = airCorp.getSquadrons().get(sqId).getMaxCount();
+                    ItemDto item = GlobalContext.getItem(airCorp.getSquadrons().get(sqId).getSlotid());
+                    result += "[" + now + "/" + max + "]:" + item.getName()
+                            + getLevelString(item.getLevel()) + " " + getAlvString(item.getAlv())
+                            + " (半径:" + item.getParam().getDistance() + ")\r\n";
+                }
+                result += "\r\n";
+            }
+            this.airbaseCombo.setToolTipText(result);
+        });
+    }
+
+    private String getAlvString(int alv){
+        switch (alv){
+            case 1: return "|";
+            case 2: return "||";
+            case 3: return "|||";
+            case 4: return "/";
+            case 5: return "//";
+            case 6: return "///";
+            case 7: return ">>";
+        }
+        return "";
+    }
+
+    private String getLevelString(int lv){
+        return lv > 0 ? "+" + lv : "";
     }
 
     /**
