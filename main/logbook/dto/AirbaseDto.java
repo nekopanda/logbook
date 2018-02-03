@@ -16,7 +16,7 @@ public class AirbaseDto {
     public AirbaseDto(JsonArray json) {
         this.airbase = json.stream()
                 .map(JsonObject.class::cast)
-                .collect(Collectors.groupingBy(api -> Integer.parseInt(api.get("api_area_id").toString())))
+                .collect(Collectors.groupingBy(api -> api.getInt("api_area_id")))
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().stream()
@@ -53,11 +53,11 @@ public class AirbaseDto {
 
         public AirCorpsDto(JsonObject json) {
             this(
-                    Integer.parseInt(json.get("api_rid").toString()),
-                    json.get("api_name").toString(),
-                    Integer.parseInt(json.get("api_distance").toString()),
-                    Integer.parseInt(json.get("api_action_kind").toString()),
-                    ((JsonArray) json.get("api_plane_info")).stream()
+                    json.getInt("api_rid"),
+                    json.getString("api_name"),
+                    json.getInt("api_distance"),
+                    json.getInt("api_action_kind"),
+                    json.getJsonArray("api_plane_info").stream()
                             .map(JsonObject.class::cast)
                             .map(SquadronDto::new)
                             .collect(Collectors.toMap(k -> k.getId(), v -> v))
@@ -74,12 +74,12 @@ public class AirbaseDto {
         }
 
         public void setPlane(JsonObject json) {
-            this.distance = Integer.parseInt(json.get("api_distance").toString());
+            this.distance = json.getInt("api_distance");
             this.supply(json);
         }
 
         public void supply(JsonObject json) {
-            this.squadrons.putAll(((JsonArray) json.get("api_plane_info")).stream()
+            this.squadrons.putAll(json.getJsonArray("api_plane_info").stream()
                     .map(JsonObject.class::cast)
                     .map(SquadronDto::new)
                     .collect(Collectors.toMap(k -> k.getId(), v -> v)));
@@ -144,7 +144,7 @@ public class AirbaseDto {
 
         public AirPower getAirPower() {
             int method = AppConfig.get().getSeikuMethod();
-            AirPower power = squadrons.values().stream().map(squadron -> {
+            AirPower power = squadrons.values().stream().filter(squadron -> squadron.count > 0).map(squadron -> {
                 ItemDto item = GlobalContext.getItem(squadron.slotid);
                 int constSkilledBonus;
                 int[] skilledBonus;
@@ -307,14 +307,19 @@ public class AirbaseDto {
             private int cond;
 
             SquadronDto(JsonObject json) {
-                this(
-                        Integer.parseInt(json.get("api_squadron_id").toString()),
-                        Integer.parseInt(json.get("api_state").toString()),
-                        Integer.parseInt(json.get("api_slotid").toString()),
-                        Integer.parseInt(json.get("api_count").toString()),
-                        Integer.parseInt(json.get("api_max_count").toString()),
-                        Integer.parseInt(json.get("api_cond").toString())
-                );
+                this.id = json.getInt("api_squadron_id");
+                this.state = json.getInt("api_state");
+                this.slotid = json.getInt("api_slotid");
+                // 未配属 or 配置転換中
+                if (this.state == 0 || this.state == 2) {
+                    this.count = 0;
+                    this.maxCount = 0;
+                    this.cond = 0;
+                } else {
+                    this.count = json.getInt("api_count");
+                    this.maxCount = json.getInt("api_max_count");
+                    this.cond = json.getInt("api_cond");
+                }
             }
 
             SquadronDto(int id, int state, int slotid, int count, int maxCount, int cond) {

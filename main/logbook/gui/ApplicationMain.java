@@ -2190,10 +2190,15 @@ public final class ApplicationMain extends WindowBase {
                 for(final int sqId : airCorp.getSquadrons().keySet().stream().sorted().collect(Collectors.toList())){
                     int now = airCorp.getSquadrons().get(sqId).getCount();
                     int max = airCorp.getSquadrons().get(sqId).getMaxCount();
-                    ItemDto item = GlobalContext.getItem(airCorp.getSquadrons().get(sqId).getSlotid());
-                    result += "[" + now + "/" + max + "]:" + item.getName()
-                            + getLevelString(item.getLevel()) + " " + getAlvString(item.getAlv())
-                            + " (半径:" + item.getParam().getDistance() + ")\r\n";
+                    int slotid = airCorp.getSquadrons().get(sqId).getSlotid();
+                    if(slotid > 0){
+                        ItemDto item = GlobalContext.getItem(slotid);
+                        result += "[" + now + "/" + max + "]:" + item.getName()
+                                + getLevelString(item.getLevel()) + " " + getAlvString(item.getAlv())
+                                + " (半径:" + item.getParam().getDistance() + ")\r\n";
+                    } else {
+                        result += "(なし)\r\n";
+                    }
                 }
                 result += "\r\n";
             }
