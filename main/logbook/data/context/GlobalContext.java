@@ -1390,6 +1390,9 @@ public final class GlobalContext {
                     if (battle.isCombined()) {
                         battle.getDockCombined().setUpdate(true);
                     }
+
+                    resultRecord.update(apidata.getInt("api_member_exp"));
+                    ApplicationMain.main.updateResultRecord();
                 }
 
                 // 出撃を更新
