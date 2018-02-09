@@ -349,6 +349,9 @@ public class AppConstants {
     /** メッセージ  艦隊合計Lv:{0} */
     public static final String MESSAGE_TOTAL_LV = "艦隊合計Lv:{0}。";
 
+    /** メッセージ 艦隊防空値:{0} */
+    public static final String MESSAGE_AA = "艦隊防空値:{0}。";
+
     /** Push 通知のアプリケーション名*/
     public static final String PUSH_NOTIFY_APPNAME = "航海日誌";
 

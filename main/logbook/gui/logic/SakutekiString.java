@@ -120,7 +120,7 @@ public class SakutekiString implements Comparable<SakutekiString> {
                         break;
                     case 13: // 大型電探
                         this.oogataDentan += saku;
-                        this.dentanKaisyu += 1.25 * Math.sqrt(lv);
+                        this.dentanKaisyu += 1.4 * Math.sqrt(lv);
                         break;
                     case 29: // 探照灯
                         this.tansyouto += saku;
@@ -234,7 +234,7 @@ public class SakutekiString implements Comparable<SakutekiString> {
                 + (p.other * 0.6);
         double fromShip = Math.sqrt(p.sakuteki);
 
-        this.calc25v4 += fromItem + fromShip;
+        this.calc25v4 += fromItem * AppConfig.get().getBunkitenKeisu() + fromShip;
         this.v4Item += fromItem;
         this.v4Ship += fromShip;
     }
@@ -281,6 +281,7 @@ public class SakutekiString implements Comparable<SakutekiString> {
     @Override
     public String toString() {
         double base = Math.sqrt(this.totalSakuteki - this.teisatsuSakuteki - this.dentanSakuteki);
+        double bunki = AppConfig.get().getBunkitenKeisu();
         int method = AppConfig.get().getSakutekiMethodV4();
         if ((method != 0) && this.sakutekiFailed) {
             return "<ゲーム画面をリロードしてください>";
@@ -290,8 +291,8 @@ public class SakutekiString implements Comparable<SakutekiString> {
             return String.format("%d+%d",
                     this.totalSakuteki - this.slotSakuteki, this.slotSakuteki);
         case 1: // 判定式(33)(艦素索敵分 + 装備分 + 提督Lv分 + 艦隊空き数分)
-            return String.format("%.2f (%.1f%+.1f%+.1f%+.1f )", this.calc25v4, this.v4Ship, this.v4Item,
-                    this.v4HqLv, this.v4Space);
+            return String.format("%.2f (%.1f%+.1f(%.1f)%+.1f%+.1f )", this.calc25v4, this.v4Ship, this.v4Item,
+                    bunki, this.v4HqLv, this.v4Space);
         case 2: // 判定式(33)(旧:2-5式(秋))
             return String.format("%.2f (%.1f)", this.calc25v4, this.calc25v2);
         case 3: // ほっぼアルファVer2.0.1(艦素索敵分 + 装備分 + 提督Lv分)

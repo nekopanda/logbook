@@ -454,6 +454,16 @@ public final class ConfigDialog extends Dialog {
         sakutekiCombo.add("I.装備込みの艦隊索敵値(2-5式(旧))");
         sakutekiCombo.select(AppConfig.get().getSakutekiMethodV4());
 
+        Label labelBunkiten = new Label(compositeFleetTab, SWT.NONE);
+        labelBunkiten.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        labelBunkiten.setText("分岐点係数");
+
+        final Text bunkiten = new Text(compositeFleetTab, SWT.BORDER);
+        GridData gdBunkiten = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+        gdBunkiten.widthHint = SwtUtils.DPIAwareWidth(180);
+        bunkiten.setLayoutData(gdBunkiten);
+        bunkiten.setText(Double.toString(AppConfig.get().getBunkitenKeisu()));
+
         Label mainLog = new Label(compositeFleetTab, SWT.NONE);
         mainLog.setText("母港タブのログ");
         mainLog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
@@ -542,6 +552,12 @@ public final class ConfigDialog extends Dialog {
         showGunAndBulge.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
         showGunAndBulge.setText("機銃やバルジの装備数を表示");
         showGunAndBulge.setSelection(AppConfig.get().isShowGunAndBulge());
+
+        final Button showAA = new Button(compositeFleetDetail, SWT.CHECK);
+        showAA.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+        showAA.setText("対空項目を表示");
+        showAA.setSelection(AppConfig.get().isShowAA());
+        showAA.setToolTipText("陣形は単縦陣/第四警戒、対空カットインはなしとなっています。");
 
         final Button showCondTimer = new Button(compositeFleetDetail, SWT.CHECK);
         showCondTimer.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
@@ -1157,11 +1173,13 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setVisibleOnReturnBathwater(visibleOnReturnBathwater.getSelection());
                 AppConfig.get().setMonoIcon(useMonoIcon.getSelection());
                 AppConfig.get().setShowGunAndBulge(showGunAndBulge.getSelection());
+                AppConfig.get().setShowAA(showAA.getSelection());
                 AppConfig.get().setShowCondTimer(showCondTimer.getSelection());
                 AppConfig.get().setShowAkashiTimer(showAkashiTimer.getSelection());
                 AppConfig.get().setAkashiTimerFormat(akashiFormatCombo.getSelectionIndex());
                 AppConfig.get().setSeikuMethod(seikuCombo.getSelectionIndex());
                 AppConfig.get().setSakutekiMethodV4(sakutekiCombo.getSelectionIndex());
+                AppConfig.get().setBunkitenKeisu(Double.valueOf(bunkiten.getText()));
                 // notify
                 AppConfig.get().setOkCond(condSpinner.getSelection());
                 AppConfig.get().setNoticeCondOnlyMainFleet(condOnlyMain.getSelection());

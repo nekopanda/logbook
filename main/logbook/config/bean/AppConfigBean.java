@@ -45,6 +45,12 @@ public final class AppConfigBean {
     /** 母港タブの疲労度タイマー表示 */
     private boolean showCondCycleTimer = true;
 
+    /** 母港タブの戦果表示 */
+    private boolean showResultRecord = false;
+
+    /** 母港タブの基地航空隊表示 */
+    private boolean showAirbase = false;
+
     /** 音量 */
     private float soundLevel = 0.85f;
 
@@ -219,6 +225,9 @@ public final class AppConfigBean {
     /** 機銃やバルジの装備数を表示 */
     private boolean showGunAndBulge = true;
 
+    /** 対空項目を表示 */
+    private boolean showAA = false;
+
     /** 疲労タイマーを表示する */
     private boolean showCondTimer = true;
 
@@ -339,6 +348,9 @@ public final class AppConfigBean {
 
     /** 艦娘一覧ウィンドウのフィルタパネル表示・非表示 */
     private ShipFilterPanelConfigBean[] shipTablePanelVisibles = new ShipFilterPanelConfigBean[4];
+
+    /** 分岐点係数 */
+    private double bunkitenKeisu = 1;
 
     /** 保存したJSONを読み込ませてテストするためのウィンドウメニューを表示するかどうか */
     private boolean enableTestWindow = false;
@@ -510,6 +522,10 @@ public final class AppConfigBean {
     public void setShowCondCycleTimer(boolean showCondTimer) {
         this.showCondCycleTimer = showCondTimer;
     }
+
+    public boolean isShowResultRecord() { return showResultRecord; }
+
+    public void setShowResultRecord(boolean showResultRecord) { this.showResultRecord = showResultRecord; }
 
     /**
      * @return showNotifySetting
@@ -1331,6 +1347,16 @@ public final class AppConfigBean {
      */
     public void setShowGunAndBulge(boolean showGunAndBulge) {
         this.showGunAndBulge = showGunAndBulge;
+    }
+
+
+
+    public boolean isShowAA() {
+        return showAA;
+    }
+
+    public void setShowAA(boolean showAA) {
+        this.showAA = showAA;
     }
 
     /**
@@ -2206,4 +2232,20 @@ public final class AppConfigBean {
         this.useLockedOnlyFleetFormat = useLockedOnlyFleetFormat;
     }
 
+    public double getBunkitenKeisu(){
+        return bunkitenKeisu;
+    }
+
+    public void setBunkitenKeisu(double keisu){
+        this.bunkitenKeisu = keisu;
+    }
+
+
+    public boolean isShowAirbase() {
+        return showAirbase;
+    }
+
+    public void setShowAirbase(boolean showAirbase) {
+        this.showAirbase = showAirbase;
+    }
 }

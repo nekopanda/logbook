@@ -1,54 +1,31 @@
 package logbook.gui.background;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
-
 import logbook.config.AppConfig;
 import logbook.config.ShipGroupConfig;
 import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.data.context.TimerContext;
-import logbook.dto.BasicInfoDto;
-import logbook.dto.DeckMissionDto;
-import logbook.dto.DockDto;
-import logbook.dto.ItemInfoDto;
-import logbook.dto.NdockDto;
-import logbook.dto.ShipDto;
+import logbook.dto.*;
 import logbook.gui.ApplicationMain;
 import logbook.gui.FleetWindow;
-import logbook.gui.logic.ColorManager;
-import logbook.gui.logic.LayoutLogic;
-import logbook.gui.logic.PushNotify;
-import logbook.gui.logic.Sound;
-import logbook.gui.logic.TimeLogic;
+import logbook.gui.logic.*;
 import logbook.gui.widgets.FleetComposite;
-import logbook.internal.AkashiTimer;
-import logbook.internal.CondTiming;
-import logbook.internal.EnemyData;
-import logbook.internal.LoggerHolder;
-import logbook.internal.MasterData;
-import logbook.internal.ShipParameterRecord;
+import logbook.internal.*;
 import logbook.scripting.ScriptData;
 import logbook.util.SwtUtils;
-
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.TaskItem;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.ToolTip;
+import org.eclipse.swt.widgets.*;
 import org.eclipse.wb.swt.SWTResourceManager;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 非同期にメイン画面を更新します
@@ -62,7 +39,7 @@ public final class AsyncExecApplicationMain extends Thread {
 
     /**
      * 非同期にメイン画面を更新するスレッドのコンストラクター
-     * 
+     *
      * @param main メイン画面
      */
     public AsyncExecApplicationMain(ApplicationMain main) {
@@ -220,8 +197,7 @@ public final class AsyncExecApplicationMain extends Thread {
 
                         if (max <= (size + AppConfig.get().getNotifyFully())) {
                             item.setProgressState(SWT.PAUSED);
-                        }
-                        else {
+                        } else {
                             item.setProgressState(SWT.NORMAL);
                         }
                     }
@@ -239,13 +215,15 @@ public final class AsyncExecApplicationMain extends Thread {
 
         private static final LoggerHolder LOG = new LoggerHolder(UpdateDeckNdockTask.class);
 
-        private static final boolean[] FLAG_NOTICE_DECK = { false, false, false };
-        private static final boolean[] FLAG_NOTICE_NDOCK = { false, false, false, false };
-        private static final boolean[] FLAG_NOTICE_COND = { false, false, false, false };
+        private static final boolean[] FLAG_NOTICE_DECK = {false, false, false};
+        private static final boolean[] FLAG_NOTICE_NDOCK = {false, false, false, false};
+        private static final boolean[] FLAG_NOTICE_COND = {false, false, false, false};
 
         private final ApplicationMain main;
 
-        /** 日付フォーマット */
+        /**
+         * 日付フォーマット
+         */
         private final SimpleDateFormat format = new SimpleDateFormat(AppConstants.DATE_SHORT_FORMAT);
 
         private final List<String> noticeMission = new ArrayList<String>();
@@ -368,12 +346,10 @@ public final class AsyncExecApplicationMain extends Thread {
             if (rest <= (ONE_MINUTES * 5)) {
                 return ColorManager
                         .getColor(AppConstants.TIME_IN_5_MIN);
-            }
-            else if (rest <= (ONE_MINUTES * 10)) {
+            } else if (rest <= (ONE_MINUTES * 10)) {
                 return ColorManager
                         .getColor(AppConstants.TIME_IN_10_MIN);
-            }
-            else if (rest <= (ONE_MINUTES * 20)) {
+            } else if (rest <= (ONE_MINUTES * 20)) {
                 return ColorManager
                         .getColor(AppConstants.TIME_IN_20_MIN);
             }
@@ -393,17 +369,14 @@ public final class AsyncExecApplicationMain extends Thread {
                 if ((rest <= ONE_MINUTES) && !FLAG_NOTICE_DECK[index]) {
                     this.noticeMission.add(dispname + " がまもなく帰投します");
                     FLAG_NOTICE_DECK[index] = true;
-                }
-                else if (AppConfig.get().isMissionRemind() && (rest < -1)
+                } else if (AppConfig.get().isMissionRemind() && (rest < -1)
                         && ((rest % AppConfig.get().getRemindInterbal()) == 0)) {
                     // 定期的にリマインドする
                     this.noticeMission.add(dispname + " がまもなく帰投します");
-                }
-                else if (rest > ONE_MINUTES) {
+                } else if (rest > ONE_MINUTES) {
                     FLAG_NOTICE_DECK[index] = false;
                 }
-            }
-            else {
+            } else {
                 FLAG_NOTICE_DECK[index] = false;
             }
         }
@@ -415,12 +388,10 @@ public final class AsyncExecApplicationMain extends Thread {
                         this.noticeCond.add(dispname + " が疲労回復しました");
                     }
                     FLAG_NOTICE_COND[index] = true;
-                }
-                else if (rest > 0) {
+                } else if (rest > 0) {
                     FLAG_NOTICE_COND[index] = false;
                 }
-            }
-            else {
+            } else {
                 FLAG_NOTICE_COND[index] = false;
             }
         }
@@ -452,9 +423,7 @@ public final class AsyncExecApplicationMain extends Thread {
 
         /**
          * 遠征を更新する
-         * 
-         * @param now
-         * @param notice
+         *
          * @return
          */
         private void updateDeck() {
@@ -462,17 +431,16 @@ public final class AsyncExecApplicationMain extends Thread {
             if (AppConfig.get().isNameOnTitlebar() && (basicDto != null)) {
                 String titlebarText = basicDto.getNickname() + " - 航海日誌";
                 this.main.setTitleText(titlebarText);
-            }
-            else {
+            } else {
                 this.main.setTitleText(AppConstants.TITLEBAR_TEXT);
             }
 
             Label[] deckNameLabels = {
                     this.main.getDeck1name(), this.main.getDeck2name(),
-                    this.main.getDeck3name(), this.main.getDeck4name() };
+                    this.main.getDeck3name(), this.main.getDeck4name()};
             Text[] deckTimeTexts = {
                     this.main.getDeck1time(), this.main.getDeck2time(),
-                    this.main.getDeck3time(), this.main.getDeck4time() };
+                    this.main.getDeck3time(), this.main.getDeck4time()};
 
             DeckMissionDto[] deckMissions = GlobalContext.getDeckMissions();
             Map<Integer, Date> ndockMap = GlobalContext.getNDockCompleteTimeMap();
@@ -509,8 +477,7 @@ public final class AsyncExecApplicationMain extends Thread {
                                 time = "まもなく帰投します";
                             }
                         }
-                    }
-                    else {
+                    } else {
                         // 遠征中でない
                         // 疲労回復時刻を計算
                         CondTiming condTiming = GlobalContext.getCondTiming();
@@ -548,22 +515,19 @@ public final class AsyncExecApplicationMain extends Thread {
                                     String remainStr = TimeLogic.toDateRestString(rest);
                                     if (remainStr == null) {
                                         txt += ":まもなく修理完了します";
-                                    }
-                                    else {
+                                    } else {
                                         txt += ":残り" + remainStr + "(" + this.format.format(state.getFinish()) + ")";
                                     }
                                     if (tooltip == null) {
                                         tooltip = txt;
-                                    }
-                                    else {
+                                    } else {
                                         tooltip += "\n" + txt;
                                     }
                                 }
                             }
 
                             this.updateNoticeAkashi(dock, repairState);
-                        }
-                        else if (!GlobalContext.isSortie(dock.getId()) && (condClearTime != null)) {
+                        } else if (!GlobalContext.isSortie(dock.getId()) && (condClearTime != null)) {
                             dispname = dockName + " (疲労回復中)";
 
                             // ツールチップテキストで時刻を表示する
@@ -594,30 +558,26 @@ public final class AsyncExecApplicationMain extends Thread {
                 if ((rest <= ONE_MINUTES) && !FLAG_NOTICE_NDOCK[index]) {
                     this.noticeNdock.add(name + " がまもなくお風呂からあがります");
                     FLAG_NOTICE_NDOCK[index] = true;
-                }
-                else if (rest > ONE_MINUTES) {
+                } else if (rest > ONE_MINUTES) {
                     FLAG_NOTICE_NDOCK[index] = false;
                 }
-            }
-            else {
+            } else {
                 FLAG_NOTICE_NDOCK[index] = false;
             }
         }
 
         /**
          * 入渠を更新する
-         * 
-         * @param now
-         * @param notice
+         *
          * @return
          */
         private void updateNdock() {
             Map<Integer, ShipDto> shipMap = GlobalContext.getShipMap();
 
-            Label[] ndockNameLabels = { this.main.getNdock1name(), this.main.getNdock2name(),
-                    this.main.getNdock3name(), this.main.getNdock4name() };
-            Text[] ndockTimeTexts = { this.main.getNdock1time(), this.main.getNdock2time(), this.main.getNdock3time(),
-                    this.main.getNdock4time() };
+            Label[] ndockNameLabels = {this.main.getNdock1name(), this.main.getNdock2name(),
+                    this.main.getNdock3name(), this.main.getNdock4name()};
+            Text[] ndockTimeTexts = {this.main.getNdock1time(), this.main.getNdock2time(), this.main.getNdock3time(),
+                    this.main.getNdock4time()};
 
             NdockDto[] ndocks = GlobalContext.getNdocks();
 
@@ -645,8 +605,7 @@ public final class AsyncExecApplicationMain extends Thread {
                             time = "まもなくお風呂からあがります";
                         }
                     }
-                }
-                else {
+                } else {
                     ndockTimeTexts[i].setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
                     ndockTimeTexts[i].setToolTipText(null);
                 }
@@ -675,13 +634,11 @@ public final class AsyncExecApplicationMain extends Thread {
                 condTimerLabel.setText("");
                 condTimerText.setToolTipText(null);
                 condTimerText.setText("");
-            }
-            else if (nextUpdateTime == null) {
+            } else if (nextUpdateTime == null) {
                 condTimerLabel.setText("次の疲労回復まで");
                 condTimerText.setToolTipText("十分な情報がありません");
                 condTimerText.setText("???");
-            }
-            else {
+            } else {
                 int accuracy = (int) timing.getCurrentAccuracy() / 2000;
                 condTimerLabel.setText("次の疲労回復まで(±" + accuracy + "秒)");
 
@@ -702,8 +659,7 @@ public final class AsyncExecApplicationMain extends Thread {
                 akashiTimerText.setText("???");
                 akashiTimerText.setToolTipText("十分な情報がありません");
                 akashiTimerText.setBackground(ColorManager.getColor(SWT.COLOR_WHITE));
-            }
-            else {
+            } else {
                 long elapsed = this.now.getTime() - akashiTimer.getStartTime().getTime();
                 String time = TimeLogic.toDateRestString(elapsed / 1000, true);
                 akashiTimerText.setText(time);
@@ -712,7 +668,9 @@ public final class AsyncExecApplicationMain extends Thread {
             }
         }
 
-        /** エラー表示を更新 */
+        /**
+         * エラー表示を更新
+         */
         private void updateErrorLabel() {
             int state = GlobalContext.getState();
             Label errorLabel = ApplicationMain.main.getErrorLabel();
@@ -722,8 +680,7 @@ public final class AsyncExecApplicationMain extends Thread {
                 errorText = "データが不完全です（理由不明）";
                 if (state == 2) {
                     errorText = "艦これのリロードが必要です";
-                }
-                else if (state == 3) {
+                } else if (state == 3) {
                     errorText = "航海日誌の再起動が必要です\r\n（アカウントが変更されたため）";
                 }
                 printLabel = true;

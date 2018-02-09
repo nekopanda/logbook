@@ -1,6 +1,7 @@
 package logbook.config;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -11,6 +12,7 @@ import logbook.dto.DeckMissionDto;
 import logbook.dto.ItemDto;
 import logbook.internal.CondTiming;
 import logbook.internal.LoggerHolder;
+import logbook.internal.ResultRecord;
 import logbook.util.BeanUtils;
 
 /**
@@ -29,6 +31,8 @@ public class UserDataConfig {
 
     private Date akashiStartTime;
 
+    private ResultRecord resultRecord;
+
     /**
      * ユーザーゲームデータをファイルに書き込みます
      */
@@ -38,6 +42,7 @@ public class UserDataConfig {
         config.previousMissions = GlobalContext.getPreviousMissions();
         config.condTiming = GlobalContext.getCondTiming().getUpdateTiming();
         config.akashiStartTime = GlobalContext.getAkashiTimer().getStartTime();
+        config.resultRecord = GlobalContext.getResultRecord();
         BeanUtils.writeObject(AppConstants.USER_DATA_CONFIG, config);
     }
 
@@ -112,5 +117,13 @@ public class UserDataConfig {
      */
     public void setAkashiStartTime(Date akashiStartTime) {
         this.akashiStartTime = akashiStartTime;
+    }
+
+    public ResultRecord getResultRecord() {
+        return resultRecord;
+    }
+
+    public void setResultRecord(ResultRecord resultRecord) {
+        this.resultRecord = resultRecord;
     }
 }

@@ -1,49 +1,67 @@
 package logbook.dto;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-
 import logbook.data.context.GlobalContext;
 import logbook.internal.Item;
 import logbook.internal.Ship;
 
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 会敵を表します
- *
  */
 public final class BattleDto extends AbstractDto {
 
-    /** 味方艦隊 */
+    /**
+     * 味方艦隊
+     */
     private final List<DockDto> friends = new ArrayList<>();
 
-    /** 敵艦隊 */
+    /**
+     * 敵艦隊
+     */
     private final List<ShipInfoDto> enemy = new ArrayList<>();
 
-    /** 敵装備 */
+    /**
+     * 敵装備
+     */
     private final List<ItemInfoDto[]> enemySlot = new ArrayList<>();
 
-    /** 味方HP */
+    /**
+     * 味方HP
+     */
     private final int[] nowFriendHp = new int[7];
 
-    /** 敵HP */
+    /**
+     * 敵HP
+     */
     private final int[] nowEnemyHp = new int[6];
 
-    /** 味方MaxHP */
+    /**
+     * 味方MaxHP
+     */
     private final int[] maxFriendHp = new int[7];
 
-    /** 敵MaxHP */
+    /**
+     * 敵MaxHP
+     */
     private final int[] maxEnemyHp = new int[6];
 
-    /** 味方陣形 */
+    /**
+     * 味方陣形
+     */
     private final String friendFormation;
 
-    /** 敵陣形 */
+    /**
+     * 敵陣形
+     */
     private final String enemyFormation;
 
-    /** 艦隊行動 */
+    /**
+     * 艦隊行動
+     */
     private final String intercept;
 
     /**
@@ -55,8 +73,7 @@ public final class BattleDto extends AbstractDto {
 
         if (object.containsKey("api_dock_id")) {
             dockId = object.get("api_dock_id").toString();
-        }
-        else {
+        } else {
             dockId = object.get("api_deck_id").toString();
         }
         this.friends.add(GlobalContext.getDock(dockId));
@@ -88,8 +105,7 @@ public final class BattleDto extends AbstractDto {
         for (int i = 1; i < nowhps.size(); i++) {
             if (i <= 6) {
                 this.nowFriendHp[i - 1] = nowhps.getJsonNumber(i).intValue();
-            }
-            else {
+            } else {
                 this.nowEnemyHp[i - 1 - 6] = nowhps.getJsonNumber(i).intValue();
             }
         }
@@ -98,8 +114,7 @@ public final class BattleDto extends AbstractDto {
         for (int i = 1; i < maxhps.size(); i++) {
             if (i <= 6) {
                 this.maxFriendHp[i - 1] = maxhps.getJsonNumber(i).intValue();
-            }
-            else {
+            } else {
                 this.maxEnemyHp[i - 1 - 6] = maxhps.getJsonNumber(i).intValue();
             }
         }
@@ -108,30 +123,29 @@ public final class BattleDto extends AbstractDto {
             JsonArray formation = object.getJsonArray("api_formation");
             // 味方陣形
             switch (formation.get(0).getValueType()) {
-            case NUMBER:
-                this.friendFormation = toFormation(formation.getInt(0));
-                break;
-            default:
-                this.friendFormation = toFormation(Integer.parseInt(formation.getString(0)));
+                case NUMBER:
+                    this.friendFormation = toFormation(formation.getInt(0));
+                    break;
+                default:
+                    this.friendFormation = toFormation(Integer.parseInt(formation.getString(0)));
             }
             // 敵陣形
             switch (formation.get(1).getValueType()) {
-            case NUMBER:
-                this.enemyFormation = toFormation(formation.getInt(1));
-                break;
-            default:
-                this.enemyFormation = toFormation(Integer.parseInt(formation.getString(1)));
+                case NUMBER:
+                    this.enemyFormation = toFormation(formation.getInt(1));
+                    break;
+                default:
+                    this.enemyFormation = toFormation(Integer.parseInt(formation.getString(1)));
             }
             // 艦隊行動
             switch (formation.get(2).getValueType()) {
-            case NUMBER:
-                this.intercept = toIntercept(formation.getInt(2));
-                break;
-            default:
-                this.intercept = toIntercept(Integer.parseInt(formation.getString(2)));
+                case NUMBER:
+                    this.intercept = toIntercept(formation.getInt(2));
+                    break;
+                default:
+                    this.intercept = toIntercept(Integer.parseInt(formation.getString(2)));
             }
-        }
-        else {
+        } else {
             this.friendFormation = "陣形不明";
             this.enemyFormation = "陣形不明";
             this.intercept = "不明";
@@ -141,36 +155,39 @@ public final class BattleDto extends AbstractDto {
     private static String toFormation(int f) {
         String formation;
         switch (f) {
-        case 1:
-            formation = "単縦陣";
-            break;
-        case 2:
-            formation = "複縦陣";
-            break;
-        case 3:
-            formation = "輪形陣";
-            break;
-        case 4:
-            formation = "梯形陣";
-            break;
-        case 5:
-            formation = "単横陣";
-            break;
-        case 11:
-            formation = "第一警戒航行序列";
-            break;
-        case 12:
-            formation = "第二警戒航行序列";
-            break;
-        case 13:
-            formation = "第三警戒航行序列";
-            break;
-        case 14:
-            formation = "第四警戒航行序列";
-            break;
-        default:
-            formation = "単縦陣";
-            break;
+            case 1:
+                formation = "単縦陣";
+                break;
+            case 2:
+                formation = "複縦陣";
+                break;
+            case 3:
+                formation = "輪形陣";
+                break;
+            case 4:
+                formation = "梯形陣";
+                break;
+            case 5:
+                formation = "単横陣";
+                break;
+            case 6:
+                formation = "警戒陣";
+                break;
+            case 11:
+                formation = "第一警戒航行序列";
+                break;
+            case 12:
+                formation = "第二警戒航行序列";
+                break;
+            case 13:
+                formation = "第三警戒航行序列";
+                break;
+            case 14:
+                formation = "第四警戒航行序列";
+                break;
+            default:
+                formation = "単縦陣";
+                break;
         }
         return formation;
     }
@@ -178,26 +195,27 @@ public final class BattleDto extends AbstractDto {
     private static String toIntercept(int i) {
         String intercept;
         switch (i) {
-        case 1:
-            intercept = "同航戦";
-            break;
-        case 2:
-            intercept = "反航戦";
-            break;
-        case 3:
-            intercept = "Ｔ字戦(有利)";
-            break;
-        case 4:
-            intercept = "Ｔ字戦(不利)";
-            break;
-        default:
-            intercept = "同航戦";
+            case 1:
+                intercept = "同航戦";
+                break;
+            case 2:
+                intercept = "反航戦";
+                break;
+            case 3:
+                intercept = "Ｔ字戦(有利)";
+                break;
+            case 4:
+                intercept = "Ｔ字戦(不利)";
+                break;
+            default:
+                intercept = "同航戦";
         }
         return intercept;
     }
 
     /**
      * 味方艦隊を取得します。
+     *
      * @return 味方艦隊
      */
     public List<DockDto> getFriends() {
@@ -206,6 +224,7 @@ public final class BattleDto extends AbstractDto {
 
     /**
      * 敵艦隊を取得します。
+     *
      * @return 敵艦隊
      */
     public List<ShipInfoDto> getEnemy() {
@@ -214,6 +233,7 @@ public final class BattleDto extends AbstractDto {
 
     /**
      * 敵装備を取得します。
+     *
      * @return 敵装備
      */
     public List<ItemInfoDto[]> getEnemySlot() {
@@ -222,6 +242,7 @@ public final class BattleDto extends AbstractDto {
 
     /**
      * 味方HPを取得します。
+     *
      * @return 味方HP
      */
     public int[] getNowFriendHp() {
@@ -230,6 +251,7 @@ public final class BattleDto extends AbstractDto {
 
     /**
      * 敵HPを取得します。
+     *
      * @return 敵HP
      */
     public int[] getNowEnemyHp() {
@@ -238,6 +260,7 @@ public final class BattleDto extends AbstractDto {
 
     /**
      * 味方MaxHPを取得します。
+     *
      * @return 味方MaxHP
      */
     public int[] getMaxFriendHp() {
@@ -246,6 +269,7 @@ public final class BattleDto extends AbstractDto {
 
     /**
      * 敵MaxHPを取得します。
+     *
      * @return 敵MaxHP
      */
     public int[] getMaxEnemyHp() {
@@ -254,6 +278,7 @@ public final class BattleDto extends AbstractDto {
 
     /**
      * 味方陣形を取得します。
+     *
      * @return 味方陣形
      */
     public String getFriendFormation() {
@@ -262,6 +287,7 @@ public final class BattleDto extends AbstractDto {
 
     /**
      * 敵陣形を取得します。
+     *
      * @return 敵陣形
      */
     public String getEnemyFormation() {
@@ -270,6 +296,7 @@ public final class BattleDto extends AbstractDto {
 
     /**
      * 艦隊行動を取得します。
+     *
      * @return 艦隊行動
      */
     public String getIntercept() {

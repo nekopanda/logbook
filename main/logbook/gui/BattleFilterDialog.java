@@ -3,10 +3,7 @@
  */
 package logbook.gui;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import logbook.dto.ResultRank;
 import logbook.gui.background.AsyncExecApplicationMain;
@@ -19,6 +16,8 @@ import logbook.internal.LoggerHolder;
 import logbook.internal.TimeSpanKind;
 import logbook.util.ReportUtils;
 
+import logbook.util.SwtUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -73,6 +72,9 @@ public class BattleFilterDialog extends WindowBase {
     private Composite rankCompo;
     private Label rankPlaceholder;
     private List<Button> rankCheckboxList;
+
+    private List<Boolean> locationList;
+    private CheckAndCombo locationCombo;
 
     public BattleFilterDialog(DropReportTable parent) {
         super.createContents(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE, false);
@@ -138,7 +140,7 @@ public class BattleFilterDialog extends WindowBase {
         RowLayout rankCompoLayout = new RowLayout(SWT.VERTICAL);
         rankCompoLayout.wrap = false;
         this.rankCompo.setLayout(rankCompoLayout);
-        this.rankCheckboxList = new ArrayList<Button>();
+        this.rankCheckboxList = new ArrayList<>();
         for (char rank : ALL_RANKS.toCharArray()) {
             Button checkbox = new Button(this.rankCompo, SWT.CHECK);
             this.rankCheckboxList.add(checkbox);
@@ -154,7 +156,7 @@ public class BattleFilterDialog extends WindowBase {
         this.shipCombo.initState(listener);
 
         // ランク
-        this.rankList = new ArrayList<String>();
+        this.rankList = new ArrayList<>();
         for (char rank : ALL_RANKS.toCharArray()) {
             this.rankList.add(String.valueOf(rank));
         }
@@ -176,7 +178,7 @@ public class BattleFilterDialog extends WindowBase {
         this.rankCombo.initState(listener);
 
         // 戦闘種別
-        this.kindList = new ArrayList<Boolean>();
+        this.kindList = new ArrayList<>();
         this.kindCombo = new CheckAndCombo(shell, "戦闘種別", 1);
         this.kindCombo.combo.add("出撃のみ");
         this.kindList.add(false);
@@ -185,13 +187,26 @@ public class BattleFilterDialog extends WindowBase {
         this.kindCombo.initState(listener);
 
         // 期間
-        this.timeList = new ArrayList<TimeSpanKind>();
+        this.timeList = new ArrayList<>();
         this.timeCombo = new CheckAndCombo(shell, "期間", 1);
         for (TimeSpanKind time : TimeSpanKind.values()) {
             this.timeCombo.combo.add(time.toString());
             this.timeList.add(time);
         }
         this.timeCombo.initState(listener);
+
+        // 場所
+        this.locationList = new ArrayList<>();
+        this.locationCombo = new CheckAndCombo(shell,"場所",1);
+        this.locationCombo.combo.add("ボス");
+        this.locationList.add(true);
+        this.locationCombo.combo.add("道中");
+        this.locationList.add(false);
+        this.locationCombo.initState(listener);
+
+        // SPACE
+        new Label(shell,SWT.NONE);
+        new Label(shell,SWT.NONE);
 
         // 時刻
         Label startLabel = new Label(shell, SWT.NONE);
@@ -220,6 +235,7 @@ public class BattleFilterDialog extends WindowBase {
                     (filter.printPractice == null) ? -1 :
                             filter.printPractice ? 1 : 0;
             int timeSpanIdx = (filter.timeSpan == null) ? -1 : this.timeList.indexOf(filter.timeSpan);
+            int locationIdx = Optional.ofNullable(filter.printBoss).map(BooleanUtils::toInteger).orElse(-1);
 
             if (mapIdx != -1) {
                 this.mapCombo.select(mapIdx);
@@ -246,6 +262,9 @@ public class BattleFilterDialog extends WindowBase {
             if (filter.toTime != null) {
                 this.toDate.setDate(toCalendar(filter.toTime), true);
             }
+            if (locationIdx != -1) {
+                this.locationCombo.select(locationIdx);
+            }
         }
 
         this.updateCalenderVisible();
@@ -253,24 +272,16 @@ public class BattleFilterDialog extends WindowBase {
         shell.pack();
 
         // データの更新を受け取る
-        final Runnable datalistener = new GuiUpdator(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    BattleFilterDialog.this.updateContents();
-                }
-                catch (Exception e) {
-                    LOG.get().warn("フィルタの更新に失敗", e);
-                }
+        final Runnable datalistener = new GuiUpdator(() -> {
+            try {
+                BattleFilterDialog.this.updateContents();
+            }
+            catch (Exception e) {
+                LOG.get().warn("フィルタの更新に失敗", e);
             }
         });
         BattleResultServer.addListener(datalistener);
-        this.getShell().addListener(SWT.Dispose, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                BattleResultServer.removeListener(datalistener);
-            }
-        });
+        this.getShell().addListener(SWT.Dispose, event -> BattleResultServer.removeListener(datalistener));
     }
 
     private void updateContents() {
@@ -311,6 +322,7 @@ public class BattleFilterDialog extends WindowBase {
         }
         filter.printPractice = (Boolean) getSelectedItem(this.kindCombo, this.kindList);
         TimeSpanKind timeSpan = (TimeSpanKind) getSelectedItem(this.timeCombo, this.timeList);
+        filter.printBoss = (Boolean) getSelectedItem(this.locationCombo,this.locationList);
         if (timeSpan == TimeSpanKind.MANUAL) {
             filter.timeSpan = null;
             filter.fromTime = this.fromDate.getSelectedDate(false);

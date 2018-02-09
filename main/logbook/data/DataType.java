@@ -137,6 +137,16 @@ public enum DataType {
     ITEMUSE_COND("/kcsapi/api_req_member/itemuse_cond"),
     /** ログイン時の情報 */
     REQUIRE_INFO("/kcsapi/api_get_member/require_info"),
+    /** 基地航空隊情報 */
+    BASE_AIR_CORPS("/kcsapi/api_get_member/base_air_corps"),
+    /** 基地航空隊:中隊設定 */
+    SET_PLANE("/kcsapi/api_req_air_corps/set_plane"),
+    /** 基地航空隊:行動指示変更 */
+    SET_ACTION("/kcsapi/api_req_air_corps/set_action"),
+    /** 基地航空隊:補給 */
+    SUPPLY("/kcsapi/api_req_air_corps/supply"),
+    /** 基地航空隊:名前変更 */
+    CHANGE_NAME("/kcsapi/api_req_air_corps/change_name"),
     /** フィルタ前のデータ */
     UNDEFINED(null);
 

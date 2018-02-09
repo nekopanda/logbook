@@ -84,6 +84,17 @@ public final class ItemInfoDto extends AbstractDto {
                 houk, tais, saku, luck, soku, leng);
     }
 
+    public ItemInfoDto(int id, int type2, int type3, int atap, int bakk, int baku, int houg, int houk, int houm,
+                       int leng, int luck, String name, int raig, int raik, int raim, int rare, int sakb, int saku,
+                       int soku, int souk, int taik, int tais, int tyku, int distance) {
+        this.id = id;
+        this.type[2] = type2;
+        this.type[3] = type3;
+        this.name = name;
+        this.param = new ShipParameters(taik, houg, houm, raig, baku, tyku, souk,
+                houk, tais, saku, luck, soku, leng, distance);
+    }
+
     public boolean isPlane() {
         for (int i = 0; i < AppConstants.PLANE_ITEM_TYPES.length; ++i) {
             if (this.type[2] == AppConstants.PLANE_ITEM_TYPES[i]) {
