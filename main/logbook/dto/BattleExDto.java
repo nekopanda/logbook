@@ -258,6 +258,10 @@ public class BattleExDto extends AbstractDto {
         @Tag(101)
         private final boolean isNightToDay;
 
+        /** 友軍艦隊支援か？*/
+        @Tag(104)
+        private final boolean isFriendFleet;
+
         /** 支援攻撃のタイプ */
         @Tag(7)
         private String supportType;
@@ -308,6 +312,8 @@ public class BattleExDto extends AbstractDto {
         private List<BattleAtackDto> hougeki_n_1 = null;
         @Tag(103)
         private List<BattleAtackDto> hougeki_n_2 = null;
+        @Tag(105)
+        private List<BattleAtackDto> hougeki_f = null;
 
         @Tag(30)
         private final String json;
@@ -333,6 +339,10 @@ public class BattleExDto extends AbstractDto {
 
             this.kind = kind;
             this.isNight = kind.isNight();
+
+            // 友軍艦隊支援か？
+            this.isFriendFleet = (object.containsKey("api_friendly_battle")
+                    ? true : false);
 
             this.nowFriendHp = beforeFriendHp.clone();
             this.nowEnemyHp = beforeEnemyHp.clone();
@@ -484,6 +494,15 @@ public class BattleExDto extends AbstractDto {
                     JsonUtils.getJsonObject(object, "api_hougeki3"),
                     kind.isHougeki3Second(), this.isEnemySecond);
 
+            if (this.isFriendFleet) {
+		JsonObject FriendObj = JsonUtils.getJsonObject(object, "api_friendly_battle");
+                this.hougeki_f = BattleAtackDto.makeHougeki(baseidx, battle.friendSecondBase,
+                        JsonUtils.getJsonObject(FriendObj, "api_hougeki"),
+                        false, false);
+            }
+
+
+
             // 雷撃
             this.raigeki = BattleAtackDto.makeRaigeki(baseidx, battle.friendSecondBase,
                     JsonUtils.getJsonObject(object, "api_raigeki"),
@@ -492,26 +511,32 @@ public class BattleExDto extends AbstractDto {
             // ダメージを反映 //
 
             if (this.airBaseInjection != null)
-                this.doAtack(this.airBaseInjection.atacks, battle.friendSecondBase);
+                this.doAtack(this.airBaseInjection.atacks, battle.friendSecondBase, this.isFriendFleet);
             if (this.airBase != null)
                 for (AirBattleDto attack : this.airBase)
-                    this.doAtack(attack.atacks, battle.friendSecondBase);
+                    this.doAtack(attack.atacks, battle.friendSecondBase, this.isFriendFleet);
             if (this.airInjection != null)
-                this.doAtack(this.airInjection.atacks, battle.friendSecondBase);
+                this.doAtack(this.airInjection.atacks, battle.friendSecondBase, this.isFriendFleet);
             if (this.air != null)
-                this.doAtack(this.air.atacks, battle.friendSecondBase);
-            this.doAtack(this.support, battle.friendSecondBase);
+                this.doAtack(this.air.atacks, battle.friendSecondBase, this.isFriendFleet);
+            this.doAtack(this.support, battle.friendSecondBase, this.isFriendFleet);
             if (this.air2 != null)
-                this.doAtack(this.air2.atacks, battle.friendSecondBase);
-            this.doAtack(this.openingTaisen, battle.friendSecondBase);
-            this.doAtack(this.opening, battle.friendSecondBase);
-            this.doAtack(this.hougeki_n_1, battle.friendSecondBase);
-            this.doAtack(this.hougeki_n_2, battle.friendSecondBase);
-            this.doAtack(this.hougeki, battle.friendSecondBase);
-            this.doAtack(this.hougeki1, battle.friendSecondBase);
-            this.doAtack(this.raigeki, battle.friendSecondBase);
-            this.doAtack(this.hougeki2, battle.friendSecondBase);
-            this.doAtack(this.hougeki3, battle.friendSecondBase);
+                this.doAtack(this.air2.atacks, battle.friendSecondBase, this.isFriendFleet);
+            this.doAtack(this.openingTaisen, battle.friendSecondBase, this.isFriendFleet);
+            this.doAtack(this.opening, battle.friendSecondBase, this.isFriendFleet);
+            this.doAtack(this.hougeki_n_1, battle.friendSecondBase, this.isFriendFleet);
+            this.doAtack(this.hougeki_n_2, battle.friendSecondBase, this.isFriendFleet);
+            this.doAtack(this.hougeki1, battle.friendSecondBase, this.isFriendFleet);
+            this.doAtack(this.raigeki, battle.friendSecondBase, this.isFriendFleet);
+            this.doAtack(this.hougeki2, battle.friendSecondBase, this.isFriendFleet);
+            this.doAtack(this.hougeki3, battle.friendSecondBase, this.isFriendFleet);
+            if (isFriendFleet) {
+                // １つのjsonファイルの中に友軍艦隊の砲撃と自艦隊の砲撃の２つの処理が存在する場合
+                this.doAtack(this.hougeki_f, battle.friendSecondBase, this.isFriendFleet);
+                this.doAtack(this.hougeki, battle.friendSecondBase, false);
+            } else {
+                this.doAtack(this.hougeki, battle.friendSecondBase, this.isFriendFleet);
+            }
 
             this.json = object.toString();
         }
@@ -738,7 +763,7 @@ public class BattleExDto extends AbstractDto {
         }
 
         // ダメージを反映
-        private void doAtack(List<BattleAtackDto> seq, int friendSecondBase) {
+        private void doAtack(List<BattleAtackDto> seq, int friendSecondBase, boolean isFF) {
             if (seq == null)
                 return;
 
@@ -746,7 +771,8 @@ public class BattleExDto extends AbstractDto {
                 for (int i = 0; i < dto.target.length; ++i) {
                     int target = dto.target[i];
                     int damage = dto.damage[i];
-                    if (dto.friendAtack) {
+                    // 自艦隊から敵艦隊への攻撃
+                    if ((dto.friendAtack == true) && (isFF == false)) {
                         if (target < ENEMY_SECOND_BASE) {
                             this.nowEnemyHp[target] -= damage;
                         }
@@ -754,7 +780,17 @@ public class BattleExDto extends AbstractDto {
                             this.nowEnemyHpCombined[target - ENEMY_SECOND_BASE] -= damage;
                         }
                     }
-                    else {
+                    // 友軍艦隊から敵艦隊への攻撃
+                    else if ((dto.friendAtack == true) && (isFF == true)) {
+                        if (target < ENEMY_SECOND_BASE) {
+                            this.nowEnemyHp[target] -= damage;
+                        }
+                        else {
+                            this.nowEnemyHpCombined[target - ENEMY_SECOND_BASE] -= damage;
+                        }
+                    }
+                    // 敵艦隊から自艦隊への攻撃
+                    else if ((dto.friendAtack == false) && (isFF == false)) {
                         if (target < friendSecondBase) {
                             this.nowFriendHp[target] -= damage;
                         }
@@ -762,6 +798,10 @@ public class BattleExDto extends AbstractDto {
                             this.nowFriendHpCombined[target - friendSecondBase] -= damage;
                         }
                     }
+                    // 敵艦隊から友軍艦隊への攻撃は、それを反映させる値がないため無視する
+                    else if ((dto.friendAtack == false) && (isFF == true)) {
+                    }
+
                 }
             }
         }
