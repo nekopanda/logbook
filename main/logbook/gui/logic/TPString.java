@@ -120,10 +120,12 @@ public class TPString implements Comparable<TPString> {
         case 230: // 特大発動艇+戦車第11連隊
             return 8;
         case 167: // 特二式内火艇
-            return 2;
+            return 22;
         case 145: // 戦闘糧食
             return 1;
         case 150: // 秋刀魚の缶詰
+            return 1;
+        case 241: // 戦闘糧食(特別なおにぎり)
             return 1;
         default:
             return 0;

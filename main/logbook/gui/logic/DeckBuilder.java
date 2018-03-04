@@ -112,7 +112,7 @@ public class DeckBuilder {
                                 item.add("id", slotExItem.getSlotitemId());
                                 item.add("rf", slotExItem.getLevel());
                                 item.add("mas", slotExItem.getAlv());
-                                if (slotNum < 4) {
+                                if (slotNum < 5) {
                                     items.add("i" + (slotNum + 1), item);
                                 } else {
                                     items.add("ix", item);
@@ -184,7 +184,7 @@ public class DeckBuilder {
                                     item.add("rf", 0);
                                 }                               
                                 item.add("mas", Integer.toString(slotExItem.getAlv()));
-                                if (slotNum < 4) {
+                                if (slotNum < 5) {
                                     items.add("i" + (slotNum + 1), item);
                                 } else {
                                     items.add("ix", item);
