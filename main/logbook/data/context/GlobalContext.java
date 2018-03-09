@@ -755,6 +755,9 @@ public final class GlobalContext {
             case COMBINED_BATTLE_GOBACK_PORT:
                 doBattleGobackPort(data, apidata);
                 break;
+            case YB_BATTLE_GOBACK_PORT:
+                doYBBattleGobackPort(data, apidata);
+                break;
             // 演習
             case PRACTICE_BATTLE:
                 doBattle(data, apidata, BattlePhaseKind.PRACTICE_BATTLE);
@@ -1443,6 +1446,36 @@ public final class GlobalContext {
             addConsole("護衛退避しました");
         } catch (Exception e) {
             LOG.get().warn("護衛退避を更新しますに失敗しました", e);
+            LOG.get().warn(data);
+        }
+    }
+
+    /**
+     * 単艦退避(遊撃部隊における退避)情報を更新します
+     * @param data
+     */
+    private static void doYBBattleGobackPort(Data data, JsonValue json) {
+        try {
+            if (battle != null) {
+                int[] escapeInfo = battle.getEscapeInfo();
+                if ((battle.getEscaped() != null) && (escapeInfo != null)) {
+                    // 退避を選択したので単艦退避した艦を追加しておく
+                    boolean[] escaped = battle.getEscaped().clone();
+                    escaped[escapeInfo[0]] = true;
+                    for (int i = 0; i < 1; ++i) {
+                        // 遊撃部隊は現時点で最大7隻
+                        battle.getFriends().get(i).setEscaped(
+                                Arrays.copyOfRange(escaped, i * 7, (i + 1) * 7));
+                    }
+
+                    // 更新
+                    battle.getDock().setUpdate(true);
+                    battle.getDockCombined().setUpdate(true);
+                }
+            }
+            addConsole("単艦退避しました");
+        } catch (Exception e) {
+            LOG.get().warn("単艦退避を更新しますに失敗しました", e);
             LOG.get().warn(data);
         }
     }

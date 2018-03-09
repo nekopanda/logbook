@@ -1457,6 +1457,22 @@ public class BattleExDto extends AbstractDto {
                     }
                 }
             }
+            else {
+                // 退避（遊撃部隊は今の所最大が7隻なのでそれで固定）
+                this.escaped = new boolean[7];
+                // 退避艦は1始まりの模様
+                if (JsonUtils.hasKey(object, "api_escape_idx")) {
+                    for (JsonValue jsonShip : JsonUtils.getJsonArray(object, "api_escape_idx")) {
+                        this.escaped[((JsonNumber) jsonShip).intValue() - 1] = true;
+                    }
+                }
+                for (int i = 0; i < 1; ++i) {
+                    DockDto dock = this.friends.get(i);
+                    if (dock != null) {
+                        dock.setEscaped(Arrays.copyOfRange(this.escaped, i * 7, (i + 1) * 7));
+                    }
+                }
+            }
         }
 
         if (this.phaseList.size() > 0) {
@@ -1526,11 +1542,20 @@ public class BattleExDto extends AbstractDto {
         this.hqLv = object.getInt("api_member_lv");
         if (JsonUtils.hasKey(object, "api_escape")) {
             JsonObject jsonEscape = object.getJsonObject("api_escape");
-            // 退避艦は1始まりの模様
-            this.escapeInfo = new int[] {
+            if (JsonUtils.hasKey(jsonEscape, "api_tow_idx")) {
+                // 退避艦は1始まりの模様
+                // 連合艦隊 護衛退避では退避艦と随行艦の情報
+                this.escapeInfo = new int[] {
                     JsonUtils.getJsonArray(jsonEscape, "api_escape_idx").getInt(0) - 1,
                     JsonUtils.getJsonArray(jsonEscape, "api_tow_idx").getInt(0) - 1
-            };
+                };
+            }
+            else {
+                // 遊撃部隊 司令部施設の場合、退避艦１隻のみの情報となる
+                this.escapeInfo = new int[] {
+                    JsonUtils.getJsonArray(jsonEscape, "api_escape_idx").getInt(0) - 1
+                };
+            }
         }
         if (JsonUtils.hasKey(object, "api_lost_flag")) {
             this.lostflag = new boolean[AppConstants.MAXCHARA];
