@@ -844,7 +844,7 @@ public class BattleExDto extends AbstractDto {
 
         /**
          * 攻撃の全シーケンスを取得
-         * [ 噴式基地航空隊航空戦, 基地航空隊航空戦, 噴式航空戦, 航空戦1, 支援艦隊の攻撃, 航空戦2, 開幕対潜, 開幕, 夜戦の砲撃戦1, 夜戦の砲撃戦2, 夜戦, 砲撃戦1, 雷撃, 砲撃戦2, 砲撃戦3 ]
+         * [ 噴式基地航空隊航空戦, 基地航空隊航空戦, 噴式航空戦, 航空戦1, 支援艦隊の攻撃, 航空戦2, 開幕対潜, 開幕, 夜戦の砲撃戦1, 夜戦の砲撃戦2, 夜戦, 砲撃戦1, 雷撃, 砲撃戦2, 砲撃戦3, 友軍艦隊 ]
          * 各戦闘がない場合はnullになる
          * @return
          */
@@ -861,12 +861,13 @@ public class BattleExDto extends AbstractDto {
                     this.openingTaisen == null ? null : this.toArray(this.openingTaisen),
                     this.opening == null ? null : this.toArray(this.opening),
                     this.hougeki_n_1 == null ? null : this.toArray(this.hougeki_n_1),
-                    this.hougeki_n_2 == null ? null : this.toArray(this.hougeki_n_2),
+                    this.hougeki_n_2 == null ? null : this.toArray(this.hougeki_n_2),                   
                     this.hougeki == null ? null : this.toArray(this.hougeki),
                     this.hougeki1 == null ? null : this.toArray(this.hougeki1),
                     this.raigeki == null ? null : this.toArray(this.raigeki),
                     this.hougeki2 == null ? null : this.toArray(this.hougeki2),
                     this.hougeki3 == null ? null : this.toArray(this.hougeki3),
+                    this.hougeki_f == null ? null : this.hougeki_f.stream().filter(attack -> attack.friendAtack).toArray(BattleAtackDto[]::new), 
             };
         }
 
