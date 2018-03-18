@@ -73,8 +73,10 @@ public enum DataType {
     BATTLE_RESULT("/kcsapi/api_req_sortie/battleresult"),
     /** 戦闘結果(連合艦隊) */
     COMBINED_BATTLE_RESULT("/kcsapi/api_req_combined_battle/battleresult"),
-    /** 退避 */
+    /** 連合艦隊 護衛退避 */
     COMBINED_BATTLE_GOBACK_PORT("/kcsapi/api_req_combined_battle/goback_port"),
+    /** 遊撃部隊 単艦退避 */
+    YB_BATTLE_GOBACK_PORT("/kcsapi/api_req_sortie/goback_port"),
     /** 開発 */
     CREATE_ITEM("/kcsapi/api_req_kousyou/createitem"),
     /** 建造 */
