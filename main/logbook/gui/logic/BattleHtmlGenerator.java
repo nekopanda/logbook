@@ -882,16 +882,11 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                 int[] flarePos = phase.getFlarePos();
                 if (flarePos != null) {
                     if (flarePos[0] != -1) {
-                        // int base = phase.getKind().isHougekiSecond() ? MAXCHARA : 0;
-                        // isHougekiSecond()が通常艦隊編成(自艦隊)の設定値を返してしまうため、
-                        // 連合艦隊編成(自艦隊)の場合、正常に動作しない。
-                        // 通常艦隊編成(自艦隊)の設定値を返す理由：敵連合艦隊夜戦用のAPI
-                        // (COMBINED_EC_BATTLE_MIDNIGHT)が通常艦隊編成(自艦隊)と連合艦隊編成(自艦隊)
-                        // で同一のため。
-                        int base = phase.getisFriendSecond() ? battle.getFriendSecondBase() : 0;
-                        flare[0] = this.getShipName(friendShips, (flarePos[0] - 1) + base);
+                        flare[0] = this.getShipName(friendShips, flarePos[0]);
                     }
                     if (flarePos[1] != -1) {
+                        // 敵軍の照明弾発射艦を表す内部データも変更されている可能性は高いが
+                        // 該当するJsonを得られず動作確認ができないため変更を保留します。
                         int base = phase.isEnemySecond() ? battle.getEnemySecondBase() : 0;
                         flare[1] = this.getShipName(enemyShips, (flarePos[1] - 1) + base);
                     }
