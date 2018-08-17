@@ -9,18 +9,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import logbook.config.AppConfig;
-import logbook.constants.AppConstants;
-import logbook.data.context.GlobalContext;
-import logbook.gui.logic.ColorManager;
-import logbook.gui.logic.LayoutLogic;
-import logbook.gui.logic.PushNotify;
-import logbook.internal.EvaluateExp;
-import logbook.internal.SeaExp;
-import logbook.util.JIntellitypeWrapper;
-import logbook.util.SwtUtils;
-import logbook.util.SwtUtils.TableDragAndDropListener;
-
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -53,6 +41,18 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+
+import logbook.config.AppConfig;
+import logbook.constants.AppConstants;
+import logbook.data.context.GlobalContext;
+import logbook.gui.logic.ColorManager;
+import logbook.gui.logic.LayoutLogic;
+import logbook.gui.logic.PushNotify;
+import logbook.internal.EvaluateExp;
+import logbook.internal.SeaExp;
+import logbook.util.JIntellitypeWrapper;
+import logbook.util.SwtUtils;
+import logbook.util.SwtUtils.TableDragAndDropListener;
 
 /**
  * 設定画面
@@ -238,26 +238,6 @@ public final class ConfigDialog extends Dialog {
         proxyPortSpinner.setSelection(AppConfig.get().getProxyPort());
         proxyPortSpinner.setLayoutData(SwtUtils.initSpinner(55,
                 new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1)));
-
-        final Button sendDatabaseButton = new Button(compositeConnection, SWT.CHECK);
-        sendDatabaseButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
-        sendDatabaseButton.setText("艦これ統計データベースへデータを送信する");
-        sendDatabaseButton.setSelection(AppConfig.get().isSendDatabase());
-
-        Label accessKeyLabel = new Label(compositeConnection, SWT.NONE);
-        accessKeyLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        accessKeyLabel.setText("アクセスキー:");
-
-        final Text accessKeyText = new Text(compositeConnection, SWT.BORDER);
-        GridData gdAccessKeyText = new GridData(SWT.FILL, SWT.CENTER, false, false, 3, 1);
-        // gdAccessKeyText.widthHint = SwtUtils.DPIAwareWidth(300);
-        accessKeyText.setLayoutData(gdAccessKeyText);
-        accessKeyText.setText(AppConfig.get().getAccessKey());
-
-        final Button databaseLogButton = new Button(compositeConnection, SWT.CHECK);
-        databaseLogButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
-        databaseLogButton.setText("データベースへの送信をログ出力する");
-        databaseLogButton.setSelection(AppConfig.get().isDatabaseSendLog());
 
         // システム タブ
         compositeSystem.setLayout(new GridLayout(3, false));
@@ -901,7 +881,6 @@ public final class ConfigDialog extends Dialog {
         pushover.setText("Pushover によるPush通知");
         pushover.setSelection(AppConfig.get().getNotifyPushover());
 
-
         Label label18 = new Label(compositePushNotify, SWT.NONE);
         label18.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
         label18.setText("Pushover UserKey");
@@ -1223,9 +1202,6 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setUseProxy(useProxyButton.getSelection());
                 AppConfig.get().setProxyHost(proxyHostText.getText());
                 AppConfig.get().setProxyPort(proxyPortSpinner.getSelection());
-                AppConfig.get().setSendDatabase(sendDatabaseButton.getSelection());
-                AppConfig.get().setDatabaseSendLog(databaseLogButton.getSelection());
-                AppConfig.get().setAccessKey(accessKeyText.getText());
                 // push notify
                 AppConfig.get().setNotifyProwl(prowl.getSelection());
                 AppConfig.get().setProwlAPIKey(prowlAPIKey.getText());

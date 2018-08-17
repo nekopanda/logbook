@@ -9,13 +9,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import logbook.config.AppConfig;
-import logbook.data.Data;
-import logbook.data.DataType;
-import logbook.data.UndefinedData;
-import logbook.data.context.GlobalContext;
-import logbook.internal.LoggerHolder;
-
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.HttpRequest;
@@ -25,6 +18,13 @@ import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.swt.widgets.Display;
+
+import logbook.config.AppConfig;
+import logbook.data.Data;
+import logbook.data.DataType;
+import logbook.data.UndefinedData;
+import logbook.data.context.GlobalContext;
+import logbook.internal.LoggerHolder;
 
 /**
  * リバースプロキシ
@@ -86,8 +86,7 @@ public final class ReverseProxyServlet extends ProxyServlet {
     @Override
     protected String filterResponseHeader(HttpServletRequest request,
             String headerName,
-            String headerValue)
-    {
+            String headerValue) {
         // Content Encoding を取得する
         if (headerName.compareToIgnoreCase("Content-Encoding") == 0) {
             request.setAttribute(Filter.CONTENT_ENCODING, headerValue);
@@ -139,9 +138,6 @@ public final class ReverseProxyServlet extends ProxyServlet {
                     public void run() {
                         try {
                             UndefinedData decodedData = rawData.decode(contentEncoding);
-
-                            // 統計データベース(http://kancolle-db.net/)に送信する
-                            DatabaseClient.send(decodedData);
 
                             // キャプチャしたバイト配列は何のデータかを決定する
                             Data data = decodedData.toDefinedData();
