@@ -112,7 +112,7 @@ public enum DataType {
     /** 任務消化 */
     QUEST_CLEAR("/kcsapi/api_req_quest/clearitemget"),
     /** 設定 */
-    START2("/kcsapi/api_start2"),
+    START2("/kcsapi/api_start2/getData"),
     /** マップ情報 */
     MAPINFO("/kcsapi/api_get_member/mapinfo"),
     /** 遠征情報 */
