@@ -188,6 +188,14 @@ public abstract class ShipBaseDto extends AbstractDto {
     }
 
     /**
+     * 艦ソートID
+     * @return 艦ソートID
+     */
+    public int getSortId() {
+        return this.shipInfo.getShipSortId();
+    }
+
+    /**
      * 艦種
      * @return 艦種
      */

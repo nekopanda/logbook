@@ -27,6 +27,10 @@ public final class ShipInfoDto extends AbstractDto {
     @Tag(1)
     private int shipId;
 
+    /** 艦ソートID */
+    @Tag(32)
+    private int shipSortId;
+
     @Tag(30)
     /** 初期艦のID */
     private int charId;
@@ -117,6 +121,7 @@ public final class ShipInfoDto extends AbstractDto {
     public ShipInfoDto(JsonObject object) {
         this.name = object.getString("api_name");
         this.shipId = object.getJsonNumber("api_id").intValue();
+        this.shipSortId = object.getJsonNumber("api_sort_id").intValue();
         this.flagship = object.getString("api_yomi");
         if ("-".equals(this.flagship)) {
             this.flagship = "";
@@ -191,6 +196,21 @@ public final class ShipInfoDto extends AbstractDto {
      */
     public int getShipId() {
         return this.shipId;
+    }
+
+    /**
+     * 艦ソートIDを設定します。
+     * @param shipId 艦ソートID
+     */
+    public void setShipSortId(int shipSortId) {
+        this.shipSortId = shipSortId;
+    }
+
+    /**
+     * 艦ソートIDを取得します。
+     */
+    public int getShipSortId() {
+        return this.shipSortId;
     }
 
     /**

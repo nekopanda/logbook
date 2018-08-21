@@ -53,7 +53,7 @@ public class ShipOrder {
             public int compare(ShipOrder o1, ShipOrder o2) {
                 int ret = -Integer.compare(o1.ship.getLv(), o2.ship.getLv());
                 if (ret == 0) {
-                    return super.compare(o1, o2);
+                    ret = Integer.compare(o1.ship.getSortId(), o2.ship.getSortId());
                 }
                 return ret;
             }
@@ -62,9 +62,9 @@ public class ShipOrder {
         genSortNumber(ships, 1, new Comparator<ShipOrder>() {
             @Override
             public int compare(ShipOrder o1, ShipOrder o2) {
-                int ret = -Integer.compare(o1.ship.getShipInfo().getStype(), o2.ship.getShipInfo().getStype());
+                int ret = Integer.compare(o1.ship.getSortId(), o2.ship.getSortId());
                 if (ret == 0) {
-                    ret = Integer.compare(o1.ship.getSortno(), o2.ship.getSortno());
+                    ret = -Integer.compare(o1.ship.getLv(), o2.ship.getLv());
                     /*// Lv順の後に安定ソートするので
                     if (ret == 0) {
                         ret = -Integer.compare(o1.ship.getLv(), o2.ship.getLv());
@@ -92,7 +92,10 @@ public class ShipOrder {
                 double o2rate = (double) o2.ship.getNowhp() / (double) o2.ship.getMaxhp();
                 int ret = Double.compare(o1rate, o2rate);
                 if (ret == 0) {
-                    return super.compare(o1, o2);
+                    ret = Integer.compare(o1.ship.getSortId(), o2.ship.getSortId());
+                    if (ret == 0) {
+                        ret = -Integer.compare(o1.ship.getLv(), o2.ship.getLv());
+                    }
                 }
                 return ret;
             }
