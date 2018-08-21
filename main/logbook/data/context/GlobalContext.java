@@ -4,31 +4,75 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.CheckForNull;
-import javax.json.*;
+import javax.json.JsonArray;
+import javax.json.JsonNumber;
+import javax.json.JsonObject;
+import javax.json.JsonValue;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.ToolTip;
 
 import logbook.config.AppConfig;
 import logbook.config.UserDataConfig;
 import logbook.constants.AppConstants;
 import logbook.data.Data;
 import logbook.data.EventListener;
-import logbook.dto.*;
+import logbook.dto.AirbaseDto;
+import logbook.dto.BasicInfoDto;
+import logbook.dto.BattleExDto;
 import logbook.dto.BattleExDto.Phase;
+import logbook.dto.BattlePhaseKind;
+import logbook.dto.BattleResultDto;
+import logbook.dto.CreateItemDto;
+import logbook.dto.DeckMissionDto;
+import logbook.dto.DockDto;
+import logbook.dto.GetShipDto;
+import logbook.dto.ItemDto;
+import logbook.dto.ItemInfoDto;
+import logbook.dto.KdockDto;
+import logbook.dto.LostEntityDto;
+import logbook.dto.MapCellDto;
+import logbook.dto.MaterialDto;
+import logbook.dto.MissionResultDto;
+import logbook.dto.NdockDto;
+import logbook.dto.PracticeUserDetailDto;
+import logbook.dto.PracticeUserDto;
+import logbook.dto.QuestDto;
+import logbook.dto.ResourceItemDto;
+import logbook.dto.ShipDto;
+import logbook.dto.ShipInfoDto;
 import logbook.gui.ApplicationMain;
 import logbook.gui.logic.CreateReportLogic;
 import logbook.gui.logic.Sound;
-import logbook.internal.*;
+import logbook.internal.AkashiTimer;
+import logbook.internal.BattleResultServer;
+import logbook.internal.CondTiming;
+import logbook.internal.Item;
+import logbook.internal.LoggerHolder;
+import logbook.internal.MasterData;
+import logbook.internal.ResultRecord;
+import logbook.internal.Ship;
 import logbook.internal.ShipParameterRecord.UpdateShipParameter;
 import logbook.scripting.EventListenerProxy;
 import logbook.util.JsonUtils;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.ToolTip;
 
 /**
  * ゲームのユーザ情報を管理します
@@ -556,8 +600,9 @@ public final class GlobalContext {
         return akashiTimer;
     }
 
-
-    public static ResultRecord getResultRecord() { return resultRecord; }
+    public static ResultRecord getResultRecord() {
+        return resultRecord;
+    }
 
     /**
      * リクエスト・レスポンスを受け取るEventListener登録
@@ -841,7 +886,7 @@ public final class GlobalContext {
             // 基地航空隊情報
             case BASE_AIR_CORPS:
                 doBaseAirCorps(data, apidata);
-            // 基地航空隊:中隊設定
+                // 基地航空隊:中隊設定
             case SET_PLANE:
                 doSetPlane(data, apidata);
                 break;
@@ -851,7 +896,7 @@ public final class GlobalContext {
                 break;
             //基地航空隊:補給
             case SUPPLY:
-                doSupply(data , apidata);
+                doSupply(data, apidata);
                 break;
             // 基地航空隊:名前変更
             case CHANGE_NAME:
@@ -996,7 +1041,7 @@ public final class GlobalContext {
                 List<ShipDto> ships = dockdto.getShips();
                 DockDto rdock = null;
 
-                if (shipidx == -1) {
+                if (shipid == -2) {
                     // 旗艦以外解除
                     for (int i = 1; i < ships.size(); ++i) {
                         ships.get(i).setFleetid("");
@@ -2146,7 +2191,7 @@ public final class GlobalContext {
                 if ((materialLogLastUpdate == null)
                         || (TimeUnit.MILLISECONDS
                                 .toSeconds(time.getTime() - materialLogLastUpdate.getTime()) > AppConfig.get()
-                                .getMaterialLogInterval())) {
+                                        .getMaterialLogInterval())) {
                     CreateReportLogic.storeMaterialReport(material, basic);
 
                     materialLogLastUpdate = time;
@@ -2714,19 +2759,19 @@ public final class GlobalContext {
         }
     }
 
-    private static void doBaseAirCorps(Data data, JsonValue json){
+    private static void doBaseAirCorps(Data data, JsonValue json) {
         // 処理ちゃんと分かってないので保留
     }
 
-    private static void doSetPlane(Data data, JsonValue json){
+    private static void doSetPlane(Data data, JsonValue json) {
         try {
             if (json instanceof JsonObject) {
                 JsonObject apidata = (JsonObject) json;
-                if(Objects.nonNull(airbase)){
+                if (Objects.nonNull(airbase)) {
                     int area = Integer.parseInt(data.getField("api_area_id"));
                     int base = Integer.parseInt(data.getField("api_base_id"));
-                    if(airbase.get().containsKey(area)){
-                        if(airbase.get().get(area).containsKey(base)){
+                    if (airbase.get().containsKey(area)) {
+                        if (airbase.get().get(area).containsKey(base)) {
                             airbase.get().get(area).get(base).setPlane(apidata);
                             ApplicationMain.main.updateAirbase();
                         }
@@ -2740,17 +2785,19 @@ public final class GlobalContext {
         }
     }
 
-    private static void doSetAction(Data data, JsonValue json){
+    private static void doSetAction(Data data, JsonValue json) {
         try {
-            if(Objects.nonNull(airbase)){
+            if (Objects.nonNull(airbase)) {
                 int area = Integer.parseInt(data.getField("api_area_id"));
-                int[] bases = Arrays.stream(data.getField("api_base_id").split(",")).mapToInt(Integer::parseInt).toArray();
-                int[] actionKinds = Arrays.stream(data.getField("api_action_kind").split(",")).mapToInt(Integer::parseInt).toArray();
-                if(airbase.get().containsKey(area)){
-                    for(int i = 0;i < bases.length;i++){
+                int[] bases = Arrays.stream(data.getField("api_base_id").split(",")).mapToInt(Integer::parseInt)
+                        .toArray();
+                int[] actionKinds = Arrays.stream(data.getField("api_action_kind").split(","))
+                        .mapToInt(Integer::parseInt).toArray();
+                if (airbase.get().containsKey(area)) {
+                    for (int i = 0; i < bases.length; i++) {
                         int base = bases[i];
                         int actionKind = actionKinds[i];
-                        if(airbase.get().get(area).containsKey(base)){
+                        if (airbase.get().get(area).containsKey(base)) {
                             airbase.get().get(area).get(base).setActionKind(actionKind);
                             ApplicationMain.main.updateAirbase();
                         }
@@ -2764,15 +2811,15 @@ public final class GlobalContext {
         }
     }
 
-    private static void doSupply(Data data, JsonValue json){
+    private static void doSupply(Data data, JsonValue json) {
         try {
             if (json instanceof JsonObject) {
                 JsonObject apidata = (JsonObject) json;
-                if(Objects.nonNull(airbase)){
+                if (Objects.nonNull(airbase)) {
                     int area = Integer.parseInt(data.getField("api_area_id"));
                     int base = Integer.parseInt(data.getField("api_base_id"));
-                    if(airbase.get().containsKey(area)){
-                        if(airbase.get().get(area).containsKey(base)){
+                    if (airbase.get().containsKey(area)) {
+                        if (airbase.get().get(area).containsKey(base)) {
                             airbase.get().get(area).get(base).supply(apidata);
                             ApplicationMain.main.updateAirbase();
                         }
@@ -2786,14 +2833,14 @@ public final class GlobalContext {
         }
     }
 
-    private static void doChangeName(Data data, JsonValue json){
+    private static void doChangeName(Data data, JsonValue json) {
         try {
-            if(Objects.nonNull(airbase)){
+            if (Objects.nonNull(airbase)) {
                 int area = Integer.parseInt(data.getField("api_area_id"));
                 int base = Integer.parseInt(data.getField("api_base_id"));
                 String name = data.getField("api_name");
-                if(airbase.get().containsKey(area)){
-                    if(airbase.get().get(area).containsKey(base)){
+                if (airbase.get().containsKey(area)) {
+                    if (airbase.get().get(area).containsKey(base)) {
                         airbase.get().get(area).get(base).setName(name);
                         ApplicationMain.main.updateAirbase();
                     }
