@@ -324,8 +324,6 @@ public class MasterData {
                     JsonObject object = (JsonObject) apiMstShip.get(i);
                     int id = object.getInt("api_id");
                     this.ships.put(id, this.toShipInfoDto(object));
-                    int sort_id = object.getInt("api_sort_id");
-                    this.ships.put(sort_id, this.toShipInfoDto(object));
                 }
             }
             this.setCharId();

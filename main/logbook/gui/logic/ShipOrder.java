@@ -54,6 +54,9 @@ public class ShipOrder {
                 int ret = -Integer.compare(o1.ship.getLv(), o2.ship.getLv());
                 if (ret == 0) {
                     ret = Integer.compare(o1.ship.getSortId(), o2.ship.getSortId());
+                    if (ret == 0) {
+                        ret = Integer.compare(o1.ship.getId(), o2.ship.getId());
+                    }
                 }
                 return ret;
             }
@@ -63,25 +66,17 @@ public class ShipOrder {
             @Override
             public int compare(ShipOrder o1, ShipOrder o2) {
                 int ret = Integer.compare(o1.ship.getSortId(), o2.ship.getSortId());
+                /*// Lv順の後に安定ソートするので
                 if (ret == 0) {
-                    ret = -Integer.compare(o1.ship.getLv(), o2.ship.getLv());
-                    /*// Lv順の後に安定ソートするので
                     if (ret == 0) {
                         ret = -Integer.compare(o1.ship.getLv(), o2.ship.getLv());
                         if (ret == 0) {
                             ret = Integer.compare(o1.ship.getId(), o2.ship.getId());
                         }
                     }
-                    */
                 }
+                */
                 return ret;
-            }
-        });
-        // NEW
-        genSortNumber(ships, 2, new ShipComparatorBase() {
-            @Override
-            public int compare(ShipOrder o1, ShipOrder o2) {
-                return -Integer.compare(o1.ship.getId(), o2.ship.getId());
             }
         });
         // 修理順
@@ -91,13 +86,25 @@ public class ShipOrder {
                 double o1rate = (double) o1.ship.getNowhp() / (double) o1.ship.getMaxhp();
                 double o2rate = (double) o2.ship.getNowhp() / (double) o2.ship.getMaxhp();
                 int ret = Double.compare(o1rate, o2rate);
+                /*// 艦種順の後に安定ソートするので
                 if (ret == 0) {
                     ret = Integer.compare(o1.ship.getSortId(), o2.ship.getSortId());
                     if (ret == 0) {
                         ret = -Integer.compare(o1.ship.getLv(), o2.ship.getLv());
+                        if (ret == 0) {
+                            ret = Integer.compare(o1.ship.getId(), o2.ship.getId());
+                        }
                     }
                 }
+                */
                 return ret;
+            }
+        });
+        // NEW
+        genSortNumber(ships, 2, new ShipComparatorBase() {
+            @Override
+            public int compare(ShipOrder o1, ShipOrder o2) {
+                return -Integer.compare(o1.ship.getId(), o2.ship.getId());
             }
         });
         // 最後にID順にしておく
