@@ -901,6 +901,20 @@ public final class ConfigDialog extends Dialog {
         PushoverApitoken.setLayoutData(gdPushoverApitoken);
         PushoverApitoken.setText(AppConfig.get().getPushoverApitoken());
 
+        final Button line = new Button(compositePushNotify, SWT.CHECK);
+        line.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+        line.setText("LINE Notify API による通知");
+        line.setSelection(AppConfig.get().getNotifyLINE());
+
+        Label label20 = new Label(compositePushNotify, SWT.NONE);
+        label20.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        label20.setText("LINE Notify API Token");
+        final Text LINEApitoken = new Text(compositePushNotify, SWT.PASSWORD | SWT.BORDER);
+        GridData gdLINEApitoken = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
+        gdLINEApitoken.widthHint = SwtUtils.DPIAwareWidth(200);
+        LINEApitoken.setLayoutData(gdLINEApitoken);
+        LINEApitoken.setText(AppConfig.get().getLINEApitoken());
+
         String pushName[] = new String[] {
                 "遠征帰投を通知",
                 "入渠完了を通知",
@@ -968,6 +982,8 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setNotifyPushover(pushover.getSelection());
                 AppConfig.get().setPushoverUserKey(PushoverUserKey.getText());
                 AppConfig.get().setPushoverApitoken(PushoverApitoken.getText());
+                AppConfig.get().setNotifyLINE(line.getSelection());
+                AppConfig.get().setLINEApitoken(LINEApitoken.getText());
                 AppConfig.get().setPushMission(pushNotifyMission.getSelection());
                 AppConfig.get().setPushNdock(pushNotifyNdock.getSelection());
                 AppConfig.get().setPushPriorityMission(pushPriorityMissionCombo.getSelectionIndex() - 2);
@@ -995,6 +1011,8 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setNotifyPushover(pushover.getSelection());
                 AppConfig.get().setPushoverUserKey(PushoverUserKey.getText());
                 AppConfig.get().setPushoverApitoken(PushoverApitoken.getText());
+                AppConfig.get().setNotifyLINE(line.getSelection());
+                AppConfig.get().setLINEApitoken(LINEApitoken.getText());
                 AppConfig.get().setPushMission(pushNotifyMission.getSelection());
                 AppConfig.get().setPushNdock(pushNotifyNdock.getSelection());
                 AppConfig.get().setPushPriorityMission(pushPriorityMissionCombo.getSelectionIndex() - 2);
@@ -1214,6 +1232,8 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setNotifyPushover(pushover.getSelection());
                 AppConfig.get().setPushoverUserKey(PushoverUserKey.getText());
                 AppConfig.get().setPushoverApitoken(PushoverApitoken.getText());
+                AppConfig.get().setNotifyLINE(line.getSelection());
+                AppConfig.get().setLINEApitoken(LINEApitoken.getText());
                 AppConfig.get().setPushMission(pushNotifyMission.getSelection());
                 AppConfig.get().setPushNdock(pushNotifyNdock.getSelection());
                 AppConfig.get().setPushAkashi(pushNotifyAkashi.getSelection());

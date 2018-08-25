@@ -367,6 +367,9 @@ public class AppConstants {
     /** Pushover のアクセス先 URI */
     public static final String PUSH_NOTIFY_PUSHOVER_URI = "https://api.pushover.net/1/messages.json";
 
+   /** LINE Notify API のアクセス先 URI */
+    public static final String NOTIFY_LINE_URI = "https://notify-api.line.me/api/notify";
+
     /** メッセージ  ドラム缶:{0} ({1}隻) */
     public static final String MESSAGE_TOTAL_DRAM = "ドラム缶:{0} ({1}隻)。";
 

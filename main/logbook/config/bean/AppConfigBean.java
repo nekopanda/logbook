@@ -108,6 +108,12 @@ public final class AppConfigBean {
     /** Pushover による Push 通知 Apitoken */
     private String PushoverApitoken = "";
 
+    /** LINE Notify API による 通知設定 */
+    private boolean NotifyLINE = false;
+
+    /** LINE Notify API による 通知 Apitoken */
+    private String LINEApitoken = "";
+
     /** 遠征Push通知のPriority */
     private int PushPriorityMission = 0;
 
@@ -781,6 +787,31 @@ public final class AppConfigBean {
      */
     public void setPushoverApitoken(String apitoken) {
         this.PushoverApitoken = apitoken;
+    }
+
+    /** LINE Notify API による 通知の設定を取得します
+     * @return LINE Notify API による 通知の設定
+     */
+    public boolean getNotifyLINE() {
+        return this.NotifyLINE;
+    }
+    /** LINE Notify API による 通知の Apitoken を取得します
+     * @return Apitoken
+     */
+    public String getLINEApitoken() {
+        return this.LINEApitoken;
+    }
+    /** LINE Notify API による 通知を設定します
+     * @param LINE Notify API による 通知
+     */
+    public void setNotifyLINE(boolean linecflg) {
+        this.NotifyLINE = linecflg;
+    }
+    /** LINE Notify API による 通知の Apitoken を設定します
+     * @param Apitoken
+     */
+    public void setLINEApitoken(String apitoken) {
+        this.LINEApitoken = apitoken;
     }
 
     /** 遠征帰投時にPush通知する を取得します
