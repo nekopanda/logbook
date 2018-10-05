@@ -471,6 +471,8 @@ public class BattleAtackDto {
             return "カットイン(主砲/主砲)";
         case 7:
             return "カットイン(空母)";
+        case 100:
+            return "ネルソンタッチ";
         }
         return "不明(" + this.type + ")";
     }
