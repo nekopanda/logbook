@@ -71,6 +71,7 @@ public class SakutekiString implements Comparable<SakutekiString> {
         public double dentanKaisyu;
         public double kanteiKaisyu;
         public double suiteiKaisyu;
+        public double suibakuKaisyu;
 
         public boolean failed;
 
@@ -89,6 +90,7 @@ public class SakutekiString implements Comparable<SakutekiString> {
             this.dentanKaisyu = 0;
             this.kanteiKaisyu = 0;
             this.suiteiKaisyu = 0;
+            this.suibakuKaisyu = 0;
             for (int i = 0; i < items.size(); i++) {
                 ItemDto item = items.get(i);
                 if (item != null) {
@@ -116,6 +118,7 @@ public class SakutekiString implements Comparable<SakutekiString> {
                         break;
                     case 11: // 水上爆撃機
                         this.suibaku += saku;
+                        this.suibakuKaisyu += 1.15 * Math.sqrt(lv);
                         break;
                     case 12: // 小型電探
                         this.kogataDentan += saku;
@@ -231,7 +234,7 @@ public class SakutekiString implements Comparable<SakutekiString> {
                 + (p.kanko * 0.8)
                 + ((p.kantei + p.kanteiKaisyu) * 1.0)
                 + ((p.suitei + p.suiteiKaisyu) * 1.2)
-                + (p.suibaku * 1.1)
+                + ((p.suibaku + p.suibakuKaisyu) * 1.1)
                 + ((p.kogataDentan + p.oogataDentan + p.dentanKaisyu) * 0.6)
                 + (p.tansyouto * 0.6)
                 + (p.other * 0.6);
