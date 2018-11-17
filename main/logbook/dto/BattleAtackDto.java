@@ -473,6 +473,8 @@ public class BattleAtackDto {
             return "カットイン(空母)";
         case 100:
             return "ネルソンタッチ";
+        case 101:
+            return "一斉射かッ…胸が熱いな！";
         }
         return "不明(" + this.type + ")";
     }
