@@ -24,7 +24,7 @@ public class AppConstants {
     public static final String SUFFIX = "拡張版";
 
     /** バージョン */
-    public static final String VERSION = "2.5.4";
+    public static final String VERSION = "2.5.5";
 
     /** ホームページ */
     public static final URI HOME_PAGE_URI = URI.create("http://nekopanda.blog.jp/");
@@ -367,7 +367,7 @@ public class AppConstants {
     /** Pushover のアクセス先 URI */
     public static final String PUSH_NOTIFY_PUSHOVER_URI = "https://api.pushover.net/1/messages.json";
 
-   /** LINE Notify API のアクセス先 URI */
+    /** LINE Notify API のアクセス先 URI */
     public static final String NOTIFY_LINE_URI = "https://notify-api.line.me/api/notify";
 
     /** メッセージ  ドラム缶:{0} ({1}隻) */
