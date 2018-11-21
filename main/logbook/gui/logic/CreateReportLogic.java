@@ -658,10 +658,10 @@ public final class CreateReportLogic {
         OutputStream stream = new BufferedOutputStream(new FileOutputStream(file, applend));
         try {
             if (!file.exists() || (FileUtils.sizeOf(file) <= 0)) {
-                IOUtils.write(StringUtils.join(header, ',') + "\r\n", stream, charset);
+                IOUtils.write(StringUtils.join(header, '\t') + "\r\n", stream, charset);
             }
             for (Comparable[] colums : body) {
-                IOUtils.write(StringUtils.join(ReportUtils.toStringArray(colums), ',') + "\r\n", stream,
+                IOUtils.write(StringUtils.join(ReportUtils.toStringArray(colums), '\t') + "\r\n", stream,
                         charset);
             }
         } finally {

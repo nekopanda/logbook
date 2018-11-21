@@ -73,6 +73,11 @@ public final class PushNotify {
         if (AppConfig.get().getNotifyPushover()) {
             pushPushover(msg);
         }
+
+        if (AppConfig.get().getNotifyLINE()) {
+            pushLINE(msg);
+        }
+
     }
 
     /**
@@ -254,6 +259,38 @@ public final class PushNotify {
     }
 
     /**
+     * LINE Notify APIによる通知
+     * 
+     * @param String 通知メッセージ
+     */
+    private static void pushLINE(String msg[]) {
+        StringBuilder postdata = new StringBuilder();
+        String result = null;
+        try {
+                String token = AppConfig.get().getLINEApitoken();
+                addPOSTData(postdata, "message", msg[1]+" "+msg[0]);
+                result = HttpPOSTRequestLINE(AppConstants.NOTIFY_LINE_URI ,
+                        postdata, token);
+            
+            JsonParser parser = Json.createParser(new StringReader(result));
+            boolean postflag = false;
+            while (parser.hasNext()) {
+                JsonParser.Event event = parser.next();
+                if (event == VALUE_STRING) {
+                    if (parser.getString() == "ok") {
+                        postflag = true;
+                    }
+                }
+            }
+            if (postflag = false) {
+                LOG.get().warn("LINE による 通知に失敗しました", result);
+            }
+        } catch (Exception e) {
+            LOG.get().warn("LINE による 通知に失敗しました", e);
+        }
+    }
+
+    /**
      * HTTP POSTリクエストの送信
      * 
      * @param String URL
@@ -294,6 +331,55 @@ public final class PushNotify {
             }
         } catch (Exception e) {
             LOG.get().warn("Push 通知に失敗しました", e);
+            return "";
+        }
+
+    }
+
+    /**
+     * HTTP POSTリクエストの送信(for LINE Notify API)
+     * 
+     * @param String URL
+     * @param StringBuilder POSTデータ
+     * 
+     */
+    private static String HttpPOSTRequestLINE(String posturi, StringBuilder postsb, String token) {
+        HttpURLConnection connection = null;
+        URL url = null;
+        String Auth_data = "Bearer"+" "+token;
+        String postdata = postsb.toString();
+        try {
+            url = new URL(posturi);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+            connection.setUseCaches(false);
+            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            connection.setRequestProperty("Authorization", Auth_data);
+
+
+            OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+            writer.write(postdata);
+            writer.flush();
+            writer.close();
+
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(connection.getInputStream()));
+
+            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                StringBuffer response = new StringBuffer();
+                String line = null;
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
+                }
+                String resultStr = response.toString();
+                return resultStr;
+            } else {
+                LOG.get().warn("LINE 通知に失敗しました。HTTPレスポンスコード:" + connection.getResponseCode());
+                return "";
+            }
+        } catch (Exception e) {
+            LOG.get().warn("LINE 通知に失敗しました", e);
             return "";
         }
 

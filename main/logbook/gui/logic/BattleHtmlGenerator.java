@@ -577,12 +577,26 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                 damageClass = DAMAGE_CLASS[1];
             }
 
+            String HTypeS = "";
             for (int i = 0; i < atack.damage.length; ++i) {
                 this.begin("tr", null);
 
                 if (i == 0) {
                     this.inline("td", text[0], null);
                     this.inline("td", this.getShipName(origin, atack.origin[0]), textClass[0]);
+                    HTypeS = atack.getHougekiTypeString();
+                } else if ((i == 1) && (HTypeS.equals("ネルソンタッチ"))) {
+                    this.inline("td", text[0], null);
+                    this.inline("td", this.getShipName(origin, 2), textClass[0]);
+                } else if ((i == 2) && (HTypeS.equals("ネルソンタッチ"))) {
+                    this.inline("td", text[0], null);
+                    this.inline("td", this.getShipName(origin, 4), textClass[0]);
+                } else if ((i == 1) && (HTypeS.equals("一斉射かッ…胸が熱いな！"))) {
+                    this.inline("td", text[0], null);
+                    this.inline("td", this.getShipName(origin, 0), textClass[0]);
+                } else if ((i == 2) && (HTypeS.equals("一斉射かッ…胸が熱いな！"))) {
+                    this.inline("td", text[0], null);
+                    this.inline("td", this.getShipName(origin, 1), textClass[0]);
                 } else {
                     this.inline("td", getColSpan(2), "", null);
                 }

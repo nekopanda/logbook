@@ -47,7 +47,7 @@ public class AirbaseDto {
 
         private int rid;
         private String name;
-        private int distance;
+        private JsonObject distance;
         private int actionKind;
         private Map<Integer, SquadronDto> squadrons;
 
@@ -55,7 +55,7 @@ public class AirbaseDto {
             this(
                     json.getInt("api_rid"),
                     json.getString("api_name"),
-                    json.getInt("api_distance"),
+                    json.getJsonObject("api_distance"),
                     json.getInt("api_action_kind"),
                     json.getJsonArray("api_plane_info").stream()
                             .map(JsonObject.class::cast)
@@ -64,7 +64,7 @@ public class AirbaseDto {
             );
         }
 
-        public AirCorpsDto(int rid, String name, int distance, int actionKind, Map<Integer, SquadronDto> squadrons) {
+        public AirCorpsDto(int rid, String name, JsonObject distance, int actionKind, Map<Integer, SquadronDto> squadrons) {
             this.rid = rid;
             this.name = name;
             this.distance = distance;
@@ -74,7 +74,7 @@ public class AirbaseDto {
         }
 
         public void setPlane(JsonObject json) {
-            this.distance = json.getInt("api_distance");
+            this.distance = json.getJsonObject("api_distance");
             this.supply(json);
         }
 
@@ -101,11 +101,11 @@ public class AirbaseDto {
             this.name = name;
         }
 
-        public int getDistance() {
+        public JsonObject getDistance() {
             return this.distance;
         }
 
-        public void setDistance(int distance) {
+        public void setDistance(JsonObject distance) {
             this.distance = distance;
         }
 
@@ -291,6 +291,38 @@ public class AirbaseDto {
                         return Integer.toString((this.min + this.max) / 2);
                 }
                 return Integer.toString(this.max);
+            }
+        }
+
+        public static class Distance {
+
+            private int base;
+            private int bonus;
+
+            Distance(JsonObject json) {
+                this.base = json.getInt("api_base");
+                this.bonus = json.getInt("api_bonus");
+            }
+
+            Distance(int base, int bonus) {
+                this.base = base;
+                this.bonus = bonus;
+            }
+
+            public int getBase() {
+                return base;
+            }
+
+            public void setBase(int base) {
+                this.base = base;
+            }
+
+            public int getBonus() {
+                return bonus;
+            }
+
+            public void setBonus(int bonus) {
+                this.bonus = bonus;
             }
         }
 
