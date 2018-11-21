@@ -826,21 +826,6 @@ public final class ConfigDialog extends Dialog {
         prowlAPIKey.setLayoutData(gdprowlAPIKey);
         prowlAPIKey.setText(AppConfig.get().getProwlAPIKey());
 
-        final Button nma = new Button(compositePushNotify, SWT.CHECK);
-        nma.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-        nma.setText("Notify My Android (NMA)によるPush通知");
-        nma.setSelection(AppConfig.get().getNotifyNMA());
-
-        Label label12 = new Label(compositePushNotify, SWT.NONE);
-        label12.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-        label12.setText("NMA APIKey");
-
-        final Text nmaAPIKey = new Text(compositePushNotify, SWT.BORDER);
-        GridData gdnmaAPIKey = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
-        gdnmaAPIKey.widthHint = SwtUtils.DPIAwareWidth(200);
-        nmaAPIKey.setLayoutData(gdnmaAPIKey);
-        nmaAPIKey.setText(AppConfig.get().getNMAAPIKey());
-
         final Button imkayac = new Button(compositePushNotify, SWT.CHECK);
         imkayac.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
         imkayac.setText("ImKayac によるPush通知(秘密鍵優先)");
@@ -973,8 +958,6 @@ public final class ConfigDialog extends Dialog {
             public void widgetSelected(SelectionEvent e) {
                 AppConfig.get().setNotifyProwl(prowl.getSelection());
                 AppConfig.get().setProwlAPIKey(prowlAPIKey.getText());
-                AppConfig.get().setNotifyNMA(nma.getSelection());
-                AppConfig.get().setNMAAPIKey(nmaAPIKey.getText());
                 AppConfig.get().setNotifyImKayac(imkayac.getSelection());
                 AppConfig.get().setImKayacUserName(imkayacUserName.getText());
                 AppConfig.get().setImKayacPasswd(imkayacPasswd.getText());
@@ -1002,8 +985,6 @@ public final class ConfigDialog extends Dialog {
             public void widgetSelected(SelectionEvent e) {
                 AppConfig.get().setNotifyProwl(prowl.getSelection());
                 AppConfig.get().setProwlAPIKey(prowlAPIKey.getText());
-                AppConfig.get().setNotifyNMA(nma.getSelection());
-                AppConfig.get().setNMAAPIKey(nmaAPIKey.getText());
                 AppConfig.get().setNotifyImKayac(imkayac.getSelection());
                 AppConfig.get().setImKayacUserName(imkayacUserName.getText());
                 AppConfig.get().setImKayacPasswd(imkayacPasswd.getText());
@@ -1223,8 +1204,6 @@ public final class ConfigDialog extends Dialog {
                 // push notify
                 AppConfig.get().setNotifyProwl(prowl.getSelection());
                 AppConfig.get().setProwlAPIKey(prowlAPIKey.getText());
-                AppConfig.get().setNotifyNMA(nma.getSelection());
-                AppConfig.get().setNMAAPIKey(nmaAPIKey.getText());
                 AppConfig.get().setNotifyImKayac(imkayac.getSelection());
                 AppConfig.get().setImKayacUserName(imkayacUserName.getText());
                 AppConfig.get().setImKayacPasswd(imkayacPasswd.getText());

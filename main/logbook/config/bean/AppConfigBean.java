@@ -6,11 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import logbook.constants.AppConstants;
-import logbook.dto.ShipFilterDto;
-
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.swt.graphics.RGB;
+
+import logbook.constants.AppConstants;
+import logbook.dto.ShipFilterDto;
 
 /**
  * アプリケーションの設定
@@ -81,10 +81,10 @@ public final class AppConfigBean {
     /** Prowl による Push 通知 APIKey */
     private String ProwlAPIKey = "";
 
-    /** NMA による Push 通知設定 */
+    /** NMA による Push 通知設定  (obsolete) */
     private boolean NotifyNMA = false;
 
-    /** NMA による Push 通知 APIKey */
+    /** NMA による Push 通知 APIKey (obsolete) */
     private String NMAAPIKey = "";
 
     /** ImKayac による Push 通知設定 */
@@ -529,9 +529,13 @@ public final class AppConfigBean {
         this.showCondCycleTimer = showCondTimer;
     }
 
-    public boolean isShowResultRecord() { return showResultRecord; }
+    public boolean isShowResultRecord() {
+        return this.showResultRecord;
+    }
 
-    public void setShowResultRecord(boolean showResultRecord) { this.showResultRecord = showResultRecord; }
+    public void setShowResultRecord(boolean showResultRecord) {
+        this.showResultRecord = showResultRecord;
+    }
 
     /**
      * @return showNotifySetting
@@ -795,18 +799,21 @@ public final class AppConfigBean {
     public boolean getNotifyLINE() {
         return this.NotifyLINE;
     }
+
     /** LINE Notify API による 通知の Apitoken を取得します
      * @return Apitoken
      */
     public String getLINEApitoken() {
         return this.LINEApitoken;
     }
+
     /** LINE Notify API による 通知を設定します
      * @param LINE Notify API による 通知
      */
     public void setNotifyLINE(boolean linecflg) {
         this.NotifyLINE = linecflg;
     }
+
     /** LINE Notify API による 通知の Apitoken を設定します
      * @param Apitoken
      */
@@ -1380,10 +1387,8 @@ public final class AppConfigBean {
         this.showGunAndBulge = showGunAndBulge;
     }
 
-
-
     public boolean isShowAA() {
-        return showAA;
+        return this.showAA;
     }
 
     public void setShowAA(boolean showAA) {
@@ -2263,17 +2268,16 @@ public final class AppConfigBean {
         this.useLockedOnlyFleetFormat = useLockedOnlyFleetFormat;
     }
 
-    public double getBunkitenKeisu(){
-        return bunkitenKeisu;
+    public double getBunkitenKeisu() {
+        return this.bunkitenKeisu;
     }
 
-    public void setBunkitenKeisu(double keisu){
+    public void setBunkitenKeisu(double keisu) {
         this.bunkitenKeisu = keisu;
     }
 
-
     public boolean isShowAirbase() {
-        return showAirbase;
+        return this.showAirbase;
     }
 
     public void setShowAirbase(boolean showAirbase) {

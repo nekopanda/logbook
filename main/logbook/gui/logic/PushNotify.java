@@ -62,10 +62,6 @@ public final class PushNotify {
             pushProwl(msg);
         }
 
-        if (AppConfig.get().getNotifyNMA()) {
-            pushNMA(msg);
-        }
-
         if (AppConfig.get().getNotifyImKayac()) {
             pushImKayac(msg);
         }
@@ -116,46 +112,6 @@ public final class PushNotify {
             }
         } catch (Exception e) {
             LOG.get().warn("Prowl による Push 通知に失敗しました。", e);
-        }
-
-    }
-
-    /**
-     * NMAによる通知
-     * 
-     * @param String 通知メッセージ
-     */
-    private static void pushNMA(String msg[]) {
-
-        StringBuilder postdata = new StringBuilder();
-        String result = null;
-
-        addPOSTData(postdata, "apikey", AppConfig.get().getNMAAPIKey());
-        addPOSTData(postdata, "application", AppConstants.PUSH_NOTIFY_APPNAME);
-        addPOSTData(postdata, "description", msg[0]);
-        addPOSTData(postdata, "event", msg[1]);
-        addPOSTData(postdata, "priority", msg[2]);
-
-        try {
-            result = HttpPOSTRequest(AppConstants.PUSH_NOTIFY_NMA_URI, postdata);
-
-            if (result != "") {
-                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder db = factory.newDocumentBuilder();
-                InputSource inStream = new InputSource();
-                inStream.setCharacterStream(new StringReader(result));
-                Document doc = db.parse(inStream);
-                Element root = doc.getDocumentElement();
-                if (root.getTagName().equals("nma")) {
-                    Node item = root.getFirstChild();
-                    String childName = item.getNodeName();
-                    if (!childName.equals("success")) {
-                        LOG.get().warn("NMA による Push 通知に失敗しました。", result);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            LOG.get().warn("NMA による Push 通知に失敗しました。", e);
         }
 
     }
