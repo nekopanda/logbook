@@ -71,8 +71,13 @@ public class ResourceLog extends AbstractDto {
             while (ite.hasNext()) {
                 String line = ite.next();
                 // 日付,（直前のイベント,）燃料,弾薬,鋼材,ボーキ,高速建造材,高速修復材,開発資材,ネジ
-                // 高速建造材,高速修復材が逆になっているので注意
-                String[] colums = line.split(",");
+                // 高速建造材,高速修復材が逆になっているので注意               
+                String[] colums;
+                if (line.contains(",")) {
+                    colums = line.split(",");
+                } else {
+                    colums = line.split("\t");
+                }
                 try {
                     pos.setIndex(0);
                     Date date = null;
