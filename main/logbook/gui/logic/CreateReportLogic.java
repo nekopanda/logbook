@@ -864,7 +864,7 @@ public final class CreateReportLogic {
             File file = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), AppConstants.LOG_CREATE_SHIP));
             if (file.exists()) {
                 CSVReader reader = new CSVReader(new InputStreamReader(
-                        new FileInputStream(file), AppConstants.CHARSET));
+                        new FileInputStream(file), AppConstants.CHARSET), '\t');
                 dtoList = getCreateShip(reader.readAll());
                 reader.close();
             }
@@ -904,7 +904,7 @@ public final class CreateReportLogic {
             File file = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), AppConstants.LOG_CREATE_ITEM));
             if (file.exists()) {
                 CSVReader reader = new CSVReader(new InputStreamReader(
-                        new FileInputStream(file), AppConstants.CHARSET));
+                        new FileInputStream(file), AppConstants.CHARSET), '\t');
                 dtoList = getCreateItem(reader.readAll());
                 reader.close();
             }
@@ -944,7 +944,7 @@ public final class CreateReportLogic {
             File file = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), AppConstants.LOG_MISSION));
             if (file.exists()) {
                 CSVReader reader = new CSVReader(new InputStreamReader(
-                        new FileInputStream(file), AppConstants.CHARSET));
+                        new FileInputStream(file), AppConstants.CHARSET), '\t');
                 dtoList = getMissionResult(reader.readAll());
                 reader.close();
             }
