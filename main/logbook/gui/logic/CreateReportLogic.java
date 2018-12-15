@@ -2,14 +2,15 @@ package logbook.gui.logic;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -24,6 +25,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
@@ -58,14 +65,6 @@ import logbook.scripting.QuestProxy;
 import logbook.scripting.ShipItemListener;
 import logbook.scripting.ShipItemProxy;
 import logbook.util.ReportUtils;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import au.com.bytecode.opencsv.CSVReader;
 
 /**
  * 各種報告書を作成します
@@ -799,8 +798,7 @@ public final class CreateReportLogic {
             // 艦種でフィルタ
             if ((filter.enabledType != null) &&
                     (filter.enabledType.length > ship.getStype()) &&
-                    (filter.enabledType[ship.getStype()] == false))
-            {
+                    (filter.enabledType[ship.getStype()] == false)) {
                 return false;
             }
         }
@@ -813,6 +811,24 @@ public final class CreateReportLogic {
             }
         }
         return true;
+    }
+
+    private static List<String[]> parseCSV(BufferedReader br) throws IOException {
+        List<String[]> ret = new ArrayList<String[]>();
+        br.readLine(); // skip header
+        while (true) {
+            String line = br.readLine();
+            if (line == null) {
+                break;
+            }
+            if (line.contains("\t")) {
+                ret.add(line.split("\t", -1));
+            }
+            else {
+                ret.add(line.split(",", -1));
+            }
+        }
+        return ret;
     }
 
     /**
@@ -863,10 +879,9 @@ public final class CreateReportLogic {
         try {
             File file = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), AppConstants.LOG_CREATE_SHIP));
             if (file.exists()) {
-                CSVReader reader = new CSVReader(new InputStreamReader(
-                        new FileInputStream(file), AppConstants.CHARSET));
-                dtoList = getCreateShip(reader.readAll());
-                reader.close();
+                try (BufferedReader br = Files.newBufferedReader(file.toPath(), AppConstants.CHARSET)) {
+                    dtoList = getCreateShip(parseCSV(br));
+                }
             }
         } catch (Exception e) {
             LOG.get().warn("建造報告書の読み込みに失敗しました", e);
@@ -903,10 +918,9 @@ public final class CreateReportLogic {
         try {
             File file = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), AppConstants.LOG_CREATE_ITEM));
             if (file.exists()) {
-                CSVReader reader = new CSVReader(new InputStreamReader(
-                        new FileInputStream(file), AppConstants.CHARSET));
-                dtoList = getCreateItem(reader.readAll());
-                reader.close();
+                try (BufferedReader br = Files.newBufferedReader(file.toPath(), AppConstants.CHARSET)) {
+                    dtoList = getCreateItem(parseCSV(br));
+                }
             }
         } catch (Exception e) {
             LOG.get().warn("開発報告書の読み込みに失敗しました", e);
@@ -943,10 +957,9 @@ public final class CreateReportLogic {
         try {
             File file = new File(FilenameUtils.concat(AppConfig.get().getReportPath(), AppConstants.LOG_MISSION));
             if (file.exists()) {
-                CSVReader reader = new CSVReader(new InputStreamReader(
-                        new FileInputStream(file), AppConstants.CHARSET));
-                dtoList = getMissionResult(reader.readAll());
-                reader.close();
+                try (BufferedReader br = Files.newBufferedReader(file.toPath(), AppConstants.CHARSET)) {
+                    dtoList = getMissionResult(parseCSV(br));
+                }
             }
         } catch (Exception e) {
             LOG.get().warn("遠征報告書の読み込みに失敗しました", e);

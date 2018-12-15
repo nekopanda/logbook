@@ -15,11 +15,11 @@ import java.util.List;
 
 import javax.annotation.CheckForNull;
 
-import logbook.config.AppConfig;
-import logbook.dto.AbstractDto;
-
 import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.math.NumberUtils;
+
+import logbook.config.AppConfig;
+import logbook.dto.AbstractDto;
 
 /**
  * 資材ログを表します
@@ -72,7 +72,13 @@ public class ResourceLog extends AbstractDto {
                 String line = ite.next();
                 // 日付,（直前のイベント,）燃料,弾薬,鋼材,ボーキ,高速建造材,高速修復材,開発資材,ネジ
                 // 高速建造材,高速修復材が逆になっているので注意
-                String[] colums = line.split(",");
+                String[] colums;
+                if (line.contains("\t")) {
+                    colums = line.split("\t", -1);
+                }
+                else {
+                    colums = line.split(",", -1);
+                }
                 try {
                     pos.setIndex(0);
                     Date date = null;
