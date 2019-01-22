@@ -2031,12 +2031,13 @@ public final class GlobalContext {
      */
     private static void doSlotExchangeIndex(Data data, JsonValue json) {
         try {
-            int shipId = Integer.parseInt(data.getField("api_id"));
-            ShipDto ship = shipMap.get(shipId);
-            if (ship != null) {
-                if (json instanceof JsonObject) {
-                    JsonObject apidata = (JsonObject) json;
-                    ship.setSlotFromJson(apidata);
+            if (json instanceof JsonObject) {
+                JsonObject apidata = (JsonObject) json;
+                JsonObject apiship = apidata.getJsonObject("api_ship_data");
+                int shipId = apiship.getInt("api_id");
+                ShipDto ship = shipMap.get(shipId);
+                if (ship != null) {
+                    ship.setSlotFromJson(apiship);
 
                     // 次アップデート
                     String fleetid = ship.getFleetid();
