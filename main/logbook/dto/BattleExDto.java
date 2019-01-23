@@ -511,31 +511,31 @@ public class BattleExDto extends AbstractDto {
             // ダメージを反映 //
 
             if (this.airBaseInjection != null)
-                this.doAtack(this.airBaseInjection.atacks, battle.friendSecondBase, this.isFriendFleet);
+                this.doAtack(this.airBaseInjection.atacks, battle.friendSecondBase, this.isFriendFleet, battle);
             if (this.airBase != null)
                 for (AirBattleDto attack : this.airBase)
-                    this.doAtack(attack.atacks, battle.friendSecondBase, this.isFriendFleet);
+                    this.doAtack(attack.atacks, battle.friendSecondBase, this.isFriendFleet, battle);
             if (this.airInjection != null)
-                this.doAtack(this.airInjection.atacks, battle.friendSecondBase, this.isFriendFleet);
+                this.doAtack(this.airInjection.atacks, battle.friendSecondBase, this.isFriendFleet, battle);
             if (this.air != null)
-                this.doAtack(this.air.atacks, battle.friendSecondBase, this.isFriendFleet);
-            this.doAtack(this.support, battle.friendSecondBase, this.isFriendFleet);
+                this.doAtack(this.air.atacks, battle.friendSecondBase, this.isFriendFleet, battle);
+            this.doAtack(this.support, battle.friendSecondBase, this.isFriendFleet, battle);
             if (this.air2 != null)
-                this.doAtack(this.air2.atacks, battle.friendSecondBase, this.isFriendFleet);
-            this.doAtack(this.openingTaisen, battle.friendSecondBase, this.isFriendFleet);
-            this.doAtack(this.opening, battle.friendSecondBase, this.isFriendFleet);
-            this.doAtack(this.hougeki_n_1, battle.friendSecondBase, this.isFriendFleet);
-            this.doAtack(this.hougeki_n_2, battle.friendSecondBase, this.isFriendFleet);
-            this.doAtack(this.hougeki1, battle.friendSecondBase, this.isFriendFleet);
-            this.doAtack(this.raigeki, battle.friendSecondBase, this.isFriendFleet);
-            this.doAtack(this.hougeki2, battle.friendSecondBase, this.isFriendFleet);
-            this.doAtack(this.hougeki3, battle.friendSecondBase, this.isFriendFleet);
+                this.doAtack(this.air2.atacks, battle.friendSecondBase, this.isFriendFleet, battle);
+            this.doAtack(this.openingTaisen, battle.friendSecondBase, this.isFriendFleet, battle);
+            this.doAtack(this.opening, battle.friendSecondBase, this.isFriendFleet, battle);
+            this.doAtack(this.hougeki_n_1, battle.friendSecondBase, this.isFriendFleet, battle);
+            this.doAtack(this.hougeki_n_2, battle.friendSecondBase, this.isFriendFleet, battle);
+            this.doAtack(this.hougeki1, battle.friendSecondBase, this.isFriendFleet, battle);
+            this.doAtack(this.raigeki, battle.friendSecondBase, this.isFriendFleet, battle);
+            this.doAtack(this.hougeki2, battle.friendSecondBase, this.isFriendFleet, battle);
+            this.doAtack(this.hougeki3, battle.friendSecondBase, this.isFriendFleet, battle);
             if (isFriendFleet) {
                 // １つのjsonファイルの中に友軍艦隊の砲撃と自艦隊の砲撃の２つの処理が存在する場合
-                this.doAtack(this.hougeki_f, battle.friendSecondBase, this.isFriendFleet);
-                this.doAtack(this.hougeki, battle.friendSecondBase, false);
+                this.doAtack(this.hougeki_f, battle.friendSecondBase, this.isFriendFleet, battle);
+                this.doAtack(this.hougeki, battle.friendSecondBase, false, battle);
             } else {
-                this.doAtack(this.hougeki, battle.friendSecondBase, this.isFriendFleet);
+                this.doAtack(this.hougeki, battle.friendSecondBase, this.isFriendFleet, battle);
             }
 
             this.json = object.toString();
@@ -763,7 +763,7 @@ public class BattleExDto extends AbstractDto {
         }
 
         // ダメージを反映
-        private void doAtack(List<BattleAtackDto> seq, int friendSecondBase, boolean isFF) {
+        private void doAtack(List<BattleAtackDto> seq, int friendSecondBase, boolean isFF, BattleExDto battle) {
             if (seq == null)
                 return;
 
@@ -793,9 +793,55 @@ public class BattleExDto extends AbstractDto {
                     else if ((dto.friendAtack == false) && (isFF == false)) {
                         if (target < friendSecondBase) {
                             this.nowFriendHp[target] -= damage;
+                            // issue#98対応
+                            // Hp変更後にその値を確認し、それが0以下の場合、女神復活・ダメコン発動が
+                            // 行われる可能性がある(該当アイテムを保持していた場合)ので、その処理(ア
+                            // イテム発動による残Hpの変更処理)を実施する。
+                            if (this.nowFriendHp[target] <= 0) {
+                                DockDto dock = battle.getDock();
+                                if (dock != null) {
+                                    dock.getShips();
+                                }
+                                ShipDto ship = dock.getShips().get(target);
+                                List<ItemDto> items = new ArrayList<>(ship.getItem2());
+                                items.add(ship.getSlotExItem());
+                                for (ItemDto item : items) {
+                                    if (item == null)
+                                        continue;
+                                    if (item.getSlotitemId() == 42) { //応急修理要員
+                                        this.nowFriendHp[target] = (int) (ship.getMaxhp() * 0.2);
+                                        break;
+                                    }
+                                    else if (item.getSlotitemId() == 43) { //応急修理女神
+                                        this.nowFriendHp[target] = ship.getMaxhp();
+                                        break;
+                                    }
+                                }
+                            }
                         }
                         else {
                             this.nowFriendHpCombined[target - friendSecondBase] -= damage;
+                            if (this.nowFriendHpCombined[target - friendSecondBase] <= 0) {
+                                DockDto dockCombined = battle.getDockCombined();
+                                if (dockCombined != null) {
+                                    dockCombined.getShips();
+                                }
+                                ShipDto shipCombined = dockCombined.getShips().get(target);
+                                List<ItemDto> itemsCombined = new ArrayList<>(shipCombined.getItem2());
+                                itemsCombined.add(shipCombined.getSlotExItem());
+                                for (ItemDto itemCombined : itemsCombined) {
+                                    if (itemCombined == null)
+                                        continue;
+                                    if (itemCombined.getSlotitemId() == 42) { //応急修理要員
+                                        this.nowFriendHpCombined[target  - friendSecondBase] = (int) (shipCombined.getMaxhp() * 0.2);
+                                        break;
+                                    }
+                                    else if (itemCombined.getSlotitemId() == 43) { //応急修理女神
+                                        this.nowFriendHpCombined[target  - friendSecondBase] = shipCombined.getMaxhp();
+                                        break;
+                                    }
+                                }
+                            }
                         }
                     }
                     // 敵艦隊から友軍艦隊への攻撃は、それを反映させる値がないため無視する
