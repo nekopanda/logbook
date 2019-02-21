@@ -1,11 +1,10 @@
 package logbook.gui.widgets;
 
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import logbook.config.ShipGroupConfig;
 import logbook.config.bean.ShipGroupBean;
@@ -13,6 +12,8 @@ import logbook.constants.AppConstants;
 import logbook.data.context.GlobalContext;
 import logbook.dto.ItemDto;
 import logbook.dto.ShipFilterDto;
+import logbook.dto.ShipFilterItemDto;
+import logbook.gui.ShipFilterGroupDialog;
 import logbook.gui.ShipTable;
 import logbook.gui.WindowBase;
 import logbook.gui.logic.LayoutLogic;
@@ -23,20 +24,14 @@ import logbook.util.SwtUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.*;
+import org.eclipse.swt.layout.*;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.wb.swt.SWTResourceManager;
@@ -73,6 +68,18 @@ public final class ShipFilterComposite extends Composite {
     private int maxTypeId;
 
     private Composite etcCompo;
+
+    private Composite etcExCompo;
+    private Composite filterComposite;
+    private Combo filterCombo;
+    private ScrolledComposite filterScroll;
+    private Composite filterMainFrame;
+    private ArrayList<ShipFilterItemDto> filterList = new ArrayList<>();
+    private List<Composite> compositeList = new ArrayList<>();
+    private List<Button> filterBtnList = new ArrayList<>();
+
+    private Label fleetExp;
+
     /** 名前 */
     private Combo nametext;
     /** 名前.正規表現を使用する */
@@ -111,6 +118,210 @@ public final class ShipFilterComposite extends Composite {
         super(shipTable.getShell(), SWT.NONE);
         this.shipTable = shipTable;
         this.createContents();
+    }
+
+    private void addFilterContents(ShipFilterItemDto filter) {
+        addFilterContents(filter.type);
+        int index = this.compositeList.size() - 1;
+        Control[] controls = this.compositeList.get(index).getChildren();
+        switch(filter.type){
+            case ID:
+            case LV:
+            case COND:
+            case REPAIR:
+            case FIRE_POWER:
+            case TORPEDO:
+            case AA:
+            case ARMOR:
+            case NIGHT_BATTLE:
+            case ASW:
+            case EVASION:
+            case LOS:
+            case LUCK:
+                ((Combo) controls[1]).setText(filter.sign.getText());
+                ((Spinner) controls[2]).setSelection(filter.value);
+                this.filterList.get(index).sign = filter.sign;
+                this.filterList.get(index).value = filter.value;
+                break;
+            case LOCK:
+            case DOCK:
+            case EXPEDITION:
+            case EXPANSION:
+            case SHIP_TYPE:
+            case FLEET:
+            case DAMAGED:
+            case SPEED:
+            case SALLY_AREA:
+                for (int i = 0;i < controls.length;i++) {
+                    Button button = (Button) controls[i];
+                    button.setSelection(filter.enabledType.get(i));
+                    this.filterList.get(index).enabledType.set(i, filter.enabledType.get(i));
+                }
+                break;
+        }
+    }
+
+    private void addFilterContents(ShipFilterItemDto.FilterType type) {
+        switch(type){
+            case ID:
+            case LV:
+            case COND:
+            case REPAIR:
+            case FIRE_POWER:
+            case TORPEDO:
+            case AA:
+            case ARMOR:
+            case NIGHT_BATTLE:
+            case ASW:
+            case EVASION:
+            case LOS:
+            case LUCK:
+                Composite c = new Composite(this.filterMainFrame, SWT.NONE);
+                c.setLayoutData(new GridData(GridData.FILL_BOTH));
+                c.setLayout(new GridLayout(3,true));
+                c.setData(type);
+                c.pack();
+
+                Label label = new Label(c,SWT.NULL);
+                label.setText(type.getText());
+                label.setSize(label.computeSize(30,SWT.DEFAULT));
+                label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+                Combo compCombo = new Combo(c, SWT.READ_ONLY);
+                Arrays.stream(ShipFilterItemDto.EqualSign.values()).map(value -> value.getText()).forEach(str -> compCombo.add(str));
+                compCombo.select(0);
+                compCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+                compCombo.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        Combo combo = (Combo) e.widget;
+                        ShipFilterItemDto item = filterList.get(compositeList.indexOf(combo.getParent()));
+                        item.sign = ShipFilterItemDto.EqualSign.codeOf(combo.getText());
+                        ShipFilterComposite.this.shipTable.updateFilter(ShipFilterComposite.this.createFilter());
+                    }
+                });
+                Spinner spinner = new Spinner(c, SWT.NONE);
+                spinner.setSelection(1);
+                spinner.setMinimum(0);
+                spinner.setMaximum(Spinner.LIMIT);
+                spinner.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+                spinner.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        Spinner spinner = (Spinner) e.widget;
+                        ShipFilterItemDto item = filterList.get(compositeList.indexOf(spinner.getParent()));
+                        item.value = Integer.parseInt(spinner.getText());
+                        ShipFilterComposite.this.shipTable.updateFilter(ShipFilterComposite.this.createFilter());
+                    }
+                });
+                this.compositeList.add(c);
+                this.filterList.add(new ShipFilterItemDto(type, ShipFilterItemDto.EqualSign.codeOf(compCombo.getText()), Integer.parseInt(spinner.getText())));
+                break;
+            case LOCK:
+            case DOCK:
+            case EXPEDITION:
+            case EXPANSION:
+                Composite c2 = new Composite(this.filterMainFrame, SWT.NONE);
+                c2.setLayoutData(new GridData(GridData.FILL_BOTH));
+                c2.setData(type);
+                c2.pack();
+
+                Button b = new Button(c2, SWT.CHECK);
+                b.setText(type.getText());
+                b.pack();
+                b.setSelection(true);
+                b.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        Button b = (Button) e.widget;
+                        ShipFilterItemDto item = filterList.get(compositeList.indexOf(b.getParent()));
+                        item.enabledType.set(0, !item.enabledType.get(0));
+                        ShipFilterComposite.this.shipTable.updateFilter(ShipFilterComposite.this.createFilter());
+                    }
+                });
+                this.compositeList.add(c2);
+                this.filterList.add(new ShipFilterItemDto(type, new ArrayList<>(Arrays.asList(b.getSelection()))));
+                break;
+            case SHIP_TYPE:
+            case FLEET:
+            case DAMAGED:
+            case SPEED:
+            case SALLY_AREA:
+                Group group = new Group(this.filterMainFrame, SWT.NONE);
+                group.setText(type.getText());
+                group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+                group.setLayout(new RowLayout(SWT.HORIZONTAL));
+                group.setData(type);
+                group.pack();
+
+                List<String> list = ((Supplier<List<String>>) () -> {
+                    switch (type) {
+                        case SHIP_TYPE:
+                            return MasterData.get().getStart2().getStype().stream().filter(stype -> {
+                                int key = stype.getId();
+                                return !(AppConstants.SHIP_TYPE_INFO.containsKey(key) && AppConstants.SHIP_TYPE_INFO.get(key).equals("#"));
+                            }).map(stype -> {
+                                int key = stype.getId();
+                                if (AppConstants.SHIP_TYPE_INFO.containsKey(key)) {
+                                    return AppConstants.SHIP_TYPE_INFO.get(key);
+                                }
+                                return stype.getName();
+                            }).collect(Collectors.toList());
+                        case FLEET:
+                            return Arrays.asList("なし","第一艦隊", "第二艦隊", "第三艦隊", "第四艦隊");
+                        case DAMAGED:
+                            return Arrays.asList("健在", "小破", "中破", "大破");
+                        case SPEED:
+                            return Arrays.asList("低速", "高速", "高速+", "最速");
+                        case SALLY_AREA:
+                            return Arrays.asList("札なし","札A", "札B", "札C", "札D", "札E", "札F");
+                    }
+                    return new ArrayList<>();
+                }).get();
+                list.forEach(str -> {
+                    Button button = new Button(group, SWT.CHECK);
+                    button.setText(str);
+                    button.setSelection(true);
+                    button.addSelectionListener(new SelectionAdapter() {
+                        @Override
+                        public void widgetSelected(SelectionEvent e) {
+                            Button b = (Button) e.widget;
+                            ShipFilterItemDto item = filterList.get(compositeList.indexOf(b.getParent()));
+                            Control[] controls = b.getParent().getChildren();
+                            int index = Arrays.asList(controls).indexOf(b);
+                            item.enabledType.set(index, !item.enabledType.get(index));
+                            ShipFilterComposite.this.shipTable.updateFilter(ShipFilterComposite.this.createFilter());
+                        }
+                    });
+                    button.pack();
+                });
+                this.compositeList.add(group);
+                this.filterList.add(new ShipFilterItemDto(type, new ArrayList<>(list.stream().map(f -> new Boolean(true)).collect(Collectors.toList()))));
+                break;
+        }
+        Button btnRemove = new Button(this.filterMainFrame, SWT.NONE);
+        btnRemove.setData(this.compositeList.size() - 1);
+        this.filterBtnList.add(btnRemove);
+        btnRemove.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                int index = (int)e.widget.getData();
+                compositeList.get(index).dispose();
+                compositeList.remove(index);
+                filterList.remove(index);
+                filterBtnList.get(index).dispose();
+                filterBtnList.remove(index);
+                IntStream.range(index, filterBtnList.size()).boxed().map(i -> filterBtnList.get(i)).forEach(button ->
+                        button.setData((int)button.getData() - 1));
+                filterMainFrame.layout();
+                filterScroll.setMinHeight(filterMainFrame.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+                ShipFilterComposite.this.shipTable.updateFilter(ShipFilterComposite.this.createFilter());
+            }
+        });
+        btnRemove.setImage(SWTResourceManager.getImage(ShipFilterGroupDialog.class, AppConstants.R_ICON_DELETE));
+        btnRemove.pack();
+        btnRemove.setLayoutData(new GridData(SWT.CENTER, SWT.RIGHT, false, false, 1, 1));
+        this.filterMainFrame.layout();
+        this.filterScroll.setMinHeight(filterMainFrame.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
     }
 
     /**
@@ -193,6 +404,52 @@ public final class ShipFilterComposite extends Composite {
             button.addSelectionListener(categoryListener);
         }
 
+        this.etcExCompo = new Composite(this.switchCompo, SWT.NONE);
+        this.etcExCompo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+        this.etcExCompo.setLayout(SwtUtils.makeGridLayout(1, 0, 0, 0, 0));
+
+        this.filterComposite = new Composite(this.etcExCompo, SWT.NONE);
+        this.filterComposite.setLayoutData(new GridData(SWT.FILL,SWT.FILL, true, true));
+        GridLayout mainLayout = new GridLayout(2, false);
+        mainLayout.verticalSpacing = 1;
+        mainLayout.marginWidth = 1;
+        mainLayout.marginHeight = 1;
+        mainLayout.marginBottom = 1;
+        mainLayout.horizontalSpacing = 1;
+        this.filterComposite.setLayout(mainLayout);
+
+        this.filterCombo = new Combo(this.filterComposite, SWT.READ_ONLY);
+        Arrays.stream(ShipFilterItemDto.FilterType.values()).map(value -> value.getText()).forEach(str -> this.filterCombo.add(str));
+        this.filterCombo.select(0);
+        SwtUtils.makeGridLayout(4,1,1,0,0);
+        this.filterCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        Button btnAdd = new Button(this.filterComposite, SWT.NONE);
+        btnAdd.setImage(SWTResourceManager.getImage(ShipFilterGroupDialog.class, AppConstants.R_ICON_ADD));
+
+        this.filterScroll = new ScrolledComposite(this.filterComposite, SWT.V_SCROLL | SWT.BORDER);
+        GridData gd2 = new GridData(SWT.FILL, SWT.FILL, true, true,2,1);
+        gd2.heightHint = 120;
+        this.filterScroll.setLayoutData(gd2);
+        this.filterScroll.setLayout(new FillLayout());
+        this.filterScroll.setExpandHorizontal(true);
+        this.filterScroll.setExpandVertical(true);
+        this.filterScroll.setAlwaysShowScrollBars(true);
+
+        this.filterMainFrame = new Composite(this.filterScroll, SWT.NONE);
+        this.filterMainFrame.setLayout(new GridLayout(2, false));
+        this.filterMainFrame.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+
+        this.filterScroll.setContent(this.filterMainFrame);
+        this.filterScroll.setMinHeight(this.filterMainFrame.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+
+        btnAdd.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                addFilterContents(ShipFilterItemDto.FilterType.codeOf(filterCombo.getText()));
+                ShipFilterComposite.this.shipTable.updateFilter(ShipFilterComposite.this.createFilter());
+            }
+        });
+
         // その他パネル
         this.etcCompo = new Composite(this.switchCompo, SWT.NONE);
         this.etcCompo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
@@ -246,6 +503,8 @@ public final class ShipFilterComposite extends Composite {
         this.needBath.setSelection(false);
         this.needBath.addSelectionListener(listener);
 
+        this.fleetExp = new Label(etcSelectCompo, SWT.NONE);
+
         //-----------　フリーワード
         Composite namegroup = new Composite(this.etcCompo, SWT.NONE);
         namegroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
@@ -253,15 +512,11 @@ public final class ShipFilterComposite extends Composite {
 
         this.nametext = new Combo(namegroup, SWT.BORDER);
         this.nametext.setLayoutData(new RowData(150, SWT.DEFAULT));
-        this.nametext.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                if (ShipFilterComposite.this.changeEnabled)
-                    ShipFilterComposite.this.shipTable.updateFilter(ShipFilterComposite.this.createFilter(), false);
-            }
+        this.nametext.addModifyListener(e -> {
+            if (ShipFilterComposite.this.changeEnabled)
+                ShipFilterComposite.this.shipTable.updateFilter(ShipFilterComposite.this.createFilter(), false);
         });
         this.nametext.addSelectionListener(new SelectionAdapter() {
-
             @Override
             public void widgetSelected(SelectionEvent e) {
                 // 装備から選択された場合は正規表現をオフ
@@ -375,12 +630,8 @@ public final class ShipFilterComposite extends Composite {
             }
         };
         ShipGroupObserver.addListener(shipGroupListner);
-        this.addListener(SWT.Dispose, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                ShipGroupObserver.removeListener(shipGroupListner);
-            }
-        });
+        this.addListener(SWT.Dispose, event ->
+            ShipGroupObserver.removeListener(shipGroupListner));
     }
 
     /**
@@ -393,7 +644,7 @@ public final class ShipFilterComposite extends Composite {
 
     public void updateContents(ShipFilterDto filter, boolean panelVisible, boolean etcVisible) {
         this.changeEnabled = false;
-        Set<String> items = new TreeSet<String>();
+        Set<String> items = new TreeSet<>();
         for (ItemDto entry : GlobalContext.getItemMap().values()) {
             items.add(entry.getName());
         }
@@ -424,6 +675,7 @@ public final class ShipFilterComposite extends Composite {
         LayoutLogic.hide(this.groupCompo, this.groupMode != 0);
         LayoutLogic.hide(this.typeCompo, this.groupMode != 1);
         LayoutLogic.hide(this.etcCompo, !this.etcVisible);
+        LayoutLogic.hide(this.etcExCompo, this.groupMode != 2);
     }
 
     public int getGroupMode() {
@@ -449,6 +701,11 @@ public final class ShipFilterComposite extends Composite {
 
     public boolean getEtcVisible() {
         return this.etcVisible;
+    }
+
+    public void setFleetExp(String text) {
+        this.fleetExp.setText(text);
+        this.fleetExp.getParent().layout();
     }
 
     public void setPanelVisible(boolean panelVisible, boolean etcVisible) {
@@ -649,6 +906,9 @@ public final class ShipFilterComposite extends Composite {
         // お風呂に入りたい
         this.needBath.setSelection(!filter.notneedbath);
 
+        Optional.ofNullable(filter.filterList).ifPresent(list ->
+            list.forEach(item -> addFilterContents(item)));
+
         // タブ選択
         this.setGroupMode(filter.groupMode);
     }
@@ -713,6 +973,8 @@ public final class ShipFilterComposite extends Composite {
         filter.needbath = true;
         filter.notneedbath = !this.needBath.getSelection();
         filter.groupMode = this.groupMode;
+
+        filter.filterList = this.filterList;
 
         return filter;
     }

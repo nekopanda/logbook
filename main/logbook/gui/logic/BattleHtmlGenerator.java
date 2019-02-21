@@ -218,9 +218,9 @@ public class BattleHtmlGenerator extends HTMLGenerator {
             // 加重対空値
             this.inline("td", String.format("%.2f", calcAA.getFinalWeightedAirValue(ship, allShips, isFriend, formationNo)), null);
             // 割合撃墜
-            this.inline("td", String.format("%.2f%%", calcAA.getPropShotDown(ship, isFriend, battle.isCombined(), isSecond) * 100), null);
+            this.inline("td", String.format("%.2f%%", calcAA.getPropShotDown(ship, isFriend, battle.isCombined(), isSecond, battle.getLastPhase().getKind() == BattlePhaseKind.COMBINED_LD_AIR) * 100), null);
             // 固定撃墜
-            String[] fixedShotDown = Arrays.stream(aaCiList).map(kind -> calcAA.getFixedShotDown(ship, allShips, isFriend, battle.isCombined(), isSecond, formationNo, kind))
+            String[] fixedShotDown = Arrays.stream(aaCiList).map(kind -> calcAA.getFixedShotDown(ship, allShips, isFriend, battle.isCombined(), isSecond, formationNo, kind, battle.getLastPhase().getKind() == BattlePhaseKind.COMBINED_LD_AIR))
                     .mapToObj(String::valueOf)
                     .toArray(String[]::new);
             this.inline("td", String.join("/", fixedShotDown), null);

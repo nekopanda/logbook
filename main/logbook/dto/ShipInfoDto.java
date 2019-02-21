@@ -90,6 +90,9 @@ public final class ShipInfoDto extends AbstractDto {
     @Tag(20)
     private String json;
 
+    @Tag(33)
+    private int ctype;
+
     // 探索用
     private transient Object data = null;
 
@@ -128,6 +131,8 @@ public final class ShipInfoDto extends AbstractDto {
         }
         this.stype = object.getJsonNumber("api_stype").intValue();
         this.slotNum = object.getInt("api_slot_num");
+
+        this.ctype = object.getJsonNumber("api_ctype").intValue();
 
         if (this.isKanmusu()) {
             this.maxBull = object.getJsonNumber("api_bull_max").intValue();
@@ -316,6 +321,18 @@ public final class ShipInfoDto extends AbstractDto {
     public int getMaxBull() {
         return this.maxBull;
     }
+
+    /**
+     * 艦型IDを取得します。
+     * @return 艦型ID
+     */
+    public int getCtype() { return this.ctype; }
+
+    /**
+     * 艦型IDを設定します。
+     * @param ctype 艦型ID
+     */
+    public void setCtype(int ctype) { this.ctype = ctype; }
 
     /**
      * 弾を設定します。

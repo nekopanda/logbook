@@ -14,18 +14,15 @@ import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.IntStream;
 
+import logbook.gui.ApplicationMain;
+import logbook.gui.ShipTable;
+import logbook.gui.widgets.ShipFilterComposite;
+import logbook.internal.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -51,10 +48,6 @@ import logbook.dto.ResourceItemDto;
 import logbook.dto.ShipDto;
 import logbook.dto.ShipFilterDto;
 import logbook.dto.UseItemDto;
-import logbook.internal.BattleResultFilter;
-import logbook.internal.BattleResultServer;
-import logbook.internal.LoggerHolder;
-import logbook.internal.MasterData;
 import logbook.internal.MasterData.MissionDto;
 import logbook.scripting.BattleLogProxy;
 import logbook.scripting.ItemInfoListener;
@@ -65,6 +58,9 @@ import logbook.scripting.QuestProxy;
 import logbook.scripting.ShipItemListener;
 import logbook.scripting.ShipItemProxy;
 import logbook.util.ReportUtils;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Shell;
 
 /**
  * 各種報告書を作成します
@@ -393,16 +389,30 @@ public final class CreateReportLogic {
         List<Comparable[]> body = new ArrayList<Comparable[]>();
         ShipItemListener script = ShipItemProxy.get();
         script.begin(specdisp == 0, filter, specdisp);
+        int exp = 0;
         for (ShipDto ship : GlobalContext.getShipMap().values()) {
             if ((filter != null) && !shipFilter(ship, filter, missionSet)) {
                 continue;
             }
+            exp += ship.getExp();
             body.add(ArrayUtils.addAll(new Comparable[] {
                     new TableRowHeader(1, ship)
             }, script.body(ship)));
         }
+        String expString = String.valueOf(exp);
+        Arrays.stream(ApplicationMain.main.getShipTables()).filter(Objects::nonNull).forEach(shipTable -> {
+            Optional.ofNullable(shipTable).ifPresent(table -> {
+                Optional.ofNullable(table.getShell()).ifPresent(shell -> {
+                    ShipFilterComposite composite = (ShipFilterComposite) shell.getChildren()[0]
+                            .getShell()
+                            .getChildren()[0]
+                            .getShell()
+                            .getChildren()[0];
+                    composite.setFleetExp("累積経験値:" + expString);
+                });
+            });
+        });
         script.end();
-        //ApplicationMain.sysPrint("ShipListBody Finish");
         return body;
     }
 
@@ -794,7 +804,78 @@ public final class CreateReportLogic {
             }
         }
 
-        if (filter.groupMode == 1) {
+        if (filter.groupMode == 2) {
+            if (Objects.isNull(filter.filterList)) return true;
+            // 特殊フィルタ
+            return filter.filterList.stream().allMatch(content -> {
+                switch (content.type) {
+                    case ID:
+                        return content.sign.compareBySign(ship.getId(), content.value);
+                    case LV:
+                        return content.sign.compareBySign(ship.getLv(), content.value);
+                    case COND:
+                        return content.sign.compareBySign(ship.getCond(), content.value);
+                    case REPAIR:
+                        return content.sign.compareBySign(ship.getMaxhp() - ship.getNowhp(), content.value);
+                    case FIRE_POWER:
+                        return content.sign.compareBySign(ship.getKaryoku(), content.value);
+                    case TORPEDO:
+                        return content.sign.compareBySign(ship.getRaisou(), content.value);
+                    case AA:
+                        return content.sign.compareBySign(ship.getTaiku(), content.value);
+                    case ARMOR:
+                        return content.sign.compareBySign(ship.getSoukou(), content.value);
+                    case NIGHT_BATTLE:
+                        return content.sign.compareBySign(ship.getYasenPower(), content.value);
+                    case ASW:
+                        return content.sign.compareBySign(ship.getTaisen(), content.value);
+                    case EVASION:
+                        return content.sign.compareBySign(ship.getKaihi(), content.value);
+                    case LOS:
+                        return content.sign.compareBySign(ship.getSakuteki(), content.value);
+                    case LUCK:
+                        return content.sign.compareBySign(ship.getLucky(), content.value);
+                    case LOCK:
+                        return ship.getLocked() == content.enabledType.get(0);
+                    case DOCK:
+                        if (content.enabledType.get(0)) {
+                            return (ship.getDocktime() > 0) && GlobalContext.isNdock(ship.getId());
+                        } else {
+                            return !GlobalContext.isNdock(ship.getId());
+                        }
+                    case EXPEDITION:
+                        return missionSet.contains(ship.getId()) == content.enabledType.get(0);
+                    case EXPANSION:
+                        return ship.hasSlotEx() == content.enabledType.get(0);
+                    case SHIP_TYPE:
+                        int count = (int) AppConstants.SHIP_TYPE_INFO.keySet().stream()
+                                .filter(stype -> AppConstants.SHIP_TYPE_INFO.get(stype).equals("#"))
+                                .filter(stype -> stype < ship.getStype()).count();
+                        return content.enabledType.get(ship.getStype() - count - 1);
+                    case FLEET:
+                        if(StringUtils.isEmpty(ship.getFleetid())){
+                            return content.enabledType.get(0);
+                        } else {
+                            return content.enabledType.get(Integer.parseInt(ship.getFleetid()));
+                        }
+                    case DAMAGED:
+                        // 大破 & 中破 & 小破 & 健在
+                        return (content.enabledType.get(3) && ship.isBadlyDamage())
+                                || (content.enabledType.get(2) && !ship.isBadlyDamage() && ship.isHalfDamage())
+                                || (content.enabledType.get(1) && !ship.isBadlyDamage() && !ship.isHalfDamage() && ship.isSlightDamage())
+                                || (content.enabledType.get(0) && !ship.isBadlyDamage() && !ship.isHalfDamage() && !ship.isSlightDamage() && !ship.isSunk());
+                    case SPEED:
+                        return (content.enabledType.get(0) && ship.getSoku() == 5)
+                                || (content.enabledType.get(1) && ship.getSoku() == 10)
+                                || (content.enabledType.get(2) && ship.getSoku() == 15)
+                                || (content.enabledType.get(3) && ship.getSoku() == 20);
+                    case SALLY_AREA:
+                        return IntStream.rangeClosed(0,6).anyMatch(i -> content.enabledType.get(i) && ship.getSallyArea() == i);
+                }
+                return true;
+            });
+        }
+        else if (filter.groupMode == 1) {
             // 艦種でフィルタ
             if ((filter.enabledType != null) &&
                     (filter.enabledType.length > ship.getStype()) &&

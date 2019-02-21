@@ -4,19 +4,15 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 
 import logbook.config.AppConfig;
-import logbook.data.Data;
-import logbook.data.DataType;
 import logbook.data.EventListener;
 import logbook.data.context.GlobalContext;
 import logbook.dto.ShipDto;
 import logbook.internal.EvaluateExp;
 import logbook.internal.ExpTable;
-import logbook.internal.SeaExp;
 import logbook.util.CalcExpUtils;
 import logbook.util.SwtUtils;
 
@@ -26,17 +22,12 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
@@ -48,7 +39,7 @@ import org.eclipse.swt.widgets.Text;
  */
 public final class CalcExpDialog extends WindowBase {
 
-    private final List<ShipDto> shiplist = new ArrayList<ShipDto>();
+    private final List<ShipDto> shiplist = new ArrayList<>();
 
     private final Shell parent;
     private Shell shell;
@@ -57,7 +48,7 @@ public final class CalcExpDialog extends WindowBase {
     private Text beforexp;
     private Spinner afterlv;
     private Text afterexp;
-    private Combo seacombo;
+    private Spinner basexp;
     private Combo evalcombo;
     private Button flagbtn;
     private Button mvpbtn;
@@ -165,11 +156,12 @@ public final class CalcExpDialog extends WindowBase {
         plan2.setLayout(new RowLayout());
         plan2.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         Label label7 = new Label(plan2, SWT.NONE);
-        label7.setText("海域");
-        this.seacombo = new Combo(plan2, SWT.READ_ONLY);
-        for (Entry<String, Integer> entry : SeaExp.get().entrySet()) {
-            this.seacombo.add(entry.getKey());
-        }
+        label7.setText("基礎経験値");
+        this.basexp = new Spinner(plan2, SWT.BORDER);
+        this.basexp.setLayoutData(SwtUtils.initSpinner(45, new RowData()));
+        this.basexp.setMaximum(1000);
+        this.basexp.setMinimum(10);
+        this.basexp.setIncrement(5);
         Label label8 = new Label(plan2, SWT.NONE);
         label8.setText("評価");
         this.evalcombo = new Combo(plan2, SWT.READ_ONLY);
@@ -214,12 +206,6 @@ public final class CalcExpDialog extends WindowBase {
         gdBattlecount.widthHint = SwtUtils.DPIAwareWidth(55);
         this.battlecount.setLayoutData(gdBattlecount);
 
-        // 海域のインデックス値を復元
-        for (int i = 0; i < this.seacombo.getItemCount(); i++) {
-            if (this.seacombo.getItem(i).equals(AppConfig.get().getDefaultSea())) {
-                this.seacombo.select(i);
-            }
-        }
         // 評価のインデックス値を復元
         for (int i = 0; i < this.evalcombo.getItemCount(); i++) {
             if (this.evalcombo.getItem(i).equals(AppConfig.get().getDefaultEvaluate())) {
@@ -229,22 +215,26 @@ public final class CalcExpDialog extends WindowBase {
 
         this.shipcombo.addSelectionListener(new PresetListener());
         secretary.addSelectionListener(new SecretaryListener());
-        SelectionListener beforeLvListener = new BeforeLvListener(this.beforexp, this.beforelv);
+        SelectionListener beforeLvListener = new LvListener(this.beforexp, this.beforelv);
         this.beforelv.addSelectionListener(beforeLvListener);
         this.beforelv.addMouseWheelListener(new WheelListener(this.beforelv, beforeLvListener));
-        SelectionListener afterLvListener = new BeforeLvListener(this.afterexp, this.afterlv);
+        SelectionListener afterLvListener = new LvListener(this.afterexp, this.afterlv);
         this.afterlv.addSelectionListener(afterLvListener);
         this.afterlv.addMouseWheelListener(new WheelListener(this.afterlv, afterLvListener));
 
-        this.seacombo.addSelectionListener(new UpdateListener());
+        this.basexp.addSelectionListener(new UpdateListener());
+        this.basexp.addMouseWheelListener(new BasexpWheelListener(this.basexp, new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                CalcExpDialog.this.calc();
+            }
+        }));
         this.evalcombo.addSelectionListener(new UpdateListener());
         this.flagbtn.addSelectionListener(new UpdateListener());
         this.mvpbtn.addSelectionListener(new UpdateListener());
 
-        final EventListener updateListener = new EventListener() {
-            @Override
-            public void update(DataType type, Data data) {
-                switch (type) {
+        final EventListener updateListener = (type, data) -> {
+            switch (type) {
                 case PORT:
                 case SHIP2:
                 case SHIP3:
@@ -252,20 +242,14 @@ public final class CalcExpDialog extends WindowBase {
                     break;
                 default:
                     break;
-                }
             }
         };
         GlobalContext.addEventListener(updateListener);
-        this.getShell().addListener(SWT.Dispose, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                GlobalContext.removeEventListener(updateListener);
-            }
-        });
+        this.getShell().addListener(SWT.Dispose, e -> GlobalContext.removeEventListener(updateListener));
 
         // 選択する項目はドラックで移動できないようにする
         for (Control c : new Control[] { this.shipcombo, secretary, this.beforexp, this.afterexp, this.getexp,
-                this.needexp, this.beforelv, this.afterlv, this.seacombo, this.evalcombo, this.flagbtn,
+                this.needexp, this.beforelv, this.afterlv, this.basexp, this.evalcombo, this.flagbtn,
                 this.mvpbtn }) {
             c.setData("disable-drag-move", true);
         }
@@ -305,7 +289,7 @@ public final class CalcExpDialog extends WindowBase {
                 if (before > after) {
                     after = before + 1;
                 }
-                // 目標レベルが150を超える場合は150に設定
+                // 目標レベルが175を超える場合は175に設定
                 after = Math.min(after, ExpTable.MAX_LEVEL);
 
                 String beforeexpstr = String.valueOf(ship.getExp());
@@ -324,17 +308,17 @@ public final class CalcExpDialog extends WindowBase {
      * 計算を行う
      */
     private void calc() {
-        if ((this.seacombo.getSelectionIndex() < 0) || (this.evalcombo.getSelectionIndex() < 0)) {
+        if (this.evalcombo.getSelectionIndex() < 0) {
             return;
         }
         // 必要経験値
         int needexpint = Integer.parseInt(this.afterexp.getText()) - Integer.parseInt(this.beforexp.getText());
         // 基礎経験値
-        int baseexp = SeaExp.get().get(this.seacombo.getItem(this.seacombo.getSelectionIndex()));
+        int basexp = Integer.parseInt(this.basexp.getText());
         // 評価
         double eval = EvaluateExp.get().get(this.evalcombo.getItem(this.evalcombo.getSelectionIndex()));
         // 得られる経験値
-        int getexp = CalcExpUtils.getExp(baseexp, eval, this.flagbtn.getSelection(), this.mvpbtn.getSelection());
+        int getexp = CalcExpUtils.getExp(basexp, eval, this.flagbtn.getSelection(), this.mvpbtn.getSelection());
         // 戦闘回数
         int count = BigDecimal.valueOf(needexpint).divide(BigDecimal.valueOf(getexp), RoundingMode.CEILING).intValue();
         // 1回の戦闘
@@ -347,8 +331,6 @@ public final class CalcExpDialog extends WindowBase {
 
     /**
      * コンボボックスに艦娘をセットします
-     * 
-     * @param combo
      */
     private void setShipComboData() {
         int selected = -1;
@@ -370,12 +352,9 @@ public final class CalcExpDialog extends WindowBase {
             this.shiplist.add(ship);
         }
         // 艦娘を経験値順でソート
-        Collections.sort(this.shiplist, new Comparator<ShipDto>() {
-            @Override
-            public int compare(ShipDto o1, ShipDto o2) {
-                return Integer.compare(o2.getExp(), o1.getExp());
-            }
-        });
+        Collections.sort(this.shiplist, (ShipDto o1, ShipDto o2) ->
+            Integer.compare(o2.getExp(), o1.getExp())
+        );
         // コンボボックスに追加
         for (int i = 0; i < this.shiplist.size(); i++) {
             ShipDto ship = this.shiplist.get(i);
@@ -436,51 +415,26 @@ public final class CalcExpDialog extends WindowBase {
     }
 
     /**
-     * 今のレベルが変更された
+     * レベルが変更された
      *
      */
-    private final class BeforeLvListener extends SelectionAdapter {
-        private final Text beforexp;
-        private final Spinner beforelv;
+    private final class LvListener extends SelectionAdapter {
+        private final Text exp;
+        private final Spinner lv;
 
         /**
-         * @param beforexp
-         * @param beforelv
+         * @param exp
+         * @param lv
          */
-        private BeforeLvListener(Text beforexp, Spinner beforelv) {
-            this.beforexp = beforexp;
-            this.beforelv = beforelv;
+        private LvListener(Text exp, Spinner lv) {
+            this.exp = exp;
+            this.lv = lv;
         }
 
         @Override
         public void widgetSelected(SelectionEvent e) {
-            String beforeexpstr = String.valueOf(ExpTable.get().get(this.beforelv.getSelection()));
-            this.beforexp.setText(beforeexpstr);
-            CalcExpDialog.this.calc();
-        }
-    }
-
-    /**
-     * 目標レベルが変更された
-     *
-     */
-    private final class AfterLvListener extends SelectionAdapter {
-        private final Text afterexp;
-        private final Spinner afterlv;
-
-        /**
-         * @param afterexp
-         * @param afterlv
-         */
-        private AfterLvListener(Text afterexp, Spinner afterlv) {
-            this.afterexp = afterexp;
-            this.afterlv = afterlv;
-        }
-
-        @Override
-        public void widgetSelected(SelectionEvent e) {
-            String afterexpstr = String.valueOf(ExpTable.get().get(this.afterlv.getSelection()));
-            this.afterexp.setText(afterexpstr);
+            String expstr = String.valueOf(ExpTable.get().get(this.lv.getSelection()));
+            this.exp.setText(expstr);
             CalcExpDialog.this.calc();
         }
     }
@@ -488,7 +442,7 @@ public final class CalcExpDialog extends WindowBase {
     /**
      * ホイールでレベルを動かす
      */
-    private final class WheelListener implements MouseWheelListener {
+    private class WheelListener implements MouseWheelListener {
 
         private final Spinner spinner;
         private final SelectionListener listener;
@@ -500,15 +454,14 @@ public final class CalcExpDialog extends WindowBase {
 
         @Override
         public void mouseScrolled(MouseEvent e) {
+            int cur = this.spinner.getSelection();
             if (e.count > 0) {
-                int cur = this.spinner.getSelection();
                 if (cur < this.spinner.getMaximum()) {
                     this.spinner.setSelection(cur + 1);
                     this.listener.widgetSelected(null);
                 }
             }
             else if (e.count < 0) {
-                int cur = this.spinner.getSelection();
                 if (cur > this.spinner.getMinimum()) {
                     this.spinner.setSelection(cur - 1);
                     this.listener.widgetSelected(null);
@@ -516,5 +469,30 @@ public final class CalcExpDialog extends WindowBase {
             }
         }
 
+    }
+
+    private class BasexpWheelListener extends WheelListener {
+
+        public BasexpWheelListener(Spinner spinner, SelectionListener listener) {
+            super(spinner, listener);
+        }
+
+        @Override
+        public void mouseScrolled(MouseEvent e) {
+            if (e.count > 0) {
+                int cur = super.spinner.getSelection();
+                if (cur < super.spinner.getMaximum()) {
+                    super.spinner.setSelection(cur + 5);
+                    super.listener.widgetSelected(null);
+                }
+            }
+            else if (e.count < 0) {
+                int cur = super.spinner.getSelection();
+                if (cur > super.spinner.getMinimum()) {
+                    super.spinner.setSelection(cur - 5);
+                    super.listener.widgetSelected(null);
+                }
+            }
+        }
     }
 }

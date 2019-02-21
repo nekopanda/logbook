@@ -25,11 +25,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -233,6 +229,19 @@ public final class SwtUtils {
             gd.widthHint = DPIAwareWidth(width);
         }
         return gd;
+    }
+
+    public static RowData initSpinner(int width, RowData rd)
+    {
+        if (isGTK) {
+            // GTK3は表示が違うので大きくする
+            rd.width = DPIAwareWidth(64 + width);
+            rd.height = DPIAwareHeight(36);
+        }
+        else {
+            rd.width = DPIAwareWidth(width);
+        }
+        return rd;
     }
 
     public static Image makeImage(File file) throws IOException {

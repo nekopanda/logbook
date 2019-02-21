@@ -37,8 +37,12 @@ public enum BattlePhaseKind {
     COMBINED_BATTLE_WATER(false, false, BattlePatternConstants.WATER_PATTERN, DataType.COMBINED_BATTLE_WATER),
     /** 長距離空襲戦 */
     LD_AIRBATTLE(false, false, BattlePatternConstants.NON_COMBINED_PTTERN, DataType.LD_AIRBATTLE),
+    /** レーダー射撃戦 */
+    LD_SHOOTING(false, false, BattlePatternConstants.NON_COMBINED_PTTERN, DataType.LD_SHOOTING),
     /** 連合艦隊長距離空襲戦 */
     COMBINED_LD_AIR(false, false, BattlePatternConstants.BATTLE_PATTERN, DataType.COMBINED_LD_AIRBATTLE),
+    /** 連合艦隊レーダー射撃戦 */
+    COMBINED_LD_SHOOTING(false, false, BattlePatternConstants.BATTLE_PATTERN, DataType.COMBINED_LD_SHOOTING),
     /** 通常艦隊敵連合艦隊の昼戦*/
     COMBINED_EC_BATTLE(false, false, BattlePatternConstants.NON_COMBINED_PTTERN, DataType.COMBINED_EC_BATTLE),
     /** 通常艦隊敵連合艦隊の夜戦 */

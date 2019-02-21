@@ -79,6 +79,10 @@ public class ShipParameters {
             return "低速";
         case 10:
             return "高速";
+        case 15:
+            return "高速+";
+        case 20:
+            return "最速";
         }
         return "不明(" + soku + ")";
     }
@@ -193,7 +197,7 @@ public class ShipParameters {
             param.leng = object.getInt("api_leng");
             param.raig = object.getJsonArray("api_raisou").getInt(i);
             param.tyku = object.getJsonArray("api_taiku").getInt(i);
-            param.soku = masterShip.getParam().getSoku();
+            param.soku = object.getInt("api_soku");
             param.souk = object.getJsonArray("api_soukou").getInt(i);
             param.kaih = object.getJsonArray("api_kaihi").getInt(i);
             param.tais = object.getJsonArray("api_taisen").getInt(i);

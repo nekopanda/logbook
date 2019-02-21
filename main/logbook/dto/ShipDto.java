@@ -3,8 +3,10 @@ package logbook.dto;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.json.JsonObject;
+import javax.json.JsonValue;
 
 import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
@@ -104,6 +106,14 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
     @Tag(40)
     private final String json;
 
+    @Tag(41)
+    /** 速度 */
+    private final int soku;
+
+    @Tag(42)
+    /** 札 */
+    private final int sallyArea;
+
     /**
      * コンストラクター
      * 
@@ -141,6 +151,10 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
         }
         this.slotEx = _slotEx;
         this.slotExItem = GlobalContext.getItem(this.getSlotEx());
+
+        this.soku = object.getInt("api_soku");
+
+        this.sallyArea = object.containsKey("api_sally_area") ? object.getInt("api_sally_area") : 0;
 
         this.json = object.toString();
     }
@@ -182,6 +196,10 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
 
         this.slotEx = -1;
         this.slotExItem = null;
+
+        this.soku = shipinfo.getParam().getSoku();
+
+        this.sallyArea = 0;
 
         this.json = null;
     }
@@ -611,5 +629,21 @@ public final class ShipDto extends ShipBaseDto implements Comparable<ShipDto> {
      */
     public ItemDto getSlotExItem() {
         return this.slotExItem;
+    }
+
+    /**
+     * 速力
+     * @return
+     */
+    public int getSoku() {
+        return this.soku;
+    }
+
+    /**
+     * 出撃海域
+     * @return
+     */
+    public int getSallyArea() {
+        return this.sallyArea;
     }
 }

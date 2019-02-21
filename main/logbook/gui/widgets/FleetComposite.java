@@ -526,8 +526,8 @@ public class FleetComposite extends Composite {
                 }
                 aaString += String.format("加:%.2f 割:%.2f%% 固:%d ",
                         calcAA.getFinalWeightedAirValue(ship,aaShips,true,1),
-                        calcAA.getPropShotDown(ship,true,isCombined,dockIndex == 1) * 100,
-                        calcAA.getFixedShotDown(ship,aaShips,true,isCombined,dockIndex == 1,1,0));
+                        calcAA.getPropShotDown(ship,true,isCombined,dockIndex == 1, false) * 100,
+                        calcAA.getFixedShotDown(ship,aaShips,true,isCombined,dockIndex == 1,1,0, false));
             }
             this.aaLabels[i].setText(aaString);
             this.aaLabels[i].setForeground(SWTResourceManager.getColor(SWT.COLOR_DARK_RED));

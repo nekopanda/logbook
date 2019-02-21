@@ -26,14 +26,14 @@ public class CalcAA {
      */
     private final Map<Integer, AA_CI> AA_CI_BONUS = new LinkedHashMap<Integer, AA_CI>() {
         {
-            this.put(1, new AA_CI(7, 1.75));  // 高角砲x2/電探(秋月型)
+            this.put(1, new AA_CI(7, 1.7));  // 高角砲x2/電探(秋月型)
             this.put(2, new AA_CI(6, 1.7));   // 高角砲/電探(秋月型)
             this.put(3, new AA_CI(4, 1.6));   // 高角砲x2(秋月型)
             this.put(4, new AA_CI(6, 1.5));   // 大口径主砲/三式弾/高射装置/対空電探
-            this.put(5, new AA_CI(4, 1.55));  // 高角砲+高射装置x2/対空電探
-            this.put(6, new AA_CI(4, 1.5));   // 大口径主砲/三式弾/高射装置
+            this.put(5, new AA_CI(4, 1.5));  // 高角砲+高射装置x2/対空電探
+            this.put(6, new AA_CI(4, 1.45));   // 大口径主砲/三式弾/高射装置
             this.put(7, new AA_CI(3, 1.35));  // 高角砲/高射装置/対空電探
-            this.put(8, new AA_CI(4, 1.45));  // 高角砲+高射装置/対空電探
+            this.put(8, new AA_CI(4, 1.4));  // 高角砲+高射装置/対空電探
             this.put(9, new AA_CI(2, 1.3));   // 高角砲/高射装置
             this.put(10, new AA_CI(8, 1.65)); // 高角砲/特殊機銃/対空電探(摩耶改二)
             this.put(11, new AA_CI(6, 1.5));  // 高角砲/特殊機銃(摩耶改二)
@@ -51,9 +51,18 @@ public class CalcAA {
             this.put(23, new AA_CI(1, 1.05)); // 機銃(非特殊機銃)(UIT-25/伊504)
             this.put(24, new AA_CI(3, 1.25)); // 高角砲/機銃(非特殊機銃)(龍田改二)
             this.put(25, new AA_CI(7, 1.55)); // 新噴進砲/対空電探/三式弾(伊勢型改)
-            this.put(26, new AA_CI(0, 1));    //
+            this.put(26, new AA_CI(6, 1.4));  // 10cm連装高角砲改＋増設機銃/対空電探(武蔵改二)
             this.put(27, new AA_CI(0, 1));    //
             this.put(28, new AA_CI(4, 1.4));  // 新噴進砲/対空電探(伊勢型改/武蔵改)
+            this.put(29, new AA_CI(5, 1.55)); // 高角砲/対空電探(浜風乙改/磯風乙改)
+            this.put(30, new AA_CI(3, 1.3));  // 高角砲x3(天龍改二/Gotland改)
+            this.put(31, new AA_CI(2, 1.25)); // 高角砲x2(天龍改二)
+            this.put(32, new AA_CI(3, 1.2));  // [16inch Mk.I三連装砲改+FCR type284 or 20連装7inch UP Rocket Launchers/QF 2ポンド8連装ポンポン砲] or [20連装7inch UP Rocket Launchersx2](英国艦/金剛型改二)
+            this.put(33, new AA_CI(3, 1.35)); // 高角砲/機銃(Gotland改)
+            this.put(34, new AA_CI(7, 1.6));  // 5inch単装砲 Mk.30改+GFCS Mk.37x2(Johnston)
+            this.put(35, new AA_CI(6, 1.55)); // 5inch単装砲 Mk.30改+GFCS Mk.37/5inch単装砲 Mk.30改(Johnston)
+            this.put(36, new AA_CI(6, 1.55)); // 5inch単装砲 Mk.30改x2/GFCS Mk.37(Johnston)
+            this.put(37, new AA_CI(4, 1.45)); // 5inch単装砲 Mk.30改x2(Johnston)
         }
     };
 
@@ -80,8 +89,8 @@ public class CalcAA {
      * @param isSecond   第二艦隊か(連合艦隊時使用)
      * @return 加重対空値
      */
-    public <SHIP extends ShipBaseDto> double getPropShotDown(SHIP ship, boolean isFriend, boolean isCombined, boolean isSecond) {
-        return 0.02 * AIR_BATTLE_FACTOR * this.getWeightedAirValue(ship, isFriend) * this.getCombinedBonus(isFriend, isCombined, isSecond);
+    public <SHIP extends ShipBaseDto> double getPropShotDown(SHIP ship, boolean isFriend, boolean isCombined, boolean isSecond, boolean isRaidBattle) {
+        return 0.02 * AIR_BATTLE_FACTOR * this.getWeightedAirValue(ship, isFriend) * this.getCombinedBonus(isFriend, isCombined, isSecond, isRaidBattle);
     }
 
     /**
@@ -94,12 +103,13 @@ public class CalcAA {
      * @param isSecond      第二艦隊か(連合艦隊時使用)
      * @param formationKind 陣形
      * @param ciKind        対空CI種別
+     * @param isRaidBattle  長距離空襲戦か
      * @return 固定撃墜
      */
-    public <SHIP extends ShipBaseDto> int getFixedShotDown(SHIP ship, List<SHIP> ships, boolean isFriend, boolean isCombined, boolean isSecond, int formationKind, int ciKind) {
+    public <SHIP extends ShipBaseDto> int getFixedShotDown(SHIP ship, List<SHIP> ships, boolean isFriend, boolean isCombined, boolean isSecond, int formationKind, int ciKind, boolean isRaidBattle) {
         return (int) (this.getFinalWeightedAirValue(ship, ships, isFriend, formationKind)
                 * (ciKind > 0 && ciKind <= AA_CI_BONUS.size() ? AA_CI_BONUS.get(ciKind).getVariableBonus() : 1)
-                * this.getCombinedBonus(isFriend, isCombined, isSecond));
+                * this.getCombinedBonus(isFriend, isCombined, isSecond, isRaidBattle));
     }
 
     /**
@@ -123,11 +133,12 @@ public class CalcAA {
      * @param isFriend   味方か
      * @param isCombined 連合艦隊か
      * @param isSecond   第二艦隊か(連合艦隊時使用)
+     * @param isRaidBattle 長距離空襲戦か
      * @return 連合艦隊補正
      */
-    private double getCombinedBonus(boolean isFriend, boolean isCombined, boolean isSecond) {
+    private double getCombinedBonus(boolean isFriend, boolean isCombined, boolean isSecond, boolean isRaidBattle) {
         if (isCombined) {
-            if (isFriend) {
+            if (isRaidBattle) {
                 return !isSecond ? 0.72 : 0.48;
             }
             return !isSecond ? 0.8 : 0.48;

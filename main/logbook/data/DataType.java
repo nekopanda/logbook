@@ -47,10 +47,14 @@ public enum DataType {
     AIR_BATTLE("/kcsapi/api_req_sortie/airbattle"),
     /** 戦闘(長距離空襲戦) */
     LD_AIRBATTLE("/kcsapi/api_req_sortie/ld_airbattle"),
+    /** 戦闘(レーダー射撃戦) */
+    LD_SHOOTING("/kcsapi/api_req_sortie/ld_shooting"),
     /** 戦闘(航空戦) */
     COMBINED_AIR_BATTLE("/kcsapi/api_req_combined_battle/airbattle"),
     /** 戦闘(長距離空襲戦) */
     COMBINED_LD_AIRBATTLE("/kcsapi/api_req_combined_battle/ld_airbattle"),
+    /** 戦闘(レーダー射撃戦) */
+    COMBINED_LD_SHOOTING("/kcsapi/api_req_combined_battle/ld_shooting"),
     /** 戦闘 */
     COMBINED_BATTLE("/kcsapi/api_req_combined_battle/battle"),
     /** 戦闘 */
@@ -165,7 +169,7 @@ public enum DataType {
 
     private final String url;
 
-    private DataType(String url) {
+    DataType(String url) {
         this.url = url;
     }
 

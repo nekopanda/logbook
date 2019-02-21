@@ -101,8 +101,8 @@ public class AirbaseDto {
             this.name = name;
         }
 
-        public JsonObject getDistance() {
-            return this.distance;
+        public int getDistance() {
+            return this.distance.getInt("api_base") + this.distance.getInt("api_bonus");
         }
 
         public void setDistance(JsonObject distance) {

@@ -2,6 +2,8 @@ package logbook.dto;
 
 import logbook.config.bean.ShipGroupBean;
 
+import java.util.*;
+
 /**
  * 所有艦娘一覧で使用するフィルター
  */
@@ -39,4 +41,7 @@ public final class ShipFilterDto extends AbstractDto {
     public boolean needbath = true;
     /** 修理の必要なし */
     public boolean notneedbath = true;
+    // ListはSerializeではない
+    public ArrayList<ShipFilterItemDto> filterList = null;
+
 }

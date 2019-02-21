@@ -11,10 +11,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -47,7 +46,7 @@ public class ScriptData {
         }
     }
 
-    private static Map<String, DataObject> dataMap = new HashMap<>();
+    private static ConcurrentHashMap<String, DataObject> dataMap = new ConcurrentHashMap<>();
 
     private static boolean modified = false;
 

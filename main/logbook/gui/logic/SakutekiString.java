@@ -3,6 +3,7 @@
  */
 package logbook.gui.logic;
 
+import java.util.Arrays;
 import java.util.List;
 
 import logbook.config.AppConfig;
@@ -96,6 +97,12 @@ public class SakutekiString implements Comparable<SakutekiString> {
                 if (item != null) {
                     // 装備の索敵値
                     this.sakuteki -= item.getParam().getSaku();
+                    // 装備フィットボーナス分減少(SGレーダー(初期型))
+                    if (item.getSlotitemId() == 315
+                            && Arrays.asList(65, 69, 83, 84, 87, 91).stream()
+                                .anyMatch(ctype -> ctype == ship.getShipInfo().getCtype())) {
+                        this.sakuteki -= 4;
+                    }
                     if (item.getType2() == 0) { // 取得できていない
                         this.failed = true;
                     }

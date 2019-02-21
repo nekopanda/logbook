@@ -714,6 +714,10 @@ public final class GlobalContext {
             case SLOT_EXCHANGE_INDEX:
                 doSlotExchangeIndex(data, apidata);
                 break;
+            // 装備譲渡
+            case SLOT_DEPRIVE:
+                doSlotDeprive(data, apidata);
+                break;
             // 艦娘ロック操作
             case LOCK_SHIP:
                 doLockShip(data, apidata);
@@ -751,12 +755,20 @@ public final class GlobalContext {
                 doBattle(data, apidata, BattlePhaseKind.LD_AIRBATTLE);
                 break;
             // 海戦
+            case LD_SHOOTING:
+                doBattle(data, apidata, BattlePhaseKind.LD_SHOOTING);
+                break;
+            // 海戦
             case COMBINED_AIR_BATTLE:
                 doBattle(data, apidata, BattlePhaseKind.COMBINED_AIR);
                 break;
             // 海戦
             case COMBINED_LD_AIRBATTLE:
                 doBattle(data, apidata, BattlePhaseKind.COMBINED_LD_AIR);
+                break;
+            // 海戦
+            case COMBINED_LD_SHOOTING:
+                doBattle(data, apidata, BattlePhaseKind.COMBINED_LD_SHOOTING);
                 break;
             // 海戦
             case COMBINED_BATTLE:
@@ -2050,6 +2062,47 @@ public final class GlobalContext {
                 }
             }
 
+            addUpdateLog("装備状態を更新しました");
+        } catch (Exception e) {
+            LOG.get().warn("装備状態の更新に失敗しました", e);
+            LOG.get().warn(data);
+        }
+    }
+
+    /**
+     * 装備譲渡
+     *
+     * @param data
+     * @param json
+     */
+    private static void doSlotDeprive(Data data, JsonValue json) {
+        try {
+            if (json instanceof JsonObject) {
+                JsonObject apidata = (JsonObject) json;
+                JsonObject apiship = apidata.getJsonObject("api_ship_data");
+
+                JsonObject[] apiShip = {
+                    apiship.getJsonObject("api_set_ship"),
+                    apiship.getJsonObject("api_unset_ship")
+                };
+
+                for (int i = 0; i < apiShip.length; i++) {
+                    int shipId = apiShip[i].getInt("api_id");
+                    ShipDto ship = shipMap.get(shipId);
+                    if (ship != null) {
+                        ship.setSlotFromJson(apiShip[i]);
+
+                        // 次アップデート
+                        String fleetid = ship.getFleetid();
+                        if (fleetid != null) {
+                            DockDto dockdto = dock.get(fleetid);
+                            if (dockdto != null) {
+                                dockdto.setUpdate(true);
+                            }
+                        }
+                    }
+                }
+            }
             addUpdateLog("装備状態を更新しました");
         } catch (Exception e) {
             LOG.get().warn("装備状態の更新に失敗しました", e);
