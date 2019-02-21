@@ -654,6 +654,7 @@ public final class ShipFilterComposite extends Composite {
         }
         this.recreateGroupButtons();
         this.recreateShipTypeButtonos();
+        this.recreateEtcFilterList();
         this.applyFilter(filter);
         this.setPanelVisible(panelVisible, etcVisible);
         this.changeEnabled = true;
@@ -829,6 +830,13 @@ public final class ShipFilterComposite extends Composite {
             this.maxTypeId = Math.max(key, this.maxTypeId);
         }
         this.typeCheckCompo.layout();
+    }
+
+    private void recreateEtcFilterList() {
+        Arrays.stream(this.filterMainFrame.getChildren()).forEach(control -> control.dispose());
+        this.compositeList = new ArrayList<>();
+        this.filterList = new ArrayList<>();
+        this.filterMainFrame.layout();
     }
 
     /**
