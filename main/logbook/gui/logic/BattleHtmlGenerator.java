@@ -597,6 +597,12 @@ public class BattleHtmlGenerator extends HTMLGenerator {
                 } else if ((i == 2) && (HTypeS.equals("一斉射かッ…胸が熱いな！"))) {
                     this.inline("td", text[0], null);
                     this.inline("td", this.getShipName(origin, 1), textClass[0]);
+                } else if ((i == 1) && (HTypeS.equals("長門、いい？ いくわよ！ 主砲一斉射ッ！"))) {
+                    this.inline("td", text[0], null);
+                    this.inline("td", this.getShipName(origin, 0), textClass[0]);
+                } else if ((i == 2) && (HTypeS.equals("長門、いい？ いくわよ！ 主砲一斉射ッ！"))) {
+                    this.inline("td", text[0], null);
+                    this.inline("td", this.getShipName(origin, 1), textClass[0]);
                 } else {
                     this.inline("td", getColSpan(2), "", null);
                 }

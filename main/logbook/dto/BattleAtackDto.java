@@ -475,6 +475,8 @@ public class BattleAtackDto {
             return "ネルソンタッチ";
         case 101:
             return "一斉射かッ…胸が熱いな！";
+        case 102:
+            return "長門、いい？ いくわよ！ 主砲一斉射ッ！";
         }
         return "不明(" + this.type + ")";
     }
