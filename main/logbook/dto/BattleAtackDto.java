@@ -477,6 +477,10 @@ public class BattleAtackDto {
             return "一斉射かッ…胸が熱いな！";
         case 102:
             return "長門、いい？ いくわよ！ 主砲一斉射ッ！";
+        case 200:
+            return "瑞雲立体攻撃";
+        case 201:
+            return "海空立体攻撃";
         }
         return "不明(" + this.type + ")";
     }
