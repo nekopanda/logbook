@@ -826,7 +826,7 @@ public class BattleExDto extends AbstractDto {
                                 if (dockCombined != null) {
                                     dockCombined.getShips();
                                 }
-                                ShipDto shipCombined = dockCombined.getShips().get(target);
+                                ShipDto shipCombined = dockCombined.getShips().get(target - friendSecondBase);
                                 List<ItemDto> itemsCombined = new ArrayList<>(shipCombined.getItem2());
                                 itemsCombined.add(shipCombined.getSlotExItem());
                                 for (ItemDto itemCombined : itemsCombined) {
