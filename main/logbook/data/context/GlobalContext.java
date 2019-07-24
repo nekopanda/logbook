@@ -843,7 +843,7 @@ public final class GlobalContext {
             case MAPINFO:
                 doMapInfo(data, apidata);
                 break;
-            // 任務情報
+            // 遠征情報
             case MISSION:
                 doMission(data, apidata);
                 break;
@@ -2634,18 +2634,22 @@ public final class GlobalContext {
     }
 
     /**
-     * 任務情報を処理します
-     *
+     * 遠征情報を処理します
+     * 
      * @param data
      */
     private static void doMission(Data data, JsonValue json) {
         try {
-            if (json instanceof JsonArray) {
-                JsonArray apidata = (JsonArray) json;
-                MasterData.updateMission(apidata);
+            if (json instanceof JsonObject) {
+                JsonValue api_list_items = ((JsonObject) json).get("api_list_items");
+                if (api_list_items instanceof JsonArray) {
+                    JsonArray apidata = (JsonArray) api_list_items;
+                    MasterData.updateMission(apidata);
+                    addConsole("遠征情報を更新しました");
+                }
             }
         } catch (Exception e) {
-            LOG.get().warn("任務情報更新に失敗しました", e);
+            LOG.get().warn("遠征情報更新に失敗しました", e);
             LOG.get().warn(data);
         }
     }
