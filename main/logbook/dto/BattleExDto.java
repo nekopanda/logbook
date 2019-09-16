@@ -57,6 +57,9 @@ public class BattleExDto extends AbstractDto {
     @Tag(7)
     private int[] maxFriendHpCombined;
 
+    @Tag(116)
+    private int[] maxFriendlyFleetHp;
+
     /** 敵MaxHP */
     @Tag(8)
     private int[] maxEnemyHp;
@@ -70,6 +73,9 @@ public class BattleExDto extends AbstractDto {
 
     @Tag(10)
     private int[] startFriendHpCombined;
+
+    @Tag(117)
+    private int[] startFriendlyFleetHp;
 
     /** 敵戦闘開始時HP */
     @Tag(11)
@@ -231,6 +237,27 @@ public class BattleExDto extends AbstractDto {
         @Tag(3)
         private final int[] nowFriendHpCombined;
 
+        @Tag(108)
+        private final int[] nowFriendlyFleetHp;
+        
+        @Tag(120)
+        private final int[] maxFriendlyFleetHp;
+
+        @Tag(121)
+        private final int[] beforeFriendlyFleetHp;
+
+        /** 友軍艦隊 */
+        @Tag(115)
+        private List<EnemyShipDto> ff = new ArrayList<>();
+
+        /** 友軍艦隊 触接機（味方・敵） -1の場合は「触接なし」 */
+        @Tag(106)
+        private int[] friendlytouchPlane;
+
+        /** 友軍艦隊 照明弾発射艦 */
+        @Tag(107)
+        private int[] friendlyflarePos;
+
         /** 敵HP */
         @Tag(4)
         private final int[] nowEnemyHp;
@@ -348,6 +375,56 @@ public class BattleExDto extends AbstractDto {
             this.nowEnemyHp = beforeEnemyHp.clone();
             this.nowFriendHpCombined = isFriendCombined ? beforeFriendHpCombined.clone() : null;
             this.nowEnemyHpCombined = isEnemyCombined ? beforeEnemyHpCombined.clone() : null;
+
+            int n[] = {0,0,0,0,0,0,0}; 
+
+            this.nowFriendlyFleetHp = n.clone();
+            this.maxFriendlyFleetHp = n.clone();
+            this.beforeFriendlyFleetHp = n.clone();
+
+            if (this.isFriendFleet) {
+                this.ff = new ArrayList<>();
+                JsonObject friendlyInfoObj = JsonUtils.getJsonObject(object, "api_friendly_info");
+                JsonArray ffshipid = JsonUtils.getJsonArray(friendlyInfoObj, "api_ship_id");
+                JsonArray ffSlots = JsonUtils.getJsonArray(friendlyInfoObj, "api_Slot");
+                JsonArray ffParams = JsonUtils.getJsonArray(friendlyInfoObj, "api_Param");
+                JsonArray ffLevel = JsonUtils.getJsonArray(friendlyInfoObj, "api_ship_lv");
+
+                for (int i = baseidx; i < ffshipid.size(); i++) {
+                    int ffid = ffshipid.getInt(i);
+                    int[] ffslot = JsonUtils.toIntArray(ffSlots.getJsonArray(i - baseidx));
+                    int[] ffparam = JsonUtils.toIntArray(ffParams.getJsonArray(i - baseidx));
+                    this.ff.add(new EnemyShipDto(ffid, ffslot, ffparam, ffLevel.getInt(i)));
+                }
+
+
+                JsonArray ff_maxhps = JsonUtils.getJsonArray(friendlyInfoObj, "api_maxhps");
+                JsonArray ff_nowhps = JsonUtils.getJsonArray(friendlyInfoObj, "api_nowhps");
+                for (int i= baseidx; i< ff_maxhps.size(); i++) {
+                   this.maxFriendlyFleetHp[i] = ff_maxhps.getInt(i);
+                   this.nowFriendlyFleetHp[i] = ff_nowhps.getInt(i);
+                   this.beforeFriendlyFleetHp[i] = ff_nowhps.getInt(i);
+                }
+            } 
+
+            // 友軍艦隊 夜間触接および照明弾発射艦
+            if (JsonUtils.hasKey(object, "api_friendly_battle")) {
+                JsonObject friendlyBattleObj = JsonUtils.getJsonObject(object, "api_friendly_battle");
+                
+                JsonArray jsonfriendlyTouchPlane = JsonUtils.getJsonArray(friendlyBattleObj, "api_touch_plane");
+                if (jsonfriendlyTouchPlane != null) {
+                    this.friendlytouchPlane = new int[] {
+                        Integer.parseInt(jsonfriendlyTouchPlane.get(0).toString()),
+                        Integer.parseInt(jsonfriendlyTouchPlane.get(1).toString())
+                        };
+                }
+                
+                JsonArray jsonfriendlyFlarePos = JsonUtils.getJsonArray(friendlyBattleObj, "api_flare_pos");
+                
+                if ((jsonfriendlyFlarePos != null) && (jsonfriendlyFlarePos != JsonValue.NULL)) {
+                    this.friendlyflarePos = JsonUtils.getIntArray(friendlyBattleObj, "api_flare_pos");
+                }
+            }
 
             // 夜間触接
             JsonArray jsonTouchPlane = JsonUtils.getJsonArray(object, "api_touch_plane");
@@ -844,8 +921,13 @@ public class BattleExDto extends AbstractDto {
                             }
                         }
                     }
-                    // 敵艦隊から友軍艦隊への攻撃は、それを反映させる値がないため無視する
+                    // 敵艦隊から友軍艦隊への攻撃
                     else if ((dto.friendAtack == false) && (isFF == true)) {
+                        if (target < friendSecondBase) {
+                            this.nowFriendlyFleetHp[target] -= damage;
+                        }
+                        else {
+                        }
                     }
 
                 }
@@ -1068,6 +1150,15 @@ public class BattleExDto extends AbstractDto {
         }
 
         /**
+         * 友軍艦隊支援か？
+         * @return isFriendFeet
+         */
+        public boolean isFriendFleet() {
+            return this.isFriendFleet;
+        }
+
+
+        /**
          * 触接機 [味方・敵] -1の場合は「触接なし」
          * @return touchPlane
          */
@@ -1204,6 +1295,60 @@ public class BattleExDto extends AbstractDto {
          */
         public List<AirBattleDto> getAirBase() {
             return this.airBase;
+        }
+
+        /**
+         * 友軍艦隊関連
+         */
+
+        /**
+         * @return friendlyHougeki
+         */
+        public List<BattleAtackDto> getfriendlyHougeki() {
+            return this.hougeki_f;
+        }
+
+        /**
+         * @return friendlyflarePos
+         */
+        public int[] getfriendlyFlarePos() {
+            return this.friendlyflarePos;
+        }
+
+        /**
+         * 友軍艦隊 触接機 [味方・敵] -1の場合は「触接なし」
+         * @return friendlytouchPlane
+         */
+        public int[] getfriendlyTouchPlane() {
+            return this.friendlytouchPlane;
+        }
+
+        /**
+         * @return nowFriendlyFleetHp
+         */
+        public int[] getnowFriendlyFleetHp() {
+            return this.nowFriendlyFleetHp;
+        }
+
+        /**
+         * @return maxFriendlyFleetHp
+         */
+        public int[] getmaxFriendlyFleetHp() {
+            return this.maxFriendlyFleetHp;
+        }
+
+        /**
+         * @return beforeFriendlyFleetHp
+         */
+        public int[] getbeforeFriendlyFleetHp() {
+            return this.beforeFriendlyFleetHp;
+        }
+
+        /**
+         * @return FriendlyFleet
+         */
+        public List<EnemyShipDto> getFriendlyFleet() {
+            return this.ff;
         }
     }
 
