@@ -1672,45 +1672,21 @@ public final class GlobalContext {
                 // 投入資源
                 ResourceItemDto res = new ResourceItemDto();
                 res.loadBaseMaterialsFromField(data);
-                // 集中開発(3装備同時開発)の際、CreateItemDto createitemを1個だけ定義して
-                // それを2番目の装備、3番目の装備に使いまわした場合、3番目に作成された装備が
-                // 1番目、2番目の装備に代わり、開発報告書に重複して合計3回表示される
-                // という問題が発生する。
-                CreateItemDto createitem = new CreateItemDto(apidata, res, secretary, hqLevel);
-                CreateItemDto createitem1 = new CreateItemDto(apidata, res, secretary, hqLevel);
-                CreateItemDto createitem2 = new CreateItemDto(apidata, res, secretary, hqLevel);
-                if (createitem.isCreateFlag()) {
-                    JsonArray item_array = apidata.getJsonArray("api_get_items");
-                    for (int i=0; i < item_array.size(); i++) {
-                        ItemDto item = addSlotitem(item_array.getJsonObject(i));
-                        if (item != null) {
-                            switch (i) {
-                                case 0:
-                                    createitem.setName(item.getName());
-                                    createitem.setType(item.getTypeName());
-                                    createItemList.add(createitem);
-                                    CreateReportLogic.storeCreateItemReport(createitem);
-                                    break;
-                                case 1:
-                                    createitem1.setName(item.getName());
-                                    createitem1.setType(item.getTypeName());
-                                    createItemList.add(createitem1);
-                                    CreateReportLogic.storeCreateItemReport(createitem1);
-                                    break;
-                                case 2:
-                                    createitem2.setName(item.getName());
-                                    createitem2.setType(item.getTypeName());
-                                    createItemList.add(createitem2);
-                                    CreateReportLogic.storeCreateItemReport(createitem2);
-                                    break;
-                                default:
-                            }
-                        }
+                JsonArray item_array = apidata.getJsonArray("api_get_items");
+                for (int i=0; i<item_array.size(); i++) {
+                    CreateItemDto createitem = new CreateItemDto(apidata, res, secretary, hqLevel);
+                    ItemDto item = addSlotitem(item_array.getJsonObject(i));
+                    if (item != null) {
+                        createitem.setName(item.getName());
+                        createitem.setType(item.getTypeName());
+                        createItemList.add(createitem);
+                        CreateReportLogic.storeCreateItemReport(createitem);
                     }
-                }
-                else {
-                    createItemList.add(createitem);
-                    CreateReportLogic.storeCreateItemReport(createitem);
+                    else {
+                        createitem.setCreateFlag(false);
+                        createItemList.add(createitem);
+                        CreateReportLogic.storeCreateItemReport(createitem);
+                    }
                 }
 
                 // 資源に反映させてレポート
