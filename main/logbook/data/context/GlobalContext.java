@@ -1267,6 +1267,16 @@ public final class GlobalContext {
                 state = checkDataState(endSortie);
 
                 addUpdateLog("母港情報を更新しました");
+
+                // ギミック解除：敵勢力弱体化検知
+                JsonObject EventObj = apidata.getJsonObject("api_event_object");
+                if ((EventObj != null) && (EventObj != JsonValue.NULL)) {
+                    JsonNumber m_flg = EventObj.getJsonNumber("api_m_flag");
+                    JsonNumber m_flg2 = EventObj.getJsonNumber("api_m_flag2");
+                    if ((m_flg != null) && (m_flg2 != null) && (m_flg2.intValue() > 0)) {
+                        addUpdateLog(">>> ギミック解除：敵勢力の弱体化を確認しました！・。・v <<<");
+                    }
+                }
             }
         } catch (Exception e) {
             LOG.get().warn("母港を更新しますに失敗しました", e);
@@ -1457,6 +1467,13 @@ public final class GlobalContext {
                             addConsole(battle.getDropItemName() + "がドロップしました");
                         }
                     }
+                }
+
+                // ギミック解除：海域変化検知
+                JsonNumber m1_flg = apidata.getJsonNumber("api_m1");
+                JsonNumber m2_flg = apidata.getJsonNumber("api_m2");
+                if (((m1_flg != null) && (m1_flg.intValue() != 0)) || ((m2_flg != null) && (m2_flg.intValue() != 0))) {
+                    addUpdateLog(">>> ギミック解除：海域の変化を確認しました！・。・v <<<");
                 }
             }
         } catch (Exception e) {
