@@ -1997,14 +1997,19 @@ public final class GlobalContext {
         try {
             // 近代化改修に使った艦を取り除く
             String shipids = data.getField("api_id_items");
+            boolean destroyItem =  (data.getField("api_slot_dest_flag") != null ? (!"0".equals(data.getField("api_slot_dest_flag"))) : true);
             for (String shipid : shipids.split(",")) {
                 ShipDto ship = shipMap.get(Integer.valueOf(shipid));
                 if (ship != null) {
                     // 記録する
                     CreateReportLogic.storeLostReport(LostEntityDto.make(ship, "近代化改修"));
+                    // 装備解除後の近代化改修ではなく通常の近代化改修の場合、
                     // 持っている装備を廃棄する
-                    for (int item : ship.getItemId()) {
-                        itemMap.remove(item);
+                    if (destroyItem)
+                    {
+                        for (int item : ship.getItemId()) {
+                            removeSlotItem(item);
+                        }
                     }
                     // 艦娘を外す
                     shipMap.remove(ship.getId());
