@@ -33,6 +33,7 @@ import logbook.gui.listener.TraySelectionListener;
 import logbook.gui.logic.ColorManager;
 import logbook.gui.logic.DeckBuilder;
 import logbook.gui.logic.FleetFormatter;
+import logbook.gui.logic.ItemFormatter;
 import logbook.gui.logic.LayoutLogic;
 import logbook.gui.logic.PushNotify;
 import logbook.gui.logic.Sound;
@@ -1312,6 +1313,46 @@ public final class ApplicationMain extends WindowBase {
 
         rootFleetFormatter.setMenu(copyFleetFormatterMenu);
 
+        final MenuItem rootItemFormatter = new MenuItem(this.getPopupMenu(), SWT.CASCADE);
+        rootItemFormatter.setText("艦隊分析ページ");
+        Menu copyItemFormatterMenu = new Menu(rootItemFormatter);
+
+        final MenuItem copyItemFormat = new MenuItem(copyItemFormatterMenu, SWT.PUSH);
+        copyItemFormat.setText("装備フォーマットをクリップボードにコピー");
+
+        copyItemFormat.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+
+                if (GlobalContext.getState() == 1) {
+                    Clipboard clipboard = new Clipboard(Display.getDefault());
+                                  clipboard.setContents(new Object[] { new ItemFormatter().get(true) },
+                            new Transfer[] { TextTransfer.getInstance() });
+                } else {
+                    Shell shell = new Shell(Display.getDefault(), SWT.TOOL);
+                    MessageBox mes = new MessageBox(shell, SWT.ICON_WARNING | SWT.OK);
+                    mes.setText(AppConstants.TITLEBAR_TEXT);
+                    mes.setMessage("情報が不足しています。艦これをリロードしてデータを読み込んでください。");
+                    mes.open();
+                    shell.dispose();
+                }
+            }
+        });
+
+        final MenuItem copyItemFormatURL = new MenuItem(copyItemFormatterMenu, SWT.PUSH);
+        copyItemFormatURL.setText("サイトURLをクリップボードにコピー");
+
+        copyItemFormatURL.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                Clipboard clipboard = new Clipboard(Display.getDefault());
+                clipboard.setContents(new Object[] { "https://kancolle-fleetanalysis.firebaseapp.com/#/equipInput" },
+                        new Transfer[] { TextTransfer.getInstance() });
+            }
+        });
+
+        rootItemFormatter.setMenu(copyItemFormatterMenu);
+        
         // 選択する項目はドラックで移動できないようにする
         for (Control c : new Control[] { this.commandComposite,
                 this.deckNotice, this.ndockNotice,

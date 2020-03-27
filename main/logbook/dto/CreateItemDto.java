@@ -14,7 +14,7 @@ public final class CreateItemDto extends AbstractDto {
     private final Date createDate;
 
     /** 成功フラグ */
-    private final boolean createFlag;
+    private boolean createFlag;
 
     /** 名称 */
     private String name;
@@ -97,6 +97,13 @@ public final class CreateItemDto extends AbstractDto {
      */
     public boolean isCreateFlag() {
         return this.createFlag;
+    }
+
+    /**
+     * @param flag 成功フラグ
+     */
+    public void setCreateFlag(boolean flag) {
+        this.createFlag = flag;
     }
 
     /**

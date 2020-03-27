@@ -14,6 +14,8 @@ function header() {
 				"艦載機3", //
 				"装備4",
 				"艦載機4",
+				"装備5",
+				"艦載機5",
 				"補助" ,
 				"補助装備" ];
 }
@@ -24,8 +26,8 @@ function body(ship) {
 
 	 // 艦載機数
 	var slotItems = ship.item2;
-	var slotNames = new Array(4);
-	var onSlotString = new Array(4);
+	var slotNames = new Array(5);
+	var onSlotString = new Array(5);
 	var slotExName = (ship.slotExItem != null) ? ship.slotExItem.friendlyName : null;
 	var slotEx = ship.hasSlotEx() ? "◎" : "×";
 	var onSlot = ship.onSlot;
@@ -54,6 +56,8 @@ function body(ship) {
 					onSlotString[2],
 					slotNames[3],
 					onSlotString[3],
+					slotNames[4],
+					onSlotString[4],
 					slotEx ,
 					slotExName ]);
 }

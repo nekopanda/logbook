@@ -34,7 +34,7 @@ public class ItemType {
             this.put(18, "ソナー");
             this.put(19, "機関部強化");
             this.put(20, "上陸用舟艇");
-            this.put(21, "オートジャイロ");
+            this.put(21, "回転翼機");
             this.put(22, "指揮連絡機");
             this.put(23, "追加装甲");
             this.put(24, "探照灯");

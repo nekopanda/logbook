@@ -468,7 +468,7 @@ public final class ShipInfoDto extends AbstractDto {
     public boolean isKanmusu() {
         if (this.before20170405)
             return !this.isEnemy();
-        return this.shipId < 760;
+        return this.shipId < 1501;
     }
 
     /**
