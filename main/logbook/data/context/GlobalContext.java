@@ -2417,40 +2417,35 @@ public final class GlobalContext {
                 JsonObject apidata = (JsonObject) json;
 
                 int items_per_page = 5;
-                int disp_page = apidata.getJsonNumber("api_disp_page").intValue();
-                int page_count = apidata.getJsonNumber("api_page_count").intValue();
-                if (page_count == 0) { // 任務が１つもない時
+                int api_count = apidata.getJsonNumber("api_count").intValue();
+                if (api_count == 0) { // 任務が１つもない時
                     questList.clear();
                     questLastUpdate = new Date();
                 }
-                else if ((disp_page > page_count) || apidata.isNull("api_list")) {
-                    // 表示ページが全体ページ数より後ろの場合は任務情報が何も送られてこない
-                }
                 else {
+                    questList.clear();
+                    questLastUpdate = new Date();
                     Date now = new Date();
                     // 足りない要素を足す
-                    for (int i = questList.size(); i < (page_count * items_per_page); ++i) {
+                    for (int i = questList.size(); i < api_count; ++i) {
                         questList.add(null);
                     }
-                    // 余分な要素は削る
-                    for (int i = questList.size() - 1; i >= (page_count * items_per_page); --i) {
-                        questList.remove(i);
-                    }
                     int pos = 1;
+                    int index = 0;
+                    int disp_page = 0;
                     for (JsonValue value : apidata.getJsonArray("api_list")) {
                         if (value instanceof JsonObject) {
                             JsonObject questobject = (JsonObject) value;
                             // 任務を作成
-                            int index = ((disp_page - 1) * items_per_page) + (pos - 1);
+                            disp_page = (index + items_per_page) / items_per_page;
                             QuestDto quest = new QuestDto(questobject, disp_page, pos++);
+                            if (pos > items_per_page)
+                            {
+                                pos = 1;
+                            }
                             questList.set(index, quest);
                         }
-                    }
-                    if (pos <= items_per_page) {
-                        // 空白がある場合は削る
-                        for (int i = questList.size() - 1; i >= (((disp_page - 1) * items_per_page) + (pos - 1)); --i) {
-                            questList.remove(i);
-                        }
+                        index = index + 1;
                     }
                     // 全て揃った？
                     if (questList.contains(null) == false) {
