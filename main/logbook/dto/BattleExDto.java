@@ -321,6 +321,8 @@ public class BattleExDto extends AbstractDto {
         private AirBattleDto air2 = null;
         @Tag(13)
         private List<BattleAtackDto> support = null;
+        @Tag(122)
+        private List<BattleAtackDto> support_kouku = null;
         @Tag(50)
         private List<BattleAtackDto> openingTaisen = null;
         @Tag(14)
@@ -461,6 +463,16 @@ public class BattleExDto extends AbstractDto {
                         air_base_injection, isFriendCombined || isEnemyCombined, true);
             }
 
+            // 機動部隊(航空)友軍
+            JsonObject friendly_kouku = JsonUtils.getJsonObject(object, "api_friendly_kouku");
+            if (friendly_kouku != null) {
+                JsonObject stage3 = JsonUtils.getJsonObject(friendly_kouku, "api_stage3");
+                if (stage3 != null) {
+                    this.support_kouku = BattleAtackDto.makeSupport(baseidx,
+                        JsonUtils.getJsonArray(stage3, "api_edam"));
+                }
+            }
+
             // 航空戦（墳式強襲）
             JsonObject injection_kouku = object.getJsonObject("api_injection_kouku");
             if (injection_kouku != null) {
@@ -592,6 +604,7 @@ public class BattleExDto extends AbstractDto {
             if (this.airBase != null)
                 for (AirBattleDto attack : this.airBase)
                     this.doAtack(attack.atacks, battle.friendSecondBase, this.isFriendFleet, battle);
+            this.doAtack(this.support_kouku, battle.friendSecondBase, true, battle);
             if (this.airInjection != null)
                 this.doAtack(this.airInjection.atacks, battle.friendSecondBase, this.isFriendFleet, battle);
             if (this.air != null)
@@ -972,7 +985,7 @@ public class BattleExDto extends AbstractDto {
 
         /**
          * 攻撃の全シーケンスを取得
-         * [ 噴式基地航空隊航空戦, 基地航空隊航空戦, 噴式航空戦, 航空戦1, 支援艦隊の攻撃, 航空戦2, 開幕対潜, 開幕, 夜戦の砲撃戦1, 夜戦の砲撃戦2, 夜戦, 砲撃戦1, 雷撃, 砲撃戦2, 砲撃戦3, 友軍艦隊 ]
+         * [ 噴式基地航空隊航空戦, 基地航空隊航空戦, 道中友軍艦隊(航空支援), 噴式航空戦, 航空戦1, 支援艦隊の攻撃, 航空戦2, 開幕対潜, 開幕, 夜戦の砲撃戦1, 夜戦の砲撃戦2, 夜戦, 砲撃戦1, 雷撃, 砲撃戦2, 砲撃戦3, 友軍艦隊 ]
          * 各戦闘がない場合はnullになる
          * @return
          */
@@ -981,6 +994,7 @@ public class BattleExDto extends AbstractDto {
                     ((this.airBaseInjection == null) || (this.airBaseInjection.atacks == null)) ? null : this
                             .toArray(this.airBaseInjection.atacks),
                     this.getAirBaseBattlesArray(),
+                    (this.support_kouku == null) ? null : this.toArray(this.support_kouku),
                     ((this.airInjection == null) || (this.airInjection.atacks == null)) ? null : this
                             .toArray(this.airInjection.atacks),
                     ((this.air == null) || (this.air.atacks == null)) ? null : this.toArray(this.air.atacks),
