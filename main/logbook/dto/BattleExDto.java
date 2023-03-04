@@ -213,6 +213,11 @@ public class BattleExDto extends AbstractDto {
 
     private static Date date20170405;
 
+    @Tag(123)
+    private int[] enemy_NowHp;
+    @Tag(124)
+    private int[] enemy_MaxHp;
+
     static {
         // 敵艦IDが+1000された日時
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Tokyo"));
@@ -1545,6 +1550,30 @@ public class BattleExDto extends AbstractDto {
             this.startEnemyHp = new int[numEships];
             this.maxFriendHp = new int[numFships];
             this.maxEnemyHp = new int[numEships];
+            
+            this.enemy_NowHp = new int[numEships];
+            this.enemy_MaxHp = new int[numEships];
+          
+            for (int i = 0; i < enowhps.size(); i++) {
+                try {
+                    this.enemy_NowHp[i] = enowhps.getInt(i);
+                    
+                } catch(ClassCastException e) {
+                    // 50は"N/A"の代替値
+                    this.enemy_NowHp[i] = 50;
+                }
+            }
+            
+            for (int i = 0; i < emaxhps.size(); i++) {
+                try {
+                    this.enemy_MaxHp[i] = emaxhps.getInt(i);
+                    
+                } catch(ClassCastException e) {
+                    // 50は"N/A"の代替値
+                    this.enemy_MaxHp[i] = 50;
+                }        
+            }
+          
             if (isFriendCombined) {
                 this.startFriendHpCombined = new int[numFshipsCombined];
                 this.maxFriendHpCombined = new int[numFshipsCombined];
@@ -1592,8 +1621,8 @@ public class BattleExDto extends AbstractDto {
                     this.friendGaugeMax += this.startFriendHp[i] = fnowhps.getInt(i);
                 }
                 for (int i = 0; i < numEships; i++) {
-                    this.maxEnemyHp[i] = emaxhps.getInt(i);
-                    this.enemyGaugeMax += this.startEnemyHp[i] = enowhps.getInt(i);
+                    this.maxEnemyHp[i] = this.enemy_MaxHp[i];
+                    this.enemyGaugeMax += this.startEnemyHp[i] = this.enemy_NowHp[i];
                 }
                 for (int i = 0; i < numFshipsCombined; i++) {
                     this.maxFriendHpCombined[i] = fmaxhpsCombined.getInt(i);
