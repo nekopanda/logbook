@@ -57,6 +57,9 @@ public class BattleExDto extends AbstractDto {
     @Tag(7)
     private int[] maxFriendHpCombined;
 
+    @Tag(116)
+    private int[] maxFriendlyFleetHp;
+
     /** 敵MaxHP */
     @Tag(8)
     private int[] maxEnemyHp;
@@ -70,6 +73,9 @@ public class BattleExDto extends AbstractDto {
 
     @Tag(10)
     private int[] startFriendHpCombined;
+
+    @Tag(117)
+    private int[] startFriendlyFleetHp;
 
     /** 敵戦闘開始時HP */
     @Tag(11)
@@ -207,6 +213,11 @@ public class BattleExDto extends AbstractDto {
 
     private static Date date20170405;
 
+    @Tag(123)
+    private int[] enemy_NowHp;
+    @Tag(124)
+    private int[] enemy_MaxHp;
+
     static {
         // 敵艦IDが+1000された日時
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Tokyo"));
@@ -230,6 +241,27 @@ public class BattleExDto extends AbstractDto {
 
         @Tag(3)
         private final int[] nowFriendHpCombined;
+
+        @Tag(108)
+        private final int[] nowFriendlyFleetHp;
+        
+        @Tag(120)
+        private final int[] maxFriendlyFleetHp;
+
+        @Tag(121)
+        private final int[] beforeFriendlyFleetHp;
+
+        /** 友軍艦隊 */
+        @Tag(115)
+        private List<EnemyShipDto> ff = new ArrayList<>();
+
+        /** 友軍艦隊 触接機（味方・敵） -1の場合は「触接なし」 */
+        @Tag(106)
+        private int[] friendlytouchPlane;
+
+        /** 友軍艦隊 照明弾発射艦 */
+        @Tag(107)
+        private int[] friendlyflarePos;
 
         /** 敵HP */
         @Tag(4)
@@ -294,6 +326,8 @@ public class BattleExDto extends AbstractDto {
         private AirBattleDto air2 = null;
         @Tag(13)
         private List<BattleAtackDto> support = null;
+        @Tag(122)
+        private List<BattleAtackDto> support_kouku = null;
         @Tag(50)
         private List<BattleAtackDto> openingTaisen = null;
         @Tag(14)
@@ -349,6 +383,56 @@ public class BattleExDto extends AbstractDto {
             this.nowFriendHpCombined = isFriendCombined ? beforeFriendHpCombined.clone() : null;
             this.nowEnemyHpCombined = isEnemyCombined ? beforeEnemyHpCombined.clone() : null;
 
+            int n[] = {0,0,0,0,0,0,0}; 
+
+            this.nowFriendlyFleetHp = n.clone();
+            this.maxFriendlyFleetHp = n.clone();
+            this.beforeFriendlyFleetHp = n.clone();
+
+            if (this.isFriendFleet) {
+                this.ff = new ArrayList<>();
+                JsonObject friendlyInfoObj = JsonUtils.getJsonObject(object, "api_friendly_info");
+                JsonArray ffshipid = JsonUtils.getJsonArray(friendlyInfoObj, "api_ship_id");
+                JsonArray ffSlots = JsonUtils.getJsonArray(friendlyInfoObj, "api_Slot");
+                JsonArray ffParams = JsonUtils.getJsonArray(friendlyInfoObj, "api_Param");
+                JsonArray ffLevel = JsonUtils.getJsonArray(friendlyInfoObj, "api_ship_lv");
+
+                for (int i = baseidx; i < ffshipid.size(); i++) {
+                    int ffid = ffshipid.getInt(i);
+                    int[] ffslot = JsonUtils.toIntArray(ffSlots.getJsonArray(i - baseidx));
+                    int[] ffparam = JsonUtils.toIntArray(ffParams.getJsonArray(i - baseidx));
+                    this.ff.add(new EnemyShipDto(ffid, ffslot, ffparam, ffLevel.getInt(i)));
+                }
+
+
+                JsonArray ff_maxhps = JsonUtils.getJsonArray(friendlyInfoObj, "api_maxhps");
+                JsonArray ff_nowhps = JsonUtils.getJsonArray(friendlyInfoObj, "api_nowhps");
+                for (int i= baseidx; i< ff_maxhps.size(); i++) {
+                   this.maxFriendlyFleetHp[i] = ff_maxhps.getInt(i);
+                   this.nowFriendlyFleetHp[i] = ff_nowhps.getInt(i);
+                   this.beforeFriendlyFleetHp[i] = ff_nowhps.getInt(i);
+                }
+            } 
+
+            // 友軍艦隊 夜間触接および照明弾発射艦
+            if (JsonUtils.hasKey(object, "api_friendly_battle")) {
+                JsonObject friendlyBattleObj = JsonUtils.getJsonObject(object, "api_friendly_battle");
+                
+                JsonArray jsonfriendlyTouchPlane = JsonUtils.getJsonArray(friendlyBattleObj, "api_touch_plane");
+                if (jsonfriendlyTouchPlane != null) {
+                    this.friendlytouchPlane = new int[] {
+                        Integer.parseInt(jsonfriendlyTouchPlane.get(0).toString()),
+                        Integer.parseInt(jsonfriendlyTouchPlane.get(1).toString())
+                        };
+                }
+                
+                JsonArray jsonfriendlyFlarePos = JsonUtils.getJsonArray(friendlyBattleObj, "api_flare_pos");
+                
+                if ((jsonfriendlyFlarePos != null) && (jsonfriendlyFlarePos != JsonValue.NULL)) {
+                    this.friendlyflarePos = JsonUtils.getIntArray(friendlyBattleObj, "api_flare_pos");
+                }
+            }
+
             // 夜間触接
             JsonArray jsonTouchPlane = JsonUtils.getJsonArray(object, "api_touch_plane");
             if (jsonTouchPlane != null) {
@@ -382,6 +466,16 @@ public class BattleExDto extends AbstractDto {
             if (air_base_injection != null) {
                 this.airBaseInjection = new AirBattleDto(baseidx, battle.friendSecondBase,
                         air_base_injection, isFriendCombined || isEnemyCombined, true);
+            }
+
+            // 機動部隊(航空)友軍
+            JsonObject friendly_kouku = JsonUtils.getJsonObject(object, "api_friendly_kouku");
+            if (friendly_kouku != null) {
+                JsonObject stage3 = JsonUtils.getJsonObject(friendly_kouku, "api_stage3");
+                if (stage3 != null) {
+                    this.support_kouku = BattleAtackDto.makeSupport(baseidx,
+                        JsonUtils.getJsonArray(stage3, "api_edam"));
+                }
             }
 
             // 航空戦（墳式強襲）
@@ -511,31 +605,32 @@ public class BattleExDto extends AbstractDto {
             // ダメージを反映 //
 
             if (this.airBaseInjection != null)
-                this.doAtack(this.airBaseInjection.atacks, battle.friendSecondBase, this.isFriendFleet);
+                this.doAtack(this.airBaseInjection.atacks, battle.friendSecondBase, this.isFriendFleet, battle);
             if (this.airBase != null)
                 for (AirBattleDto attack : this.airBase)
-                    this.doAtack(attack.atacks, battle.friendSecondBase, this.isFriendFleet);
+                    this.doAtack(attack.atacks, battle.friendSecondBase, this.isFriendFleet, battle);
+            this.doAtack(this.support_kouku, battle.friendSecondBase, true, battle);
             if (this.airInjection != null)
-                this.doAtack(this.airInjection.atacks, battle.friendSecondBase, this.isFriendFleet);
+                this.doAtack(this.airInjection.atacks, battle.friendSecondBase, this.isFriendFleet, battle);
             if (this.air != null)
-                this.doAtack(this.air.atacks, battle.friendSecondBase, this.isFriendFleet);
-            this.doAtack(this.support, battle.friendSecondBase, this.isFriendFleet);
+                this.doAtack(this.air.atacks, battle.friendSecondBase, this.isFriendFleet, battle);
+            this.doAtack(this.support, battle.friendSecondBase, this.isFriendFleet, battle);
             if (this.air2 != null)
-                this.doAtack(this.air2.atacks, battle.friendSecondBase, this.isFriendFleet);
-            this.doAtack(this.openingTaisen, battle.friendSecondBase, this.isFriendFleet);
-            this.doAtack(this.opening, battle.friendSecondBase, this.isFriendFleet);
-            this.doAtack(this.hougeki_n_1, battle.friendSecondBase, this.isFriendFleet);
-            this.doAtack(this.hougeki_n_2, battle.friendSecondBase, this.isFriendFleet);
-            this.doAtack(this.hougeki1, battle.friendSecondBase, this.isFriendFleet);
-            this.doAtack(this.raigeki, battle.friendSecondBase, this.isFriendFleet);
-            this.doAtack(this.hougeki2, battle.friendSecondBase, this.isFriendFleet);
-            this.doAtack(this.hougeki3, battle.friendSecondBase, this.isFriendFleet);
+                this.doAtack(this.air2.atacks, battle.friendSecondBase, this.isFriendFleet, battle);
+            this.doAtack(this.openingTaisen, battle.friendSecondBase, this.isFriendFleet, battle);
+            this.doAtack(this.opening, battle.friendSecondBase, this.isFriendFleet, battle);
+            this.doAtack(this.hougeki_n_1, battle.friendSecondBase, this.isFriendFleet, battle);
+            this.doAtack(this.hougeki_n_2, battle.friendSecondBase, this.isFriendFleet, battle);
+            this.doAtack(this.hougeki1, battle.friendSecondBase, this.isFriendFleet, battle);
+            this.doAtack(this.raigeki, battle.friendSecondBase, this.isFriendFleet, battle);
+            this.doAtack(this.hougeki2, battle.friendSecondBase, this.isFriendFleet, battle);
+            this.doAtack(this.hougeki3, battle.friendSecondBase, this.isFriendFleet, battle);
             if (isFriendFleet) {
                 // １つのjsonファイルの中に友軍艦隊の砲撃と自艦隊の砲撃の２つの処理が存在する場合
-                this.doAtack(this.hougeki_f, battle.friendSecondBase, this.isFriendFleet);
-                this.doAtack(this.hougeki, battle.friendSecondBase, false);
+                this.doAtack(this.hougeki_f, battle.friendSecondBase, this.isFriendFleet, battle);
+                this.doAtack(this.hougeki, battle.friendSecondBase, false, battle);
             } else {
-                this.doAtack(this.hougeki, battle.friendSecondBase, this.isFriendFleet);
+                this.doAtack(this.hougeki, battle.friendSecondBase, this.isFriendFleet, battle);
             }
 
             this.json = object.toString();
@@ -763,7 +858,7 @@ public class BattleExDto extends AbstractDto {
         }
 
         // ダメージを反映
-        private void doAtack(List<BattleAtackDto> seq, int friendSecondBase, boolean isFF) {
+        private void doAtack(List<BattleAtackDto> seq, int friendSecondBase, boolean isFF, BattleExDto battle) {
             if (seq == null)
                 return;
 
@@ -793,13 +888,64 @@ public class BattleExDto extends AbstractDto {
                     else if ((dto.friendAtack == false) && (isFF == false)) {
                         if (target < friendSecondBase) {
                             this.nowFriendHp[target] -= damage;
+                            // issue#98対応
+                            // Hp変更後にその値を確認し、それが0以下の場合、女神復活・ダメコン発動が
+                            // 行われる可能性がある(該当アイテムを保持していた場合)ので、その処理(ア
+                            // イテム発動による残Hpの変更処理)を実施する。
+                            if (this.nowFriendHp[target] <= 0) {
+                                DockDto dock = battle.getDock();
+                                if (dock != null) {
+                                    dock.getShips();
+                                }
+                                ShipDto ship = dock.getShips().get(target);
+                                List<ItemDto> items = new ArrayList<>(ship.getItem2());
+                                items.add(ship.getSlotExItem());
+                                for (ItemDto item : items) {
+                                    if (item == null)
+                                        continue;
+                                    if (item.getSlotitemId() == 42) { //応急修理要員
+                                        this.nowFriendHp[target] = (int) (ship.getMaxhp() * 0.2);
+                                        break;
+                                    }
+                                    else if (item.getSlotitemId() == 43) { //応急修理女神
+                                        this.nowFriendHp[target] = ship.getMaxhp();
+                                        break;
+                                    }
+                                }
+                            }
                         }
                         else {
                             this.nowFriendHpCombined[target - friendSecondBase] -= damage;
+                            if (this.nowFriendHpCombined[target - friendSecondBase] <= 0) {
+                                DockDto dockCombined = battle.getDockCombined();
+                                if (dockCombined != null) {
+                                    dockCombined.getShips();
+                                }
+                                ShipDto shipCombined = dockCombined.getShips().get(target - friendSecondBase);
+                                List<ItemDto> itemsCombined = new ArrayList<>(shipCombined.getItem2());
+                                itemsCombined.add(shipCombined.getSlotExItem());
+                                for (ItemDto itemCombined : itemsCombined) {
+                                    if (itemCombined == null)
+                                        continue;
+                                    if (itemCombined.getSlotitemId() == 42) { //応急修理要員
+                                        this.nowFriendHpCombined[target  - friendSecondBase] = (int) (shipCombined.getMaxhp() * 0.2);
+                                        break;
+                                    }
+                                    else if (itemCombined.getSlotitemId() == 43) { //応急修理女神
+                                        this.nowFriendHpCombined[target  - friendSecondBase] = shipCombined.getMaxhp();
+                                        break;
+                                    }
+                                }
+                            }
                         }
                     }
-                    // 敵艦隊から友軍艦隊への攻撃は、それを反映させる値がないため無視する
+                    // 敵艦隊から友軍艦隊への攻撃
                     else if ((dto.friendAtack == false) && (isFF == true)) {
+                        if (target < friendSecondBase) {
+                            this.nowFriendlyFleetHp[target] -= damage;
+                        }
+                        else {
+                        }
                     }
 
                 }
@@ -844,7 +990,7 @@ public class BattleExDto extends AbstractDto {
 
         /**
          * 攻撃の全シーケンスを取得
-         * [ 噴式基地航空隊航空戦, 基地航空隊航空戦, 噴式航空戦, 航空戦1, 支援艦隊の攻撃, 航空戦2, 開幕対潜, 開幕, 夜戦の砲撃戦1, 夜戦の砲撃戦2, 夜戦, 砲撃戦1, 雷撃, 砲撃戦2, 砲撃戦3, 友軍艦隊 ]
+         * [ 噴式基地航空隊航空戦, 基地航空隊航空戦, 道中友軍艦隊(航空支援), 噴式航空戦, 航空戦1, 支援艦隊の攻撃, 航空戦2, 開幕対潜, 開幕, 夜戦の砲撃戦1, 夜戦の砲撃戦2, 夜戦, 砲撃戦1, 雷撃, 砲撃戦2, 砲撃戦3, 友軍艦隊 ]
          * 各戦闘がない場合はnullになる
          * @return
          */
@@ -853,6 +999,7 @@ public class BattleExDto extends AbstractDto {
                     ((this.airBaseInjection == null) || (this.airBaseInjection.atacks == null)) ? null : this
                             .toArray(this.airBaseInjection.atacks),
                     this.getAirBaseBattlesArray(),
+                    (this.support_kouku == null) ? null : this.toArray(this.support_kouku),
                     ((this.airInjection == null) || (this.airInjection.atacks == null)) ? null : this
                             .toArray(this.airInjection.atacks),
                     ((this.air == null) || (this.air.atacks == null)) ? null : this.toArray(this.air.atacks),
@@ -1022,6 +1169,15 @@ public class BattleExDto extends AbstractDto {
         }
 
         /**
+         * 友軍艦隊支援か？
+         * @return isFriendFeet
+         */
+        public boolean isFriendFleet() {
+            return this.isFriendFleet;
+        }
+
+
+        /**
          * 触接機 [味方・敵] -1の場合は「触接なし」
          * @return touchPlane
          */
@@ -1158,6 +1314,60 @@ public class BattleExDto extends AbstractDto {
          */
         public List<AirBattleDto> getAirBase() {
             return this.airBase;
+        }
+
+        /**
+         * 友軍艦隊関連
+         */
+
+        /**
+         * @return friendlyHougeki
+         */
+        public List<BattleAtackDto> getfriendlyHougeki() {
+            return this.hougeki_f;
+        }
+
+        /**
+         * @return friendlyflarePos
+         */
+        public int[] getfriendlyFlarePos() {
+            return this.friendlyflarePos;
+        }
+
+        /**
+         * 友軍艦隊 触接機 [味方・敵] -1の場合は「触接なし」
+         * @return friendlytouchPlane
+         */
+        public int[] getfriendlyTouchPlane() {
+            return this.friendlytouchPlane;
+        }
+
+        /**
+         * @return nowFriendlyFleetHp
+         */
+        public int[] getnowFriendlyFleetHp() {
+            return this.nowFriendlyFleetHp;
+        }
+
+        /**
+         * @return maxFriendlyFleetHp
+         */
+        public int[] getmaxFriendlyFleetHp() {
+            return this.maxFriendlyFleetHp;
+        }
+
+        /**
+         * @return beforeFriendlyFleetHp
+         */
+        public int[] getbeforeFriendlyFleetHp() {
+            return this.beforeFriendlyFleetHp;
+        }
+
+        /**
+         * @return FriendlyFleet
+         */
+        public List<EnemyShipDto> getFriendlyFleet() {
+            return this.ff;
         }
     }
 
@@ -1340,6 +1550,30 @@ public class BattleExDto extends AbstractDto {
             this.startEnemyHp = new int[numEships];
             this.maxFriendHp = new int[numFships];
             this.maxEnemyHp = new int[numEships];
+            
+            this.enemy_NowHp = new int[numEships];
+            this.enemy_MaxHp = new int[numEships];
+          
+            for (int i = 0; i < enowhps.size(); i++) {
+                try {
+                    this.enemy_NowHp[i] = enowhps.getInt(i);
+                    
+                } catch(ClassCastException e) {
+                    // 50は"N/A"の代替値
+                    this.enemy_NowHp[i] = 50;
+                }
+            }
+            
+            for (int i = 0; i < emaxhps.size(); i++) {
+                try {
+                    this.enemy_MaxHp[i] = emaxhps.getInt(i);
+                    
+                } catch(ClassCastException e) {
+                    // 50は"N/A"の代替値
+                    this.enemy_MaxHp[i] = 50;
+                }        
+            }
+          
             if (isFriendCombined) {
                 this.startFriendHpCombined = new int[numFshipsCombined];
                 this.maxFriendHpCombined = new int[numFshipsCombined];
@@ -1387,8 +1621,8 @@ public class BattleExDto extends AbstractDto {
                     this.friendGaugeMax += this.startFriendHp[i] = fnowhps.getInt(i);
                 }
                 for (int i = 0; i < numEships; i++) {
-                    this.maxEnemyHp[i] = emaxhps.getInt(i);
-                    this.enemyGaugeMax += this.startEnemyHp[i] = enowhps.getInt(i);
+                    this.maxEnemyHp[i] = this.enemy_MaxHp[i];
+                    this.enemyGaugeMax += this.startEnemyHp[i] = this.enemy_NowHp[i];
                 }
                 for (int i = 0; i < numFshipsCombined; i++) {
                     this.maxFriendHpCombined[i] = fmaxhpsCombined.getInt(i);

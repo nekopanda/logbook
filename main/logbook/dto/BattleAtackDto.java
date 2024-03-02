@@ -7,8 +7,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonValue;
 
 import logbook.util.JsonUtils;
 
@@ -325,15 +328,15 @@ public class BattleAtackDto {
         BattleAtackDto fatack = null;
         BattleAtackDto eatack = null;
 
-        if (JsonUtils.hasKey(raigeki, "api_frai")) {
+        if (JsonUtils.hasKey(raigeki, "api_frai_list_items")) {
 
             fatack = makeRaigeki(
                     baseidx,
                     true,
-                    JsonUtils.getJsonArray(raigeki, "api_frai"),
+                    convertNewApiToOldApiMinus(JsonUtils.getJsonArray(raigeki, "api_frai_list_items")),
                     JsonUtils.getJsonArray(raigeki, "api_edam"),
-                    JsonUtils.getJsonArray(raigeki, "api_fcl"),
-                    JsonUtils.getJsonArray(raigeki, "api_fydam"));
+                    convertNewApiToOldApiZero(JsonUtils.getJsonArray(raigeki, "api_fcl_list_items")),
+                    convertNewApiToOldApiZero(JsonUtils.getJsonArray(raigeki, "api_fydam_list_items")));
 
             if ((baseidx == 1) && (fatack.combineEnabled == false)) {
                 // 旧APIとの互換性: 味方の随伴艦のみが雷撃を行う場合(6-5実装以前の連合艦隊はこれ。6-5実装以降の連合艦隊は不明)
@@ -344,14 +347,14 @@ public class BattleAtackDto {
             attaks.add(fatack);
         }
 
-        if (JsonUtils.hasKey(raigeki, "api_erai")) {
+        if (JsonUtils.hasKey(raigeki, "api_erai_list_items")) {
             eatack = makeRaigeki(
                     baseidx,
                     false,
-                    JsonUtils.getJsonArray(raigeki, "api_erai"),
+                    convertNewApiToOldApiMinus(JsonUtils.getJsonArray(raigeki, "api_erai_list_items")),
                     JsonUtils.getJsonArray(raigeki, "api_fdam"),
-                    JsonUtils.getJsonArray(raigeki, "api_ecl"),
-                    JsonUtils.getJsonArray(raigeki, "api_eydam"));
+                    convertNewApiToOldApiZero(JsonUtils.getJsonArray(raigeki, "api_ecl_list_items")),
+                    convertNewApiToOldApiZero(JsonUtils.getJsonArray(raigeki, "api_eydam_list_items")));
 
             if ((baseidx == 1) && (fatack != null) && (fatack.combineEnabled == false)) {
                 // 旧APIとの互換性: 味方の随伴艦のみが雷撃を受ける場合(6-5実装以前の連合艦隊はこれ。6-5実装以降の連合艦隊は不明)
@@ -365,6 +368,52 @@ public class BattleAtackDto {
         return attaks;
     }
 
+    /**
+     * 2024年2月29日 api_opening_atack API仕様変更対応
+     * 入力：新仕様Json Array
+     * 出力：旧仕様Json Array
+     * nullは-1に置換
+     */
+    private static JsonArray convertNewApiToOldApiMinus(JsonArray newApi) {
+        JsonArrayBuilder oldApiBuilder = Json.createArrayBuilder();
+
+        for (JsonValue value : newApi) {
+            if (value.getValueType() == JsonValue.ValueType.ARRAY) {
+                JsonArray array = (JsonArray) value;
+                if (!array.isEmpty()) {
+                    oldApiBuilder.add(array.getInt(0)); // 配列の最初の要素を追加
+                }
+            } else {
+                oldApiBuilder.add(-1); // null の場合は -1 を追加
+            }
+        }
+
+        return oldApiBuilder.build();
+    }
+
+    /**
+     * 2024年2月29日 api_opening_atack API仕様変更対応
+     * 入力：新仕様Json Array
+     * 出力：旧仕様Json Array
+     * nullは0に置換
+     */
+    private static JsonArray convertNewApiToOldApiZero(JsonArray newApi) {
+        JsonArrayBuilder oldApiBuilder = Json.createArrayBuilder();
+
+        for (JsonValue value : newApi) {
+            if (value.getValueType() == JsonValue.ValueType.ARRAY) {
+                JsonArray array = (JsonArray) value;
+                if (!array.isEmpty()) {
+                    oldApiBuilder.add(array.getInt(0)); // 配列の最初の要素を追加
+                }
+            } else {
+                oldApiBuilder.add(0); // null の場合は 0 を追加
+            }
+        }
+
+        return oldApiBuilder.build();
+    }
+    
     /**
      * api_hougeki* を読み込む
      * @param baseidx 基点(0 or 1)
@@ -475,6 +524,14 @@ public class BattleAtackDto {
             return "ネルソンタッチ";
         case 101:
             return "一斉射かッ…胸が熱いな！";
+        case 102:
+            return "長門、いい？ いくわよ！ 主砲一斉射ッ！";
+        case 103:
+            return "コロラド特殊攻撃";
+        case 200:
+            return "瑞雲立体攻撃";
+        case 201:
+            return "海空立体攻撃";
         }
         return "不明(" + this.type + ")";
     }

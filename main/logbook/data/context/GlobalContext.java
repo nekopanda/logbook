@@ -843,7 +843,7 @@ public final class GlobalContext {
             case MAPINFO:
                 doMapInfo(data, apidata);
                 break;
-            // 任務情報
+            // 遠征情報
             case MISSION:
                 doMission(data, apidata);
                 break;
@@ -1267,6 +1267,16 @@ public final class GlobalContext {
                 state = checkDataState(endSortie);
 
                 addUpdateLog("母港情報を更新しました");
+
+                // ギミック解除：敵勢力弱体化検知
+                JsonObject EventObj = apidata.getJsonObject("api_event_object");
+                if ((EventObj != null) && (EventObj != JsonValue.NULL)) {
+                    JsonNumber m_flg = EventObj.getJsonNumber("api_m_flag");
+                    JsonNumber m_flg2 = EventObj.getJsonNumber("api_m_flag2");
+                    if ((m_flg != null) && (m_flg2 != null) && (m_flg2.intValue() > 0)) {
+                        addUpdateLog(">>> ギミック解除：敵勢力の弱体化を確認しました！・。・v <<<");
+                    }
+                }
             }
         } catch (Exception e) {
             LOG.get().warn("母港を更新しますに失敗しました", e);
@@ -1457,6 +1467,13 @@ public final class GlobalContext {
                             addConsole(battle.getDropItemName() + "がドロップしました");
                         }
                     }
+                }
+
+                // ギミック解除：海域変化検知
+                JsonNumber m1_flg = apidata.getJsonNumber("api_m1");
+                JsonNumber m2_flg = apidata.getJsonNumber("api_m2");
+                if (((m1_flg != null) && (m1_flg.intValue() != 0)) || ((m2_flg != null) && (m2_flg.intValue() != 0))) {
+                    addUpdateLog(">>> ギミック解除：海域の変化を確認しました！・。・v <<<");
                 }
             }
         } catch (Exception e) {
@@ -1672,19 +1689,22 @@ public final class GlobalContext {
                 // 投入資源
                 ResourceItemDto res = new ResourceItemDto();
                 res.loadBaseMaterialsFromField(data);
-                CreateItemDto createitem = new CreateItemDto(apidata, res, secretary, hqLevel);
-                if (createitem.isCreateFlag()) {
-                    ItemDto item = addSlotitem(apidata.getJsonObject("api_slot_item"));
+                JsonArray item_array = apidata.getJsonArray("api_get_items");
+                for (int i=0; i<item_array.size(); i++) {
+                    CreateItemDto createitem = new CreateItemDto(apidata, res, secretary, hqLevel);
+                    ItemDto item = addSlotitem(item_array.getJsonObject(i));
                     if (item != null) {
                         createitem.setName(item.getName());
                         createitem.setType(item.getTypeName());
                         createItemList.add(createitem);
+                        CreateReportLogic.storeCreateItemReport(createitem);
+                    }
+                    else {
+                        createitem.setCreateFlag(false);
+                        createItemList.add(createitem);
+                        CreateReportLogic.storeCreateItemReport(createitem);
                     }
                 }
-                else {
-                    createItemList.add(createitem);
-                }
-                CreateReportLogic.storeCreateItemReport(createitem);
 
                 // 資源に反映させてレポート
                 JsonArray newMaterial = apidata.getJsonArray("api_material");
@@ -1977,14 +1997,19 @@ public final class GlobalContext {
         try {
             // 近代化改修に使った艦を取り除く
             String shipids = data.getField("api_id_items");
+            boolean destroyItem =  (data.getField("api_slot_dest_flag") != null ? (!"0".equals(data.getField("api_slot_dest_flag"))) : true);
             for (String shipid : shipids.split(",")) {
                 ShipDto ship = shipMap.get(Integer.valueOf(shipid));
                 if (ship != null) {
                     // 記録する
                     CreateReportLogic.storeLostReport(LostEntityDto.make(ship, "近代化改修"));
+                    // 装備解除後の近代化改修ではなく通常の近代化改修の場合、
                     // 持っている装備を廃棄する
-                    for (int item : ship.getItemId()) {
-                        itemMap.remove(item);
+                    if (destroyItem)
+                    {
+                        for (int item : ship.getItemId()) {
+                            removeSlotItem(item);
+                        }
                     }
                     // 艦娘を外す
                     shipMap.remove(ship.getId());
@@ -2392,40 +2417,35 @@ public final class GlobalContext {
                 JsonObject apidata = (JsonObject) json;
 
                 int items_per_page = 5;
-                int disp_page = apidata.getJsonNumber("api_disp_page").intValue();
-                int page_count = apidata.getJsonNumber("api_page_count").intValue();
-                if (page_count == 0) { // 任務が１つもない時
+                int api_count = apidata.getJsonNumber("api_count").intValue();
+                if (api_count == 0) { // 任務が１つもない時
                     questList.clear();
                     questLastUpdate = new Date();
                 }
-                else if ((disp_page > page_count) || apidata.isNull("api_list")) {
-                    // 表示ページが全体ページ数より後ろの場合は任務情報が何も送られてこない
-                }
                 else {
+                    questList.clear();
+                    questLastUpdate = new Date();
                     Date now = new Date();
                     // 足りない要素を足す
-                    for (int i = questList.size(); i < (page_count * items_per_page); ++i) {
+                    for (int i = questList.size(); i < api_count; ++i) {
                         questList.add(null);
                     }
-                    // 余分な要素は削る
-                    for (int i = questList.size() - 1; i >= (page_count * items_per_page); --i) {
-                        questList.remove(i);
-                    }
                     int pos = 1;
+                    int index = 0;
+                    int disp_page = 0;
                     for (JsonValue value : apidata.getJsonArray("api_list")) {
                         if (value instanceof JsonObject) {
                             JsonObject questobject = (JsonObject) value;
                             // 任務を作成
-                            int index = ((disp_page - 1) * items_per_page) + (pos - 1);
+                            disp_page = (index + items_per_page) / items_per_page;
                             QuestDto quest = new QuestDto(questobject, disp_page, pos++);
+                            if (pos > items_per_page)
+                            {
+                                pos = 1;
+                            }
                             questList.set(index, quest);
                         }
-                    }
-                    if (pos <= items_per_page) {
-                        // 空白がある場合は削る
-                        for (int i = questList.size() - 1; i >= (((disp_page - 1) * items_per_page) + (pos - 1)); --i) {
-                            questList.remove(i);
-                        }
+                        index = index + 1;
                     }
                     // 全て揃った？
                     if (questList.contains(null) == false) {
@@ -2634,18 +2654,22 @@ public final class GlobalContext {
     }
 
     /**
-     * 任務情報を処理します
-     *
+     * 遠征情報を処理します
+     * 
      * @param data
      */
     private static void doMission(Data data, JsonValue json) {
         try {
-            if (json instanceof JsonArray) {
-                JsonArray apidata = (JsonArray) json;
-                MasterData.updateMission(apidata);
+            if (json instanceof JsonObject) {
+                JsonValue api_list_items = ((JsonObject) json).get("api_list_items");
+                if (api_list_items instanceof JsonArray) {
+                    JsonArray apidata = (JsonArray) api_list_items;
+                    MasterData.updateMission(apidata);
+                    addConsole("遠征情報を更新しました");
+                }
             }
         } catch (Exception e) {
-            LOG.get().warn("任務情報更新に失敗しました", e);
+            LOG.get().warn("遠征情報更新に失敗しました", e);
             LOG.get().warn(data);
         }
     }
